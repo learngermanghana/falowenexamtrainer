@@ -3,6 +3,523 @@
   "description": "Editor-authored English translations for exactly matching published German lyric lines. No automatic translations; studio drafts never qualify.",
   "recordings": [
     {
+      "objectKey": "music/a1/day-02/Ich heiße Bina.mp3",
+      "lines": [
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        },
+        {
+          "de": "Oh-oh, yeah …",
+          "en": "Oh-oh, yeah …"
+        },
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        },
+        {
+          "de": "Heute rufe ich die Schule an,",
+          "en": "Today I call the school,"
+        },
+        {
+          "de": "Ich möchte einen Deutschkurs machen.",
+          "en": "I would like to take a German course."
+        },
+        {
+          "de": "Die Frau sagt freundlich: „Guten Tag!",
+          "en": "The woman says kindly, \"Good day!"
+        },
+        {
+          "de": "Wie heißen Sie? Sagen Sie es mir.“",
+          "en": "What is your name? Tell me.\""
+        },
+        {
+          "de": "Ich sage: „Hallo, ich heiße Bina,",
+          "en": "I say, \"Hello, my name is Bina,"
+        },
+        {
+          "de": "Ich komme aus Ghana, das ist mein Land.“",
+          "en": "I'm from Ghana, that's my country.\""
+        },
+        {
+          "de": "Sie fragt: „Wie schreibt man Ihren Namen?“",
+          "en": "She asks, \"How do you spell your name?\""
+        },
+        {
+          "de": "Ich buchstabiere langsam dann.",
+          "en": "Then I spell it slowly."
+        },
+        {
+          "de": "Ich heiße Bina, B – I – N – A!",
+          "en": "My name is Bina, B – I – N – A!"
+        },
+        {
+          "de": "Oh-oh, das ist mein Name, ja!",
+          "en": "Oh-oh, that's my name, yes!"
+        },
+        {
+          "de": "B – I – N – A, hmm, hmm, hmm,",
+          "en": "B – I – N – A, hmm, hmm, hmm,"
+        },
+        {
+          "de": "So schreibt man meinen Namen!",
+          "en": "That's how you spell my name!"
+        },
+        {
+          "de": "Wie heißt du? Sag es mir!",
+          "en": "What's your name? Tell me!"
+        },
+        {
+          "de": "Ich heiße Bina, und wie heißt du?",
+          "en": "My name is Bina, and what's yours?"
+        },
+        {
+          "de": "Oh-oh, hmm, hmm, hmm,",
+          "en": "Oh-oh, hmm, hmm, hmm,"
+        },
+        {
+          "de": "Jetzt kennst du meinen Namen!",
+          "en": "Now you know my name!"
+        },
+        {
+          "de": "Die Frau fragt: „Wo wohnen Sie?“",
+          "en": "The woman asks, \"Where do you live?\""
+        },
+        {
+          "de": "Ich sage: „In Accra, hier bin ich.“",
+          "en": "I say, \"In Accra, here I am.\""
+        },
+        {
+          "de": "Sie sagt: „Bitte noch einmal Ihren Namen!“",
+          "en": "She says, \"Your name once again, please!\""
+        },
+        {
+          "de": "Ich sage langsam: „B – I – N – A.“",
+          "en": "I say slowly, \"B – I – N – A.\""
+        },
+        {
+          "de": "Sie schreibt meinen Namen auf,",
+          "en": "She writes down my name,"
+        },
+        {
+          "de": "Und sagt: „Danke, alles klar!",
+          "en": "and says, \"Thank you, everything is clear!"
+        },
+        {
+          "de": "Ihr Deutschkurs beginnt am Montag.“",
+          "en": "Your German course begins on Monday.\""
+        },
+        {
+          "de": "Ich freue mich, ich bin bald da!",
+          "en": "I'm happy; I'll be there soon!"
+        },
+        {
+          "de": "Ich heiße Bina, B – I – N – A!",
+          "en": "My name is Bina, B – I – N – A!"
+        },
+        {
+          "de": "Oh-oh, das ist mein Name, ja!",
+          "en": "Oh-oh, that's my name, yes!"
+        },
+        {
+          "de": "B – I – N – A, hmm, hmm, hmm,",
+          "en": "B – I – N – A, hmm, hmm, hmm,"
+        },
+        {
+          "de": "So schreibt man meinen Namen!",
+          "en": "That's how you spell my name!"
+        },
+        {
+          "de": "Wie heißt du? Sag es mir!",
+          "en": "What's your name? Tell me!"
+        },
+        {
+          "de": "Ich heiße Bina, und wie heißt du?",
+          "en": "My name is Bina, and what's yours?"
+        },
+        {
+          "de": "Oh-oh, hmm, hmm, hmm,",
+          "en": "Oh-oh, hmm, hmm, hmm,"
+        },
+        {
+          "de": "Jetzt kennst du meinen Namen!",
+          "en": "Now you know my name!"
+        },
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        },
+        {
+          "de": "Ich heiße Bina, B – I – N – A.",
+          "en": "My name is Bina, B – I – N – A."
+        },
+        {
+          "de": "Oh-oh, und wie heißt du?",
+          "en": "Oh-oh, and what's your name?"
+        },
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "buchstabieren",
+          "en": "to spell"
+        },
+        {
+          "de": "Wie heißen Sie?",
+          "en": "What is your name? (formal)"
+        },
+        {
+          "de": "Wo wohnen Sie?",
+          "en": "Where do you live? (formal)"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-03/Wer bist du_ Sag es mir!.mp3",
+      "lines": [
+        {
+          "de": "Heute kommt ein neuer Schüler,",
+          "en": "Today a new student arrives,"
+        },
+        {
+          "de": "Er hat ein Buch und einen Stift.",
+          "en": "he has a book and a pen."
+        },
+        {
+          "de": "Ich frage freundlich: „Wie heißt du?“",
+          "en": "I ask kindly, \"What's your name?\""
+        },
+        {
+          "de": "Er sagt: „Hallo, ich heiße Ben.“",
+          "en": "He says, \"Hello, my name is Ben.\""
+        },
+        {
+          "de": "„Woher kommst du?“, frage ich,",
+          "en": "\"Where are you from?\" I ask,"
+        },
+        {
+          "de": "Er sagt: „Ich komme aus Berlin.“",
+          "en": "he says, \"I'm from Berlin.\""
+        },
+        {
+          "de": "Ich sage: „Schön, dich hier zu sehen!“",
+          "en": "I say, \"It's nice to see you here!\""
+        },
+        {
+          "de": "Jetzt lernen wir zusammen Deutsch.",
+          "en": "Now we learn German together."
+        },
+        {
+          "de": "Wer bist du? Wie heißt du?",
+          "en": "Who are you? What's your name?"
+        },
+        {
+          "de": "Woher kommst du? Sag es mir!",
+          "en": "Where are you from? Tell me!"
+        },
+        {
+          "de": "Wo wohnst du? Was machst du gern?",
+          "en": "Where do you live? What do you like doing?"
+        },
+        {
+          "de": "Ich möchte dich gern kennenlernen.",
+          "en": "I'd like to get to know you."
+        },
+        {
+          "de": "Oh-oh, ich frage dich,",
+          "en": "Oh-oh, I'm asking you,"
+        },
+        {
+          "de": "Hmm-hmm, du antwortest mir.",
+          "en": "hmm-hmm, you're answering me."
+        },
+        {
+          "de": "So lernen wir uns besser kennen,",
+          "en": "That's how we get to know each other better,"
+        },
+        {
+          "de": "Und sprechen jeden Tag ein bisschen mehr.",
+          "en": "and speak a little more each day."
+        },
+        {
+          "de": "Ich frage Ben: „Wo wohnst du jetzt?“",
+          "en": "I ask Ben, \"Where do you live now?\""
+        },
+        {
+          "de": "Er sagt: „Ich wohne hier in Bonn.“",
+          "en": "He says, \"I live here in Bonn.\""
+        },
+        {
+          "de": "„Was machst du gern am Wochenende?“",
+          "en": "\"What do you like doing at weekends?\""
+        },
+        {
+          "de": "„Ich höre Musik und spiele gern.“",
+          "en": "\"I listen to music and enjoy playing.\""
+        },
+        {
+          "de": "„Wann beginnt der Deutschkurs morgen?“",
+          "en": "\"When does the German course start tomorrow?\""
+        },
+        {
+          "de": "Er sagt: „Um neun Uhr, wie heute.“",
+          "en": "He says, \"At nine o'clock, like today.\""
+        },
+        {
+          "de": "Ich sage: „Danke, bis morgen!“",
+          "en": "I say, \"Thank you, see you tomorrow!\""
+        },
+        {
+          "de": "Er lächelt und sagt: „Bis dann!“",
+          "en": "He smiles and says, \"See you then!\""
+        },
+        {
+          "de": "Wer bist du? Wie heißt du?",
+          "en": "Who are you? What's your name?"
+        },
+        {
+          "de": "Woher kommst du? Sag es mir!",
+          "en": "Where are you from? Tell me!"
+        },
+        {
+          "de": "Wo wohnst du? Was machst du gern?",
+          "en": "Where do you live? What do you like doing?"
+        },
+        {
+          "de": "Ich möchte dich gern kennenlernen.",
+          "en": "I'd like to get to know you."
+        },
+        {
+          "de": "Oh-oh, ich frage dich,",
+          "en": "Oh-oh, I'm asking you,"
+        },
+        {
+          "de": "Hmm-hmm, du antwortest mir.",
+          "en": "hmm-hmm, you're answering me."
+        },
+        {
+          "de": "So lernen wir uns besser kennen,",
+          "en": "That's how we get to know each other better,"
+        },
+        {
+          "de": "Und sprechen jeden Tag ein bisschen mehr.",
+          "en": "and speak a little more each day."
+        },
+        {
+          "de": "Hmm, hmm, jetzt kenne ich Ben,",
+          "en": "Hmm, hmm, now I know Ben,"
+        },
+        {
+          "de": "Oh-oh, wir sehen uns morgen.",
+          "en": "oh-oh, we'll see each other tomorrow."
+        },
+        {
+          "de": "Ich frage gern, ich höre zu,",
+          "en": "I like asking questions, I listen,"
+        },
+        {
+          "de": "Und lerne jeden Tag Deutsch.",
+          "en": "and I learn German every day."
+        },
+        {
+          "de": "Hmm, hmm, bis morgen!",
+          "en": "Hmm, hmm, see you tomorrow!"
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "Woher kommst du?",
+          "en": "Where are you from?"
+        },
+        {
+          "de": "kennenlernen",
+          "en": "to get to know"
+        },
+        {
+          "de": "gern",
+          "en": "gladly / like doing"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-04/Meine Nummer, meine Adresse.mp3",
+      "lines": [
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        },
+        {
+          "de": "Oh-oh, eins, zwei, drei!",
+          "en": "Oh-oh, one, two, three!"
+        },
+        {
+          "de": "Hmm, hmm, hier bin ich!",
+          "en": "Hmm, hmm, here I am!"
+        },
+        {
+          "de": "Hallo, ich heiße Ben,",
+          "en": "Hello, my name is Ben,"
+        },
+        {
+          "de": "Ich komme aus Ghana, aus Accra.",
+          "en": "I'm from Ghana, from Accra."
+        },
+        {
+          "de": "Ich bin vierundzwanzig Jahre alt,",
+          "en": "I'm twenty-four years old,"
+        },
+        {
+          "de": "Und heute stelle ich mich vor.",
+          "en": "and today I'll introduce myself."
+        },
+        {
+          "de": "Ich wohne in der Blumenstraße,",
+          "en": "I live on Blumenstraße,"
+        },
+        {
+          "de": "Meine Hausnummer ist eins zwei drei.",
+          "en": "my house number is one two three."
+        },
+        {
+          "de": "Die Postleitzahl ist eins zwei drei vier fünf,",
+          "en": "The postal code is one two three four five,"
+        },
+        {
+          "de": "Hier bin ich zu Hause, hier bin ich gern.",
+          "en": "this is my home, I like it here."
+        },
+        {
+          "de": "Eins, zwei, drei, vier, fünf, sechs,",
+          "en": "One, two, three, four, five, six,"
+        },
+        {
+          "de": "Sieben, acht, neun und zehn.",
+          "en": "seven, eight, nine and ten."
+        },
+        {
+          "de": "Elf, zwölf, dreizehn, vierzehn, fünfzehn,",
+          "en": "Eleven, twelve, thirteen, fourteen, fifteen,"
+        },
+        {
+          "de": "Sechzehn, siebzehn, achtzehn, neunzehn, zwanzig!",
+          "en": "sixteen, seventeen, eighteen, nineteen, twenty!"
+        },
+        {
+          "de": "Oh-oh, wie alt bist du?",
+          "en": "Oh-oh, how old are you?"
+        },
+        {
+          "de": "Ich bin vierundzwanzig, und du?",
+          "en": "I'm twenty-four, and you?"
+        },
+        {
+          "de": "Hmm-hmm, sag es mir,",
+          "en": "Hmm-hmm, tell me,"
+        },
+        {
+          "de": "Wie ist deine Hausnummer hier?",
+          "en": "what is your house number here?"
+        },
+        {
+          "de": "Meine Telefonnummer ist ganz einfach,",
+          "en": "My telephone number is very simple,"
+        },
+        {
+          "de": "Null, zwei, vier – fünf, sechs, sieben.",
+          "en": "zero, two, four – five, six, seven."
+        },
+        {
+          "de": "Acht, neun, null – eins, zwei, drei,",
+          "en": "Eight, nine, zero – one, two, three,"
+        },
+        {
+          "de": "Ich sage sie noch einmal langsam.",
+          "en": "I'll say it again slowly."
+        },
+        {
+          "de": "Null, zwei, vier – fünf, sechs, sieben,",
+          "en": "Zero, two, four – five, six, seven,"
+        },
+        {
+          "de": "Acht, neun, null – eins, zwei, drei.",
+          "en": "eight, nine, zero – one, two, three."
+        },
+        {
+          "de": "„Wie ist deine Telefonnummer?“",
+          "en": "\"What is your telephone number?\""
+        },
+        {
+          "de": "Jetzt kannst du sie auch sagen!",
+          "en": "Now you can say it too!"
+        },
+        {
+          "de": "Eins, zwei, drei, vier, fünf, sechs,",
+          "en": "One, two, three, four, five, six,"
+        },
+        {
+          "de": "Sieben, acht, neun und zehn.",
+          "en": "seven, eight, nine and ten."
+        },
+        {
+          "de": "Elf, zwölf, dreizehn, vierzehn, fünfzehn,",
+          "en": "Eleven, twelve, thirteen, fourteen, fifteen,"
+        },
+        {
+          "de": "Sechzehn, siebzehn, achtzehn, neunzehn, zwanzig!",
+          "en": "sixteen, seventeen, eighteen, nineteen, twenty!"
+        },
+        {
+          "de": "Oh-oh, wie alt bist du?",
+          "en": "Oh-oh, how old are you?"
+        },
+        {
+          "de": "Ich bin vierundzwanzig, und du?",
+          "en": "I'm twenty-four, and you?"
+        },
+        {
+          "de": "Hmm-hmm, sag es mir,",
+          "en": "Hmm-hmm, tell me,"
+        },
+        {
+          "de": "Wie ist deine Hausnummer hier?",
+          "en": "what is your house number here?"
+        },
+        {
+          "de": "Hmm, hmm, mein Name ist Ben,",
+          "en": "Hmm, hmm, my name is Ben,"
+        },
+        {
+          "de": "Vierundzwanzig Jahre, das bin ich.",
+          "en": "twenty-four years old, that's me."
+        },
+        {
+          "de": "Blumenstraße, eins zwei drei,",
+          "en": "Blumenstraße, one two three,"
+        },
+        {
+          "de": "Oh-oh, jetzt kennst du mich!",
+          "en": "oh-oh, now you know me!"
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Hausnummer",
+          "en": "house number"
+        },
+        {
+          "de": "die Postleitzahl",
+          "en": "postal code"
+        },
+        {
+          "de": "die Telefonnummer",
+          "en": "telephone number"
+        }
+      ]
+    },
+    {
       "objectKey": "music/a1/day-13/Zwei Tees, vier Euro.mp3",
       "lines": [
         {
@@ -599,6 +1116,272 @@
       ]
     },
     {
+      "objectKey": "music/a2/day-08/Ein Abend zu zweit.mp3",
+      "lines": [
+        {
+          "de": "Ein Abend im Restaurant.",
+          "en": "An evening at a restaurant."
+        },
+        {
+          "de": "Am Freitagabend geh’ ich mit Mia aus.",
+          "en": "On Friday evening I go out with Mia."
+        },
+        {
+          "de": "Für mich bitte Gemüse mit Reis,",
+          "en": "For me, vegetables with rice, please,"
+        },
+        {
+          "de": "für Mia die Suppe, schön heiß.",
+          "en": "for Mia the soup, nice and hot."
+        },
+        {
+          "de": "Zwei Gläser Wasser, danke sehr.",
+          "en": "Two glasses of water, thank you very much."
+        },
+        {
+          "de": "Ein Abend zu zweit, was wollen wir mehr?",
+          "en": "An evening for two, what more could we want?"
+        },
+        {
+          "de": "Doch plötzlich steht ein Fisch vor mir.",
+          "en": "But suddenly there's a fish in front of me."
+        },
+        {
+          "de": "Ich schaue auf den Teller und sage zu ihr:",
+          "en": "I look at the plate and say to her:"
+        },
+        {
+          "de": "„Das habe ich doch gar nicht bestellt!“",
+          "en": "\"But I didn't order that at all!\""
+        },
+        {
+          "de": "Der Kellner kommt und fragt: „Was fehlt?“",
+          "en": "The waiter comes and asks, \"What's wrong?\""
+        },
+        {
+          "de": "Ich sage freundlich:",
+          "en": "I say politely:"
+        },
+        {
+          "de": "„Das ist nicht mein Essen.“",
+          "en": "\"That's not my food.\""
+        },
+        {
+          "de": "Er sagt: „Entschuldigung,",
+          "en": "He says, \"I'm sorry,"
+        },
+        {
+          "de": "ich hab’s verwechselt.“",
+          "en": "I mixed it up.\""
+        },
+        {
+          "de": "Kurz darauf bringt er mein richtiges Gericht.",
+          "en": "Shortly afterwards he brings my correct meal."
+        },
+        {
+          "de": "Mia lacht und sagt:",
+          "en": "Mia laughs and says:"
+        },
+        {
+          "de": "„Jetzt fehlt uns nichts.“",
+          "en": "\"Now we have everything we need.\""
+        },
+        {
+          "de": "Für mich bitte Gemüse mit Reis,",
+          "en": "For me, vegetables with rice, please,"
+        },
+        {
+          "de": "für Mia die Suppe, schön heiß.",
+          "en": "for Mia the soup, nice and hot."
+        },
+        {
+          "de": "Zwei Gläser Wasser, danke sehr.",
+          "en": "Two glasses of water, thank you very much."
+        },
+        {
+          "de": "Ein Abend zu zweit, was wollen wir mehr?",
+          "en": "An evening for two, what more could we want?"
+        },
+        {
+          "de": "Mmm, für mich bitte Gemüse mit Reis,",
+          "en": "Mmm, for me, vegetables with rice, please,"
+        },
+        {
+          "de": "für Mia die Suppe, schön heiß.",
+          "en": "for Mia the soup, nice and hot."
+        },
+        {
+          "de": "Zwei Gläser Wasser, danke sehr.",
+          "en": "Two glasses of water, thank you very much."
+        },
+        {
+          "de": "Mmm, ein Abend zu zweit,",
+          "en": "Mmm, an evening for two,"
+        },
+        {
+          "de": "was wollen wir mehr?",
+          "en": "what more could we want?"
+        },
+        {
+          "de": "Mmm, mmm, mmm.",
+          "en": "Mmm, mmm, mmm."
+        },
+        {
+          "de": "Mmm, mmm, mmm.",
+          "en": "Mmm, mmm, mmm."
+        },
+        {
+          "de": "Mmm, mmm.",
+          "en": "Mmm, mmm."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "bestellen",
+          "en": "to order"
+        },
+        {
+          "de": "verwechseln",
+          "en": "to mix up"
+        },
+        {
+          "de": "das Gericht",
+          "en": "the meal / dish"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-10/Die Welt entdecken.mp3",
+      "lines": [
+        {
+          "de": "Mein Koffer steht schon vor der Tür,",
+          "en": "My suitcase is already by the door,"
+        },
+        {
+          "de": "mein Reisepass liegt neben mir.",
+          "en": "my passport is lying next to me."
+        },
+        {
+          "de": "Morgen fliege ich nach Nigeria,",
+          "en": "Tomorrow I'm flying to Nigeria,"
+        },
+        {
+          "de": "ich freue mich, bald bin ich da.",
+          "en": "I'm excited; I'll be there soon."
+        },
+        {
+          "de": "Ein Zimmer habe ich reserviert,",
+          "en": "I've reserved a room,"
+        },
+        {
+          "de": "die ganze Reise gut organisiert.",
+          "en": "and organised the whole trip well."
+        },
+        {
+          "de": "Ich möchte neue Menschen treffen",
+          "en": "I want to meet new people"
+        },
+        {
+          "de": "und durch die bunten Straßen gehen.",
+          "en": "and walk through the colourful streets."
+        },
+        {
+          "de": "Ich möchte nach Amerika reisen,",
+          "en": "I want to travel to America,"
+        },
+        {
+          "de": "nach Nigeria und Kanada.",
+          "en": "to Nigeria and Canada."
+        },
+        {
+          "de": "Ich will die ganze Welt entdecken,",
+          "en": "I want to discover the whole world,"
+        },
+        {
+          "de": "doch Ghana bleibt mir immer nah.",
+          "en": "but Ghana will always stay close to my heart."
+        },
+        {
+          "de": "Ich träume von New York bei Nacht,",
+          "en": "I dream of New York at night,"
+        },
+        {
+          "de": "von Dubai, wo die Sonne lacht.",
+          "en": "of Dubai, where the sun shines."
+        },
+        {
+          "de": "In Tokio möchte ich viel sehen,",
+          "en": "I want to see a lot in Tokyo,"
+        },
+        {
+          "de": "in Paris durch die Straßen gehen.",
+          "en": "and walk through the streets in Paris."
+        },
+        {
+          "de": "Auch Island steht auf meinem Plan,",
+          "en": "Iceland is on my list too,"
+        },
+        {
+          "de": "ich schaue mir die schönen Berge an.",
+          "en": "I'll look at the beautiful mountains."
+        },
+        {
+          "de": "So viele Länder, so viel zu sehen,",
+          "en": "So many countries, so much to see,"
+        },
+        {
+          "de": "ich möchte immer weitergehen.",
+          "en": "I always want to keep going."
+        },
+        {
+          "de": "Ich möchte nach Amerika reisen,",
+          "en": "I want to travel to America,"
+        },
+        {
+          "de": "nach Nigeria und Kanada.",
+          "en": "to Nigeria and Canada."
+        },
+        {
+          "de": "Ich will die ganze Welt entdecken,",
+          "en": "I want to discover the whole world,"
+        },
+        {
+          "de": "doch Ghana bleibt mir immer nah.",
+          "en": "but Ghana will always stay close to my heart."
+        },
+        {
+          "de": "Egal, wohin die Reise geht,",
+          "en": "No matter where the journey goes,"
+        },
+        {
+          "de": "egal, wo ich am Ende steh'.",
+          "en": "no matter where I end up."
+        },
+        {
+          "de": "Ich denke immer gern an Ghana,",
+          "en": "I always think fondly of Ghana,"
+        },
+        {
+          "de": "Gott segne mein Heimatland.",
+          "en": "God bless my homeland."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "der Reisepass",
+          "en": "the passport"
+        },
+        {
+          "de": "reservieren",
+          "en": "to reserve"
+        },
+        {
+          "de": "entdecken",
+          "en": "to discover"
+        }
+      ]
+    },
+    {
       "objectKey": "music/a2/day-11/Mit dem Rad, mit dem Zug.mp3",
       "lines": [
         {
@@ -841,697 +1624,6 @@
         {
           "de": "der Traum",
           "en": "the dream"
-        }
-      ]
-    },
-    {
-      "objectKey": "music/b1/day-24/Weniger kaufen.mp3",
-      "lines": [
-        {
-          "de": "Im Schaufenster sehe ich ein neues Handy.",
-          "en": "I see a new phone in the shop window."
-        },
-        {
-          "de": "Meins funktioniert eigentlich noch gut.",
-          "en": "Mine actually still works well."
-        },
-        {
-          "de": "Trotzdem möchte ich es sofort kaufen,",
-          "en": "Even so, I want to buy it right away,"
-        },
-        {
-          "de": "weil überall Werbung für das Modell läuft.",
-          "en": "because advertisements for that model are everywhere."
-        },
-        {
-          "de": "Brauche ich das wirklich heute?",
-          "en": "Do I really need it today?"
-        },
-        {
-          "de": "Vielleicht hält das Alte noch lang.",
-          "en": "Perhaps the old one will last a long time."
-        },
-        {
-          "de": "Weniger kaufen lässt Raum für anderes.",
-          "en": "Buying less leaves room for other things."
-        },
-        {
-          "de": "Zu Hause spreche ich mit meinem Bruder.",
-          "en": "At home I talk to my brother."
-        },
-        {
-          "de": "Er zeigt mir, wie ich den Akku schonen kann.",
-          "en": "He shows me how to make the battery last longer."
-        },
-        {
-          "de": "Wir beschließen, das Geld lieber zu sparen,",
-          "en": "We decide to save the money instead,"
-        },
-        {
-          "de": "um im Sommer gemeinsam zu verreisen.",
-          "en": "so that we can travel together in the summer."
-        },
-        {
-          "de": "Brauche ich das wirklich heute?",
-          "en": "Do I really need it today?"
-        },
-        {
-          "de": "Vielleicht hält das Alte noch lang.",
-          "en": "Perhaps the old one will last a long time."
-        },
-        {
-          "de": "Weniger kaufen lässt Raum für anderes.",
-          "en": "Buying less leaves room for other things."
-        },
-        {
-          "de": "Das neue Handy bleibt im Geschäft.",
-          "en": "The new phone stays in the shop."
-        },
-        {
-          "de": "Die Reise ist mir jetzt wichtiger.",
-          "en": "The trip is more important to me now."
-        },
-        {
-          "de": "Bei Falowen lerne ich, bewusster zu entscheiden.",
-          "en": "At Falowen I learn to make more conscious decisions."
-        }
-      ],
-      "vocabulary": [
-        {
-          "de": "bewusster entscheiden",
-          "en": "to make more conscious decisions"
-        },
-        {
-          "de": "die Werbung",
-          "en": "advertising"
-        },
-        {
-          "de": "den Akku schonen",
-          "en": "to preserve the battery"
-        }
-      ]
-    },
-    {
-      "objectKey": "music/b1/day-25/Als Kunde habe ich auch Rechte.mp3",
-      "lines": [
-        {
-          "de": "Letzte Woche habe ich Schuhe online bestellt.",
-          "en": "Last week I ordered shoes online."
-        },
-        {
-          "de": "Der Shop versprach eine schnelle Lieferung.",
-          "en": "The shop promised fast delivery."
-        },
-        {
-          "de": "Heute steht in der Sendungsverfolgung zugestellt,",
-          "en": "Today the tracking says \"delivered\","
-        },
-        {
-          "de": "obwohl vor meiner Tür kein Paket liegt.",
-          "en": "although there is no parcel at my door."
-        },
-        {
-          "de": "Ich frage nach, ich bleibe ruhig,",
-          "en": "I ask about it; I stay calm,"
-        },
-        {
-          "de": "und halte meine Unterlagen bereit.",
-          "en": "and keep my documents ready."
-        },
-        {
-          "de": "Als Kunde habe ich auch Rechte.",
-          "en": "As a customer, I have rights too."
-        },
-        {
-          "de": "Ich schreibe dem Kundenservice eine Nachricht.",
-          "en": "I write a message to customer service."
-        },
-        {
-          "de": "Darin nenne ich die Bestellung und das Datum.",
-          "en": "In it I give the order details and the date."
-        },
-        {
-          "de": "Am nächsten Tag kommt eine freundliche Antwort:",
-          "en": "The next day a friendly reply arrives:"
-        },
-        {
-          "de": "Das Paket wurde beim Nachbarn abgegeben.",
-          "en": "The parcel was left with the neighbour."
-        },
-        {
-          "de": "Ich frage nach, ich bleibe ruhig,",
-          "en": "I ask about it; I stay calm,"
-        },
-        {
-          "de": "und halte meine Unterlagen bereit.",
-          "en": "and keep my documents ready."
-        },
-        {
-          "de": "Als Kunde habe ich auch Rechte.",
-          "en": "As a customer, I have rights too."
-        },
-        {
-          "de": "Ich hole die Schuhe ab und bedanke mich.",
-          "en": "I collect the shoes and say thank you."
-        },
-        {
-          "de": "Beim nächsten Mal prüfe ich die Lieferadresse.",
-          "en": "Next time I'll check the delivery address."
-        },
-        {
-          "de": "Mit Falowen kenne ich die Worte für meine Rechte.",
-          "en": "With Falowen I know the words to describe my rights."
-        }
-      ],
-      "vocabulary": [
-        {
-          "de": "die Sendungsverfolgung",
-          "en": "shipment tracking"
-        },
-        {
-          "de": "zugestellt",
-          "en": "delivered"
-        },
-        {
-          "de": "die Unterlagen",
-          "en": "the documents"
-        }
-      ]
-    },
-    {
-      "objectKey": "music/a1/day-02/Ich heiße Bina.mp3",
-      "lines": [
-        {
-          "de": "Hmm, hmm, hmm …",
-          "en": "Hmm, hmm, hmm …"
-        },
-        {
-          "de": "Oh-oh, yeah …",
-          "en": "Oh-oh, yeah …"
-        },
-        {
-          "de": "Hmm, hmm, hmm …",
-          "en": "Hmm, hmm, hmm …"
-        },
-        {
-          "de": "Heute rufe ich die Schule an,",
-          "en": "Today I call the school,"
-        },
-        {
-          "de": "Ich möchte einen Deutschkurs machen.",
-          "en": "I would like to take a German course."
-        },
-        {
-          "de": "Die Frau sagt freundlich: „Guten Tag!",
-          "en": "The woman says kindly, \"Good day!"
-        },
-        {
-          "de": "Wie heißen Sie? Sagen Sie es mir.“",
-          "en": "What is your name? Tell me.\""
-        },
-        {
-          "de": "Ich sage: „Hallo, ich heiße Bina,",
-          "en": "I say, \"Hello, my name is Bina,"
-        },
-        {
-          "de": "Ich komme aus Ghana, das ist mein Land.“",
-          "en": "I'm from Ghana, that's my country.\""
-        },
-        {
-          "de": "Sie fragt: „Wie schreibt man Ihren Namen?“",
-          "en": "She asks, \"How do you spell your name?\""
-        },
-        {
-          "de": "Ich buchstabiere langsam dann.",
-          "en": "Then I spell it slowly."
-        },
-        {
-          "de": "Ich heiße Bina, B – I – N – A!",
-          "en": "My name is Bina, B – I – N – A!"
-        },
-        {
-          "de": "Oh-oh, das ist mein Name, ja!",
-          "en": "Oh-oh, that's my name, yes!"
-        },
-        {
-          "de": "B – I – N – A, hmm, hmm, hmm,",
-          "en": "B – I – N – A, hmm, hmm, hmm,"
-        },
-        {
-          "de": "So schreibt man meinen Namen!",
-          "en": "That's how you spell my name!"
-        },
-        {
-          "de": "Wie heißt du? Sag es mir!",
-          "en": "What's your name? Tell me!"
-        },
-        {
-          "de": "Ich heiße Bina, und wie heißt du?",
-          "en": "My name is Bina, and what's yours?"
-        },
-        {
-          "de": "Oh-oh, hmm, hmm, hmm,",
-          "en": "Oh-oh, hmm, hmm, hmm,"
-        },
-        {
-          "de": "Jetzt kennst du meinen Namen!",
-          "en": "Now you know my name!"
-        },
-        {
-          "de": "Die Frau fragt: „Wo wohnen Sie?“",
-          "en": "The woman asks, \"Where do you live?\""
-        },
-        {
-          "de": "Ich sage: „In Accra, hier bin ich.“",
-          "en": "I say, \"In Accra, here I am.\""
-        },
-        {
-          "de": "Sie sagt: „Bitte noch einmal Ihren Namen!“",
-          "en": "She says, \"Your name once again, please!\""
-        },
-        {
-          "de": "Ich sage langsam: „B – I – N – A.“",
-          "en": "I say slowly, \"B – I – N – A.\""
-        },
-        {
-          "de": "Sie schreibt meinen Namen auf,",
-          "en": "She writes down my name,"
-        },
-        {
-          "de": "Und sagt: „Danke, alles klar!",
-          "en": "and says, \"Thank you, everything is clear!"
-        },
-        {
-          "de": "Ihr Deutschkurs beginnt am Montag.“",
-          "en": "Your German course begins on Monday.\""
-        },
-        {
-          "de": "Ich freue mich, ich bin bald da!",
-          "en": "I'm happy; I'll be there soon!"
-        },
-        {
-          "de": "Ich heiße Bina, B – I – N – A!",
-          "en": "My name is Bina, B – I – N – A!"
-        },
-        {
-          "de": "Oh-oh, das ist mein Name, ja!",
-          "en": "Oh-oh, that's my name, yes!"
-        },
-        {
-          "de": "B – I – N – A, hmm, hmm, hmm,",
-          "en": "B – I – N – A, hmm, hmm, hmm,"
-        },
-        {
-          "de": "So schreibt man meinen Namen!",
-          "en": "That's how you spell my name!"
-        },
-        {
-          "de": "Wie heißt du? Sag es mir!",
-          "en": "What's your name? Tell me!"
-        },
-        {
-          "de": "Ich heiße Bina, und wie heißt du?",
-          "en": "My name is Bina, and what's yours?"
-        },
-        {
-          "de": "Oh-oh, hmm, hmm, hmm,",
-          "en": "Oh-oh, hmm, hmm, hmm,"
-        },
-        {
-          "de": "Jetzt kennst du meinen Namen!",
-          "en": "Now you know my name!"
-        },
-        {
-          "de": "Hmm, hmm, hmm …",
-          "en": "Hmm, hmm, hmm …"
-        },
-        {
-          "de": "Ich heiße Bina, B – I – N – A.",
-          "en": "My name is Bina, B – I – N – A."
-        },
-        {
-          "de": "Oh-oh, und wie heißt du?",
-          "en": "Oh-oh, and what's your name?"
-        },
-        {
-          "de": "Hmm, hmm, hmm …",
-          "en": "Hmm, hmm, hmm …"
-        }
-      ],
-      "vocabulary": [
-        {
-          "de": "buchstabieren",
-          "en": "to spell"
-        },
-        {
-          "de": "Wie heißen Sie?",
-          "en": "What is your name? (formal)"
-        },
-        {
-          "de": "Wo wohnen Sie?",
-          "en": "Where do you live? (formal)"
-        }
-      ]
-    },
-    {
-      "objectKey": "music/a1/day-03/Wer bist du_ Sag es mir!.mp3",
-      "lines": [
-        {
-          "de": "Heute kommt ein neuer Schüler,",
-          "en": "Today a new student arrives,"
-        },
-        {
-          "de": "Er hat ein Buch und einen Stift.",
-          "en": "he has a book and a pen."
-        },
-        {
-          "de": "Ich frage freundlich: „Wie heißt du?“",
-          "en": "I ask kindly, \"What's your name?\""
-        },
-        {
-          "de": "Er sagt: „Hallo, ich heiße Ben.“",
-          "en": "He says, \"Hello, my name is Ben.\""
-        },
-        {
-          "de": "„Woher kommst du?“, frage ich,",
-          "en": "\"Where are you from?\" I ask,"
-        },
-        {
-          "de": "Er sagt: „Ich komme aus Berlin.“",
-          "en": "he says, \"I'm from Berlin.\""
-        },
-        {
-          "de": "Ich sage: „Schön, dich hier zu sehen!“",
-          "en": "I say, \"It's nice to see you here!\""
-        },
-        {
-          "de": "Jetzt lernen wir zusammen Deutsch.",
-          "en": "Now we learn German together."
-        },
-        {
-          "de": "Wer bist du? Wie heißt du?",
-          "en": "Who are you? What's your name?"
-        },
-        {
-          "de": "Woher kommst du? Sag es mir!",
-          "en": "Where are you from? Tell me!"
-        },
-        {
-          "de": "Wo wohnst du? Was machst du gern?",
-          "en": "Where do you live? What do you like doing?"
-        },
-        {
-          "de": "Ich möchte dich gern kennenlernen.",
-          "en": "I'd like to get to know you."
-        },
-        {
-          "de": "Oh-oh, ich frage dich,",
-          "en": "Oh-oh, I'm asking you,"
-        },
-        {
-          "de": "Hmm-hmm, du antwortest mir.",
-          "en": "hmm-hmm, you're answering me."
-        },
-        {
-          "de": "So lernen wir uns besser kennen,",
-          "en": "That's how we get to know each other better,"
-        },
-        {
-          "de": "Und sprechen jeden Tag ein bisschen mehr.",
-          "en": "and speak a little more each day."
-        },
-        {
-          "de": "Ich frage Ben: „Wo wohnst du jetzt?“",
-          "en": "I ask Ben, \"Where do you live now?\""
-        },
-        {
-          "de": "Er sagt: „Ich wohne hier in Bonn.“",
-          "en": "He says, \"I live here in Bonn.\""
-        },
-        {
-          "de": "„Was machst du gern am Wochenende?“",
-          "en": "\"What do you like doing at weekends?\""
-        },
-        {
-          "de": "„Ich höre Musik und spiele gern.“",
-          "en": "\"I listen to music and enjoy playing.\""
-        },
-        {
-          "de": "„Wann beginnt der Deutschkurs morgen?“",
-          "en": "\"When does the German course start tomorrow?\""
-        },
-        {
-          "de": "Er sagt: „Um neun Uhr, wie heute.“",
-          "en": "He says, \"At nine o'clock, like today.\""
-        },
-        {
-          "de": "Ich sage: „Danke, bis morgen!“",
-          "en": "I say, \"Thank you, see you tomorrow!\""
-        },
-        {
-          "de": "Er lächelt und sagt: „Bis dann!“",
-          "en": "He smiles and says, \"See you then!\""
-        },
-        {
-          "de": "Wer bist du? Wie heißt du?",
-          "en": "Who are you? What's your name?"
-        },
-        {
-          "de": "Woher kommst du? Sag es mir!",
-          "en": "Where are you from? Tell me!"
-        },
-        {
-          "de": "Wo wohnst du? Was machst du gern?",
-          "en": "Where do you live? What do you like doing?"
-        },
-        {
-          "de": "Ich möchte dich gern kennenlernen.",
-          "en": "I'd like to get to know you."
-        },
-        {
-          "de": "Oh-oh, ich frage dich,",
-          "en": "Oh-oh, I'm asking you,"
-        },
-        {
-          "de": "Hmm-hmm, du antwortest mir.",
-          "en": "hmm-hmm, you're answering me."
-        },
-        {
-          "de": "So lernen wir uns besser kennen,",
-          "en": "That's how we get to know each other better,"
-        },
-        {
-          "de": "Und sprechen jeden Tag ein bisschen mehr.",
-          "en": "and speak a little more each day."
-        },
-        {
-          "de": "Hmm, hmm, jetzt kenne ich Ben,",
-          "en": "Hmm, hmm, now I know Ben,"
-        },
-        {
-          "de": "Oh-oh, wir sehen uns morgen.",
-          "en": "oh-oh, we'll see each other tomorrow."
-        },
-        {
-          "de": "Ich frage gern, ich höre zu,",
-          "en": "I like asking questions, I listen,"
-        },
-        {
-          "de": "Und lerne jeden Tag Deutsch.",
-          "en": "and I learn German every day."
-        },
-        {
-          "de": "Hmm, hmm, bis morgen!",
-          "en": "Hmm, hmm, see you tomorrow!"
-        }
-      ],
-      "vocabulary": [
-        {
-          "de": "Woher kommst du?",
-          "en": "Where are you from?"
-        },
-        {
-          "de": "kennenlernen",
-          "en": "to get to know"
-        },
-        {
-          "de": "gern",
-          "en": "gladly / like doing"
-        }
-      ]
-    },
-    {
-      "objectKey": "music/a1/day-04/Meine Nummer, meine Adresse.mp3",
-      "lines": [
-        {
-          "de": "Hmm, hmm, hmm …",
-          "en": "Hmm, hmm, hmm …"
-        },
-        {
-          "de": "Oh-oh, eins, zwei, drei!",
-          "en": "Oh-oh, one, two, three!"
-        },
-        {
-          "de": "Hmm, hmm, hier bin ich!",
-          "en": "Hmm, hmm, here I am!"
-        },
-        {
-          "de": "Hallo, ich heiße Ben,",
-          "en": "Hello, my name is Ben,"
-        },
-        {
-          "de": "Ich komme aus Ghana, aus Accra.",
-          "en": "I'm from Ghana, from Accra."
-        },
-        {
-          "de": "Ich bin vierundzwanzig Jahre alt,",
-          "en": "I'm twenty-four years old,"
-        },
-        {
-          "de": "Und heute stelle ich mich vor.",
-          "en": "and today I'll introduce myself."
-        },
-        {
-          "de": "Ich wohne in der Blumenstraße,",
-          "en": "I live on Blumenstraße,"
-        },
-        {
-          "de": "Meine Hausnummer ist eins zwei drei.",
-          "en": "my house number is one two three."
-        },
-        {
-          "de": "Die Postleitzahl ist eins zwei drei vier fünf,",
-          "en": "The postal code is one two three four five,"
-        },
-        {
-          "de": "Hier bin ich zu Hause, hier bin ich gern.",
-          "en": "this is my home, I like it here."
-        },
-        {
-          "de": "Eins, zwei, drei, vier, fünf, sechs,",
-          "en": "One, two, three, four, five, six,"
-        },
-        {
-          "de": "Sieben, acht, neun und zehn.",
-          "en": "seven, eight, nine and ten."
-        },
-        {
-          "de": "Elf, zwölf, dreizehn, vierzehn, fünfzehn,",
-          "en": "Eleven, twelve, thirteen, fourteen, fifteen,"
-        },
-        {
-          "de": "Sechzehn, siebzehn, achtzehn, neunzehn, zwanzig!",
-          "en": "sixteen, seventeen, eighteen, nineteen, twenty!"
-        },
-        {
-          "de": "Oh-oh, wie alt bist du?",
-          "en": "Oh-oh, how old are you?"
-        },
-        {
-          "de": "Ich bin vierundzwanzig, und du?",
-          "en": "I'm twenty-four, and you?"
-        },
-        {
-          "de": "Hmm-hmm, sag es mir,",
-          "en": "Hmm-hmm, tell me,"
-        },
-        {
-          "de": "Wie ist deine Hausnummer hier?",
-          "en": "what is your house number here?"
-        },
-        {
-          "de": "Meine Telefonnummer ist ganz einfach,",
-          "en": "My telephone number is very simple,"
-        },
-        {
-          "de": "Null, zwei, vier – fünf, sechs, sieben.",
-          "en": "zero, two, four – five, six, seven."
-        },
-        {
-          "de": "Acht, neun, null – eins, zwei, drei,",
-          "en": "Eight, nine, zero – one, two, three,"
-        },
-        {
-          "de": "Ich sage sie noch einmal langsam.",
-          "en": "I'll say it again slowly."
-        },
-        {
-          "de": "Null, zwei, vier – fünf, sechs, sieben,",
-          "en": "Zero, two, four – five, six, seven,"
-        },
-        {
-          "de": "Acht, neun, null – eins, zwei, drei.",
-          "en": "eight, nine, zero – one, two, three."
-        },
-        {
-          "de": "„Wie ist deine Telefonnummer?“",
-          "en": "\"What is your telephone number?\""
-        },
-        {
-          "de": "Jetzt kannst du sie auch sagen!",
-          "en": "Now you can say it too!"
-        },
-        {
-          "de": "Eins, zwei, drei, vier, fünf, sechs,",
-          "en": "One, two, three, four, five, six,"
-        },
-        {
-          "de": "Sieben, acht, neun und zehn.",
-          "en": "seven, eight, nine and ten."
-        },
-        {
-          "de": "Elf, zwölf, dreizehn, vierzehn, fünfzehn,",
-          "en": "Eleven, twelve, thirteen, fourteen, fifteen,"
-        },
-        {
-          "de": "Sechzehn, siebzehn, achtzehn, neunzehn, zwanzig!",
-          "en": "sixteen, seventeen, eighteen, nineteen, twenty!"
-        },
-        {
-          "de": "Oh-oh, wie alt bist du?",
-          "en": "Oh-oh, how old are you?"
-        },
-        {
-          "de": "Ich bin vierundzwanzig, und du?",
-          "en": "I'm twenty-four, and you?"
-        },
-        {
-          "de": "Hmm-hmm, sag es mir,",
-          "en": "Hmm-hmm, tell me,"
-        },
-        {
-          "de": "Wie ist deine Hausnummer hier?",
-          "en": "what is your house number here?"
-        },
-        {
-          "de": "Hmm, hmm, mein Name ist Ben,",
-          "en": "Hmm, hmm, my name is Ben,"
-        },
-        {
-          "de": "Vierundzwanzig Jahre, das bin ich.",
-          "en": "twenty-four years old, that's me."
-        },
-        {
-          "de": "Blumenstraße, eins zwei drei,",
-          "en": "Blumenstraße, one two three,"
-        },
-        {
-          "de": "Oh-oh, jetzt kennst du mich!",
-          "en": "oh-oh, now you know me!"
-        }
-      ],
-      "vocabulary": [
-        {
-          "de": "die Hausnummer",
-          "en": "house number"
-        },
-        {
-          "de": "die Postleitzahl",
-          "en": "postal code"
-        },
-        {
-          "de": "die Telefonnummer",
-          "en": "telephone number"
         }
       ]
     },
@@ -1801,6 +1893,729 @@
         {
           "de": "eine Nummer größer",
           "en": "one size bigger"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-23/Fahrrad zur Schule.mp3",
+      "lines": [
+        {
+          "de": "Jeden Morgen fahre ich zur Schule,",
+          "en": "Every morning I cycle to school,"
+        },
+        {
+          "de": "Früher bin ich immer Bus gefahren.",
+          "en": "I used to always take the bus."
+        },
+        {
+          "de": "Doch heute nehme ich mein Fahrrad,",
+          "en": "But today I take my bicycle,"
+        },
+        {
+          "de": "Weil ich die Umwelt schützen will.",
+          "en": "because I want to protect the environment."
+        },
+        {
+          "de": "Die Sonne scheint, die Luft ist frisch,",
+          "en": "The sun is shining, the air is fresh,"
+        },
+        {
+          "de": "Ich fahre langsam durch den Park.",
+          "en": "I ride slowly through the park."
+        },
+        {
+          "de": "Ich brauche heute kein Auto,",
+          "en": "I don't need a car today,"
+        },
+        {
+          "de": "Und komme pünktlich in der Schule an.",
+          "en": "and I arrive at school on time."
+        },
+        {
+          "de": "Hey-ya, hey-ya, der Morgen ist da,",
+          "en": "Hey-ya, hey-ya, morning is here,"
+        },
+        {
+          "de": "Ich fahre mit dem Fahrrad, ist doch klar.",
+          "en": "I'm riding my bicycle, of course."
+        },
+        {
+          "de": "Weniger Autos, die Luft wird rein,",
+          "en": "Fewer cars, the air becomes clean,"
+        },
+        {
+          "de": "So soll mein Weg zur Schule sein.",
+          "en": "that's how my journey to school should be."
+        },
+        {
+          "de": "Ich spare Geld, ich bleibe fit,",
+          "en": "I save money, I stay fit,"
+        },
+        {
+          "de": "Die frische Luft, die tut mir gut.",
+          "en": "the fresh air does me good."
+        },
+        {
+          "de": "Ein schöner Tag, ein gutes Gefühl,",
+          "en": "A beautiful day, a good feeling,"
+        },
+        {
+          "de": "Ich mache etwas für die Umwelt.",
+          "en": "I'm doing something for the environment."
+        },
+        {
+          "de": "Wenn es regnet, nehme ich den Bus,",
+          "en": "When it rains, I take the bus,"
+        },
+        {
+          "de": "Bei Sonne fahre ich lieber Rad.",
+          "en": "when it's sunny, I prefer cycling."
+        },
+        {
+          "de": "Manchmal gehe ich auch zu Fuß,",
+          "en": "Sometimes I also walk,"
+        },
+        {
+          "de": "Weil ich es nicht so weit habe.",
+          "en": "because I don't have far to go."
+        },
+        {
+          "de": "Ich sehe Bäume, Blumen und den Park,",
+          "en": "I see trees, flowers and the park,"
+        },
+        {
+          "de": "Und freue mich über die Natur.",
+          "en": "and enjoy nature."
+        },
+        {
+          "de": "Am Nachmittag fahre ich nach Hause,",
+          "en": "In the afternoon I ride home,"
+        },
+        {
+          "de": "Ganz entspannt und ohne Stress.",
+          "en": "completely relaxed and without stress."
+        },
+        {
+          "de": "Hey-ya, hey-ya, der Morgen ist da,",
+          "en": "Hey-ya, hey-ya, morning is here,"
+        },
+        {
+          "de": "Ich fahre mit dem Fahrrad, ist doch klar.",
+          "en": "I'm riding my bicycle, of course."
+        },
+        {
+          "de": "Weniger Autos, die Luft wird rein,",
+          "en": "Fewer cars, the air becomes clean,"
+        },
+        {
+          "de": "So soll mein Weg zur Schule sein.",
+          "en": "that's how my journey to school should be."
+        },
+        {
+          "de": "Ich spare Geld, ich bleibe fit,",
+          "en": "I save money, I stay fit,"
+        },
+        {
+          "de": "Die frische Luft, die tut mir gut.",
+          "en": "the fresh air does me good."
+        },
+        {
+          "de": "Ein schöner Tag, ein gutes Gefühl,",
+          "en": "A beautiful day, a good feeling,"
+        },
+        {
+          "de": "Ich mache etwas für die Umwelt.",
+          "en": "I'm doing something for the environment."
+        },
+        {
+          "de": "Der Wind ist warm, die Sonne scheint,",
+          "en": "The wind is warm, the sun is shining,"
+        },
+        {
+          "de": "Ich fahre langsam nach Haus.",
+          "en": "I ride slowly home."
+        },
+        {
+          "de": "Heute war ein schöner Tag,",
+          "en": "Today was a beautiful day,"
+        },
+        {
+          "de": "Morgen fahre ich wieder Rad.",
+          "en": "tomorrow I'll cycle again."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Umwelt schützen",
+          "en": "to protect the environment"
+        },
+        {
+          "de": "zu Fuß",
+          "en": "on foot"
+        },
+        {
+          "de": "pünktlich",
+          "en": "on time"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-24/Endlich Urlaub.mp3",
+      "lines": [
+        {
+          "de": "Ich möchte in den Ferien verreisen,",
+          "en": "I want to travel during the holidays,"
+        },
+        {
+          "de": "Schon lange träume ich von Hamburg.",
+          "en": "I've dreamed of Hamburg for a long time."
+        },
+        {
+          "de": "Ich habe jeden Monat Geld gespart,",
+          "en": "I've saved money every month,"
+        },
+        {
+          "de": "Jetzt kann ich endlich Urlaub machen.",
+          "en": "now I can finally take a holiday."
+        },
+        {
+          "de": "Ich suche ein Hotel im Internet,",
+          "en": "I look for a hotel on the internet,"
+        },
+        {
+          "de": "Und finde ein Zimmer in der Stadt.",
+          "en": "and find a room in the city."
+        },
+        {
+          "de": "Dann buche ich mein Ticket für Samstag,",
+          "en": "Then I book my ticket for Saturday,"
+        },
+        {
+          "de": "Jetzt fehlt nur noch mein Koffer.",
+          "en": "now all that's missing is my suitcase."
+        },
+        {
+          "de": "Endlich Urlaub, endlich frei,",
+          "en": "Finally a holiday, finally free,"
+        },
+        {
+          "de": "Ich packe meine Sachen ein.",
+          "en": "I'm packing my things."
+        },
+        {
+          "de": "Ein neues Ziel, ein neuer Ort,",
+          "en": "A new destination, a new place,"
+        },
+        {
+          "de": "Am Samstag fahre ich endlich fort.",
+          "en": "on Saturday I'm finally setting off."
+        },
+        {
+          "de": "Doo-doo, doo-doo, do-do,",
+          "en": "Doo-doo, doo-doo, do-do,"
+        },
+        {
+          "de": "Hamburg, ich freue mich auf dich!",
+          "en": "Hamburg, I'm looking forward to seeing you!"
+        },
+        {
+          "de": "Am Freitag packe ich meinen Koffer,",
+          "en": "On Friday I pack my suitcase,"
+        },
+        {
+          "de": "Ich nehme Kleidung und mein Handy mit.",
+          "en": "I take clothes and my phone."
+        },
+        {
+          "de": "Am Samstag stehe ich früh auf,",
+          "en": "On Saturday I get up early,"
+        },
+        {
+          "de": "Mein Zug fährt schon um acht Uhr ab.",
+          "en": "my train leaves at eight o'clock."
+        },
+        {
+          "de": "Am Bahnhof kaufe ich einen Kaffee,",
+          "en": "At the station I buy a coffee,"
+        },
+        {
+          "de": "Dann steige ich in meinen Zug ein.",
+          "en": "then I get on my train."
+        },
+        {
+          "de": "Ich schaue aus dem Fenster und lächle,",
+          "en": "I look out of the window and smile,"
+        },
+        {
+          "de": "Mein Urlaub beginnt, wie schön!",
+          "en": "my holiday begins, how lovely!"
+        },
+        {
+          "de": "Endlich Urlaub, endlich frei,",
+          "en": "Finally a holiday, finally free,"
+        },
+        {
+          "de": "Ich packe meine Sachen ein.",
+          "en": "I'm packing my things."
+        },
+        {
+          "de": "Ein neues Ziel, ein neuer Ort,",
+          "en": "A new destination, a new place,"
+        },
+        {
+          "de": "Am Samstag fahre ich endlich fort.",
+          "en": "on Saturday I'm finally setting off."
+        },
+        {
+          "de": "Doo-doo, doo-doo, do-do,",
+          "en": "Doo-doo, doo-doo, do-do,"
+        },
+        {
+          "de": "Hamburg, ich freue mich auf dich!",
+          "en": "Hamburg, I'm looking forward to seeing you!"
+        },
+        {
+          "de": "Am Mittag komme ich in Hamburg an,",
+          "en": "At noon I arrive in Hamburg,"
+        },
+        {
+          "de": "Ich gehe zum Hotel und checke ein.",
+          "en": "I go to the hotel and check in."
+        },
+        {
+          "de": "Dann mache ich einen Spaziergang,",
+          "en": "Then I go for a walk,"
+        },
+        {
+          "de": "Mein Urlaub kann jetzt beginnen.",
+          "en": "now my holiday can begin."
+        },
+        {
+          "de": "Am Mittag komme ich in Hamburg an,",
+          "en": "At noon I arrive in Hamburg,"
+        },
+        {
+          "de": "Ich gehe zum Hotel und checke ein.",
+          "en": "I go to the hotel and check in."
+        },
+        {
+          "de": "Dann mache ich einen Spaziergang,",
+          "en": "Then I go for a walk,"
+        },
+        {
+          "de": "Mein Urlaub kann jetzt beginnen.",
+          "en": "now my holiday can begin."
+        },
+        {
+          "de": "Doo-doo, doo-doo, do-do …",
+          "en": "Doo-doo, doo-doo, do-do …"
+        },
+        {
+          "de": "Doo-doo, doo-doo …",
+          "en": "Doo-doo, doo-doo …"
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "verreisen",
+          "en": "to go on a trip"
+        },
+        {
+          "de": "abfahren",
+          "en": "to depart"
+        },
+        {
+          "de": "einchecken",
+          "en": "to check in"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-25/Endlich Urlaub.mp3",
+      "lines": [
+        {
+          "de": "Heya, heya!",
+          "en": "Heya, heya!"
+        },
+        {
+          "de": "Die Reise geht los.",
+          "en": "The journey begins."
+        },
+        {
+          "de": "Seit Monaten spar ich Geld,",
+          "en": "I've been saving money for months,"
+        },
+        {
+          "de": "Ich möchte endlich etwas sehen.",
+          "en": "I finally want to see something."
+        },
+        {
+          "de": "Mein Traum ist eine Reise nach Hamburg,",
+          "en": "My dream is a trip to Hamburg,"
+        },
+        {
+          "de": "Jetzt kann ich wirklich fahren.",
+          "en": "now I really can go."
+        },
+        {
+          "de": "Ich suche ein Hotel im Internet,",
+          "en": "I look for a hotel on the internet,"
+        },
+        {
+          "de": "Ein schönes Zimmer, nicht zu teuer.",
+          "en": "a lovely room, not too expensive."
+        },
+        {
+          "de": "Mein Ticket buche ich am Montag,",
+          "en": "I book my ticket on Monday,"
+        },
+        {
+          "de": "Am Samstag geht die Reise los.",
+          "en": "the journey starts on Saturday."
+        },
+        {
+          "de": "Endlich Urlaub, endlich frei.",
+          "en": "Finally a holiday, finally free."
+        },
+        {
+          "de": "Endlich Urlaub, endlich frei.",
+          "en": "Finally a holiday, finally free."
+        },
+        {
+          "de": "Mein Koffer steht schon längst bereit.",
+          "en": "My suitcase has been ready for ages."
+        },
+        {
+          "de": "Mein Koffer steht schon längst bereit.",
+          "en": "My suitcase has been ready for ages."
+        },
+        {
+          "de": "Heya, heya!",
+          "en": "Heya, heya!"
+        },
+        {
+          "de": "Ich bin bereit.",
+          "en": "I'm ready."
+        },
+        {
+          "de": "Heya, heya!",
+          "en": "Heya, heya!"
+        },
+        {
+          "de": "Es ist so weit.",
+          "en": "The time has come."
+        },
+        {
+          "de": "Die Reise geht los.",
+          "en": "The journey begins."
+        },
+        {
+          "de": "Die Reise geht los.",
+          "en": "The journey begins."
+        },
+        {
+          "de": "Hamburg, ich freue mich auf dich!",
+          "en": "Hamburg, I'm looking forward to seeing you!"
+        },
+        {
+          "de": "Ich freue mich auf dich!",
+          "en": "I'm looking forward to seeing you!"
+        },
+        {
+          "de": "Am Freitag packe ich meinen Koffer,",
+          "en": "On Friday I pack my suitcase,"
+        },
+        {
+          "de": "Mein Handy und die Kamera.",
+          "en": "my phone and the camera."
+        },
+        {
+          "de": "Am Samstag stehe ich früh auf,",
+          "en": "On Saturday I get up early,"
+        },
+        {
+          "de": "Mein Zug fährt schon um acht Uhr ab.",
+          "en": "my train leaves at eight o'clock."
+        },
+        {
+          "de": "Ich sitze ruhig am Fenster,",
+          "en": "I sit quietly by the window,"
+        },
+        {
+          "de": "Die Sonne scheint, der Himmel ist blau.",
+          "en": "the sun is shining, the sky is blue."
+        },
+        {
+          "de": "Ich sehe Felder, Häuser, Bäume",
+          "en": "I see fields, houses, trees,"
+        },
+        {
+          "de": "Und freue mich auf meine Reise.",
+          "en": "and look forward to my trip."
+        },
+        {
+          "de": "Endlich Urlaub, endlich frei.",
+          "en": "Finally a holiday, finally free."
+        },
+        {
+          "de": "Endlich Urlaub, endlich frei.",
+          "en": "Finally a holiday, finally free."
+        },
+        {
+          "de": "Mein Koffer steht schon längst bereit.",
+          "en": "My suitcase has been ready for ages."
+        },
+        {
+          "de": "Mein Koffer steht schon längst bereit.",
+          "en": "My suitcase has been ready for ages."
+        },
+        {
+          "de": "Heya, heya!",
+          "en": "Heya, heya!"
+        },
+        {
+          "de": "Ich bin bereit.",
+          "en": "I'm ready."
+        },
+        {
+          "de": "Heya, heya!",
+          "en": "Heya, heya!"
+        },
+        {
+          "de": "Es ist so weit.",
+          "en": "The time has come."
+        },
+        {
+          "de": "Die Reise geht los.",
+          "en": "The journey begins."
+        },
+        {
+          "de": "Die Reise geht los.",
+          "en": "The journey begins."
+        },
+        {
+          "de": "Hamburg, ich freue mich auf dich!",
+          "en": "Hamburg, I'm looking forward to seeing you!"
+        },
+        {
+          "de": "Endlich Urlaub, endlich frei.",
+          "en": "Finally a holiday, finally free."
+        },
+        {
+          "de": "Endlich Urlaub, endlich frei.",
+          "en": "Finally a holiday, finally free."
+        },
+        {
+          "de": "Heya, heya!",
+          "en": "Heya, heya!"
+        },
+        {
+          "de": "Die Reise geht los.",
+          "en": "The journey begins."
+        },
+        {
+          "de": "Heya, heya!",
+          "en": "Heya, heya!"
+        },
+        {
+          "de": "Die Reise geht los.",
+          "en": "The journey begins."
+        },
+        {
+          "de": "Hmm …",
+          "en": "Hmm …"
+        },
+        {
+          "de": "Die Reise geht los.",
+          "en": "The journey begins."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "Geld sparen",
+          "en": "to save money"
+        },
+        {
+          "de": "bereit",
+          "en": "ready"
+        },
+        {
+          "de": "die Reise",
+          "en": "the journey"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/b1/day-24/Weniger kaufen.mp3",
+      "lines": [
+        {
+          "de": "Im Schaufenster sehe ich ein neues Handy.",
+          "en": "I see a new phone in the shop window."
+        },
+        {
+          "de": "Meins funktioniert eigentlich noch gut.",
+          "en": "Mine actually still works well."
+        },
+        {
+          "de": "Trotzdem möchte ich es sofort kaufen,",
+          "en": "Even so, I want to buy it right away,"
+        },
+        {
+          "de": "weil überall Werbung für das Modell läuft.",
+          "en": "because advertisements for that model are everywhere."
+        },
+        {
+          "de": "Brauche ich das wirklich heute?",
+          "en": "Do I really need it today?"
+        },
+        {
+          "de": "Vielleicht hält das Alte noch lang.",
+          "en": "Perhaps the old one will last a long time."
+        },
+        {
+          "de": "Weniger kaufen lässt Raum für anderes.",
+          "en": "Buying less leaves room for other things."
+        },
+        {
+          "de": "Zu Hause spreche ich mit meinem Bruder.",
+          "en": "At home I talk to my brother."
+        },
+        {
+          "de": "Er zeigt mir, wie ich den Akku schonen kann.",
+          "en": "He shows me how to make the battery last longer."
+        },
+        {
+          "de": "Wir beschließen, das Geld lieber zu sparen,",
+          "en": "We decide to save the money instead,"
+        },
+        {
+          "de": "um im Sommer gemeinsam zu verreisen.",
+          "en": "so that we can travel together in the summer."
+        },
+        {
+          "de": "Brauche ich das wirklich heute?",
+          "en": "Do I really need it today?"
+        },
+        {
+          "de": "Vielleicht hält das Alte noch lang.",
+          "en": "Perhaps the old one will last a long time."
+        },
+        {
+          "de": "Weniger kaufen lässt Raum für anderes.",
+          "en": "Buying less leaves room for other things."
+        },
+        {
+          "de": "Das neue Handy bleibt im Geschäft.",
+          "en": "The new phone stays in the shop."
+        },
+        {
+          "de": "Die Reise ist mir jetzt wichtiger.",
+          "en": "The trip is more important to me now."
+        },
+        {
+          "de": "Bei Falowen lerne ich, bewusster zu entscheiden.",
+          "en": "At Falowen I learn to make more conscious decisions."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "bewusster entscheiden",
+          "en": "to make more conscious decisions"
+        },
+        {
+          "de": "die Werbung",
+          "en": "advertising"
+        },
+        {
+          "de": "den Akku schonen",
+          "en": "to preserve the battery"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/b1/day-25/Als Kunde habe ich auch Rechte.mp3",
+      "lines": [
+        {
+          "de": "Letzte Woche habe ich Schuhe online bestellt.",
+          "en": "Last week I ordered shoes online."
+        },
+        {
+          "de": "Der Shop versprach eine schnelle Lieferung.",
+          "en": "The shop promised fast delivery."
+        },
+        {
+          "de": "Heute steht in der Sendungsverfolgung zugestellt,",
+          "en": "Today the tracking says \"delivered\","
+        },
+        {
+          "de": "obwohl vor meiner Tür kein Paket liegt.",
+          "en": "although there is no parcel at my door."
+        },
+        {
+          "de": "Ich frage nach, ich bleibe ruhig,",
+          "en": "I ask about it; I stay calm,"
+        },
+        {
+          "de": "und halte meine Unterlagen bereit.",
+          "en": "and keep my documents ready."
+        },
+        {
+          "de": "Als Kunde habe ich auch Rechte.",
+          "en": "As a customer, I have rights too."
+        },
+        {
+          "de": "Ich schreibe dem Kundenservice eine Nachricht.",
+          "en": "I write a message to customer service."
+        },
+        {
+          "de": "Darin nenne ich die Bestellung und das Datum.",
+          "en": "In it I give the order details and the date."
+        },
+        {
+          "de": "Am nächsten Tag kommt eine freundliche Antwort:",
+          "en": "The next day a friendly reply arrives:"
+        },
+        {
+          "de": "Das Paket wurde beim Nachbarn abgegeben.",
+          "en": "The parcel was left with the neighbour."
+        },
+        {
+          "de": "Ich frage nach, ich bleibe ruhig,",
+          "en": "I ask about it; I stay calm,"
+        },
+        {
+          "de": "und halte meine Unterlagen bereit.",
+          "en": "and keep my documents ready."
+        },
+        {
+          "de": "Als Kunde habe ich auch Rechte.",
+          "en": "As a customer, I have rights too."
+        },
+        {
+          "de": "Ich hole die Schuhe ab und bedanke mich.",
+          "en": "I collect the shoes and say thank you."
+        },
+        {
+          "de": "Beim nächsten Mal prüfe ich die Lieferadresse.",
+          "en": "Next time I'll check the delivery address."
+        },
+        {
+          "de": "Mit Falowen kenne ich die Worte für meine Rechte.",
+          "en": "With Falowen I know the words to describe my rights."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Sendungsverfolgung",
+          "en": "shipment tracking"
+        },
+        {
+          "de": "zugestellt",
+          "en": "delivered"
+        },
+        {
+          "de": "die Unterlagen",
+          "en": "the documents"
         }
       ]
     }
