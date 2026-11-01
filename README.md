@@ -1,5 +1,15 @@
-# Falowen Language Hub.
-Falowen Exam Coach is a two-part application that helps learners practice spoken German exam tasks. The backend (Express + OpenAI) evaluates answers and stores lightweight history, while the frontend (React) guides users through placement and speaking practice.
+# Falowen Language Hub
+
+Falowen is an A1–C2 German-learning platform with a learner Campus, course books and tutor workbooks, exam practice and mock exams, music-based lessons, class access, results, and a read-only ChatGPT Learning Companion. This repository owns the learner website, public Music player, backend APIs and public AI navigation. The teaching/Admin application lives separately in [falowenadmin](https://github.com/learngermanghana/falowenadmin).
+
+**For AI developers and coding agents:** read [AGENTS.md](AGENTS.md) and the [AI documentation hub](docs/ai/README.md) first. The source-of-truth map explains which documents and tests must change together.
+
+## AI engineering documentation
+
+- [Agent contribution rules](AGENTS.md), [architecture and boundaries](docs/ai/architecture.md), [feature ownership and update matrix](docs/ai/content-source-of-truth.md).
+- [AI teaching / marking contract](docs/ai/teaching-and-marking-rules.md), [privacy and student identity](docs/ai/student-data-and-privacy.md), [MCP tool inventory](docs/ai/mcp-plugin-reference.md).
+- [Music lyric / translation / timing workflow](docs/workflows/music-and-lyrics.md), [assessments](docs/workflows/exam-and-assignment-publishing.md), [deployment/rollback](docs/workflows/deployment-and-rollback.md).
+- Documentation consistency check: `node scripts/checkAiDocumentation.mjs`. The [docs changelog](docs/CHANGELOG.md) records material documentation revisions.
 
 ## Repository structure
 - `functions/functionz/` – Express backend with routes for speaking analysis, placement, and task scheduling.
@@ -16,7 +26,7 @@ web/src/components/A1TutorMarkedWorkbookShell.js
 Rules:
 
 - A1 tutor-marked workbooks may include an in-workbook **Grammar** tab before the assignment content when the chapter already has in-app grammar notes.
-- The assignment and submission flow must stay inside the workbook: **Grammar** (when available), **Overview/Assignment**, lesson-specific **Teil** tabs, and **Submit**.
+- The assignment and submission flow stays inside the workbook: **Overview**, **Grammar** (when available), lesson-specific **Teil** tabs, optional ungraded **Music** and **Review & Submit**. Music is not a required or scored section.
 - Do not use the A2/B1 `WorkbookTabNav` or the A2/B1 `Teil 1`, `Teil 2`, `Teil 3`, `Teil 4`, `Ref`, `Submit` tab structure for A1.
 - Do not send students to the generic `/campus/course?submitWork=1` page from A1 tutor-marked workbooks.
 - The Submit tab must render `AssignmentSubmissionPage` inside the workbook page.
