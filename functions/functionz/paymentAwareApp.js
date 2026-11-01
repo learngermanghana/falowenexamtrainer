@@ -11,6 +11,7 @@ const { registerBookCommerceRoutes, processBookWebhook } = require("./bookCommer
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
 const { registerStaffSpeakingReviewRoutes } = require("./staffSpeakingReview");
 const { getScoresForStudent } = require("./scoresSheet");
+const { makeRouter: makeChatGPTCompanionRouter } = require("./chatgptCompanion");
 const { getCanonicalTutorAssignmentSet } = require("./routes/scoresSummaryCoursePlan");
 
 const DEFAULT_TUITION_CURRENCY = "GHS";
@@ -30,6 +31,9 @@ app.use(
     },
   })
 );
+
+// ChatGPT learning companion uses its own scoped, read-only OAuth flow.
+app.use("/chatgpt", makeChatGPTCompanionRouter(admin));
 
 const roundMoney = (value) =>
   Math.round((Number(value) + Number.EPSILON) * 100) / 100;
