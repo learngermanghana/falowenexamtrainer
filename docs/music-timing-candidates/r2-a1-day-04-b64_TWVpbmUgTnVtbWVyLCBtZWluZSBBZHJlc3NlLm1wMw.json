@@ -1,0 +1,12 @@
+{
+  "trackId": "r2-a1-day-04-b64_TWVpbmUgTnVtbWVyLCBtZWluZSBBZHJlc3NlLm1wMw",
+  "objectKey": "music/a1/day-04/Meine Nummer, meine Adresse.mp3",
+  "level": "A1",
+  "day": 4,
+  "source": "approved",
+  "lyrics": "[Intro]\nHmm, hmm, hmm …\nOh-oh, eins, zwei, drei!\nHmm, hmm, hier bin ich!\n\n[Verse 1]\nHallo, ich heiße Ben,\nIch komme aus Ghana, aus Accra.\nIch bin vierundzwanzig Jahre alt,\nUnd heute stelle ich mich vor.\n\nIch wohne in der Blumenstraße,\nMeine Hausnummer ist eins zwei drei.\nDie Postleitzahl ist eins zwei drei vier fünf,\nHier bin ich zu Hause, hier bin ich gern.\n\n[Chorus]\nEins, zwei, drei, vier, fünf, sechs,\nSieben, acht, neun und zehn.\nElf, zwölf, dreizehn, vierzehn, fünfzehn,\nSechzehn, siebzehn, achtzehn, neunzehn, zwanzig!\n\nOh-oh, wie alt bist du?\nIch bin vierundzwanzig, und du?\nHmm-hmm, sag es mir,\nWie ist deine Hausnummer hier?\n\n[Verse 2]\nMeine Telefonnummer ist ganz einfach,\nNull, zwei, vier – fünf, sechs, sieben.\nAcht, neun, null – eins, zwei, drei,\nIch sage sie noch einmal langsam.\n\nNull, zwei, vier – fünf, sechs, sieben,\nAcht, neun, null – eins, zwei, drei.\n„Wie ist deine Telefonnummer?“\nJetzt kannst du sie auch sagen!\n\n[Chorus]\nEins, zwei, drei, vier, fünf, sechs,\nSieben, acht, neun und zehn.\nElf, zwölf, dreizehn, vierzehn, fünfzehn,\nSechzehn, siebzehn, achtzehn, neunzehn, zwanzig!\n\nOh-oh, wie alt bist du?\nIch bin vierundzwanzig, und du?\nHmm-hmm, sag es mir,\nWie ist deine Hausnummer hier?\n\n[Outro]\nHmm, hmm, mein Name ist Ben,\nVierundzwanzig Jahre, das bin ich.\nBlumenstraße, eins zwei drei,\nOh-oh, jetzt kennst du mich!",
+  "status": "needs-review",
+  "recordingSha256": "626a491a74d71bb408828bac95abdfb161908594cb3a56437ca2ffe810fdf50a",
+  "audioBytes": 3898726,
+  "reason": "Low acoustic match: total=51.9%, weakest line=0.0%"
+}

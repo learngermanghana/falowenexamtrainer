@@ -1,0 +1,12 @@
+{
+  "trackId": "r2-a2-day-23-b64_RmFocnJhZCB6dXIgU2NodWxlLm1wMw",
+  "objectKey": "music/a2/day-23/Fahrrad zur Schule.mp3",
+  "level": "A2",
+  "day": 23,
+  "source": "approved",
+  "lyrics": "[Verse 1]\nJeden Morgen fahre ich zur Schule,\nFrüher bin ich immer Bus gefahren.\nDoch heute nehme ich mein Fahrrad,\nWeil ich die Umwelt schützen will.\nDie Sonne scheint, die Luft ist frisch,\nIch fahre langsam durch den Park.\nIch brauche heute kein Auto,\nUnd komme pünktlich in der Schule an.\n\n[Chorus]\nHey-ya, hey-ya, der Morgen ist da,\nIch fahre mit dem Fahrrad, ist doch klar.\nWeniger Autos, die Luft wird rein,\nSo soll mein Weg zur Schule sein.\nIch spare Geld, ich bleibe fit,\nDie frische Luft, die tut mir gut.\nEin schöner Tag, ein gutes Gefühl,\nIch mache etwas für die Umwelt.\n\n[Verse 2]\nWenn es regnet, nehme ich den Bus,\nBei Sonne fahre ich lieber Rad.\nManchmal gehe ich auch zu Fuß,\nWeil ich es nicht so weit habe.\nIch sehe Bäume, Blumen und den Park,\nUnd freue mich über die Natur.\nAm Nachmittag fahre ich nach Hause,\nGanz entspannt und ohne Stress.\n\n[Chorus]\nHey-ya, hey-ya, der Morgen ist da,\nIch fahre mit dem Fahrrad, ist doch klar.\nWeniger Autos, die Luft wird rein,\nSo soll mein Weg zur Schule sein.\nIch spare Geld, ich bleibe fit,\nDie frische Luft, die tut mir gut.\nEin schöner Tag, ein gutes Gefühl,\nIch mache etwas für die Umwelt.\n\n[Outro]\nDer Wind ist warm, die Sonne scheint,\nIch fahre langsam nach Haus.\nHeute war ein schöner Tag,\nMorgen fahre ich wieder Rad.",
+  "status": "needs-review",
+  "recordingSha256": "b0883057d1559d7a004b29a7b044db872b1c46b4f6eea7b64f2350c9d5a9b195",
+  "audioBytes": 3828925,
+  "reason": "Low acoustic match: total=93.4%, weakest line=37.5%"
+}

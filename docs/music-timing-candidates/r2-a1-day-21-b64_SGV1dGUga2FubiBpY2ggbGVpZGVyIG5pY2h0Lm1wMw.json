@@ -1,0 +1,12 @@
+{
+  "trackId": "r2-a1-day-21-b64_SGV1dGUga2FubiBpY2ggbGVpZGVyIG5pY2h0Lm1wMw",
+  "objectKey": "music/a1/day-21/Heute kann ich leider nicht.mp3",
+  "level": "A1",
+  "day": 21,
+  "source": "approved",
+  "lyrics": "[Verse 1]\nHeute ist das Wetter schlecht,\nDer Himmel ist grau, es regnet stark.\nIch möchte Mia im Park treffen,\nDoch draußen ist es nass und kalt.\n\nIch schaue auf mein Handy,\nUnd rufe meine Freundin an.\nIch sage: „Mia, es tut mir leid,\nHeute kann ich leider nicht.“\n\n[Chorus]\nEs regnet, es regnet, der Wind ist kalt,\nIch bleibe heute lieber zu Haus.\nDie Sonne scheint nicht, der Himmel ist grau,\nIch gehe heute nicht mehr raus.\n\nKönnen wir uns morgen treffen?\nVielleicht scheint dann die Sonne.\nHeute muss ich leider absagen,\nDoch morgen habe ich Zeit.\n\n[Verse 2]\nAm Nachmittag kommt ein Gewitter,\nEs blitzt und donnert draußen.\nIch mache meine Fenster zu,\nUnd trinke einen warmen Tee.\n\nAm Abend wird der Regen weniger,\nIch schaue noch einmal hinaus.\nMia schreibt: „Morgen um drei?“\nIch antworte: „Ja, das passt mir gut!“\n\n[Chorus]\nEs regnet, es regnet, der Wind ist kalt,\nIch bleibe heute lieber zu Haus.\nDie Sonne scheint nicht, der Himmel ist grau,\nIch gehe heute nicht mehr raus.\n\nKönnen wir uns morgen treffen?\nVielleicht scheint dann die Sonne.\nHeute muss ich leider absagen,\nDoch morgen habe ich Zeit.\n\n[Outro]\nAm nächsten Tag scheint die Sonne,\nDer Himmel ist wieder blau.\nIch treffe Mia um drei im Park,\nUnd freue mich auf den Tag.",
+  "status": "needs-review",
+  "recordingSha256": "975dccc63635bb209a98da254a20447b0336d15fc548b82ea61694d2ab8cfdd8",
+  "audioBytes": 3716749,
+  "reason": "Low acoustic match: total=90.0%, weakest line=28.6%"
+}

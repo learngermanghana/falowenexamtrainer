@@ -1,0 +1,12 @@
+{
+  "trackId": "r2-a1-day-03-b64_V2VyIGJpc3QgZHVfIFNhZyBlcyBtaXIhLm1wMw",
+  "objectKey": "music/a1/day-03/Wer bist du_ Sag es mir!.mp3",
+  "level": "A1",
+  "day": 3,
+  "source": "approved",
+  "lyrics": "[Verse 1]\nHeute kommt ein neuer Schüler,\nEr hat ein Buch und einen Stift.\nIch frage freundlich: „Wie heißt du?“\nEr sagt: „Hallo, ich heiße Ben.“\n\n„Woher kommst du?“, frage ich,\nEr sagt: „Ich komme aus Berlin.“\nIch sage: „Schön, dich hier zu sehen!“\nJetzt lernen wir zusammen Deutsch.\n\n[Chorus]\nWer bist du? Wie heißt du?\nWoher kommst du? Sag es mir!\nWo wohnst du? Was machst du gern?\nIch möchte dich gern kennenlernen.\n\nOh-oh, ich frage dich,\nHmm-hmm, du antwortest mir.\nSo lernen wir uns besser kennen,\nUnd sprechen jeden Tag ein bisschen mehr.\n\n[Verse 2]\nIch frage Ben: „Wo wohnst du jetzt?“\nEr sagt: „Ich wohne hier in Bonn.“\n„Was machst du gern am Wochenende?“\n„Ich höre Musik und spiele gern.“\n\n„Wann beginnt der Deutschkurs morgen?“\nEr sagt: „Um neun Uhr, wie heute.“\nIch sage: „Danke, bis morgen!“\nEr lächelt und sagt: „Bis dann!“\n\n[Chorus]\nWer bist du? Wie heißt du?\nWoher kommst du? Sag es mir!\nWo wohnst du? Was machst du gern?\nIch möchte dich gern kennenlernen.\n\nOh-oh, ich frage dich,\nHmm-hmm, du antwortest mir.\nSo lernen wir uns besser kennen,\nUnd sprechen jeden Tag ein bisschen mehr.\n\n[Outro]\nHmm, hmm, jetzt kenne ich Ben,\nOh-oh, wir sehen uns morgen.\nIch frage gern, ich höre zu,\nUnd lerne jeden Tag Deutsch.\n\nHmm, hmm, bis morgen!",
+  "status": "needs-review",
+  "recordingSha256": "b76ead1ee8fd9ec0d1530f935c796e22daa27b7878560288b81e38d486366a4d",
+  "audioBytes": 3411843,
+  "reason": "Low acoustic match: total=91.2%, weakest line=0.0%"
+}
