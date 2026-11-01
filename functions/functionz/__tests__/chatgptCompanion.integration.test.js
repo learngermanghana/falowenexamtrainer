@@ -15,8 +15,20 @@ function mockFirebase() {
     ["student-2", { uid: "student-2", role: "student", level: "B1", name: "Student Two", studentCode: "TEST002" }],
     ["b2-learner", { uid: "b2-learner", role: "student", level: "B2", name: "B2 Test Learner", studentCode: "TESTB2" }],
     ["inactive", { uid: "inactive", role: "student", level: "A1", trialStatus: "expired", paymentStatus: "pending" }],
+    ["student-class", { uid: "student-class", role: "student", level: "A1", classId: "class-genuine", name: "Class Learner" }],
   ]);
   collections.set("students", studentData);
+  collections.set("classes", new Map([
+    ["class-genuine", { name: "A1 Genuine Klasse", levelId: "A1", status: "active", timezone: "Africa/Accra", zoomProfileId: "profile-genuine" }],
+    ["class-other", { name: "A1 Private Klasse", levelId: "A1", status: "active", zoomUrl: "https://zoom.us/j/333?pwd=other" }],
+  ]));
+  collections.set("classSessions", new Map([
+    ["session-genuine", { classId: "class-genuine", startsAt: "2099-01-04T10:00:00Z", endsAt: "2099-01-04T11:00:00Z", topic: "Guten Morgen", status: "scheduled", curriculumDay: 1 }],
+    ["session-other", { classId: "class-other", startsAt: "2099-01-03T10:00:00Z", endsAt: "2099-01-03T11:00:00Z", topic: "Private topic", status: "scheduled" }],
+  ]));
+  collections.set("zoomProfiles", new Map([
+    ["profile-genuine", { joinUrl: "https://us06web.zoom.us/j/111?pwd=own" }],
+  ]));
   const getStore = (name) => {
     if (!collections.has(name)) collections.set(name, new Map());
     return collections.get(name);
@@ -29,6 +41,20 @@ function mockFirebase() {
           return {
             async get() { return { id, exists: stored.has(id), data: () => stored.get(id) }; },
             async set(data) { stored.set(id, data); },
+          };
+        },
+        where(field, operator, value) {
+          if (operator !== "==") throw Error("unsupported fixture query");
+          return {
+            limit(max) {
+              return {
+                async get() {
+                  const docs = [...stored.entries()].filter(([, row]) => row?.[field] === value)
+                    .slice(0, max).map(([id, data]) => ({ id, data: () => data }));
+                  return { docs, empty: !docs.length };
+                },
+              };
+            },
           };
         },
       };
@@ -44,6 +70,7 @@ function mockFirebase() {
       db.collection = (name) => {
         const col = originalCollection(name);
         return {
+          ...col,
           doc(id) {
             const ref = col.doc(id);
             return { ...ref, collectionName: name, id };
@@ -67,6 +94,7 @@ function mockFirebase() {
   db.collection = (name) => {
     const col = origCollection(name);
     return {
+      ...col,
       doc(id) { return { ...col.doc(id), collectionName: name, id }; },
     };
   };
@@ -74,7 +102,7 @@ function mockFirebase() {
     firestore: () => db,
     auth: () => ({
       async verifyIdToken(idToken) {
-        if (!["student-1", "student-2", "b2-learner", "inactive"].includes(idToken)) throw Error("invalid token");
+        if (!["student-1", "student-2", "b2-learner", "student-class", "inactive"].includes(idToken)) throw Error("invalid token");
         return { uid: idToken, email: idToken + "@example.org", email_verified: true };
       },
     }),
@@ -263,6 +291,25 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const spoofed = await call({ day: 1, section: "reading", level: "B2" });
       expect(spoofed.data.result.structuredContent.level).toBe("B1");
       expect(spoofed.data.result.structuredContent.material.title).toBe("Traumdeutung und ihre Bedeutung");
+    });
+  });
+
+  test("OAuth-bound A1 learner sees only own class's next session and Zoom link", async () => {
+    await withServer(async (origin) => {
+      const grant = await connectStudent(origin, "student-class", "live-class");
+      expect(grant.response.status).toBe(200);
+      const result = await postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 80, method: "tools/call",
+        params: { name: "get_my_falowen_next_class", arguments: { classId: "class-other", level: "B1" } },
+      }, grant.tokens.access_token);
+      const content = result.data.result.structuredContent;
+      expect(content.classAssigned).toBe(true);
+      expect(content.className).toBe("A1 Genuine Klasse");
+      expect(content.level).toBe("A1");
+      expect(content.nextSession.topic).toBe("Guten Morgen");
+      expect(content.nextSession.startsAt).toBe("2099-01-04T10:00:00.000Z");
+      expect(content.zoomUrl).toContain("pwd=own");
+      expect(JSON.stringify(content)).not.toContain("pwd=other");
     });
   });
 
