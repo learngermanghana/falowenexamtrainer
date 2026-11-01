@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a2-day-08-b64_RWluIEFiZW5kIHp1IHp3ZWl0Lm1wMw",
+  "objectKey": "music/a2/day-08/Ein Abend zu zweit.mp3",
+  "level": "A2",
+  "day": 8,
+  "source": "approved",
+  "lyrics": "[Intro]\nEin Abend im Restaurant.\n\n[Verse 1]\nAm Freitagabend geh’ ich mit Mia aus.\n\n[Chorus]\nFür mich bitte Gemüse mit Reis,\nfür Mia die Suppe, schön heiß.\nZwei Gläser Wasser, danke sehr.\nEin Abend zu zweit, was wollen wir mehr?\n\n[Verse 2]\nDoch plötzlich steht ein Fisch vor mir.\nIch schaue auf den Teller und sage zu ihr:\n„Das habe ich doch gar nicht bestellt!“\nDer Kellner kommt und fragt: „Was fehlt?“\nIch sage freundlich:\n„Das ist nicht mein Essen.“\nEr sagt: „Entschuldigung,\nich hab’s verwechselt.“\nKurz darauf bringt er mein richtiges Gericht.\nMia lacht und sagt:\n„Jetzt fehlt uns nichts.“\n\n[Chorus]\nFür mich bitte Gemüse mit Reis,\nfür Mia die Suppe, schön heiß.\nZwei Gläser Wasser, danke sehr.\nEin Abend zu zweit, was wollen wir mehr?\n\n[Final Chorus]\nMmm, für mich bitte Gemüse mit Reis,\nfür Mia die Suppe, schön heiß.\nZwei Gläser Wasser, danke sehr.\nMmm, ein Abend zu zweit,\nwas wollen wir mehr?\n\n[Outro]\nMmm, mmm, mmm.\nMmm, mmm, mmm.\nMmm, mmm.",
+  "status": "needs-review",
+  "recordingSha256": "f13735d3d4954c4925db0c045fe27a9cd6c6c30e8cb5a4ca392eae63a18b0829",
+  "audioBytes": 2702278,
+  "reason": "Low acoustic match: total=88.5%, weakest line=0.0%",
+  "recognizedSnippet": " Ein  Abend  im  Restaurant,  am  Freitagabend  gehe  ich  mit  mir  aus  Für  mich  bitte  Gemüse  mit  Reis,  für  mir  die  Suppe  schön  heiß  Zwei  Gläser  Wasser,  danke  sehr  Ein  Abend  zu  zweit  Was  wollen  wir  mehr?  Doch  plötzlich  steht  ein  Fisch  vor  mir  Ich  schaue  auf  den  Teller  und  sage  zu  ihr  Das  habe  ich  doch  gar  nicht  bestellt  Der  Kilner  kommt  und  fragt  was  fehlt  Ich  sage  freundlich  Das"
+}

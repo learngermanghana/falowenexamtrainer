@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a1-day-15-b64_QmVpIEZhbG93ZW4gw7xiZSBpY2ggZGFzLm1wMw",
+  "objectKey": "music/a1/day-15/Bei Falowen übe ich das.mp3",
+  "level": "A1",
+  "day": 15,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nVor der Prüfung bin ich nervös.\nMia sagt: Du schaffst das.\nIch sage: Ich heiße Ben.\nIch komme aus Berlin.\n\n[Chorus]\nIch höre zu, ich frage nach.\nIch sage: Können Sie das wiederholen?\nGanz ruhig, ich bin bereit.\n\n[Verse 2]\nIch sehe eine Karte: Wasser.\nIch frage: Möchten Sie Wasser?\nMia sagt: Ja, bitte.\nIch antworte: Hier, bitte schön.\n\n[Chorus]\nIch höre zu, ich frage nach.\nIch sage: Können Sie das wiederholen?\nGanz ruhig, ich bin bereit.\n\n[Outro]\nDie Prüfung macht mir weniger Angst.\nDenn ich kann schon viel sagen.\nBei Falowen übe ich das Sprechen.",
+  "status": "review-only",
+  "recordingSha256": "65d7e2a98345d61b63bdc8c8c72158345c70b23fe9895207040334ffa62655f5",
+  "audioBytes": 3810444,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 18.68,
+      "end": 24.74,
+      "text": "Vor der Prüfung bin ich nervös."
+    },
+    {
+      "start": 26.44,
+      "end": 30.3,
+      "text": "Mia sagt: Du schaffst das."
+    },
+    {
+      "start": 31.0,
+      "end": 33.88,
+      "text": "Ich sage: Ich heiße Ben."
+    },
+    {
+      "start": 35.9,
+      "end": 38.56,
+      "text": "Ich komme aus Berlin."
+    },
+    {
+      "start": 39.72,
+      "end": 44.2,
+      "text": "Ich höre zu, ich frage nach."
+    },
+    {
+      "start": 44.8,
+      "end": 49.36,
+      "text": "Ich sage: Können Sie das wiederholen?"
+    },
+    {
+      "start": 49.78,
+      "end": 57.4,
+      "text": "Ganz ruhig, ich bin bereit."
+    },
+    {
+      "start": 61.66,
+      "end": 64.56,
+      "text": "Ich sehe eine Karte: Wasser."
+    },
+    {
+      "start": 66.96,
+      "end": 69.72,
+      "text": "Ich frage: Möchten Sie Wasser?"
+    },
+    {
+      "start": 71.4,
+      "end": 73.68,
+      "text": "Mia sagt: Ja, bitte."
+    },
+    {
+      "start": 73.98,
+      "end": 79.5,
+      "text": "Ich antworte: Hier, bitte schön."
+    },
+    {
+      "start": 79.52,
+      "end": 85.26,
+      "text": "Ich höre zu, ich frage nach."
+    },
+    {
+      "start": 86.46,
+      "end": 90.5,
+      "text": "Ich sage: Können Sie das wiederholen?"
+    },
+    {
+      "start": 91.36,
+      "end": 97.78,
+      "text": "Ganz ruhig, ich bin bereit."
+    },
+    {
+      "start": 122.12,
+      "end": 126.6,
+      "text": "Die Prüfung macht mir weniger Angst."
+    },
+    {
+      "start": 126.7,
+      "end": 131.8,
+      "text": "Denn ich kann schon viel sagen."
+    },
+    {
+      "start": 132.7,
+      "end": 138.46,
+      "text": "Bei Falowen übe ich das Sprechen."
+    }
+  ],
+  "matchCoverage": 0.945,
+  "weakestLineCoverage": 0.5,
+  "totalLines": 17,
+  "duration": 158.0
+}

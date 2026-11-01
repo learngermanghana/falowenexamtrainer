@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a2-day-13-b64_QmV3ZXJidW5nc2dlc3Byw6RjaC5tcDM",
+  "objectKey": "music/a2/day-13/Bewerbungsgespräch.mp3",
+  "level": "A2",
+  "day": 13,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nAm Montag habe ich ein Bewerbungsgespräch.\nIch bin nervös und komme früh.\nDie Chefin begrüßt mich freundlich.\nSie fragt nach meiner Erfahrung.\n\n[Chorus]\nGuten Tag, schön, dass Sie hier sind.\nIch höre zu und antworte klar.\nIch zeige, was ich gerne mache.\n\n[Verse 2]\nIch erzähle von meinem letzten Praktikum.\nDort habe ich im Team gearbeitet.\nDann frage ich nach den Arbeitszeiten.\nDie Chefin erklärt mir alles in Ruhe.\n\n[Chorus]\nGuten Tag, schön, dass Sie hier sind.\nIch höre zu und antworte klar.\nIch zeige, was ich gerne mache.\n\n[Outro]\nAm Freitag bekomme ich eine Nachricht.\nIch darf nächste Woche anfangen.\nMit Falowen bereite ich mich gut vor.",
+  "status": "review-only",
+  "recordingSha256": "1dbd1f2ff00ff309deef1f2eae3fd399311546f7c491f96f94d8e95a4a62802a",
+  "audioBytes": 3223090,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 17.22,
+      "end": 22.92,
+      "text": "Am Montag habe ich ein Bewerbungsgespräch."
+    },
+    {
+      "start": 22.94,
+      "end": 29.6,
+      "text": "Ich bin nervös und komme früh."
+    },
+    {
+      "start": 31.32,
+      "end": 35.42,
+      "text": "Die Chefin begrüßt mich freundlich."
+    },
+    {
+      "start": 35.44,
+      "end": 38.94,
+      "text": "Sie fragt nach meiner Erfahrung."
+    },
+    {
+      "start": 40.5,
+      "end": 45.52,
+      "text": "Guten Tag, schön, dass Sie hier sind."
+    },
+    {
+      "start": 46.58,
+      "end": 52.74,
+      "text": "Ich höre zu und antworte klar."
+    },
+    {
+      "start": 52.76,
+      "end": 56.02,
+      "text": "Ich zeige, was ich gerne mache."
+    },
+    {
+      "start": 62.22,
+      "end": 67.36,
+      "text": "Ich erzähle von meinem letzten Praktikum."
+    },
+    {
+      "start": 67.38,
+      "end": 70.9,
+      "text": "Dort habe ich im Team gearbeitet."
+    },
+    {
+      "start": 71.22,
+      "end": 75.26,
+      "text": "Dann frage ich nach den Arbeitszeiten."
+    },
+    {
+      "start": 75.28,
+      "end": 78.56,
+      "text": "Die Chefin erklärt mir alles in Ruhe."
+    },
+    {
+      "start": 78.64,
+      "end": 82.08,
+      "text": "Guten Tag, schön, dass Sie hier sind."
+    },
+    {
+      "start": 82.1,
+      "end": 85.76,
+      "text": "Ich höre zu und antworte klar."
+    },
+    {
+      "start": 85.78,
+      "end": 89.5,
+      "text": "Ich zeige, was ich gerne mache."
+    },
+    {
+      "start": 91.86,
+      "end": 97.68,
+      "text": "Am Freitag bekomme ich eine Nachricht."
+    },
+    {
+      "start": 98.9,
+      "end": 102.3,
+      "text": "Ich darf nächste Woche anfangen."
+    },
+    {
+      "start": 102.32,
+      "end": 106.68,
+      "text": "Mit Falowen bereite ich mich gut vor."
+    }
+  ],
+  "matchCoverage": 0.981,
+  "weakestLineCoverage": 0.833,
+  "totalLines": 17,
+  "duration": 133.56
+}

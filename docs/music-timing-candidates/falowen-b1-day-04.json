@@ -1,0 +1,102 @@
+{
+  "trackId": "r2-b1-day-04-b64_T3J0IHp1bSBMZWJlbi5tcDM",
+  "objectKey": "music/b1/day-04/Ort zum Leben.mp3",
+  "level": "B1",
+  "day": 4,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nSeit Wochen suche ich eine neue Wohnung.\nIn meinem alten Zimmer ist es zu dunkel.\nDie Angebote im Internet klingen gut,\naber oft sind die Preise viel zu hoch.\n\n[Chorus]\nIch suche nicht nur vier Wände,\nich suche einen Ort zum Leben.\nEin Fenster, Licht und etwas Ruhe.\n\n[Verse 2]\nDann schickt mir Mia eine Anzeige.\nDie Wohnung liegt nicht weit vom Park.\nIch rufe sofort beim Vermieter an,\nweil ich den Besichtigungstermin nicht verpassen möchte.\n\n[Chorus]\nIch suche nicht nur vier Wände,\nich suche einen Ort zum Leben.\nEin Fenster, Licht und etwas Ruhe.\n\n[Outro]\nMorgen sehe ich mir die Wohnung an.\nVielleicht beginnt hier mein neues Kapitel.\nBei Falowen kann ich meine Wünsche genauer erklären.",
+  "status": "review-only",
+  "recordingSha256": "ccff1e634e8f1d202dea1c5a3b1b77a6a8572102d6b20d6004e65d6e1e5d9883",
+  "audioBytes": 2505637,
+  "cues": [
+    {
+      "start": 9.74,
+      "end": 12.52,
+      "text": "Seit Wochen suche ich eine neue Wohnung."
+    },
+    {
+      "start": 13.62,
+      "end": 16.72,
+      "text": "In meinem alten Zimmer ist es zu dunkel."
+    },
+    {
+      "start": 17.98,
+      "end": 21.08,
+      "text": "Die Angebote im Internet klingen gut,"
+    },
+    {
+      "start": 21.1,
+      "end": 25.64,
+      "text": "aber oft sind die Preise viel zu hoch."
+    },
+    {
+      "start": 25.66,
+      "end": 28.36,
+      "text": "Ich suche nicht nur vier Wände,"
+    },
+    {
+      "start": 28.6,
+      "end": 33.0,
+      "text": "ich suche einen Ort zum Leben."
+    },
+    {
+      "start": 33.86,
+      "end": 37.94,
+      "text": "Ein Fenster, Licht und etwas Ruhe."
+    },
+    {
+      "start": 45.16,
+      "end": 47.08,
+      "text": "Dann schickt mir Mia eine Anzeige."
+    },
+    {
+      "start": 48.04,
+      "end": 50.18,
+      "text": "Die Wohnung liegt nicht weit vom Park."
+    },
+    {
+      "start": 50.2,
+      "end": 52.36,
+      "text": "Ich rufe sofort beim Vermieter an,"
+    },
+    {
+      "start": 52.6,
+      "end": 55.04,
+      "text": "weil ich den Besichtigungstermin nicht verpassen möchte."
+    },
+    {
+      "start": 55.06,
+      "end": 58.34,
+      "text": "Ich suche nicht nur vier Wände,"
+    },
+    {
+      "start": 58.56,
+      "end": 62.68,
+      "text": "ich suche einen Ort zum Leben."
+    },
+    {
+      "start": 62.7,
+      "end": 68.34,
+      "text": "Ein Fenster, Licht und etwas Ruhe."
+    },
+    {
+      "start": 78.48,
+      "end": 83.0,
+      "text": "Morgen sehe ich mir die Wohnung an."
+    },
+    {
+      "start": 83.02,
+      "end": 87.22,
+      "text": "Vielleicht beginnt hier mein neues Kapitel."
+    },
+    {
+      "start": 87.24,
+      "end": 92.78,
+      "text": "Bei Falowen kann ich meine Wünsche genauer erklären."
+    }
+  ],
+  "matchCoverage": 0.875,
+  "weakestLineCoverage": 0.5,
+  "totalLines": 17,
+  "duration": 107.6
+}

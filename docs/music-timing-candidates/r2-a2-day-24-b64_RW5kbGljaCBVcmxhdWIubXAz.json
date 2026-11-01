@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a2-day-24-b64_RW5kbGljaCBVcmxhdWIubXAz",
+  "objectKey": "music/a2/day-24/Endlich Urlaub.mp3",
+  "level": "A2",
+  "day": 24,
+  "source": "approved",
+  "lyrics": "[Verse 1]\nIch möchte in den Ferien verreisen,\nSchon lange träume ich von Hamburg.\nIch habe jeden Monat Geld gespart,\nJetzt kann ich endlich Urlaub machen.\nIch suche ein Hotel im Internet,\nUnd finde ein Zimmer in der Stadt.\nDann buche ich mein Ticket für Samstag,\nJetzt fehlt nur noch mein Koffer.\n\n[Chorus]\nEndlich Urlaub, endlich frei,\nIch packe meine Sachen ein.\nEin neues Ziel, ein neuer Ort,\nAm Samstag fahre ich endlich fort.\nDoo-doo, doo-doo, do-do,\nHamburg, ich freue mich auf dich!\n\n[Verse 2]\nAm Freitag packe ich meinen Koffer,\nIch nehme Kleidung und mein Handy mit.\nAm Samstag stehe ich früh auf,\nMein Zug fährt schon um acht Uhr ab.\nAm Bahnhof kaufe ich einen Kaffee,\nDann steige ich in meinen Zug ein.\nIch schaue aus dem Fenster und lächle,\nMein Urlaub beginnt, wie schön!\n\n[Chorus]\nEndlich Urlaub, endlich frei,\nIch packe meine Sachen ein.\nEin neues Ziel, ein neuer Ort,\nAm Samstag fahre ich endlich fort.\nDoo-doo, doo-doo, do-do,\nHamburg, ich freue mich auf dich!\n\n[Outro]\nAm Mittag komme ich in Hamburg an,\nIch gehe zum Hotel und checke ein.\nDann mache ich einen Spaziergang,\nMein Urlaub kann jetzt beginnen.\n\n[Outro – Repeat, Softer]\nAm Mittag komme ich in Hamburg an,\nIch gehe zum Hotel und checke ein.\nDann mache ich einen Spaziergang,\nMein Urlaub kann jetzt beginnen.\nDoo-doo, doo-doo, do-do …\nDoo-doo, doo-doo …",
+  "status": "needs-review",
+  "recordingSha256": "087650874c42ae2b28dc150eebaa27a2845c4d51f9f760fa92f1cfc20c237fc6",
+  "audioBytes": 3642336,
+  "reason": "Low acoustic match: total=83.2%, weakest line=0.0%",
+  "recognizedSnippet": " Ich  möchte  in  den  Ferien  verreisen.  Schon  lange  träume  ich  von  Hamburg.  Ich  habe  jeden  Monat  Geld  gespart.  Jetzt  kann  ich  endlich  Urlaub  machen.  Ich  suche  ein  Hotel  im  Internet  und  finde  ein  Zimmer  in  der  Stadt.  Dann  buche  ich  mein  Ticket  für  Samstag,  jetzt  fehlt  nur  noch  mein  Koffer  Endlich  Urlaub,  endlich  frei,  ich  packe  meine  Sachen  ein  Ein  neues  Ziel,  ein  neuer  Ort,  am  Samstag  fahre  ich  endlich"
+}
