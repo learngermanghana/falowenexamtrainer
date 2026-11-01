@@ -8,6 +8,16 @@ import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
 // isolated in analytics.js on the public music host. Only approved recordings play.
 const byId = id => document.getElementById(id);
 const embedded = new URLSearchParams(location.search).get("embedded") === "1";
+// Only the authenticated Campus parent may associate these activity signals
+// with an account. The public music site never receives student credentials.
+function signalCampusPractice(event, track) {
+  if (!embedded || window.parent === window || !track?.id) return;
+  window.parent.postMessage({
+    source: "falowen-music", kind: "activity", event,
+    trackId: track.id, title: track.title,
+    level: track.level, day: track.day,
+  }, location.origin);
+}
 // Embedded pages run on www.falowen.app, same-origin with the student's session.
 if (embedded) {
   document.body.classList.add("music-embedded");
@@ -16,6 +26,7 @@ if (embedded) {
   });
 }
 const audio = byId("audio");
+audio.addEventListener("play", () => signalCampusPractice("play", current));
 const player = byId("player");
 const tracksRoot = byId("tracks");
 const levelInput = byId("level");
@@ -326,7 +337,10 @@ function moveTrack(direction = 1) {
   if (!byId("song-detail").hidden) renderDetail(track);
   history.replaceState({trackId: track.id}, "", songUrl(track).pathname + songUrl(track).search);
 }
-audio.addEventListener("ended", () => { if (!audio.loop) moveTrack(1); });
+audio.addEventListener("ended", () => {
+  signalCampusPractice("complete", current); // Before autoplay changes the track.
+  if (!audio.loop) moveTrack(1);
+});
 byId("next-track")?.addEventListener("click", () => moveTrack(1));
 byId("previous-track")?.addEventListener("click", () => moveTrack(-1));
 function setTab(name) {
@@ -484,6 +498,7 @@ function checkAnswers() {
   byId("practice-feedback").textContent = answered === questions.length
     ? correct + " of " + questions.length + " correct. Practise again whenever you like."
     : answered + " of " + questions.length + " answered. Finish the remaining question(s).";
+  if (questions.length > 0 && answered === questions.length) signalCampusPractice("quiz", selected);
 }
 function renderDetail(track) {
   const lesson = lessonFor(track);
