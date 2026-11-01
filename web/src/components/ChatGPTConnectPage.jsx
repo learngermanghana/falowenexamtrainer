@@ -63,6 +63,7 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
             <li>Your course level and lesson topics</li>
             <li>Your assignment list and links to Campus</li>
             <li>Your recorded marks and teacher feedback</li>
+            <li>Your assigned class timetable, session topics and saved Zoom join link (when available)</li>
           </ul>
         </div>
         <p style={styles.subtle}>

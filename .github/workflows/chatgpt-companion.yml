@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "functions/functionz/chatgptCompanion.js"
+      - "functions/functionz/chatgptClassTimetable.js"
+      - "functions/functionz/__tests__/chatgptClassTimetable.test.js"
       - "scripts/generateChatgptLessonContent.mjs"
       - "web/src/data/b2*.js"
       - "web/package.json"
@@ -32,9 +34,10 @@ jobs:
       - name: Generate student-facing curriculum from canonical B2 sources
         run: node scripts/generateChatgptLessonContent.mjs
       - name: Verify OAuth constraints and student data scope
-        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js
+        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js
       - name: Verify JavaScript syntax
         run: |
           node --check functions/functionz/chatgptCompanion.js
+          node --check functions/functionz/chatgptClassTimetable.js
           node --check functions/functionz/paymentAwareApp.js
           node -e "JSON.parse(require('fs').readFileSync('vercel.json', 'utf8'))"
