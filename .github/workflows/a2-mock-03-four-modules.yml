@@ -1,0 +1,67 @@
+name: A2 Mock 03 four-module verification
+on:
+  pull_request:
+    paths:
+      - 'web/src/components/A2Mock3*'
+      - 'web/src/data/a2Mock3*'
+      - 'web/src/data/mockExamCatalog.js'
+      - 'web/src/data/a2FullMockContract*'
+      - 'web/src/services/a2Mock3Finalization.js'
+      - 'web/src/services/mockAssessmentRequest.js'
+      - 'web/src/utils/mockReviewAccess.js'
+      - 'web/src/App.js'
+      - 'functions/functionz/a2Mock3MarkingSet.js'
+      - 'functions/functionz/a2MockCompletionSync.js'
+      - 'functions/functionz/a2MockExaminerScore.js'
+      - 'functions/functionz/a2MockSpeakingAttemptIdentity.js'
+      - 'functions/functionz/assessmentTaskContext.js'
+      - 'functions/functionz/app.js'
+      - 'functions/functionz/tests/a2Mock3FourModules.test.cjs'
+      - '.github/workflows/a2-mock-03-four-modules.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/src/components/A2Mock3*'
+      - 'web/src/data/a2Mock3*'
+      - 'functions/functionz/a2Mock3MarkingSet.js'
+      - 'functions/functionz/tests/a2Mock3FourModules.test.cjs'
+      - '.github/workflows/a2-mock-03-four-modules.yml'
+permissions:
+  contents: read
+jobs:
+  private-marking-and-lifecycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate backend module syntax
+        run: |
+          node --check functions/functionz/app.js
+          node --check functions/functionz/a2Mock3MarkingSet.js
+          node --check functions/functionz/a2MockCompletionSync.js
+          node --check functions/functionz/assessmentTaskContext.js
+      - name: Verify Mock 03 answer keys, versioning and /100 result safety
+        run: node --test functions/functionz/tests/a2Mock3FourModules.test.cjs
+  browser-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+        working-directory: web
+      - name: A2 Mock 03 content, reading interaction and publication gates
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/components/A2Mock3Modules.test.jsx src/data/a2FullMockContract.test.js src/components/A2Mock3Hoeren.test.jsx
+      - name: Production web compile without deployment
+        working-directory: web
+        run: npx vite build

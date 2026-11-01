@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import AppBackButton from "./navigation/AppBackButton";
+import { getA2Mock3StorageKeys } from "../utils/mockReviewAccess";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import teil1 from "../data/mockDrafts/a2-mock-03-hoeren-teil-1.json";
 import teil2 from "../data/mockDrafts/a2-mock-03-hoeren-teil-2.json";
@@ -21,11 +22,16 @@ const restore = uid => {
   catch { return {}; }
 };
 
-export default function A2Mock3Hoeren() {
+const readFullHoerenCompletion = uid => {
+  try { return Boolean(JSON.parse(localStorage.getItem(getA2Mock3StorageKeys(uid).hoeren) || "null")?.completedAt); }
+  catch { return false; }
+};
+
+export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewReleased = false }) {
   const { idToken, user } = useAuth();
   const [active, setActive] = useState(0);
   const [answers, setAnswers] = useState(() => restore(user?.uid));
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(() => Boolean(embedded && readFullHoerenCompletion(user?.uid)));
   const [audioUrl, setAudioUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [audioError, setAudioError] = useState("");
@@ -41,8 +47,8 @@ export default function A2Mock3Hoeren() {
 
   useEffect(() => {
     setAnswers(restore(user?.uid));
-    setSubmitted(false);
-  }, [user?.uid]);
+    setSubmitted(Boolean(embedded && readFullHoerenCompletion(user?.uid)));
+  }, [user?.uid, embedded]);
   useEffect(() => {
     if (!user?.uid) return;
     localStorage.setItem(answersKey(user.uid), JSON.stringify(answers));
@@ -67,16 +73,31 @@ export default function A2Mock3Hoeren() {
     } finally { setLoading(false); }
   }
 
+  // Full Mock 03 gets a separate completed Hören checkpoint. Preserve the
+  // historical listening-only answers and URL unchanged.
+  useEffect(() => {
+    if (!embedded || !submitted) return;
+    const key = getA2Mock3StorageKeys(user?.uid).hoeren;
+    const old = (() => { try { return JSON.parse(localStorage.getItem(key) || "{}") || {}; } catch { return {}; } })();
+    localStorage.setItem(key, JSON.stringify({ ...old, answers, completedAt:old.completedAt || Date.now() }));
+    if (!reviewReleased) onComplete?.();
+  }, [embedded, submitted, answers, user?.uid, onComplete, reviewReleased]);
+
   const update = (question, value) => {
     if (!submitted) setAnswers(old => ({ ...old, [question.number]: value }));
   };
 
   return (
     <main className="a2-mock2-shell" lang="de" data-a2-mock3-hoeren>
-      <div className="a2-mock2-top">
+      {!embedded ? <div className="a2-mock2-top">
         <AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" />
         <span>A2 · Mock 3 · Hören</span>
-      </div>
+      </div> : null}
+      {!embedded ? <aside style={{padding:"12px 14px",border:"1px solid #bfdbfe",borderRadius:10,marginBottom:12}}>
+        <strong>Neu: A2 Mock 3 mit allen vier Modulen</strong>
+        <p>Lesen, Hören, Schreiben und Sprechen zusammen üben.</p>
+        <a href="/campus/course/a2-mock-3">Vollständige A2 Mock 3 öffnen</a>
+      </aside> : null}
       <header className="a2-mock2-progress">
         <div>
           <strong>Hören Mock 3 — Teile 1 bis 4</strong>
@@ -86,9 +107,9 @@ export default function A2Mock3Hoeren() {
       </header>
       <p role="note">
         Dies ist die vollständige Hören-Übung zu Mock 3 (Teile 1 bis 4, 20 Aufgaben).
-        Lesen, Schreiben und Sprechen gehören zur separaten vollständigen A2-Prüfung.
-        Ihre Antworten bleiben auf diesem Gerät; hier wird kein offizielles
-        vierteiliges Prüfungsergebnis gespeichert.
+        {embedded
+          ? " Nach Hören folgen Schreiben und Sprechen in dieser Mock-Prüfung. Das Gesamtergebnis wird nach serverseitiger Prüfung aller vier Module gespeichert."
+          : " Lesen, Schreiben und Sprechen gehören zur separaten vollständigen A2-Prüfung. Ihre Antworten bleiben auf diesem Gerät; hier wird kein offizielles vierteiliges Prüfungsergebnis gespeichert."}
       </p>
       <nav className="a2-mock2-nav" aria-label="Hören Teile">
         {PARTS.map((item, index) => (
@@ -154,11 +175,11 @@ export default function A2Mock3Hoeren() {
           </button>
         ) : (
           <section aria-live="polite">
-            <h2>Hören-Übungsergebnis: {score}/20</h2>
-            <p>Dies ist ausschließlich die lokale Hören-Übungsauswertung für vier Teile, keine verifizierte viermodulige Mock-Prüfungsnote.</p>
-            <button type="button" onClick={() => {
+            <h2>{embedded ? "Hören abgegeben" : `Hören-Übungsergebnis: ${score}/20`}</h2>
+            <p>{embedded ? "Der Hören-Score wird mit den anderen drei Modulen durch den Server geprüft." : "Dies ist ausschließlich die lokale Hören-Übungsauswertung für vier Teile, keine verifizierte viermodulige Mock-Prüfungsnote."}</p>
+            {!embedded ? <button type="button" onClick={() => {
               setAnswers({}); setSubmitted(false); setStarted({}); setAudioUrl("");
-            }}>Neu üben</button>
+            }}>Neu üben</button> : null}
           </section>
         )}
       </section>

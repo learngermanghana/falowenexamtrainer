@@ -6,7 +6,7 @@ import taskVersions from "../data/assessmentTaskVersions.json";
 export async function postMockAssessment(url, payload, config = {}) {
   const task = url.match(/\/(writing|speaking)\/(a1|a2|b1|b2)-mock-score$/);
   const isKombiA1 = task?.[2] === 'a1' && /^a1-mock-0[4-8]$/.test(String(payload?.mockId || ''));
-  const isKombiA2 = task?.[2] === 'a2' && /^a2-mock-0[4-8]$/.test(String(payload?.mockId || ''));
+  const isKombiA2 = task?.[2] === 'a2' && /^a2-mock-0[3-8]$/.test(String(payload?.mockId || ''));
   const requestPayload = task ? { ...payload, taskVersion: (isKombiA1 || isKombiA2) ? `${payload.mockId}-${task[1]}-v1` : taskVersions[task[2] === "a1" && ["a1-mock-02", "a1-mock-03"].includes(payload.mockId) ? `A1_MOCK_${payload.mockId.slice(-1)}` : task[2] === "a2" && payload.mockId === "a2-mock-02" ? "A2_MOCK_2" : task[2].toUpperCase()][task[1]] } : payload;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {

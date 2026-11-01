@@ -39,6 +39,15 @@ test("Mock 2 invokes the same verified attempt and completion services as Mock 1
 
 test("new A2 mocks cannot claim ready without registered and verified lifecycle", () => {
   expect(() => assertA2FullMockReady({
-    id: "a2-mock-03", level: "A2", mode: "full", status: "ready",
+    id: "a2-mock-09", level: "A2", mode: "full", status: "ready",
   })).toThrow(/cannot be published/);
+});
+
+
+test("Mock 03 has dedicated verified lifecycle capabilities (publication gated to tests)", () => {
+  const mock3 = MOCK_EXAM_CATALOG["a2-mock-03"];
+  expect(mock3.sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
+  expect(mock3.route).toBe("/campus/course/a2-mock-3");
+  expect(missingA2FullMockCapabilities("a2-mock-03")).toEqual([]);
+  expect(() => assertA2FullMockReady({...mock3,status:"ready"})).not.toThrow();
 });

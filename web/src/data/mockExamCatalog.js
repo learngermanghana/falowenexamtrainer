@@ -142,6 +142,13 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     route: "/campus/course/a2-mock-2", mode: "full",
     questionSetId: "a2-mock-02", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "a2-mock-03": {
+    id: "a2-mock-03", level: "A2", title: "A2 Mock 3", shortTitle: "A2 Mock 3",
+    description: "Complete Goethe-style A2 Mock 3 with 20 Lesen questions, 20 protected Hören questions, two writing tasks and three live speaking parts.",
+    durationLabel: "about 105 min · 4 modules", status: "preview",
+    route: "/campus/course/a2-mock-3", mode: "full",
+    questionSetId: "a2-mock-03", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
+  },
   // Published three-module tests. Hören will be added later as a separate
   // version; existing /75 attempts and marks must never be rewritten.
   "a2-mock-04": {
