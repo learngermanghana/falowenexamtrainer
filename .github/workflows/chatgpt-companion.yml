@@ -1,0 +1,33 @@
+name: ChatGPT Falowen Companion
+
+on:
+  pull_request:
+    paths:
+      - "functions/functionz/chatgptCompanion.js"
+      - "functions/functionz/__tests__/chatgptCompanion.test.js"
+      - "functions/functionz/paymentAwareApp.js"
+      - "web/src/components/ChatGPTConnectPage.jsx"
+      - "web/src/App.js"
+      - "vercel.json"
+      - ".github/workflows/chatgpt-companion.yml"
+  workflow_dispatch:
+
+jobs:
+  mcp-security-and-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm --prefix functions ci --ignore-scripts
+      - name: Verify OAuth constraints and student data scope
+        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js
+      - name: Verify JavaScript syntax
+        run: |
+          node --check functions/functionz/chatgptCompanion.js
+          node --check functions/functionz/paymentAwareApp.js
+          node -e "JSON.parse(require('fs').readFileSync('vercel.json', 'utf8'))"
