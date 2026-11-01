@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "scripts/run_falowen_music_sync_batch.py"
+      - "scripts/align_falowen_music.py"
       - ".github/workflows/music-sync-batch-20261101.yml"
 
 permissions:
