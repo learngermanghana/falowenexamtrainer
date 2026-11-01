@@ -115,7 +115,7 @@ describe("A2/B1 optional Music tab", () => {
     global.fetch=jest.fn(url => String(url).includes("/api/music-lyrics")
       ? Promise.resolve(jsonResponse({objectKey:"music/a1/day-08/Other.mp3",lyrics:"Incorrect private words"}))
       : original(url));
-    render(<WorkbookDayMusic level="A1" day={9} />);
+    render(<WorkbookDayMusic level="A1" day={9} hideLegacyNotes />);
     await waitFor(() => expect(screen.getByRole("heading", {name:"Der kleine Hund"})).toBeTruthy());
     await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/api/music-lyrics?track="), expect.any(Object)));
