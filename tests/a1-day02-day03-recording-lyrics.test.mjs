@@ -45,9 +45,11 @@ test('approved text never applies to another filename, day or private Hören key
  }
 });
 
-test('related PR 1291 replacements have exact-key untimed text and matching current questions',()=>{
+test('A1 Day21 stays untimed while Day22 uses estimated real-MP3 timestamps',()=>{
  for(const key of ['A1-13','A1-14.1']){
-  const pack=allRecordings.find(p=>p.assignmentKey===key);assert.ok(pack);assert.deepEqual(pack.cues,[]);
+  const pack=allRecordings.find(p=>p.assignmentKey===key);assert.ok(pack);
+  if(key==='A1-13') assert.deepEqual(pack.cues,[]);
+  else {assert.equal(pack.cues.length,33);assert.equal(pack.timingStatus,'estimated');}
   assert.equal(musicTrackFromKey(pack.objectKey).assignmentKey,key);
   const questions=recordingQuestions(pack.lyrics);assert.equal(questions.length,3);
   for(const q of questions.filter(q=>q.type==='listening')){assert.equal(q.options[q.correctIndex],q.answer);assert.ok(pack.lyrics.includes(q.evidence));}
