@@ -323,8 +323,8 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       // before discovering the same leaked website controls in the final PDF.
       const printed = execFileSync("pdftotext", ["-layout", file, "-"], { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
       const leaks = [
-        ["Teacher lecture links", /Teacher\\s+lecture\\s+video/i],
-        ["Workbook navigation panel", /^\\s*A2 workbook navigation\\s*$/mi],
+        ["Teacher lecture links", /Teacher\s+lecture\s+video/i],
+        ["Workbook navigation panel", /^\s*A2 workbook navigation\s*$/mi],
       ].filter(([, pattern]) => pattern.test(printed)).map(([label]) => label);
       if (leaks.length) throw new Error(`A2 Day ${lesson.day} ${suffix} print contains excluded UI: ${leaks.join(", ")}.`);
       await trimPrintedPdfTail(file, { description: `A2 Day ${lesson.day} ${suffix}` });
