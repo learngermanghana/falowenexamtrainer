@@ -1,0 +1,1022 @@
+{
+  "version": 1,
+  "description": "Editor-authored English translations for exactly matching published German lyric lines. No automatic translations; studio drafts never qualify.",
+  "recordings": [
+    {
+      "objectKey": "music/a1/day-13/Zwei Tees, vier Euro.mp3",
+      "lines": [
+        {
+          "de": "Im Café sind wir zu zweit.",
+          "en": "There are two of us in the café."
+        },
+        {
+          "de": "Zwei Tees stehen auf dem Tisch.",
+          "en": "Two cups of tea are on the table."
+        },
+        {
+          "de": "Die Uhr zeigt halb drei.",
+          "en": "The clock shows half past two."
+        },
+        {
+          "de": "Die Rechnung kommt jetzt auch.",
+          "en": "The bill is coming now too."
+        },
+        {
+          "de": "Zwei Tees, vier Euro, danke.",
+          "en": "Two teas, four euros, thank you."
+        },
+        {
+          "de": "Wie spät ist es? Halb drei.",
+          "en": "What time is it? Half past two."
+        },
+        {
+          "de": "Wir rechnen und wir lachen.",
+          "en": "We do the sums and we laugh."
+        },
+        {
+          "de": "Mia kauft noch ein Stück Kuchen.",
+          "en": "Mia buys another piece of cake."
+        },
+        {
+          "de": "Das kostet drei Euro.",
+          "en": "That costs three euros."
+        },
+        {
+          "de": "Wir zahlen sieben Euro.",
+          "en": "We pay seven euros."
+        },
+        {
+          "de": "Dann gehen wir nach Hause.",
+          "en": "Then we go home."
+        },
+        {
+          "de": "Zwei Tees, vier Euro, danke.",
+          "en": "Two teas, four euros, thank you."
+        },
+        {
+          "de": "Wie spät ist es? Halb drei.",
+          "en": "What time is it? Half past two."
+        },
+        {
+          "de": "Wir rechnen und wir lachen.",
+          "en": "We do the sums and we laugh."
+        },
+        {
+          "de": "Ich kenne Zeit und Preise.",
+          "en": "I know times and prices."
+        },
+        {
+          "de": "Bis morgen im Café!",
+          "en": "See you tomorrow at the café!"
+        },
+        {
+          "de": "Bei Falowen zählen wir zusammen.",
+          "en": "At Falowen we count together."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Rechnung",
+          "en": "the bill"
+        },
+        {
+          "de": "halb drei",
+          "en": "half past two (2:30)"
+        },
+        {
+          "de": "kosten",
+          "en": "to cost"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-14/Einsteigen – Wir fahren los.mp3",
+      "lines": [
+        {
+          "de": "Am Bahnhof, kurz vor acht,",
+          "en": "At the station, just before eight,"
+        },
+        {
+          "de": "Mia hat die Fahrkarte mitgebracht.",
+          "en": "Mia has brought the train ticket."
+        },
+        {
+          "de": "Sie fragt: „Wo können wir einsteigen?“",
+          "en": "She asks, \"Where can we get on?\""
+        },
+        {
+          "de": "Ben sagt: „Am Gleis drei, komm mit!“",
+          "en": "Ben says, \"At platform three, come along!\""
+        },
+        {
+          "de": "Die Uhr zeigt acht, wir sind bereit,",
+          "en": "The clock shows eight, we're ready,"
+        },
+        {
+          "de": "der Zug fährt ab, jetzt ist es so weit.",
+          "en": "the train is leaving; now it's time."
+        },
+        {
+          "de": "Die Türen sind offen, wir steigen ein,",
+          "en": "The doors are open, we get on,"
+        },
+        {
+          "de": "heute wollen wir zusammen sein.",
+          "en": "today we want to be together."
+        },
+        {
+          "de": "Wir können jetzt einsteigen,",
+          "en": "We can board now,"
+        },
+        {
+          "de": "wir wollen zusammen mitfahren.",
+          "en": "we want to ride together."
+        },
+        {
+          "de": "Wir müssen in Hannover umsteigen,",
+          "en": "We have to change trains in Hanover,"
+        },
+        {
+          "de": "wir möchten in Berlin ankommen.",
+          "en": "we would like to arrive in Berlin."
+        },
+        {
+          "de": "Einsteigen, umsteigen, weiterfahren,",
+          "en": "Get on, change trains, travel on,"
+        },
+        {
+          "de": "wir können zusammen nach Berlin fahren.",
+          "en": "we can travel to Berlin together."
+        },
+        {
+          "de": "Der Zug fährt los, wir schauen raus,",
+          "en": "The train sets off; we look outside,"
+        },
+        {
+          "de": "die Stadt sieht jetzt ganz anders aus.",
+          "en": "the city looks completely different now."
+        },
+        {
+          "de": "„Muss ich hier aussteigen?“",
+          "en": "\"Do I have to get off here?\""
+        },
+        {
+          "de": "Ben sagt: „Nein, wir müssen umsteigen.“",
+          "en": "Ben says, \"No, we have to change trains.\""
+        },
+        {
+          "de": "Der nächste Zug kommt gleich an,",
+          "en": "The next train arrives shortly,"
+        },
+        {
+          "de": "wir schauen, wo er halten kann.",
+          "en": "we look to see where it will stop."
+        },
+        {
+          "de": "„Darf ich jetzt schon einsteigen?“",
+          "en": "\"May I get on already?\""
+        },
+        {
+          "de": "„Ja, komm mit, wir können weiterfahren.“",
+          "en": "\"Yes, come along, we can continue.\""
+        },
+        {
+          "de": "Wir können jetzt einsteigen,",
+          "en": "We can board now,"
+        },
+        {
+          "de": "wir wollen zusammen mitfahren.",
+          "en": "we want to ride together."
+        },
+        {
+          "de": "Wir müssen in Hannover umsteigen,",
+          "en": "We have to change trains in Hanover,"
+        },
+        {
+          "de": "wir möchten in Berlin ankommen.",
+          "en": "we would like to arrive in Berlin."
+        },
+        {
+          "de": "Einsteigen, umsteigen, weiterfahren,",
+          "en": "Get on, change trains, travel on,"
+        },
+        {
+          "de": "wir können zusammen nach Berlin fahren.",
+          "en": "we can travel to Berlin together."
+        },
+        {
+          "de": "„Wann muss der Zug abfahren?“",
+          "en": "\"When does the train have to depart?\""
+        },
+        {
+          "de": "„Um vierzehn Uhr zwanzig.“",
+          "en": "\"At two twenty in the afternoon.\""
+        },
+        {
+          "de": "„Wo müssen wir umsteigen?“",
+          "en": "\"Where do we have to change trains?\""
+        },
+        {
+          "de": "„In Hannover, am Hauptbahnhof.“",
+          "en": "\"In Hanover, at the main station.\""
+        },
+        {
+          "de": "„Und wo können wir aussteigen?“",
+          "en": "\"And where can we get off?\""
+        },
+        {
+          "de": "„In Berlin! Dann sind wir da.“",
+          "en": "\"In Berlin! Then we'll be there.\""
+        },
+        {
+          "de": "Wir können jetzt einsteigen,",
+          "en": "We can board now,"
+        },
+        {
+          "de": "wir wollen zusammen mitfahren.",
+          "en": "we want to ride together."
+        },
+        {
+          "de": "Wir müssen in Hannover umsteigen,",
+          "en": "We have to change trains in Hanover,"
+        },
+        {
+          "de": "wir möchten in Berlin ankommen.",
+          "en": "we would like to arrive in Berlin."
+        },
+        {
+          "de": "Einsteigen, umsteigen, weiterfahren,",
+          "en": "Get on, change trains, travel on,"
+        },
+        {
+          "de": "zusammen können wir alles schaffen!",
+          "en": "together we can achieve anything!"
+        },
+        {
+          "de": "Der Zug kommt an, wir sind am Ziel,",
+          "en": "The train arrives; we've reached our destination,"
+        },
+        {
+          "de": "wir können jetzt aussteigen.",
+          "en": "we can get off now."
+        },
+        {
+          "de": "Mit Falowen lerne ich jeden Tag,",
+          "en": "With Falowen I learn every day,"
+        },
+        {
+          "de": "und morgen kann ich weiterfahren.",
+          "en": "and tomorrow I can travel on."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "einsteigen",
+          "en": "to get on / board"
+        },
+        {
+          "de": "umsteigen",
+          "en": "to change trains"
+        },
+        {
+          "de": "aussteigen",
+          "en": "to get off"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-21/Heute kann ich leider nicht.mp3",
+      "lines": [
+        {
+          "de": "Heute ist das Wetter schlecht,",
+          "en": "The weather is bad today,"
+        },
+        {
+          "de": "Der Himmel ist grau, es regnet stark.",
+          "en": "the sky is grey and it's raining heavily."
+        },
+        {
+          "de": "Ich möchte Mia im Park treffen,",
+          "en": "I want to meet Mia in the park,"
+        },
+        {
+          "de": "Doch draußen ist es nass und kalt.",
+          "en": "but outside it's wet and cold."
+        },
+        {
+          "de": "Ich schaue auf mein Handy,",
+          "en": "I look at my phone,"
+        },
+        {
+          "de": "Und rufe meine Freundin an.",
+          "en": "and call my friend."
+        },
+        {
+          "de": "Ich sage: „Mia, es tut mir leid,",
+          "en": "I say, \"Mia, I'm sorry,"
+        },
+        {
+          "de": "Heute kann ich leider nicht.“",
+          "en": "unfortunately I can't today.\""
+        },
+        {
+          "de": "Es regnet, es regnet, der Wind ist kalt,",
+          "en": "It's raining, it's raining, the wind is cold,"
+        },
+        {
+          "de": "Ich bleibe heute lieber zu Haus.",
+          "en": "I'd rather stay at home today."
+        },
+        {
+          "de": "Die Sonne scheint nicht, der Himmel ist grau,",
+          "en": "The sun isn't shining, the sky is grey,"
+        },
+        {
+          "de": "Ich gehe heute nicht mehr raus.",
+          "en": "I'm not going outside again today."
+        },
+        {
+          "de": "Können wir uns morgen treffen?",
+          "en": "Can we meet tomorrow?"
+        },
+        {
+          "de": "Vielleicht scheint dann die Sonne.",
+          "en": "Perhaps the sun will shine then."
+        },
+        {
+          "de": "Heute muss ich leider absagen,",
+          "en": "Unfortunately, I have to cancel today,"
+        },
+        {
+          "de": "Doch morgen habe ich Zeit.",
+          "en": "but I have time tomorrow."
+        },
+        {
+          "de": "Am Nachmittag kommt ein Gewitter,",
+          "en": "A thunderstorm comes in the afternoon,"
+        },
+        {
+          "de": "Es blitzt und donnert draußen.",
+          "en": "there's lightning and thunder outside."
+        },
+        {
+          "de": "Ich mache meine Fenster zu,",
+          "en": "I close my windows,"
+        },
+        {
+          "de": "Und trinke einen warmen Tee.",
+          "en": "and drink some warm tea."
+        },
+        {
+          "de": "Am Abend wird der Regen weniger,",
+          "en": "In the evening the rain eases,"
+        },
+        {
+          "de": "Ich schaue noch einmal hinaus.",
+          "en": "I look outside once more."
+        },
+        {
+          "de": "Mia schreibt: „Morgen um drei?“",
+          "en": "Mia texts, \"Tomorrow at three?\""
+        },
+        {
+          "de": "Ich antworte: „Ja, das passt mir gut!“",
+          "en": "I reply, \"Yes, that works well for me!\""
+        },
+        {
+          "de": "Es regnet, es regnet, der Wind ist kalt,",
+          "en": "It's raining, it's raining, the wind is cold,"
+        },
+        {
+          "de": "Ich bleibe heute lieber zu Haus.",
+          "en": "I'd rather stay at home today."
+        },
+        {
+          "de": "Die Sonne scheint nicht, der Himmel ist grau,",
+          "en": "The sun isn't shining, the sky is grey,"
+        },
+        {
+          "de": "Ich gehe heute nicht mehr raus.",
+          "en": "I'm not going outside again today."
+        },
+        {
+          "de": "Können wir uns morgen treffen?",
+          "en": "Can we meet tomorrow?"
+        },
+        {
+          "de": "Vielleicht scheint dann die Sonne.",
+          "en": "Perhaps the sun will shine then."
+        },
+        {
+          "de": "Heute muss ich leider absagen,",
+          "en": "Unfortunately, I have to cancel today,"
+        },
+        {
+          "de": "Doch morgen habe ich Zeit.",
+          "en": "but I have time tomorrow."
+        },
+        {
+          "de": "Am nächsten Tag scheint die Sonne,",
+          "en": "The next day the sun is shining,"
+        },
+        {
+          "de": "Der Himmel ist wieder blau.",
+          "en": "the sky is blue again."
+        },
+        {
+          "de": "Ich treffe Mia um drei im Park,",
+          "en": "I meet Mia at three in the park,"
+        },
+        {
+          "de": "Und freue mich auf den Tag.",
+          "en": "and look forward to the day."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "absagen",
+          "en": "to cancel"
+        },
+        {
+          "de": "das Gewitter",
+          "en": "the thunderstorm"
+        },
+        {
+          "de": "das passt mir gut",
+          "en": "that works well for me"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-22/Arzttermin.mp3",
+      "lines": [
+        {
+          "de": "Heute fühle ich mich nicht gut,",
+          "en": "I don't feel well today,"
+        },
+        {
+          "de": "Mein Kopf tut weh, mein Hals ist rot.",
+          "en": "my head hurts and my throat is red."
+        },
+        {
+          "de": "Ich habe Fieber und bin müde,",
+          "en": "I have a fever and I'm tired,"
+        },
+        {
+          "de": "Ich möchte heute nicht zur Schule.",
+          "en": "I don't want to go to school today."
+        },
+        {
+          "de": "Ich rufe bei meinem Arzt an",
+          "en": "I call my doctor"
+        },
+        {
+          "de": "und frage: „Haben Sie heute Zeit?“",
+          "en": "and ask, \"Do you have time today?\""
+        },
+        {
+          "de": "Die Frau sagt: „Ja, um zehn Uhr.“",
+          "en": "The woman says, \"Yes, at ten o'clock.\""
+        },
+        {
+          "de": "Ich sage: „Danke, ich komme gleich.“",
+          "en": "I say, \"Thank you, I'll come right away.\""
+        },
+        {
+          "de": "Mir geht es nicht gut, ich bin krank.",
+          "en": "I don't feel well, I'm ill."
+        },
+        {
+          "de": "Mein Kopf tut weh, ich brauche Hilfe.",
+          "en": "My head hurts, I need help."
+        },
+        {
+          "de": "Ich möchte einen Termin beim Arzt,",
+          "en": "I'd like an appointment with the doctor,"
+        },
+        {
+          "de": "am besten noch heute, bitte.",
+          "en": "preferably today, please."
+        },
+        {
+          "de": "Ich habe Husten, ich habe Fieber.",
+          "en": "I have a cough, I have a fever."
+        },
+        {
+          "de": "Ich brauche Ruhe und etwas Zeit.",
+          "en": "I need rest and some time."
+        },
+        {
+          "de": "Ich hoffe, morgen geht es mir besser,",
+          "en": "I hope I'll feel better tomorrow,"
+        },
+        {
+          "de": "dann bin ich wieder fit.",
+          "en": "then I'll be fit again."
+        },
+        {
+          "de": "Um zehn Uhr sitze ich beim Arzt.",
+          "en": "At ten o'clock I'm sitting at the doctor's."
+        },
+        {
+          "de": "Er fragt mich: „Was fehlt Ihnen?“",
+          "en": "He asks me, \"What's wrong?\""
+        },
+        {
+          "de": "Ich sage: „Mein Hals tut weh,",
+          "en": "I say, \"My throat hurts,"
+        },
+        {
+          "de": "und seit gestern habe ich Fieber.“",
+          "en": "and I've had a fever since yesterday.\""
+        },
+        {
+          "de": "Der Arzt sagt: „Trinken Sie viel Wasser",
+          "en": "The doctor says, \"Drink plenty of water"
+        },
+        {
+          "de": "und bleiben Sie heute zu Haus.“",
+          "en": "and stay at home today.\""
+        },
+        {
+          "de": "Ich gehe danach zur Apotheke",
+          "en": "Afterwards I go to the pharmacy"
+        },
+        {
+          "de": "und ruhe mich zu Hause aus.",
+          "en": "and rest at home."
+        },
+        {
+          "de": "Mir geht es nicht gut, ich bin krank.",
+          "en": "I don't feel well, I'm ill."
+        },
+        {
+          "de": "Mein Kopf tut weh, ich brauche Hilfe.",
+          "en": "My head hurts, I need help."
+        },
+        {
+          "de": "Ich möchte einen Termin beim Arzt,",
+          "en": "I'd like an appointment with the doctor,"
+        },
+        {
+          "de": "am besten noch heute, bitte.",
+          "en": "preferably today, please."
+        },
+        {
+          "de": "Ich habe Husten, ich habe Fieber.",
+          "en": "I have a cough, I have a fever."
+        },
+        {
+          "de": "Ich brauche Ruhe und etwas Zeit.",
+          "en": "I need rest and some time."
+        },
+        {
+          "de": "Ich hoffe, morgen geht es mir besser,",
+          "en": "I hope I'll feel better tomorrow,"
+        },
+        {
+          "de": "dann bin ich wieder fit.",
+          "en": "then I'll be fit again."
+        },
+        {
+          "de": "Dann bin ich wieder fit.",
+          "en": "Then I'll be fit again."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "Was fehlt Ihnen?",
+          "en": "What's wrong? / What seems to be the problem?"
+        },
+        {
+          "de": "der Termin",
+          "en": "the appointment"
+        },
+        {
+          "de": "sich ausruhen",
+          "en": "to rest"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-11/Mit dem Rad, mit dem Zug.mp3",
+      "lines": [
+        {
+          "de": "Mit dem Rad, mit dem Zug.",
+          "en": "By bike, by train."
+        },
+        {
+          "de": "Am Morgen fahre ich mit dem Rad,",
+          "en": "In the morning I ride my bike,"
+        },
+        {
+          "de": "die Sonne scheint auf meine Stadt.",
+          "en": "the sun shines on my city."
+        },
+        {
+          "de": "Der Wind ist frisch, die Luft ist klar,",
+          "en": "The wind is fresh, the air is clear,"
+        },
+        {
+          "de": "ich fahre los, wie wunderbar.",
+          "en": "I set off; how wonderful."
+        },
+        {
+          "de": "Mit dem Rad, mit dem Zug, ich bin unterwegs,",
+          "en": "By bike, by train, I'm on my way,"
+        },
+        {
+          "de": "durch die Stadt, durch das Land, ich finde meinen Weg.",
+          "en": "through the city, across the country, I find my way."
+        },
+        {
+          "de": "Mal schnell, mal langsam, ich komme gut an.",
+          "en": "Sometimes fast, sometimes slow, I arrive safely."
+        },
+        {
+          "de": "Am Nachmittag nehme ich den Zug,",
+          "en": "In the afternoon I take the train,"
+        },
+        {
+          "de": "ich habe heute noch nicht genug.",
+          "en": "I haven't had enough of today yet."
+        },
+        {
+          "de": "Ich kaufe mir eine Fahrkarte",
+          "en": "I buy myself a ticket"
+        },
+        {
+          "de": "und steige ein, bevor ich starte.",
+          "en": "and get on before setting off."
+        },
+        {
+          "de": "Die Häuser ziehen schnell vorbei,",
+          "en": "The houses rush past,"
+        },
+        {
+          "de": "ich schaue raus und fühle mich frei.",
+          "en": "I look outside and feel free."
+        },
+        {
+          "de": "Am Bahnhof wartest du auf mich,",
+          "en": "You're waiting for me at the station,"
+        },
+        {
+          "de": "ich steige aus und freue mich.",
+          "en": "I get off and I'm happy."
+        },
+        {
+          "de": "Mit dem Rad, mit dem Zug, ich bin unterwegs,",
+          "en": "By bike, by train, I'm on my way,"
+        },
+        {
+          "de": "durch die Stadt, durch das Land, ich finde meinen Weg.",
+          "en": "through the city, across the country, I find my way."
+        },
+        {
+          "de": "Mal schnell, mal langsam, ich komme gut an,",
+          "en": "Sometimes fast, sometimes slow, I arrive safely,"
+        },
+        {
+          "de": "weil ich mit dir die Welt entdecken kann.",
+          "en": "because I can discover the world with you."
+        },
+        {
+          "de": "Mal fahre ich Rad, mal nehme ich den Zug,",
+          "en": "Sometimes I cycle, sometimes I take the train,"
+        },
+        {
+          "de": "ich bin unterwegs, das gefällt mir gut.",
+          "en": "I'm travelling, and I like it."
+        },
+        {
+          "de": "Ob nah, ob fern, ich komme an,",
+          "en": "Whether near or far, I arrive,"
+        },
+        {
+          "de": "weil jeder Weg uns verbinden kann.",
+          "en": "because every journey can bring us together."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "unterwegs sein",
+          "en": "to be on the way"
+        },
+        {
+          "de": "die Fahrkarte",
+          "en": "the ticket"
+        },
+        {
+          "de": "aussteigen",
+          "en": "to get off"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-12/Träume ändern sich.mp3",
+      "lines": [
+        {
+          "de": "Als Kind wollte ich Pilot werden,",
+          "en": "As a child I wanted to become a pilot,"
+        },
+        {
+          "de": "den Himmel sehen, frei und weit.",
+          "en": "to see the sky, wide and free."
+        },
+        {
+          "de": "Jetzt interessiert mich die Medizin,",
+          "en": "Now I'm interested in medicine,"
+        },
+        {
+          "de": "ich nehme mir zum Lernen Zeit.",
+          "en": "I make time to study."
+        },
+        {
+          "de": "Ich möchte Menschen Hoffnung geben,",
+          "en": "I want to give people hope,"
+        },
+        {
+          "de": "und jeden Tag etwas Neues sehen.",
+          "en": "and see something new every day."
+        },
+        {
+          "de": "Vielleicht verändert sich mein Leben,",
+          "en": "Perhaps my life will change,"
+        },
+        {
+          "de": "doch ich will meinen Weg weitergehen.",
+          "en": "but I want to keep following my path."
+        },
+        {
+          "de": "Was willst du später machen?",
+          "en": "What do you want to do in the future?"
+        },
+        {
+          "de": "Was fühlt sich richtig an?",
+          "en": "What feels right?"
+        },
+        {
+          "de": "Wir dürfen neue Wege finden,",
+          "en": "We're allowed to find new paths,"
+        },
+        {
+          "de": "weil jeder Traum sich ändern kann.",
+          "en": "because every dream can change."
+        },
+        {
+          "de": "Meine Freundin will Lehrerin werden,",
+          "en": "My friend wants to become a teacher,"
+        },
+        {
+          "de": "ein Praktikum hat sie gemacht.",
+          "en": "she has done an internship."
+        },
+        {
+          "de": "Sie hat den Kindern vorgelesen,",
+          "en": "She read aloud to the children,"
+        },
+        {
+          "de": "mit ihnen gelernt und viel gelacht.",
+          "en": "learned with them and laughed a lot."
+        },
+        {
+          "de": "Wir reden oft von unseren Plänen,",
+          "en": "We often talk about our plans,"
+        },
+        {
+          "de": "und suchen Kurse, die uns passen.",
+          "en": "and look for courses that suit us."
+        },
+        {
+          "de": "Wir wissen noch nicht, was mal kommt,",
+          "en": "We don't yet know what will happen,"
+        },
+        {
+          "de": "doch wollen wir uns Zeit dafür lassen.",
+          "en": "but we want to give ourselves time for it."
+        },
+        {
+          "de": "Was willst du später machen?",
+          "en": "What do you want to do in the future?"
+        },
+        {
+          "de": "Was fühlt sich richtig an?",
+          "en": "What feels right?"
+        },
+        {
+          "de": "Wir dürfen neue Wege finden,",
+          "en": "We're allowed to find new paths,"
+        },
+        {
+          "de": "weil jeder Traum sich ändern kann.",
+          "en": "because every dream can change."
+        },
+        {
+          "de": "Wir wissen noch nicht alles,",
+          "en": "We don't know everything yet,"
+        },
+        {
+          "de": "doch wir lernen jeden Tag.",
+          "en": "but we learn every day."
+        },
+        {
+          "de": "Bei Falowen sprechen wir von Träumen,",
+          "en": "At Falowen we talk about dreams,"
+        },
+        {
+          "de": "und davon, was die Zukunft bringen mag.",
+          "en": "and what the future might bring."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "das Praktikum",
+          "en": "the internship"
+        },
+        {
+          "de": "sich verändern",
+          "en": "to change"
+        },
+        {
+          "de": "der Traum",
+          "en": "the dream"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/b1/day-24/Weniger kaufen.mp3",
+      "lines": [
+        {
+          "de": "Im Schaufenster sehe ich ein neues Handy.",
+          "en": "I see a new phone in the shop window."
+        },
+        {
+          "de": "Meins funktioniert eigentlich noch gut.",
+          "en": "Mine actually still works well."
+        },
+        {
+          "de": "Trotzdem möchte ich es sofort kaufen,",
+          "en": "Even so, I want to buy it right away,"
+        },
+        {
+          "de": "weil überall Werbung für das Modell läuft.",
+          "en": "because advertisements for that model are everywhere."
+        },
+        {
+          "de": "Brauche ich das wirklich heute?",
+          "en": "Do I really need it today?"
+        },
+        {
+          "de": "Vielleicht hält das Alte noch lang.",
+          "en": "Perhaps the old one will last a long time."
+        },
+        {
+          "de": "Weniger kaufen lässt Raum für anderes.",
+          "en": "Buying less leaves room for other things."
+        },
+        {
+          "de": "Zu Hause spreche ich mit meinem Bruder.",
+          "en": "At home I talk to my brother."
+        },
+        {
+          "de": "Er zeigt mir, wie ich den Akku schonen kann.",
+          "en": "He shows me how to make the battery last longer."
+        },
+        {
+          "de": "Wir beschließen, das Geld lieber zu sparen,",
+          "en": "We decide to save the money instead,"
+        },
+        {
+          "de": "um im Sommer gemeinsam zu verreisen.",
+          "en": "so that we can travel together in the summer."
+        },
+        {
+          "de": "Brauche ich das wirklich heute?",
+          "en": "Do I really need it today?"
+        },
+        {
+          "de": "Vielleicht hält das Alte noch lang.",
+          "en": "Perhaps the old one will last a long time."
+        },
+        {
+          "de": "Weniger kaufen lässt Raum für anderes.",
+          "en": "Buying less leaves room for other things."
+        },
+        {
+          "de": "Das neue Handy bleibt im Geschäft.",
+          "en": "The new phone stays in the shop."
+        },
+        {
+          "de": "Die Reise ist mir jetzt wichtiger.",
+          "en": "The trip is more important to me now."
+        },
+        {
+          "de": "Bei Falowen lerne ich, bewusster zu entscheiden.",
+          "en": "At Falowen I learn to make more conscious decisions."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "bewusster entscheiden",
+          "en": "to make more conscious decisions"
+        },
+        {
+          "de": "die Werbung",
+          "en": "advertising"
+        },
+        {
+          "de": "den Akku schonen",
+          "en": "to preserve the battery"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/b1/day-25/Als Kunde habe ich auch Rechte.mp3",
+      "lines": [
+        {
+          "de": "Letzte Woche habe ich Schuhe online bestellt.",
+          "en": "Last week I ordered shoes online."
+        },
+        {
+          "de": "Der Shop versprach eine schnelle Lieferung.",
+          "en": "The shop promised fast delivery."
+        },
+        {
+          "de": "Heute steht in der Sendungsverfolgung zugestellt,",
+          "en": "Today the tracking says \"delivered\","
+        },
+        {
+          "de": "obwohl vor meiner Tür kein Paket liegt.",
+          "en": "although there is no parcel at my door."
+        },
+        {
+          "de": "Ich frage nach, ich bleibe ruhig,",
+          "en": "I ask about it; I stay calm,"
+        },
+        {
+          "de": "und halte meine Unterlagen bereit.",
+          "en": "and keep my documents ready."
+        },
+        {
+          "de": "Als Kunde habe ich auch Rechte.",
+          "en": "As a customer, I have rights too."
+        },
+        {
+          "de": "Ich schreibe dem Kundenservice eine Nachricht.",
+          "en": "I write a message to customer service."
+        },
+        {
+          "de": "Darin nenne ich die Bestellung und das Datum.",
+          "en": "In it I give the order details and the date."
+        },
+        {
+          "de": "Am nächsten Tag kommt eine freundliche Antwort:",
+          "en": "The next day a friendly reply arrives:"
+        },
+        {
+          "de": "Das Paket wurde beim Nachbarn abgegeben.",
+          "en": "The parcel was left with the neighbour."
+        },
+        {
+          "de": "Ich frage nach, ich bleibe ruhig,",
+          "en": "I ask about it; I stay calm,"
+        },
+        {
+          "de": "und halte meine Unterlagen bereit.",
+          "en": "and keep my documents ready."
+        },
+        {
+          "de": "Als Kunde habe ich auch Rechte.",
+          "en": "As a customer, I have rights too."
+        },
+        {
+          "de": "Ich hole die Schuhe ab und bedanke mich.",
+          "en": "I collect the shoes and say thank you."
+        },
+        {
+          "de": "Beim nächsten Mal prüfe ich die Lieferadresse.",
+          "en": "Next time I'll check the delivery address."
+        },
+        {
+          "de": "Mit Falowen kenne ich die Worte für meine Rechte.",
+          "en": "With Falowen I know the words to describe my rights."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Sendungsverfolgung",
+          "en": "shipment tracking"
+        },
+        {
+          "de": "zugestellt",
+          "en": "delivered"
+        },
+        {
+          "de": "die Unterlagen",
+          "en": "the documents"
+        }
+      ]
+    }
+  ]
+}
