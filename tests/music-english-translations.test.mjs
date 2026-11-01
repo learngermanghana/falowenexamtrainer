@@ -10,7 +10,7 @@ const recorded=[
  ...read('web/public/music/timings.json').recordings,
 ];
 test('offline English translations exactly match published recording lyric lines, not drafts',()=>{
- assert.ok(translated.recordings.length>=8);
+ assert.equal(translated.recordings.length,19);
  const keys=new Set();
  let count=0;
  for(const row of translated.recordings){
@@ -23,8 +23,10 @@ test('offline English translations exactly match published recording lyric lines
   assert.ok(row.vocabulary.length>0);
   count+=row.lines.length;
  }
- assert.ok(count>=200);
+ assert.equal(count,564);
  assert.equal(keys.size,translated.recordings.length);
+ const publishedKeys=new Set(recorded.map(x=>x.objectKey));
+ assert.deepEqual(keys,publishedKeys,'all owner-reviewed recording packs have English translations');
 });
 test('never attach translation to a changed lyric, different MP3 or a partial translation',()=>{
  const row=translated.recordings[0];
