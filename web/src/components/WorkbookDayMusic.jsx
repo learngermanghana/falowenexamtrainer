@@ -141,7 +141,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
           ) : null}
           <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{chosen.title}</h3>
           <audio key={chosen.id} data-music-audio="true" controls preload="none"
-            onPlay={() => { void recordMusicPractice({ event: "play", trackId: chosen.id, title: chosen.title, level: courseLevel, day: lessonDay }); }}
+            onPlay={(event) => { if (event.currentTarget.currentTime >= 1) return; void recordMusicPractice({ event: "play", trackId: chosen.id, title: chosen.title, level: courseLevel, day: lessonDay }); }}
             onEnded={() => { void recordMusicPractice({ event: "complete", trackId: chosen.id, title: chosen.title, level: courseLevel, day: lessonDay }); }}
             src={chosen.audioUrl} style={{ width: "100%" }}>
             Your browser does not support this audio player.
