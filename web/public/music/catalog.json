@@ -112,6 +112,24 @@
       "approved": true
     },
     {
+      "id": "r2-a2-day-15-b64_S2xlaW5lIE1vbWVudGUubXAz",
+      "title": "Kleine Momente",
+      "level": "A2",
+      "day": 15,
+      "assignmentKey": "A2-6.15",
+      "topic": "Lieblingssachen · Freizeit und Wohlbefinden",
+      "type": "Learning story",
+      "genre": "Acoustic Afro-Soul",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-15-b64_S2xlaW5lIE1vbWVudGUubXAz",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/day-15/Kleine Momente.mp3",
+      "approved": true
+    },
+    {
       "id": "r2-a2-day-16-b64_S2xlaW5lIFNjaHJpdHRlLm1wMw",
       "title": "Kleine Schritte",
       "level": "A2",
