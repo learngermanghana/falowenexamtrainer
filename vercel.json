@@ -210,6 +210,53 @@
           "value": "nosniff"
         }
       ]
+    },
+    {
+      "source": "/chatgpt/connect",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/oauth-authorization-server/:path*",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/oauth-protected-resource/:path*",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
     }
   ],
   "routes": [
@@ -411,6 +458,28 @@
         "Cache-Control": "public, max-age=0, must-revalidate"
       },
       "dest": "/help.html"
+    },
+    {
+      "src": "/chatgpt/connect/?",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/\\.well-known/oauth-protected-resource/api/chatgpt/mcp",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store, max-age=0",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "continue": true
+    },
+    {
+      "src": "/\\.well-known/oauth-authorization-server/api/chatgpt",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store, max-age=0",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "continue": true
     },
     {
       "handle": "filesystem"
