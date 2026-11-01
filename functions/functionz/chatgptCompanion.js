@@ -195,7 +195,7 @@ const toolDefinitions = [
   },
 ].map((tool) => ({
   ...tool, annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
-  _meta: { securitySchemes: [{ type: "oauth2", scopes: [SCOPE] }] },
+  securitySchemes: [{ type: "oauth2", scopes: [SCOPE] }],
 }));
 
 async function callTool(name, args, student) {
@@ -332,7 +332,6 @@ function makeRouter(admin) {
           item.resource !== RESOURCE || item.scope !== SCOPE ||
           (grant === "authorization_code" && (
             item.redirectUri !== CALLBACK ||
-            sha256(Buffer.from(body.code_verifier).toString("utf8")) === "" ||
             crypto.createHash("sha256").update(body.code_verifier).digest("base64url") !== item.challenge
           ))) return null;
         tx.delete(ref);
@@ -349,9 +348,14 @@ function makeRouter(admin) {
     }
   });
 
-  const challenge = (res) => {
-    res.setHeader("WWW-Authenticate", 'Bearer resource_metadata="' + ISSUER + '/.well-known/oauth-protected-resource", scope="' + SCOPE + '"');
-    return res.status(401).json({ error: "unauthorized", message: "Connect your Falowen student account." });
+  const challenge = (res, id) => {
+    const description = 'Bearer resource_metadata="' + ISSUER + '/.well-known/oauth-protected-resource", error="insufficient_scope", error_description="Connect your Falowen student account"';
+    res.setHeader("WWW-Authenticate", description);
+    return res.json({ jsonrpc: "2.0", id, result: {
+      isError: true,
+      content: [{ type: "text", text: "Please connect your Falowen student account to ChatGPT." }],
+      _meta: { "mcp/www_authenticate": [description] },
+    } });
   };
 
   router.post("/mcp", async (req, res) => {
@@ -376,16 +380,16 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } });
     }
     const match = normalize(req.headers.authorization).match(/^Bearer\s+([A-Za-z0-9_-]{43})$/i);
-    if (!match) return challenge(res);
+    if (!match) return challenge(res, id);
     try {
       const token = await admin.firestore().collection("chatgptOauthAccessTokens").doc(sha256(match[1])).get();
       const session = token.data();
       if (!session || isExpired(session.expiresAt) || session.scope !== SCOPE ||
-          session.resource !== RESOURCE || session.clientId !== CLIENT_ID) return challenge(res);
+          session.resource !== RESOURCE || session.clientId !== CLIENT_ID) return challenge(res, id);
       const student = await studentForIdentity(admin, {
         uid: session.uid, email: session.email, email_verified: session.emailVerified,
       }, session.studentId);
-      if (!student) return challenge(res);
+      if (!student) return challenge(res, id);
       const name = normalize(message.params?.name);
       if (!toolDefinitions.some((tool) => tool.name === name)) {
         return res.json({ jsonrpc: "2.0", id, error: { code: -32602, message: "Unknown tool" } });
