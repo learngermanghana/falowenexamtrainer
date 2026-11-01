@@ -93,8 +93,19 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
   root.querySelectorAll(
     '[data-pdf-exclude], [data-self-learning-supporting-materials], [data-teacher-lecture-support],' +
     '[data-timed-assignment], section[aria-label="Assessment rules"],' +
-    '[data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture]'
+    '[data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture],' +
+    '    [data-a2-day18-teacher-lecture], [data-universal-a2-workbook-tabs]'
   ).forEach(node => hide(node, "resource-or-assessment-ui"));
+
+  // Days 16-18 also contain inline teacher-lecture <details> panels. The
+  // Day 18 marker was omitted from the old export, and older deployed pages
+  // may lack any marker, so match their specific summary (never exercise text).
+  for (const details of root.querySelectorAll("details")) {
+    const summary = details.querySelector(":scope > summary");
+    if (/^Teacher\s+lecture\s+video(?:\s*[·:–-]|$)/i.test(normalize(summary?.textContent))) {
+      hide(details, "inline-teacher-lecture");
+    }
+  }
 
   // Deployed web builds may not yet carry data-pdf-exclude attributes.
   // Find only the stand-alone WorkbookStartGuide resource section. Its heading
