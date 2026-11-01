@@ -100,10 +100,11 @@ test("Day 14 preserves graphical-only worksheet pages with real central artwork"
 
 test("A2 trims only a trailing read-only notice page after substantive exercise content", async () => {
   await withFixture(async (pdf, font) => {
-    pdf.addPage([595.28, 841.89]).drawText(
-      "Hörverstehen. Lesen Sie die fünf Fragen. Wählen Sie A, B oder C und begründen Sie Ihre Wahl. Schreiben Sie Ihre Antworten auf.",
-      { x: 50, y: 710, font, size: 12 },
-    );
+    const exercise = pdf.addPage([595.28, 841.89]);
+    exercise.drawText("Hörverstehen. Lesen Sie die fünf Fragen. Wählen Sie A, B oder C.",
+      { x: 50, y: 710, font, size: 12 });
+    exercise.drawText("Begründen Sie Ihre Wahl. Schreiben Sie die Antworten und besprechen Sie diese im Unterricht.",
+      { x: 50, y: 680, font, size: 12 });
     pdf.addPage([595.28, 841.89]).drawText(
       "Read-only printed practice. Submit graded coursework in Falowen.",
       { x: 38, y: 810, font, size: 9 },
