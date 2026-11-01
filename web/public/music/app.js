@@ -665,7 +665,9 @@ Promise.all([
     .catch(() => ({recordings:[]})),
 ]).then(([data, lessons, drafts, translations]) => {
   englishTranslations = Array.isArray(translations?.recordings) ? translations : {recordings:[]};
-  pinnedTracks = (Array.isArray(data.tracks) ? data.tracks : []).map(safeTrack).filter(Boolean);
+  pinnedTracks = (Array.isArray(data.tracks) ? data.tracks : [])
+    .filter(row => row.retired !== true)
+    .map(safeTrack).filter(Boolean);
   catalog = [...pinnedTracks];
   learning = lessons && typeof lessons.lessons === "object" && lessons.lessons ? lessons.lessons : {};
   studioDrafts = Array.isArray(drafts?.tracks) ? drafts.tracks.filter(item =>
