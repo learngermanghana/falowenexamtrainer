@@ -167,8 +167,17 @@ function summarizeStudentAssignments(student, rows) {
 const toolDefinitions = [
   {
     name: "get_my_falowen_profile",
-    description: "Show the connected student's own Falowen course level and campus link. Never infer access to another account.",
+    description: "Identify my connected Falowen student profile and course level without exposing student numbers or private records.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    outputSchema: {
+      type: "object", properties: {
+        id: { type: "string", minLength: 1, pattern: "\\S" },
+        name: { type: "string" },
+        nickname: { type: "string" },
+      },
+      required: ["id"], additionalProperties: false,
+    },
+    _meta: { "openai/profile": true },
   },
   {
     name: "get_my_falowen_assignments",
@@ -196,11 +205,16 @@ const toolDefinitions = [
 ].map((tool) => ({
   ...tool, annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
   securitySchemes: [{ type: "oauth2", scopes: [SCOPE] }],
+  _meta: { ...(tool._meta || {}) },
 }));
 
 async function callTool(name, args, student) {
   const view = studentView(student);
-  if (name === "get_my_falowen_profile") return view;
+  if (name === "get_my_falowen_profile") return {
+    id: "flw_" + sha256(student.id).slice(0, 32),
+    name: view.name,
+    nickname: view.level ? "Falowen " + view.level + " student" : "Falowen student",
+  };
   if (name === "get_my_falowen_lesson") {
     if (!Number.isInteger(args?.day) || args.day < 1 || args.day > 50) throw new Error("day must be an integer between 1 and 50");
     if (!view.level) return { error: "Course level is not available." };
