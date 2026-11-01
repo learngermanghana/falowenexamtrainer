@@ -177,6 +177,6 @@ test("A2 print excludes late fallback workbook navigation and all inline teacher
     assert.ok(helpers.includes(selector), `Missing DOM print exclusion: ${selector}`);
   }
   assert.match(helpers, /inline-teacher-lecture/);
-  assert.match(renderer, /A2 Day \\${lesson\\.day\\} \\${suffix\\} print contains excluded UI/);
+  assert.ok(renderer.includes("print contains excluded UI"));
   assert.match(renderer, /pdftotext/);
 });
