@@ -964,6 +964,142 @@
       ],
       "timingMethod": "Waveform-guided draft line intervals from matching owner-supplied MP3 (SHA-256); not ear-verified. Review against playback before treating as exact. Repeated choruses have separate cues.",
       "source": "Owner-supplied A2 Day 12 final lyrics and exact recording; waveform-based estimated timing awaiting review"
+    },
+    {
+      "trackId": "r2-a2-day-16-b64_S2xlaW5lIFNjaHJpdHRlLm1wMw",
+      "objectKey": "music/a2/day-16/Kleine Schritte.mp3",
+      "assignmentKey": "A2-6.16",
+      "title": "Kleine Schritte",
+      "lyrics": "[Verse 1]\nIch stehe morgens früh auf, trinke Wasser, mache mich fit.\nZum Frühstück esse ich gern Obst, und Vollkornbrot gehört dazu.\nIch koche meistens selbst zu Haus, mit Gemüse, Reis und Fisch.\nFastfood esse ich nur selten, frisches Essen tut mir gut.\n\n[Chorus]\nIch lebe gesund.\nIch fühle mich gut.\nBewegung gibt mir neue Kraft.\nIch achte auf mich.\nTag für Tag,\nweil Gesundheit wichtig ist.\n\n[Verse 2]\nNach der Arbeit gehe ich laufen, manchmal trainiere ich im Park.\nIch fahre oft mit meinem Fahrrad statt mit dem Auto durch die Stadt.\nAm Abend mache ich eine Pause, lege mein Handy einfach weg.\nIch schlafe meistens sieben Stunden, damit ich morgen wieder fit bin.\n\n[Chorus]\nIch lebe gesund.\nIch fühle mich gut.\nBewegung gibt mir neue Kraft.\nIch achte auf mich.\nTag für Tag,\nweil Gesundheit wichtig ist.\n\n[Outro]\nNicht jeder Tag läuft perfekt.\nDoch ich bleibe weiter dran.\nMit kleinen Schritten jeden Tag\nfängt ein gutes Leben an.",
+      "cues": [
+        {
+          "start": 13.35,
+          "end": 17.75,
+          "text": "Ich stehe morgens früh auf, trinke Wasser, mache mich fit."
+        },
+        {
+          "start": 18,
+          "end": 22.2,
+          "text": "Zum Frühstück esse ich gern Obst, und Vollkornbrot gehört dazu."
+        },
+        {
+          "start": 22.45,
+          "end": 26.55,
+          "text": "Ich koche meistens selbst zu Haus, mit Gemüse, Reis und Fisch."
+        },
+        {
+          "start": 26.8,
+          "end": 31.2,
+          "text": "Fastfood esse ich nur selten, frisches Essen tut mir gut."
+        },
+        {
+          "start": 32.55,
+          "end": 34.35,
+          "text": "Ich lebe gesund."
+        },
+        {
+          "start": 34.65,
+          "end": 36.55,
+          "text": "Ich fühle mich gut."
+        },
+        {
+          "start": 36.9,
+          "end": 40.1,
+          "text": "Bewegung gibt mir neue Kraft."
+        },
+        {
+          "start": 40.4,
+          "end": 42.3,
+          "text": "Ich achte auf mich."
+        },
+        {
+          "start": 42.65,
+          "end": 44.4,
+          "text": "Tag für Tag,"
+        },
+        {
+          "start": 44.85,
+          "end": 47.75,
+          "text": "weil Gesundheit wichtig ist."
+        },
+        {
+          "start": 60.85,
+          "end": 65.3,
+          "text": "Nach der Arbeit gehe ich laufen, manchmal trainiere ich im Park."
+        },
+        {
+          "start": 65.55,
+          "end": 69.75,
+          "text": "Ich fahre oft mit meinem Fahrrad statt mit dem Auto durch die Stadt."
+        },
+        {
+          "start": 70,
+          "end": 73.9,
+          "text": "Am Abend mache ich eine Pause, lege mein Handy einfach weg."
+        },
+        {
+          "start": 74.15,
+          "end": 78.55,
+          "text": "Ich schlafe meistens sieben Stunden, damit ich morgen wieder fit bin."
+        },
+        {
+          "start": 79.45,
+          "end": 81.3,
+          "text": "Ich lebe gesund."
+        },
+        {
+          "start": 81.55,
+          "end": 83.45,
+          "text": "Ich fühle mich gut."
+        },
+        {
+          "start": 83.8,
+          "end": 87,
+          "text": "Bewegung gibt mir neue Kraft."
+        },
+        {
+          "start": 87.25,
+          "end": 89.15,
+          "text": "Ich achte auf mich."
+        },
+        {
+          "start": 89.45,
+          "end": 91.2,
+          "text": "Tag für Tag,"
+        },
+        {
+          "start": 91.55,
+          "end": 94.25,
+          "text": "weil Gesundheit wichtig ist."
+        },
+        {
+          "start": 95.75,
+          "end": 98.1,
+          "text": "Nicht jeder Tag läuft perfekt."
+        },
+        {
+          "start": 99.05,
+          "end": 101.45,
+          "text": "Doch ich bleibe weiter dran."
+        },
+        {
+          "start": 102.05,
+          "end": 104.6,
+          "text": "Mit kleinen Schritten jeden Tag"
+        },
+        {
+          "start": 105.4,
+          "end": 108.75,
+          "text": "fängt ein gutes Leben an."
+        }
+      ],
+      "strictRecordingLyrics": true,
+      "recordingSha256": "5634b38c73c45f41cdf6c6be4f5e40a43dd9805fcfced693603194d0b113ae4d",
+      "duration": 113.64,
+      "genre": "Acoustic Afro-Soul",
+      "source": "User-provided A2 Day 16 Kleine Schritte recording and sung transcript (2026-11-01).",
+      "timingStatus": "estimated",
+      "timingMethod": "Manually sequenced, approximate vocal line windows against supplied 113.64-second MP3; review exact starts and ends during playback."
     }
   ]
 }
