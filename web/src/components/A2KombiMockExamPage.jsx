@@ -13,7 +13,7 @@ import "./A2GoetheWritingMockPreview.css";
 
 const LEGACY_ORDER=["lesen","schreiben","sprechen"];
 const FULL_ORDER=["lesen","hoeren","schreiben","sprechen"];
-const NEW_HOEREN = new Set(["a2-mock-04", "a2-mock-06"]);
+const NEW_HOEREN = new Set(["a2-mock-04", "a2-mock-06", "a2-mock-07"]);
 const orderFor=flow=>flow?.attemptInfo?.assessmentVersion==="four-module-v2"?FULL_ORDER:LEGACY_ORDER;
 const LABELS={lesen:"Lesen",hoeren:"Hören",schreiben:"Schreiben",sprechen:"Sprechen"};
 const read=key=>{try{return JSON.parse(localStorage.getItem(key)||"{}")||{};}catch{return {};}};
