@@ -148,6 +148,24 @@
       "approved": true
     },
     {
+      "id": "r2-a2-day-17-b64_SWNoIGdlaGUgenVyIEFwb3RoZWtlLm1wMw",
+      "title": "Ich gehe zur Apotheke",
+      "level": "A2",
+      "day": 17,
+      "assignmentKey": "A2-6.17",
+      "topic": "Apotheke · Beschwerden und Gesundheit",
+      "type": "Learning story",
+      "genre": "German acoustic pop",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-17-b64_SWNoIGdlaGUgenVyIEFwb3RoZWtlLm1wMw",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/day-17/Ich gehe zur Apotheke.mp3",
+      "approved": true
+    },
+    {
       "id": "a2-day-18-bank",
       "title": "Die Karte funktioniert nicht",
       "level": "A2",
