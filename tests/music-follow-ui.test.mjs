@@ -82,15 +82,16 @@ test('B1 Day 4 course draft can follow estimated lines without claiming a verifi
  assert.equal(d.getElementById('show-english').checked,false,'B1 English starts hidden');
  assert.match(d.getElementById('english-status').textContent,/COURSE DRAFT TRANSLATION/);
  assert.match(d.getElementById('lyrics-text').textContent,/Seit Wochen suche ich eine neue Wohnung/);
- assert.match(d.getElementById('lyrics-text').textContent,/These lyrics have not been checked against this MP3/);
+ assert.match(d.getElementById('lyrics-text').textContent,/not been teacher-verified/);
+ assert.match(d.getElementById('follow-label').textContent,/Follow lyrics \(estimated\)/);
  assert.ok(d.querySelectorAll('.english-line').length===17);
  assert.ok([...d.querySelectorAll('.english-line')].every(x=>x.hidden));
  d.getElementById('show-english').click();
  assert.equal(d.getElementById('show-english').checked,true);
  assert.ok([...d.querySelectorAll('.english-line')].every(x=>!x.hidden));
  assert.match(d.getElementById('lyrics-text').textContent,/I have been looking for a new apartment for weeks/);
- // This fixture supplies studio text but no stored timestamps; another test
- // checks the actual shipped studio draft with exactly matching MP3 key.
- assert.equal(d.querySelector('.lyric-line.is-active'),null,'untimed fixture stays untimed');
+ assert.equal(studio.cues.length,17,'B1 Day4 was aligned against the real MP3');
+ assert.equal(d.querySelectorAll('.lyric-line:disabled').length,0,'estimated cues allow seeking to each sung line');
+ assert.equal(d.querySelector('.lyric-line.is-active'),null,'no line is highlighted in instrumental intro');
  dom.window.close();
 });
