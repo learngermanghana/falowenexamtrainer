@@ -20,7 +20,7 @@ import { B2_REVIEW_KEY_POINTS } from "../web/src/data/b2ReviewKeyPoints.js";
 import { getB2SkillFocus, getB2DayTabs } from "../web/src/data/b2SkillCycle.js";
 import { B1_READING_TASKS } from "../web/src/data/b1ReadingTasks.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
-import { getCurriculumEntriesForLevel } from "../functions/data/curriculumManifest.js";
+import curriculumManifest from "../functions/data/curriculumManifest.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "functions/data/chatgptLessonContent.generated.json");
@@ -63,7 +63,7 @@ function extractB1Day1Reading(source) {
 }
 
 const B1 = {};
-const b1Entries = getCurriculumEntriesForLevel("B1");
+const b1Entries = curriculumManifest.getCurriculumEntriesForLevel("B1");
 for (let day = 1; day <= 28; day += 1) {
   const lesson = b1Entries.find((x) => Number(x.day ?? x.assignmentDay) === day);
   if (!lesson) throw new Error("Missing canonical B1 lesson day " + day);
