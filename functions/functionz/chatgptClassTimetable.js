@@ -146,11 +146,15 @@ function upcomingSessions(rows, klass, now = new Date(), limit = 3) {
 
 function topicForSession(row, level) {
   const topic = text(row.topic || row.title || row.sessionLabel).slice(0, 220);
-  const day = Number(row.curriculumDay || row.lessonDay || row.curriculumIndex);
+  const explicitDay = Number(row.curriculumDay || row.lessonDay);
+  const provisionalIndex = Number(row.curriculumIndex);
+  const verified = Number.isInteger(explicitDay) && explicitDay >= 1 && explicitDay <= 50;
+  const day = verified ? explicitDay : provisionalIndex;
   return {
     topic: topic || null,
     topicConfirmed: Boolean(topic),
     lessonDay: Number.isInteger(day) && day >= 1 && day <= 50 ? day : null,
+    lessonDaySource: verified ? "explicit_session_day" : "curriculum_index_unverified",
     lessonUrl: Number.isInteger(day) && day >= 1 && day <= 50 && level
       ? SITE + "/campus/course/lesson/" + level + "/" + day : null,
   };
