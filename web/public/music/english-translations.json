@@ -1534,6 +1534,275 @@
           "en": "telephone number"
         }
       ]
+    },
+    {
+      "objectKey": "music/a2/day-18/die-karte-funktioniert-nicht.mp3",
+      "lines": [
+        {
+          "de": "Heute möchte ich mit meiner Karte bezahlen.",
+          "en": "Today I'd like to pay with my card."
+        },
+        {
+          "de": "Aber das Gerät zeigt einen Fehler.",
+          "en": "But the machine shows an error."
+        },
+        {
+          "de": "Zu Hause rufe ich meine Bank an.",
+          "en": "At home I call my bank."
+        },
+        {
+          "de": "Eine Mitarbeiterin fragt nach dem Problem.",
+          "en": "An employee asks about the problem."
+        },
+        {
+          "de": "Guten Tag, ich habe eine Frage.",
+          "en": "Good day, I have a question."
+        },
+        {
+          "de": "Können Sie mir bitte helfen?",
+          "en": "Could you please help me?"
+        },
+        {
+          "de": "Wir finden gemeinsam eine Lösung.",
+          "en": "Together we find a solution."
+        },
+        {
+          "de": "Wir finden gemeinsam eine Lösung.",
+          "en": "Together we find a solution."
+        },
+        {
+          "de": "Sie prüft meine Angaben am Telefon.",
+          "en": "She checks my details over the phone."
+        },
+        {
+          "de": "Dann erklärt sie mir den nächsten Schritt.",
+          "en": "Then she explains the next step."
+        },
+        {
+          "de": "Ich soll die Karte noch einmal testen.",
+          "en": "I should try the card again."
+        },
+        {
+          "de": "Am Nachmittag klappt die Zahlung wieder.",
+          "en": "In the afternoon the payment works again."
+        },
+        {
+          "de": "Guten Tag, ich habe eine Frage.",
+          "en": "Good day, I have a question."
+        },
+        {
+          "de": "Können Sie mir bitte helfen?",
+          "en": "Could you please help me?"
+        },
+        {
+          "de": "Wir finden gemeinsam eine Lösung.",
+          "en": "Together we find a solution."
+        },
+        {
+          "de": "Ich bedanke mich für die Hilfe.",
+          "en": "I thank her for the help."
+        },
+        {
+          "de": "Ich bedanke mich für die Hilfe.",
+          "en": "I thank her for the help."
+        },
+        {
+          "de": "Das Problem ist endlich gelöst.",
+          "en": "The problem is finally solved."
+        },
+        {
+          "de": "Bei Falowen übe ich schwierige Telefonate.",
+          "en": "At Falowen I practise difficult phone calls."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Zahlung",
+          "en": "payment"
+        },
+        {
+          "de": "die Angaben",
+          "en": "personal details / information"
+        },
+        {
+          "de": "eine Lösung finden",
+          "en": "to find a solution"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-19/lieber-online-oder-im-laden.mp3",
+      "lines": [
+        {
+          "de": "Mia braucht neue Schuhe für den Winter.",
+          "en": "Mia needs new shoes for winter."
+        },
+        {
+          "de": "Online findet sie ein günstiges Paar.",
+          "en": "She finds an affordable pair online."
+        },
+        {
+          "de": "Doch sie kennt ihre Größe nicht genau.",
+          "en": "But she doesn't know her exact size."
+        },
+        {
+          "de": "Darum gehen wir zuerst in ein Geschäft.",
+          "en": "So we go to a shop first."
+        },
+        {
+          "de": "Wo kaufen wir am besten ein?",
+          "en": "Where is the best place to shop?"
+        },
+        {
+          "de": "Wir schauen, fragen, vergleichen.",
+          "en": "We look, ask questions and compare."
+        },
+        {
+          "de": "Dann treffen wir die richtige Wahl, die richtige Wahl.",
+          "en": "Then we make the right choice, the right choice."
+        },
+        {
+          "de": "Im Geschäft probiert Mia zwei Paare.",
+          "en": "In the shop Mia tries on two pairs."
+        },
+        {
+          "de": "Das zweite sitzt viel bequemer.",
+          "en": "The second pair fits much more comfortably."
+        },
+        {
+          "de": "Der Preis ist auch in Ordnung.",
+          "en": "The price is reasonable too."
+        },
+        {
+          "de": "Mia kauft es gleich und ist zufrieden.",
+          "en": "Mia buys it right away and is happy."
+        },
+        {
+          "de": "Wo kaufen wir am besten ein?",
+          "en": "Where is the best place to shop?"
+        },
+        {
+          "de": "Wir schauen, fragen, vergleichen.",
+          "en": "We look, ask questions and compare."
+        },
+        {
+          "de": "Dann treffen wir die richtige Wahl, die richtige Wahl.",
+          "en": "Then we make the right choice, the right choice."
+        },
+        {
+          "de": "Zu Hause stellt sie die Schuhe ins Regal.",
+          "en": "At home she puts the shoes on the shelf."
+        },
+        {
+          "de": "Jetzt kann der Winter kommen.",
+          "en": "Now winter can come."
+        },
+        {
+          "de": "Mit Falowen kann ich Preise vergleichen.",
+          "en": "With Falowen I can compare prices."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Größe",
+          "en": "size"
+        },
+        {
+          "de": "anprobieren",
+          "en": "to try on"
+        },
+        {
+          "de": "vergleichen",
+          "en": "to compare"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-20/Höflich reklamieren.mp3",
+      "lines": [
+        {
+          "de": "Vor einer Woche habe ich eine Jacke gekauft.",
+          "en": "A week ago I bought a jacket."
+        },
+        {
+          "de": "Heute merke ich: Sie ist zu klein.",
+          "en": "Today I notice it's too small."
+        },
+        {
+          "de": "Ich finde noch den Kassenbon.",
+          "en": "I still find the receipt."
+        },
+        {
+          "de": "Dann gehe ich zurück ins Geschäft.",
+          "en": "Then I go back to the shop."
+        },
+        {
+          "de": "Entschuldigung, ich habe ein Problem.",
+          "en": "Excuse me, I have a problem."
+        },
+        {
+          "de": "Können wir das bitte klären?",
+          "en": "Could we please sort this out?"
+        },
+        {
+          "de": "Wir sprechen ruhig miteinander.",
+          "en": "We speak calmly with each other."
+        },
+        {
+          "de": "Die Verkäuferin fragt nach dem Kaufdatum.",
+          "en": "The saleswoman asks for the purchase date."
+        },
+        {
+          "de": "Ich zeige ihr den Kassenbon.",
+          "en": "I show her the receipt."
+        },
+        {
+          "de": "Sie bringt die Jacke eine Nummer größer.",
+          "en": "She brings the jacket one size bigger."
+        },
+        {
+          "de": "Jetzt passt sie mir sehr gut.",
+          "en": "Now it fits me very well."
+        },
+        {
+          "de": "Entschuldigung, ich habe ein Problem.",
+          "en": "Excuse me, I have a problem."
+        },
+        {
+          "de": "Können wir das bitte klären?",
+          "en": "Could we please sort this out?"
+        },
+        {
+          "de": "Wir sprechen ruhig miteinander.",
+          "en": "We speak calmly with each other."
+        },
+        {
+          "de": "Ich sage danke für die Hilfe.",
+          "en": "I say thank you for the help."
+        },
+        {
+          "de": "So endet der Tag doch noch schön.",
+          "en": "So the day ends nicely after all."
+        },
+        {
+          "de": "Bei Falowen lerne ich, höflich zu reklamieren.",
+          "en": "At Falowen I learn to make polite complaints."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "reklamieren",
+          "en": "to make a complaint"
+        },
+        {
+          "de": "der Kassenbon",
+          "en": "the receipt"
+        },
+        {
+          "de": "eine Nummer größer",
+          "en": "one size bigger"
+        }
+      ]
     }
   ]
 }
