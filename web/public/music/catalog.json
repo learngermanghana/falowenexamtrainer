@@ -112,6 +112,24 @@
       "approved": true
     },
     {
+      "id": "r2-a2-day-03-b64_WndlaSBTdMOkZHRlLm1wMw",
+      "title": "Zwei Städte",
+      "level": "A2",
+      "day": 3,
+      "assignmentKey": "A2-1.3",
+      "topic": "Berlin und Hamburg · Städte vergleichen",
+      "type": "Learning story",
+      "genre": "Acoustic Afro-Soul",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-03-b64_WndlaSBTdMOkZHRlLm1wMw",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/day-03/Zwei Städte.mp3",
+      "approved": true
+    },
+    {
       "id": "r2-a2-day-15-b64_S2xlaW5lIE1vbWVudGUubXAz",
       "title": "Kleine Momente",
       "level": "A2",
