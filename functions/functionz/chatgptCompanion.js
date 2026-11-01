@@ -526,7 +526,7 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "Falowen Learning Companion", version: "1.0.0" },
-        instructions: "Read-only learning companion for connected Falowen students. Tutor-marked assignments must be submitted in Campus; do not claim to submit them here. Scores come from officially recorded results only. Never share other students' records.",
+        instructions: "Read-only Falowen learning companion. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, say so rather than inventing a workbook passage. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
