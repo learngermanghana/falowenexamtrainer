@@ -2619,5 +2619,107 @@
         }
       ]
     }
+  ],
+  "drafts": [
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-04/Ort zum Leben.mp3",
+      "level": "B1",
+      "day": 4,
+      "assignmentKey": "B1-2.4",
+      "draftTitle": "Ein Zimmer mit Licht",
+      "lines": [
+        {
+          "de": "Seit Wochen suche ich eine neue Wohnung.",
+          "en": "I have been looking for a new apartment for weeks."
+        },
+        {
+          "de": "In meinem alten Zimmer ist es zu dunkel.",
+          "en": "My old room is too dark."
+        },
+        {
+          "de": "Die Angebote im Internet klingen gut,",
+          "en": "The listings on the internet sound good,"
+        },
+        {
+          "de": "aber oft sind die Preise viel zu hoch.",
+          "en": "but the prices are often far too high."
+        },
+        {
+          "de": "Ich suche nicht nur vier Wände,",
+          "en": "I'm looking for more than just four walls,"
+        },
+        {
+          "de": "ich suche einen Ort zum Leben.",
+          "en": "I'm looking for a place to live."
+        },
+        {
+          "de": "Ein Fenster, Licht und etwas Ruhe.",
+          "en": "A window, light and a little peace and quiet."
+        },
+        {
+          "de": "Dann schickt mir Mia eine Anzeige.",
+          "en": "Then Mia sends me a listing."
+        },
+        {
+          "de": "Die Wohnung liegt nicht weit vom Park.",
+          "en": "The apartment isn't far from the park."
+        },
+        {
+          "de": "Ich rufe sofort beim Vermieter an,",
+          "en": "I call the landlord immediately,"
+        },
+        {
+          "de": "weil ich den Besichtigungstermin nicht verpassen möchte.",
+          "en": "because I don't want to miss the viewing appointment."
+        },
+        {
+          "de": "Ich suche nicht nur vier Wände,",
+          "en": "I'm looking for more than just four walls,"
+        },
+        {
+          "de": "ich suche einen Ort zum Leben.",
+          "en": "I'm looking for a place to live."
+        },
+        {
+          "de": "Ein Fenster, Licht und etwas Ruhe.",
+          "en": "A window, light and a little peace and quiet."
+        },
+        {
+          "de": "Morgen sehe ich mir die Wohnung an.",
+          "en": "Tomorrow I'm going to see the apartment."
+        },
+        {
+          "de": "Vielleicht beginnt hier mein neues Kapitel.",
+          "en": "Perhaps a new chapter of my life will begin here."
+        },
+        {
+          "de": "Bei Falowen kann ich meine Wünsche genauer erklären.",
+          "en": "At Falowen I can explain my wishes more precisely."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Wohnung",
+          "en": "apartment / flat"
+        },
+        {
+          "de": "die Anzeige",
+          "en": "listing / advertisement"
+        },
+        {
+          "de": "der Vermieter",
+          "en": "landlord"
+        },
+        {
+          "de": "der Besichtigungstermin",
+          "en": "viewing appointment"
+        },
+        {
+          "de": "vier Wände",
+          "en": "four walls (a home or room)"
+        }
+      ]
+    }
   ]
 }
