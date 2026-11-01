@@ -21,11 +21,11 @@ jest.mock("react-i18next", () => ({
 const MUSIC_URL = "https://music.falowen.app/";
 
 test("opens the public music site directly from homepage navigation and footer", () => {
-  render(<LandingPageSimple />);
+  const { container } = render(<LandingPageSimple />);
   const nav = screen.getByRole("navigation", { name: "Falowen" });
   expect(within(nav).getByRole("link", { name: "German Music" })).toHaveAttribute("href", MUSIC_URL);
   expect(within(nav).getByRole("link", { name: "German Music" })).not.toHaveAttribute("target", "_blank");
-  expect(screen.getByRole("contentinfo").querySelector('a[href="' + MUSIC_URL + '"]')).toHaveTextContent("German Music");
+  expect(container.querySelector('.falowen-home-footer a[href="' + MUSIC_URL + '"]')).toHaveTextContent("German Music");
 });
 
 test.each([
