@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import { A2_MOCK_04_HOEREN } from "../data/a2Mock04Hoeren";
+import { A2_MOCK_05_HOEREN } from "../data/a2Mock05Hoeren";
 import { A2_MOCK_06_HOEREN } from "../data/a2Mock06Hoeren";
 import { A2_MOCK_07_HOEREN } from "../data/a2Mock07Hoeren";
 import "./A2Mock2Hoeren.css";
 
 // No answer key or transcript is shipped to the student browser.
-export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value = {}, onChange, onSubmit, timeRemaining }) {
-  const parts = mockId === "a2-mock-07" ? A2_MOCK_07_HOEREN : mockId === "a2-mock-06" ? A2_MOCK_06_HOEREN : A2_MOCK_04_HOEREN;
+export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value = {}, onChange, onSubmit, timeRemaining, submitLabel = "Hören abgeben → Schreiben", submitDisabled = false, readOnly = false }) {
+  const parts = mockId === "a2-mock-07" ? A2_MOCK_07_HOEREN : mockId === "a2-mock-06" ? A2_MOCK_06_HOEREN : mockId === "a2-mock-05" ? A2_MOCK_05_HOEREN : A2_MOCK_04_HOEREN;
   const [active,setActive] = useState(0);
   const [urls,setUrls] = useState({});
   const [loading,setLoading] = useState(false);
@@ -36,7 +37,7 @@ export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value =
     <header className="a2-mock2-progress">
       <div><strong>Hören · Teil {active+1} von 4</strong>
         <span>{totalAnswered} / 20 Antworten</span></div>
-      <strong aria-label="Time remaining">{timeRemaining}</strong>
+      {timeRemaining ? <strong aria-label="Time remaining">{timeRemaining}</strong> : null}
     </header>
     <nav className="a2-mock2-nav" aria-label="Hören Teile">
       {parts.map((section,index)=>
@@ -64,7 +65,7 @@ export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value =
       {part.questions.map(q=><fieldset key={q.number} className="a2-mock2-question">
         <legend><strong>{q.number}.</strong> {q.question}</legend>
         {q.options.map(option=><label key={option.id} className={value[q.number]===option.id?"selected":""}>
-          <input type="radio" name={`a2-${mockId}-hoeren-${q.number}`}
+          <input type="radio" disabled={readOnly} name={`a2-${mockId}-hoeren-${q.number}`}
             checked={value[q.number]===option.id}
             onChange={()=>onChange({...value,[q.number]:option.id})}/>
           <span><strong>{active===3?"":`${option.id.toUpperCase()})`}</strong> {option.label}</span>
@@ -74,7 +75,7 @@ export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value =
         <button type="button" disabled={active===0} onClick={()=>setActive(i=>i-1)}>Zurück</button>
         {active<3
           ?<button type="button" className="a2-mock2-primary" onClick={()=>setActive(i=>i+1)}>Weiter: Teil {active+2}</button>
-          :<button type="button" className="a2-mock2-primary" onClick={onSubmit}>Hören abgeben → Schreiben</button>}
+          :<button type="button" className="a2-mock2-primary" disabled={submitDisabled} onClick={onSubmit}>{submitLabel}</button>}
       </footer>
     </article>
   </section>;

@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import ListeningPracticeSamplePage from "./ListeningPracticeSamplePage";
+import A2Mock3Hoeren from "./A2Mock3Hoeren";
+import A2MockListeningPractice from "./A2MockListeningPractice";
 
 const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const { t } = useTranslation();
@@ -23,7 +25,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
       const sampleExists =
         sampleId === "sample-1" ||
         (normalizedLevel === "A1" && ["sample-2", "sample-3"].includes(sampleId)) ||
-        (normalizedLevel === "A2" && sampleId === "sample-2");
+        (normalizedLevel === "A2" && /^sample-[2-7]$/.test(sampleId));
 
       if (!sampleExists) {
         return (
@@ -36,6 +38,8 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
         );
       }
 
+      if (normalizedLevel === "A2" && sampleId === "sample-3") return <A2Mock3Hoeren practiceReturnPath="/exams/horen" />;
+      if (normalizedLevel === "A2" && /^sample-[4-7]$/.test(sampleId)) return <A2MockListeningPractice mockNumber={Number(sampleId.slice(-1))} />;
       return <ListeningPracticeSamplePage level={normalizedLevel} sampleId={sampleId} />;
     }
 
@@ -66,7 +70,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
               {normalizedLevel === "A1"
                 ? "15 questions · Teil 1–3"
                 : normalizedLevel === "A2"
-                  ? "20 questions · Teil 1–4"
+                  ? "20 questions · Teil 1–4 · From A2 Mock 1"
                   : "30 questions · Teil 1–4"}
             </span>
           </button>
@@ -91,25 +95,14 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
             </button>
           ) : null}
 
-          {normalizedLevel === "A2" ? (
-            <button
-              type="button"
-              onClick={() => openListeningSample("/exams/horen/a2/sample-2", "Hören Sample 2 opened successfully.")}
-              style={{
-                ...styles.secondaryButton,
-                width: "100%",
-                textAlign: "left",
-                display: "grid",
-                gap: 4,
-                padding: "14px 16px",
-              }}
-            >
-              <strong>Hören Sample 2</strong>
-              <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
-                20 questions · Teil 1–4 · From A2 Mock 2
-              </span>
+          {normalizedLevel === "A2" ? [2,3,4,5,6,7].map(number => (
+            <button type="button" key={number}
+              onClick={() => openListeningSample(`/exams/horen/a2/sample-${number}`, `Hören Sample ${number} opened successfully.`)}
+              style={{ ...styles.secondaryButton, width:"100%", textAlign:"left", display:"grid", gap:4, padding:"14px 16px" }}>
+              <strong>Hören Sample {number}</strong>
+              <span style={{ fontSize:13, fontWeight:500, opacity:0.8 }}>20 questions · Teil 1–4 · From A2 Mock {number}</span>
             </button>
-          ) : null}
+          )) : null}
 
           {normalizedLevel === "A1" ? (
             <>

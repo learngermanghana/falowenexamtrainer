@@ -31,6 +31,8 @@ const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = 
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
 const { verifyTeacherApprovedA2Mock3Audio } = require("./a2Mock3PublishedAudio");
 const { verifyA2Mock04Audio } = require("./a2Mock04PublishedAudio");
+const { verifyA2Mock05Audio } = require("./a2Mock05PublishedAudio");
+const { gradeA2HoerenOnly } = require("./a2HoerenOnlyScore");
 const { verifyA2Mock06Audio } = require("./a2Mock06PublishedAudio");
 const { verifyA2Mock07Audio } = require("./a2Mock07PublishedAudio");
 const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
@@ -1143,6 +1145,27 @@ app.get("/course-media/a1/mock-audio-url", async (req, res) => {
   }
 });
 
+// Hören-only practice: reuse server-private answers without opening an AI-marked full mock.
+app.post("/a2-mock/hoeren-practice/score", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable." });
+    const profile = await findAuthedStudentProfile(db, authedUser);
+    const blocked = getA2MediaAccessBlockReason({ authedUser, student: profile?.data || null });
+    if (blocked) return res.status(403).json({ error: "A2 Hören access is not available for this account.", code: blocked });
+    let result;
+    try { result = gradeA2HoerenOnly({ mockId: req.body?.mockId, answers: req.body?.answers }); }
+    catch (error) { return res.status(400).json({ error: error.message || "Invalid Hören answers." }); }
+    res.set("Cache-Control", "private, no-store");
+    return res.json(result);
+  } catch (error) {
+    console.error("A2 Hören practice scoring failed", error);
+    return res.status(500).json({ error: "Hören practice could not be scored." });
+  }
+});
+
 app.get("/course-media/a2/mock-audio-url", async (req, res) => {
   try {
     const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
@@ -1182,12 +1205,14 @@ app.get("/course-media/a2/mock-audio-url", async (req, res) => {
       ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
     const isApprovedMock4Part = validated.mockId === "mock-04" &&
       ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
+    const isApprovedMock5Part = validated.mockId === "mock-05" &&
+      ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
     const isApprovedMock6Part = validated.mockId === "mock-06" &&
       ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
     const isApprovedMock7Part = validated.mockId === "mock-07" &&
       ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
     const released = await isReleasedMockHoerenAudio({ db, ...validated });
-    if (!released && !isApprovedMock3Part && !isApprovedMock4Part && !isApprovedMock6Part && !isApprovedMock7Part) {
+    if (!released && !isApprovedMock3Part && !isApprovedMock4Part && !isApprovedMock5Part && !isApprovedMock6Part && !isApprovedMock7Part) {
       return res.status(404).json({ error: "Mock Hören recording is not published." });
     }
     const signed = await createA2MockAudioSignedUrl(validated);
@@ -1200,6 +1225,11 @@ app.get("/course-media/a2/mock-audio-url", async (req, res) => {
       ...validated, signedUrl: signed.url,
     }))) {
       return res.status(404).json({ error: "A2 Mock 04 Hören is unavailable until the approved MP3 is uploaded." });
+    }
+    if (isApprovedMock5Part && !(await verifyA2Mock05Audio({
+      ...validated, signedUrl: signed.url,
+    }))) {
+      return res.status(404).json({ error: "A2 Mock 05 Hören recording is unavailable until it matches the approved MP3." });
     }
     if (isApprovedMock6Part && !(await verifyA2Mock06Audio({
       ...validated, signedUrl: signed.url,

@@ -27,7 +27,7 @@ const readFullHoerenCompletion = uid => {
   catch { return false; }
 };
 
-export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewReleased = false }) {
+export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewReleased = false, practiceReturnPath = "/exams/mocks" }) {
   const { idToken, user } = useAuth();
   const [active, setActive] = useState(0);
   const [answers, setAnswers] = useState(() => restore(user?.uid));
@@ -90,7 +90,7 @@ export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewRele
   return (
     <main className="a2-mock2-shell" lang="de" data-a2-mock3-hoeren>
       {!embedded ? <div className="a2-mock2-top">
-        <AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" />
+        <AppBackButton label="Zurück zum Prüfungsraum" fallbackPath={practiceReturnPath} />
         <span>A2 · Mock 3 · Hören</span>
       </div> : null}
       {!embedded ? <aside style={{padding:"12px 14px",border:"1px solid #bfdbfe",borderRadius:10,marginBottom:12}}>
