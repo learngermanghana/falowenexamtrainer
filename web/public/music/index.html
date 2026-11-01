@@ -40,7 +40,11 @@
           <button id="listen-next" class="outline-button" type="button">Continue to lyrics →</button>
         </div>
         <div id="detail-lyrics" class="detail-panel" hidden>
-          <div class="learning-columns"><div><h3>Sing along</h3><label class="follow-control"><input id="follow-lyrics" type="checkbox" checked> <span id="follow-label">Follow lyrics</span></label><div id="lyrics-text" class="lyrics-text" lang="de"></div></div><div><h3>Useful German</h3><p class="detail-note">Tap a phrase to see its English meaning.</p><div id="vocab-list" class="vocab-list"></div></div></div>
+          <div class="learning-columns"><div><h3>Sing along</h3><div class="lyrics-controls">
+              <label class="follow-control"><input id="follow-lyrics" type="checkbox" checked> <span id="follow-label">Follow lyrics</span></label>
+              <label class="follow-control"><input id="show-english" type="checkbox"> Show English</label>
+            </div><p id="english-status" class="english-status" role="status"></p>
+            <div id="lyrics-text" class="lyrics-text"></div></div><div><h3>Useful German</h3><p class="detail-note">Tap a phrase to see its English meaning.</p><div id="vocab-list" class="vocab-list"></div></div></div>
           <button id="lyrics-next" class="outline-button" type="button">Try listening questions →</button>
         </div>
         <div id="detail-practice" class="detail-panel" hidden>
