@@ -1412,6 +1412,19 @@
       "source": "User-provided A2 Day 14 Pläne für mein Leben.mp3 with 28 original lyric lines, 2026-11-01; R2 upload still required",
       "timingStatus": "estimated",
       "timingMethod": "Approximate vocal line windows for the attached 136.8-second recording. Not teacher/ear-certified; review boundaries against playback after R2 upload."
+    },
+    {
+      "trackId": "r2-a2-day-17-b64_SWNoIGdlaGUgenVyIEFwb3RoZWtlLm1wMw",
+      "objectKey": "music/a2/day-17/Ich gehe zur Apotheke.mp3",
+      "assignmentKey": "A2-6.17",
+      "title": "Ich gehe zur Apotheke",
+      "lyrics": "[Verse 1]\nSeit gestern fühle ich mich nicht gut,\nmein Kopf tut weh, mein Hals ist rot.\nIch habe Husten und auch Schnupfen,\ndie ganze Nacht konnte ich kaum schlafen.\n\nAm Morgen messe ich mein Fieber,\nund rufe bei der Arbeit an.\nIch sage, dass ich heute krank bin,\nund leider nicht zur Arbeit kann.\n\n[Chorus]\nIch gehe heute zur Apotheke,\ndenn ich brauche Medizin.\nIch frage nach den richtigen Tabletten,\ndamit es mir bald besser geht.\n\n[Verse 2]\nDie Apothekerin fragt mich freundlich:\n„Was fehlt Ihnen? Was tut Ihnen weh?“\nIch sage: „Ich habe starke Kopfschmerzen,\nund seit zwei Tagen tut mein Hals weh.“\n\nSie gibt mir etwas gegen Husten,\nund erklärt mir ganz genau,\nwie oft ich die Medizin nehmen soll,\nund worauf ich achten muss.\n\n[Chorus]\nIch gehe heute zur Apotheke,\ndenn ich brauche Medizin.\nIch frage nach den richtigen Tabletten,\ndamit es mir bald besser geht.\n\n[Outro]\nZu Hause trinke ich warmen Tee,\nund lege mich ins Bett zurück.\nIch hoffe, morgen geht es besser,\nund bald bin ich wieder fit.",
+      "cues": [],
+      "strictRecordingLyrics": true,
+      "genre": "German acoustic pop",
+      "source": "Owner-supplied German sung lyrics and verified public R2 object key, 2026-11-01. Audio waveform and duration not accessible for cue creation.",
+      "timingStatus": "missing",
+      "timingMethod": "No invented timestamps. Requires actual recording-specific offline transcription/alignment and ear review."
     }
   ]
 }
