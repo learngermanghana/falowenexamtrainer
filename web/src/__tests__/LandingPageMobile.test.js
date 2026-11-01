@@ -57,13 +57,17 @@ describe("Falowen current five-slide public homepage and iPhone navigation", () 
     expect(screen.queryByText(/★★★★★/)).not.toBeInTheDocument();
   });
 
-  it("provides usable German and French navigation and book links",async()=>{
+  it("provides German Music links and usable English, German and French navigation",async()=>{
     renderHome();
+    const nav=within(screen.getByRole("navigation",{name:"Falowen"}));
+    expect(nav.getByRole("link",{name:"German Music"})).toHaveAttribute("href","https://music.falowen.app/");
     fireEvent.change(screen.getByRole("combobox",{name:"Language"}),{target:{value:"de"}});
-    await waitFor(()=>expect(screen.getByRole("link",{name:"Live-Kurse"})).toHaveAttribute("href","/classes"));
+    await waitFor(()=>expect(nav.getByRole("link",{name:"Live-Kurse"})).toHaveAttribute("href","/classes"));
+    expect(nav.getByRole("link",{name:"Deutsch mit Musik"})).toHaveAttribute("href","https://music.falowen.app/");
     expect(screen.getByRole("link",{name:"Bücher"})).toHaveAttribute("href","/books");
     fireEvent.change(screen.getByRole("combobox",{name:"Sprache"}),{target:{value:"fr"}});
-    await waitFor(()=>expect(screen.getByRole("link",{name:"Cours en direct"})).toHaveAttribute("href","/classes"));
+    await waitFor(()=>expect(nav.getByRole("link",{name:"Cours en direct"})).toHaveAttribute("href","/classes"));
+    expect(nav.getByRole("link",{name:"Musique allemande"})).toHaveAttribute("href","https://music.falowen.app/");
     expect(screen.getByRole("link",{name:"Livres"})).toHaveAttribute("href","/books");
   });
 
