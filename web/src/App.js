@@ -12,6 +12,7 @@ import CourseLessonPage from "./components/CourseLessonPage";
 import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
 import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
 import BookStoreCheckout from "./components/BookStoreCheckout";
+import ChatGPTConnectPage from "./components/ChatGPTConnectPage";
 import CampusMusicPage from "./components/CampusMusicPage";
 import CampusBooksPage from "./components/CampusBooksPage";
 import ExamGuideComingSoon from "./components/ExamGuideComingSoon";
@@ -456,6 +457,12 @@ function App() {
         <div style={styles.card}>{t("appStatus.authLoading")}</div>
       </div>
     );
+  }
+
+  if (/^\/chatgpt\/connect\/?$/.test(location.pathname)) {
+    return user
+      ? <ChatGPTConnectPage user={user} studentProfile={studentProfile} />
+      : <AuthGate initialMode="login" onBack={() => navigate("/")} onSwitchToSignup={() => navigate("/signup")} />;
   }
 
   if (location.pathname === "/books" || location.pathname === "/books/") return <BookStoreCheckout catalogOnly />;
