@@ -69,7 +69,7 @@ test('untimed A1 recording still permits approximate page follow without pretend
  assert.equal(d.getElementById('lyrics-next').hidden,true);dom.window.close();
 });
 
-test('B1 Day 4 course draft supports optional explicitly unverified English without fabricated lyric cue',async()=>{
+test('B1 Day 4 course draft can follow estimated lines without claiming a verified recording',async()=>{
  const studio=JSON.parse(read('web/public/music/studio-drafts.json')).tracks.find(x=>x.level==='B1'&&x.day===4);
  const row=JSON.parse(read('web/public/music/english-translations.json')).drafts.find(x=>x.objectKey==='music/b1/day-04/Ort zum Leben.mp3');
  const track={id:'r2-b1-day-04-b64_T3J0IHp1bSBMZWJlbi5tcDM',level:'B1',day:4,
@@ -82,13 +82,16 @@ test('B1 Day 4 course draft supports optional explicitly unverified English with
  assert.equal(d.getElementById('show-english').checked,false,'B1 English starts hidden');
  assert.match(d.getElementById('english-status').textContent,/COURSE DRAFT TRANSLATION/);
  assert.match(d.getElementById('lyrics-text').textContent,/Seit Wochen suche ich eine neue Wohnung/);
- assert.match(d.getElementById('lyrics-text').textContent,/These lyrics have not been checked against this MP3/);
+ assert.match(d.getElementById('lyrics-text').textContent,/not been teacher-verified/);
+ assert.match(d.getElementById('follow-label').textContent,/Follow lyrics \(estimated\)/);
  assert.ok(d.querySelectorAll('.english-line').length===17);
  assert.ok([...d.querySelectorAll('.english-line')].every(x=>x.hidden));
  d.getElementById('show-english').click();
  assert.equal(d.getElementById('show-english').checked,true);
  assert.ok([...d.querySelectorAll('.english-line')].every(x=>!x.hidden));
  assert.match(d.getElementById('lyrics-text').textContent,/I have been looking for a new apartment for weeks/);
- assert.equal(d.querySelector('.lyric-line.is-active'),null,'draft never pretends to be timed');
+ assert.equal(studio.cues.length,17,'B1 Day4 was aligned against the real MP3');
+ assert.equal(d.querySelectorAll('.lyric-line:disabled').length,0,'estimated cues allow seeking to each sung line');
+ assert.equal(d.querySelector('.lyric-line.is-active'),null,'no line is highlighted in instrumental intro');
  dom.window.close();
 });
