@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { matchingEnglishTranslation, sungGermanLines } from '../web/public/music/english-translations.js';
+import { matchingEnglishTranslation, matchingDraftEnglishTranslation, sungGermanLines } from '../web/public/music/english-translations.js';
 
 const read=path=>JSON.parse(readFileSync(path,'utf8'));
 const translated=read('web/public/music/english-translations.json');
@@ -43,7 +43,7 @@ test('both public listening and workbook use matching published words, with leve
  const template=readFileSync('web/public/music/index.html','utf8');
  assert.match(template,/id="show-english"/);
  assert.match(publicApp,/matchingEnglishTranslation\(/);
- assert.match(publicApp,/!lesson.referenceOnly/);
+ assert.match(publicApp,/matchingDraftEnglishTranslation\(/);
  assert.match(publicApp,/track.level === "A1"/);
  assert.match(publicApp,/\.english-line/);
  assert.match(workbook,/matchingEnglishTranslation\(/);
@@ -52,4 +52,24 @@ test('both public listening and workbook use matching published words, with leve
  assert.match(workbook,/English translation is not available/);
  assert.match(publicApp,/fetch\("\/music\/english-translations.json"/);
  assert.match(workbook,/getJson\("\/music\/english-translations.json"\)/);
+});
+
+test('B1 Day 4 Ort zum Leben can show English for its exact studio draft without claiming audio verification',()=>{
+ const row=translated.drafts.find(x=>x.objectKey==='music/b1/day-04/Ort zum Leben.mp3');
+ const studio=read('web/public/music/studio-drafts.json').tracks.find(x=>x.level==='B1'&&x.day===4);
+ assert.equal(row.source,'course-draft');
+ assert.equal(row.draftTitle,studio.title);
+ assert.equal(row.assignmentKey,studio.assignmentKey);
+ assert.equal(row.lines.length,17);
+ const track={objectKey:row.objectKey,level:'B1',day:4};
+ const draft={lyrics:studio.lyrics,assignmentKey:studio.assignmentKey,draftTitle:studio.title,referenceOnly:true};
+ assert.equal(matchingDraftEnglishTranslation(translated,track,draft),row);
+ assert.equal(matchingEnglishTranslation(translated,row.objectKey,studio.lyrics),null,
+  'no draft may masquerade as owner-reviewed recording lyrics');
+ assert.equal(matchingDraftEnglishTranslation(translated,{...track,objectKey:'music/b1/day-05/Ort zum Leben.mp3'},draft),null);
+ assert.equal(matchingDraftEnglishTranslation(translated,track,{...draft,referenceOnly:false}),null);
+ assert.equal(matchingDraftEnglishTranslation(translated,track,{...draft,lyrics:studio.lyrics.replace('Seit Wochen','Seit Tagen')}),null);
+ assert.equal(matchingDraftEnglishTranslation(translated,track,{...draft,draftTitle:'Different draft'}),null);
+ assert.equal(matchingDraftEnglishTranslation(translated,{...track,level:'A2'},draft),null);
+ assert.equal(matchingDraftEnglishTranslation(translated,track,{...draft,assignmentKey:'B1-10.4'}),null);
 });
