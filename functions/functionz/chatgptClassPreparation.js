@@ -88,6 +88,10 @@ function prepareFromTimetable({ timetable, level, courseContent }) {
     notesUrl: text(content.grammar?.notesUrl || content.grammar?.noteLinks?.[0]?.url, 420) || null,
     fullExplanationIncluded: content.grammar?.fullExplanationIncluded !== false
       && Boolean(content.grammar?.sections?.length),
+    teaching: (content.grammar?.sections || []).slice(0, 3).map((section) => ({
+      title: text(section.title, 180),
+      explanation: text(section.explanation, 950),
+    })),
   };
 
   const plan = [
