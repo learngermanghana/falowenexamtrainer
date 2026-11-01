@@ -6,6 +6,11 @@ on:
     paths:
       - 'web/public/music/analytics*'
       - 'web/public/music/app.js'
+      - 'web/src/components/CampusMusicPage.js'
+      - 'web/src/components/WorkbookDayMusic.jsx'
+      - 'web/src/components/FalowenLessonMusic.jsx'
+      - 'web/src/services/musicPracticeService.js'
+      - 'web/tests/student-music-practice.test.cjs'
       - 'web/public/music/index.html'
       - 'web/scripts/write-music-analytics-config.mjs'
       - 'web/tests/music-analytics.test.cjs'
@@ -22,4 +27,4 @@ jobs:
           node-version: '22'
       - run: node --check web/public/music/analytics.js
       - run: node --check web/public/music/app.js
-      - run: node --test web/tests/music-analytics.test.cjs
+      - run: node --test web/tests/music-analytics.test.cjs web/tests/student-music-practice.test.cjs
