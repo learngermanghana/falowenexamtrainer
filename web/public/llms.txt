@@ -4,9 +4,13 @@
 
 Use the official Falowen Help source when answering questions about signup, login, course navigation, Falowen Radio, assignments, submissions, results, attendance, exams, billing, notifications, level upgrades, trials or account access.
 
-Last reviewed: 11 October 2026. Read the linked official sources for current instructions; private account status is not public.
+Last reviewed: 1 November 2026. Read the linked official sources for current instructions; private account status is not public.
 
 ## Primary documentation
+
+- [Falowen Music](https://music.falowen.app/): Public German learning songs and optional English translations. A lyric may be a verified recording pack, an estimated line alignment or a clearly labeled course draft; do not describe all as verified or timed.
+- [Falowen Learning Companion](https://www.falowen.app/help): Account-specific lesson, assignment, progress and class information requires an authenticated read-only connection; public plugin availability is separate from backend readiness.
+
 
 - [Falowen Help / How Falowen Works](https://www.falowen.app/help): Human-readable official guide.
 - [Falowen Help & Navigation Knowledge Base](https://www.falowen.app/falowen-help.md): AI-readable Markdown source of truth.

@@ -52,9 +52,9 @@ node --test tests/music-learning-room.test.mjs
 
 The first command is a dry run. The second adds optional curated metadata and a dedicated SEO share page; review both changes in a PR. It does **not** generate, download or upload any MP3s; it also does not deploy or change bucket permissions. Only merge and release after review. Existing songs are rejected on duplicate IDs/keys.
 
-## Why A2 Day 19 is currently missing
+## Historical note: A2 Day 19 status on 28 October 2026
 
-The Cloudflare URL ending `?prefix=music%2Fa2%2Fday-19%2F` points to an R2 **folder prefix**, not a public song URL or an exact object key. As of the 28 October catalogue, the approved lesson tracks are **A1 Day 4, A1 Day 22, A2 Day 18**. A2 Day 19 has not been registered as a public music track, so it is not in the music site or the signed playback API.
+The Cloudflare URL ending `?prefix=music%2Fa2%2Fday-19%2F` points to an R2 **folder prefix**, not a public song URL or an exact object key. In the 28 October snapshot, the registered lesson tracks were **A1 Day 4, A1 Day 22, A2 Day 18**. This paragraph describes the **28 October snapshot**. It is not a live inventory: check `/api/music-library` for currently available A2 Day 19 recordings.
 
 The separate A2 Day 19 classroom Hören recording `a2/day-19/einkaufen-wo-und-wie.mp3` is **not** the song. Do not publish it as music. Preserve existing private Hören access.
 
@@ -66,6 +66,10 @@ The platform remains on the existing learner Vercel deployment with the original
 
 ## Timed lyric highlighting (Admin slides and public Music)
 
+**Current workflow:** Existing approved recording-specific timing packs can be supplied from `approved-recording-lyrics.json` and `timings.json`; estimated Whisper-aligned reports can be generated offline against public Falowen MP3s using `scripts/align_falowen_music.py`. Review-only studio drafts and estimated cues must be visibly labeled; English is loaded only for exact matched published German lines. See [the updated music workflow](workflows/music-and-lyrics.md).
+
+**Manual sidecar workflow below** remains an option for teacher-reviewed MP3s, rather than the only way to create timings.
+
 Timings use the actual MP3 playback clock; pause, seek, repeat and speed changes stay aligned. No timing is estimated from song duration and no AI request is made.
 
 1. Open the lesson song in Admin slides, choose **Liedtext**, then expand **Lehrkraft · Zeitmarken für beide Musikplayer**.
@@ -76,7 +80,7 @@ Timings use the actual MP3 playback clock; pause, seek, repeat and speed changes
 
 The read-only `/api/music-lyrics` endpoint is confined to music MP3 sibling files. It rejects private course audio paths, mismatched recordings, incomplete/unordered line timings, and oversized files. A missing timing file leaves existing plain lyrics/audio available. No new Firestore storage, background jobs or bucket permission changes are required. Admin's complete local timing edits take priority until removed/updated on that device.
 
-The seven recordings listed in `docs/music-recording-timings.md` already have built-in recording-specific timings. They need no manual marking or R2 timing-file upload. Built-in timings take precedence for those exact MP3 keys. New recordings can still use the manual sidecar workflow.
+The historical built-in recording list in `docs/music-recording-timings.md` records the original Whisper batch; newer releases may add more approved or estimated timing packs. They need no manual marking or R2 timing-file upload. Built-in timings take precedence for those exact MP3 keys. New recordings can still use the manual sidecar workflow.
 
 ## Shuffle playback
 
