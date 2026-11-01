@@ -28,6 +28,11 @@ test('direct lesson players use account-only reporter; public GA4 remains anonym
   assert.match(service, /auth\?\.currentUser/);
   assert.match(service, /getIdToken\(/);
   assert.match(service, /music-analytics\/practice/);
+  assert.match(service, /SAVE_INTERVAL_MS = 10 \* 60 \* 1000/);
+  assert.match(service, /MAX_BATCH_EVENTS = 24/);
+  assert.match(service, /pending\.push\(event\)/);
+  assert.match(service, /window\.addEventListener\('pagehide'/);
+  assert.doesNotMatch(service, /setInterval\(/);
   const ga = read('public/music/analytics.js');
   assert.match(ga, /get\('embedded'\) === '1'\) return/);
   assert.doesNotMatch(ga, /studentId|studentEmail|user_id|auth\.currentUser/);
