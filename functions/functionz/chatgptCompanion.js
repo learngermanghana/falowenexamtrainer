@@ -41,7 +41,9 @@ function lessonContentResponse(level, day, section = "overview") {
     availableSections: VALID_LESSON_SECTIONS.size && [...VALID_LESSON_SECTIONS].filter((key) =>
       key === "overview" || Boolean(content[key])),
     studySequence: [
-      "Read the vocabulary and grammar teaching in Campus.",
+      ...(level === "B1" && content.reading
+        ? ["Read the original Falowen Lesen passage and answer its questions. Do not request a key before attempting them."]
+        : ["Read the vocabulary and grammar teaching in Campus."]),
       content.skillFocus === "lesen" ? "Read the lesson passage and answer the reading questions without a solution key."
         : content.skillFocus === "hoeren" ? "Listen to the audio in Campus and answer the listening questions."
           : content.skillFocus === "write" ? "Follow the assigned writing prompt in Campus and draft your own response."
@@ -296,7 +298,7 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_lesson_content",
-    description: "Read actual student-facing Falowen Course Book material for my enrolled course: vocabulary, grammar explanations and checks, reading passage/questions, listening task details, writing prompt and review. Does not reveal answer keys, model answers, audio transcripts or other students' work. Supported in depth for B2; other levels report unavailable rather than invent exercises.",
+    description: "Read authentic Falowen Course Book content for my enrolled level. B1: original reading passages, comprehension questions and writing prompts where available; B2: vocabulary, grammar, reading, listening, writing and review. Missing content is reported transparently. Never expose answer keys, solutions or private student work.",
     inputSchema: {
       type: "object",
       properties: {
