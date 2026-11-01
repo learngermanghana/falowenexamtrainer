@@ -2,7 +2,7 @@
 
 const {
   getStudentTimetable, resolveStudentClass, matchedStudentClass,
-  sessionMatchesClass, upcomingSessions, zoomUrl,
+  sessionMatchesClass, upcomingSessions, zoomUrl, verifiedDayFromAssignment,
 } = require("../chatgptClassTimetable");
 
 const iso = (value) => new Date(value).toISOString();
@@ -161,4 +161,25 @@ describe("Falowen ChatGPT live timetable", () => {
     const result = await getStudentTimetable({ db, student:student(), now });
     expect(result.nextSession.startsAt).toBe("2026-11-04T09:00:00.000Z");
   });
+  test("confirms a lesson day from the canonical assignment ID without assuming calendar index", async () => {
+    expect(verifiedDayFromAssignment({ assignmentIds: ["A1-0.1"] }, "A1")).toBe(1);
+    expect(verifiedDayFromAssignment({ assignmentIds: ["A2-1.1"] }, "A2")).toBe(1);
+    expect(verifiedDayFromAssignment({ assignmentIds: ["A2-1.1"] }, "A1")).toBeNull();
+    const { db } = firebaseFixture({
+      classes,
+      sessions: { indexed: {
+        classId: "cohort-A1",
+        startsAt: "2026-11-06T10:00:00.000Z",
+        endsAt: "2026-11-06T11:00:00.000Z",
+        curriculumIndex: 29,
+        assignmentIds: ["A1-0.1"],
+        topic: "Greetings",
+        status: "scheduled",
+      } },
+    });
+    const result = await getStudentTimetable({ db, student: student(), now });
+    expect(result.nextSession.lessonDay).toBe(1);
+    expect(result.nextSession.lessonDaySource).toBe("assignment_identity");
+  });
+
 });
