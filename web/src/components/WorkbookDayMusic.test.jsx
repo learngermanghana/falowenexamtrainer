@@ -140,9 +140,9 @@ describe("A2/B1 optional Music tab", () => {
     setFetch({catalog:[song],discovered:[],translations:[pack],
       sidecars:{[song.id]:{objectKey:song.objectKey,lyrics,cues:[]}}});
     const {container}=render(<WorkbookDayMusic level={level} day={13} hideLegacyNotes />);
-    await waitFor(()=>expect(container.querySelectorAll('[data-english-line="true"]').length).toBe(enabled?2:0));
+    await waitFor(()=>expect(screen.getByRole("checkbox",{name:"Show English"}).disabled).toBe(false));
     const input=screen.getByRole("checkbox",{name:"Show English"});
-    expect(input.disabled).toBe(false);
+    expect(container.querySelectorAll('[data-english-line="true"]').length).toBe(enabled?2:0);
     expect(input.checked).toBe(enabled);
     fireEvent.click(input);
     expect(input.checked).toBe(!enabled);
