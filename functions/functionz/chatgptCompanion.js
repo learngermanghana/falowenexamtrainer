@@ -44,11 +44,11 @@ function lessonContentResponse(level, day, section = "overview") {
       ...(level === "B1" && content.reading
         ? ["Read the original Falowen Lesen passage and answer its questions. Do not request a key before attempting them."]
         : ["Read the vocabulary and grammar teaching in Campus."]),
-      content.skillFocus === "lesen" ? "Read the lesson passage and answer the reading questions without a solution key."
+      (content.skillFocus === "lesen" || (level === "B1" && content.reading)) ? "Read the lesson passage and answer the reading questions without a solution key."
         : content.skillFocus === "hoeren" ? "Listen to the audio in Campus and answer the listening questions."
           : content.skillFocus === "write" ? "Follow the assigned writing prompt in Campus and draft your own response."
             : "Complete the speaking or communication task shown in Campus.",
-      "Review the lesson key points and practise your own sentences.",
+      level === "B1" ? "Finish any required submission in Campus." : "Review the lesson key points and practise your own sentences.",
     ],
     grammarExercise: content.grammar?.task || null,
     readingTitle: content.reading?.title || null,
