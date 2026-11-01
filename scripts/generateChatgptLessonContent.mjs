@@ -27,9 +27,12 @@ import { A2_LISTENING_TASKS, A2_LISTENING_MODES } from "../web/src/data/a2Listen
 import { A2_REQUIRED_WRITING_DAYS } from "../web/src/data/a2WritingSchedule.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
+import { extractGrammarTeaching, grammarComponentPaths } from "./extractFalowenGrammar.mjs";
+import { loadWorkbookSource, extractLiteralQuestions, extractLiteralParagraphs, extractA1Day3Reading } from "./extractFalowenWorkbook.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "functions/data/chatgptLessonContent.generated.json");
+const grammarSources = grammarComponentPaths(root);
 const text = (value, length = 1500) => String(value || "").trim().slice(0, length);
 const strings = (items, maximum = 20, length = 1500) =>
   (Array.isArray(items) ? items : []).slice(0, maximum).map((v) => text(v, length)).filter(Boolean);
@@ -115,6 +118,36 @@ const a1Day1Workbook = fs.readFileSync(
 );
 if (!A1["1"]) throw new Error("Canonical A1 Day 1 lesson missing");
 A1["1"].reading = extractA1Day1(a1Day1Workbook);
+// Source-literal exercises from the original tutor workbooks, without answers.
+if (!A1["2"] || !A1["3"]) throw new Error("A1 canonical Day 2/3 missing");
+const a1Day2 = loadWorkbookSource(path.join(root, "web/src/components/A1Day2Kapitel11WorkbookPage.js"));
+A1["2"].listening = {
+  title: "Kapitel 1.1 · Teil 1 Hören", chapter: "1.1",
+  task: "Watch and listen to the original video on introducing yourself and a friend.",
+  audioAvailableInCampus: true, mediaUrl: "https://youtu.be/nih5h7B48NY",
+  questions: extractLiteralQuestions(a1Day2, "questions", 4),
+};
+A1["2"].writing = {
+  chapter: "1.1", prompt: "Write a short text introducing yourself.",
+  instructions: [
+    "Include your name, where you come from, where you live, a greeting and a farewell.",
+    "Submit your final writing and listening answers through the A1-1.1 Campus workbook.",
+  ],
+};
+const a1Day3 = loadWorkbookSource(path.join(root, "web/src/components/A1Day3PronounsIntroducingYourselfWorkbookPage.js"));
+A1["3"].reading = extractA1Day3Reading(a1Day3);
+A1["3"].listening = {
+  title: "Kapitel 1.2 · Teil 3 Hören", chapter: "1.2",
+  audioAvailableInCampus: true, mediaUrl: "https://youtu.be/3p-Vl1HsOok",
+  questions: extractLiteralQuestions(a1Day3, "multipleChoiceQuestions", 5),
+};
+A1["3"].writing = {
+  chapter: "1.2", prompt: "Introduce yourself in a short paragraph.",
+  instructions: [
+    "Include your name, where you come from, where you live and a greeting.",
+    "Submit your original work through the Falowen Campus workbook A1-1.2.",
+  ],
+};
 
 const A2 = {};
 const a2Entries = curriculumManifest.getCurriculumEntriesForLevel("A2");
@@ -130,6 +163,7 @@ for (let day = 1; day <= 28; day += 1) {
   const listening = A2_LISTENING_TASKS[day];
   const grammarLink = A2_GRAMMAR_ROUTE_ENTRIES.find((entry) => Number(entry.day) === day);
   const writingRequired = A2_REQUIRED_WRITING_DAYS.includes(day);
+  const originalGrammar = extractGrammarTeaching(grammarSources.A2[day]);
   A2[String(day)] = {
     level: "A2", day, chapter: text(lesson.chapter || reading.chapter, 25),
     title: text(lesson.title || lesson.topic, 240),
@@ -148,7 +182,7 @@ for (let day = 1; day <= 28; day += 1) {
     grammar: {
       focus: text(lesson.grammar_topic || lesson.grammarFocus, 320),
       notesUrl: text(grammarLink?.route || lesson.grammarPage, 450),
-      fullExplanationIncluded: false,
+      ...originalGrammar,
     },
     ...(listening && listening.mode !== A2_LISTENING_MODES.NONE ? { listening: {
       task: text(listening.task, 950), mode: text(listening.mode, 50),
@@ -194,6 +228,13 @@ function extractB1Day1Reading(source) {
 
 const B1 = {};
 const b1Entries = curriculumManifest.getCurriculumEntriesForLevel("B1");
+const b1Day2 = loadWorkbookSource(path.join(root, "web/src/components/B1Day2FreundeFuersLebenWorkbookPage.js"));
+const b1Day2Reading = {
+  title: "Essay: Was bedeutet es, ein wahrer Freund zu sein?",
+  paragraphs: extractLiteralParagraphs(b1Day2,
+    "Freundschaft ist eine der wichtigsten Beziehungen", 7),
+  questions: extractLiteralQuestions(b1Day2, "lesenQuestions", 7),
+};
 for (let day = 1; day <= 28; day += 1) {
   const lesson = b1Entries.find((x) => Number(x.day ?? x.assignmentDay) === day);
   if (!lesson) throw new Error("Missing canonical B1 lesson day " + day);
@@ -201,6 +242,7 @@ for (let day = 1; day <= 28; day += 1) {
   const workbookReading = task?.text;
   const reading = day === 1
     ? extractB1Day1Reading(firstB1Workbook)
+    : day === 2 ? b1Day2Reading
     : workbookReading && Array.isArray(workbookReading.paragraphs) &&
       Array.isArray(workbookReading.questions) && workbookReading.paragraphs.length &&
       workbookReading.questions.length
@@ -211,6 +253,7 @@ for (let day = 1; day <= 28; day += 1) {
       }
       : null;
   const writing = B1_WRITING_TASKS[day] || null;
+  const originalGrammar = extractGrammarTeaching(grammarSources.B1[day]);
   B1[String(day)] = {
     level: "B1", day,
     chapter: text(lesson.chapter || lesson.displayChapter, 20),
@@ -220,6 +263,10 @@ for (let day = 1; day <= 28; day += 1) {
     grammarFocus: text(lesson.grammar_topic || lesson.grammarFocus, 260),
     skillFocus: "lesen_hoeren",
     campusTabs: ["Grammar", "Sprechen", "Schreiben", "Lesen", "Hören", "Submit"],
+    grammar: {
+      focus: text(lesson.grammar_topic || lesson.grammarFocus, 320),
+      ...originalGrammar,
+    },
     ...(reading ? { reading: {
       ...reading,
       instructions: text(task?.instructions, 700),
@@ -304,6 +351,11 @@ for (let day = 1; day <= 28; day += 1) {
   B2[String(day)] = item;
 }
 
+const grammarCoverage = Object.fromEntries(["A2", "B1"].map((level) => [level,
+  Object.values(level === "A2" ? A2 : B1).filter((entry) => entry.grammar?.fullExplanationIncluded).length]));
+if (grammarCoverage.A2 < 20 || grammarCoverage.B1 < 20) {
+  throw new Error("Insufficient actual grammar pages exported: " + JSON.stringify(grammarCoverage));
+}
 const artifact = {
   schemaVersion: 1,
   provenance: "Learner-facing Falowen Course Book content compiled from canonical workbook and lesson sources",
@@ -316,4 +368,4 @@ if (serialized.includes('"answerIndex"') || serialized.includes('"sampleAnswer"'
 }
 fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, serialized, "utf8");
-process.stdout.write("Generated A1 + 28 A2 + 28 B1 + 28 B2 ChatGPT student lessons (" + Buffer.byteLength(serialized) + " bytes)\n");
+process.stdout.write("Generated A1–B2 student lessons and original grammar teaching " + JSON.stringify(grammarCoverage) + " (" + Buffer.byteLength(serialized) + " bytes)\n");

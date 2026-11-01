@@ -195,10 +195,12 @@ describe("B1 original Falowen Course Book reading", () => {
     expect(reading9.available).toBe(true);
     expect(reading9.material.title).toMatch(/Stress im Alltag/);
     expect(reading9.material.questions.length).toBeGreaterThan(0);
-    const unsupported = lessonContentResponse("B1", 2, "reading");
-    expect(unsupported.available).toBe(false);
-    expect(unsupported.material).toBeUndefined();
-    expect(unsupported.clarification).toMatch(/not included/);
+    const b1Day2 = lessonContentResponse("B1", 2, "reading");
+    expect(b1Day2.available).toBe(true);
+    expect(b1Day2.material.title).toMatch(/wahrer Freund/);
+    expect(b1Day2.material.paragraphs).toHaveLength(7);
+    expect(b1Day2.material.questions).toHaveLength(7);
+    expect(b1Day2.material.questions[0]).not.toHaveProperty("answerIndex");
   });
 
   test("keeps submission in Campus and never leaks private answer keys", () => {
@@ -255,7 +257,7 @@ describe("A1 and A2 canonical Course Book exports for ChatGPT", () => {
       expect(reading.material.text.length).toBeGreaterThan(45);
       expect(reading.material.questions.length).toBeGreaterThan(0);
       expect(reading.material.questions[0]).not.toHaveProperty("answerIndex");
-      expect(lessonContentResponse("A2", day, "grammar").material.fullExplanationIncluded).toBe(false);
+      expect(lessonContentResponse("A2", day, "grammar").material.fullExplanationIncluded).toBe(true);
     }
     const first = lessonContentResponse("A2", 1, "reading");
     expect(first.material.title).toBe("Neu im Büro");
@@ -265,5 +267,55 @@ describe("A1 and A2 canonical Course Book exports for ChatGPT", () => {
     expect(listening.material.task).toMatch(/Höre den Text zweimal/);
     expect(listening.material.questions).toHaveLength(5);
     expect(listening.material).not.toHaveProperty("transcript");
+  });
+});
+
+
+describe("Original Falowen grammar teaching and remaining workbook gaps", () => {
+  test("makes the actual A2 grammar teaching readable for every day", () => {
+    for (let day = 1; day <= 28; day += 1) {
+      const grammar = lessonContentResponse("A2", day, "grammar");
+      expect(grammar.available).toBe(true);
+      expect(grammar.material.fullExplanationIncluded).toBe(true);
+      expect(grammar.material.sections.length).toBeGreaterThan(0);
+      expect(grammar.material.sections[0]).toHaveProperty("explanation");
+      expect(grammar.material.sections[0].explanation.length).toBeGreaterThan(25);
+    }
+    const day1 = lessonContentResponse("A2", 1, "grammar");
+    expect(JSON.stringify(day1.material.sections)).toMatch(/weil|deshalb/i);
+    expect(JSON.stringify(day1.material)).not.toContain('"answer"');
+  });
+
+  test("makes the actual B1 grammar notes readable across all 28 days", () => {
+    for (let day = 1; day <= 28; day += 1) {
+      const grammar = lessonContentResponse("B1", day, "grammar");
+      expect(grammar.available).toBe(true);
+      expect(grammar.material.fullExplanationIncluded).toBe(true);
+      expect(grammar.material.sections.length).toBeGreaterThan(0);
+    }
+    const day1 = lessonContentResponse("B1", 1, "grammar");
+    expect(JSON.stringify(day1.material.sections)).toMatch(/Präsens|Perfekt/);
+  });
+
+  test("shows original A1 Day 2 Hören and Schreiben tasks without answers", () => {
+    const listening = lessonContentResponse("A1", 2, "listening");
+    expect(listening.available).toBe(true);
+    expect(listening.material.chapter).toBe("1.1");
+    expect(listening.material.questions).toHaveLength(4);
+    expect(listening.material.questions[0].question).toMatch(/Wie heißt sie/);
+    expect(listening.material.questions[0]).not.toHaveProperty("answer");
+    const writing = lessonContentResponse("A1", 2, "writing");
+    expect(writing.material.prompt).toMatch(/introducing yourself/);
+  });
+
+  test("shows source-literal A1 Day 3 Lesen and Hören while preserving blanks", () => {
+    const reading = lessonContentResponse("A1", 3, "reading");
+    expect(reading.available).toBe(true);
+    expect(reading.material.paragraphs[0]).toMatch(/Hallo! Ich heiße Anna/);
+    expect(reading.material.questions).toHaveLength(9);
+    expect(reading.material.questions[0].question).toMatch(/Ich ___ Anna/);
+    const listening = lessonContentResponse("A1", 3, "listening");
+    expect(listening.material.questions).toHaveLength(5);
+    expect(listening.material.chapter).toBe("1.2");
   });
 });

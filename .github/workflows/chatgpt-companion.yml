@@ -12,6 +12,12 @@ on:
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
       - "functions/functionz/__tests__/chatgptClassTimetable.test.js"
       - "scripts/generateChatgptLessonContent.mjs"
+      - "scripts/extractFalowenGrammar.mjs"
+      - "scripts/extractFalowenWorkbook.mjs"
+      - "web/src/components/A2B1WorkbookGrammarNotesContent.js"
+      - "web/src/components/*GrammarPage.js"
+      - "web/src/components/*GrammarNotesPage.js"
+      - "web/src/components/*WorkbookPage.js"
       - "web/src/data/b2*.js"
       - "web/package.json"
       - "functions/functionz/__tests__/chatgptCompanion.test.js"
@@ -42,6 +48,8 @@ jobs:
         run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js
       - name: Verify JavaScript syntax
         run: |
+          node --check scripts/extractFalowenGrammar.mjs
+          node --check scripts/extractFalowenWorkbook.mjs
           node --check functions/functionz/chatgptCompanion.js
           node --check functions/functionz/chatgptClassTimetable.js
           node --check functions/functionz/chatgptClassPreparation.js
