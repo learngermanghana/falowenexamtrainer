@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { recordMusicPractice, normalizeMusicPracticeEvent } from "../services/musicPracticeService";
+import { recordMusicPractice, normalizeMusicPracticeEvent, flushMusicPractice } from "../services/musicPracticeService";
 
 /**
  * Reuses the existing Falowen Music app through the SAME ORIGIN.
@@ -22,7 +22,7 @@ export default function CampusMusicPage() {
       if (activity) void recordMusicPractice(activity);
     }
     window.addEventListener("message", handleMusicActivity);
-    return () => window.removeEventListener("message", handleMusicActivity);
+    return () => { window.removeEventListener("message", handleMusicActivity); void flushMusicPractice(); };
   }, []);
 
   return (
