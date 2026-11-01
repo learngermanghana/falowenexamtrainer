@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'web/public/music/**'
+      - 'web/tests/music-playback-queue.test.cjs'
       - 'api/approved-music.js'
       - 'scripts/publishApprovedMusic.mjs'
       - 'tests/music-learning-room.test.mjs'
@@ -19,6 +20,7 @@ on:
     branches: [main]
     paths:
       - 'web/public/music/**'
+      - 'web/tests/music-playback-queue.test.cjs'
       - 'api/approved-music.js'
       - 'scripts/publishApprovedMusic.mjs'
       - 'tests/music-learning-room.test.mjs'
@@ -43,8 +45,11 @@ jobs:
       - name: Parse music JS and publishing script
         run: |
           node --check web/public/music/app.js
+          node --check web/public/music/playback-queue.js
           node --check api/approved-music.js
           node --check scripts/publishApprovedMusic.mjs
+      - name: Check mobile continuous-playback queue and lock-screen contracts
+        run: node --test web/tests/music-playback-queue.test.cjs
       - name: Install isolated DOM test dependencies
         run: npm ci --prefix tests/music-ui --ignore-scripts
       - name: Verify published songs, quiz evidence and R2 privacy
