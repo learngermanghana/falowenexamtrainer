@@ -38,7 +38,7 @@ test('A2 Day 18 promotes Ein neues Leben without altering older banking audio',(
   assert.equal(legacy.objectKey,'music/a2/day-18/die-karte-funktioniert-nicht.mp3');
   assert.equal(legacy.retired,true);
   assert.equal(legacy.slides,false);
-  assert.ok(!legacy.coursebook);
+  assert.equal(legacy.coursebook,true); // retained for legacy signed playback, hidden by retired flag
   assert.equal(catalog.tracks.filter(x=>x.slides===true).length,3);
   assert.equal(catalog.tracks.filter(x=>x.level==='A2'&&x.day===18&&x.slides===true).length,1);
   assert.ok(require('../web/public/music/timings.json').recordings.some(x=>x.trackId==='a2-day-18-bank'));
