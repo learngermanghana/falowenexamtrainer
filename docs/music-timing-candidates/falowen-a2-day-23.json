@@ -5,8 +5,194 @@
   "day": 23,
   "source": "approved",
   "lyrics": "[Verse 1]\nJeden Morgen fahre ich zur Schule,\nFrüher bin ich immer Bus gefahren.\nDoch heute nehme ich mein Fahrrad,\nWeil ich die Umwelt schützen will.\nDie Sonne scheint, die Luft ist frisch,\nIch fahre langsam durch den Park.\nIch brauche heute kein Auto,\nUnd komme pünktlich in der Schule an.\n\n[Chorus]\nHey-ya, hey-ya, der Morgen ist da,\nIch fahre mit dem Fahrrad, ist doch klar.\nWeniger Autos, die Luft wird rein,\nSo soll mein Weg zur Schule sein.\nIch spare Geld, ich bleibe fit,\nDie frische Luft, die tut mir gut.\nEin schöner Tag, ein gutes Gefühl,\nIch mache etwas für die Umwelt.\n\n[Verse 2]\nWenn es regnet, nehme ich den Bus,\nBei Sonne fahre ich lieber Rad.\nManchmal gehe ich auch zu Fuß,\nWeil ich es nicht so weit habe.\nIch sehe Bäume, Blumen und den Park,\nUnd freue mich über die Natur.\nAm Nachmittag fahre ich nach Hause,\nGanz entspannt und ohne Stress.\n\n[Chorus]\nHey-ya, hey-ya, der Morgen ist da,\nIch fahre mit dem Fahrrad, ist doch klar.\nWeniger Autos, die Luft wird rein,\nSo soll mein Weg zur Schule sein.\nIch spare Geld, ich bleibe fit,\nDie frische Luft, die tut mir gut.\nEin schöner Tag, ein gutes Gefühl,\nIch mache etwas für die Umwelt.\n\n[Outro]\nDer Wind ist warm, die Sonne scheint,\nIch fahre langsam nach Haus.\nHeute war ein schöner Tag,\nMorgen fahre ich wieder Rad.",
-  "status": "needs-review",
+  "status": "candidate",
   "recordingSha256": "b0883057d1559d7a004b29a7b044db872b1c46b4f6eea7b64f2350c9d5a9b195",
   "audioBytes": 3828925,
-  "reason": "Low acoustic match: total=93.4%, weakest line=37.5%"
+  "alignmentThreshold": "high-overall-coverage-draft",
+  "cues": [
+    {
+      "start": 13.22,
+      "end": 16.04,
+      "text": "Jeden Morgen fahre ich zur Schule,"
+    },
+    {
+      "start": 16.06,
+      "end": 19.28,
+      "text": "Früher bin ich immer Bus gefahren."
+    },
+    {
+      "start": 19.3,
+      "end": 21.82,
+      "text": "Doch heute nehme ich mein Fahrrad,"
+    },
+    {
+      "start": 22.38,
+      "end": 24.96,
+      "text": "Weil ich die Umwelt schützen will."
+    },
+    {
+      "start": 24.98,
+      "end": 28.68,
+      "text": "Die Sonne scheint, die Luft ist frisch,"
+    },
+    {
+      "start": 28.98,
+      "end": 31.58,
+      "text": "Ich fahre langsam durch den Park."
+    },
+    {
+      "start": 31.6,
+      "end": 35.38,
+      "text": "Ich brauche heute kein Auto,"
+    },
+    {
+      "start": 35.62,
+      "end": 38.1,
+      "text": "Und komme pünktlich in der Schule an."
+    },
+    {
+      "start": 38.8,
+      "end": 41.72,
+      "text": "Hey-ya, hey-ya, der Morgen ist da,"
+    },
+    {
+      "start": 41.74,
+      "end": 45.12,
+      "text": "Ich fahre mit dem Fahrrad, ist doch klar."
+    },
+    {
+      "start": 46.08,
+      "end": 48.7,
+      "text": "Weniger Autos, die Luft wird rein,"
+    },
+    {
+      "start": 48.92,
+      "end": 51.62,
+      "text": "So soll mein Weg zur Schule sein."
+    },
+    {
+      "start": 51.64,
+      "end": 55.12,
+      "text": "Ich spare Geld, ich bleibe fit,"
+    },
+    {
+      "start": 55.14,
+      "end": 58.4,
+      "text": "Die frische Luft, die tut mir gut."
+    },
+    {
+      "start": 58.42,
+      "end": 61.66,
+      "text": "Ein schöner Tag, ein gutes Gefühl,"
+    },
+    {
+      "start": 61.74,
+      "end": 64.62,
+      "text": "Ich mache etwas für die Umwelt."
+    },
+    {
+      "start": 77.98,
+      "end": 81.6,
+      "text": "Wenn es regnet, nehme ich den Bus,"
+    },
+    {
+      "start": 81.62,
+      "end": 83.98,
+      "text": "Bei Sonne fahre ich lieber Rad."
+    },
+    {
+      "start": 84.56,
+      "end": 88.22,
+      "text": "Manchmal gehe ich auch zu Fuß,"
+    },
+    {
+      "start": 88.24,
+      "end": 91.48,
+      "text": "Weil ich es nicht so weit habe."
+    },
+    {
+      "start": 91.5,
+      "end": 94.58,
+      "text": "Ich sehe Bäume, Blumen und den Park,"
+    },
+    {
+      "start": 94.6,
+      "end": 97.4,
+      "text": "Und freue mich über die Natur."
+    },
+    {
+      "start": 97.66,
+      "end": 101.42,
+      "text": "Am Nachmittag fahre ich nach Hause,"
+    },
+    {
+      "start": 101.44,
+      "end": 104.8,
+      "text": "Ganz entspannt und ohne Stress."
+    },
+    {
+      "start": 106.76,
+      "end": 108.1,
+      "text": "Hey-ya, hey-ya, der Morgen ist da,"
+    },
+    {
+      "start": 108.12,
+      "end": 111.0,
+      "text": "Ich fahre mit dem Fahrrad, ist doch klar."
+    },
+    {
+      "start": 111.02,
+      "end": 114.88,
+      "text": "Weniger Autos, die Luft wird rein,"
+    },
+    {
+      "start": 115.08,
+      "end": 117.8,
+      "text": "So soll mein Weg zur Schule sein."
+    },
+    {
+      "start": 117.82,
+      "end": 121.14,
+      "text": "Ich spare Geld, ich bleibe fit,"
+    },
+    {
+      "start": 121.16,
+      "end": 124.58,
+      "text": "Die frische Luft, die tut mir gut."
+    },
+    {
+      "start": 124.6,
+      "end": 127.5,
+      "text": "Ein schöner Tag, ein gutes Gefühl,"
+    },
+    {
+      "start": 127.52,
+      "end": 130.48,
+      "text": "Ich mache etwas für die Umwelt."
+    },
+    {
+      "start": 130.5,
+      "end": 134.14,
+      "text": "Der Wind ist warm, die Sonne scheint,"
+    },
+    {
+      "start": 134.16,
+      "end": 137.64,
+      "text": "Ich fahre langsam nach Haus."
+    },
+    {
+      "start": 137.66,
+      "end": 140.96,
+      "text": "Heute war ein schöner Tag,"
+    },
+    {
+      "start": 140.98,
+      "end": 143.84,
+      "text": "Morgen fahre ich wieder Rad."
+    }
+  ],
+  "matchCoverage": 0.921,
+  "weakestLineCoverage": 0.375,
+  "totalLines": 36,
+  "duration": 159.56
 }

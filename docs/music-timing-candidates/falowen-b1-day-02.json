@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-b1-day-02-b64_RnJldW5kc2NoYWZ0IGFtIEZsdXNzLm1wMw",
+  "objectKey": "music/b1/day-02/Freundschaft am Fluss.mp3",
+  "level": "B1",
+  "day": 2,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nFrüher saßen wir oft am Fluss.\nBen und ich erzählten uns alles.\nDann ist er in eine andere Stadt gezogen,\nund unser Kontakt wurde immer seltener.\n\n[Chorus]\nGute Freunde bleiben nicht nur im Bild,\nsie hören zu, wenn das Leben laut wird.\nEin Anruf kann uns wieder näherbringen.\n\n[Verse 2]\nHeute rufe ich ihn nach langer Zeit an.\nEr sagt, dass er oft an mich gedacht hat.\nWir lachen über unsere Schulzeit\nund planen ein Treffen im nächsten Monat.\n\n[Chorus]\nGute Freunde bleiben nicht nur im Bild,\nsie hören zu, wenn das Leben laut wird.\nEin Anruf kann uns wieder näherbringen.\n\n[Outro]\nAn der alten Bank am Fluss warten wir.\nManche Freundschaften finden zurück.\nBei Falowen erzähle ich, was Freundschaft für mich bedeutet.",
+  "status": "review-only",
+  "recordingSha256": "8ec428d830ec6ef2497c5394ca7995299af6b3df696ab3afcfc7a4684bd0cb49",
+  "audioBytes": 3217582,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 12.32,
+      "end": 15.84,
+      "text": "Früher saßen wir oft am Fluss."
+    },
+    {
+      "start": 16.1,
+      "end": 21.76,
+      "text": "Ben und ich erzählten uns alles."
+    },
+    {
+      "start": 21.78,
+      "end": 27.54,
+      "text": "Dann ist er in eine andere Stadt gezogen,"
+    },
+    {
+      "start": 27.56,
+      "end": 34.16,
+      "text": "und unser Kontakt wurde immer seltener."
+    },
+    {
+      "start": 34.18,
+      "end": 39.46,
+      "text": "Gute Freunde bleiben nicht nur im Bild,"
+    },
+    {
+      "start": 39.48,
+      "end": 46.2,
+      "text": "sie hören zu, wenn das Leben laut wird."
+    },
+    {
+      "start": 48.16,
+      "end": 51.12,
+      "text": "Ein Anruf kann uns wieder näherbringen."
+    },
+    {
+      "start": 60.68,
+      "end": 64.04,
+      "text": "Heute rufe ich ihn nach langer Zeit an."
+    },
+    {
+      "start": 64.06,
+      "end": 66.94,
+      "text": "Er sagt, dass er oft an mich gedacht hat."
+    },
+    {
+      "start": 66.96,
+      "end": 69.72,
+      "text": "Wir lachen über unsere Schulzeit"
+    },
+    {
+      "start": 69.74,
+      "end": 72.68,
+      "text": "und planen ein Treffen im nächsten Monat."
+    },
+    {
+      "start": 72.7,
+      "end": 76.56,
+      "text": "Gute Freunde bleiben nicht nur im Bild,"
+    },
+    {
+      "start": 76.92,
+      "end": 82.94,
+      "text": "sie hören zu, wenn das Leben laut wird."
+    },
+    {
+      "start": 84.1,
+      "end": 87.86,
+      "text": "Ein Anruf kann uns wieder näherbringen."
+    },
+    {
+      "start": 97.54,
+      "end": 101.98,
+      "text": "An der alten Bank am Fluss warten wir."
+    },
+    {
+      "start": 102.0,
+      "end": 106.14,
+      "text": "Manche Freundschaften finden zurück."
+    },
+    {
+      "start": 108.98,
+      "end": 115.4,
+      "text": "Bei Falowen erzähle ich, was Freundschaft für mich bedeutet."
+    }
+  ],
+  "matchCoverage": 0.932,
+  "weakestLineCoverage": 0.667,
+  "totalLines": 17,
+  "duration": 136.8
+}

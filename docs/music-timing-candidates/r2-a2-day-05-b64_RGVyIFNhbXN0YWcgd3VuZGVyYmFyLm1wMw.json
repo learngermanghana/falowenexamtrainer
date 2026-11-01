@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a2-day-05-b64_RGVyIFNhbXN0YWcgd3VuZGVyYmFyLm1wMw",
+  "objectKey": "music/a2/day-05/Der Samstag wunderbar.mp3",
+  "level": "A2",
+  "day": 5,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nNach einer langen Woche bin ich frei.\nMorgens schlafe ich ein wenig länger.\nDann gehe ich mit Ben schwimmen.\nEr macht lieber Sport als Fernsehen.\n\n[Chorus]\nIn meiner Freizeit finde ich Zeit\nfür Freunde, Sport und neue Ideen.\nSo wird der Samstag wunderbar.\n\n[Verse 2]\nAm Mittag treffen wir noch Sara.\nSie hat gestern einen Kuchen gebacken.\nWir essen draußen in der Sonne.\nAm Abend höre ich Musik zu Hause.\n\n[Chorus]\nIn meiner Freizeit finde ich Zeit\nfür Freunde, Sport und neue Ideen.\nSo wird der Samstag wunderbar.\n\n[Outro]\nAm Sonntag plane ich die neue Woche.\nIch freue mich schon aufs Wochenende.\nMit Falowen erzähle ich gern vom Wochenende.",
+  "status": "review-only",
+  "recordingSha256": "89a7747a692601a4c68ce1eac297e78d53993ffed6e38bcf311b3a0f69d85062",
+  "audioBytes": 3520921,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 16.1,
+      "end": 20.04,
+      "text": "Nach einer langen Woche bin ich frei."
+    },
+    {
+      "start": 21.32,
+      "end": 23.92,
+      "text": "Morgens schlafe ich ein wenig länger."
+    },
+    {
+      "start": 23.94,
+      "end": 28.22,
+      "text": "Dann gehe ich mit Ben schwimmen."
+    },
+    {
+      "start": 28.36,
+      "end": 32.06,
+      "text": "Er macht lieber Sport als Fernsehen."
+    },
+    {
+      "start": 32.08,
+      "end": 38.1,
+      "text": "In meiner Freizeit finde ich Zeit"
+    },
+    {
+      "start": 39.22,
+      "end": 43.9,
+      "text": "für Freunde, Sport und neue Ideen."
+    },
+    {
+      "start": 43.92,
+      "end": 47.58,
+      "text": "So wird der Samstag wunderbar."
+    },
+    {
+      "start": 63.34,
+      "end": 66.66,
+      "text": "Am Mittag treffen wir noch Sara."
+    },
+    {
+      "start": 66.86,
+      "end": 71.52,
+      "text": "Sie hat gestern einen Kuchen gebacken."
+    },
+    {
+      "start": 71.74,
+      "end": 75.46,
+      "text": "Wir essen draußen in der Sonne."
+    },
+    {
+      "start": 75.48,
+      "end": 79.1,
+      "text": "Am Abend höre ich Musik zu Hause."
+    },
+    {
+      "start": 79.12,
+      "end": 85.24,
+      "text": "In meiner Freizeit finde ich Zeit"
+    },
+    {
+      "start": 86.87,
+      "end": 91.06,
+      "text": "für Freunde, Sport und neue Ideen."
+    },
+    {
+      "start": 91.08,
+      "end": 94.82,
+      "text": "So wird der Samstag wunderbar."
+    },
+    {
+      "start": 111.78,
+      "end": 116.22,
+      "text": "Am Sonntag plane ich die neue Woche."
+    },
+    {
+      "start": 116.24,
+      "end": 120.48,
+      "text": "Ich freue mich schon aufs Wochenende."
+    },
+    {
+      "start": 120.5,
+      "end": 128.92,
+      "text": "Mit Falowen erzähle ich gern vom Wochenende."
+    }
+  ],
+  "matchCoverage": 0.971,
+  "weakestLineCoverage": 0.833,
+  "totalLines": 17,
+  "duration": 147.16
+}

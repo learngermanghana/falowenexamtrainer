@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-b1-day-08-b64_R2VzdW5kIGJsZWliZW4gaW0gS2xlaW5lbi5tcDM",
+  "objectKey": "music/b1/day-08/Gesund bleiben im Kleinen.mp3",
+  "level": "B1",
+  "day": 8,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nSeit einigen Wochen schlafe ich schlecht.\nIch bin oft müde bei der Arbeit.\nBeim Arzt spreche ich über meinen Alltag,\nweil ich etwas verändern möchte.\n\n[Chorus]\nGesund bleiben beginnt im Kleinen,\nmit Ruhe, Bewegung und Zeit.\nIch höre auf, was mein Körper braucht.\n\n[Verse 2]\nDie Ärztin empfiehlt regelmäßige Pausen.\nIch gehe nun jeden Abend spazieren.\nAußerdem lege ich das Handy früher weg,\nobwohl das anfangs nicht leicht war.\n\n[Chorus]\nGesund bleiben beginnt im Kleinen,\nmit Ruhe, Bewegung und Zeit.\nIch höre auf, was mein Körper braucht.\n\n[Outro]\nHeute fühle ich mich schon viel wacher.\nIch möchte auf mich achten.\nBei Falowen finde ich Worte für mein Wohlbefinden.",
+  "status": "review-only",
+  "recordingSha256": "a15036aa0d4f3ac2c2630ae9f8635c5d4df0c92d79a939f04b697e0cc5ca4e23",
+  "audioBytes": 3516420,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 17.3,
+      "end": 21.2,
+      "text": "Seit einigen Wochen schlafe ich schlecht."
+    },
+    {
+      "start": 21.22,
+      "end": 26.86,
+      "text": "Ich bin oft müde bei der Arbeit."
+    },
+    {
+      "start": 26.88,
+      "end": 30.68,
+      "text": "Beim Arzt spreche ich über meinen Alltag,"
+    },
+    {
+      "start": 31.82,
+      "end": 36.24,
+      "text": "weil ich etwas verändern möchte."
+    },
+    {
+      "start": 37.84,
+      "end": 40.7,
+      "text": "Gesund bleiben beginnt im Kleinen,"
+    },
+    {
+      "start": 42.2,
+      "end": 46.02,
+      "text": "mit Ruhe, Bewegung und Zeit."
+    },
+    {
+      "start": 46.04,
+      "end": 54.9,
+      "text": "Ich höre auf, was mein Körper braucht."
+    },
+    {
+      "start": 54.92,
+      "end": 61.0,
+      "text": "Die Ärztin empfiehlt regelmäßige Pausen."
+    },
+    {
+      "start": 61.02,
+      "end": 66.08,
+      "text": "Ich gehe nun jeden Abend spazieren."
+    },
+    {
+      "start": 66.1,
+      "end": 71.1,
+      "text": "Außerdem lege ich das Handy früher weg,"
+    },
+    {
+      "start": 71.12,
+      "end": 75.46,
+      "text": "obwohl das anfangs nicht leicht war."
+    },
+    {
+      "start": 77.9,
+      "end": 80.68,
+      "text": "Gesund bleiben beginnt im Kleinen,"
+    },
+    {
+      "start": 82.78,
+      "end": 85.92,
+      "text": "mit Ruhe, Bewegung und Zeit."
+    },
+    {
+      "start": 85.94,
+      "end": 94.88,
+      "text": "Ich höre auf, was mein Körper braucht."
+    },
+    {
+      "start": 107.34,
+      "end": 112.4,
+      "text": "Heute fühle ich mich schon viel wacher."
+    },
+    {
+      "start": 113.08,
+      "end": 117.76,
+      "text": "Ich möchte auf mich achten."
+    },
+    {
+      "start": 118.72,
+      "end": 126.14,
+      "text": "Bei Falowen finde ich Worte für mein Wohlbefinden."
+    }
+  ],
+  "matchCoverage": 0.932,
+  "weakestLineCoverage": 0.8,
+  "totalLines": 17,
+  "duration": 139.2
+}

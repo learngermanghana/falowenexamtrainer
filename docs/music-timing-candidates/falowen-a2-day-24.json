@@ -8,5 +8,6 @@
   "status": "needs-review",
   "recordingSha256": "087650874c42ae2b28dc150eebaa27a2845c4d51f9f760fa92f1cfc20c237fc6",
   "audioBytes": 3642336,
-  "reason": "Low acoustic match: total=83.2%, weakest line=0.0%"
+  "reason": "Low acoustic match: total=83.2%, weakest line=0.0%",
+  "recognizedSnippet": " Ich  möchte  in  den  Ferien  verreisen.  Schon  lange  träume  ich  von  Hamburg.  Ich  habe  jeden  Monat  Geld  gespart.  Jetzt  kann  ich  endlich  Urlaub  machen.  Ich  suche  ein  Hotel  im  Internet  und  finde  ein  Zimmer  in  der  Stadt.  Dann  buche  ich  mein  Ticket  für  Samstag,  jetzt  fehlt  nur  noch  mein  Koffer  Endlich  Urlaub,  endlich  frei,  ich  packe  meine  Sachen  ein  Ein  neues  Ziel,  ein  neuer  Ort,  am  Samstag  fahre  ich  endlich"
 }

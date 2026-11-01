@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-05-b64_U2Now7ZuLCBkaWNoIGtlbm5lbnp1bGVybmVuLm1wMw",
+  "objectKey": "music/a1/day-05/Schön, dich kennenzulernen.mp3",
+  "level": "A1",
+  "day": 5,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nHallo, ich heiße Sara.\nIch komme aus Accra.\nIch wohne jetzt in Berlin.\nUnd ich lerne gern Deutsch.\n\n[Chorus]\nWie heißt du? Woher kommst du?\nWo wohnst du? Was machst du?\nWir lernen uns heute kennen.\n\n[Verse 2]\nDas ist mein Freund Karim.\nEr hat einen kleinen Hund.\nKarim sagt: Das ist Bello.\nBello spielt vor dem Haus.\n\n[Chorus]\nWie heißt du? Woher kommst du?\nWo wohnst du? Was machst du?\nWir lernen uns heute kennen.\n\n[Outro]\nWir sagen alle: Willkommen!\nUnser Kurs ist wie ein Team.\nBei Falowen stelle ich mich vor.",
+  "status": "needs-review",
+  "recordingSha256": "bfe8d48468fc6a2802b916ee97f9c42ff44795226e2300f6d9714a686881d3d8",
+  "audioBytes": 3324553,
+  "reason": "Low acoustic match: total=39.8%, weakest line=0.0%",
+  "recognizedSnippet": " Ich  heiße  Sarah,  ich  bin  neu  hier,  ich  komme  aus  Akra,  jetzt  bin  ich  hier,  in  Berlin  beginnt  Mein  neuer  Tag  Ich  lerne  Deutsch,  weil  ich  es  mag  Du  lächelst  mich  an  und  sagst  hallo  Ich  lächle  zurück  und  frage  dich  Wie  heißt  du?  Erzähl  mir  von  dir  Woher  kommst  du?  Bleib  noch  hier  Wo  wohnst  du?  Ich  wohne  in  Berlin,  schön  dich  kennenzulernen.  Das  ist  Karim,  er  kommt  aus"
+}

@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a2-day-28-b64_RWluIGtsZWluZXIgUGxhbi5tcDM",
+  "objectKey": "music/a2/day-28/Ein kleiner Plan.mp3",
+  "level": "A2",
+  "day": 28,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nAm Ende des Jahres denke ich nach.\nWas habe ich in den letzten Monaten gelernt?\nIch habe viele neue Menschen getroffen.\nMein Deutsch ist schon viel besser geworden.\n\n[Chorus]\nNächstes Jahr möchte ich weiterlernen,\netwas Neues ausprobieren.\nEin kleiner Plan wird ein neuer Weg.\n\n[Verse 2]\nMia möchte einen Deutschkurs besuchen.\nBen will eine neue Arbeit finden.\nWir sprechen über unsere Wünsche.\nDann schreiben wir unsere Ziele auf.\n\n[Chorus]\nNächstes Jahr möchte ich weiterlernen,\netwas Neues ausprobieren.\nEin kleiner Plan wird ein neuer Weg.\n\n[Outro]\nMorgen fangen wir mit dem ersten Schritt an.\nIch freue mich auf die Zukunft.\nBei Falowen spreche ich über meine Zukunft.",
+  "status": "review-only",
+  "recordingSha256": "ff7ca40ff59d7892f711dd2e784310d2f45591ed9478b518657a7fb5cd14872b",
+  "audioBytes": 3429201,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 13.72,
+      "end": 19.1,
+      "text": "Am Ende des Jahres denke ich nach."
+    },
+    {
+      "start": 19.34,
+      "end": 25.82,
+      "text": "Was habe ich in den letzten Monaten gelernt?"
+    },
+    {
+      "start": 27.18,
+      "end": 32.88,
+      "text": "Ich habe viele neue Menschen getroffen."
+    },
+    {
+      "start": 34.28,
+      "end": 39.68,
+      "text": "Mein Deutsch ist schon viel besser geworden."
+    },
+    {
+      "start": 43.0,
+      "end": 45.7,
+      "text": "Nächstes Jahr möchte ich weiterlernen,"
+    },
+    {
+      "start": 47.62,
+      "end": 49.94,
+      "text": "etwas Neues ausprobieren."
+    },
+    {
+      "start": 49.96,
+      "end": 53.76,
+      "text": "Ein kleiner Plan wird ein neuer Weg."
+    },
+    {
+      "start": 70.68,
+      "end": 74.82,
+      "text": "Mia möchte einen Deutschkurs besuchen."
+    },
+    {
+      "start": 77.32,
+      "end": 81.72,
+      "text": "Ben will eine neue Arbeit finden."
+    },
+    {
+      "start": 83.9,
+      "end": 88.8,
+      "text": "Wir sprechen über unsere Wünsche."
+    },
+    {
+      "start": 89.98,
+      "end": 95.8,
+      "text": "Dann schreiben wir unsere Ziele auf."
+    },
+    {
+      "start": 98.68,
+      "end": 101.46,
+      "text": "Nächstes Jahr möchte ich weiterlernen,"
+    },
+    {
+      "start": 102.4,
+      "end": 105.98,
+      "text": "etwas Neues ausprobieren."
+    },
+    {
+      "start": 106.0,
+      "end": 109.64,
+      "text": "Ein kleiner Plan wird ein neuer Weg."
+    },
+    {
+      "start": 112.16,
+      "end": 117.16,
+      "text": "Morgen fangen wir mit dem ersten Schritt an."
+    },
+    {
+      "start": 119.14,
+      "end": 123.62,
+      "text": "Ich freue mich auf die Zukunft."
+    },
+    {
+      "start": 124.92,
+      "end": 130.84,
+      "text": "Bei Falowen spreche ich über meine Zukunft."
+    }
+  ],
+  "matchCoverage": 0.95,
+  "weakestLineCoverage": 0.8,
+  "totalLines": 17,
+  "duration": 147.6
+}

@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-b1-day-07-b64_VW5zZXIgTWl0dGVsd2VnLm1wMw",
+  "objectKey": "music/b1/day-07/Unser Mittelweg.mp3",
+  "level": "B1",
+  "day": 7,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nNach der Arbeit wollen wir etwas essen.\nBen schlägt wieder schnelle Burger vor.\nIch sage, dass wir auch kochen könnten,\ndenn zu Hause steht noch frisches Gemüse.\n\n[Chorus]\nSchnell und einfach ist nicht immer besser,\ndoch gesund muss nicht kompliziert sein.\nWir finden heute unseren Mittelweg.\n\n[Verse 2]\nWir schneiden Tomaten, Zwiebeln und Paprika.\nBen würzt den Reis mit frischen Kräutern.\nEs dauert etwas länger als Bestellen,\naber wir reden und lachen dabei.\n\n[Chorus]\nSchnell und einfach ist nicht immer besser,\ndoch gesund muss nicht kompliziert sein.\nWir finden heute unseren Mittelweg.\n\n[Outro]\nAm Ende schmeckt uns das Essen besonders gut.\nMorgen kochen wir vielleicht wieder gemeinsam.\nMit Falowen begründe ich, was für mich gesund ist.",
+  "status": "review-only",
+  "recordingSha256": "392806087c5983c319b29df93c847ac565bca0e724279ea3627ffed99968c08b",
+  "audioBytes": 2699612,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 0,
+      "end": 3.94,
+      "text": "Nach der Arbeit wollen wir etwas essen."
+    },
+    {
+      "start": 7.72,
+      "end": 10.32,
+      "text": "Ben schlägt wieder schnelle Burger vor."
+    },
+    {
+      "start": 12.66,
+      "end": 16.92,
+      "text": "Ich sage, dass wir auch kochen könnten,"
+    },
+    {
+      "start": 17.8,
+      "end": 23.16,
+      "text": "denn zu Hause steht noch frisches Gemüse."
+    },
+    {
+      "start": 25.72,
+      "end": 29.84,
+      "text": "Schnell und einfach ist nicht immer besser,"
+    },
+    {
+      "start": 32.18,
+      "end": 36.62,
+      "text": "doch gesund muss nicht kompliziert sein."
+    },
+    {
+      "start": 38.82,
+      "end": 44.08,
+      "text": "Wir finden heute unseren Mittelweg."
+    },
+    {
+      "start": 47.36,
+      "end": 52.12,
+      "text": "Wir schneiden Tomaten, Zwiebeln und Paprika."
+    },
+    {
+      "start": 53.42,
+      "end": 55.36,
+      "text": "Ben würzt den Reis mit frischen Kräutern."
+    },
+    {
+      "start": 55.52,
+      "end": 58.44,
+      "text": "Es dauert etwas länger als Bestellen,"
+    },
+    {
+      "start": 58.46,
+      "end": 61.4,
+      "text": "aber wir reden und lachen dabei."
+    },
+    {
+      "start": 61.84,
+      "end": 65.56,
+      "text": "Schnell und einfach ist nicht immer besser,"
+    },
+    {
+      "start": 68.66,
+      "end": 72.32,
+      "text": "doch gesund muss nicht kompliziert sein."
+    },
+    {
+      "start": 74.5,
+      "end": 79.44,
+      "text": "Wir finden heute unseren Mittelweg."
+    },
+    {
+      "start": 79.46,
+      "end": 86.14,
+      "text": "Am Ende schmeckt uns das Essen besonders gut."
+    },
+    {
+      "start": 86.16,
+      "end": 92.92,
+      "text": "Morgen kochen wir vielleicht wieder gemeinsam."
+    },
+    {
+      "start": 92.94,
+      "end": 101.62,
+      "text": "Mit Falowen begründe ich, was für mich gesund ist."
+    }
+  ],
+  "matchCoverage": 0.91,
+  "weakestLineCoverage": 0.571,
+  "totalLines": 17,
+  "duration": 116.8
+}

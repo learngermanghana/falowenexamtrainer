@@ -8,5 +8,6 @@
   "status": "needs-review",
   "recordingSha256": "b76ead1ee8fd9ec0d1530f935c796e22daa27b7878560288b81e38d486366a4d",
   "audioBytes": 3411843,
-  "reason": "Low acoustic match: total=91.2%, weakest line=0.0%"
+  "reason": "Low acoustic match: total=93.1%, weakest line=25.0%",
+  "recognizedSnippet": " Heute  kommt  ein  neuer  Schüler,  er  hat  dein  Buch  und  einen  Stift  Ich  frage  freundlich  wie  heißt  du,  er  sagt  hallo,  ich  heiße  Ben  Woher  kommst  du,  frage  ich.  Er  sagt  ich  komme  aus  Berlin.  Ich  sage  schön,  dich  hier  zu  sehen.  Jetzt  lernen  wir  zusammen  Deutsch.  Wer  bist  du?  Wie  heißt  du?  Woher  kommst  du?  Sag  es  mir.  Wo  wohnst  du?  Was  machst  du  gern?  Ich  möchte  dich  gern"
 }

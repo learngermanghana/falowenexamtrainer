@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-b1-day-28-b64_RWluIGtsZWluZXIgV2VnLm1wMw",
+  "objectKey": "music/b1/day-28/Ein kleiner Weg.mp3",
+  "level": "B1",
+  "day": 28,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nMein Vater fährt für jeden Weg mit dem Auto.\nIch habe ihm von meiner Idee erzählt:\nVielleicht können wir öfter den Bus nehmen,\nwenn das Wetter und die Zeit es erlauben.\n\n[Chorus]\nWir müssen nicht alles heute ändern,\ndoch morgen können wir anfangen.\nEin kleiner Weg führt uns weiter.\n\n[Verse 2]\nAm Sonntag fahren wir mit dem Fahrrad zum Markt.\nWir kaufen Gemüse aus der Region.\nSpäter sprechen wir über unseren Stromverbrauch,\nohne dass jemand alles perfekt machen muss.\n\n[Chorus]\nWir müssen nicht alles heute ändern,\ndoch morgen können wir anfangen.\nEin kleiner Weg führt uns weiter.\n\n[Outro]\nUnser Alltag sieht noch fast gleich aus.\nAber wir achten jetzt bewusster auf die Zukunft.\nBei Falowen lerne ich, über unsere Zukunft nachzudenken.",
+  "status": "needs-review",
+  "recordingSha256": "42dc95108ab49013140089e3de0de8944cfb2edd65011363b08bb5272c26222d",
+  "audioBytes": 4016067,
+  "reason": "Low acoustic match: total=87.9%, weakest line=0.0%",
+  "recognizedSnippet": " Mein  Vater  fährt  für  jeden  Weg  mit  dem  Auto  Ich  habe  ihn  von  meiner  Idee  erzählt  Vielleicht  können  wir  öfter  den  Bus  nehmen,  wenn  das  Wetter  und  die  Zeit  ist  erlauben.  Wir  müssen  nicht  alles  heute  ändern,  doch  morgen  können  wir  anfangen.  Ein  kleiner  Weg  führt  uns  weiter  Hm,  können  wir  anfangen  Im  Sonntag  fahren  wir  mit  dem  Fahrrad  zum  Markt  Wir  kaufen  Gemüse  aus  der  Region.  Später  sprechen  wir"
+}

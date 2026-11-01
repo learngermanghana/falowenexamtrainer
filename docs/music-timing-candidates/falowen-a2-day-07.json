@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a2-day-07-b64_RWluZSBXb2hudW5nIHp1IHVucyBwYXNzZW4ubXAz",
+  "objectKey": "music/a2/day-07/Eine Wohnung zu uns passen.mp3",
+  "level": "A2",
+  "day": 7,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nWir suchen seit Wochen eine Wohnung.\nHeute sehen wir uns eine neue an.\nDie Küche ist groß und hell.\nAber die Straße ist ziemlich laut.\n\n[Chorus]\nEine Wohnung soll zu uns passen,\nnicht nur schön auf Fotos sein.\nWir schauen genau und fragen nach.\n\n[Verse 2]\nDie zweite Wohnung liegt am Park.\nSie ist kleiner, aber ruhiger.\nDer Vermieter beantwortet alle Fragen.\nAm Abend schicken wir unsere Bewerbung.\n\n[Chorus]\nEine Wohnung soll zu uns passen,\nnicht nur schön auf Fotos sein.\nWir schauen genau und fragen nach.\n\n[Outro]\nZwei Tage später kommt die Zusage.\nJetzt können wir endlich umziehen.\nMit Falowen kann ich nach Wohnungen fragen.",
+  "status": "review-only",
+  "recordingSha256": "2beeac69dc33dffc6c4f01fa378d9164df8ddde784c50ac9a1e55a0c315a4cb1",
+  "audioBytes": 2800720,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 10.94,
+      "end": 15.12,
+      "text": "Wir suchen seit Wochen eine Wohnung."
+    },
+    {
+      "start": 15.68,
+      "end": 19.54,
+      "text": "Heute sehen wir uns eine neue an."
+    },
+    {
+      "start": 19.84,
+      "end": 24.26,
+      "text": "Die Küche ist groß und hell."
+    },
+    {
+      "start": 24.28,
+      "end": 27.92,
+      "text": "Aber die Straße ist ziemlich laut."
+    },
+    {
+      "start": 30.38,
+      "end": 35.08,
+      "text": "Eine Wohnung soll zu uns passen,"
+    },
+    {
+      "start": 35.1,
+      "end": 38.28,
+      "text": "nicht nur schön auf Fotos sein."
+    },
+    {
+      "start": 39.96,
+      "end": 43.52,
+      "text": "Wir schauen genau und fragen nach."
+    },
+    {
+      "start": 48.12,
+      "end": 52.9,
+      "text": "Die zweite Wohnung liegt am Park."
+    },
+    {
+      "start": 52.92,
+      "end": 56.7,
+      "text": "Sie ist kleiner, aber ruhiger."
+    },
+    {
+      "start": 56.72,
+      "end": 61.94,
+      "text": "Der Vermieter beantwortet alle Fragen."
+    },
+    {
+      "start": 62.1,
+      "end": 66.28,
+      "text": "Am Abend schicken wir unsere Bewerbung."
+    },
+    {
+      "start": 67.62,
+      "end": 72.6,
+      "text": "Eine Wohnung soll zu uns passen,"
+    },
+    {
+      "start": 72.62,
+      "end": 76.3,
+      "text": "nicht nur schön auf Fotos sein."
+    },
+    {
+      "start": 77.0,
+      "end": 83.42,
+      "text": "Wir schauen genau und fragen nach."
+    },
+    {
+      "start": 87.06,
+      "end": 92.2,
+      "text": "Zwei Tage später kommt die Zusage."
+    },
+    {
+      "start": 92.22,
+      "end": 96.02,
+      "text": "Jetzt können wir endlich umziehen."
+    },
+    {
+      "start": 97.28,
+      "end": 104.0,
+      "text": "Mit Falowen kann ich nach Wohnungen fragen."
+    }
+  ],
+  "matchCoverage": 0.941,
+  "weakestLineCoverage": 0.6,
+  "totalLines": 17,
+  "duration": 124.76
+}

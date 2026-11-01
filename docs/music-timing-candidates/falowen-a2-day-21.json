@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a2-day-21-b64_RW5kbGljaCBXb2NoZW5lbmRlLm1wMw",
+  "objectKey": "music/a2/day-21/Endlich Wochenende.mp3",
+  "level": "A2",
+  "day": 21,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nAm Freitag fragen wir unsere Freunde:\nHabt ihr am Wochenende schon etwas vor?\nBen möchte in die Berge fahren.\nMia bleibt lieber in der Nähe.\n\n[Chorus]\nWas machen wir am Wochenende?\nWir hören zu und planen zusammen.\nFür alle soll etwas dabei sein.\n\n[Verse 2]\nAm Ende fahren wir am Samstag zum See.\nDort gibt es einen kurzen Wanderweg.\nAm Sonntag besuchen wir ein kleines Café.\nAlle sind mit dem Plan zufrieden.\n\n[Chorus]\nWas machen wir am Wochenende?\nWir hören zu und planen zusammen.\nFür alle soll etwas dabei sein.\n\n[Outro]\nWir schicken die Zeiten in unsere Gruppe.\nJetzt kann das Wochenende kommen.\nMit Falowen planen wir einen schönen Ausflug.",
+  "status": "needs-review",
+  "recordingSha256": "55440940e8e8961aae3edaa9e5d6720c1bde12572c1c6e492852478713c69df9",
+  "audioBytes": 3843884,
+  "reason": "Low acoustic match: total=32.4%, weakest line=0.0%",
+  "recognizedSnippet": " Es  ist  Freitag,  die  Woche  ist  vorbei  Ich  rufe  meine  Freunde  an,  habt  ihr  am  Wochenende  schon  etwas  vor?  Wir  könnten  doch  zusammen  etwas  machen,  dann  möchte  gerne  in  die  Berge  fahren,  mir  bleibt  lieber  in  der  Stadt  Ich  schlage  einen  Ausflug  zum  See  vor,  Vielleicht  haben  alle  darauf  los  Wir  haben  viele  Ideen  Doch  nur  zwei  Tage  Zeit  Wir  suchen  einen  guten  Plan  Dann  sind  wir  endlich  so  weit"
+}

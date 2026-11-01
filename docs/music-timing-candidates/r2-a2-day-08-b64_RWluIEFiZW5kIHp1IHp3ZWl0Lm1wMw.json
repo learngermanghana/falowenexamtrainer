@@ -8,5 +8,6 @@
   "status": "needs-review",
   "recordingSha256": "f13735d3d4954c4925db0c045fe27a9cd6c6c30e8cb5a4ca392eae63a18b0829",
   "audioBytes": 2702278,
-  "reason": "Low acoustic match: total=87.8%, weakest line=0.0%"
+  "reason": "Low acoustic match: total=88.5%, weakest line=0.0%",
+  "recognizedSnippet": " Ein  Abend  im  Restaurant,  am  Freitagabend  gehe  ich  mit  mir  aus  Für  mich  bitte  Gemüse  mit  Reis,  für  mir  die  Suppe  schön  heiß  Zwei  Gläser  Wasser,  danke  sehr  Ein  Abend  zu  zweit  Was  wollen  wir  mehr?  Doch  plötzlich  steht  ein  Fisch  vor  mir  Ich  schaue  auf  den  Teller  und  sage  zu  ihr  Das  habe  ich  doch  gar  nicht  bestellt  Der  Kilner  kommt  und  fragt  was  fehlt  Ich  sage  freundlich  Das"
 }

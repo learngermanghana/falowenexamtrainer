@@ -5,8 +5,194 @@
   "day": 21,
   "source": "approved",
   "lyrics": "[Verse 1]\nHeute ist das Wetter schlecht,\nDer Himmel ist grau, es regnet stark.\nIch möchte Mia im Park treffen,\nDoch draußen ist es nass und kalt.\n\nIch schaue auf mein Handy,\nUnd rufe meine Freundin an.\nIch sage: „Mia, es tut mir leid,\nHeute kann ich leider nicht.“\n\n[Chorus]\nEs regnet, es regnet, der Wind ist kalt,\nIch bleibe heute lieber zu Haus.\nDie Sonne scheint nicht, der Himmel ist grau,\nIch gehe heute nicht mehr raus.\n\nKönnen wir uns morgen treffen?\nVielleicht scheint dann die Sonne.\nHeute muss ich leider absagen,\nDoch morgen habe ich Zeit.\n\n[Verse 2]\nAm Nachmittag kommt ein Gewitter,\nEs blitzt und donnert draußen.\nIch mache meine Fenster zu,\nUnd trinke einen warmen Tee.\n\nAm Abend wird der Regen weniger,\nIch schaue noch einmal hinaus.\nMia schreibt: „Morgen um drei?“\nIch antworte: „Ja, das passt mir gut!“\n\n[Chorus]\nEs regnet, es regnet, der Wind ist kalt,\nIch bleibe heute lieber zu Haus.\nDie Sonne scheint nicht, der Himmel ist grau,\nIch gehe heute nicht mehr raus.\n\nKönnen wir uns morgen treffen?\nVielleicht scheint dann die Sonne.\nHeute muss ich leider absagen,\nDoch morgen habe ich Zeit.\n\n[Outro]\nAm nächsten Tag scheint die Sonne,\nDer Himmel ist wieder blau.\nIch treffe Mia um drei im Park,\nUnd freue mich auf den Tag.",
-  "status": "needs-review",
+  "status": "candidate",
   "recordingSha256": "975dccc63635bb209a98da254a20447b0336d15fc548b82ea61694d2ab8cfdd8",
   "audioBytes": 3716749,
-  "reason": "Low acoustic match: total=90.0%, weakest line=28.6%"
+  "alignmentThreshold": "high-overall-coverage-draft",
+  "cues": [
+    {
+      "start": 11.96,
+      "end": 14.12,
+      "text": "Heute ist das Wetter schlecht,"
+    },
+    {
+      "start": 14.14,
+      "end": 18.34,
+      "text": "Der Himmel ist grau, es regnet stark."
+    },
+    {
+      "start": 18.36,
+      "end": 20.84,
+      "text": "Ich möchte Mia im Park treffen,"
+    },
+    {
+      "start": 20.86,
+      "end": 24.88,
+      "text": "Doch draußen ist es nass und kalt."
+    },
+    {
+      "start": 25.12,
+      "end": 27.22,
+      "text": "Ich schaue auf mein Handy,"
+    },
+    {
+      "start": 27.24,
+      "end": 31.58,
+      "text": "Und rufe meine Freundin an."
+    },
+    {
+      "start": 31.6,
+      "end": 35.56,
+      "text": "Ich sage: „Mia, es tut mir leid,"
+    },
+    {
+      "start": 35.58,
+      "end": 38.46,
+      "text": "Heute kann ich leider nicht.“"
+    },
+    {
+      "start": 38.48,
+      "end": 42.86,
+      "text": "Es regnet, es regnet, der Wind ist kalt,"
+    },
+    {
+      "start": 42.88,
+      "end": 44.62,
+      "text": "Ich bleibe heute lieber zu Haus."
+    },
+    {
+      "start": 46.08,
+      "end": 49.34,
+      "text": "Die Sonne scheint nicht, der Himmel ist grau,"
+    },
+    {
+      "start": 49.52,
+      "end": 51.82,
+      "text": "Ich gehe heute nicht mehr raus."
+    },
+    {
+      "start": 51.84,
+      "end": 54.04,
+      "text": "Können wir uns morgen treffen?"
+    },
+    {
+      "start": 54.12,
+      "end": 57.38,
+      "text": "Vielleicht scheint dann die Sonne."
+    },
+    {
+      "start": 58.0,
+      "end": 60.9,
+      "text": "Heute muss ich leider absagen,"
+    },
+    {
+      "start": 60.94,
+      "end": 64.16,
+      "text": "Doch morgen habe ich Zeit."
+    },
+    {
+      "start": 77.62,
+      "end": 80.4,
+      "text": "Am Nachmittag kommt ein Gewitter,"
+    },
+    {
+      "start": 81.96,
+      "end": 83.86,
+      "text": "Es blitzt und donnert draußen."
+    },
+    {
+      "start": 84.4,
+      "end": 87.24,
+      "text": "Ich mache meine Fenster zu,"
+    },
+    {
+      "start": 87.26,
+      "end": 91.5,
+      "text": "Und trinke einen warmen Tee."
+    },
+    {
+      "start": 91.52,
+      "end": 93.78,
+      "text": "Am Abend wird der Regen weniger,"
+    },
+    {
+      "start": 94.52,
+      "end": 96.32,
+      "text": "Ich schaue noch einmal hinaus."
+    },
+    {
+      "start": 98.14,
+      "end": 99.94,
+      "text": "Mia schreibt: „Morgen um drei?“"
+    },
+    {
+      "start": 99.96,
+      "end": 103.64,
+      "text": "Ich antworte: „Ja, das passt mir gut!“"
+    },
+    {
+      "start": 105.32,
+      "end": 109.18,
+      "text": "Es regnet, es regnet, der Wind ist kalt,"
+    },
+    {
+      "start": 109.2,
+      "end": 111.16,
+      "text": "Ich bleibe heute lieber zu Haus."
+    },
+    {
+      "start": 112.32,
+      "end": 115.5,
+      "text": "Die Sonne scheint nicht, der Himmel ist grau,"
+    },
+    {
+      "start": 115.7,
+      "end": 118.04,
+      "text": "Ich gehe heute nicht mehr raus."
+    },
+    {
+      "start": 118.06,
+      "end": 119.9,
+      "text": "Können wir uns morgen treffen?"
+    },
+    {
+      "start": 119.92,
+      "end": 123.6,
+      "text": "Vielleicht scheint dann die Sonne."
+    },
+    {
+      "start": 124.12,
+      "end": 126.68,
+      "text": "Heute muss ich leider absagen,"
+    },
+    {
+      "start": 126.7,
+      "end": 130.02,
+      "text": "Doch morgen habe ich Zeit."
+    },
+    {
+      "start": 132.96,
+      "end": 136.92,
+      "text": "Am nächsten Tag scheint die Sonne,"
+    },
+    {
+      "start": 136.96,
+      "end": 139.8,
+      "text": "Der Himmel ist wieder blau."
+    },
+    {
+      "start": 139.82,
+      "end": 142.96,
+      "text": "Ich treffe Mia um drei im Park,"
+    },
+    {
+      "start": 142.98,
+      "end": 146.72,
+      "text": "Und freue mich auf den Tag."
+    }
+  ],
+  "matchCoverage": 0.91,
+  "weakestLineCoverage": 0.4,
+  "totalLines": 36,
+  "duration": 162.8
 }

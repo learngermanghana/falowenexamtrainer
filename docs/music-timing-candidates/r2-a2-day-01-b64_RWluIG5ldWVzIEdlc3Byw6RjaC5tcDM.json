@@ -1,0 +1,128 @@
+{
+  "trackId": "r2-a2-day-01-b64_RWluIG5ldWVzIEdlc3Byw6RjaC5tcDM",
+  "objectKey": "music/a2/day-01/Ein neues Gespräch.mp3",
+  "level": "A2",
+  "day": 1,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nHallo, ich heiße Daniel. Wie heißt du?\nIch komme aus Ghana. Woher kommst du?\nIch wohne in Accra und lerne Deutsch.\nSeit einem Jahr macht mir das Spaß.\nManchmal ist es schwer, doch ich gebe nicht auf.\n\n[Chorus]\nWie geht es dir? Mir geht es gut.\nWas machst du gern? Ich höre Musik.\nEin kleines Hallo, ein neues Gespräch.\nSo lernen wir uns kennen.\n\n[Verse 2]\nAm Morgen trinke ich Kaffee oder Tee.\nDann gehe ich zur Arbeit in die Stadt.\nAm Abend lerne ich oder sehe fern.\nAm Wochenende treffe ich Freunde gern.\nWie ist das Wetter heute bei dir?\nHier scheint die Sonne. Erzähl doch von dir!\n\n[Chorus]\nWie geht es dir? Mir geht es gut.\nWas machst du gern? Ich höre Musik.\nEin kleines Hallo, ein neues Gespräch.\nSo lernen wir uns kennen.\n\n[Outro]\nIch frage, ich höre zu und erzähle von mir.\nMit jedem Gespräch wird Deutsch leichter.\nMit Falowen lerne ich jeden Tag mehr.",
+  "status": "review-only",
+  "recordingSha256": "e0682ec055b227787a0933a2aebfeaeab2693f6187125bc4fdfea3ca05bb376b",
+  "audioBytes": 3836916,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 17.94,
+      "end": 22.4,
+      "text": "Hallo, ich heiße Daniel. Wie heißt du?"
+    },
+    {
+      "start": 23.26,
+      "end": 26.5,
+      "text": "Ich komme aus Ghana. Woher kommst du?"
+    },
+    {
+      "start": 26.52,
+      "end": 30.94,
+      "text": "Ich wohne in Accra und lerne Deutsch."
+    },
+    {
+      "start": 30.96,
+      "end": 35.06,
+      "text": "Seit einem Jahr macht mir das Spaß."
+    },
+    {
+      "start": 39.32,
+      "end": 44.22,
+      "text": "Manchmal ist es schwer, doch ich gebe nicht auf."
+    },
+    {
+      "start": 44.24,
+      "end": 49.0,
+      "text": "Wie geht es dir? Mir geht es gut."
+    },
+    {
+      "start": 49.7,
+      "end": 53.0,
+      "text": "Was machst du gern? Ich höre Musik."
+    },
+    {
+      "start": 57.4,
+      "end": 62.36,
+      "text": "Ein kleines Hallo, ein neues Gespräch."
+    },
+    {
+      "start": 62.98,
+      "end": 64.84,
+      "text": "So lernen wir uns kennen."
+    },
+    {
+      "start": 69.08,
+      "end": 73.22,
+      "text": "Am Morgen trinke ich Kaffee oder Tee."
+    },
+    {
+      "start": 73.24,
+      "end": 75.04,
+      "text": "Dann gehe ich zur Arbeit in die Stadt."
+    },
+    {
+      "start": 76.68,
+      "end": 81.68,
+      "text": "Am Abend lerne ich oder sehe fern."
+    },
+    {
+      "start": 81.7,
+      "end": 86.0,
+      "text": "Am Wochenende treffe ich Freunde gern."
+    },
+    {
+      "start": 86.32,
+      "end": 90.08,
+      "text": "Wie ist das Wetter heute bei dir?"
+    },
+    {
+      "start": 90.68,
+      "end": 94.54,
+      "text": "Hier scheint die Sonne. Erzähl doch von dir!"
+    },
+    {
+      "start": 95.42,
+      "end": 99.1,
+      "text": "Wie geht es dir? Mir geht es gut."
+    },
+    {
+      "start": 99.88,
+      "end": 103.32,
+      "text": "Was machst du gern? Ich höre Musik."
+    },
+    {
+      "start": 107.6,
+      "end": 112.52,
+      "text": "Ein kleines Hallo, ein neues Gespräch."
+    },
+    {
+      "start": 113.16,
+      "end": 115.52,
+      "text": "So lernen wir uns kennen."
+    },
+    {
+      "start": 123.06,
+      "end": 128.02,
+      "text": "Ich frage, ich höre zu und erzähle von mir."
+    },
+    {
+      "start": 128.04,
+      "end": 132.04,
+      "text": "Mit jedem Gespräch wird Deutsch leichter."
+    },
+    {
+      "start": 137.8,
+      "end": 143.96,
+      "text": "Mit Falowen lerne ich jeden Tag mehr."
+    }
+  ],
+  "matchCoverage": 0.916,
+  "weakestLineCoverage": 0.5,
+  "totalLines": 22,
+  "duration": 164.4
+}

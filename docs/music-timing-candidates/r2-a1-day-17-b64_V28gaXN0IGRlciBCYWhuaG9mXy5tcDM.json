@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-17-b64_V28gaXN0IGRlciBCYWhuaG9mXy5tcDM",
+  "objectKey": "music/a1/day-17/Wo ist der Bahnhof_.mp3",
+  "level": "A1",
+  "day": 17,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nIch stehe vor dem Rathaus.\nIch suche den Bahnhof.\nIch frage eine nette Frau:\nWie komme ich dorthin?\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Verse 2]\nDie Frau sagt: Gehen Sie weiter.\nAn der Ampel nach rechts.\nIch sage: Vielen Dank!\nSie lächelt: Gern geschehen.\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Outro]\nJetzt sehe ich den Bahnhof.\nMein Zug kommt gerade an.\nMit Falowen finde ich den Weg.",
+  "status": "needs-review",
+  "recordingSha256": "e71ab6989d1d075b5d70e7c0da7c62ea2f004f429b327fefc019728d259b505a",
+  "audioBytes": 3435845,
+  "reason": "Low acoustic match: total=41.8%, weakest line=0.0%",
+  "recognizedSnippet": " Ich  bin  heute  in  einer  neuen  Stadt,  ich  möchte  mit  dem  Zug  nach  Haus.  Doch  ich  weiß  nicht  wo  der  Bahnhof  ist,  ich  kenne  mich  hier  noch  nicht  aus.  Ich  stehe  vor  dem  Rathaus  und  sehe  eine  Frau  vor  mir.  Ich  frage  Entschuldigung,  wo  ist  der  Bahnhof  von  hier?  Die  Frau  lächelt  und  sagt  zu  mir,  der  Bahnhof  ist  nicht  weit  von  hier  Gehen  Sie  einfach  geradeaus,  dann  kommen  Sie"
+}

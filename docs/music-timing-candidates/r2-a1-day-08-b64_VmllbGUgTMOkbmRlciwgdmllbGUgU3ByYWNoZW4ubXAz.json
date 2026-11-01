@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-08-b64_VmllbGUgTMOkbmRlciwgdmllbGUgU3ByYWNoZW4ubXAz",
+  "objectKey": "music/a1/day-08/Viele Länder, viele Sprachen.mp3",
+  "level": "A1",
+  "day": 8,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nIm Kurs sitzt mein Freund Sam.\nEr fragt: Woher kommst du?\nIch sage: Aus Ghana.\nUnd du? Aus Österreich.\n\n[Chorus]\nWoher kommst du? Welche Sprache sprichst du?\nIch spreche Deutsch und Englisch.\nWir verstehen uns jeden Tag.\n\n[Verse 2]\nMia kommt aus Italien.\nSie spricht Italienisch.\nWir sprechen heute Deutsch.\nUnd lernen neue Wörter.\n\n[Chorus]\nWoher kommst du? Welche Sprache sprichst du?\nIch spreche Deutsch und Englisch.\nWir verstehen uns jeden Tag.\n\n[Outro]\nViele Länder, viele Sprachen.\nEin Kurs, ein schönes Hallo.\nMit Falowen spreche ich über Länder.",
+  "status": "needs-review",
+  "recordingSha256": "61951bfa150e472ac2f291859f13a2e4c41feb3cc1f58a231ce5a936fc075c80",
+  "audioBytes": 3606563,
+  "reason": "Low acoustic match: total=10.8%, weakest line=0.0%",
+  "recognizedSnippet": " Ich  komme  aus  Ghana,  ich  wohne  jetzt  in  Berlin  In  Ghana  spricht  man  Englisch  und  viele  sprechen  auch  Tfi  In  Deutschland  spricht  man  Deutsch,  in  Frankreich  spricht  man  Französisch  In  Spanien  spricht  man  Spanisch,  so  viele  Sprachen  auf  der  Welt  Ich  lerne  jeden  Tag  ein  Wort,  mal  hier,  mal  dort,  an  jedem  Mont  Ich  frage  gern,  ich  höre  zu  und  lerne  jeden  Tag  dazu  Woher  kommst  du,  wo  wohnst  du"
+}

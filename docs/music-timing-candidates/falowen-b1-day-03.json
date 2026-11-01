@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-b1-day-03-b64_RWluIGtsZWluZXIgRXJmb2xnLm1wMw",
+  "objectKey": "music/b1/day-03/Ein kleiner Erfolg.mp3",
+  "level": "B1",
+  "day": 3,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nAls Sara ihren ersten Kurs begann,\nkonnte sie kaum einen Satz sagen.\nSie machte Fehler und schämte sich,\nobwohl sie jeden Abend fleißig übte.\n\n[Chorus]\nEin kleiner Erfolg verändert viel,\nauch wenn noch nicht alles gelingt.\nIch bleibe dran und glaube an mich.\n\n[Verse 2]\nEines Tages hielt sie einen kurzen Vortrag.\nSie zitterte, doch sie sprach bis zum Schluss.\nDie Gruppe hörte aufmerksam zu.\nDanach sagte jemand: Das hast du gut gemacht.\n\n[Chorus]\nEin kleiner Erfolg verändert viel,\nauch wenn noch nicht alles gelingt.\nIch bleibe dran und glaube an mich.\n\n[Outro]\nSara ging lächelnd nach Hause.\nSie wusste, dass Übung wirklich hilft.\nMit Falowen wachsen meine Sätze und mein Mut.",
+  "status": "needs-review",
+  "recordingSha256": "5ea00a32422c74d91b4b6c30ff7d1d6a5d2d11b3ba04cd3713f1d23867a82f52",
+  "audioBytes": 2285466,
+  "reason": "Low acoustic match: total=84.1%, weakest line=12.5%",
+  "recognizedSnippet": " Als  Sauer  ihren  ersten  Kurs  begann,  konnte  sie  kaum  meinen  Satz  sagen,  sie  machte  Fehler  und  schämte  sich  obwohl  sie  jeden  Abend  fleißig  übte  Ein  kleiner  Erfolg  verändert  viel,  auch  wenn  noch  nicht  alles  geliebt  Ich  bleibe  dran  und  glaube  an  mich  Eines  Tages  hielt  sie  einen  kurzen  Vortrag,  sie  zitterte  doch  sich  brach  bis  zum  Schluss  Die  Gruppe  hörte  aufmerksam  zu,  danach  sagte  jemand,  das  hast  du  gut  gemacht"
+}

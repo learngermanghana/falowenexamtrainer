@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-06-b64_RWluIFNvbm50YWcgbWl0IG1laW5lciBGYW1pbGllLm1wMw",
+  "objectKey": "music/a1/day-06/Ein Sonntag mit meiner Familie.mp3",
+  "level": "A1",
+  "day": 6,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nAm Sonntag bin ich zu Hause.\nMeine Mutter macht den Tee.\nMein Bruder spielt Gitarre.\nIch singe ein Lied dazu.\n\n[Chorus]\nWas machst du gern? Was machst du gern?\nIch singe gern, du spielst gern.\nZusammen sind wir froh.\n\n[Verse 2]\nMein Vater liest ein Buch.\nMeine Schwester malt ein Bild.\nWir lachen und essen zusammen.\nDann gehen wir in den Park.\n\n[Chorus]\nWas machst du gern? Was machst du gern?\nIch singe gern, du spielst gern.\nZusammen sind wir froh.\n\n[Outro]\nDas ist mein schöner Sonntag.\nIch mag meine Familie sehr.\nMit Falowen erzähle ich von zu Haus.",
+  "status": "needs-review",
+  "recordingSha256": "e4fc317a466a89d405cef01ff0f0dccbb1749fe9af74dc14c1c3983a6ce025ef",
+  "audioBytes": 3683523,
+  "reason": "Low acoustic match: total=28.7%, weakest line=0.0%",
+  "recognizedSnippet": " Am  Sonntag  scheint  die  Sonne,  der  Morgen  fängt  ganz  langsam  an  Meine  Mutter  kocht  den  Kaffee,  mein  Bruder  spielt  Gitarre  dann  Ich  sitze  draußen  und  sing,  die  Musik  klingt  durch  das  Haus  Wir  haben  heute  alle  frei  und  niemand  muss  früh  raus  Ein  bisschen  Zeit,  ein  bisschen  Ruhe,  wir  machen  was  uns  Freude  macht  Die  kleinen  Dinge  sind  so  schön,  wir  reden  viel  und  lachen  Was  machst  du  gerne  in"
+}

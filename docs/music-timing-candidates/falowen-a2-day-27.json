@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a2-day-27-b64_SGFuZHlzIHdlZy5tcDM",
+  "objectKey": "music/a2/day-27/Handys weg.mp3",
+  "level": "A2",
+  "day": 27,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nMia schreibt mir eine Nachricht.\nSie fragt, ob ich heute Zeit habe.\nIch bin unterwegs und sehe sie nicht.\nErst am Abend öffne ich mein Handy.\n\n[Chorus]\nEine Nachricht, ein kleiner Gruß,\nwir bleiben in Kontakt.\nDoch manchmal braucht man auch eine Pause.\n\n[Verse 2]\nIch schreibe: Entschuldige die späte Antwort.\nMia sagt: Kein Problem, ich verstehe.\nWir machen einen Termin für morgen.\nDann legen wir beide das Handy weg.\n\n[Chorus]\nEine Nachricht, ein kleiner Gruß,\nwir bleiben in Kontakt.\nDoch manchmal braucht man auch eine Pause.\n\n[Outro]\nAm nächsten Tag reden wir persönlich.\nDas ist manchmal einfach schöner.\nMit Falowen schreibe ich klare Nachrichten.",
+  "status": "needs-review",
+  "recordingSha256": "db7209d0c3092a6a9b94ede867a05344faeb5305f71c9683d7564de6e35d2746",
+  "audioBytes": 2410154,
+  "reason": "Low acoustic match: total=32.0%, weakest line=0.0%",
+  "recognizedSnippet": " Heute  Morgen  schreibt  mir  mir,  sie  fragt  hast  du  heute  Zeit  Doch  ich  bin  schon  auf  dem  Weg  zur  Arbeit  und  mein  Handy  liegt  ganz  weit  Erst  am  Abend  sehe  ich  ihre  Nachricht,  ich  denke  oh  das  tut  mir  leid  Ich  wollte  ihr  schon  früher  schreiben,  doch  der  Tag  empfehlt  so  schnell  vorbei  Eine  Nachricht,  ein  kleiner  Groß  Wir  bleiben  in  Kontakt  Doch  manchmal  leg  ich  mein  Handy  weg  Weil"
+}

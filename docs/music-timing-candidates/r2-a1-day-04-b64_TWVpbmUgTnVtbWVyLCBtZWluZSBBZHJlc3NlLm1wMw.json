@@ -8,5 +8,6 @@
   "status": "needs-review",
   "recordingSha256": "626a491a74d71bb408828bac95abdfb161908594cb3a56437ca2ffe810fdf50a",
   "audioBytes": 3898726,
-  "reason": "Low acoustic match: total=51.9%, weakest line=0.0%"
+  "reason": "Low acoustic match: total=50.9%, weakest line=0.0%",
+  "recognizedSnippet": " Hallo  ich  heiße  Ben,  ich  komme  aus  Ghana  aus  Akra,  ich  bin  24  Jahre  alt  und  heute  stelle  Ich  wohne  in  der  Blumenstraße,  meine  Hausnummer  ist  1,  2,  3  Die  Postleitzahl  ist  1,  2,  3,  4,  5  Hier  bin  ich  zu  Hause,  hier  bin  ich  gern  1,  2,  3,  4,  5,  6,  7,  8,  9  und  10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20  Oh  oh  oh"
 }

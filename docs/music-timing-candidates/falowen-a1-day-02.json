@@ -8,5 +8,6 @@
   "status": "needs-review",
   "recordingSha256": "bff8440f79a18941381e371c2cfdacac4ce0fbbde7aad84c52d0ca8df40740ff",
   "audioBytes": 3892679,
-  "reason": "Low acoustic match: total=77.2%, weakest line=0.0%"
+  "reason": "Low acoustic match: total=78.1%, weakest line=0.0%",
+  "recognizedSnippet": " Heute  rufe  ich  die  Schule  an,  ich  möchte  einen  Deutschkurs  machen.  Die  Frau  sagt  freundlich  guten  Tag  Wie  heißen  Sie,  sagen  Sie  es  mir  Ich  sage  Hallo,  ich  heiße  Bina  Ich  komme  aus  Ghana,  das  ist  mein  Land  Sie  fragt  wie  schreibt  man  Ihren  Namen  Ich  buche  tabiere  langsam,  dann  ich  heiße  Bina,  B -I -N -A  Oh,  oh,  das  ist  mein  Name,  ja  B -I -N -A  Mhm,  so"
 }

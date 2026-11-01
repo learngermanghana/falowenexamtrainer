@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-11-b64_TWVpbiBUYWcg4oCTIFZvbiBtb3JnZW5zIGJpcy5tcDM",
+  "objectKey": "music/a1/day-11/Mein Tag – Von morgens bis.mp3",
+  "level": "A1",
+  "day": 11,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nUm sieben stehe ich auf.\nUm acht trinke ich Tee.\nUm neun beginnt mein Deutschkurs.\nIch gehe zu Fuß dorthin.\n\n[Chorus]\nWie spät ist es? Wie spät ist es?\nEs ist zehn, wir lernen jetzt.\nAm Abend bin ich wieder da.\n\n[Verse 2]\nUm zwölf esse ich zu Mittag.\nUm vier gehe ich nach Haus.\nUm sechs rufe ich Mama an.\nDann mache ich das Licht aus.\n\n[Chorus]\nWie spät ist es? Wie spät ist es?\nEs ist zehn, wir lernen jetzt.\nAm Abend bin ich wieder da.\n\n[Outro]\nMorgen geht der Tag von vorn los.\nUnd ich bin wieder dabei.\nBei Falowen übe ich die Uhrzeit.",
+  "status": "needs-review",
+  "recordingSha256": "69a3ed6ae9d8984758056f7c1076c2f2b23d199ffea78081859f3b0e3ce49930",
+  "audioBytes": 4881147,
+  "reason": "Low acoustic match: total=36.3%, weakest line=0.0%",
+  "recognizedSnippet": " Musik  Um  sieben  Uhr  stehe  ich  auf,  ich  mache  das  Fenster  auf  Um  halb  acht  frühstücke  ich,  dann  ziehe  ich  meine  Jacke  an  Um  acht  Uhr  gehe  ich  aus  dem  Haus,  mein  Deutschkurs  fängt  um  neun  Uhr  an  Von  neun  bis  zwölf  lerne  ich  Deutsch,  danach  fahre  ich  wieder  nach  Haus  Am  Morgen  habe  ich  viel  zu  tun,  am  Mittag  mache  ich  eine  Pause  Ich  schaue  kurz  auf  meine  Uhr,"
+}

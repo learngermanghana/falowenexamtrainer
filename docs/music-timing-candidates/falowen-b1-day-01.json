@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-b1-day-01-b64_RWluIFRyYXVtIGdlaHQgbmljaHQgdmVybG9yZW4oMSkubXAz",
+  "objectKey": "music/b1/day-01/Ein Traum geht nicht verloren(1).mp3",
+  "level": "B1",
+  "day": 1,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nIm Keller finde ich einen alten Koffer.\nDarin liegt mein Reisebuch von damals.\nAls Kind wollte ich um die Welt fahren,\ndoch später blieb für Träume kaum Zeit.\n\n[Chorus]\nEin Traum geht nicht einfach verloren,\nauch wenn die Jahre weiterziehen.\nHeute mach ich wieder einen Schritt.\n\n[Verse 2]\nIch erzähle Mia von meinem großen Wunsch.\nSie sagt, dass ich noch immer reisen kann.\nWir suchen gemeinsam nach günstigen Tickets,\nobwohl die Reise noch weit entfernt ist.\n\n[Chorus]\nEin Traum geht nicht einfach verloren,\nauch wenn die Jahre weiterziehen.\nHeute mach ich wieder einen Schritt.\n\n[Outro]\nAm Abend liegt ein kleiner Plan auf dem Tisch.\nDer erste Ort auf meiner Liste heißt Wien.\nMit Falowen finde ich neue Worte für alte Träume.",
+  "status": "review-only",
+  "recordingSha256": "d5f88594ffcce7ec4dd01b49c8b872adf87c0197e94a8c91c2ae369fa1696d04",
+  "audioBytes": 2349094,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 0,
+      "end": 3.72,
+      "text": "Im Keller finde ich einen alten Koffer."
+    },
+    {
+      "start": 3.74,
+      "end": 6.78,
+      "text": "Darin liegt mein Reisebuch von damals."
+    },
+    {
+      "start": 6.8,
+      "end": 10.9,
+      "text": "Als Kind wollte ich um die Welt fahren,"
+    },
+    {
+      "start": 11.28,
+      "end": 13.92,
+      "text": "doch später blieb für Träume kaum Zeit."
+    },
+    {
+      "start": 14.12,
+      "end": 18.38,
+      "text": "Ein Traum geht nicht einfach verloren,"
+    },
+    {
+      "start": 18.62,
+      "end": 24.88,
+      "text": "auch wenn die Jahre weiterziehen."
+    },
+    {
+      "start": 24.9,
+      "end": 28.66,
+      "text": "Heute mach ich wieder einen Schritt."
+    },
+    {
+      "start": 28.9,
+      "end": 32.48,
+      "text": "Ich erzähle Mia von meinem großen Wunsch."
+    },
+    {
+      "start": 32.5,
+      "end": 35.6,
+      "text": "Sie sagt, dass ich noch immer reisen kann."
+    },
+    {
+      "start": 35.62,
+      "end": 39.38,
+      "text": "Wir suchen gemeinsam nach günstigen Tickets,"
+    },
+    {
+      "start": 39.4,
+      "end": 43.36,
+      "text": "obwohl die Reise noch weit entfernt ist."
+    },
+    {
+      "start": 43.78,
+      "end": 48.66,
+      "text": "Ein Traum geht nicht einfach verloren,"
+    },
+    {
+      "start": 50.12,
+      "end": 53.14,
+      "text": "auch wenn die Jahre weiterziehen."
+    },
+    {
+      "start": 55.56,
+      "end": 58.56,
+      "text": "Heute mach ich wieder einen Schritt."
+    },
+    {
+      "start": 72.22,
+      "end": 76.6,
+      "text": "Am Abend liegt ein kleiner Plan auf dem Tisch."
+    },
+    {
+      "start": 76.62,
+      "end": 80.64,
+      "text": "Der erste Ort auf meiner Liste heißt Wien."
+    },
+    {
+      "start": 80.66,
+      "end": 87.64,
+      "text": "Mit Falowen finde ich neue Worte für alte Träume."
+    }
+  ],
+  "matchCoverage": 0.948,
+  "weakestLineCoverage": 0.8,
+  "totalLines": 17,
+  "duration": 102.8
+}
