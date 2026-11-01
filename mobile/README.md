@@ -1,5 +1,9 @@
 # Falowen iOS (Capacitor + Codemagic)
 
+**Progress:** The Personal Account Codemagic free unsigned simulator workflow **successfully built Falowen (Build #2)** on 1 November 2026. This establishes compilation only, not on-device or Apple TestFlight validation.
+
+**Next:** [TestFlight readiness checklist](./APP_STORE_CHECKLIST.md) — release blockers, cost safeguards and planned App Store metadata.
+
 The existing Falowen React/Vite site remains in `web/` and keeps its Vercel deployment. This folder is a **separate, native iOS shell** for packaging the same web build, not a second student website. Codemagic generates the Xcode project during the build: you do **not** need a Mac just to run CI.
 
 ## Phase 1: Free unsigned simulator build (no Apple payment)
@@ -18,7 +22,7 @@ The existing Falowen React/Vite site remains in `web/` and keeps its Vercel depl
 4. Choose **Falowen iOS - Free unsigned simulator build** (`falowen-ios-simulator`) and press **Start new build** manually. It deliberately has no automatic push trigger to save free build minutes.
 5. On success, inspect the `App.app` artifact. It is an *unsigned iOS Simulator app*, **not** an installable iPhone IPA or App Store release.
 
-The build: installs the repository and web dependencies, builds Vite assets to `web/dist/`, installs pinned Capacitor 8 into `mobile/`, creates `mobile/ios/`, syncs assets, and compiles an unsigned Xcode simulator target. Neither Xcode nor generated files are committed to the main website repository.
+The build: installs repository and web dependencies, builds Vite assets to `web/dist/`, installs pinned Capacitor 8 into `mobile/`, creates `mobile/ios/`, syncs assets, generates a **temporary Falowen-branded iOS icon** using the existing `web/public/falo.png`, and compiles an unsigned Xcode simulator target. Neither Xcode nor generated files are committed to the main website repository.
 
 ## Phase 2: Paid Apple Developer membership / TestFlight
 
@@ -47,7 +51,7 @@ References:
 - **Music and listening:** Test streaming, auto-play restrictions, lyric sync and background behaviour.
 - **Navigation:** Test deep links, redirects, React Router refreshes, downloads and PDF opening.
 - **Payments:** Evaluate App Store In-App Purchase requirements for selling digital courses/exams; existing web Paystack checkout must not simply be reused for in-app digital purchases without confirming Apple policy and applicable exceptions.
-- **App presentation:** Replace the default generated Capacitor app icon/splash images with proper Falowen artwork; add native-value features as needed so the submission is not just a thin website wrapper.
+- **App presentation:** The workflow now generates a provisional native Falowen icon from existing site artwork. Review it on-device and approve or replace before distribution; review splash assets and demonstrate native-value features beyond a website wrapper.
 - **Security and costs:** Do not put Apple signing keys in the repository. Build workflows are manual to avoid unnecessary Codemagic minutes.
 
 ## Local macOS development (optional)
@@ -62,9 +66,10 @@ npm install --no-package-lock
 npx cap add ios
 npx cap sync ios
 python3 scripts/prepare_ios.py
+sh scripts/generate_icon.sh
 npx cap open ios
 ```
 
 `mobile/capacitor.config.json` intentionally points to `../web/dist`. The iOS Xcode project is generated and ignored in Git; create it again after cleaning your workspace.
 
-**Status:** CI configuration and wrapper scaffold only. Until Codemagic runs successfully and the native feature checklist is completed, Falowen is **not** a tested, published iOS app.
+**Status:** An unsigned iOS Simulator compile **succeeded** on Codemagic Personal Account. A signed iPhone IPA, TestFlight upload, real-device acceptance testing and App Store review remain **not yet completed**. Refer to [APP_STORE_CHECKLIST.md](./APP_STORE_CHECKLIST.md).
