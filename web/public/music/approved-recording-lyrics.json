@@ -1100,6 +1100,162 @@
       "source": "User-provided A2 Day 16 Kleine Schritte recording and sung transcript (2026-11-01).",
       "timingStatus": "estimated",
       "timingMethod": "Manually sequenced, approximate vocal line windows against supplied 113.64-second MP3; review exact starts and ends during playback."
+    },
+    {
+      "trackId": "r2-a2-day-15-b64_S2xlaW5lIE1vbWVudGUubXAz",
+      "objectKey": "music/a2/day-15/Kleine Momente.mp3",
+      "assignmentKey": "A2-6.15",
+      "title": "Kleine Momente",
+      "lyrics": "[Verse 1]\nAm Samstag habe ich endlich Zeit,\nmein Lieblingscafé ist nicht mehr weit.\nIch trinke Tee und lese ein Buch,\ndort kann ich bleiben, so lang ich will.\n\nZum Mittag gibt es Reis mit Fisch,\nmein Lieblingsessen steht auf dem Tisch.\nDanach läuft meine Lieblingsmusik,\nund ich singe leise mit.\n\n[Chorus]\nMein Lieblingslied, mein Lieblingsort,\nich fühle mich wohl und möchte nicht fort.\nWas ich am liebsten mag im Leben,\nsind kleine Momente voller Glück.\n\n[Verse 2]\nMein Lieblingssport ist Schwimmen,\ndas mache ich gern nach der Arbeit.\nMein Lieblingsplatz ist nah am Wasser,\nhier lasse ich den Stress zurück.\n\nMein Lieblingsfilm läuft heute Abend,\nzwei Freunde kommen noch vorbei.\nWir kochen, reden, lachen lange,\nund morgen haben wir alle frei.\n\n[Chorus]\nMein Lieblingslied, mein Lieblingsort,\nich fühle mich wohl und möchte nicht fort.\nWas ich am liebsten mag im Leben,\nsind kleine Momente voller Glück.\n\n[Outro]\nManchmal ändern sich meine Wünsche,\ndoch eines bleibt für mich ganz klar:\nDie Menschen und die schönen Momente\nmachen mein Leben wunderbar.",
+      "cues": [
+        {
+          "start": 18.7,
+          "end": 21.5,
+          "text": "Am Samstag habe ich endlich Zeit,"
+        },
+        {
+          "start": 22.7,
+          "end": 25.3,
+          "text": "mein Lieblingscafé ist nicht mehr weit."
+        },
+        {
+          "start": 26.9,
+          "end": 29.4,
+          "text": "Ich trinke Tee und lese ein Buch,"
+        },
+        {
+          "start": 30.9,
+          "end": 33.5,
+          "text": "dort kann ich bleiben, so lang ich will."
+        },
+        {
+          "start": 34.9,
+          "end": 37.4,
+          "text": "Zum Mittag gibt es Reis mit Fisch,"
+        },
+        {
+          "start": 38.9,
+          "end": 41.5,
+          "text": "mein Lieblingsessen steht auf dem Tisch."
+        },
+        {
+          "start": 42.9,
+          "end": 45.8,
+          "text": "Danach läuft meine Lieblingsmusik,"
+        },
+        {
+          "start": 46.8,
+          "end": 49.6,
+          "text": "und ich singe leise mit."
+        },
+        {
+          "start": 50.1,
+          "end": 54,
+          "text": "Mein Lieblingslied, mein Lieblingsort,"
+        },
+        {
+          "start": 54.3,
+          "end": 59.4,
+          "text": "ich fühle mich wohl und möchte nicht fort."
+        },
+        {
+          "start": 60.1,
+          "end": 64.8,
+          "text": "Was ich am liebsten mag im Leben,"
+        },
+        {
+          "start": 65,
+          "end": 70.7,
+          "text": "sind kleine Momente voller Glück."
+        },
+        {
+          "start": 85,
+          "end": 88.3,
+          "text": "Mein Lieblingssport ist Schwimmen,"
+        },
+        {
+          "start": 88.7,
+          "end": 91.9,
+          "text": "das mache ich gern nach der Arbeit."
+        },
+        {
+          "start": 92.5,
+          "end": 95.5,
+          "text": "Mein Lieblingsplatz ist nah am Wasser,"
+        },
+        {
+          "start": 96.1,
+          "end": 99.4,
+          "text": "hier lasse ich den Stress zurück."
+        },
+        {
+          "start": 100.1,
+          "end": 103,
+          "text": "Mein Lieblingsfilm läuft heute Abend,"
+        },
+        {
+          "start": 104,
+          "end": 106.8,
+          "text": "zwei Freunde kommen noch vorbei."
+        },
+        {
+          "start": 108.2,
+          "end": 110.7,
+          "text": "Wir kochen, reden, lachen lange,"
+        },
+        {
+          "start": 111.2,
+          "end": 114.2,
+          "text": "und morgen haben wir alle frei."
+        },
+        {
+          "start": 115.2,
+          "end": 118.7,
+          "text": "Mein Lieblingslied, mein Lieblingsort,"
+        },
+        {
+          "start": 119,
+          "end": 122.6,
+          "text": "ich fühle mich wohl und möchte nicht fort."
+        },
+        {
+          "start": 123,
+          "end": 126.6,
+          "text": "Was ich am liebsten mag im Leben,"
+        },
+        {
+          "start": 127.1,
+          "end": 130.5,
+          "text": "sind kleine Momente voller Glück."
+        },
+        {
+          "start": 135.7,
+          "end": 138.6,
+          "text": "Manchmal ändern sich meine Wünsche,"
+        },
+        {
+          "start": 139.5,
+          "end": 142.1,
+          "text": "doch eines bleibt für mich ganz klar:"
+        },
+        {
+          "start": 143,
+          "end": 146.3,
+          "text": "Die Menschen und die schönen Momente"
+        },
+        {
+          "start": 146.8,
+          "end": 150.6,
+          "text": "machen mein Leben wunderbar."
+        }
+      ],
+      "strictRecordingLyrics": true,
+      "recordingSha256": "c866522f0eaca9a73bd8c02ca8c1480f963e4bc1526322f98cf70e44f54d9b31",
+      "duration": 156.432,
+      "genre": "Acoustic Afro-Soul",
+      "source": "Owner-provided A2 Day 15 Kleine Momente.mp3 and lyrics, 2026-11-01.",
+      "timingStatus": "estimated",
+      "timingMethod": "Approximate lyric-line windows manually assigned to the supplied 156.432-second recording; not acoustically verified; review playback before treating as exact."
     }
   ]
 }
