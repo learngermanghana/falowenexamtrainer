@@ -54,7 +54,7 @@ function lessonContentResponse(level, day, section = "overview") {
     ],
     grammarExercise: content.grammar?.task || null,
     workbookChapters: content.workbook?.chapters?.map((chapter) => ({
-      chapter: chapter.chapter, title: chapter.title, sections: chapter.sections, route: chapter.route,
+      chapter: chapter.chapter, title: chapter.title, assignmentId: chapter.assignmentId, sections: chapter.sections, route: chapter.route,
     })) || [],
     grammarNotesUrl: content.grammar?.notesUrl || content.grammar?.noteLinks?.[0]?.url || null,
     fullGrammarExplanationIncluded: content.grammar?.fullExplanationIncluded !== false,
@@ -66,7 +66,7 @@ function lessonContentResponse(level, day, section = "overview") {
   };
   if (!content[section]) return {
     ...base, available: false,
-    clarification: "This source section is not exported for this lesson; open the relevant Falowen Campus tab. Do not invent missing exercises.",
+    clarification: "This section is not included in the exported lesson material; open the relevant Falowen Campus tab. Do not invent missing exercises.",
   };
   return { ...base, available: true, material: content[section] };
 }
