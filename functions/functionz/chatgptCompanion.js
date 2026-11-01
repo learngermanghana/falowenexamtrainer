@@ -8,6 +8,7 @@ const { getAssignmentSummary } = require("./routes/scoresSummaryCoursePlan");
 const { getCurriculumEntriesForLevel } = require("../data/curriculumManifest");
 const { getScoresForStudent } = require("./scoresSheet");
 const { getStudentTimetable } = require("./chatgptClassTimetable");
+const { prepareFromTimetable } = require("./chatgptClassPreparation");
 
 let GENERATED_COURSE_CONTENT = null;
 try {
@@ -17,7 +18,7 @@ try {
 } catch (error) {
   if (error.code !== "MODULE_NOT_FOUND") throw error;
 }
-const VALID_LESSON_SECTIONS = new Set(["overview", "vocabulary", "grammar", "reading", "listening", "writing", "review"]);
+const VALID_LESSON_SECTIONS = new Set(["overview", "workbook", "vocabulary", "grammar", "reading", "listening", "writing", "review"]);
 function contentForLesson(level, day) {
   return GENERATED_COURSE_CONTENT?.levels?.[level]?.[String(day)] || null;
 }
@@ -52,13 +53,20 @@ function lessonContentResponse(level, day, section = "overview") {
       level === "B1" ? "Finish any required submission in Campus." : "Review the lesson key points and practise your own sentences.",
     ],
     grammarExercise: content.grammar?.task || null,
+    workbookChapters: content.workbook?.chapters?.map((chapter) => ({
+      chapter: chapter.chapter, title: chapter.title, sections: chapter.sections, route: chapter.route,
+    })) || [],
+    grammarNotesUrl: content.grammar?.notesUrl || content.grammar?.noteLinks?.[0]?.url || null,
+    fullGrammarExplanationIncluded: content.grammar?.fullExplanationIncluded !== false,
+    originalReadingAvailable: Boolean(content.reading?.questions?.length),
+    instruction: content.instruction || null,
     readingTitle: content.reading?.title || null,
     writingPrompt: content.writing?.prompt || null,
     clarification: "This study order describes the actual available Course Book sections. The sequence is guidance, not a verified timed assignment or completion record.",
   };
   if (!content[section]) return {
     ...base, available: false,
-    clarification: "This section is not included for this lesson day. Only the applicable B2 skill tab is present.",
+    clarification: "This source section is not exported for this lesson; open the relevant Falowen Campus tab. Do not invent missing exercises.",
   };
   return { ...base, available: true, material: content[section] };
 }
@@ -295,6 +303,11 @@ const toolDefinitions = [
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
+    name: "get_my_falowen_class_preparation",
+    description: "Prepare me interactively for my next Falowen live class. First verify my enrolled class and next session through the real timetable. Use its recorded topic and only trusted lesson-day mapping to return original Course Book reading questions, grammar focus, workbook sections and a 10-minute study plan. Never guess the day, topic, or answers. Ask one question at a time.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
     name: "get_my_falowen_lesson",
     description: "Get my assigned course day's goal and Campus link, plus real learner-facing teaching tasks where they are available. Do not browse the public web to guess Falowen exercises.",
     inputSchema: {
@@ -304,7 +317,7 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_lesson_content",
-    description: "Read authentic Falowen Course Book content for my enrolled level. B1: original reading passages, comprehension questions and writing prompts where available; B2: vocabulary, grammar, reading, listening, writing and review. Missing content is reported transparently. Never expose answer keys, solutions or private student work.",
+    description: "Read learner-facing Falowen Course Book content for my enrolled level. A1: original chapter/workbook section index plus verified exercises where extracted (Day 1 reading/questions); A2: original Lesen text/questions, Hören instructions/questions and linked grammar notes; B1: available original Lesen; B2: detailed vocabulary, grammar, reading and more. Do not invent missing exercises or expose answers, transcripts or private student work.",
     inputSchema: {
       type: "object",
       properties: {
@@ -330,6 +343,10 @@ async function callTool(name, args, student, admin) {
     name: view.name,
     nickname: view.level ? "Falowen " + view.level + " student" : "Falowen student",
   };
+  if (name === "get_my_falowen_class_preparation") {
+    const timetable = await getStudentTimetable({ db: admin.firestore(), student, now: new Date() });
+    return prepareFromTimetable({ timetable, level: view.level, courseContent: contentForLesson });
+  }
   if (name === "get_my_falowen_next_class") {
     return getStudentTimetable({ db: admin.firestore(), student, now: new Date() });
   }
@@ -535,7 +552,7 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "Falowen Learning Companion", version: "1.0.0" },
-        instructions: "Read-only Falowen learning companion. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, say so rather than inventing a workbook passage. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks for live class date, topic, preparation or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
+        instructions: "Read-only Falowen learning companion. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, say so rather than inventing a workbook passage. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
