@@ -8,6 +8,58 @@ const { getAssignmentSummary } = require("./routes/scoresSummaryCoursePlan");
 const { getCurriculumEntriesForLevel } = require("../data/curriculumManifest");
 const { getScoresForStudent } = require("./scoresSheet");
 
+let GENERATED_COURSE_CONTENT = null;
+try {
+  // Generated from real Falowen learner-facing data during the web prebuild.
+  // Static path lets Vercel include the snapshot in the existing API bundle.
+  GENERATED_COURSE_CONTENT = require("../data/chatgptLessonContent.generated.json");
+} catch (error) {
+  if (error.code !== "MODULE_NOT_FOUND") throw error;
+}
+const VALID_LESSON_SECTIONS = new Set(["overview", "vocabulary", "grammar", "reading", "listening", "writing", "review"]);
+function contentForLesson(level, day) {
+  return GENERATED_COURSE_CONTENT?.levels?.[level]?.[String(day)] || null;
+}
+function lessonContentResponse(level, day, section = "overview") {
+  if (!VALID_LESSON_SECTIONS.has(section)) return { error: "Unsupported lesson section" };
+  const content = contentForLesson(level, day);
+  if (!content) return {
+    level, day, section, available: false,
+    clarification: "The full learner-facing material is not exported for this lesson yet. Open Falowen Campus; do not invent or claim to quote its exercises.",
+    lessonUrl: lessonUrl(level, { dayNumber: day }),
+  };
+  const base = {
+    level, day, chapter: content.chapter, title: content.title, section,
+    source: "Falowen Course Book (learner-facing source data)",
+    lessonUrl: lessonUrl(level, { dayNumber: day, displayChapter: content.chapter }),
+    guidance: "Use only the supplied learner-facing text for claims about Falowen's exact exercises. Do not claim to know answers or completion state.",
+  };
+  if (section === "overview") return {
+    ...base, available: true,
+    topic: content.topic, goal: content.goal, grammarFocus: content.grammarFocus,
+    skillFocus: content.skillFocus, campusTabs: content.campusTabs,
+    availableSections: VALID_LESSON_SECTIONS.size && [...VALID_LESSON_SECTIONS].filter((key) =>
+      key === "overview" || Boolean(content[key])),
+    studySequence: [
+      "Read the vocabulary and grammar teaching in Campus.",
+      content.skillFocus === "lesen" ? "Read the lesson passage and answer the reading questions without a solution key."
+        : content.skillFocus === "hoeren" ? "Listen to the audio in Campus and answer the listening questions."
+          : content.skillFocus === "write" ? "Follow the assigned writing prompt in Campus and draft your own response."
+            : "Complete the speaking or communication task shown in Campus.",
+      "Review the lesson key points and practise your own sentences.",
+    ],
+    grammarExercise: content.grammar?.task || null,
+    readingTitle: content.reading?.title || null,
+    writingPrompt: content.writing?.prompt || null,
+    clarification: "This study order describes the actual available Course Book sections. The sequence is guidance, not a verified timed assignment or completion record.",
+  };
+  if (!content[section]) return {
+    ...base, available: false,
+    clarification: "This section is not included for this lesson day. Only the applicable B2 skill tab is present.",
+  };
+  return { ...base, available: true, material: content[section] };
+}
+
 const SITE = "https://www.falowen.app";
 const ISSUER = SITE + "/api/chatgpt";
 const RESOURCE = ISSUER + "/mcp";
@@ -236,9 +288,24 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_lesson",
-    description: "Retrieve the topic, learning goal and Campus link for a day in my assigned course. Use to guide practice, not to submit official work.",
+    description: "Get my assigned course day's goal and Campus link, plus real learner-facing teaching tasks where they are available. Do not browse the public web to guess Falowen exercises.",
     inputSchema: {
       type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50, description: "Lesson day in the student's enrolled course." } },
+      required: ["day"], additionalProperties: false,
+    },
+  },
+  {
+    name: "get_my_falowen_lesson_content",
+    description: "Read actual student-facing Falowen Course Book material for my enrolled course: vocabulary, grammar explanations and checks, reading passage/questions, listening task details, writing prompt and review. Does not reveal answer keys, model answers, audio transcripts or other students' work. Supported in depth for B2; other levels report unavailable rather than invent exercises.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        day: { type: "integer", minimum: 1, maximum: 50, description: "Course Book day" },
+        section: {
+          type: "string", enum: ["overview", "vocabulary", "grammar", "reading", "listening", "writing", "review"],
+          description: "Choose one section per call to keep results fast. Default overview.",
+        },
+      },
       required: ["day"], additionalProperties: false,
     },
   },
@@ -255,8 +322,12 @@ async function callTool(name, args, student) {
     name: view.name,
     nickname: view.level ? "Falowen " + view.level + " student" : "Falowen student",
   };
-  if (name === "get_my_falowen_lesson") {
+  if (name === "get_my_falowen_lesson" || name === "get_my_falowen_lesson_content") {
     if (!Number.isInteger(args?.day) || args.day < 1 || args.day > 50) throw new Error("day must be an integer between 1 and 50");
+    if (name === "get_my_falowen_lesson_content") {
+      const section = args?.section === undefined ? "overview" : String(args.section);
+      return lessonContentResponse(view.level, args.day, section);
+    }
     if (!view.level) return { error: "Course level is not available." };
     const lessons = getCurriculumEntriesForLevel(view.level);
     const matching = lessons.filter((entry) =>
@@ -270,6 +341,12 @@ async function callTool(name, args, student) {
       grammarFocus: normalize(entry.grammar_topic || entry.grammarFocus).slice(0, 200),
       lessonUrl: lessonUrl(view.level, { dayNumber: args.day, displayChapter: entry.displayChapter || entry.chapter }),
       guidance: "Explain concepts and offer short original practice questions. Do not complete graded coursework for the learner.",
+      ...(contentForLesson(view.level, args.day)
+        ? { courseBookContent: lessonContentResponse(view.level, args.day, "overview"),
+            contentTool: "get_my_falowen_lesson_content",
+            exactContentAvailable: true }
+        : { exactContentAvailable: false,
+            disclaimer: "Only lesson metadata is available here. Do not invent the Campus exercises." }),
     };
   }
   if (!view.level) return { error: "No supported course level is assigned to this account." };
@@ -491,5 +568,6 @@ function makeRouter(admin) {
 
 module.exports = {
   makeRouter, oauthParameters, safeStudentAccess, scoreRowsForStudent, summarizeStudentAssignments,
+  lessonContentResponse,
   constants: { ISSUER, RESOURCE, SCOPE, CLIENT_ID, CALLBACK },
 };

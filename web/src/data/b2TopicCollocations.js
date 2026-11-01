@@ -1,4 +1,4 @@
-import { B2_LESSON_CONTENT_ALIGNMENT } from "./b2LessonContentAlignment";
+import { B2_LESSON_CONTENT_ALIGNMENT } from "./b2LessonContentAlignment.js";
 
 // [expression, meaning, contextual example, tested preposition, case]
 // Titles come from the same curriculum as the lesson, never a second topic list.

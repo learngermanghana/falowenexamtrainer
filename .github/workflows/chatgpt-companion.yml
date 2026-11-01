@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "functions/functionz/chatgptCompanion.js"
+      - "scripts/generateChatgptLessonContent.mjs"
+      - "web/src/data/b2*.js"
+      - "web/package.json"
       - "functions/functionz/__tests__/chatgptCompanion.test.js"
       - "functions/functionz/__tests__/chatgptCompanion.integration.test.js"
       - "functions/functionz/paymentAwareApp.js"
@@ -26,6 +29,8 @@ jobs:
           cache: npm
       - run: npm install --no-package-lock --ignore-scripts
       - run: npm --prefix functions install --no-package-lock --ignore-scripts
+      - name: Generate student-facing curriculum from canonical B2 sources
+        run: node scripts/generateChatgptLessonContent.mjs
       - name: Verify OAuth constraints and student data scope
         run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js
       - name: Verify JavaScript syntax
