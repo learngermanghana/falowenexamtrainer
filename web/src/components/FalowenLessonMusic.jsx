@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { recordMusicPractice } from "../services/musicPracticeService";
+import { recordMusicPractice, flushMusicPractice } from "../services/musicPracticeService";
 
 // Optional lesson song: the coursebook never waits for music to render and
 // never reads private Hören audio. Only approved public catalog entries appear.
 export default function FalowenLessonMusic({ level, day, assignmentKey = "" }) {
   const [track, setTrack] = useState(null);
+  useEffect(() => () => { void flushMusicPractice(); }, []);
   useEffect(() => {
     const controller = new AbortController();
     setTrack(null);
