@@ -216,8 +216,163 @@
       "level": "A2",
       "day": 3,
       "assignmentKey": "A2-1.3",
-      "title": "Welches Fahrrad nehmen wir?",
-      "lyrics": "[Verse 1]\nTom braucht ein Fahrrad für die Stadt.\nIm Laden stehen zwei Modelle.\nDas rote Rad ist leichter.\nDas blaue Rad ist etwas günstiger.\n\n[Chorus]\nWelches passt besser zu dir?\nVergleiche in Ruhe, schau genau.\nDas Beste ist nicht immer das Teuerste.\n\n[Verse 2]\nTom fährt beide Räder zur Probe.\nDas rote fährt schneller bergauf.\nDas blaue ist aber bequemer.\nEr entscheidet sich für das blaue Rad.\n\n[Chorus]\nWelches passt besser zu dir?\nVergleiche in Ruhe, schau genau.\nDas Beste ist nicht immer das Teuerste.\n\n[Outro]\nJetzt fährt Tom jeden Tag zur Arbeit.\nEr ist mit seiner Wahl zufrieden.\nMit Falowen kann ich Dinge besser vergleichen."
+      "title": "Zwei Städte",
+      "lyrics": "[Verse 1]\nLetzten Sommer war ich in Berlin,\nich blieb dort eine ganze Woche.\nIch besuchte das Brandenburger Tor,\nund machte viele schöne Fotos.\nAm Abend ging ich mit Freunden aus,\nwir aßen zusammen im Restaurant.\nIch fuhr oft mit Bus und U-Bahn,\nund entdeckte jeden Tag etwas Neues.\n\n[Chorus]\nZwei Städte, so viel zu erleben,\nso viele Orte, die ich noch nicht kannte.\nIch habe schöne Tage verbracht,\nund denke gern an diese Reise.\n\n[Verse 2]\nDanach fuhr ich mit dem Zug nach Hamburg,\ndie Fahrt war angenehm und ruhig.\nAm Hafen sah ich große Schiffe,\nund machte einen Spaziergang an der Elbe.\nAm nächsten Tag besuchte ich den Fischmarkt,\nund probierte ein frisches Fischbrötchen.\nAm Abend saß ich an der Alster,\nund genoss die Ruhe am Wasser.\n\n[Chorus]\nZwei Städte, so viel zu erleben,\nso viele Orte, die ich noch nicht kannte.\nIch habe schöne Tage verbracht,\nund denke gern an diese Reise.\n\n[Outro]\nBerlin ist größer und lebhafter,\nHamburg fand ich ruhiger und grüner.\nIn Berlin gefiel mir das Nachtleben,\nin Hamburg war der Hafen am schönsten.\nBeide Städte haben mir gefallen,\ndoch Hamburg passt ein bisschen besser zu mir.",
+      "recordingObjectKey": "music/a2/day-03/Zwei Städte.mp3",
+      "recordingSha256": "52e2d4b834dde2a2ee07850d6e813231e777eef6d95831337b24ac9bd896a361",
+      "timingStatus": "estimated",
+      "cues": [
+        {
+          "start": 16.1,
+          "end": 19.1,
+          "text": "Letzten Sommer war ich in Berlin,"
+        },
+        {
+          "start": 19.9,
+          "end": 22.55,
+          "text": "ich blieb dort eine ganze Woche."
+        },
+        {
+          "start": 23.25,
+          "end": 26.25,
+          "text": "Ich besuchte das Brandenburger Tor,"
+        },
+        {
+          "start": 26.95,
+          "end": 30.1,
+          "text": "und machte viele schöne Fotos."
+        },
+        {
+          "start": 30.95,
+          "end": 34,
+          "text": "Am Abend ging ich mit Freunden aus,"
+        },
+        {
+          "start": 34.75,
+          "end": 37.75,
+          "text": "wir aßen zusammen im Restaurant."
+        },
+        {
+          "start": 38.5,
+          "end": 41.35,
+          "text": "Ich fuhr oft mit Bus und U-Bahn,"
+        },
+        {
+          "start": 42.2,
+          "end": 46.4,
+          "text": "und entdeckte jeden Tag etwas Neues."
+        },
+        {
+          "start": 49.5,
+          "end": 52.35,
+          "text": "Zwei Städte, so viel zu erleben,"
+        },
+        {
+          "start": 53.05,
+          "end": 56.1,
+          "text": "so viele Orte, die ich noch nicht kannte."
+        },
+        {
+          "start": 56.8,
+          "end": 60,
+          "text": "Ich habe schöne Tage verbracht,"
+        },
+        {
+          "start": 60.7,
+          "end": 64.45,
+          "text": "und denke gern an diese Reise."
+        },
+        {
+          "start": 77.8,
+          "end": 81.1,
+          "text": "Danach fuhr ich mit dem Zug nach Hamburg,"
+        },
+        {
+          "start": 81.75,
+          "end": 84.9,
+          "text": "die Fahrt war angenehm und ruhig."
+        },
+        {
+          "start": 85.55,
+          "end": 88.15,
+          "text": "Am Hafen sah ich große Schiffe,"
+        },
+        {
+          "start": 88.8,
+          "end": 92.2,
+          "text": "und machte einen Spaziergang an der Elbe."
+        },
+        {
+          "start": 92.8,
+          "end": 96.1,
+          "text": "Am nächsten Tag besuchte ich den Fischmarkt,"
+        },
+        {
+          "start": 96.7,
+          "end": 100.15,
+          "text": "und probierte ein frisches Fischbrötchen."
+        },
+        {
+          "start": 100.7,
+          "end": 103.9,
+          "text": "Am Abend saß ich an der Alster,"
+        },
+        {
+          "start": 104.5,
+          "end": 107.4,
+          "text": "und genoss die Ruhe am Wasser."
+        },
+        {
+          "start": 108.5,
+          "end": 111.4,
+          "text": "Zwei Städte, so viel zu erleben,"
+        },
+        {
+          "start": 112.1,
+          "end": 115.2,
+          "text": "so viele Orte, die ich noch nicht kannte."
+        },
+        {
+          "start": 115.85,
+          "end": 119.05,
+          "text": "Ich habe schöne Tage verbracht,"
+        },
+        {
+          "start": 119.7,
+          "end": 123.25,
+          "text": "und denke gern an diese Reise."
+        },
+        {
+          "start": 124.2,
+          "end": 126.85,
+          "text": "Berlin ist größer und lebhafter,"
+        },
+        {
+          "start": 127.45,
+          "end": 129.95,
+          "text": "Hamburg fand ich ruhiger und grüner."
+        },
+        {
+          "start": 130.6,
+          "end": 133.25,
+          "text": "In Berlin gefiel mir das Nachtleben,"
+        },
+        {
+          "start": 133.9,
+          "end": 136.45,
+          "text": "in Hamburg war der Hafen am schönsten."
+        },
+        {
+          "start": 137.2,
+          "end": 139.95,
+          "text": "Beide Städte haben mir gefallen,"
+        },
+        {
+          "start": 140.65,
+          "end": 146.4,
+          "text": "doch Hamburg passt ein bisschen besser zu mir."
+        }
+      ]
     },
     {
       "level": "A2",
