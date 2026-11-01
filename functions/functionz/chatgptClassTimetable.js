@@ -91,7 +91,7 @@ async function resolveStudentClass(db, data) {
   // or choose one based only on "A1" / "B1" course level.
   const names = [...new Set([
     data.className, data.classname, data.class, data.groupName,
-    data.cohortName, data.group, data.cohort,
+    data.cohortName, data.group, data.cohort, data.classId, data.assignedClassId,
   ].map(text).filter((value) => value && value.length <= 160))];
   if (!names.length) return { status: "class_not_found" };
   const results = new Map();
@@ -112,18 +112,20 @@ async function resolveStudentClass(db, data) {
 async function loadClassSessions(db, klass) {
   const coll = db.collection("classSessions");
   const found = new Map();
-  const lookups = [
-    ["classRecordId", klass.id],
-    ["classId", klass.id],
-    ["classId", classNameOf(klass)],
-    ["className", classNameOf(klass)],
-  ];
-  for (const [field, value] of lookups) {
-    if (!value) continue;
-    const snap = await coll.where(field, "==", value).limit(100).get();
-    fromSnapshots(snap).forEach((row) => {
-      if (sessionMatchesClass(row, klass) && row.superseded !== true) found.set(row.id, row);
-    });
+  // For modern classes these two indexed equality reads are enough. Only
+  // query legacy name aliases if the canonical ID has no recorded sessions.
+  async function collect(lookups) {
+    for (const [field, value] of lookups) {
+      if (!value) continue;
+      const snap = await coll.where(field, "==", value).limit(100).get();
+      fromSnapshots(snap).forEach((row) => {
+        if (sessionMatchesClass(row, klass) && row.superseded !== true) found.set(row.id, row);
+      });
+    }
+  }
+  await collect([["classRecordId", klass.id], ["classId", klass.id]]);
+  if (!found.size) {
+    await collect([["classId", classNameOf(klass)], ["className", classNameOf(klass)]]);
   }
   return [...found.values()];
 }
