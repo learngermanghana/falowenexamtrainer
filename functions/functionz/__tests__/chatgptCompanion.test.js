@@ -214,3 +214,56 @@ describe("B1 original Falowen Course Book reading", () => {
     }
   });
 });
+
+
+describe("A1 and A2 canonical Course Book exports for ChatGPT", () => {
+  test("A1 Day 1 contains the real greeting text and all ten original unanswered questions", () => {
+    const overview = lessonContentResponse("A1", 1, "overview");
+    expect(overview.available).toBe(true);
+    expect(overview.availableSections).toContain("reading");
+    expect(overview.availableSections).toContain("workbook");
+    expect(overview.workbookChapters).toEqual(expect.arrayContaining([
+      expect.objectContaining({ chapter: "0.1", assignmentId: "A1-0.1" }),
+    ]));
+    const reading = lessonContentResponse("A1", 1, "reading");
+    expect(reading.material.paragraphs[0]).toMatch(/^Guten Morgen! Wie geht es dir\?/);
+    expect(reading.material.questions).toHaveLength(10);
+    expect(reading.material.questions[0].question).toMatch(/7:00 Uhr/);
+    expect(reading.material.questions[0].options).toHaveLength(4);
+    expect(reading.material.questions[0]).not.toHaveProperty("answer");
+    const grammar = lessonContentResponse("A1", 1, "grammar");
+    expect(grammar.material.fullExplanationIncluded).toBe(false);
+    expect(grammar.material.noteLinks[0].url).toContain("/campus/course/");
+  });
+
+  test("A1 assigns distinct verified workbook chapters to their actual days", () => {
+    const day2 = lessonContentResponse("A1", 2, "workbook");
+    expect(day2.available).toBe(true);
+    expect(day2.material.chapters.map(x => x.assignmentId)).toEqual(
+      expect.arrayContaining(["A1-0.2", "A1-1.1"]));
+    const day22 = lessonContentResponse("A1", 22, "workbook");
+    expect(day22.material.chapters.some(x => x.assignmentId === "A1-14.1")).toBe(true);
+    expect(day22.material.chapters.every(x => x.route.startsWith("/campus/"))).toBe(true);
+    const day5 = lessonContentResponse("A1", 5, "reading");
+    expect(day5.available).toBe(false); // Do not invent unexported JSX text.
+  });
+
+  test("A2 has original reading passage and questions for all 28 Course Book days", () => {
+    for (let day = 1; day <= 28; day += 1) {
+      const reading = lessonContentResponse("A2", day, "reading");
+      expect(reading.available).toBe(true);
+      expect(reading.material.text.length).toBeGreaterThan(45);
+      expect(reading.material.questions.length).toBeGreaterThan(0);
+      expect(reading.material.questions[0]).not.toHaveProperty("answerIndex");
+      expect(lessonContentResponse("A2", day, "grammar").material.fullExplanationIncluded).toBe(false);
+    }
+    const first = lessonContentResponse("A2", 1, "reading");
+    expect(first.material.title).toBe("Neu im Büro");
+    expect(first.material.text).toMatch(/seit Montag neu bei der Firma Keller/);
+    expect(first.material.questions[0].question).toMatch(/Seit wann/);
+    const listening = lessonContentResponse("A2", 1, "listening");
+    expect(listening.material.task).toMatch(/Höre den Text zweimal/);
+    expect(listening.material.questions).toHaveLength(5);
+    expect(listening.material).not.toHaveProperty("transcript");
+  });
+});
