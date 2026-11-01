@@ -27,9 +27,11 @@ import { A2_LISTENING_TASKS, A2_LISTENING_MODES } from "../web/src/data/a2Listen
 import { A2_REQUIRED_WRITING_DAYS } from "../web/src/data/a2WritingSchedule.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
+import { extractGrammarTeaching, grammarComponentPaths } from "./extractFalowenGrammar.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "functions/data/chatgptLessonContent.generated.json");
+const grammarSources = grammarComponentPaths(root);
 const text = (value, length = 1500) => String(value || "").trim().slice(0, length);
 const strings = (items, maximum = 20, length = 1500) =>
   (Array.isArray(items) ? items : []).slice(0, maximum).map((v) => text(v, length)).filter(Boolean);
@@ -130,6 +132,7 @@ for (let day = 1; day <= 28; day += 1) {
   const listening = A2_LISTENING_TASKS[day];
   const grammarLink = A2_GRAMMAR_ROUTE_ENTRIES.find((entry) => Number(entry.day) === day);
   const writingRequired = A2_REQUIRED_WRITING_DAYS.includes(day);
+  const originalGrammar = extractGrammarTeaching(grammarSources.A2[day]);
   A2[String(day)] = {
     level: "A2", day, chapter: text(lesson.chapter || reading.chapter, 25),
     title: text(lesson.title || lesson.topic, 240),
@@ -148,7 +151,7 @@ for (let day = 1; day <= 28; day += 1) {
     grammar: {
       focus: text(lesson.grammar_topic || lesson.grammarFocus, 320),
       notesUrl: text(grammarLink?.route || lesson.grammarPage, 450),
-      fullExplanationIncluded: false,
+      ...originalGrammar,
     },
     ...(listening && listening.mode !== A2_LISTENING_MODES.NONE ? { listening: {
       task: text(listening.task, 950), mode: text(listening.mode, 50),
@@ -211,6 +214,7 @@ for (let day = 1; day <= 28; day += 1) {
       }
       : null;
   const writing = B1_WRITING_TASKS[day] || null;
+  const originalGrammar = extractGrammarTeaching(grammarSources.B1[day]);
   B1[String(day)] = {
     level: "B1", day,
     chapter: text(lesson.chapter || lesson.displayChapter, 20),
@@ -220,6 +224,10 @@ for (let day = 1; day <= 28; day += 1) {
     grammarFocus: text(lesson.grammar_topic || lesson.grammarFocus, 260),
     skillFocus: "lesen_hoeren",
     campusTabs: ["Grammar", "Sprechen", "Schreiben", "Lesen", "Hören", "Submit"],
+    grammar: {
+      focus: text(lesson.grammar_topic || lesson.grammarFocus, 320),
+      ...originalGrammar,
+    },
     ...(reading ? { reading: {
       ...reading,
       instructions: text(task?.instructions, 700),
@@ -304,6 +312,11 @@ for (let day = 1; day <= 28; day += 1) {
   B2[String(day)] = item;
 }
 
+const grammarCoverage = Object.fromEntries(["A2", "B1"].map((level) => [level,
+  Object.values(level === "A2" ? A2 : B1).filter((entry) => entry.grammar?.fullExplanationIncluded).length]));
+if (grammarCoverage.A2 < 20 || grammarCoverage.B1 < 20) {
+  throw new Error("Insufficient actual grammar pages exported: " + JSON.stringify(grammarCoverage));
+}
 const artifact = {
   schemaVersion: 1,
   provenance: "Learner-facing Falowen Course Book content compiled from canonical workbook and lesson sources",
@@ -316,4 +329,4 @@ if (serialized.includes('"answerIndex"') || serialized.includes('"sampleAnswer"'
 }
 fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, serialized, "utf8");
-process.stdout.write("Generated A1 + 28 A2 + 28 B1 + 28 B2 ChatGPT student lessons (" + Buffer.byteLength(serialized) + " bytes)\n");
+process.stdout.write("Generated A1–B2 student lessons and original grammar teaching " + JSON.stringify(grammarCoverage) + " (" + Buffer.byteLength(serialized) + " bytes)\n");
