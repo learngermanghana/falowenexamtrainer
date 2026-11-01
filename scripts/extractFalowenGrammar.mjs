@@ -68,6 +68,37 @@ function literalTeaching(ast) {
     } : null;
   }).filter(Boolean);
 }
+function inlineGrammarProps(ast) {
+  // A2 Day 17 renders grammar content as literal props on its existing
+  // A2MiniLearningBlock. Only teaching props are read; never its questions,
+  // answer indices, feedback, or quiz explanation props.
+  return findNodes(ast, (n) => n.type === "JSXElement" &&
+    tag(n) === "A2MiniLearningBlock").map((element) => {
+    const props = {};
+    for (const attr of element.openingElement.attributes || []) {
+      if (attr.type !== "JSXAttribute") continue;
+      const key = attr.name?.name;
+      if (!["title", "english", "rule", "examples", "outputPrompt", "starters"].includes(key)) continue;
+      const value = attr.value?.type === "StringLiteral" ? attr.value.value
+        : attr.value?.type === "JSXExpressionContainer" ? staticValue(attr.value.expression) : null;
+      props[key] = value;
+    }
+    const body = [];
+    for (const key of ["english", "rule", "outputPrompt"]) {
+      const v = safe(props[key], 1200);
+      if (v) body.push(v);
+    }
+    for (const example of Array.isArray(props.examples) ? props.examples.slice(0, 7) : []) {
+      const v = safe(example, 450);
+      if (v) body.push(v);
+    }
+    return body.length ? {
+      title: safe(props.title, 170) || "Grammar teaching",
+      explanation: body.join("\n").slice(0, 2700),
+    } : null;
+  }).filter(Boolean);
+}
+
 function jsxTeaching(ast) {
   // Later A2 lessons use a local SectionCard/Section React wrapper whose
   // visible title is a literal JSX attribute, not an h2. The wrapper is
@@ -93,7 +124,7 @@ function jsxTeaching(ast) {
 export function extractGrammarTeaching(filePath) {
   const source = fs.readFileSync(filePath, "utf8");
   const ast = parse(source, { sourceType: "module", plugins: ["jsx", "typescript"] });
-  const sections = [...jsxTeaching(ast.program), ...literalTeaching(ast.program)].slice(0, 8);
+  const sections = [...jsxTeaching(ast.program), ...literalTeaching(ast.program), ...inlineGrammarProps(ast.program)].slice(0, 8);
   return {
     source: "Falowen original learner-facing grammar teaching page",
     fullExplanationIncluded: sections.length > 0,
