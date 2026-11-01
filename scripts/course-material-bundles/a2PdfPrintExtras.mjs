@@ -102,7 +102,7 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
   // may lack any marker, so match their specific summary (never exercise text).
   for (const details of root.querySelectorAll("details")) {
     const summary = details.querySelector(":scope > summary");
-    if (/^Teacher\\s+lecture\\s+video(?:\\s*[·:–-]|$)/i.test(normalize(summary?.textContent))) {
+    if (/^Teacher\s+lecture\s+video(?:\s*[·:–-]|$)/i.test(normalize(summary?.textContent))) {
       hide(details, "inline-teacher-lecture");
     }
   }
