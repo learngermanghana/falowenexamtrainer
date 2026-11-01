@@ -66,6 +66,34 @@ describe("Falowen ChatGPT read-only records", () => {
     expect(progress.assignments[0].submissionUrl).toContain("/campus/course/lesson/A2/");
   });
 
+  test("B2 self-study student sees 28 lesson days, not missing grades", () => {
+    const b2 = { id: "B2-001", data: { studentCode: "B2-001", level: "B2", name: "B2 Learner" } };
+    const result = summarizeStudentAssignments(b2, []);
+    expect(result.level).toBe("B2");
+    expect(result.courseMode).toBe("self_study");
+    expect(result.totalSelfStudyLessons).toBe(28);
+    expect(result.totalTutorAssignments).toBe(0);
+    expect(result.completedCount).toBeNull();
+    expect(result.completionAvailable).toBe(false);
+    expect(result.assignments[0]).toMatchObject({
+      day: 1, status: "self_study", completionVerified: false,
+      lessonUrl: expect.stringContaining("/campus/course/lesson/B2/1"),
+    });
+    expect(result.assignments[0].title).toMatch(/Umweltschutz/);
+    expect(result.assignments.every((row) => !("bestRecordedScore" in row))).toBe(true);
+  });
+
+  test("C1 self-study is recognised and C2 is not incorrectly relabelled A1", () => {
+    const c1 = summarizeStudentAssignments({ id: "C1", data: { level: "C1" } }, []);
+    expect(c1.level).toBe("C1");
+    expect(c1.courseMode).toBe("self_study");
+    expect(c1.totalSelfStudyLessons).toBeGreaterThan(0);
+    const c2 = summarizeStudentAssignments({ id: "C2", data: { level: "C2" } }, []);
+    expect(c2.level).toBe("C2");
+    expect(c2.totalTutorAssignments).toBe(0);
+    expect(c2.clarification).toMatch(/not yet available/);
+  });
+
   test("reports a score when a canonical tutor assignment has been marked", () => {
     const original = summarizeStudentAssignments(student, []);
     const first = original.assignments[0];
