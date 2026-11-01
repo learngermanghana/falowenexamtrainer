@@ -1425,6 +1425,162 @@
       "source": "Owner-supplied German sung lyrics and verified public R2 object key, 2026-11-01. Audio waveform and duration not accessible for cue creation.",
       "timingStatus": "missing",
       "timingMethod": "No invented timestamps. Requires actual recording-specific offline transcription/alignment and ear review."
+    },
+    {
+      "trackId": "r2-a2-day-18-b64_RWluIG5ldWVzIExlYmVuLm1wMw",
+      "objectKey": "music/a2/day-18/Ein neues Leben.mp3",
+      "assignmentKey": "A2-7.18",
+      "title": "Ein neues Leben",
+      "lyrics": "[Verse 1]\nIch bin gerade in Deutschland gelandet,\nmein Studium fängt bald an.\nAm Bahnhof suche ich den Zug,\nund schaue auf den Stadtplan.\n\nMein Zimmer liegt nicht weit vom Campus,\nich packe meinen Koffer aus.\nJetzt brauche ich ein Bankkonto,\ndamit ich meine Miete zahlen kann.\n\n[Chorus]\nEin neues Land, ein neues Leben,\nso viele Dinge muss ich verstehen.\nIch frage nach, wenn ich Hilfe brauche,\nund finde meinen Weg hier in Deutschland.\n\n[Verse 2]\nAm Montag gehe ich zur Bank,\nmein Reisepass ist mit dabei.\nIch sage: „Ich möchte ein Konto eröffnen,\nist es für Studenten kostenlos?“\n\nDie Mitarbeiterin prüft meine Daten,\nund fragt mich nach meiner Adresse.\nSie erklärt mir das Online-Banking,\nund zeigt mir, wie ich Geld überweise.\n\n[Chorus]\nEin neues Land, ein neues Leben,\nso viele Dinge muss ich verstehen.\nIch frage nach, wenn ich Hilfe brauche,\nund finde meinen Weg hier in Deutschland.\n\n[Outro]\nJetzt habe ich meine IBAN,\ndie Bankkarte kommt bald mit der Post.\nMein neues Leben hat begonnen,\nund ich freue mich auf meine Studienzeit.",
+      "cues": [
+        {
+          "start": 1.25,
+          "end": 4.05,
+          "text": "Ich bin gerade in Deutschland gelandet,"
+        },
+        {
+          "start": 4.75,
+          "end": 7.15,
+          "text": "mein Studium fängt bald an."
+        },
+        {
+          "start": 8.15,
+          "end": 10.65,
+          "text": "Am Bahnhof suche ich den Zug,"
+        },
+        {
+          "start": 10.95,
+          "end": 13.15,
+          "text": "und schaue auf den Stadtplan."
+        },
+        {
+          "start": 13.65,
+          "end": 16.5,
+          "text": "Mein Zimmer liegt nicht weit vom Campus,"
+        },
+        {
+          "start": 16.85,
+          "end": 19.6,
+          "text": "ich packe meinen Koffer aus."
+        },
+        {
+          "start": 20.2,
+          "end": 23.1,
+          "text": "Jetzt brauche ich ein Bankkonto,"
+        },
+        {
+          "start": 23.4,
+          "end": 26.8,
+          "text": "damit ich meine Miete zahlen kann."
+        },
+        {
+          "start": 28.1,
+          "end": 32.6,
+          "text": "Ein neues Land, ein neues Leben,"
+        },
+        {
+          "start": 33,
+          "end": 37.2,
+          "text": "so viele Dinge muss ich verstehen."
+        },
+        {
+          "start": 37.65,
+          "end": 43.25,
+          "text": "Ich frage nach, wenn ich Hilfe brauche,"
+        },
+        {
+          "start": 43.55,
+          "end": 50.4,
+          "text": "und finde meinen Weg hier in Deutschland."
+        },
+        {
+          "start": 55.7,
+          "end": 58.1,
+          "text": "Am Montag gehe ich zur Bank,"
+        },
+        {
+          "start": 58.45,
+          "end": 61.1,
+          "text": "mein Reisepass ist mit dabei."
+        },
+        {
+          "start": 61.45,
+          "end": 64.3,
+          "text": "Ich sage: „Ich möchte ein Konto eröffnen,"
+        },
+        {
+          "start": 64.65,
+          "end": 67.4,
+          "text": "ist es für Studenten kostenlos?“"
+        },
+        {
+          "start": 67.75,
+          "end": 70,
+          "text": "Die Mitarbeiterin prüft meine Daten,"
+        },
+        {
+          "start": 70.25,
+          "end": 72.5,
+          "text": "und fragt mich nach meiner Adresse."
+        },
+        {
+          "start": 72.75,
+          "end": 75.05,
+          "text": "Sie erklärt mir das Online-Banking,"
+        },
+        {
+          "start": 75.3,
+          "end": 77,
+          "text": "und zeigt mir, wie ich Geld überweise."
+        },
+        {
+          "start": 77.45,
+          "end": 82.7,
+          "text": "Ein neues Land, ein neues Leben,"
+        },
+        {
+          "start": 83.05,
+          "end": 88.1,
+          "text": "so viele Dinge muss ich verstehen."
+        },
+        {
+          "start": 88.45,
+          "end": 95,
+          "text": "Ich frage nach, wenn ich Hilfe brauche,"
+        },
+        {
+          "start": 95.35,
+          "end": 103.05,
+          "text": "und finde meinen Weg hier in Deutschland."
+        },
+        {
+          "start": 120.2,
+          "end": 122.7,
+          "text": "Jetzt habe ich meine IBAN,"
+        },
+        {
+          "start": 123,
+          "end": 125.55,
+          "text": "die Bankkarte kommt bald mit der Post."
+        },
+        {
+          "start": 125.8,
+          "end": 128.3,
+          "text": "Mein neues Leben hat begonnen,"
+        },
+        {
+          "start": 128.55,
+          "end": 131.35,
+          "text": "und ich freue mich auf meine Studienzeit."
+        }
+      ],
+      "strictRecordingLyrics": true,
+      "recordingSha256": "43a22c6d964966f63cd0bf31439d7e2c3273adce14ad5002fe7c582156aadc06",
+      "duration": 134.24,
+      "genre": "Gentle piano Afro-Soul",
+      "source": "2026-11-01 user-supplied exact 134.24-second Ein neues Leben.mp3 and song text; matching filename discovered in live R2 library (remote bytes not fingerprint-verified).",
+      "timingStatus": "estimated",
+      "timingMethod": "Waveform-guided approximate per-line cue windows derived from supplied MP3 and known sung order; not word-aligned or ear-certified. Vocal-free la-la interlude is intentionally not represented as text."
     }
   ]
 }
