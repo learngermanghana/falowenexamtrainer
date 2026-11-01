@@ -22,7 +22,9 @@ const MAX_RESULT_ROWS = 40;
 const sha256 = (v) => crypto.createHash("sha256").update(String(v)).digest("hex");
 const randomToken = () => crypto.randomBytes(32).toString("base64url");
 const normalize = (v) => String(v || "").trim();
-const normalizeLevel = (v) => (normalize(v).toUpperCase().match(/\b(A1|A2|B1)\b/) || [])[1] || "";
+// Keep the student level from the live Falowen record. B2/C1 are self-study courses.
+const normalizeLevel = (v) => (normalize(v).toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/) || [])[1] || "";
+const SELF_STUDY_LEVELS = new Set(["B2", "C1", "C2"]);
 const numberOrNull = (v) => v === null || v === undefined || v === "" || !Number.isFinite(Number(v)) ? null : Number(v);
 const isExpired = (value) => {
   const ms = value && typeof value.toMillis === "function" ? value.toMillis() : new Date(value).getTime();
@@ -131,7 +133,45 @@ function scoreRowsForStudent(rows, level) {
 
 function summarizeStudentAssignments(student, rows) {
   const level = studentView(student).level;
-  if (!level) return { error: "An A1, A2 or B1 course level is not set on this account.", campusUrl: SITE + "/campus" };
+  if (!level) return { error: "No supported course level is assigned to this account.", campusUrl: SITE + "/campus" };
+
+  if (SELF_STUDY_LEVELS.has(level)) {
+    // Do not label B2/C1/C2 lessons "missing assignments" or synthesize a tutor score.
+    // These courses use learner-led lesson completion, which can be device-local.
+    const source = getCurriculumEntriesForLevel(level) || [];
+    const days = new Map();
+    source.forEach((entry) => {
+      const day = Number(entry.day ?? entry.assignmentDay ?? entry.displayDay);
+      if (!Number.isInteger(day) || day < 1 || day > 50) return;
+      if (!days.has(day) || (entry.progressionEligible && !days.get(day).progressionEligible)) {
+        days.set(day, entry);
+      }
+    });
+    const lessons = [...days.entries()].sort(([a], [b]) => a - b).map(([day, entry]) => ({
+      day,
+      title: normalize(entry.lessonTitle || entry.topic || entry.title || "Lesson").slice(0, 180),
+      goal: normalize(entry.goal).slice(0, 500),
+      grammarFocus: normalize(entry.grammar_topic || entry.grammarFocus).slice(0, 250),
+      status: "self_study",
+      completionVerified: false,
+      lessonUrl: lessonUrl(level, { dayNumber: day, displayChapter: entry.displayChapter || entry.chapter }),
+    }));
+    return {
+      level,
+      courseMode: "self_study",
+      totalCourseItems: lessons.length,
+      totalSelfStudyLessons: lessons.length,
+      totalTutorAssignments: 0,
+      completedCount: null,
+      completionAvailable: false,
+      clarification: lessons.length
+        ? "These are your self-study Course Book lessons, not tutor-submission assignments. ChatGPT cannot verify device-local completion; use Falowen Campus to review actual progress."
+        : "The self-study course is recognised, but its lesson catalogue is not yet available to this plugin. Open Falowen Campus for the latest lessons.",
+      assignments: lessons,
+      campusUrl: SITE + "/campus/course",
+    };
+  }
+
   const { lessons, totalCourseItems } = getAssignmentSummary(level);
   const graded = scoreRowsForStudent(rows, level);
   const byId = new Map();
@@ -181,12 +221,12 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_assignments",
-    description: "List my tutor assignments, recorded grades and links to complete or submit work in Falowen Campus. A missing grade does not prove work is pending.",
+    description: "List my course work and Campus lesson links. A1–B1 have tutor-marked assignments; B2–C2 show self-study lessons without inventing submission or completion status.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_my_falowen_progress",
-    description: "Summarize my own marked tutor assignment completion. Unmarked work may still have been submitted.",
+    description: "Summarize my recorded A1–B1 tutor-assignment completion; for B2–C2 explain that self-study completion is not verified from this connection.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -232,9 +272,33 @@ async function callTool(name, args, student) {
       guidance: "Explain concepts and offer short original practice questions. Do not complete graded coursework for the learner.",
     };
   }
-  if (!view.level) return { error: "An A1, A2 or B1 course level is not set on this account." };
+  if (!view.level) return { error: "No supported course level is assigned to this account." };
+
+  // Lesson lists and self-study progress should not depend on Google Sheets
+  // or incur a scores query for B2/C1/C2.
+  if (SELF_STUDY_LEVELS.has(view.level) && name !== "get_my_falowen_feedback") {
+    const summary = summarizeStudentAssignments(student, []);
+    if (name === "get_my_falowen_progress") {
+      const { assignments, ...result } = summary;
+      return result;
+    }
+    if (name === "get_my_falowen_assignments") {
+      return { ...summary, assignments: summary.assignments.slice(0, MAX_RESULT_ROWS) };
+    }
+  }
+
   const studentCode = normalize(student.data.studentCode || student.data.studentcode || student.id);
-  const rows = await getScoresForStudent(studentCode);
+  let rows;
+  try {
+    rows = await getScoresForStudent(studentCode);
+  } catch (error) {
+    if (!SELF_STUDY_LEVELS.has(view.level)) throw error;
+    return {
+      level: view.level, recentFeedback: [],
+      clarification: "The tutor score sheet is unavailable. This does not mean your self-study lessons are incomplete. Use Falowen Campus for progress.",
+      campusUrl: SITE + "/campus",
+    };
+  }
   if (name === "get_my_falowen_feedback") {
     return {
       level: view.level,
