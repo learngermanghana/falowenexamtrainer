@@ -139,7 +139,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(5);
+      expect(list.data.result.tools).toHaveLength(6);
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
       expect(list.data.result.tools[0].securitySchemes[0].type).toBe("oauth2");
       const unlinked = await postJson(origin + "/api/chatgpt/mcp", {
@@ -230,6 +230,19 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const lesson = await call("get_my_falowen_lesson", { day: 1 });
       expect(lesson.data.result.structuredContent.title).toMatch(/Umweltschutz/);
       expect(lesson.data.result.structuredContent.lessonUrl).toContain("/lesson/B2/1");
+      expect(lesson.data.result.structuredContent.exactContentAvailable).toBe(true);
+      expect(lesson.data.result.structuredContent.courseBookContent.readingTitle)
+        .toBe("Müll vermeiden statt nur besser entsorgen");
+
+      const reading = await call("get_my_falowen_lesson_content", { day: 1, section: "reading" });
+      expect(reading.data.result.structuredContent.material.paragraphs[0]).toMatch(/Papiertonne/);
+      expect(reading.data.result.structuredContent.material.questions[0]).not.toHaveProperty("answerIndex");
+
+      const vocabulary = await call("get_my_falowen_lesson_content", { day: 1, section: "vocabulary" });
+      expect(vocabulary.data.result.structuredContent.material.length).toBeGreaterThan(2);
+      const grammar = await call("get_my_falowen_lesson_content", { day: 1, section: "grammar" });
+      expect(grammar.data.result.structuredContent.material.task).toMatch(/drei Sätzen/);
+
     });
   });
 
