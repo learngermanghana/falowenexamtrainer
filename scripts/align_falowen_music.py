@@ -63,7 +63,7 @@ def monotone_word_matching(expected, observed):
             insert=current[j-1]-1
             best=max(diagonal,delete,insert)
             current[j]=best
-            back[i][j]=1 if equal and best==diagonal else (2 if best==delete else 3)
+            back[i][j]=(1 if equal else 4) if best==diagonal else (2 if best==delete else 3)
         previous=current
     matched=[[] for _ in range(max(line_i for line_i,_ in expected)+1)]
     i,j=n,m
@@ -76,6 +76,9 @@ def monotone_word_matching(expected, observed):
             j-=1
         elif direction==2:
             i-=1
+        elif direction==4:
+            i-=1
+            j-=1
         else:
             j-=1
     for line in matched:
@@ -137,6 +140,13 @@ def match_transcript(lyrics, recognized, duration, minimum_coverage=0.70, minimu
         if end <= start:
             raise ValueError("Non-positive vocal interval at line %d" % (i+1))
         cues.append({"start": round(start,2), "end":round(end,2), "text":line})
+    # Keep adjacent sung lines strictly non-overlapping, including near
+    # consecutive vocals where 0.12s onset padding would otherwise overlap.
+    for index in range(1,len(cues)):
+        if cues[index-1]["end"] >= cues[index]["start"]:
+            cues[index-1]["end"] = round(cues[index]["start"]-0.02,2)
+            if cues[index-1]["end"]<=cues[index-1]["start"]:
+                raise ValueError("Ambiguous overlapping words at line %d" % (index+1))
     return {"cues":cues, "matchCoverage":round(total_ratio,3),
             "weakestLineCoverage":round(min(fractions),3),
             "totalLines":len(lines)}
