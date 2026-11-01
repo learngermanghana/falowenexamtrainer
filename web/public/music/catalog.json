@@ -178,7 +178,7 @@
       "audioUrl": "https://www.falowen.app/api/music?track=a2-day-18-bank",
       "featured": false,
       "attendance": false,
-      "coursebook": false,
+      "coursebook": true,
       "slides": false,
       "objectKey": "music/a2/day-18/die-karte-funktioniert-nicht.mp3",
       "approved": true,
