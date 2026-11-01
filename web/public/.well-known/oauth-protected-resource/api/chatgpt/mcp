@@ -1,0 +1,10 @@
+{
+  "resource": "https://www.falowen.app/api/chatgpt/mcp",
+  "authorization_servers": [
+    "https://www.falowen.app/api/chatgpt"
+  ],
+  "scopes_supported": [
+    "falowen:read"
+  ],
+  "resource_documentation": "https://www.falowen.app/help"
+}
