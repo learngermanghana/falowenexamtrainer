@@ -28,7 +28,7 @@ function prepareFromTimetable({ timetable, level, courseContent }) {
   }
 
   const session = timetable.nextSession;
-  const verifiedDay = session.lessonDaySource === "explicit_session_day";
+  const verifiedDay = ["explicit_session_day", "assignment_identity"].includes(session.lessonDaySource);
   const day = verifiedDay && Number.isInteger(session.lessonDay) ? session.lessonDay : null;
   const content = day ? courseContent(level, day) : null;
   const baseResponse = {
