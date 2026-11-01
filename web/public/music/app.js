@@ -325,6 +325,7 @@ function moveTrack(direction = 1) {
     index = 0;
   }
   const track = playbackQueue[(index + direction + playbackQueue.length) % playbackQueue.length];
+  if (selected?.id !== track.id) showEnglish = track.level === "A1";
   selected = track;
   setPlayer(track, true);
   if (!byId("song-detail").hidden) renderDetail(track);
