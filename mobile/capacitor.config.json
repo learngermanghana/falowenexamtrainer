@@ -1,0 +1,8 @@
+{
+  "appId": "app.falowen.student",
+  "appName": "Falowen",
+  "webDir": "../web/dist",
+  "ios": {
+    "contentInset": "automatic"
+  }
+}
