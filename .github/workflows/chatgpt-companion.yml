@@ -22,8 +22,8 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - run: npm ci --ignore-scripts
-      - run: npm --prefix functions ci --ignore-scripts
+      - run: npm install --no-package-lock --ignore-scripts
+      - run: npm --prefix functions install --no-package-lock --ignore-scripts
       - name: Verify OAuth constraints and student data scope
         run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js
       - name: Verify JavaScript syntax
