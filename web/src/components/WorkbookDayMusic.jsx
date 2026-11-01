@@ -41,6 +41,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const [packs, setPacks] = useState({});
   const [selectedId, setSelectedId] = useState("");
   const [state, setState] = useState("loading");
+  const [recordingLyrics, setRecordingLyrics] = useState(null);
 
   useEffect(() => {
     if (!valid) return undefined;
@@ -81,16 +82,44 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   }, [courseLevel, lessonDay, valid]);
 
   const chosen = useMemo(() => songs.find(song => song.id === selectedId) || null, [songs, selectedId]);
-  // Never show draft lyrics for another recording or an unapproved audio version.
-  const approvedLyrics = chosen && !chosen.autoDiscovered && chosen.assignmentKey
+
+  // The existing music-lyrics API verifies the EXACT R2 MP3 key and excludes
+  // stale or mismatched sidecars. New recordings should not need a workbook
+  // code release before their owner-approved lyrics can be displayed.
+  useEffect(() => {
+    if (!chosen) return undefined;
+    const controller = new AbortController();
+    setRecordingLyrics(null);
+    fetch("/api/music-lyrics?track=" + encodeURIComponent(chosen.id), {
+      signal: controller.signal,
+      cache: "no-cache",
+    }).then(response => response.ok ? response.json() : null).then(data => {
+      if (controller.signal.aborted) return;
+      if (data?.objectKey === chosen.objectKey && typeof data.lyrics === "string" && data.lyrics.trim()) {
+        setRecordingLyrics({ id: chosen.id, objectKey: chosen.objectKey, lyrics: data.lyrics.trim() });
+      }
+    }).catch(() => {
+      // Missing lyric sidecars are normal for newly uploaded MP3s.
+      // Playback always remains available, and a different song's text
+      // must never appear in this lesson.
+    });
+    return () => controller.abort();
+  }, [chosen?.id, chosen?.objectKey]);
+
+  // Keep the older approved learning packs as a fallback for curated songs.
+  // Never display unapproved studio drafts as recording-matched lyric sheets.
+  const legacyLyrics = chosen && !chosen.autoDiscovered && chosen.assignmentKey
     && packs[chosen.id]?.assignmentKey === chosen.assignmentKey
     ? String(packs[chosen.id]?.lyrics || "").trim() : "";
+  const approvedLyrics = recordingLyrics?.id === chosen?.id &&
+    recordingLyrics?.objectKey === chosen?.objectKey
+    ? recordingLyrics.lyrics : legacyLyrics;
 
   if (!valid) return null;
 
   return (
     <section data-workbook-music="true" data-music-level={courseLevel} data-music-day={lessonDay}
-      style={{ ...(compact ? {} : styles.card), display: "grid", gap: 14, padding: compact ? "18px 14px" : undefined, minWidth: 0,
+      style={{ ...(compact ? {} : styles.card), display: "grid", gap: 14, alignContent: "start", gridAutoRows: "max-content", padding: compact ? "18px 14px" : undefined, minWidth: 0,
         border: "1px solid #9bcdb8", borderRadius: 20,
         background: "radial-gradient(circle at 94% 7%, rgba(194,244,176,.42), transparent 44%), linear-gradient(145deg,#f0fcf4,#f0f6ff 64%,#fffdf1)" }}>
       <div style={{ display: "grid", gap: 5 }}>
@@ -125,8 +154,10 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
         </p>
       ) : null}
       {chosen ? (
-        <div style={{ display: "grid", gap: 11, padding: 18, background: "rgba(255,255,255,.86)",
-          border: "1px solid #c4e0d4", borderRadius: 16, boxShadow: "0 12px 28px rgba(18,74,61,.07)" }}>
+        <div data-workbook-song-card="true" style={{ display: "flex", flexDirection: "column", justifyContent: "flex-start",
+          alignItems: "stretch", gap: 12, padding: 16, minWidth: 0, width: "100%", height: "auto",
+          background: "rgba(255,255,255,.94)", border: "1px solid #c4e0d4",
+          borderRadius: 16, boxShadow: "0 12px 28px rgba(18,74,61,.07)" }}>
           {songs.length > 1 ? (
             <label style={{ display: "grid", gap: 5, fontWeight: 700, color: "#164e36" }}>
               Choose a song for this day
@@ -137,9 +168,20 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
               </select>
             </label>
           ) : null}
-          <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{chosen.title}</h3>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+            <span aria-hidden="true" style={{ display: "grid", placeItems: "center", flex: "0 0 48px",
+              width: 48, height: 48, fontSize: 23, borderRadius: 12, color: "#f1fff3",
+              background: "linear-gradient(145deg,#235d4c,#173a52)" }}>♫</span>
+            <div style={{ minWidth: 0 }}>
+              <span style={{ color: "#567768", fontWeight: 800, fontSize: 11, letterSpacing: ".05em" }}>
+                {courseLevel} · DAY {lessonDay} · LISTEN
+              </span>
+              <h3 style={{ margin: "3px 0 0", fontSize: "1.14rem", lineHeight: 1.4, color: "#163f35" }}>{chosen.title}</h3>
+            </div>
+          </div>
           <audio key={chosen.id} data-music-audio="true" controls preload="none"
-            src={chosen.audioUrl} style={{ width: "100%" }}>
+            src={chosen.audioUrl} style={{ display: "block", width: "100%", maxWidth: "100%",
+              height: 50, minHeight: 50, maxHeight: 50, alignSelf: "stretch", flex: "0 0 50px" }}>
             Your browser does not support this audio player.
           </audio>
           <a href={listenLinkFor(chosen)} target="_blank" rel="noopener noreferrer"
@@ -156,7 +198,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
             </details>
           ) : (
             <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
-              Reviewed lyrics have not been published for this recording yet.
+              Reviewed lyrics have not been published for this recording yet. You can still listen; line highlighting will be available after the matching lyrics and timings are added.
             </p>
           )}
         </div>
