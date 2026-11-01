@@ -5,6 +5,7 @@ on:
     paths:
       - "functions/functionz/chatgptCompanion.js"
       - "functions/functionz/__tests__/chatgptCompanion.test.js"
+      - "functions/functionz/__tests__/chatgptCompanion.integration.test.js"
       - "functions/functionz/paymentAwareApp.js"
       - "web/src/components/ChatGPTConnectPage.jsx"
       - "web/src/App.js"
@@ -25,7 +26,7 @@ jobs:
       - run: npm install --no-package-lock --ignore-scripts
       - run: npm --prefix functions install --no-package-lock --ignore-scripts
       - name: Verify OAuth constraints and student data scope
-        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js
+        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js
       - name: Verify JavaScript syntax
         run: |
           node --check functions/functionz/chatgptCompanion.js
