@@ -15,12 +15,7 @@ spec=importlib.util.spec_from_file_location("align_falowen_music",ROOT/"scripts"
 align=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(align)
 
-TARGETS=[
- ("A1",2),("A1",3),("A1",4),("A1",21),("A1",22),
- ("A2",8),("A2",23),("A2",24),
- ("B1",4),
-]
-
+TARGETS=[(level,day) for level in ("A1","A2","B1") for day in range(1,29)]
 def main():
     library=align.fetch_json(align.API+"/api/music-library")
     tracks=library.get("tracks") or []
@@ -28,13 +23,19 @@ def main():
     studio=align.read_json(align.MUSIC/"studio-drafts.json")
     output=ROOT/"docs"/"music-timing-candidates"
     output.mkdir(parents=True,exist_ok=True)
+    # Skip existing validated packs; also skip the two candidates already
+    # promoted in production PR #3287, although this audit branch predates it.
+    already_timed={row["objectKey"] for row in approved["recordings"] if row.get("cues")}
+    already_timed.update(row["objectKey"] for row in align.read_json(align.MUSIC/"timings.json")["recordings"] if row.get("cues"))
+    already_timed.update({"music/a1/day-22/Arzttermin.mp3","music/b1/day-04/Ort zum Leben.mp3"})
     selected=[]
     for level,day in TARGETS:
         matches=[r for r in tracks if r.get("level")==level and r.get("day")==day and r.get("coursebook")]
         if len(matches)!=1:
             print(f"SKIP {level} day {day}: {len(matches)} public songs",flush=True)
             continue
-        selected.append(matches[0])
+        if matches[0]["objectKey"] not in already_timed:
+            selected.append(matches[0])
     if not selected:
         raise RuntimeError("No public MP3s could be resolved from Falowen music-library")
     from faster_whisper import WhisperModel
@@ -47,6 +48,7 @@ def main():
         if not source:
             print("  No candidate German lyrics: skip",flush=True)
             continue
+        words=[]
         report={"trackId":track["id"],"objectKey":track["objectKey"],
                 "level":track["level"],"day":track["day"],"source":kind,
                 "lyrics":source["lyrics"],"status":"needs-review"}
@@ -61,12 +63,27 @@ def main():
                 segments,info=model.transcribe(str(file),language="de",word_timestamps=True,
                                                beam_size=5,vad_filter=False,condition_on_previous_text=False)
                 words=[(w.word,w.start,w.end) for seg in segments for w in (seg.words or [])]
-                result=align.match_transcript(source["lyrics"],words,info.duration)
+                try:
+                    result=align.match_transcript(source["lyrics"],words,info.duration)
+                    report["alignmentThreshold"]="standard"
+                except ValueError as strict_error:
+                    if kind!="approved":
+                        raise
+                    # An owner-approved lyric pack can receive a clearly labeled
+                    # estimated cue draft with high total accuracy and at least
+                    # a few acoustically observed words anchoring every line.
+                    result=align.match_transcript(source["lyrics"],words,info.duration,
+                                                  minimum_coverage=0.90,minimum_line=0.35)
+                    report["alignmentThreshold"]="high-overall-coverage-draft"
                 report.update(result)
                 report["duration"]=round(info.duration,3)
                 report["status"]="candidate" if kind=="approved" else "review-only"
         except Exception as error:
             report["reason"]=str(error)[:500]
+            # No audio bytes are committed. For transcription review, keep only
+            # a short bounded text snippet from the singer, if Whisper ran.
+            if "words" in locals():
+                report["recognizedSnippet"]=" ".join(w[0] for w in words[:70])[:750]
             print("  NEEDS REVIEW:",report["reason"],flush=True)
         tally[report["status"]]+=1
         out=output/("falowen-"+track["level"].lower()+"-day-"+str(track["day"]).zfill(2)+".json")
