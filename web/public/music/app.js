@@ -1,5 +1,5 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
-import { buildPlaybackQueue } from "./playback-queue.js?v=20261028-shuffle";
+import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
 import { matchingEnglishTranslation, matchingDraftEnglishTranslation } from "./english-translations.js?v=20261101-draft";
@@ -63,14 +63,33 @@ let followLyrics = true;
 let highlightedLine = -1;
 let playbackQueue = [];
 let playbackTracks = [];
-let shuffleEnabled = false;
-try { shuffleEnabled = localStorage.getItem("falowen_music_shuffle") === "1"; } catch {}
+let queueScope = "all"; // All published songs by default, not a one-song filtered view.
+let shuffleEnabled = true;
+let playbackRequested = false;
+let playAttemptToken = 0;
+let pendingBackgroundDetail = false;
+const failedTrackIds = new Set();
+try {
+  const savedShuffle = localStorage.getItem("falowen_music_shuffle");
+  if (savedShuffle !== null) shuffleEnabled = savedShuffle === "1";
+} catch {}
 byId("shuffle").checked = shuffleEnabled;
-byId("shuffle").addEventListener("change", () => {
-  shuffleEnabled = byId("shuffle").checked;
-  playbackQueue = buildPlaybackQueue(playbackTracks, current?.id, shuffleEnabled);
-  if (shuffleEnabled) { byId("repeat").checked = false; audio.loop = false; }
-  try { localStorage.setItem("falowen_music_shuffle", shuffleEnabled ? "1" : "0"); } catch {}
+function rebuildPlaybackQueue(track = current || selected) {
+  playbackTracks = queueScope === "selection" && visibleTracks.length ? [...visibleTracks] : [...catalog];
+  if (track && !playbackTracks.some(item => item.id === track.id)) playbackTracks.unshift(track);
+  playbackQueue = buildPlaybackQueue(playbackTracks, track?.id, shuffleEnabled);
+}
+function setShuffle(enabled) {
+  shuffleEnabled = enabled;
+  byId("shuffle").checked = enabled;
+  if (enabled) { byId("repeat").checked = false; audio.loop = false; }
+  rebuildPlaybackQueue();
+  try { localStorage.setItem("falowen_music_shuffle", enabled ? "1" : "0"); } catch {}
+}
+byId("shuffle").addEventListener("change", () => setShuffle(byId("shuffle").checked));
+byId("queue-scope").addEventListener("change", () => {
+  queueScope = byId("queue-scope").value === "selection" ? "selection" : "all";
+  rebuildPlaybackQueue();
 });
 
 const FAV_KEY = "falowen_music_favorites_v1";
@@ -186,12 +205,30 @@ async function shareCurrent() {
     setShareText("Copy page URL");
   }
 }
+function playCurrentTrack() {
+  if (!current) return;
+  const attempt = ++playAttemptToken;
+  playbackRequested = true;
+  try {
+    const started = audio.play();
+    if (started && typeof started.catch === "function") {
+      started.catch(error => { if (attempt === playAttemptToken) handlePlaybackFailure(error); });
+    }
+  } catch (error) {
+    if (attempt === playAttemptToken) handlePlaybackFailure(error);
+  }
+}
 function setPlayer(track, start = false) {
   if (!track) return;
-  if (!current || current.id !== track.id) {
-    audio.pause();
+  const changed = !current || current.id !== track.id;
+  if (changed) {
+    // Reuse the same <audio> element so the OS retains the audio session.
+    // Changing src automatically starts loading; avoid a redundant pause/load
+    // cycle at every song boundary, especially while the phone is locked.
+    ++playAttemptToken;
     audio.src = track.audioUrl;
-    audio.load();
+  } else if (start && audio.ended) {
+    audio.currentTime = 0; // A one-track playlist should replay rather than stop.
   }
   current = track;
   audio.dataset.trackId = track.id;
@@ -200,12 +237,14 @@ function setPlayer(track, start = false) {
   byId("player-error").textContent = "";
   audio.playbackRate = Number(byId("speed").value) || 1;
   audio.loop = byId("repeat").checked;
+  audio.preload = "auto";
   player.hidden = false;
   document.body.classList.add("has-player");
+  updateMediaSession(track);
   if (start) {
     try { localStorage.setItem("falowen_music_recent", track.id); } catch {}
     rememberPlayed(track.id);
-    audio.play().catch(() => { byId("player-error").textContent = "Tap Play in the audio controls to start listening."; });
+    playCurrentTrack();
   }
 }
 function populateFeatured() {
@@ -214,9 +253,11 @@ function populateFeatured() {
   if (featured) {
     prompt.textContent = "Featured: " + featured.title + " · " + (featured.level === "ALL" ? featured.type : featured.level + " · Day " + featured.day) + ". Learn through the recording and a short activity.";
     byId("featured-play").disabled = false;
+    byId("play-all").disabled = false;
   } else {
     prompt.textContent = "New approved songs will appear here.";
     byId("featured-play").disabled = true;
+    byId("play-all").disabled = true;
   }
   try {
     const recentId = localStorage.getItem("falowen_music_recent");
@@ -323,20 +364,102 @@ function renderCatalog() {
   byId("song-count").textContent = visibleTracks.length + (visibleTracks.length === 1 ? " song" : " songs");
 }
 function moveTrack(direction = 1) {
-  if (!playbackQueue.length) return;
-  let index = playbackQueue.findIndex(track => track.id === current?.id);
-  if (shuffleEnabled && direction > 0 && index === playbackQueue.length - 1 && playbackQueue.length > 1) {
-    playbackQueue = buildPlaybackQueue(playbackQueue, current.id, true);
-    index = 0;
-  }
-  const track = playbackQueue[(index + direction + playbackQueue.length) % playbackQueue.length];
+  if (!playbackQueue.length) rebuildPlaybackQueue();
+  const next = advancePlaybackQueue(playbackQueue, current?.id, direction, shuffleEnabled);
+  if (!next.track) return;
+  playbackQueue = next.queue;
+  const track = next.track;
   if (selected?.id !== track.id) showEnglish = track.level === "A1";
   selected = track;
   setPlayer(track, true);
-  if (!byId("song-detail").hidden) renderDetail(track);
-  history.replaceState({trackId: track.id}, "", songUrl(track).pathname + songUrl(track).search);
+  // Updating lyrics and scrolling the page while locked wastes resources and
+  // can delay the next audio.play() call. Refresh the view on unlocking.
+  if (document.hidden) {
+    pendingBackgroundDetail = true;
+  } else {
+    if (!byId("song-detail").hidden) renderDetail(track);
+    history.replaceState({trackId: track.id}, "", songUrl(track).pathname + songUrl(track).search);
+  }
 }
+function handlePlaybackFailure(error) {
+  if (!playbackRequested || !current || error?.name === "AbortError") return;
+  if (error?.name === "NotAllowedError") {
+    playbackRequested = false;
+    byId("player-error").textContent = "Your browser stopped background playback. Unlock your phone and tap Play to continue.";
+    return;
+  }
+  if (failedTrackIds.has(current.id)) return; // An error event and play() rejection can both fire.
+  failedTrackIds.add(current.id);
+  if (playbackQueue.length > 1 && failedTrackIds.size < playbackQueue.length) {
+    moveTrack(1); // Skip an unavailable recording, but never retry endlessly.
+  } else {
+    playbackRequested = false;
+    byId("player-error").textContent = "The playlist could not continue. Check your connection and tap Play again.";
+  }
+}
+function updateMediaSession(track) {
+  const session = navigator.mediaSession;
+  if (!session || !track) return;
+  try {
+    if (typeof MediaMetadata !== "undefined") {
+      session.metadata = new MediaMetadata({
+        title: track.title,
+        artist: "Falowen Music",
+        album: track.level === "ALL" ? "German learning music" : track.level + " German learning songs",
+      });
+    }
+    session.playbackState = audio.paused ? "paused" : "playing";
+  } catch {}
+}
+function updateMediaPosition() {
+  const session = navigator.mediaSession;
+  if (!session?.setPositionState || !Number.isFinite(audio.duration) || audio.duration <= 0) return;
+  try {
+    session.setPositionState({
+      duration: audio.duration,
+      playbackRate: audio.playbackRate,
+      position: Math.min(audio.duration, Math.max(0, audio.currentTime || 0)),
+    });
+  } catch {}
+}
+function setupLockScreenControls() {
+  const session = navigator.mediaSession;
+  if (!session?.setActionHandler) return;
+  const actions = {
+    play: () => playCurrentTrack(),
+    pause: () => { playbackRequested = false; audio.pause(); },
+    nexttrack: () => moveTrack(1),
+    previoustrack: () => moveTrack(-1),
+    seekto: details => {
+      if (Number.isFinite(details.seekTime)) {
+        audio.currentTime = Math.min(Number.isFinite(audio.duration) ? audio.duration : details.seekTime,
+          Math.max(0, details.seekTime));
+      }
+    },
+    seekbackward: details => { audio.currentTime = Math.max(0, audio.currentTime - (details.seekOffset || 10)); },
+    seekforward: details => {
+      const target = audio.currentTime + (details.seekOffset || 10);
+      audio.currentTime = Number.isFinite(audio.duration) ? Math.min(audio.duration, target) : target;
+    },
+  };
+  for (const [action, handler] of Object.entries(actions)) {
+    try { session.setActionHandler(action, handler); } catch {} // Support varies by browser.
+  }
+}
+setupLockScreenControls();
+audio.addEventListener("playing", () => { failedTrackIds.clear(); playbackRequested = true; updateMediaSession(current); });
+audio.addEventListener("play", () => updateMediaSession(current));
+audio.addEventListener("pause", () => { if (!audio.ended) playbackRequested = false; updateMediaSession(current); });
+audio.addEventListener("loadedmetadata", updateMediaPosition);
+audio.addEventListener("seeked", updateMediaPosition);
+audio.addEventListener("ratechange", updateMediaPosition);
 audio.addEventListener("ended", () => { if (!audio.loop) moveTrack(1); });
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden || !pendingBackgroundDetail || !selected) return;
+  pendingBackgroundDetail = false;
+  if (!byId("song-detail").hidden) renderDetail(selected);
+  history.replaceState({trackId: selected.id}, "", songUrl(selected).pathname + songUrl(selected).search);
+});
 byId("next-track")?.addEventListener("click", () => moveTrack(1));
 byId("previous-track")?.addEventListener("click", () => moveTrack(-1));
 function setTab(name) {
@@ -561,8 +684,7 @@ function renderDetail(track) {
 function showSong(track, autoplay = false, navigate = true) {
   if (selected?.id !== track.id) showEnglish = track.level === "A1";
   selected = track;
-  playbackTracks = [...(visibleTracks.some(song => song.id === track.id) ? visibleTracks : catalog)];
-  playbackQueue = buildPlaybackQueue(playbackTracks, track.id, shuffleEnabled);
+  rebuildPlaybackQueue(track);
   setPlayer(track, autoplay);
   renderDetail(track);
   if (navigate && location.pathname + location.search !== songUrl(track).pathname + songUrl(track).search) history.pushState({ trackId: track.id }, "", songUrl(track).pathname + songUrl(track).search);
@@ -592,6 +714,14 @@ byId("clear").addEventListener("click", () => {
   renderCatalog();
 });
 byId("featured-play").addEventListener("click", () => { if (featured) showSong(featured, true); });
+byId("play-all").addEventListener("click", () => {
+  const first = featured || catalog[0];
+  if (!first) return;
+  queueScope = "all";
+  byId("queue-scope").value = "all";
+  setShuffle(true);
+  showSong(first, true);
+});
 byId("detail-play").addEventListener("click", () => { if (selected) setPlayer(selected, true); });
 byId("back-library").addEventListener("click", () => closeDetail());
 document.querySelectorAll(".lesson-tabs button").forEach(button => button.addEventListener("click", () => setTab(button.dataset.tab)));
@@ -607,8 +737,11 @@ byId("show-english").addEventListener("change", () => {
   byId("lyrics-text").querySelectorAll(".english-line").forEach(line => { line.hidden = !showEnglish; });
 });
 byId("speed").addEventListener("change", () => { audio.playbackRate = Number(byId("speed").value) || 1; });
-byId("repeat").addEventListener("change", () => { audio.loop = byId("repeat").checked; });
-audio.addEventListener("error", () => { byId("player-error").textContent = "This song could not be loaded. Please try another track."; });
+byId("repeat").addEventListener("change", () => {
+  if (byId("repeat").checked) setShuffle(false);
+  audio.loop = byId("repeat").checked;
+});
+audio.addEventListener("error", () => handlePlaybackFailure(audio.error));
 window.addEventListener("popstate", () => {
   const id = location.pathname.match(/\/music\/songs\/([a-z0-9-]+)\.html$/)?.[1] || new URLSearchParams(location.search).get("track");
   const track = catalog.find(song => song.id === id);
@@ -639,6 +772,7 @@ async function refreshMusic() {
       && !publishedDays.has(track.level+":"+track.day))];
     populateFilters();
     renderCatalog();
+    if (current) rebuildPlaybackQueue(current);
     byId("discovery-status").textContent="";
     if(selected){lyricsRequests.delete(selected.id);loadPublishedLyrics(selected);}
     const selectedId=initialId || new URLSearchParams(location.search).get("track");
@@ -685,4 +819,5 @@ Promise.all([
   byId("library-status").textContent = error.message;
   byId("song-count").textContent = "Unavailable";
   byId("featured-play").disabled = true;
+  byId("play-all").disabled = true;
 });
