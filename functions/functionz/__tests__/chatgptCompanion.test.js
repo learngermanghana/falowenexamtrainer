@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const {
   oauthParameters, safeStudentAccess, scoreRowsForStudent,
-  summarizeStudentAssignments, constants,
+  summarizeStudentAssignments, lessonContentResponse, constants,
 } = require("../chatgptCompanion");
 
 const validRequest = {
@@ -118,5 +118,54 @@ describe("ChatGPT OAuth static discovery", () => {
     expect(server.client_id_metadata_document_supported).toBe(true);
     expect(protectedResource.resource).toBe(constants.RESOURCE);
     expect(protectedResource.authorization_servers).toEqual([constants.ISSUER]);
+  });
+});
+
+
+describe("Canonical B2 Course Book material in ChatGPT", () => {
+  test("B2 day 1 contains the actual reading text, vocabulary, grammar exercise and review", () => {
+    const overview = lessonContentResponse("B2", 1, "overview");
+    expect(overview.available).toBe(true);
+    expect(overview.readingTitle).toBe("Müll vermeiden statt nur besser entsorgen");
+    expect(overview.grammarExercise).toMatch(/drei Sätzen/);
+    expect(overview.skillFocus).toBe("lesen");
+    expect(overview.availableSections).toContain("reading");
+
+    const vocabulary = lessonContentResponse("B2", 1, "vocabulary");
+    expect(vocabulary.material).toEqual(expect.arrayContaining([
+      expect.objectContaining({ expression: "Abfall vermeiden", meaning: "to prevent waste" }),
+    ]));
+    const grammar = lessonContentResponse("B2", 1, "grammar");
+    expect(grammar.material.introduction).toMatch(/Stoffbeutel/);
+    expect(grammar.material.sections[0].title).toMatch(/indem/);
+    const reading = lessonContentResponse("B2", 1, "reading");
+    expect(reading.material.paragraphs[0]).toMatch(/Papiertonne/);
+    expect(reading.material.questions.length).toBeGreaterThan(2);
+    const review = lessonContentResponse("B2", 1, "review");
+    expect(review.material.length).toBeGreaterThan(1);
+  });
+
+  test("publishes 28 real B2 lessons; avoids inventing unavailable sections", () => {
+    for (let day = 1; day <= 28; day += 1) {
+      expect(lessonContentResponse("B2", day, "overview").available).toBe(true);
+    }
+    expect(lessonContentResponse("B2", 1, "writing").available).toBe(false);
+    expect(lessonContentResponse("B2", 4, "writing").material.instructions.length).toBe(4);
+    expect(lessonContentResponse("B2", 2, "listening").material.audioAvailableInCampus).toBe(true);
+    expect(lessonContentResponse("C1", 1, "reading").available).toBe(false);
+  });
+
+  test("never exports graded answers, model solutions, teacher feedback or audio transcript", () => {
+    const root = path.resolve(__dirname, "../../..");
+    const raw = fs.readFileSync(path.join(root, "functions/data/chatgptLessonContent.generated.json"), "utf8");
+    for (const forbidden of ['"answerIndex"', '"answer"', '"sampleAnswer"', '"sample"',
+      '"starterTemplate"', '"transcript"', '"correctOption"', '"teacherNotes"']) {
+      expect(raw).not.toContain(forbidden);
+    }
+    const reading = lessonContentResponse("B2", 1, "reading");
+    expect(reading.material.questions[0]).toHaveProperty("options");
+    expect(reading.material.questions[0]).not.toHaveProperty("answerIndex");
+    expect(reading.material.questions[0]).not.toHaveProperty("explanation");
+    expect(lessonContentResponse("B2", 2, "listening").material).not.toHaveProperty("transcript");
   });
 });
