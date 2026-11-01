@@ -221,6 +221,8 @@ function playCurrentTrack() {
 function setPlayer(track, start = false) {
   if (!track) return;
   const changed = !current || current.id !== track.id;
+  // Browsing lyrics should not download an entire MP3 until Play is requested.
+  audio.preload = start ? "auto" : "none";
   if (changed) {
     // Reuse the same <audio> element so the OS retains the audio session.
     // Changing src automatically starts loading; avoid a redundant pause/load
@@ -237,7 +239,6 @@ function setPlayer(track, start = false) {
   byId("player-error").textContent = "";
   audio.playbackRate = Number(byId("speed").value) || 1;
   audio.loop = byId("repeat").checked;
-  audio.preload = "auto";
   player.hidden = false;
   document.body.classList.add("has-player");
   updateMediaSession(track);
