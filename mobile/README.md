@@ -6,7 +6,7 @@ The existing Falowen React/Vite site remains in `web/` and keeps its Vercel depl
 
 1. Create a Codemagic account at https://codemagic.io and connect GitHub repository `learngermanghana/falowenexamtrainer`.
 2. Select a `codemagic.yaml` workflow (repository root) on the branch containing these changes.
-3. In the Codemagic **Application settings > Environment variables**, add the six **web Firebase project configuration** values also used in the existing Falowen Vercel frontend. Set their names exactly:
+3. In Codemagic **Application settings > Environment variables**, create/select the application-level group **`falowen_firebase`** and put all six **web Firebase project configuration** values from the existing Falowen Vercel frontend in that group. Both YAML workflows import this group. Set their variable names exactly:
    - `REACT_APP_FIREBASE_API_KEY`
    - `REACT_APP_FIREBASE_AUTH_DOMAIN`
    - `REACT_APP_FIREBASE_PROJECT_ID`
