@@ -1,0 +1,38 @@
+name: Falowen AI documentation contract
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "README.md"
+      - "docs/ai/**"
+      - "docs/workflows/**"
+      - "docs/CHANGELOG.md"
+      - "docs/music-publishing.md"
+      - "web/public/llms.txt"
+      - "web/public/falowen-help.md"
+      - "web/public/falowen-navigation.json"
+      - "scripts/checkAiDocumentation.mjs"
+      - ".github/workflows/ai-documentation.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/ai/**"
+      - "AGENTS.md"
+      - "scripts/checkAiDocumentation.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate source links and public AI documentation consistency
+        run: node scripts/checkAiDocumentation.mjs
