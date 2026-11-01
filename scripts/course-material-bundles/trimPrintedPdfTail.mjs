@@ -74,8 +74,8 @@ export const trimPrintedPdfTail = async (file, { description = "" } = {}) => {
     // Remove only that exact footer, only at the end of a read-only Teil
     // companion, and only when the preceding exercise page is substantive.
     // Never classify any user-provided or question text as a disposable page.
-    const a2Companion = /^A2 Day (?:[1-9]|1\\d|2[0-8]) teil-[1-4] companion$/.test(description);
-    const footerOnly = textPages[index].replace(/\\s+/g, " ").trim() ===
+    const a2Companion = /^A2 Day (?:[1-9]|1\d|2[0-8]) teil-[1-4] companion$/.test(description);
+    const footerOnly = textPages[index].replace(/\s+/g, " ").trim() ===
       "Read-only printed practice. Submit graded coursework in Falowen.";
     if (a2Companion && footerOnly && textPages[index - 1].trim().length > 100) {
       if (removed >= 3) throw new Error("Too many trailing print pages in " + description);
