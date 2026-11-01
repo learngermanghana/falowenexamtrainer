@@ -39,8 +39,12 @@ function referenceLyricsFor(track) {
   const byKey = track.assignmentKey && candidates.find(item => item.assignmentKey === track.assignmentKey);
   const draft = exact || byKey || (candidates.length === 1 ? candidates[0] : null);
   return draft && typeof draft.lyrics === "string" && draft.lyrics.trim()
-    ? {lyrics:draft.lyrics, cues:[], referenceOnly:true, assignmentKey:draft.assignmentKey,
-       draftTitle:draft.title} : null;
+    ? {lyrics:draft.lyrics,
+       cues:track.objectKey && draft.recordingObjectKey === track.objectKey &&
+           draft.timingStatus === "estimated" && /^[a-f0-9]{64}$/.test(draft.recordingSha256 || "")
+          ? draft.cues : [],
+       referenceOnly:true, timingStatus:draft.timingStatus,
+       assignmentKey:draft.assignmentKey, draftTitle:draft.title} : null;
 }
 function lessonFor(track) {
   return resolveRecordingLesson(track,learning,pinnedTracks,publishedLyrics.get(track.id));
@@ -370,9 +374,13 @@ function renderLyrics(lesson) {
   // cue packs support per-line highlighting and seeking.
   byId("follow-lyrics").disabled = false;
   byId("follow-lyrics").checked = followLyrics;
-  byId("follow-label").textContent = renderedCues.length ? "Follow lyrics" : "Follow lyrics (approximate scroll)";
+  byId("follow-label").textContent = renderedCues.length
+    ? (lesson.referenceOnly ? "Follow lyrics (estimated)" : "Follow lyrics")
+    : "Follow lyrics (approximate scroll)";
   const note = el("p", "detail-note", lesson.referenceOnly
-    ? "COURSE DRAFT — These lyrics have not been checked against this MP3. Follow lyrics scrolls the page approximately with playback; it does not synchronize individual words or lines."
+    ? (renderedCues.length
+       ? "COURSE DRAFT — Whisper has estimated these line timings from this MP3, but the German words have not been teacher-verified. The highlighted lines are approximate and need a listening review."
+       : "COURSE DRAFT — These lyrics have not been checked against this MP3. Follow lyrics scrolls the page approximately with playback; it does not synchronize individual words or lines.")
     : lesson.timingStatus === "estimated" && renderedCues.length
       ? "TIMING DRAFT — The highlighted lines use estimated cues for this recording. Exact starts still need a listening review."
       : renderedCues.length ? "Follow the highlighted line, or tap a line to replay it."
