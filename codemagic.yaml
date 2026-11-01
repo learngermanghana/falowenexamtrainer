@@ -1,0 +1,107 @@
+# Falowen's React/Vite site is in web/; this separate iOS wrapper lives in mobile/.
+# Workflows are manual on purpose to preserve free Codemagic build minutes.
+# First, add the six REACT_APP_FIREBASE_* variables in Codemagic app settings.
+workflows:
+  falowen-ios-simulator:
+    name: Falowen iOS - Free unsigned simulator build
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    environment:
+      node: 22
+      xcode: latest
+      vars:
+        REACT_APP_AUTH_CONTINUE_URL: "https://www.falowen.app"
+    scripts:
+      - name: Install Falowen and Capacitor dependencies
+        script: |
+          npm ci --no-audit --no-fund
+          npm ci --prefix web --no-audit --no-fund
+          npm install --prefix mobile --no-audit --no-fund --no-package-lock
+      - name: Check Firebase build configuration
+        script: |
+          for key in REACT_APP_FIREBASE_API_KEY REACT_APP_FIREBASE_AUTH_DOMAIN REACT_APP_FIREBASE_PROJECT_ID REACT_APP_FIREBASE_STORAGE_BUCKET REACT_APP_FIREBASE_MESSAGING_SENDER_ID REACT_APP_FIREBASE_APP_ID; do
+            if [ -z "$(printenv "$key")" ]; then
+              echo "Missing Codemagic environment variable: $key"
+              exit 1
+            fi
+          done
+      - name: Build Falowen web assets
+        script: |
+          npm run build --prefix web
+      - name: Generate iOS Xcode project from Capacitor
+        script: |
+          cd mobile
+          npx cap add ios
+          npx cap sync ios
+      - name: Build unsigned iOS Simulator app
+        script: |
+          xcodebuild build \
+            -project mobile/ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath mobile/ios/output \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - mobile/ios/output/Build/Products/Debug-iphonesimulator/App.app
+      - /tmp/xcodebuild_logs/*.log
+
+  # Optional, for later. Requires paid Apple Developer membership and Codemagic
+  # appstore_credentials environment group; do not run it until Apple is ready.
+  falowen-ios-testflight:
+    name: Falowen iOS - Signed TestFlight upload (Apple required)
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    environment:
+      node: 22
+      xcode: latest
+      groups:
+        - appstore_credentials
+      vars:
+        REACT_APP_AUTH_CONTINUE_URL: "https://www.falowen.app"
+    scripts:
+      - name: Install Falowen and Capacitor dependencies
+        script: |
+          npm ci --no-audit --no-fund
+          npm ci --prefix web --no-audit --no-fund
+          npm install --prefix mobile --no-audit --no-fund --no-package-lock
+      - name: Check Firebase build configuration
+        script: |
+          for key in REACT_APP_FIREBASE_API_KEY REACT_APP_FIREBASE_AUTH_DOMAIN REACT_APP_FIREBASE_PROJECT_ID REACT_APP_FIREBASE_STORAGE_BUCKET REACT_APP_FIREBASE_MESSAGING_SENDER_ID REACT_APP_FIREBASE_APP_ID; do
+            if [ -z "$(printenv "$key")" ]; then
+              echo "Missing Codemagic environment variable: $key"
+              exit 1
+            fi
+          done
+      - name: Build Falowen web assets
+        script: |
+          npm run build --prefix web
+      - name: Generate iOS Xcode project from Capacitor
+        script: |
+          cd mobile
+          npx cap add ios
+          npx cap sync ios
+      - name: Retrieve Apple distribution signing files
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "app.falowen.student" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles --project mobile/ios/App/App.xcodeproj
+      - name: Build signed iOS IPA
+        script: |
+          xcode-project build-ipa \
+            --project "$CM_BUILD_DIR/mobile/ios/App/App.xcodeproj" \
+            --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: false
+        submit_to_app_store: false
