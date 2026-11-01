@@ -19,11 +19,14 @@ const day19 = {
 };
 
 const jsonResponse = payload => ({ ok: true, json: async () => payload });
-const setFetch = ({ catalog = [day18], discovered = [day18, day19], packs = {} } = {}) => {
+const setFetch = ({ catalog = [day18], discovered = [day18, day19], packs = {},
+  translations = [], sidecars = {} } = {}) => {
   global.fetch = jest.fn(url => Promise.resolve(
     jsonResponse(url.includes("catalog.json") ? { tracks: catalog }
       : url.includes("music-library") ? { ok: true, tracks: discovered }
-        : { lessons: packs }),
+      : url.includes("english-translations") ? { recordings: translations }
+      : url.includes("/api/music-lyrics") ? sidecars[new URL(url, "https://www.falowen.app").searchParams.get("track")] || {}
+      : { lessons: packs }),
   ));
 };
 
@@ -121,6 +124,45 @@ describe("A2/B1 optional Music tab", () => {
       expect.stringContaining("/api/music-lyrics?track="), expect.any(Object)));
     expect(screen.queryByText("Incorrect private words")).toBeNull();
     expect(screen.getByText(/Reviewed lyrics have not been published/)).toBeTruthy();
+  });
+
+
+  test.each([["A1",true],["A2",false],["B1",false]])("%s defaults English to the right setting and lets students toggle it", async (level, enabled) => {
+    const song={id:"test-song-"+level.toLowerCase(),title:"Learning song",level,day:13,
+      assignmentKey:level+"-13",coursebook:true,approved:true,
+      objectKey:"music/"+level.toLowerCase()+"/day-13/test.mp3",
+      audioUrl:"https://www.falowen.app/api/music?track=test-song-"+level.toLowerCase()};
+    const lyrics="[Verse 1]\\nDer Hund ist da.\\nIch sehe den Hund.";
+    const pack={objectKey:song.objectKey,lines:[
+      {de:"Der Hund ist da.",en:"The dog is here."},
+      {de:"Ich sehe den Hund.",en:"I see the dog."},
+    ],vocabulary:[{de:"der Hund",en:"the dog"}]};
+    setFetch({catalog:[song],discovered:[],translations:[pack],
+      sidecars:{[song.id]:{objectKey:song.objectKey,lyrics,cues:[]}}});
+    const {container}=render(<WorkbookDayMusic level={level} day={13} hideLegacyNotes />);
+    await waitFor(()=>expect(screen.getByRole("checkbox",{name:"Show English"}).disabled).toBe(false));
+    const input=screen.getByRole("checkbox",{name:"Show English"});
+    expect(container.querySelectorAll('[data-english-line="true"]').length).toBe(enabled?2:0);
+    expect(input.checked).toBe(enabled);
+    fireEvent.click(input);
+    expect(input.checked).toBe(!enabled);
+    expect(container.querySelectorAll('[data-english-line="true"]').length).toBe(enabled?0:2);
+    expect(screen.getByText("der Hund")).toBeTruthy();
+  });
+
+  test("revised MP3 lyrics cannot borrow translation from an older recording",async()=>{
+    const song={id:"r2-a1-day-13-test",title:"German song",level:"A1",day:13,
+      coursebook:true,autoDiscovered:true,
+      objectKey:"music/a1/day-13/new.mp3",
+      audioUrl:"https://www.falowen.app/api/music?track=r2-a1-day-13-test"};
+    setFetch({catalog:[],discovered:[song],
+      translations:[{objectKey:song.objectKey,lines:[{de:"Old German",en:"Old English"}]}],
+      sidecars:{[song.id]:{objectKey:song.objectKey,lyrics:"New German",cues:[]}}});
+    const {container}=render(<WorkbookDayMusic level="A1" day={13} hideLegacyNotes />);
+    await waitFor(()=>expect(screen.getByText("New German")).toBeTruthy());
+    expect(screen.getByRole("checkbox",{name:"Show English"}).disabled).toBe(true);
+    expect(container.querySelector('[data-english-line]')).toBeNull();
+    expect(screen.getByText(/English translation is not available/)).toBeTruthy();
   });
 
   test("no recording means a gentle empty state, not a full music library", async () => {

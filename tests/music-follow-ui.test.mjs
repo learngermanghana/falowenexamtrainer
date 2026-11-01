@@ -7,12 +7,13 @@ import {buildPlaybackQueue} from '../web/public/music/playback-queue.js';
 import {lyricLines,validateCues,activeLyricIndex} from '../web/public/music/lyrics-timing.js';
 import {resolveRecordingLesson} from '../web/public/music/lesson-content.js';
 import {approximateScrollTop} from '../web/public/music/follow-lyrics.js';
+import {matchingEnglishTranslation} from '../web/public/music/english-translations.js';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const recordings=JSON.parse(read('web/public/music/timings.json')).recordings;
 async function room(track,pack){
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
  const w=dom.window;
- Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,approximateScrollTop,
+ Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,approximateScrollTop,matchingEnglishTranslation,
   matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:[]}:String(url).includes('studio-drafts')?{tracks:[{...track,lyrics:'Draft lyrics are different'}]}:{lessons:{}}})});
  const a=w.document.getElementById('audio');
  a.play=()=>Promise.resolve(); a.pause=()=>{};a.load=()=>{};Object.defineProperty(a,'readyState',{value:1});
