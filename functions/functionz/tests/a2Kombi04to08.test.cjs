@@ -111,6 +111,23 @@ test("new A2 Mock 04 Hören is verified as the fourth /25 module without alterin
   assert.equal(sixArtifacts.scoreDocument.maxPoints,100);
   assert.equal(sixArtifacts.scoreDocument.hoerenPending,false);
   assert.deepEqual(sixArtifacts.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
+  const listening07=require("../a2Mock07HoerenKeys");
+  const result07=buildVerifiedA2MockScore({
+    mockId:"a2-mock-07",
+    state:{mockId:"a2-mock-07",assessmentVersion:"four-module-v2",
+      lesenAnswers:sets["a2-mock-07"].reading,hoerenAnswers:listening07},
+    verifiedSections:verification,
+  });
+  assert.equal(result07.overall.points,100);
+  assert.equal(result07.overall.maxPoints,100);
+  assert.equal(result07.sectionScores.hoeren,25);
+  const artifacts07=buildA2MockCompletionArtifacts({
+    mockId:"a2-mock-07",authedUser:{uid:"student-07"},attemptId:"fresh",
+    overall:result07.overall,sectionScores:result07.sectionScores,
+  });
+  assert.equal(artifacts07.scoreDocument.maxPoints,100);
+  assert.equal(artifacts07.scoreDocument.hoerenPending,false);
+  assert.deepEqual(artifacts07.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
   assert.throws(()=>buildVerifiedA2MockScore({
     mockId:"a2-mock-05",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
     verifiedSections:verification,

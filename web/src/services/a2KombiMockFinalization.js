@@ -7,7 +7,7 @@ const read = key => {
 
 export const A2_KOMBI_VERSION = "three-module-v1";
 export const A2_MOCK_04_FOUR_VERSION = "four-module-v2";
-const NEW_HOEREN = new Set(["a2-mock-04", "a2-mock-06"]);
+const NEW_HOEREN = new Set(["a2-mock-04", "a2-mock-06", "a2-mock-07"]);
 export const a2KombiKeys = (mockId, uid) => {
   const prefix = `falowen:a2:kombi:${mockId}:${uid || "guest"}:v1`;
   return {flow:`${prefix}:flow`,lesen:`${prefix}:lesen`,...(NEW_HOEREN.has(mockId)?{hoeren:`${prefix}:hoeren`}:{}),schreiben:`${prefix}:schreiben`,sprechen:`${prefix}:sprechen`};
