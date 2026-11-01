@@ -2,6 +2,7 @@ import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-
 import { buildPlaybackQueue } from "./playback-queue.js?v=20261028-shuffle";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
+import { matchingEnglishTranslation } from "./english-translations.js?v=20261101";
 // Never autoplay on initial load; continue only after a listener starts a song.
 // Falowen Music's static listening room. No authentication, AI calls,
 // Firestore writes or generated media. Optional consented GA4 usage tracking is
@@ -26,6 +27,9 @@ let catalog = [];
 let pinnedTracks = [];
 let learning = {};
 let studioDrafts = [];
+let englishTranslations = {recordings:[]};
+let showEnglish = false;
+let activeEnglishPack = null;
 const normalizedTitle = value => String(value || "").toLocaleLowerCase("de-DE")
   .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
 function referenceLyricsFor(track) {
@@ -346,6 +350,14 @@ function renderLyrics(lesson) {
   const root = byId("lyrics-text");
   root.replaceChildren();
   renderedCues = validateCues(lesson.cues, lesson.lyrics);
+  activeEnglishPack = !lesson.referenceOnly ? matchingEnglishTranslation(
+    englishTranslations, selected?.objectKey, lesson.lyrics) : null;
+  const translateControl = byId("show-english");
+  translateControl.disabled = !activeEnglishPack;
+  translateControl.checked = Boolean(activeEnglishPack && showEnglish);
+  byId("english-status").textContent = activeEnglishPack
+    ? "English is a learning aid; German remains the main lyric."
+    : "English translation has not been published for this recording yet.";
   highlightedLine = -1;
   // Every song with lyrics supports following the page. Only exact published
   // cue packs support per-line highlighting and seeking.
@@ -378,12 +390,21 @@ function renderLyrics(lesson) {
       if (audio.readyState >= 1) seek(); else audio.addEventListener("loadedmetadata", seek, {once:true});
       audio.play().catch(() => {});
     });
-    root.append(line);
+    const pair = el("div", "lyric-pair");
+    pair.append(line);
+    const translated = activeEnglishPack?.lines?.[index - 1]?.en;
+    if (translated) {
+      const english = el("span", "english-line", translated);
+      english.lang = "en";
+      english.hidden = !showEnglish;
+      pair.append(english);
+    }
+    root.append(pair);
   }
   updateLyricHighlight();
   const vocab = byId("vocab-list");
   vocab.replaceChildren();
-  for (const item of lesson.vocabulary || []) {
+  for (const item of (lesson.vocabulary?.length ? lesson.vocabulary : activeEnglishPack?.vocabulary || [])) {
     const details = el("details", "vocab-item");
     const summary = el("summary", "", item.de);
     const meaning = el("p", "", item.en);
@@ -523,6 +544,7 @@ function renderDetail(track) {
   if (description) description.content = "Listen to " + track.title + " on Falowen Music" + (hasLesson ? ", read German lyrics and practise listening." : ".");
 }
 function showSong(track, autoplay = false, navigate = true) {
+  if (selected?.id !== track.id) showEnglish = track.level === "A1";
   selected = track;
   playbackTracks = [...(visibleTracks.some(song => song.id === track.id) ? visibleTracks : catalog)];
   playbackQueue = buildPlaybackQueue(playbackTracks, track.id, shuffleEnabled);
@@ -565,6 +587,10 @@ byId("share").addEventListener("click", shareCurrent);
 byId("detail-share").addEventListener("click", shareCurrent);
 byId("detail-favorite").addEventListener("click", () => { if (selected) toggleFavorite(selected.id); });
 byId("follow-lyrics").addEventListener("change", () => { followLyrics=byId("follow-lyrics").checked; highlightedLine = -2; updateLyricHighlight(); });
+byId("show-english").addEventListener("change", () => {
+  showEnglish = byId("show-english").checked;
+  byId("lyrics-text").querySelectorAll(".english-line").forEach(line => { line.hidden = !showEnglish; });
+});
 byId("speed").addEventListener("change", () => { audio.playbackRate = Number(byId("speed").value) || 1; });
 byId("repeat").addEventListener("change", () => { audio.loop = byId("repeat").checked; });
 audio.addEventListener("error", () => { byId("player-error").textContent = "This song could not be loaded. Please try another track."; });
@@ -620,7 +646,10 @@ Promise.all([
     .catch(() => ({ lessons: {} })),
   fetch("/music/studio-drafts.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : { tracks: [] })
     .catch(() => ({ tracks: [] })),
-]).then(([data, lessons, drafts]) => {
+  fetch("/music/english-translations.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : {recordings:[]})
+    .catch(() => ({recordings:[]})),
+]).then(([data, lessons, drafts, translations]) => {
+  englishTranslations = Array.isArray(translations?.recordings) ? translations : {recordings:[]};
   pinnedTracks = (Array.isArray(data.tracks) ? data.tracks : []).map(safeTrack).filter(Boolean);
   catalog = [...pinnedTracks];
   learning = lessons && typeof lessons.lessons === "object" && lessons.lessons ? lessons.lessons : {};
