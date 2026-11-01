@@ -97,3 +97,38 @@ test("Day 14 preserves graphical-only worksheet pages with real central artwork"
     assert.equal(result.after, 2);
   });
 });
+
+test("A2 trims only a trailing read-only notice page after substantive exercise content", async () => {
+  await withFixture(async (pdf, font) => {
+    pdf.addPage([595.28, 841.89]).drawText(
+      "Hörverstehen. Lesen Sie die fünf Fragen. Wählen Sie A, B oder C und begründen Sie Ihre Wahl.",
+      { x: 50, y: 710, font, size: 12 },
+    );
+    pdf.addPage([595.28, 841.89]).drawText(
+      "Read-only printed practice. Submit graded coursework in Falowen.",
+      { x: 38, y: 810, font, size: 9 },
+    );
+  }, async (filename) => {
+    const trimmed = await trimPrintedPdfTail(filename, { description: "A2 Day 10 teil-4 companion" });
+    assert.deepEqual(trimmed, { before: 2, after: 1, removed: 1 });
+    const output = await PDFDocument.load(fs.readFileSync(filename));
+    assert.equal(output.getPageCount(), 1);
+  });
+});
+
+test("A2 print tail cleanup keeps generic notice pages outside a read-only Teil companion", async () => {
+  await withFixture(async (pdf, font) => {
+    pdf.addPage([595.28, 841.89]).drawText(
+      "Complete questions 1 through 5. Exercise reading and listening with your study partner.",
+      { x: 50, y: 710, font, size: 12 },
+    );
+    pdf.addPage([595.28, 841.89]).drawText(
+      "Read-only printed practice. Submit graded coursework in Falowen.",
+      { x: 38, y: 810, font, size: 9 },
+    );
+  }, async (filename) => {
+    const result = await trimPrintedPdfTail(filename, { description: "Day 10 workbook" });
+    assert.equal(result.removed, 0);
+    assert.equal((await PDFDocument.load(fs.readFileSync(filename))).getPageCount(), 2);
+  });
+});
