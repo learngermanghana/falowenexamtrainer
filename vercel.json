@@ -210,6 +210,19 @@
           "value": "nosniff"
         }
       ]
+    },
+    {
+      "source": "/chatgpt/connect",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ],
   "routes": [
@@ -411,6 +424,22 @@
         "Cache-Control": "public, max-age=0, must-revalidate"
       },
       "dest": "/help.html"
+    },
+    {
+      "src": "/\\.well-known/oauth-authorization-server/api/chatgpt/?",
+      "dest": "/api/chatgpt/.well-known/oauth-authorization-server"
+    },
+    {
+      "src": "/\\.well-known/oauth-protected-resource/api/chatgpt/mcp/?",
+      "dest": "/api/chatgpt/.well-known/oauth-protected-resource"
+    },
+    {
+      "src": "/\\.well-known/oauth-protected-resource/?",
+      "dest": "/api/chatgpt/.well-known/oauth-protected-resource"
+    },
+    {
+      "src": "/chatgpt/connect/?",
+      "dest": "/index.html"
     },
     {
       "handle": "filesystem"
