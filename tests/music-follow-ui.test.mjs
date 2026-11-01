@@ -7,14 +7,14 @@ import {buildPlaybackQueue} from '../web/public/music/playback-queue.js';
 import {lyricLines,validateCues,activeLyricIndex} from '../web/public/music/lyrics-timing.js';
 import {resolveRecordingLesson} from '../web/public/music/lesson-content.js';
 import {approximateScrollTop} from '../web/public/music/follow-lyrics.js';
-import {matchingEnglishTranslation} from '../web/public/music/english-translations.js';
+import {matchingEnglishTranslation,matchingDraftEnglishTranslation} from '../web/public/music/english-translations.js';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const recordings=JSON.parse(read('web/public/music/timings.json')).recordings;
-async function room(track,pack){
+async function room(track,pack,{studio=null,translations=null}={}){
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
  const w=dom.window;
- Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,approximateScrollTop,matchingEnglishTranslation,
-  matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:[]}:String(url).includes('studio-drafts')?{tracks:[{...track,lyrics:'Draft lyrics are different'}]}:{lessons:{}}})});
+ Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,approximateScrollTop,matchingEnglishTranslation,matchingDraftEnglishTranslation,
+  matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
  const a=w.document.getElementById('audio');
  a.play=()=>Promise.resolve(); a.pause=()=>{};a.load=()=>{};Object.defineProperty(a,'readyState',{value:1});
  w.eval(read('web/public/music/app.js').replace(/^import .*;\n/gm,''));
@@ -67,4 +67,28 @@ test('untimed A1 recording still permits approximate page follow without pretend
  a.currentTime=90;a.dispatchEvent(new w.Event('timeupdate'));
  assert.equal(root.scrollTop,at,'listener can disable approximate follow');
  assert.equal(d.getElementById('lyrics-next').hidden,true);dom.window.close();
+});
+
+test('B1 Day 4 course draft supports optional explicitly unverified English without fabricated lyric cue',async()=>{
+ const studio=JSON.parse(read('web/public/music/studio-drafts.json')).tracks.find(x=>x.level==='B1'&&x.day===4);
+ const row=JSON.parse(read('web/public/music/english-translations.json')).drafts.find(x=>x.objectKey==='music/b1/day-04/Ort zum Leben.mp3');
+ const track={id:'r2-b1-day-04-b64_T3J0IHp1bSBMZWJlbi5tcDM',level:'B1',day:4,
+  title:'Ort zum Leben',assignmentKey:'',objectKey:row.objectKey,
+  autoDiscovered:true,coursebook:true,
+  audioUrl:'https://www.falowen.app/api/music?track=r2-b1-day-04-b64_T3J0IHp1bSBMZWJlbi5tcDM'};
+ const {w,dom}=await room(track,null,{studio:[studio],translations:{recordings:[],drafts:[row]}});
+ const d=w.document;d.querySelector('[data-tab="lyrics"]').click();
+ assert.equal(d.getElementById('show-english').disabled,false);
+ assert.equal(d.getElementById('show-english').checked,false,'B1 English starts hidden');
+ assert.match(d.getElementById('english-status').textContent,/COURSE DRAFT TRANSLATION/);
+ assert.match(d.getElementById('lyrics-text').textContent,/Seit Wochen suche ich eine neue Wohnung/);
+ assert.match(d.getElementById('lyrics-text').textContent,/These lyrics have not been checked against this MP3/);
+ assert.ok(d.querySelectorAll('.english-line').length===17);
+ assert.ok([...d.querySelectorAll('.english-line')].every(x=>x.hidden));
+ d.getElementById('show-english').click();
+ assert.equal(d.getElementById('show-english').checked,true);
+ assert.ok([...d.querySelectorAll('.english-line')].every(x=>!x.hidden));
+ assert.match(d.getElementById('lyrics-text').textContent,/I have been looking for a new apartment for weeks/);
+ assert.equal(d.querySelector('.lyric-line.is-active'),null,'draft never pretends to be timed');
+ dom.window.close();
 });

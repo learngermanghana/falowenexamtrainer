@@ -2,7 +2,7 @@ import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-
 import { buildPlaybackQueue } from "./playback-queue.js?v=20261028-shuffle";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
-import { matchingEnglishTranslation } from "./english-translations.js?v=20261101";
+import { matchingEnglishTranslation, matchingDraftEnglishTranslation } from "./english-translations.js?v=20261101-draft";
 // Never autoplay on initial load; continue only after a listener starts a song.
 // Falowen Music's static listening room. No authentication, AI calls,
 // Firestore writes or generated media. Optional consented GA4 usage tracking is
@@ -39,7 +39,8 @@ function referenceLyricsFor(track) {
   const byKey = track.assignmentKey && candidates.find(item => item.assignmentKey === track.assignmentKey);
   const draft = exact || byKey || (candidates.length === 1 ? candidates[0] : null);
   return draft && typeof draft.lyrics === "string" && draft.lyrics.trim()
-    ? {lyrics:draft.lyrics, cues:[], referenceOnly:true, assignmentKey:draft.assignmentKey} : null;
+    ? {lyrics:draft.lyrics, cues:[], referenceOnly:true, assignmentKey:draft.assignmentKey,
+       draftTitle:draft.title} : null;
 }
 function lessonFor(track) {
   return resolveRecordingLesson(track,learning,pinnedTracks,publishedLyrics.get(track.id));
@@ -351,14 +352,19 @@ function renderLyrics(lesson) {
   const root = byId("lyrics-text");
   root.replaceChildren();
   renderedCues = validateCues(lesson.cues, lesson.lyrics);
-  activeEnglishPack = !lesson.referenceOnly ? matchingEnglishTranslation(
-    englishTranslations, selected?.objectKey, lesson.lyrics) : null;
+  activeEnglishPack = lesson.referenceOnly
+    ? matchingDraftEnglishTranslation(englishTranslations, selected, lesson)
+    : matchingEnglishTranslation(englishTranslations, selected?.objectKey, lesson.lyrics);
   const translateControl = byId("show-english");
   translateControl.disabled = !activeEnglishPack;
   translateControl.checked = Boolean(activeEnglishPack && showEnglish);
-  byId("english-status").textContent = activeEnglishPack
-    ? "English is a learning aid; German remains the main lyric."
-    : "English translation has not been published for this recording yet.";
+  byId("english-status").textContent = activeEnglishPack?.source === "course-draft"
+    ? "COURSE DRAFT TRANSLATION — English explains the displayed German draft, not a verified transcription of this recording."
+    : activeEnglishPack
+      ? "English is a learning aid; German remains the main lyric."
+      : lesson.referenceOnly
+        ? "English translation of this unverified course draft is not available yet."
+        : "English translation has not been published for this recording yet.";
   highlightedLine = -1;
   // Every song with lyrics supports following the page. Only exact published
   // cue packs support per-line highlighting and seeking.
