@@ -5,6 +5,11 @@ on:
     paths:
       - "functions/functionz/chatgptCompanion.js"
       - "functions/functionz/chatgptClassTimetable.js"
+      - "functions/functionz/chatgptClassPreparation.js"
+      - "functions/functionz/__tests__/chatgptClassPreparation.test.js"
+      - "web/src/data/a1*.js"
+      - "web/src/data/a2*.js"
+      - "web/src/components/A1Day1GreetingsWorkbookPage.js"
       - "functions/functionz/__tests__/chatgptClassTimetable.test.js"
       - "scripts/generateChatgptLessonContent.mjs"
       - "web/src/data/b2*.js"
@@ -31,13 +36,14 @@ jobs:
           cache: npm
       - run: npm install --no-package-lock --ignore-scripts
       - run: npm --prefix functions install --no-package-lock --ignore-scripts
-      - name: Generate student-facing curriculum from canonical B2 sources
+      - name: Generate student-facing curriculum from canonical A1–B2 sources
         run: node scripts/generateChatgptLessonContent.mjs
       - name: Verify OAuth constraints and student data scope
-        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js
+        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js
       - name: Verify JavaScript syntax
         run: |
           node --check functions/functionz/chatgptCompanion.js
           node --check functions/functionz/chatgptClassTimetable.js
+          node --check functions/functionz/chatgptClassPreparation.js
           node --check functions/functionz/paymentAwareApp.js
           node -e "JSON.parse(require('fs').readFileSync('vercel.json', 'utf8'))"

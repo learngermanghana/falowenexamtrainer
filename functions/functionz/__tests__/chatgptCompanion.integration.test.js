@@ -167,7 +167,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(7);
+      expect(list.data.result.tools).toHaveLength(8);
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
       expect(list.data.result.tools[0].securitySchemes[0].type).toBe("oauth2");
       const unlinked = await postJson(origin + "/api/chatgpt/mcp", {
@@ -291,6 +291,43 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const spoofed = await call({ day: 1, section: "reading", level: "B2" });
       expect(spoofed.data.result.structuredContent.level).toBe("B1");
       expect(spoofed.data.result.structuredContent.material.title).toBe("Traumdeutung und ihre Bedeutung");
+    });
+  });
+
+  test("OAuth-bound A1 learner gets original class preparation without impersonating B2", async () => {
+    await withServer(async (origin) => {
+      const grant = await connectStudent(origin, "student-class", "prep-a1-class");
+      expect(grant.response.status).toBe(200);
+      const result = await postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 90, method: "tools/call",
+        params: { name: "get_my_falowen_class_preparation",
+          arguments: { level: "B2", classId: "class-other", day: 1 } },
+      }, grant.tokens.access_token);
+      const prep = result.data.result.structuredContent;
+      expect(prep.level).toBe("A1");
+      expect(prep.className).toBe("A1 Genuine Klasse");
+      expect(prep.nextSession.topic).toBe("Guten Morgen");
+      expect(prep.exactLessonAvailable).toBe(true);
+      expect(prep.practiceQuestions[0].question).toMatch(/7:00 Uhr/);
+      expect(prep.practiceQuestions[0]).not.toHaveProperty("answer");
+      expect(JSON.stringify(prep)).not.toContain("Private Klasse");
+    });
+  });
+
+  test("OAuth-bound A2 learner sees exact original reading instead of a fabricated checklist", async () => {
+    await withServer(async (origin) => {
+      const grant = await connectStudent(origin, "student-1", "content-a2");
+      expect(grant.response.status).toBe(200);
+      const result = await postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 91, method: "tools/call",
+        params: { name: "get_my_falowen_lesson_content",
+          arguments: { day: 1, section: "reading", level: "B2" } },
+      }, grant.tokens.access_token);
+      const reading = result.data.result.structuredContent;
+      expect(reading.level).toBe("A2");
+      expect(reading.material.title).toBe("Neu im Büro");
+      expect(reading.material.text).toContain("Firma Keller");
+      expect(reading.material.questions[0]).not.toHaveProperty("answerIndex");
     });
   });
 

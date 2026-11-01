@@ -2,7 +2,7 @@ import {
   buildA1CanonicalChapterLessonRoute,
   buildA1ShortChapterLessonRoute,
   normalizeA1Chapter,
-} from "./a1CanonicalLessonRoutes";
+} from "./a1CanonicalLessonRoutes.js";
 
 /**
  * Canonical ownership information for every tutor-marked A1 workbook.
