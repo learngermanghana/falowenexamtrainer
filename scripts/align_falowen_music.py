@@ -5,7 +5,7 @@ Example:
   python -m pip install faster-whisper
   python scripts/align_falowen_music.py --level B1 --day 4 --include-drafts
   python scripts/align_falowen_music.py --all --limit 60
-  python scripts/align_falowen_music.py --track r2-a1-day-22-b64_QXJ6dHRlcm1pbi5tcDM --apply --reviewed
+  python scripts/align_falowen_music.py --apply-report /tmp/falowen-music-timing-review/SONG.json --reviewed
 
 Dry runs write JSON review reports only. Applying requires explicit listening review
 and updates only the exact approved recording in approved-recording-lyrics.json.
@@ -102,7 +102,7 @@ def download_public_music(track, dest):
     track_id = track["id"]
     if not re.fullmatch(r"[A-Za-z0-9_-]{3,240}", track_id):
         raise ValueError("Unsafe public music track ID")
-    if not re.fullmatch(r"music/(a1|a2|b1)/day-(0[1-9]|1[0-9]|2[0-8])/.+\\.mp3",
+    if not re.fullmatch(r"music/(a1|a2|b1)/day-(0[1-9]|1[0-9]|2[0-8])/.+\.mp3",
                         track.get("objectKey",""),flags=re.I):
         raise ValueError("Not an approved public music-folder MP3")
     url = API + "/api/music?track=" + track_id
@@ -181,6 +181,21 @@ def apply_reviewed(approved, report, path):
     prior=row.get("recordingSha256")
     if prior and prior!=report["recordingSha256"]:
         raise ValueError("MP3 fingerprint changed; cannot apply stale owner-approved lyrics")
+    lines=sung_lines(report["lyrics"])
+    cues=report["cues"]
+    if len(cues)!=len(lines) or any(cue.get("text")!=line for cue,line in zip(cues,lines)):
+        raise ValueError("Report does not have one matching cue for every approved lyric line")
+    if any(not isinstance(c["start"],(int,float)) or not isinstance(c["end"],(int,float)) or
+           c["start"]<0 or c["end"]<=c["start"] or c["end"]>report["duration"]
+           for c in cues):
+        raise ValueError("Invalid timing boundaries")
+    if any(cues[i]["start"]<=cues[i-1]["start"] or cues[i]["start"]<=cues[i-1]["end"]
+           for i in range(1,len(cues))):
+        raise ValueError("Overlapping or unsorted lyrics")
+    if report.get("matchCoverage",0)<.70 or report.get("weakestLineCoverage",0)<.45:
+        raise ValueError("Report below alignment confidence gates")
+    if not re.fullmatch(r"[0-9a-f]{64}",report.get("recordingSha256","")):
+        raise ValueError("Missing recording fingerprint")
     row["cues"]=report["cues"]
     row["recordingSha256"]=report["recordingSha256"]
     row["duration"]=report["duration"]
@@ -235,16 +250,10 @@ def run(args):
                 report.update(result)
                 report["duration"]=round(duration,3)
                 report["status"]="candidate" if kind=="approved" else "review-only"
-                # The draft lyrics are never silently treated as confirmed MP3 lyrics.
-                if args.apply and kind=="approved":
-                    if not args.reviewed:
-                        raise ValueError("--apply requires --reviewed after listening to the candidate")
-                    apply_reviewed(approved,report,approved_path)
-                    report["status"]="published-estimated"
-                    print("Applied:",key)
-                else:
-                    print("Review:",key,"coverage",result["matchCoverage"],
-                          "lines",result["totalLines"],"status",report["status"])
+                # Timing generation is never publication. Review JSON against
+                # the final audio, then use --apply-report separately.
+                print("Review:",key,"coverage",result["matchCoverage"],
+                      "lines",result["totalLines"],"status",report["status"])
                 counts["candidate"]+=1
             except Exception as error:
                 report["status"]="needs-review"
@@ -269,13 +278,19 @@ def main():
     parser.add_argument("--force",action="store_true",help="Reprocess existing timed recording")
     parser.add_argument("--model",default="small",help="Locally installed or downloaded Whisper model")
     parser.add_argument("--output",default="/tmp/falowen-music-timing-review")
-    parser.add_argument("--apply",action="store_true",help="Apply only reviewed, exact-approved song cues")
-    parser.add_argument("--reviewed",action="store_true",help="Teacher confirms listening review of every emitted cue")
+    parser.add_argument("--apply-report",help="Path to a saved, listened-to candidate JSON report")
+    parser.add_argument("--reviewed",action="store_true",help="Teacher confirms listening review of saved report")
     args=parser.parse_args()
     if args.limit<1 or args.limit>200: parser.error("--limit must be between 1 and 200")
     if args.day and not 1<=args.day<=28: parser.error("Day must be 1–28")
-    if args.apply and not args.reviewed: parser.error("--apply needs --reviewed")
-    run(args)
+    if args.apply_report:
+        if not args.reviewed:
+            parser.error("--apply-report needs --reviewed (listen before publishing)")
+        approved_path=MUSIC/"approved-recording-lyrics.json"
+        apply_reviewed(read_json(approved_path),read_json(args.apply_report),approved_path)
+        print("Published estimated timing into approved-recording-lyrics.json; review diff and run tests before merging.")
+    else:
+        run(args)
 
 
 if __name__=="__main__":
