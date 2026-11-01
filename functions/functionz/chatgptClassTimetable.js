@@ -3,6 +3,7 @@
 // Read-only student timetable resolver, using the same Firestore classes,
 // classSessions and zoomProfiles documents as Falowen Admin. All queries are
 // scoped to a verified student profile; never discover cohorts by level alone.
+const { getCurriculumEntriesForLevel } = require("../data/curriculumManifest");
 const SITE = "https://www.falowen.app";
 const DEFAULT_TZ = "Africa/Accra";
 const text = (value) => String(value ?? "").trim();
@@ -144,17 +145,37 @@ function upcomingSessions(rows, klass, now = new Date(), limit = 3) {
     .slice(0, limit);
 }
 
+function verifiedDayFromAssignment(row, level) {
+  if (!level) return null;
+  const ids = (Array.isArray(row.assignmentIds) && row.assignmentIds.length ? row.assignmentIds
+    : Array.isArray(row.chapterIds) && row.chapterIds.length ? row.chapterIds
+      : Array.isArray(row.curriculumIds) && row.curriculumIds.length ? row.curriculumIds
+        : [row.assignment_id, row.assignmentId])
+    .map((v) => text(v).toUpperCase()).filter(Boolean);
+  if (!ids.length) return null;
+  const assignments = new Set(ids);
+  const matchedDays = new Set((getCurriculumEntriesForLevel(level) || [])
+    .filter((entry) => assignments.has(text(entry.assignmentId || entry.assignment_id || entry.id).toUpperCase()))
+    .map((entry) => Number(entry.day ?? entry.assignmentDay))
+    .filter((day) => Number.isInteger(day) && day >= 1 && day <= 50));
+  return matchedDays.size === 1 ? [...matchedDays][0] : null;
+}
 function topicForSession(row, level) {
   const topic = text(row.topic || row.title || row.sessionLabel).slice(0, 220);
   const explicitDay = Number(row.curriculumDay || row.lessonDay);
+  const curriculumDay = verifiedDayFromAssignment(row, level);
   const provisionalIndex = Number(row.curriculumIndex);
-  const verified = Number.isInteger(explicitDay) && explicitDay >= 1 && explicitDay <= 50;
-  const day = verified ? explicitDay : provisionalIndex;
+  const explicit = Number.isInteger(explicitDay) && explicitDay >= 1 && explicitDay <= 50;
+  // Conflicting explicit day and source assignment ID must not produce a confident mapping.
+  const conflict = explicit && curriculumDay !== null && explicitDay !== curriculumDay;
+  const verified = !conflict && (explicit || curriculumDay !== null);
+  const day = conflict ? null : explicit ? explicitDay : curriculumDay !== null ? curriculumDay : provisionalIndex;
   return {
     topic: topic || null,
     topicConfirmed: Boolean(topic),
     lessonDay: Number.isInteger(day) && day >= 1 && day <= 50 ? day : null,
-    lessonDaySource: verified ? "explicit_session_day" : "curriculum_index_unverified",
+    lessonDaySource: conflict ? "conflicting_source" : !verified ? "curriculum_index_unverified"
+      : explicit ? "explicit_session_day" : "assignment_identity",
     lessonUrl: Number.isInteger(day) && day >= 1 && day <= 50 && level
       ? SITE + "/campus/course/lesson/" + level + "/" + day : null,
   };
@@ -227,5 +248,5 @@ async function getStudentTimetable({ db, student, now = new Date(), includeZoom 
 
 module.exports = {
   getStudentTimetable, resolveStudentClass, matchedStudentClass, sessionMatchesClass,
-  upcomingSessions, sessionView, zoomUrl, dateOf,
+  upcomingSessions, sessionView, zoomUrl, dateOf, verifiedDayFromAssignment,
 };
