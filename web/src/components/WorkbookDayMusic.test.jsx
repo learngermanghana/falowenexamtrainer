@@ -74,6 +74,55 @@ describe("A2/B1 optional Music tab", () => {
       .toBe("https://music.falowen.app/?track=r2-b1-day-19-speaking");
   });
 
+  test("new R2 Day 9 song keeps native audio compact and reads exact published lyrics", async () => {
+    const day9 = {
+      id: "r2-a1-day-09-b64_RGVyIGtsZWluZSBIdW5kLm1wMw",
+      title: "Der kleine Hund", level: "A1", day: 9, coursebook: true,
+      autoDiscovered: true, objectKey: "music/a1/day-09/Der kleine Hund.mp3",
+      audioUrl: "https://www.falowen.app/api/music?track=r2-a1-day-09-b64_RGVyIGtsZWluZSBIdW5kLm1wMw",
+    };
+    setFetch({catalog:[],discovered:[day9]});
+    const original = global.fetch;
+    global.fetch = jest.fn(url => String(url).includes("/api/music-lyrics")
+      ? Promise.resolve(jsonResponse({
+          objectKey: day9.objectKey,
+          lyrics: "[Verse 1]\\nDer Hund ist hier.\\nIch sehe den Hund.",
+          cues: [],
+        }))
+      : original(url));
+    render(<WorkbookDayMusic level="A1" day={9} hideLegacyNotes />);
+    await waitFor(() => expect(screen.getByRole("heading", {name:"Der kleine Hund"})).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("German lyrics · Mitlesen")).toBeTruthy());
+    const card = document.querySelector('[data-workbook-song-card="true"]');
+    const audio = document.querySelector('[data-music-audio="true"]');
+    expect(card.style.display).toBe("flex");
+    expect(card.style.flexDirection).toBe("column");
+    expect(audio.style.height).toBe("50px");
+    expect(audio.getAttribute("src")).toBe(day9.audioUrl);
+    fireEvent.click(screen.getByText("German lyrics · Mitlesen"));
+    expect(screen.getByText(/Ich sehe den Hund/)).toBeTruthy();
+    expect(document.querySelector('[data-workbook-submission]')).toBeNull();
+  });
+
+  test("wrong-object lyric sidecars never appear with an R2 recording", async () => {
+    const day9 = {
+      id: "r2-a1-day-09-test",title:"Der kleine Hund",level:"A1",day:9,
+      coursebook:true,autoDiscovered:true,objectKey:"music/a1/day-09/Der kleine Hund.mp3",
+      audioUrl:"https://www.falowen.app/api/music?track=r2-a1-day-09-test",
+    };
+    setFetch({catalog:[],discovered:[day9]});
+    const original=global.fetch;
+    global.fetch=jest.fn(url => String(url).includes("/api/music-lyrics")
+      ? Promise.resolve(jsonResponse({objectKey:"music/a1/day-08/Other.mp3",lyrics:"Incorrect private words"}))
+      : original(url));
+    render(<WorkbookDayMusic level="A1" day={9} hideLegacyNotes />);
+    await waitFor(() => expect(screen.getByRole("heading", {name:"Der kleine Hund"})).toBeTruthy());
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/music-lyrics?track="), expect.any(Object)));
+    expect(screen.queryByText("Incorrect private words")).toBeNull();
+    expect(screen.getByText(/Reviewed lyrics have not been published/)).toBeTruthy();
+  });
+
   test("no recording means a gentle empty state, not a full music library", async () => {
     setFetch({ catalog: [day18], discovered: [day19] });
     render(<WorkbookDayMusic level="B1" day={28} />);
