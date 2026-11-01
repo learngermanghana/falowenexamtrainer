@@ -25,7 +25,7 @@ test("all five A2 Kombiprüfungen have 20 private answer keys and unique task ru
   }
 });
 
-test("A2 Mocks 04–08 score only three verified modules out of 75; Hören is not fabricated",()=>{
+test("Historical A2 Mocks 04–08 keep their three-module /75 verified results; Hören is not fabricated",()=>{
   for(let n=4;n<=8;n++){
     const id=`a2-mock-0${n}`,key=sets[id].reading;
     const verification={schreiben:{verified:true,score:20},sprechen:{verified:true,score:22}};
@@ -93,6 +93,24 @@ test("new A2 Mock 04 Hören is verified as the fourth /25 module without alterin
   assert.equal(artifacts.scoreDocument.hoerenPending,false);
   assert.deepEqual(artifacts.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
   assert.equal(artifacts.scoreDocument.sectionScores.hoeren,25);
+  const sixListening = require("../a2Mock06HoerenKeys");
+  const sixReading = sets["a2-mock-06"].reading;
+  const sixResult = buildVerifiedA2MockScore({
+    mockId:"a2-mock-06",
+    state:{mockId:"a2-mock-06",assessmentVersion:"four-module-v2",
+      lesenAnswers:sixReading,hoerenAnswers:sixListening},
+    verifiedSections:verification,
+  });
+  assert.equal(sixResult.overall.points,100);
+  assert.equal(sixResult.overall.maxPoints,100);
+  assert.equal(sixResult.sectionScores.hoeren,25);
+  const sixArtifacts=buildA2MockCompletionArtifacts({
+    mockId:"a2-mock-06",authedUser:{uid:"student-06"},attemptId:"fresh",
+    overall:sixResult.overall,sectionScores:sixResult.sectionScores,
+  });
+  assert.equal(sixArtifacts.scoreDocument.maxPoints,100);
+  assert.equal(sixArtifacts.scoreDocument.hoerenPending,false);
+  assert.deepEqual(sixArtifacts.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
   assert.throws(()=>buildVerifiedA2MockScore({
     mockId:"a2-mock-05",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
     verifiedSections:verification,
