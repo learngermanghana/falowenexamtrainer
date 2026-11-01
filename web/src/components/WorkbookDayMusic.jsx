@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { styles } from "../styles";
+import { matchingEnglishTranslation } from "../utils/musicEnglishTranslations";
 
 // Only approved public music playback IDs; private Hören assets are never read.
 // Uploads to music/<level>/day-XX/ are discovered through the existing
@@ -42,6 +43,9 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const [selectedId, setSelectedId] = useState("");
   const [state, setState] = useState("loading");
   const [recordingLyrics, setRecordingLyrics] = useState(null);
+  const [translations, setTranslations] = useState({recordings:[]});
+  const [showEnglish, setShowEnglish] = useState(courseLevel === "A1");
+  useEffect(() => { setShowEnglish(courseLevel === "A1"); }, [courseLevel]);
 
   useEffect(() => {
     if (!valid) return undefined;
@@ -56,7 +60,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
       getJson("/music/catalog.json"),
       getJson("/api/music-library"),
       getJson("/music/learning.json"),
-    ]).then(([curated, discovered, lessons]) => {
+      getJson("/music/english-translations.json"),
+    ]).then(([curated, discovered, lessons, english]) => {
       if (controller.signal.aborted) return;
       const pinned = curated.status === "fulfilled"
         ? (Array.isArray(curated.value?.tracks) ? curated.value.tracks : []) : [];
@@ -76,6 +81,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
       setSelectedId(previous => sorted.some(song => song.id === previous) ? previous : sorted[0]?.id || "");
       setPacks(lessons.status === "fulfilled" && typeof lessons.value?.lessons === "object"
         ? lessons.value.lessons : {});
+      setTranslations(english.status === "fulfilled" && Array.isArray(english.value?.recordings)
+        ? english.value : {recordings:[]});
       setState(curated.status === "rejected" && discovered.status === "rejected" ? "error" : "ready");
     }).catch(() => { if (!controller.signal.aborted) setState("error"); });
     return () => controller.abort();
@@ -114,6 +121,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const approvedLyrics = recordingLyrics && chosen &&
     recordingLyrics.id === chosen.id && recordingLyrics.objectKey === chosen.objectKey
     ? recordingLyrics.lyrics : legacyLyrics;
+  const englishPack = chosen && approvedLyrics ? matchingEnglishTranslation(
+    translations, chosen.objectKey, approvedLyrics) : null;
 
   if (!valid) return null;
 
@@ -193,8 +202,55 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
               <summary style={{ cursor: "pointer", fontWeight: 800, color: "#164e36" }}>
                 German lyrics · Mitlesen
               </summary>
-              <p lang="de" style={{ whiteSpace: "pre-wrap", lineHeight: 1.9, color: "#1f2937",
-                padding: "12px 4px", margin: 0 }}>{approvedLyrics}</p>
+              <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
+                <label style={{ display: "inline-flex", alignItems: "center", gap: 9, color: "#245745",
+                  fontSize: 14, fontWeight: 750, opacity: englishPack ? 1 : .6 }}>
+                  <input aria-label="Show English" type="checkbox" checked={Boolean(englishPack && showEnglish)}
+                    disabled={!englishPack} onChange={event => setShowEnglish(event.target.checked)}
+                    style={{ accentColor: "#21694c", width: 18, height: 18 }} />
+                  Show English
+                </label>
+                {!englishPack ? <p data-english-unavailable="true" style={{ margin: 0, fontSize: 12, color: "#62766b" }}>
+                  English translation is not available for this recording yet.
+                </p> : null}
+                <div style={{ display: "grid", gap: 5, padding: "4px 0" }}>
+                  {String(approvedLyrics).replace(/\\n/g, "\n").split(/\r?\n/).map((line, rawIndex) => {
+                    const de = line.trim();
+                    if (!de) return null;
+                    if (/^\[.*\]$/.test(de)) return (
+                      <h4 key={rawIndex} style={{ margin: "13px 0 5px", color: "#45675a", fontSize: 13,
+                        textTransform: "uppercase", letterSpacing: ".07em" }}>{de.slice(1,-1)}</h4>
+                    );
+                    const sourceLines = String(approvedLyrics).replace(/\\n/g, "\n")
+                      .split(/\r?\n/).slice(0,rawIndex).filter(item => item.trim() && !/^\[.*\]$/.test(item.trim()));
+                    const translation = englishPack?.lines?.[sourceLines.length]?.en;
+                    return <div key={rawIndex} data-lyric-pair="true" style={{
+                        padding: "8px 10px", borderBottom: "1px solid #e2efe5",
+                        borderRadius: 7, background: rawIndex % 2 ? "#fbfdfb" : "transparent",
+                      }}>
+                      <div lang="de" style={{ fontSize: 16, lineHeight: 1.6, color: "#203c31", fontWeight: 650 }}>{de}</div>
+                      {showEnglish && translation ? <div data-english-line="true" lang="en"
+                        style={{ fontSize: 14, lineHeight: 1.55, color: "#5b7667", marginTop: 3 }}>
+                        {translation}
+                      </div> : null}
+                    </div>;
+                  })}
+                </div>
+                {englishPack?.vocabulary?.length ? (
+                  <details data-music-vocabulary="true">
+                    <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 800, color: "#205c44" }}>
+                      Useful German · Vocabulary
+                    </summary>
+                    <div style={{ display: "grid", gap: 7, padding: "10px 0" }}>
+                      {englishPack.vocabulary.map((item, index) => (
+                        <p key={index} style={{ margin: 0, fontSize: 13, lineHeight: 1.6 }}>
+                          <strong lang="de">{item.de}</strong> — <span lang="en">{item.en}</span>
+                        </p>
+                      ))}
+                    </div>
+                  </details>
+                ) : null}
+              </div>
             </details>
           ) : (
             <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
