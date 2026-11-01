@@ -13,6 +13,7 @@ function mockFirebase() {
   const studentData = new Map([
     ["student-1", { uid: "student-1", role: "student", level: "A2", name: "Student One", studentCode: "TEST001" }],
     ["student-2", { uid: "student-2", role: "student", level: "B1", name: "Student Two", studentCode: "TEST002" }],
+    ["b2-learner", { uid: "b2-learner", role: "student", level: "B2", name: "B2 Test Learner", studentCode: "TESTB2" }],
     ["inactive", { uid: "inactive", role: "student", level: "A1", trialStatus: "expired", paymentStatus: "pending" }],
   ]);
   collections.set("students", studentData);
@@ -73,7 +74,7 @@ function mockFirebase() {
     firestore: () => db,
     auth: () => ({
       async verifyIdToken(idToken) {
-        if (!["student-1", "student-2", "inactive"].includes(idToken)) throw Error("invalid token");
+        if (!["student-1", "student-2", "b2-learner", "inactive"].includes(idToken)) throw Error("invalid token");
         return { uid: idToken, email: idToken + "@example.org", email_verified: true };
       },
     }),
@@ -206,4 +207,30 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect(expired.status).toBe(403);
     });
   });
+  test("B2 authenticated student can read self-study lessons and progress without score sheet access", async () => {
+    await withServer(async (origin) => {
+      const grant = await connectStudent(origin, "b2-learner", "b2-course");
+      expect(grant.response.status).toBe(200);
+      const call = (name, args = {}) => postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 19, method: "tools/call",
+        params: { name, arguments: args },
+      }, grant.tokens.access_token);
+
+      const profile = await call("get_my_falowen_profile");
+      expect(profile.data.result.structuredContent.nickname).toBe("Falowen B2 student");
+      const list = await call("get_my_falowen_assignments");
+      expect(list.data.result.structuredContent.level).toBe("B2");
+      expect(list.data.result.structuredContent.courseMode).toBe("self_study");
+      expect(list.data.result.structuredContent.assignments).toHaveLength(28);
+      expect(list.data.result.structuredContent.assignments[0].lessonUrl).toContain("/lesson/B2/1");
+
+      const progress = await call("get_my_falowen_progress");
+      expect(progress.data.result.structuredContent.completionAvailable).toBe(false);
+      expect(progress.data.result.structuredContent.completedCount).toBeNull();
+      const lesson = await call("get_my_falowen_lesson", { day: 1 });
+      expect(lesson.data.result.structuredContent.title).toMatch(/Umweltschutz/);
+      expect(lesson.data.result.structuredContent.lessonUrl).toContain("/lesson/B2/1");
+    });
+  });
+
 });
