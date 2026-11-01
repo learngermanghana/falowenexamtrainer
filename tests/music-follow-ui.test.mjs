@@ -69,7 +69,7 @@ test('untimed A1 recording still permits approximate page follow without pretend
  assert.equal(d.getElementById('lyrics-next').hidden,true);dom.window.close();
 });
 
-test('B1 Day 4 course draft supports optional explicitly unverified English without fabricated lyric cue',async()=>{
+test('B1 Day 4 course draft can follow estimated lines without claiming a verified recording',async()=>{
  const studio=JSON.parse(read('web/public/music/studio-drafts.json')).tracks.find(x=>x.level==='B1'&&x.day===4);
  const row=JSON.parse(read('web/public/music/english-translations.json')).drafts.find(x=>x.objectKey==='music/b1/day-04/Ort zum Leben.mp3');
  const track={id:'r2-b1-day-04-b64_T3J0IHp1bSBMZWJlbi5tcDM',level:'B1',day:4,
@@ -89,6 +89,8 @@ test('B1 Day 4 course draft supports optional explicitly unverified English with
  assert.equal(d.getElementById('show-english').checked,true);
  assert.ok([...d.querySelectorAll('.english-line')].every(x=>!x.hidden));
  assert.match(d.getElementById('lyrics-text').textContent,/I have been looking for a new apartment for weeks/);
- assert.equal(d.querySelector('.lyric-line.is-active'),null,'draft never pretends to be timed');
+ // This fixture supplies studio text but no stored timestamps; another test
+ // checks the actual shipped studio draft with exactly matching MP3 key.
+ assert.equal(d.querySelector('.lyric-line.is-active'),null,'untimed fixture stays untimed');
  dom.window.close();
 });
