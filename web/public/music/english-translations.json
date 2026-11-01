@@ -1017,6 +1017,523 @@
           "en": "the documents"
         }
       ]
+    },
+    {
+      "objectKey": "music/a1/day-02/Ich heiße Bina.mp3",
+      "lines": [
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        },
+        {
+          "de": "Oh-oh, yeah …",
+          "en": "Oh-oh, yeah …"
+        },
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        },
+        {
+          "de": "Heute rufe ich die Schule an,",
+          "en": "Today I call the school,"
+        },
+        {
+          "de": "Ich möchte einen Deutschkurs machen.",
+          "en": "I would like to take a German course."
+        },
+        {
+          "de": "Die Frau sagt freundlich: „Guten Tag!",
+          "en": "The woman says kindly, \"Good day!"
+        },
+        {
+          "de": "Wie heißen Sie? Sagen Sie es mir.“",
+          "en": "What is your name? Tell me.\""
+        },
+        {
+          "de": "Ich sage: „Hallo, ich heiße Bina,",
+          "en": "I say, \"Hello, my name is Bina,"
+        },
+        {
+          "de": "Ich komme aus Ghana, das ist mein Land.“",
+          "en": "I'm from Ghana, that's my country.\""
+        },
+        {
+          "de": "Sie fragt: „Wie schreibt man Ihren Namen?“",
+          "en": "She asks, \"How do you spell your name?\""
+        },
+        {
+          "de": "Ich buchstabiere langsam dann.",
+          "en": "Then I spell it slowly."
+        },
+        {
+          "de": "Ich heiße Bina, B – I – N – A!",
+          "en": "My name is Bina, B – I – N – A!"
+        },
+        {
+          "de": "Oh-oh, das ist mein Name, ja!",
+          "en": "Oh-oh, that's my name, yes!"
+        },
+        {
+          "de": "B – I – N – A, hmm, hmm, hmm,",
+          "en": "B – I – N – A, hmm, hmm, hmm,"
+        },
+        {
+          "de": "So schreibt man meinen Namen!",
+          "en": "That's how you spell my name!"
+        },
+        {
+          "de": "Wie heißt du? Sag es mir!",
+          "en": "What's your name? Tell me!"
+        },
+        {
+          "de": "Ich heiße Bina, und wie heißt du?",
+          "en": "My name is Bina, and what's yours?"
+        },
+        {
+          "de": "Oh-oh, hmm, hmm, hmm,",
+          "en": "Oh-oh, hmm, hmm, hmm,"
+        },
+        {
+          "de": "Jetzt kennst du meinen Namen!",
+          "en": "Now you know my name!"
+        },
+        {
+          "de": "Die Frau fragt: „Wo wohnen Sie?“",
+          "en": "The woman asks, \"Where do you live?\""
+        },
+        {
+          "de": "Ich sage: „In Accra, hier bin ich.“",
+          "en": "I say, \"In Accra, here I am.\""
+        },
+        {
+          "de": "Sie sagt: „Bitte noch einmal Ihren Namen!“",
+          "en": "She says, \"Your name once again, please!\""
+        },
+        {
+          "de": "Ich sage langsam: „B – I – N – A.“",
+          "en": "I say slowly, \"B – I – N – A.\""
+        },
+        {
+          "de": "Sie schreibt meinen Namen auf,",
+          "en": "She writes down my name,"
+        },
+        {
+          "de": "Und sagt: „Danke, alles klar!",
+          "en": "and says, \"Thank you, everything is clear!"
+        },
+        {
+          "de": "Ihr Deutschkurs beginnt am Montag.“",
+          "en": "Your German course begins on Monday.\""
+        },
+        {
+          "de": "Ich freue mich, ich bin bald da!",
+          "en": "I'm happy; I'll be there soon!"
+        },
+        {
+          "de": "Ich heiße Bina, B – I – N – A!",
+          "en": "My name is Bina, B – I – N – A!"
+        },
+        {
+          "de": "Oh-oh, das ist mein Name, ja!",
+          "en": "Oh-oh, that's my name, yes!"
+        },
+        {
+          "de": "B – I – N – A, hmm, hmm, hmm,",
+          "en": "B – I – N – A, hmm, hmm, hmm,"
+        },
+        {
+          "de": "So schreibt man meinen Namen!",
+          "en": "That's how you spell my name!"
+        },
+        {
+          "de": "Wie heißt du? Sag es mir!",
+          "en": "What's your name? Tell me!"
+        },
+        {
+          "de": "Ich heiße Bina, und wie heißt du?",
+          "en": "My name is Bina, and what's yours?"
+        },
+        {
+          "de": "Oh-oh, hmm, hmm, hmm,",
+          "en": "Oh-oh, hmm, hmm, hmm,"
+        },
+        {
+          "de": "Jetzt kennst du meinen Namen!",
+          "en": "Now you know my name!"
+        },
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        },
+        {
+          "de": "Ich heiße Bina, B – I – N – A.",
+          "en": "My name is Bina, B – I – N – A."
+        },
+        {
+          "de": "Oh-oh, und wie heißt du?",
+          "en": "Oh-oh, and what's your name?"
+        },
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "buchstabieren",
+          "en": "to spell"
+        },
+        {
+          "de": "Wie heißen Sie?",
+          "en": "What is your name? (formal)"
+        },
+        {
+          "de": "Wo wohnen Sie?",
+          "en": "Where do you live? (formal)"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-03/Wer bist du_ Sag es mir!.mp3",
+      "lines": [
+        {
+          "de": "Heute kommt ein neuer Schüler,",
+          "en": "Today a new student arrives,"
+        },
+        {
+          "de": "Er hat ein Buch und einen Stift.",
+          "en": "he has a book and a pen."
+        },
+        {
+          "de": "Ich frage freundlich: „Wie heißt du?“",
+          "en": "I ask kindly, \"What's your name?\""
+        },
+        {
+          "de": "Er sagt: „Hallo, ich heiße Ben.“",
+          "en": "He says, \"Hello, my name is Ben.\""
+        },
+        {
+          "de": "„Woher kommst du?“, frage ich,",
+          "en": "\"Where are you from?\" I ask,"
+        },
+        {
+          "de": "Er sagt: „Ich komme aus Berlin.“",
+          "en": "he says, \"I'm from Berlin.\""
+        },
+        {
+          "de": "Ich sage: „Schön, dich hier zu sehen!“",
+          "en": "I say, \"It's nice to see you here!\""
+        },
+        {
+          "de": "Jetzt lernen wir zusammen Deutsch.",
+          "en": "Now we learn German together."
+        },
+        {
+          "de": "Wer bist du? Wie heißt du?",
+          "en": "Who are you? What's your name?"
+        },
+        {
+          "de": "Woher kommst du? Sag es mir!",
+          "en": "Where are you from? Tell me!"
+        },
+        {
+          "de": "Wo wohnst du? Was machst du gern?",
+          "en": "Where do you live? What do you like doing?"
+        },
+        {
+          "de": "Ich möchte dich gern kennenlernen.",
+          "en": "I'd like to get to know you."
+        },
+        {
+          "de": "Oh-oh, ich frage dich,",
+          "en": "Oh-oh, I'm asking you,"
+        },
+        {
+          "de": "Hmm-hmm, du antwortest mir.",
+          "en": "hmm-hmm, you're answering me."
+        },
+        {
+          "de": "So lernen wir uns besser kennen,",
+          "en": "That's how we get to know each other better,"
+        },
+        {
+          "de": "Und sprechen jeden Tag ein bisschen mehr.",
+          "en": "and speak a little more each day."
+        },
+        {
+          "de": "Ich frage Ben: „Wo wohnst du jetzt?“",
+          "en": "I ask Ben, \"Where do you live now?\""
+        },
+        {
+          "de": "Er sagt: „Ich wohne hier in Bonn.“",
+          "en": "He says, \"I live here in Bonn.\""
+        },
+        {
+          "de": "„Was machst du gern am Wochenende?“",
+          "en": "\"What do you like doing at weekends?\""
+        },
+        {
+          "de": "„Ich höre Musik und spiele gern.“",
+          "en": "\"I listen to music and enjoy playing.\""
+        },
+        {
+          "de": "„Wann beginnt der Deutschkurs morgen?“",
+          "en": "\"When does the German course start tomorrow?\""
+        },
+        {
+          "de": "Er sagt: „Um neun Uhr, wie heute.“",
+          "en": "He says, \"At nine o'clock, like today.\""
+        },
+        {
+          "de": "Ich sage: „Danke, bis morgen!“",
+          "en": "I say, \"Thank you, see you tomorrow!\""
+        },
+        {
+          "de": "Er lächelt und sagt: „Bis dann!“",
+          "en": "He smiles and says, \"See you then!\""
+        },
+        {
+          "de": "Wer bist du? Wie heißt du?",
+          "en": "Who are you? What's your name?"
+        },
+        {
+          "de": "Woher kommst du? Sag es mir!",
+          "en": "Where are you from? Tell me!"
+        },
+        {
+          "de": "Wo wohnst du? Was machst du gern?",
+          "en": "Where do you live? What do you like doing?"
+        },
+        {
+          "de": "Ich möchte dich gern kennenlernen.",
+          "en": "I'd like to get to know you."
+        },
+        {
+          "de": "Oh-oh, ich frage dich,",
+          "en": "Oh-oh, I'm asking you,"
+        },
+        {
+          "de": "Hmm-hmm, du antwortest mir.",
+          "en": "hmm-hmm, you're answering me."
+        },
+        {
+          "de": "So lernen wir uns besser kennen,",
+          "en": "That's how we get to know each other better,"
+        },
+        {
+          "de": "Und sprechen jeden Tag ein bisschen mehr.",
+          "en": "and speak a little more each day."
+        },
+        {
+          "de": "Hmm, hmm, jetzt kenne ich Ben,",
+          "en": "Hmm, hmm, now I know Ben,"
+        },
+        {
+          "de": "Oh-oh, wir sehen uns morgen.",
+          "en": "oh-oh, we'll see each other tomorrow."
+        },
+        {
+          "de": "Ich frage gern, ich höre zu,",
+          "en": "I like asking questions, I listen,"
+        },
+        {
+          "de": "Und lerne jeden Tag Deutsch.",
+          "en": "and I learn German every day."
+        },
+        {
+          "de": "Hmm, hmm, bis morgen!",
+          "en": "Hmm, hmm, see you tomorrow!"
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "Woher kommst du?",
+          "en": "Where are you from?"
+        },
+        {
+          "de": "kennenlernen",
+          "en": "to get to know"
+        },
+        {
+          "de": "gern",
+          "en": "gladly / like doing"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-04/Meine Nummer, meine Adresse.mp3",
+      "lines": [
+        {
+          "de": "Hmm, hmm, hmm …",
+          "en": "Hmm, hmm, hmm …"
+        },
+        {
+          "de": "Oh-oh, eins, zwei, drei!",
+          "en": "Oh-oh, one, two, three!"
+        },
+        {
+          "de": "Hmm, hmm, hier bin ich!",
+          "en": "Hmm, hmm, here I am!"
+        },
+        {
+          "de": "Hallo, ich heiße Ben,",
+          "en": "Hello, my name is Ben,"
+        },
+        {
+          "de": "Ich komme aus Ghana, aus Accra.",
+          "en": "I'm from Ghana, from Accra."
+        },
+        {
+          "de": "Ich bin vierundzwanzig Jahre alt,",
+          "en": "I'm twenty-four years old,"
+        },
+        {
+          "de": "Und heute stelle ich mich vor.",
+          "en": "and today I'll introduce myself."
+        },
+        {
+          "de": "Ich wohne in der Blumenstraße,",
+          "en": "I live on Blumenstraße,"
+        },
+        {
+          "de": "Meine Hausnummer ist eins zwei drei.",
+          "en": "my house number is one two three."
+        },
+        {
+          "de": "Die Postleitzahl ist eins zwei drei vier fünf,",
+          "en": "The postal code is one two three four five,"
+        },
+        {
+          "de": "Hier bin ich zu Hause, hier bin ich gern.",
+          "en": "this is my home, I like it here."
+        },
+        {
+          "de": "Eins, zwei, drei, vier, fünf, sechs,",
+          "en": "One, two, three, four, five, six,"
+        },
+        {
+          "de": "Sieben, acht, neun und zehn.",
+          "en": "seven, eight, nine and ten."
+        },
+        {
+          "de": "Elf, zwölf, dreizehn, vierzehn, fünfzehn,",
+          "en": "Eleven, twelve, thirteen, fourteen, fifteen,"
+        },
+        {
+          "de": "Sechzehn, siebzehn, achtzehn, neunzehn, zwanzig!",
+          "en": "sixteen, seventeen, eighteen, nineteen, twenty!"
+        },
+        {
+          "de": "Oh-oh, wie alt bist du?",
+          "en": "Oh-oh, how old are you?"
+        },
+        {
+          "de": "Ich bin vierundzwanzig, und du?",
+          "en": "I'm twenty-four, and you?"
+        },
+        {
+          "de": "Hmm-hmm, sag es mir,",
+          "en": "Hmm-hmm, tell me,"
+        },
+        {
+          "de": "Wie ist deine Hausnummer hier?",
+          "en": "what is your house number here?"
+        },
+        {
+          "de": "Meine Telefonnummer ist ganz einfach,",
+          "en": "My telephone number is very simple,"
+        },
+        {
+          "de": "Null, zwei, vier – fünf, sechs, sieben.",
+          "en": "zero, two, four – five, six, seven."
+        },
+        {
+          "de": "Acht, neun, null – eins, zwei, drei,",
+          "en": "Eight, nine, zero – one, two, three,"
+        },
+        {
+          "de": "Ich sage sie noch einmal langsam.",
+          "en": "I'll say it again slowly."
+        },
+        {
+          "de": "Null, zwei, vier – fünf, sechs, sieben,",
+          "en": "Zero, two, four – five, six, seven,"
+        },
+        {
+          "de": "Acht, neun, null – eins, zwei, drei.",
+          "en": "eight, nine, zero – one, two, three."
+        },
+        {
+          "de": "„Wie ist deine Telefonnummer?“",
+          "en": "\"What is your telephone number?\""
+        },
+        {
+          "de": "Jetzt kannst du sie auch sagen!",
+          "en": "Now you can say it too!"
+        },
+        {
+          "de": "Eins, zwei, drei, vier, fünf, sechs,",
+          "en": "One, two, three, four, five, six,"
+        },
+        {
+          "de": "Sieben, acht, neun und zehn.",
+          "en": "seven, eight, nine and ten."
+        },
+        {
+          "de": "Elf, zwölf, dreizehn, vierzehn, fünfzehn,",
+          "en": "Eleven, twelve, thirteen, fourteen, fifteen,"
+        },
+        {
+          "de": "Sechzehn, siebzehn, achtzehn, neunzehn, zwanzig!",
+          "en": "sixteen, seventeen, eighteen, nineteen, twenty!"
+        },
+        {
+          "de": "Oh-oh, wie alt bist du?",
+          "en": "Oh-oh, how old are you?"
+        },
+        {
+          "de": "Ich bin vierundzwanzig, und du?",
+          "en": "I'm twenty-four, and you?"
+        },
+        {
+          "de": "Hmm-hmm, sag es mir,",
+          "en": "Hmm-hmm, tell me,"
+        },
+        {
+          "de": "Wie ist deine Hausnummer hier?",
+          "en": "what is your house number here?"
+        },
+        {
+          "de": "Hmm, hmm, mein Name ist Ben,",
+          "en": "Hmm, hmm, my name is Ben,"
+        },
+        {
+          "de": "Vierundzwanzig Jahre, das bin ich.",
+          "en": "twenty-four years old, that's me."
+        },
+        {
+          "de": "Blumenstraße, eins zwei drei,",
+          "en": "Blumenstraße, one two three,"
+        },
+        {
+          "de": "Oh-oh, jetzt kennst du mich!",
+          "en": "oh-oh, now you know me!"
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Hausnummer",
+          "en": "house number"
+        },
+        {
+          "de": "die Postleitzahl",
+          "en": "postal code"
+        },
+        {
+          "de": "die Telefonnummer",
+          "en": "telephone number"
+        }
+      ]
     }
   ]
 }
