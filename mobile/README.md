@@ -43,7 +43,7 @@ References:
 
 - **Login:** Confirm email/password sign-in and account creation inside WKWebView. Google `signInWithPopup` is used in Falowen's web code and may need a native-safe authentication flow before iOS release.
 - **Password reset and verification:** The iOS build sets `REACT_APP_AUTH_CONTINUE_URL=https://www.falowen.app` so Firebase email action links open the real HTTPS site, not `capacitor://localhost`. Test end-to-end.
-- **Speaking:** Test microphone permissions, record/stop/playback and AI examiner audio on an actual iPhone. Native `NSMicrophoneUsageDescription` and any necessary permissions/plugins must be configured before signed distribution.
+- **Speaking:** Test microphone permissions, record/stop/playback and AI examiner audio on an actual iPhone. The Codemagic build now writes `NSMicrophoneUsageDescription` into the generated iOS `Info.plist`. Additional permissions/plugins, if needed, must be configured and tested before signed distribution.
 - **Music and listening:** Test streaming, auto-play restrictions, lyric sync and background behaviour.
 - **Navigation:** Test deep links, redirects, React Router refreshes, downloads and PDF opening.
 - **Payments:** Evaluate App Store In-App Purchase requirements for selling digital courses/exams; existing web Paystack checkout must not simply be reused for in-app digital purchases without confirming Apple policy and applicable exceptions.
@@ -61,6 +61,7 @@ cd mobile
 npm install --no-package-lock
 npx cap add ios
 npx cap sync ios
+python3 scripts/prepare_ios.py
 npx cap open ios
 ```
 
