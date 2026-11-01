@@ -5,18 +5,21 @@ import { loadPublicClasses } from "../services/publicClassCatalogService";
 const WORDING = {
   en: [
     { kicker:"UPCOMING GERMAN CLASSES",title:"Your next chapter",accent:"starts with German.",desc:"Find your next class and take the first step. Learn live with a tutor, practise with AI, and keep building your confidence between lessons.",action:"View upcoming classes",support:"Find my level",href:"/classes",kind:"courses" },
+    { kicker:"LEARN GERMAN WITH MUSIC",title:"Make German practice",accent:"sound better.",desc:"Listen to original German-learning songs for A1, A2 and B1. Follow the lyrics, practise pronunciation and learn vocabulary through music.",action:"Explore German songs",href:"https://music.falowen.app/",kind:"music" },
     { kicker:"FREE PLACEMENT TEST",title:"Find your",accent:"German level.",desc:"New to German, or unsure where to begin? Take a free A1–B1 placement test to discover your starting point.",action:"Take free placement test",href:"/placement-test",kind:"placement" },
     { kicker:"GOETHE-STYLE EXAM PRACTICE",title:"Prepare for",accent:"your German exam.",desc:"Practise sample tests and full mocks in Lesen, Hören, Schreiben and Sprechen, with AI-supported feedback.",action:"Explore exam practice",href:"/exam-practice",kind:"exams" },
     { kicker:"FALOWEN BOOKSTORE",title:"Learn more with",accent:"German books.",desc:"Explore Falowen German workbooks. Choose an available digital edition or order a printed book.",action:"Browse German books",href:"/books",kind:"books" },
   ],
   de: [
     { kicker:"KOMMENDE DEUTSCHKURSE",title:"Dein nächstes Kapitel",accent:"beginnt mit Deutsch.",desc:"Lerne online von überall mit Live-Unterricht, Lehrkräften, Aufzeichnungen, Arbeitsbüchern und KI-Übungen.",action:"Kommende Kurse ansehen",support:"Mein Niveau finden",href:"/classes",kind:"courses" },
+    { kicker:"DEUTSCH LERNEN MIT MUSIK",title:"Deutsch üben",accent:"mit Musik.",desc:"Entdecke Lernlieder für A1, A2 und B1. Höre zu, lies den Liedtext mit und trainiere Aussprache und Wortschatz.",action:"Deutsche Lieder entdecken",href:"https://music.falowen.app/",kind:"music" },
     { kicker:"KOSTENLOSER EINSTUFUNGSTEST",title:"Finde dein",accent:"Deutschniveau.",desc:"Du weißt nicht, wo du anfangen sollst? Mit dem kostenlosen A1–B1-Test findest du deinen Einstieg.",action:"Einstufungstest starten",href:"/placement-test",kind:"placement" },
     { kicker:"GOETHE-ORIENTIERTE PRÜFUNGSÜBUNGEN",title:"Bereite dich auf",accent:"deine Prüfung vor.",desc:"Übe Lesen, Hören, Schreiben und Sprechen mit Beispieltests, Probeprüfungen und KI-Feedback.",action:"Prüfungsübungen ansehen",href:"/exam-practice",kind:"exams" },
     { kicker:"FALOWEN BÜCHER",title:"Deutsch lernen",accent:"mit Arbeitsbüchern.",desc:"Entdecke Falowen Arbeitsbücher als verfügbare digitale oder gedruckte Ausgabe.",action:"Bücher ansehen",href:"/books",kind:"books" },
   ],
   fr: [
     { kicker:"PROCHAINS COURS D'ALLEMAND",title:"Votre prochain chapitre",accent:"commence en allemand.",desc:"Suivez des cours en ligne depuis n'importe où, avec enseignants, vidéos, cahiers et exercices IA.",action:"Voir les prochains cours",support:"Trouver mon niveau",href:"/classes",kind:"courses" },
+    { kicker:"APPRENDRE L'ALLEMAND EN MUSIQUE",title:"Apprenez l'allemand",accent:"avec la musique.",desc:"Écoutez des chansons pédagogiques pour les niveaux A1, A2 et B1. Suivez les paroles et entraînez votre prononciation et votre vocabulaire.",action:"Découvrir les chansons",href:"https://music.falowen.app/",kind:"music" },
     { kicker:"TEST DE NIVEAU GRATUIT",title:"Découvrez votre",accent:"niveau d'allemand.",desc:"Vous hésitez sur votre niveau? Faites notre test gratuit A1–B1 et trouvez où commencer.",action:"Faire le test gratuit",href:"/placement-test",kind:"placement" },
     { kicker:"PRÉPARATION AUX EXAMENS TYPE GOETHE",title:"Préparez votre",accent:"examen d'allemand.",desc:"Entraînez-vous en lecture, écoute, expression écrite et orale avec des examens blancs et des retours IA.",action:"Explorer les examens",href:"/exam-practice",kind:"exams" },
     { kicker:"LIVRES FALOWEN",title:"Progressez avec",accent:"nos livres d'allemand.",desc:"Découvrez les cahiers Falowen disponibles en version numérique ou imprimée.",action:"Voir les livres",href:"/books",kind:"books" },
@@ -58,6 +61,20 @@ function UpcomingClassCard({ language }) {
 
 function SlideIllustration({kind,language}) {
   if (kind === "courses") return <UpcomingClassCard language={language} />;
+  if(kind==="music") return (
+    <div className="falowen-slide-illustration falowen-slide-music" aria-hidden="true">
+      <div className="falowen-slide-music-player">
+        <div className="falowen-slide-music-top"><span className="falowen-slide-music-mark">♫</span> FALOWEN MUSIC</div>
+        <div className="falowen-slide-music-art">♪</div>
+        <strong>Deutsch mit Musik</strong>
+        <small>A1 · A2 · B1</small>
+        <div className="falowen-slide-music-wave">
+          {[12, 22, 35, 25, 43, 29, 18, 36, 45, 30, 16, 32, 40, 25, 14, 27, 36, 19].map((height, index) => <span key={index} style={{ height }} />)}
+        </div>
+        <div className="falowen-slide-music-caption"><span>Follow the lyrics</span><span>Listen & learn</span></div>
+      </div>
+    </div>
+  );
   if(kind==="placement") return (
     <div className="falowen-slide-illustration" aria-hidden="true">
       <div className="falowen-slide-paper">

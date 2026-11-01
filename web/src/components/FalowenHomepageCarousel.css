@@ -100,3 +100,32 @@
 .falowen-class-board-footer {display:flex;justify-content:space-between;gap:14px;margin-top:18px;font-size:11px;line-height:1.5;color:#65748a;}
 .falowen-class-board-footer a {color:#123f92;font-weight:700;}
 @media(max-width:760px){.falowen-carousel-courses .falowen-carousel-content{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;padding-right:0;}.falowen-class-board{margin:8px 20px 60px;}.falowen-class-board-head,.falowen-class-board-body{padding:20px;}}
+
+/* Music discovery: a lightweight CSS illustration, with no audio or player requests on the landing page. */
+.falowen-carousel-music { --tone:#7150d4; --soft:#f3efff; --deep:#1e2450; }
+.falowen-slide-music { background:radial-gradient(circle at 80% 16%,#e4d6ff 0,transparent 44%),linear-gradient(145deg,#f5eeff,#e1e9ff); }
+.falowen-slide-music-player {
+  width:min(100%,320px);padding:24px 27px 20px;display:flex;flex-direction:column;align-items:center;
+  gap:9px;border:1px solid rgba(255,255,255,.6);border-radius:22px;color:#fff;text-align:center;
+  background:linear-gradient(145deg,#22204b,#453682 75%,#6244ac);box-shadow:0 24px 50px rgba(49,32,106,.23);
+}
+.falowen-slide-music-top {align-self:stretch;display:flex;align-items:center;gap:8px;text-align:left;font-size:10px;font-weight:900;letter-spacing:.13em;color:#e3dcff;}
+.falowen-slide-music-mark {display:grid;place-items:center;width:27px;height:27px;border-radius:9px;background:#a188f0;color:#fff;font-size:19px;letter-spacing:0;}
+.falowen-slide-music-art {display:grid;place-items:center;width:88px;height:88px;margin:4px 0 0;border:8px solid #29254e;border-radius:50%;background:repeating-radial-gradient(circle at center,#6652b3 0,#6652b3 8px,#503e95 9px,#503e95 15px);color:#fff;font-size:45px;box-shadow:0 5px 20px #16103066;}
+.falowen-slide-music-player strong {font-size:22px;line-height:1.15;letter-spacing:-.02em;color:#fff;}
+.falowen-slide-music-player small {font-size:12px;font-weight:700;letter-spacing:.13em;color:#e0d9ff;}
+.falowen-slide-music-wave {display:flex;align-items:center;justify-content:center;gap:4px;width:100%;height:46px;margin-top:2px;}
+.falowen-slide-music-wave span {display:block;flex:1;max-width:6px;min-width:3px;border-radius:9px;background:linear-gradient(#a68bff,#64d7db);}
+.falowen-slide-music-caption {display:flex;justify-content:space-between;width:100%;gap:14px;border-top:1px solid #ffffff33;padding-top:10px;font-size:10px;font-weight:800;color:#e4ddff;}
+@media(max-width:700px) {
+ .falowen-slide-music {padding:8px 20px;}
+ .falowen-slide-music-player {width:min(100%,300px);padding:10px 16px;display:grid;grid-template-columns:50px minmax(0,1fr);gap:4px 11px;text-align:left;border-radius:16px;}
+ .falowen-slide-music-top {grid-column:1 / -1;font-size:9px;}
+ .falowen-slide-music-mark {width:22px;height:22px;font-size:15px;}
+ .falowen-slide-music-art {grid-column:1;grid-row:2 / span 2;width:49px;height:49px;border-width:5px;font-size:26px;margin:0;}
+ .falowen-slide-music-player strong {grid-column:2;font-size:17px;align-self:end;}
+ .falowen-slide-music-player small {grid-column:2;font-size:10px;align-self:start;}
+ .falowen-slide-music-wave {grid-column:1 / -1;height:26px;margin-top:0;gap:3px;}
+ .falowen-slide-music-wave span {max-height:25px;}
+ .falowen-slide-music-caption {grid-column:1 / -1;font-size:9px;padding-top:6px;}
+}
