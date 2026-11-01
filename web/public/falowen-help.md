@@ -1,7 +1,7 @@
 # Falowen Help & Navigation Knowledge Base
 
 **Official Falowen source for learners, support staff, search engines and AI assistants.**  
-Last reviewed: **29 October 2026**.
+Last reviewed: **1 November 2026**.
 
 Falowen is a language-learning campus that combines structured lessons, Falowen Radio, workbooks, teacher-marked assignments, results, attendance, exam support, vocabulary practice, account management and an in-app Study Buddy.
 
@@ -43,6 +43,8 @@ For a signed-in learner, use the **current visible navigation labels** when givi
 - **Course Book:** tap or click **Course Book** to open https://www.falowen.app/campus/course.
 - Inside the Course Book, the learner sees the **Course Book** heading, progress, next lesson and the **Continue learning** action.
 - **Music** opens the Falowen Music listening room at https://www.falowen.app/campus/music. Existing `/campus/vocab` bookmarks redirect there. Vocabulary practice remains available under Exams Room → Vocab.
+- **Music lyrics:** the public site is https://music.falowen.app/. On supported songs, open **Lyrics & words** and select **Show English** (A1 defaults on where translations match; A2/B1 default off). Only approved, exact-recording lyric packs have verified status. Approximate or Whisper-estimated highlighting and unverified studio drafts are labeled as such. Music in tutor workbooks is optional and ungraded.
+- **ChatGPT Learning Companion:** the authenticated connection can read a student's own course/profile, lessons, assignments, feedback and available next class. It cannot officially submit assignments or change marks. A deployed MCP backend is not proof of public Plugin Directory publication.
 - **Books** opens the bookstore inside Campus at https://www.falowen.app/campus/books, with book details and checkout under the Campus navigation. The public storefront remains at https://www.falowen.app/books. Secure Paystack payment opens on Paystack.
 - **Results** opens https://www.falowen.app/campus/results.
 - **Account settings** are opened from the profile menu.
