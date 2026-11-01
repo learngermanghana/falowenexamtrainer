@@ -70,6 +70,13 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
           ChatGPT cannot submit assignments, change grades, access payment records, or start timed exams.
           Official work stays on Falowen Campus.
         </p>
+        <p style={styles.subtle}>
+          Connecting sends relevant learning information to ChatGPT when you ask for it. Review the{" "}
+          <a href="/chatgpt-privacy.html" target="_blank" rel="noreferrer" style={styles.link}>Falowen ChatGPT privacy notice</a>{" "}
+          and{" "}
+          <a href="/chatgpt-terms.html" target="_blank" rel="noreferrer" style={styles.link}>terms of use</a>{" "}
+          before granting permission. You can disconnect in ChatGPT plugin settings.
+        </p>
         {error && <p role="alert" style={{ color: "#b21d2d" }}>{error}</p>}
         {!hasRequest ? (
           <p role="alert" style={{ color: "#b21d2d" }}>The ChatGPT connection request is incomplete. Start again from ChatGPT.</p>
