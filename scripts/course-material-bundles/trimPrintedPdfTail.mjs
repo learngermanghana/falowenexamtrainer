@@ -69,6 +69,20 @@ export const trimPrintedPdfTail = async (file, { description = "" } = {}) => {
   }
   let removed = 0;
   for (let index = pageCount - 1; index > 0; index--) {
+    // A2 source-controlled practice sometimes prints its generic footer on
+    // an otherwise empty extra sheet (as in the 332-page November export).
+    // Remove only that exact footer, only at the end of a read-only Teil
+    // companion, and only when the preceding exercise page is substantive.
+    // Never classify any user-provided or question text as a disposable page.
+    const a2Companion = /^A2 Day (?:[1-9]|1\d|2[0-8]) teil-[1-4] companion$/.test(description);
+    const footerOnly = textPages[index].replace(/\s+/g, " ").trim() ===
+      "Read-only printed practice. Submit graded coursework in Falowen.";
+    if (a2Companion && footerOnly && textPages[index - 1].trim().length > 100) {
+      if (removed >= 3) throw new Error("Too many trailing print pages in " + description);
+      pdf.removePage(index);
+      removed++;
+      continue;
+    }
     if (textPages[index].trim()) break;
     if (!isVisuallyEmptyPgm(renderPageToGrayscale(file, index + 1))) {
       // Preserve a legitimate graphical page, even if pdftotext sees nothing.
