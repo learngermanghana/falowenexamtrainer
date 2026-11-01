@@ -33,6 +33,7 @@ workflows:
           cd mobile
           npx cap add ios
           npx cap sync ios
+          python3 scripts/prepare_ios.py
       - name: Build unsigned iOS Simulator app
         script: |
           xcodebuild build \
@@ -84,6 +85,7 @@ workflows:
           cd mobile
           npx cap add ios
           npx cap sync ios
+          python3 scripts/prepare_ios.py
       - name: Retrieve Apple distribution signing files
         script: |
           keychain initialize
