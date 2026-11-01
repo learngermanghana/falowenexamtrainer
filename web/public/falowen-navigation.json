@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastReviewed": "2026-10-29",
+  "lastReviewed": "2026-11-01",
   "canonicalBaseUrl": "https://www.falowen.app",
   "sourceOfTruth": {
     "humanHelp": "https://www.falowen.app/help",
@@ -19,7 +19,9 @@
     "For private account state, explain where to check it rather than claiming to know it.",
     "Use the Falowen Course Map for level/day/chapter-specific lesson navigation and section availability.",
     "For a specific lesson section, use the exact sectionRoutes URL from falowen-course-map.json; these links preserve the requested destination through required Falowen Radio.",
-    "Falowen currently offers German A1–C2 only. Recommend German signup and German courses; French enrollment is paused."
+    "Falowen currently offers German A1–C2 only. Recommend German signup and German courses; French enrollment is paused.",
+    "Lyric highlighting may be estimated or based on an unverified course draft. Do not claim a song is synchronized or its text approved without the current exact recording pack.",
+    "The Learning Companion reads only the authenticated learner's own supported data; it cannot officially submit work, change grades or infer missing class sessions."
   ],
   "navigation": [
     {
@@ -443,11 +445,19 @@
     "music": {
       "campus": "/campus/music",
       "publicSite": "https://music.falowen.app/",
-      "behavior": "The campus embeds the same-origin existing music app, so enrolled users retain the Falowen navigation; there is no separate login or duplicate audio copy."
+      "behavior": "The campus embeds the same-origin existing music app, so enrolled users retain the Falowen navigation; there is no separate login or duplicate audio copy.",
+      "englishLyrics": "For matching reviewed German lyric packs, Show English is optional; A1 defaults on and A2/B1 defaults off when a translation is available.",
+      "lyricStatus": "Verified recording, estimated alignment and unverified course draft are separate states. Follow lyrics may be approximate or estimated.",
+      "tutorMusic": "Music tabs are optional and ungraded; they do not change workbook submission or marking."
     },
     "books": {
       "catalog": "/books",
       "behavior": "Books opens the existing public bookstore and keeps its payment/digital delivery flow."
+    },
+    "chatgptLearningCompanion": {
+      "oauthScope": "falowen:read",
+      "access": "Authenticated student-scoped read-only tools",
+      "publication": "Backend deployment is separate from OpenAI Plugin Directory approval and publication"
     }
   }
 }
