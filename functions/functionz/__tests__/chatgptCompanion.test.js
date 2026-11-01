@@ -257,7 +257,7 @@ describe("A1 and A2 canonical Course Book exports for ChatGPT", () => {
       expect(reading.material.text.length).toBeGreaterThan(45);
       expect(reading.material.questions.length).toBeGreaterThan(0);
       expect(reading.material.questions[0]).not.toHaveProperty("answerIndex");
-      expect(lessonContentResponse("A2", day, "grammar").material.fullExplanationIncluded).toBe(false);
+      expect(lessonContentResponse("A2", day, "grammar").material.fullExplanationIncluded).toBe(true);
     }
     const first = lessonContentResponse("A2", 1, "reading");
     expect(first.material.title).toBe("Neu im Büro");
