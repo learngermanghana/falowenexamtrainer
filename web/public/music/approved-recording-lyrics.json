@@ -1256,6 +1256,162 @@
       "source": "Owner-provided A2 Day 15 Kleine Momente.mp3 and lyrics, 2026-11-01.",
       "timingStatus": "estimated",
       "timingMethod": "Approximate lyric-line windows manually assigned to the supplied 156.432-second recording; not acoustically verified; review playback before treating as exact."
+    },
+    {
+      "trackId": "r2-a2-day-14-b64_UGzDpG5lIGbDvHIgbWVpbiBMZWJlbi5tcDM",
+      "objectKey": "music/a2/day-14/Pläne für mein Leben.mp3",
+      "assignmentKey": "A2-5.14",
+      "title": "Pläne für mein Leben",
+      "lyrics": "[Verse 1]\nIch arbeite seit zwei Jahren im Büro,\ndie Arbeit macht mir meistens Spaß.\nIch schreibe E-Mails, plane Termine,\nund spreche täglich mit den Kunden.\n\nManchmal ist die Arbeit stressig,\nund manchmal fehlt mir Erfahrung.\nDoch ich möchte besser werden,\ndenn ich habe große Ziele.\n\n[Chorus]\nIch habe Pläne für mein Leben,\nich möchte lernen und mehr verstehen.\nIch will im Beruf erfolgreich sein,\nund meine Zukunft selbst gestalten.\n\n[Verse 2]\nNächstes Jahr mache ich eine Weiterbildung,\ndamit ich neue Dinge lernen kann.\nIch möchte besser Deutsch sprechen,\ndenn das hilft mir auch im Beruf.\n\nVielleicht werde ich einmal Teamleiter,\nund übernehme mehr Verantwortung.\nIch spare Geld für meine Zukunft,\nund suche neue Möglichkeiten.\n\n[Chorus]\nIch habe Pläne für mein Leben,\nich möchte lernen und mehr verstehen.\nIch will im Beruf erfolgreich sein,\nund meine Zukunft selbst gestalten.\n\n[Outro]\nIch weiß, der Weg ist manchmal schwer,\ndoch meine Ziele bleiben klar.\nIch lerne heute für die Zukunft,\nund freue mich auf das nächste Jahr.",
+      "cues": [
+        {
+          "start": 15.9,
+          "end": 19.2,
+          "text": "Ich arbeite seit zwei Jahren im Büro,"
+        },
+        {
+          "start": 19.45,
+          "end": 22.2,
+          "text": "die Arbeit macht mir meistens Spaß."
+        },
+        {
+          "start": 22.45,
+          "end": 25.6,
+          "text": "Ich schreibe E-Mails, plane Termine,"
+        },
+        {
+          "start": 25.9,
+          "end": 29.1,
+          "text": "und spreche täglich mit den Kunden."
+        },
+        {
+          "start": 29.9,
+          "end": 33.1,
+          "text": "Manchmal ist die Arbeit stressig,"
+        },
+        {
+          "start": 33.35,
+          "end": 36.35,
+          "text": "und manchmal fehlt mir Erfahrung."
+        },
+        {
+          "start": 36.7,
+          "end": 40.05,
+          "text": "Doch ich möchte besser werden,"
+        },
+        {
+          "start": 40.45,
+          "end": 43.9,
+          "text": "denn ich habe große Ziele."
+        },
+        {
+          "start": 44.85,
+          "end": 48.15,
+          "text": "Ich habe Pläne für mein Leben,"
+        },
+        {
+          "start": 48.55,
+          "end": 51.7,
+          "text": "ich möchte lernen und mehr verstehen."
+        },
+        {
+          "start": 52.05,
+          "end": 55.3,
+          "text": "Ich will im Beruf erfolgreich sein,"
+        },
+        {
+          "start": 55.65,
+          "end": 59.05,
+          "text": "und meine Zukunft selbst gestalten."
+        },
+        {
+          "start": 71.9,
+          "end": 75.4,
+          "text": "Nächstes Jahr mache ich eine Weiterbildung,"
+        },
+        {
+          "start": 75.65,
+          "end": 78.7,
+          "text": "damit ich neue Dinge lernen kann."
+        },
+        {
+          "start": 79.05,
+          "end": 82.25,
+          "text": "Ich möchte besser Deutsch sprechen,"
+        },
+        {
+          "start": 82.6,
+          "end": 85.75,
+          "text": "denn das hilft mir auch im Beruf."
+        },
+        {
+          "start": 86.25,
+          "end": 89.8,
+          "text": "Vielleicht werde ich einmal Teamleiter,"
+        },
+        {
+          "start": 90.05,
+          "end": 93.4,
+          "text": "und übernehme mehr Verantwortung."
+        },
+        {
+          "start": 93.75,
+          "end": 97.1,
+          "text": "Ich spare Geld für meine Zukunft,"
+        },
+        {
+          "start": 97.4,
+          "end": 100.65,
+          "text": "und suche neue Möglichkeiten."
+        },
+        {
+          "start": 101.5,
+          "end": 104.75,
+          "text": "Ich habe Pläne für mein Leben,"
+        },
+        {
+          "start": 105.05,
+          "end": 108.15,
+          "text": "ich möchte lernen und mehr verstehen."
+        },
+        {
+          "start": 108.5,
+          "end": 111.7,
+          "text": "Ich will im Beruf erfolgreich sein,"
+        },
+        {
+          "start": 112.05,
+          "end": 115.55,
+          "text": "und meine Zukunft selbst gestalten."
+        },
+        {
+          "start": 120.55,
+          "end": 123.55,
+          "text": "Ich weiß, der Weg ist manchmal schwer,"
+        },
+        {
+          "start": 124,
+          "end": 126.85,
+          "text": "doch meine Ziele bleiben klar."
+        },
+        {
+          "start": 127.25,
+          "end": 130,
+          "text": "Ich lerne heute für die Zukunft,"
+        },
+        {
+          "start": 130.35,
+          "end": 134.95,
+          "text": "und freue mich auf das nächste Jahr."
+        }
+      ],
+      "strictRecordingLyrics": true,
+      "recordingSha256": "479a69d10c7231ace8e8e7689cdbe62f2f9349601c7ab76e613e8388ec4e12fe",
+      "duration": 136.8,
+      "genre": "Acoustic Afro-Soul",
+      "source": "User-provided A2 Day 14 Pläne für mein Leben.mp3 with 28 original lyric lines, 2026-11-01; R2 upload still required",
+      "timingStatus": "estimated",
+      "timingMethod": "Approximate vocal line windows for the attached 136.8-second recording. Not teacher/ear-certified; review boundaries against playback after R2 upload."
     }
   ]
 }
