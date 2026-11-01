@@ -6,7 +6,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const { parse } = require("@babel/parser");
+let parse;
+try {
+  ({ parse } = require("@babel/parser"));
+} catch (error) {
+  if (error.code !== "MODULE_NOT_FOUND") throw error;
+  // Web CI/Vercel install under web/node_modules, unlike backend CI.
+  ({ parse } = createRequire(new URL("../web/package.json", import.meta.url))("@babel/parser"));
+}
 const tidy = (v, max = 1100) => String(v || "").replace(/\s+/g, " ").trim().slice(0, max);
 const forbidden = /\b(?:answer key|correct answer|musterl[oö]sung|l[oö]sungsschl[uü]ssel|solution key|auswertung|bewertungstabelle)\b/i;
 const safe = (v, max) => { const x = tidy(v, max); return x && !forbidden.test(x) ? x : ""; };
