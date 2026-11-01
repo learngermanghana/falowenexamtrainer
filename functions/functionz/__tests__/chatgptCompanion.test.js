@@ -1,5 +1,7 @@
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
 const {
   oauthParameters, safeStudentAccess, scoreRowsForStudent,
   summarizeStudentAssignments, constants,
@@ -73,5 +75,20 @@ describe("Falowen ChatGPT read-only records", () => {
     expect(progress.assignments[0].status).toBe("passed");
     expect(progress.assignments[0].bestRecordedScore).toBe(92);
     expect(progress.passed).toBe(1);
+  });
+});
+
+describe("ChatGPT OAuth static discovery", () => {
+  test("the Vercel well-known discovery documents match the backend issuer and resource", () => {
+    const root = path.resolve(__dirname, "../../..");
+    const load = (name) => JSON.parse(fs.readFileSync(path.join(root, "web/public/.well-known", name), "utf8"));
+    const server = load("oauth-authorization-server/api/chatgpt");
+    const protectedResource = load("oauth-protected-resource/api/chatgpt/mcp");
+    expect(server.issuer).toBe(constants.ISSUER);
+    expect(server.authorization_endpoint).toBe(constants.ISSUER + "/authorize");
+    expect(server.token_endpoint).toBe(constants.ISSUER + "/token");
+    expect(server.client_id_metadata_document_supported).toBe(true);
+    expect(protectedResource.resource).toBe(constants.RESOURCE);
+    expect(protectedResource.authorization_servers).toEqual([constants.ISSUER]);
   });
 });
