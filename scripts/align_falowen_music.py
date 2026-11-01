@@ -139,7 +139,7 @@ def known_lyrics(track, approved, studio, allow_drafts):
         return None, "no-approved-lyrics"
     options = [r for r in studio.get("tracks", [])
                if r.get("level")==track.get("level") and r.get("day")==track.get("day")]
-    match = next((r for r in options if r.get("title","").casefold()==track["title"].casefold()),None)
+    match = next((r for r in options if r.get("title","").casefold()==str(track.get("title","")).casefold()),None)
     match = match or (options[0] if len(options)==1 else None)
     if match and match.get("lyrics"):
         return match,"draft-review-only"
