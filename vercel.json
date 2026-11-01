@@ -223,6 +223,40 @@
           "value": "noindex, nofollow"
         }
       ]
+    },
+    {
+      "source": "/.well-known/oauth-authorization-server/:path*",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/oauth-protected-resource/:path*",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
     }
   ],
   "routes": [
@@ -424,18 +458,6 @@
         "Cache-Control": "public, max-age=0, must-revalidate"
       },
       "dest": "/help.html"
-    },
-    {
-      "src": "/\\.well-known/oauth-authorization-server/api/chatgpt/?",
-      "dest": "/api/chatgpt/.well-known/oauth-authorization-server"
-    },
-    {
-      "src": "/\\.well-known/oauth-protected-resource/api/chatgpt/mcp/?",
-      "dest": "/api/chatgpt/.well-known/oauth-protected-resource"
-    },
-    {
-      "src": "/\\.well-known/oauth-protected-resource/?",
-      "dest": "/api/chatgpt/.well-known/oauth-protected-resource"
     },
     {
       "src": "/chatgpt/connect/?",
