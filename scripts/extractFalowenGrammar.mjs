@@ -69,14 +69,26 @@ function literalTeaching(ast) {
   }).filter(Boolean);
 }
 function jsxTeaching(ast) {
-  return jsxElements(ast, "section").map((section) => {
+  // Later A2 lessons use a local SectionCard/Section React wrapper whose
+  // visible title is a literal JSX attribute, not an h2. The wrapper is
+  // learner-facing; we still skip all dynamic quiz/result props.
+  const containers = findNodes(ast, (node) =>
+    node.type === "JSXElement" &&
+    ["section", "SectionCard", "Section"].includes(tag(node)));
+  return containers.map((section) => {
     const titleEl = findNodes(section, (n) => n.type === "JSXElement" && /^h[234]$/.test(tag(n)))[0];
-    const title = safe(visibleText(titleEl), 170);
-    if (!title) return null;
-    const body = safe(visibleText(section), 3600);
+    const attr = section.openingElement?.attributes?.find((item) =>
+      item.type === "JSXAttribute" && item.name?.name === "title");
+    const title = safe(
+      attr?.value?.type === "StringLiteral" ? attr.value.value : visibleText(titleEl), 170);
+    if (!title || /(?:test|quiz|self-check|knowledge check|prüfung|lösung)/i.test(title)) return null;
+    const rawText = tag(section) === "section" ? visibleText(section)
+      : (section.children || []).map(visibleText).join(" ");
+    const body = safe(rawText, 3600);
     if (!body || body.length < 50) return null;
-    return { title, explanation: body.slice(title.length).trim().slice(0, 2600) };
-  }).filter((section) => section?.explanation?.length > 30).slice(0, 7);
+    const explanation = (tag(section) === "section" ? body.slice(title.length) : body).trim().slice(0, 2600);
+    return explanation.length > 30 ? { title, explanation } : null;
+  }).filter(Boolean).slice(0, 8);
 }
 export function extractGrammarTeaching(filePath) {
   const source = fs.readFileSync(filePath, "utf8");
