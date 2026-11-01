@@ -19,6 +19,12 @@ import { B2_WRITING_TASKS } from "../web/src/data/b2WritingTasks.js";
 import { B2_REVIEW_KEY_POINTS } from "../web/src/data/b2ReviewKeyPoints.js";
 import { getB2SkillFocus, getB2DayTabs } from "../web/src/data/b2SkillCycle.js";
 import { B1_READING_TASKS } from "../web/src/data/b1ReadingTasks.js";
+import { A1_ASSIGNMENT_REGISTRY } from "../web/src/data/a1AssignmentRegistry.js";
+import { A1_GRAMMAR_ROUTE_ENTRIES } from "../web/src/data/a1GrammarRoutes.js";
+import { A2_GRAMMAR_ROUTE_ENTRIES } from "../web/src/data/a2GrammarRoutes.js";
+import { A2_READING_TASKS } from "../web/src/data/a2ReadingTasks.js";
+import { A2_LISTENING_TASKS, A2_LISTENING_MODES } from "../web/src/data/a2ListeningTasks.js";
+import { A2_REQUIRED_WRITING_DAYS } from "../web/src/data/a2WritingSchedule.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
 
@@ -34,6 +40,130 @@ const publicQuestions = (items) => (Array.isArray(items) ? items : []).slice(0, 
   options: strings(item?.options, 6, 450),
 })).filter((item) => item.question);
 
+
+
+// A1 is a chapter-based course; one day may contain multiple assignments.
+// Export each actual workbook chapter and its exact section labels. Never
+// reassign a chapter to another day or invent a textbook exercise.
+const A1 = {};
+const a1Entries = curriculumManifest.getCurriculumEntriesForLevel("A1");
+for (const day of [...new Set(a1Entries.map((entry) =>
+  Number(entry.day ?? entry.assignmentDay ?? entry.displayDay)).filter((n) =>
+    Number.isInteger(n) && n >= 1 && n <= 50))].sort((a, b) => a - b)) {
+  const source = a1Entries.filter((entry) =>
+    Number(entry.day ?? entry.assignmentDay ?? entry.displayDay) === day);
+  const primary = source.find((entry) => entry.submissionRequired) || source[0];
+  const assignments = Object.values(A1_ASSIGNMENT_REGISTRY).filter((entry) => Number(entry.day) === day);
+  const grammarRoutes = A1_GRAMMAR_ROUTE_ENTRIES.filter((entry) => Number(entry.day) === day);
+  A1[String(day)] = {
+    level: "A1", day,
+    chapter: text(primary?.chapter || assignments[0]?.chapter, 20),
+    title: text(primary?.title || primary?.topic || assignments[0]?.title, 230),
+    topic: text(primary?.topic || primary?.title || assignments[0]?.title, 250),
+    goal: text(primary?.goal || assignments[0]?.title, 650),
+    grammarFocus: text(primary?.grammar_topic || primary?.grammarFocus, 320),
+    skillFocus: "guided",
+    campusTabs: ["Overview", "Workbook", "Music (optional)", "Submit (tutor-marked work)"],
+    // This is a table of contents, not a promise the full JSX text is available.
+    workbook: {
+      chapters: assignments.map((entry) => ({
+        chapter: text(entry.chapter, 25),
+        title: text(entry.title, 240),
+        assignmentId: text(entry.assignmentKey, 40),
+        route: text(entry.workbookRoute, 400),
+        sections: entry.sections.map((section) => text(section.label, 130)),
+        tutorSubmissionRequired: true,
+      })),
+      source: "Falowen A1 canonical tutor-marked workbook registry",
+    },
+    grammar: {
+      focus: text(primary?.grammar_topic || primary?.grammarFocus, 320),
+      noteLinks: grammarRoutes.map((entry) => ({
+        chapter: text(entry.chapter, 25), url: text(entry.route, 400),
+      })),
+      fullExplanationIncluded: false,
+    },
+  };
+}
+
+// The original A1 Day 1 workbook has literal text and questions. Extract only
+// its learner-visible data, not its React UI, marking keys or state.
+function extractA1Day1(source) {
+  const reading = source.match(/<strong>Text:<\/strong>\s*([^<]+)<\/p>/);
+  const translation = source.match(/<strong>Translation:<\/strong>\s*([^<]+)<\/p>/);
+  const literal = source.match(/const questions = (\[[\s\S]*?\n\]);/);
+  if (!reading || !literal) throw new Error("A1 Day 1 source reading has changed; review the exporter");
+  const raw = literal[1].replace(/(\bstem|\btranslation|\boptions)\s*:/g, '"$1":')
+    .replace(/,\s*([}\]])/g, "$1");
+  const questions = JSON.parse(raw);
+  if (questions.length !== 10 || !reading[1].startsWith("Guten Morgen! Wie geht es dir?")) {
+    throw new Error("A1 Day 1 source content drifted; review the exporter");
+  }
+  return {
+    title: "Teil 1 · Reading Text",
+    paragraphs: [text(reading[1], 1900)],
+    translation: text(translation?.[1], 1900),
+    questions: questions.map((question) => ({
+      question: text(question.stem, 350),
+      translation: text(question.translation, 350),
+      options: strings(question.options, 5, 250),
+    })),
+  };
+}
+const a1Day1Workbook = fs.readFileSync(
+  path.join(root, "web/src/components/A1Day1GreetingsWorkbookPage.js"), "utf8"
+);
+if (!A1["1"]) throw new Error("Canonical A1 Day 1 lesson missing");
+A1["1"].reading = extractA1Day1(a1Day1Workbook);
+
+const A2 = {};
+const a2Entries = curriculumManifest.getCurriculumEntriesForLevel("A2");
+for (let day = 1; day <= 28; day += 1) {
+  const entries = a2Entries.filter((entry) =>
+    Number(entry.day ?? entry.assignmentDay ?? entry.displayDay) === day);
+  const lesson = entries.find((entry) => entry.submissionRequired) || entries[0];
+  if (!lesson) throw new Error("A2 canonical lesson missing for day " + day);
+  const reading = A2_READING_TASKS[day];
+  if (!reading?.text || !Array.isArray(reading.questions) || !reading.questions.length) {
+    throw new Error("A2 reading passage missing for day " + day);
+  }
+  const listening = A2_LISTENING_TASKS[day];
+  const grammarLink = A2_GRAMMAR_ROUTE_ENTRIES.find((entry) => Number(entry.day) === day);
+  const writingRequired = A2_REQUIRED_WRITING_DAYS.includes(day);
+  A2[String(day)] = {
+    level: "A2", day, chapter: text(lesson.chapter || reading.chapter, 25),
+    title: text(lesson.title || lesson.topic, 240),
+    topic: text(lesson.topic || lesson.title, 240),
+    goal: text(lesson.goal, 750),
+    grammarFocus: text(lesson.grammar_topic || lesson.grammarFocus, 320),
+    skillFocus: "lesen_hoeren",
+    campusTabs: ["Grammar", "Sprechen", ...(writingRequired ? ["Schreiben"] : []),
+      "Lesen", ...(listening && listening.mode !== A2_LISTENING_MODES.NONE ? ["Hören"] : []), "Submit"],
+    instruction: text(lesson.instruction, 800),
+    reading: {
+      title: text(reading.title, 240), format: text(reading.format, 130),
+      strategy: text(reading.strategy, 600), text: text(reading.text, 5500),
+      questions: publicQuestions(reading.questions),
+    },
+    grammar: {
+      focus: text(lesson.grammar_topic || lesson.grammarFocus, 320),
+      notesUrl: text(grammarLink?.route || lesson.grammarPage, 450),
+      fullExplanationIncluded: false,
+    },
+    ...(listening && listening.mode !== A2_LISTENING_MODES.NONE ? { listening: {
+      task: text(listening.task, 950), mode: text(listening.mode, 50),
+      audioAvailableInCampus: Boolean(listening.audioUrl || listening.audioKey),
+      mediaUrl: /^https:\/\/(youtu\.be|(?:www\.)?youtube\.com)\//i.test(text(listening.audioUrl))
+        ? text(listening.audioUrl, 500) : null,
+      questions: publicQuestions(listening.questions),
+    } } : {}),
+    ...(writingRequired ? { writing: {
+      requiredInCampus: true,
+      instructions: [text(lesson.instruction, 800)].filter(Boolean),
+      clarification: "This is a Course Book submission requirement. The full writing prompt may be in the Campus workbook; no missing prompt is invented.",
+    } } : {}),
+  };
+}
 
 // B1 Day 1's preserved reading is authored directly in the React workbook.
 // Extract its *literal* paragraph and question text at build time. Fail closed
@@ -177,7 +307,7 @@ for (let day = 1; day <= 28; day += 1) {
 const artifact = {
   schemaVersion: 1,
   provenance: "Learner-facing Falowen Course Book content compiled from canonical workbook and lesson sources",
-  levels: { B1, B2 },
+  levels: { A1, A2, B1, B2 },
 };
 const serialized = JSON.stringify(artifact, null, 2) + "\n";
 if (serialized.includes('"answerIndex"') || serialized.includes('"sampleAnswer"') ||
@@ -186,4 +316,4 @@ if (serialized.includes('"answerIndex"') || serialized.includes('"sampleAnswer"'
 }
 fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, serialized, "utf8");
-process.stdout.write("Generated 28 B1 + 28 B2 ChatGPT student lesson records (" + Buffer.byteLength(serialized) + " bytes)\n");
+process.stdout.write("Generated A1 + 28 A2 + 28 B1 + 28 B2 ChatGPT student lessons (" + Buffer.byteLength(serialized) + " bytes)\n");
