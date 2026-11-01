@@ -26,7 +26,15 @@ if (embedded) {
   });
 }
 const audio = byId("audio");
-audio.addEventListener("play", () => signalCampusPractice("play", current));
+let practicePlaybackId = null;
+// Only new track starts/restarts are practice plays; pause/resume is not.
+audio.addEventListener("play", () => {
+  if (current?.id && current.id !== practicePlaybackId) {
+    practicePlaybackId = current.id;
+    signalCampusPractice("play", current);
+  }
+});
+audio.addEventListener("emptied", () => { practicePlaybackId = null; });
 const player = byId("player");
 const tracksRoot = byId("tracks");
 const levelInput = byId("level");
@@ -339,6 +347,7 @@ function moveTrack(direction = 1) {
 }
 audio.addEventListener("ended", () => {
   signalCampusPractice("complete", current); // Before autoplay changes the track.
+  practicePlaybackId = null;
   if (!audio.loop) moveTrack(1);
 });
 byId("next-track")?.addEventListener("click", () => moveTrack(1));
