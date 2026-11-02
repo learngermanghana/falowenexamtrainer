@@ -9,10 +9,10 @@
   <meta property="og:type" content="website"><meta property="og:title" content="Falowen Music · German songs for every learning day">
   <meta property="og:description" content="Listen to original German-learning songs and practise with lyrics, vocabulary and listening questions.">
   <meta property="og:url" content="https://music.falowen.app/">
-  <link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/music/style.css?v=20261102-cover-art">
+  <link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/music/style.css?v=20261102-behind-the-song">
   <script src="/music/analytics-config.js?v=20261031" defer></script>
   <script src="/music/analytics.js?v=20261031" defer></script>
-  <script src="/music/app.js?v=20261102-cover-art" type="module"></script>
+  <script src="/music/app.js?v=20261102-behind-the-song" type="module"></script>
 </head>
 <body>
   <a class="skip" href="#library">Skip to songs</a>
@@ -30,6 +30,18 @@
           <div><p id="detail-eyebrow" class="eyebrow dark">FALOWEN MUSIC</p><h2 id="detail-title"></h2><p id="detail-meta"></p></div>
           <div class="detail-actions"><button id="detail-play" class="play-button" type="button">▶ Play song</button><button id="detail-favorite" class="outline-button" type="button" aria-pressed="false">♡ Save song</button><button id="detail-share" class="outline-button" type="button">Copy song link</button></div>
         </div>
+        <section class="behind-song" aria-labelledby="behind-song-heading">
+          <div class="behind-song-story">
+            <h3 id="behind-song-heading">Die Idee hinter dem Song <span lang="en">· Behind the Song</span></h3>
+            <p id="story-de" lang="de"></p>
+            <p id="story-en" lang="en" class="behind-song-translation"></p>
+          </div>
+          <div class="behind-song-learning">
+            <h4>Das lernst du <span lang="en">· What you'll practise</span></h4>
+            <p id="story-focus-de" lang="de"></p>
+            <p id="story-focus-en" lang="en" class="behind-song-translation"></p>
+          </div>
+        </section>
         <nav class="lesson-tabs" aria-label="Song learning steps">
           <button type="button" data-tab="listen" aria-pressed="true">1 · Listen</button>
           <button type="button" data-tab="lyrics" aria-pressed="false">2 · Lyrics & words</button>

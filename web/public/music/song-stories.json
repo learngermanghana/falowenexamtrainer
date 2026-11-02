@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "description": "Bilingual editorial descriptions of song scenarios and learning focus; no unsupported personal songwriter claims.",
+  "byObjectKey": {
+    "music/a1/day-02/Ich heiße Bina.mp3": {
+      "storyDe": "Bina ruft bei einer Sprachschule an und buchstabiert ihren Namen. Ein einfacher Anruf wird zu einer kleinen Geschichte über einen neuen Anfang.",
+      "storyEn": "Bina calls a language school and spells her name. A simple phone call becomes a story about a new beginning.",
+      "focusDe": "Den eigenen Namen sagen und buchstabieren, nach einem Deutschkurs fragen und höflich antworten.",
+      "focusEn": "Say and spell your name, ask about a German course, and reply politely."
+    },
+    "music/a1/day-03/Wer bist du_ Sag es mir!.mp3": {
+      "storyDe": "Ein neuer Schüler kommt in den Deutschkurs. Zwei Menschen lernen sich kennen, sprechen über ihre Herkunft und entdecken gemeinsame Interessen.",
+      "storyEn": "A new student joins the German class. Two people get to know each other, talk about where they come from, and discover shared interests.",
+      "focusDe": "Fragen mit „wie“, „woher“ und „wo“ stellen und jemanden kennenlernen.",
+      "focusEn": "Ask questions with “wie,” “woher,” and “wo,” and get to know someone."
+    },
+    "music/a1/day-04/Meine Nummer, meine Adresse.mp3": {
+      "storyDe": "Ben stellt sich vor und erzählt von seinem Leben in Accra. Dabei nennt er sein Alter, seine Hausnummer und seine Adresse.",
+      "storyEn": "Ben introduces himself and talks about his life in Accra, sharing his age, house number, and address.",
+      "focusDe": "Zahlen, Telefonnummern, Adressen und persönliche Angaben verstehen und nennen.",
+      "focusEn": "Understand and give numbers, phone numbers, addresses, and personal details."
+    },
+    "music/a1/day-14/Einsteigen – Wir fahren los.mp3": {
+      "storyDe": "Die Geschichte dreht sich um eine Fahrt mit öffentlichen Verkehrsmitteln. Sie macht typische Situationen beim Einsteigen und Unterwegssein lebendig.",
+      "storyEn": "The story centres on a journey by public transport. It brings familiar situations when boarding and travelling to life.",
+      "focusDe": "Verkehrsmittel, einfache Wegbeschreibungen und Wörter für die Reise üben.",
+      "focusEn": "Practise transport vocabulary, simple directions, and words for travelling."
+    },
+    "music/a1/day-21/Heute kann ich leider nicht.mp3": {
+      "storyDe": "Ein geplanter Besuch im Park fällt wegen schlechten Wetters aus. Die Hauptfigur ruft eine Freundin an und erklärt freundlich, warum sie nicht kommen kann.",
+      "storyEn": "A planned meeting in the park is cancelled because of bad weather. The main character calls a friend and politely explains why they cannot come.",
+      "focusDe": "Über das Wetter sprechen, sich entschuldigen und Pläne ändern.",
+      "focusEn": "Talk about the weather, apologise, and change plans."
+    },
+    "music/a1/day-22/Arzttermin.mp3": {
+      "storyDe": "Jemand fühlt sich krank und ruft in einer Arztpraxis an. Aus einer schwierigen Alltagssituation wird eine Übung für ein wichtiges Gespräch.",
+      "storyEn": "Someone feels unwell and calls a doctor's office. A difficult everyday situation becomes practice for an important conversation.",
+      "focusDe": "Beschwerden beschreiben, nach einem Termin fragen und Uhrzeiten nennen.",
+      "focusEn": "Describe symptoms, ask for an appointment, and tell the time."
+    },
+    "music/a2/day-01/Ein nettes Gespräch.mp3": {
+      "storyDe": "Ein Abend im Restaurant bietet die Gelegenheit, jemanden besser kennenzulernen. Die beiden unterhalten sich, stellen Fragen und lachen zusammen.",
+      "storyEn": "An evening in a restaurant becomes an opportunity to get to know someone better. The two talk, ask questions, and laugh together.",
+      "focusDe": "Small Talk führen, nach dem Tag fragen und ein Gespräch weiterführen.",
+      "focusEn": "Make small talk, ask about someone's day, and keep a conversation going."
+    },
+    "music/a2/day-03/Zwei Städte.mp3": {
+      "storyDe": "Eine Reise führt zuerst nach Berlin und dann nach Hamburg. Die Erlebnisse an Sehenswürdigkeiten, am Hafen und in der Stadt laden zum Vergleichen ein.",
+      "storyEn": "A journey first leads to Berlin and then Hamburg. Experiences at landmarks, the harbour, and around the cities invite comparisons.",
+      "focusDe": "Von vergangenen Reisen erzählen und Städte miteinander vergleichen.",
+      "focusEn": "Talk about past trips and compare cities."
+    },
+    "music/a2/day-08/Ein Abend zu zweit.mp3": {
+      "storyDe": "Zwei Menschen gehen gemeinsam essen. Eine überraschende Bestellung macht den Restaurantbesuch zu einer kleinen Geschichte über Missverständnisse.",
+      "storyEn": "Two people go out for dinner. An unexpected order turns their restaurant visit into a little story about misunderstandings.",
+      "focusDe": "Im Restaurant bestellen, Wünsche äußern und höflich auf Fehler reagieren.",
+      "focusEn": "Order at a restaurant, express preferences, and respond politely to mistakes."
+    },
+    "music/a2/day-10/Die Welt entdecken.mp3": {
+      "storyDe": "Ein Reisender packt seinen Koffer und bereitet eine Reise nach Nigeria vor. Die Vorfreude auf neue Orte und Begegnungen steht im Mittelpunkt.",
+      "storyEn": "A traveller packs a suitcase and prepares for a trip to Nigeria. The excitement of new places and encounters is at the heart of the song.",
+      "focusDe": "Über Reisepläne, Länder, Vorbereitungen und Erwartungen sprechen.",
+      "focusEn": "Talk about travel plans, countries, preparations, and expectations."
+    },
+    "music/a2/day-11/Mit dem Rad, mit dem Zug.mp3": {
+      "storyDe": "Die Hauptfigur ist mit dem Fahrrad und mit dem Zug unterwegs. Bewegung, frische Luft und neue Wege geben der Geschichte ihren Rhythmus.",
+      "storyEn": "The main character travels by bicycle and train. Movement, fresh air, and new routes give the story its rhythm.",
+      "focusDe": "Verkehrsmittel nennen und beschreiben, wie man von einem Ort zum anderen kommt.",
+      "focusEn": "Name forms of transport and describe how to travel from one place to another."
+    },
+    "music/a2/day-12/Träume ändern sich.mp3": {
+      "storyDe": "Ein früherer Berufswunsch verändert sich: Aus dem Traum vom Fliegen wächst das Interesse an Medizin. Das Lied zeigt, dass sich Zukunftspläne entwickeln dürfen.",
+      "storyEn": "An early career dream changes: the wish to fly gives way to an interest in medicine. The song shows that plans for the future can evolve.",
+      "focusDe": "Über frühere Wünsche, neue Interessen und berufliche Ziele sprechen.",
+      "focusEn": "Talk about childhood wishes, new interests, and career goals."
+    },
+    "music/a2/day-14/Mein Traumberuf.mp3": {
+      "storyDe": "Schon als Kind träumt die Hauptfigur davon, Häuser und Brücken zu bauen. Deutschkurs, Mathematik und ein Praktikum gehören zum Weg in den Ingenieurberuf.",
+      "storyEn": "Since childhood, the main character has dreamed of building houses and bridges. German classes, maths, and an internship are steps towards becoming an engineer.",
+      "focusDe": "Berufswünsche, Zukunftspläne, Ausbildung und Ziele beschreiben.",
+      "focusEn": "Describe dream jobs, future plans, education, and goals."
+    },
+    "music/a2/day-15/Kleine Momente.mp3": {
+      "storyDe": "Ein freier Samstag mit einem Lieblingscafé, gutem Essen und Musik erinnert daran, wie wertvoll kleine Pausen sein können.",
+      "storyEn": "A free Saturday with a favourite café, good food, and music is a reminder of how valuable small breaks can be.",
+      "focusDe": "Über Lieblingssachen, Freizeit und persönliche Vorlieben sprechen.",
+      "focusEn": "Talk about favourite things, free time, and personal preferences."
+    },
+    "music/a2/day-16/Kleine Schritte.mp3": {
+      "storyDe": "Wasser trinken, selbst kochen und sich bewegen: Das Lied erzählt von einfachen Gewohnheiten, die im Alltag zu einem gesunden Lebensstil beitragen.",
+      "storyEn": "Drinking water, cooking at home, and staying active: the song describes simple everyday habits that contribute to a healthy lifestyle.",
+      "focusDe": "Gesunde Gewohnheiten, Ernährung und Bewegung beschreiben.",
+      "focusEn": "Describe healthy habits, nutrition, and physical activity."
+    },
+    "music/a2/day-17/Ich gehe zur Apotheke.mp3": {
+      "storyDe": "Mit Husten, Schnupfen und Fieber muss die Hauptfigur auf ihre Gesundheit achten. Die Geschichte zeigt eine vertraute Situation rund um Krankheit und Apotheke.",
+      "storyEn": "With a cough, a runny nose, and a fever, the main character needs to look after their health. The story explores a familiar situation involving illness and a pharmacy.",
+      "focusDe": "Krankheitssymptome erklären und in der Apotheke um Hilfe bitten.",
+      "focusEn": "Explain symptoms and ask for help at a pharmacy."
+    },
+    "music/a2/day-18/die-karte-funktioniert-nicht.mp3": {
+      "storyDe": "Beim Bezahlen funktioniert die Bankkarte nicht. Ein Anruf bei der Bank zeigt, wie man ein Problem ruhig erklärt und gemeinsam eine Lösung findet.",
+      "storyEn": "A bank card stops working during payment. A call to the bank shows how to explain a problem calmly and work towards a solution.",
+      "focusDe": "Probleme beim Bezahlen beschreiben und höflich um Unterstützung bitten.",
+      "focusEn": "Describe payment problems and politely ask for assistance."
+    },
+    "music/a2/day-18/Ein neues Leben.mp3": {
+      "storyDe": "Ein internationaler Student kommt nach Deutschland und bereitet sein Studium vor. Zwischen Bahnhof, Unterkunft und Bankkonto beginnt ein neuer Lebensabschnitt.",
+      "storyEn": "An international student arrives in Germany and prepares for university. Between the train station, accommodation, and opening a bank account, a new chapter begins.",
+      "focusDe": "Über Ankunft, Studium, Unterkunft und Bankgeschäfte sprechen.",
+      "focusEn": "Talk about arriving, studying, accommodation, and banking."
+    },
+    "music/a2/day-23/Fahrrad zur Schule.mp3": {
+      "storyDe": "Statt wie früher mit dem Bus zu fahren, nimmt die Hauptfigur das Fahrrad zur Schule. Der Schulweg wird zu einer kleinen Entscheidung für den Umweltschutz.",
+      "storyEn": "Instead of taking the bus as before, the main character cycles to school. The commute becomes a small choice in favour of protecting the environment.",
+      "focusDe": "Verkehrsmittel vergleichen und Gründe für umweltfreundliche Entscheidungen nennen.",
+      "focusEn": "Compare transport options and give reasons for environmentally friendly choices."
+    },
+    "music/a2/day-24/Endlich Urlaub.mp3": {
+      "storyDe": "Nach Monaten des Sparens plant die Hauptfigur einen Urlaub in Hamburg. Hotelsuche, Buchung und Vorfreude gehören zu den Vorbereitungen.",
+      "storyEn": "After saving money for months, the main character plans a holiday in Hamburg. Finding a hotel, booking, and looking forward to the trip are all part of the preparation.",
+      "focusDe": "Urlaub planen, ein Hotel buchen und von Reiseplänen erzählen.",
+      "focusEn": "Plan a holiday, book a hotel, and talk about travel arrangements."
+    },
+    "music/a2/day-25/Endlich Urlaub.mp3": {
+      "storyDe": "Ein lang ersehnter Urlaub in Hamburg rückt näher. Das Lied begleitet die Vorbereitungen und die Freude auf eine Reise mit dem Zug.",
+      "storyEn": "A long-awaited holiday in Hamburg is getting closer. The song follows the preparations and excitement for a journey by train.",
+      "focusDe": "Über Reisevorbereitungen, Wünsche und zukünftige Aktivitäten sprechen.",
+      "focusEn": "Talk about travel preparations, wishes, and future activities."
+    },
+    "music/b1/day-01/Ein Traum geht nicht verloren(1).mp3": {
+      "storyDe": "Ein alter Koffer erinnert die Hauptfigur an einen früheren Reisetraum. Die Geschichte fragt, ob man einen lang vergessenen Wunsch wieder aufgreifen kann.",
+      "storyEn": "An old suitcase reminds the main character of an earlier dream of travelling. The story asks whether a long-forgotten wish can be revived.",
+      "focusDe": "Über vergangene Träume, Erinnerungen und neue Entscheidungen erzählen.",
+      "focusEn": "Talk about past dreams, memories, and new decisions."
+    },
+    "music/b1/day-02/Freundschaft am Fluss.mp3": {
+      "storyDe": "Zwei Freunde verlieren durch einen Umzug den regelmäßigen Kontakt. Das Lied erzählt davon, wie wertvoll Zuhören und ein neuer Anruf sein können.",
+      "storyEn": "Two friends gradually lose touch after one moves away. The song explores the value of listening and reaching out again.",
+      "focusDe": "Über Freundschaft, Veränderungen und persönliche Erfahrungen sprechen.",
+      "focusEn": "Talk about friendship, changes, and personal experiences."
+    },
+    "music/b1/day-03/Ein kleiner Erfolg.mp3": {
+      "storyDe": "Deutschlernen beginnt nicht immer leicht: Fehler und Unsicherheit gehören dazu. Ein kleiner Lernerfolg macht Mut, weiterzumachen.",
+      "storyEn": "Learning German is not always easy at first: mistakes and uncertainty are part of it. A small achievement brings the courage to keep going.",
+      "focusDe": "Lernfortschritte, Herausforderungen und Gefühle beschreiben.",
+      "focusEn": "Describe learning progress, challenges, and feelings."
+    },
+    "music/b1/day-04/Ort zum Leben.mp3": {
+      "storyDe": "Auf der Suche nach einer neuen Wohnung zählt nicht nur der Preis. Die Geschichte zeigt den Wunsch nach einem hellen Ort, an dem man sich zu Hause fühlt.",
+      "storyEn": "When searching for a new home, the price is not the only thing that matters. The story captures the wish for a bright place where one feels at home.",
+      "focusDe": "Wohnungen beschreiben, Angebote vergleichen und Wünsche begründen.",
+      "focusEn": "Describe flats, compare listings, and explain housing preferences."
+    }
+  },
+  "byTrackId": {
+    "gemeinsam-schaffen-wir-das": {
+      "storyDe": "Gemeinsam lernen ist leichter: Dieses Klassenlied erinnert daran, dass gegenseitige Unterstützung Mut und Freude am Lernen geben kann.",
+      "storyEn": "Learning together is easier: this classroom song reminds us that supporting one another can bring confidence and joy to learning.",
+      "focusDe": "Ermutigende Sätze und Wörter über Zusammenarbeit wiederholen.",
+      "focusEn": "Repeat encouraging phrases and vocabulary about teamwork."
+    },
+    "schritt-fuer-schritt": {
+      "storyDe": "Nicht alles muss sofort gelingen. Dieses Motivationslied stellt kleine Fortschritte und das Dranbleiben beim Lernen in den Mittelpunkt.",
+      "storyEn": "Not everything has to work immediately. This motivational song puts small achievements and persistence in learning at its centre.",
+      "focusDe": "Über Ziele, Fortschritt und Motivation auf Deutsch sprechen.",
+      "focusEn": "Talk about goals, progress, and motivation in German."
+    }
+  }
+}
