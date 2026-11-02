@@ -1,6 +1,7 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { installLoopHandoff } from "./loop-handoff.js?v=20261102-ios-loop";
+import { prefersNativeLoop, installEndedHandoff } from "./background-playback.js?v=20261102-android-ended";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
 import { matchingEnglishTranslation, matchingDraftEnglishTranslation } from "./english-translations.js?v=20261101-draft";
@@ -18,6 +19,8 @@ if (embedded) {
   });
 }
 const audio = byId("audio");
+const iosLoopMode = prefersNativeLoop({userAgent: navigator.userAgent, platform: navigator.platform, maxTouchPoints: navigator.maxTouchPoints});
+function syncAudioLoop() { audio.loop = iosLoopMode || byId("repeat").checked; }
 const player = byId("player");
 const tracksRoot = byId("tracks");
 const levelInput = byId("level");
@@ -85,7 +88,7 @@ function setShuffle(enabled) {
   shuffleEnabled = enabled;
   byId("shuffle").checked = enabled;
   if (enabled) { byId("repeat").checked = false; }
-  // Native audio looping remains enabled regardless of Shuffle or Repeat.
+  syncAudioLoop(); // Android uses ended; iOS keeps the native loop alive.
   rebuildPlaybackQueue();
   try { localStorage.setItem("falowen_music_shuffle", enabled ? "1" : "0"); } catch {}
 }
@@ -230,10 +233,8 @@ function setPlayer(track, start = false) {
   // Browsing lyrics should not download an entire MP3 until Play is requested.
   audio.preload = start ? "auto" : "none";
   if (changed) {
-    // Pausing before swapping a still-looped source avoids WebKit closing its
-    // session at natural end; the same audio element is reused for all songs.
+    // Do not pause: on locked Android this can end the audio session.
     trackTransitionPending = start;
-    audio.pause();
     ++playAttemptToken;
     loopHandoff.reset();
     audio.src = track.audioUrl;
@@ -243,20 +244,18 @@ function setPlayer(track, start = false) {
   }
   current = track;
   audio.dataset.trackId = track.id;
+  syncAudioLoop();
+  audio.playbackRate = Number(byId("speed").value) || 1;
+  if (start) playCurrentTrack(); // Synchronous with 'ended' on Android.
   byId("now-title").textContent = track.title;
   byId("now-meta").textContent = [track.level === "ALL" ? "All levels" : track.level, track.day ? "Day " + track.day : track.type].join(" · ");
   byId("player-error").textContent = "";
-  audio.playbackRate = Number(byId("speed").value) || 1;
-  // Always loop in the media engine. The Repeat switch only controls whether
-  // to stay on this track when the native loop boundary is detected.
-  audio.loop = true;
   player.hidden = false;
   document.body.classList.add("has-player");
   updateMediaSession(track);
   if (start) {
     try { localStorage.setItem("falowen_music_recent", track.id); } catch {}
     rememberPlayed(track.id);
-    playCurrentTrack();
   }
 }
 function populateFeatured() {
@@ -460,12 +459,12 @@ function setupLockScreenControls() {
   }
 }
 const loopHandoff = installLoopHandoff(audio, {
-  isActive: () => playbackRequested,
+  isActive: () => iosLoopMode && playbackRequested,
   shouldAdvance: () => !byId("repeat").checked && playbackQueue.length > 1,
   onComplete: () => audio.dispatchEvent(new Event("falowen:music-complete")),
   onAdvance: () => moveTrack(1),
 });
-audio.loop = true;
+syncAudioLoop();
 setupLockScreenControls();
 audio.addEventListener("playing", () => {
   trackTransitionPending = false;
@@ -482,14 +481,16 @@ audio.addEventListener("pause", () => {
 audio.addEventListener("loadedmetadata", updateMediaPosition);
 audio.addEventListener("seeked", updateMediaPosition);
 audio.addEventListener("ratechange", updateMediaPosition);
-// Defensive fallback for browsers that still report a natural completion.
-audio.addEventListener("ended", () => {
-  if (byId("repeat").checked || playbackQueue.length <= 1) {
-    audio.currentTime = 0;
-    playCurrentTrack();
-  } else {
+// Android uses 'ended' and calls the next play() in the same JS task.
+// iOS normally uses the loop detector but retains this fallback.
+installEndedHandoff(audio, {
+  isRepeating: () => byId("repeat").checked,
+  hasMoreTracks: () => playbackQueue.length > 1,
+  advance: () => {
+    audio.dispatchEvent(new Event("falowen:music-complete"));
     moveTrack(1);
-  }
+  },
+  replay: () => { audio.currentTime = 0; playCurrentTrack(); },
 });
 document.addEventListener("visibilitychange", () => {
   if (document.hidden || !pendingBackgroundDetail || !selected) return;
@@ -780,7 +781,7 @@ byId("show-english").addEventListener("change", () => {
 byId("speed").addEventListener("change", () => { audio.playbackRate = Number(byId("speed").value) || 1; });
 byId("repeat").addEventListener("change", () => {
   if (byId("repeat").checked) setShuffle(false);
-  audio.loop = true; // Native loop is never disabled by the UI.
+  syncAudioLoop(); // Android loops only on Repeat; iOS always loops.
 });
 audio.addEventListener("error", () => handlePlaybackFailure(audio.error));
 window.addEventListener("popstate", () => {
