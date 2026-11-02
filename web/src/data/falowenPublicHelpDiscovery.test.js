@@ -197,9 +197,9 @@ describe("Falowen public help and AI discovery", () => {
     expect(c2ScheduleHtml).toContain("What is Falowen C2 Day 28?");
 
     expect((scheduleMarkdown.match(/\*\*Question:\*\* What is Falowen A1 Day 2\?/g) || [])).toHaveLength(1);
-    expect((a1ScheduleHtml.match(/What is Falowen A1 Day 2\?/g) || [])).toHaveLength(2);
+    expect((a1ScheduleHtml.match(/What is Falowen A1 Day 2\?/g) || [])).toHaveLength(1);
     expect(scheduleMarkdown).toContain("German Alphabet");
-    expect(scheduleMarkdown).toContain("Personal Pronouns and Verb Conjugation");
+    expect(scheduleMarkdown).toContain("Personal Pronouns and First Verbs");
 
     const c2 = publicCatalogue.courses.find((course) => course.label === "German C2");
     expect(c2).toBeTruthy();
