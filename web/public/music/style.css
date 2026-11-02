@@ -236,3 +236,14 @@ html,body { background:#0e1921; }
 .player-cover{overflow:hidden;}
 .player-cover-img {height:100%;width:100%;object-fit:cover;display:block;}
 @media(max-width:700px){.detail-cover{width:104px;height:78px;}}
+
+/* Bilingual songwriter-context card: factual lesson scenarios, no unsourced
+   claims about the artist's personal inspiration. German first, English below. */
+.behind-song{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(225px,1fr);gap:22px;align-items:start;margin:22px 0 21px;padding:23px 25px;border:1px solid #bfd9c8;border-radius:18px;background:linear-gradient(125deg,#f7fff6,#eff8f3);color:#173d34;box-shadow:0 9px 26px #153d3510}
+.behind-song h3,.behind-song h4{margin:0 0 12px;color:#1a4235;font-weight:800;letter-spacing:-.025em}
+.behind-song h3{font-size:1.18rem}.behind-song h4{font-size:1rem}
+.behind-song h3 span,.behind-song h4 span{font-size:.76em;font-weight:600;color:#58786b;letter-spacing:0}
+.behind-song p{margin:0;font-size:14px;line-height:1.65}
+.behind-song .behind-song-translation{margin-top:9px;padding-top:9px;border-top:1px solid #d8e9df;color:#567066;font-size:13px}
+.behind-song-learning{border-left:1px solid #cbded3;padding-left:20px}
+@media(max-width:700px){.behind-song{grid-template-columns:minmax(0,1fr);gap:17px;padding:18px 16px;margin:19px 0}.behind-song-learning{border-left:none;border-top:1px solid #cbded3;padding:15px 0 0}.behind-song h3{font-size:1.1rem}}
