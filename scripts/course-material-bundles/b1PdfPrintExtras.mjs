@@ -79,10 +79,12 @@ export const prepareB1PrintView = () => {
     /^The highlighted card at the top of each section tells you exactly what to answer\.?$/i,
     /^Choose one answer for each question Click an answer option\./i,
   ];
-  for (const el of [...root.querySelectorAll("a,button,label,p,span,small")]) {
+  for (const el of [...root.querySelectorAll("a,button,label,p,span,small,div,section,h2,h3")]) {
     if (!el.isConnected) continue;
     const t = normalize(el.textContent);
-    if (!t || t.length > 320 || el.querySelector("fieldset,textarea")) continue;
+    if (!t || t.length > 320 || el.querySelector("fieldset,textarea,input[type=text]")) continue;
+    // Some old workbooks wrap these labels in anonymous divs, not paragraphs.
+    // Match only the entire short label; never erase a card containing tasks.
     if (webAction.test(t) || meta.some(rx => rx.test(t))) swap(el);
   }
 
