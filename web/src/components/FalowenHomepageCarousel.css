@@ -1,5 +1,5 @@
 
-/* Falowen marketing carousel; all four paths share one viewport-sized slide. */
+/* Falowen marketing carousel: all five options share a consistent slide height. */
 .falowen-carousel { --tone:#0861e9;--soft:#ecf5ff; --deep:#10244a; }
 .falowen-carousel-placement { --tone:#9b622c;--soft:#fff6e7; }
 .falowen-carousel-exams { --tone:#087558;--soft:#e8f8f2; }
@@ -128,4 +128,124 @@
  .falowen-slide-music-wave {grid-column:1 / -1;height:26px;margin-top:0;gap:3px;}
  .falowen-slide-music-wave span {max-height:25px;}
  .falowen-slide-music-caption {grid-column:1 / -1;font-size:9px;padding-top:6px;}
+}
+
+
+/* Consistent carousel footprint: the live class preview must not resize the
+   homepage whenever it rotates to or from another slide. */
+.falowen-carousel-content {
+  height: 515px;
+  min-height: 0;
+}
+.falowen-carousel-courses .falowen-carousel-copy {
+  padding: 32px 24px 65px 40px;
+  gap: 12px;
+}
+.falowen-carousel-courses .falowen-carousel-copy h1 {
+  font-size: clamp(31px, 3.5vw, 47px);
+}
+.falowen-carousel-courses .falowen-carousel-copy p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.falowen-carousel-courses .falowen-class-board {
+  margin: 18px 0 56px;
+}
+.falowen-carousel-courses .falowen-class-board-head { padding: 14px 18px; }
+.falowen-carousel-courses .falowen-class-board-head h2 { font-size: 18px; margin-top: 4px; }
+.falowen-carousel-courses .falowen-class-board-head > span { font-size: 23px; }
+.falowen-carousel-courses .falowen-class-board-body { padding: 14px 18px; }
+.falowen-carousel-courses .falowen-class-board-label strong { padding: 7px; font-size: 17px; }
+.falowen-carousel-courses .falowen-class-board-body h3 { font-size: 18px; margin: 9px 0 4px; }
+.falowen-carousel-courses .falowen-class-board-body p { margin-bottom: 10px; }
+.falowen-carousel-courses .falowen-class-board-body dl { padding: 10px 0; gap: 9px 12px; }
+.falowen-carousel-courses .falowen-class-board-body dt { margin-bottom: 3px; }
+.falowen-carousel-courses .falowen-class-board-body dd { line-height: 1.35; }
+.falowen-carousel-courses .falowen-class-board-cta { min-height: 42px; padding: 9px 12px; margin-top: 12px; }
+.falowen-carousel-courses .falowen-class-board-footer { margin-top: 10px; }
+
+@media (max-width: 700px) {
+  /* Keep all five mobile slides as short as the music slide.
+     The class preview shows the essentials; full information remains one tap away. */
+  .falowen-carousel-content {
+    height: 525px;
+    min-height: 0;
+    grid-template-rows: minmax(0, 1fr) 195px;
+  }
+  .falowen-carousel-courses .falowen-carousel-content {
+    height: 525px;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: stretch;
+    padding-right: 0;
+  }
+  .falowen-carousel-courses .falowen-carousel-copy {
+    padding: 17px 19px 6px;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+  .falowen-carousel-courses .falowen-carousel-copy h1 { font-size: clamp(25px, 7.5vw, 33px); line-height: 1.08; }
+  .falowen-carousel-courses .falowen-carousel-copy > p,
+  .falowen-carousel-courses .falowen-class-benefits { display: none; }
+  .falowen-carousel-courses .falowen-carousel-cta { gap: 8px 12px; }
+  .falowen-carousel-courses .falowen-carousel-button { min-height: 40px; padding: 9px 12px; }
+  .falowen-carousel-courses .falowen-class-board {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin: 5px 18px 51px;
+    overflow: hidden;
+  }
+  .falowen-carousel-courses .falowen-class-board-head { padding: 9px 13px; }
+  .falowen-carousel-courses .falowen-class-board-head small,
+  .falowen-carousel-courses .falowen-class-board-head > span { display: none; }
+  .falowen-carousel-courses .falowen-class-board-head h2 { font-size: 16px; margin: 0; }
+  .falowen-carousel-courses .falowen-class-board-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    padding: 9px 13px 11px;
+  }
+  .falowen-carousel-courses .falowen-class-board-label strong { font-size: 13px; padding: 5px 8px; }
+  .falowen-carousel-courses .falowen-class-board-label > span { padding: 5px 8px; }
+  .falowen-carousel-courses .falowen-class-board-body h3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 16px;
+    line-height: 1.2;
+    margin: 6px 0;
+  }
+  .falowen-carousel-courses .falowen-class-board-body > p,
+  .falowen-carousel-courses .falowen-class-board-footer { display: none; }
+  .falowen-carousel-courses .falowen-class-board-body dl {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: 10px;
+    padding: 8px 0;
+    margin: 0;
+  }
+  .falowen-carousel-courses .falowen-class-board-body dl > div:nth-child(n+3) { display: none; }
+  .falowen-carousel-courses .falowen-class-board-body dt { font-size: 10px; margin-bottom: 3px; }
+  .falowen-carousel-courses .falowen-class-board-body dd { font-size: 11px; line-height: 1.35; }
+  .falowen-carousel-courses .falowen-class-board-body dl > div:nth-child(2) dd {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+  .falowen-carousel-courses .falowen-class-board-cta {
+    min-height: 40px;
+    margin-top: auto;
+    padding: 8px 10px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 400px) {
+  /* Small Android and iPhone widths still show the CTA and carousel controls. */
+  .falowen-carousel-content,
+  .falowen-carousel-courses .falowen-carousel-content { height: 535px; min-height: 0; }
 }

@@ -1,4 +1,6 @@
 import React from "react";
+import fs from "fs";
+import path from "path";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Carousel from "./FalowenHomepageCarousel";
@@ -40,4 +42,26 @@ it.each([
   expect(screen.getByText("A1 · A2 · B1")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name:"Next slide" }));
   expect(screen.getByRole("link", { name:/test|Einstufungstest|test gratuit/i })).toBeInTheDocument();
+});
+
+it("keeps all five slides in a consistent viewport, including the compact mobile class preview", () => {
+  loadPublicClasses.mockResolvedValue([]);
+  render(<Carousel />);
+  const carousel = screen.getByRole("region", { name: "Explore Falowen learning options" });
+  expect(carousel).toHaveClass("falowen-carousel-courses");
+  expect(screen.getByRole("link", { name: /View class details & register/ })).toHaveAttribute("href", "/classes");
+  expect(screen.getByText("Class schedule")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Show slide 2" }));
+  expect(carousel).toHaveClass("falowen-carousel-music");
+  expect(screen.getByRole("link", { name: /Explore German songs/ })).toHaveAttribute("href", "https://music.falowen.app/");
+
+  const css = fs.readFileSync(path.join(__dirname, "FalowenHomepageCarousel.css"), "utf8");
+  const uniform = css.slice(css.indexOf("/* Consistent carousel footprint:"));
+  expect(uniform).toContain("height: 515px");
+  expect(uniform).toContain("height: 525px");
+  expect(uniform).toContain(".falowen-carousel-courses .falowen-carousel-content");
+  expect(uniform).toContain(".falowen-carousel-courses .falowen-class-board-cta");
+  expect(uniform).toContain(".falowen-carousel-courses .falowen-class-board-body dl > div:nth-child(n+3)");
+  expect(uniform).toContain("height: 535px");
+  expect(uniform).not.toContain("display: none; }\n  .falowen-carousel-courses .falowen-class-board-cta");
 });
