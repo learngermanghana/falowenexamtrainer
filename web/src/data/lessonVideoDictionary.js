@@ -41,26 +41,7 @@ export const LESSON_VIDEO_DICTIONARY = {
     1: {
       ai_grammar_video: "https://youtu.be/5WIMkENgdGE",
     },
-    2: {
-      videoResources: [
-        {
-          key: "ai-grammar-video-0-2",
-          chapter: "0.2",
-          title: "Kapitel 0.2 · Alphabet · AI video",
-          description:
-            "AI video lesson for the German alphabet, letter names, umlauts and spelling practice.",
-          url: "https://youtu.be/pCQVdJGsvtk",
-        },
-        {
-          key: "ai-grammar-video-1-1-pronouns-conjugation",
-          chapter: "1.1",
-          title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
-          description:
-            "AI video lesson for German subject pronouns and basic verb conjugation.",
-          url: "https://youtu.be/kqagu9qsOcc",
-        },
-      ],
-    },
+    2: { videoResources: [] },
     3: {
       videoResources: [
         {
