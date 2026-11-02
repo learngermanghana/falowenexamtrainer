@@ -48,9 +48,9 @@ test("B1 locked reading and listening companions both receive authenticated less
   const end = source.indexOf("const getWorkbookTabAvailability =", start);
   assert.ok(start >= 0 && end > start, "B1 print renderer must be present");
   const renderer = source.slice(start, end);
-  assert.match(renderer, /\\["teil-3", "teil-4"\\]\\.includes\\(part\\)/);
-  assert.match(renderer, /QRCode\\.toDataURL\\(lessonUrl/);
-  assert.match(renderer, /buildB1ReadOnlyPrintHtml\\(\\{ day: lesson\\.day, part, lessonUrl, audioQrDataUrl \\}\\)/);
+  assert.ok(renderer.includes('["teil-3", "teil-4"].includes(part)'));
+  assert.ok(renderer.includes("QRCode.toDataURL(lessonUrl"));
+  assert.ok(renderer.includes("buildB1ReadOnlyPrintHtml({ day: lesson.day, part, lessonUrl, audioQrDataUrl })"));
 });
 
 test("A1 render plan contains only grammar and workbook targets", () => {
