@@ -17,7 +17,7 @@ function pricePrintedGuide(pages) {
 
 // Small downloadable exam guides are priced by editorial scope rather than
 // pretending PDF page count incurs the same cost as a printed book.
-// The existing 32-page Writing Skills PDF is GH₵39, full A1 PDF GH₵99.
+// The existing 32-page Writing Skills PDF is GH₵39, full A1 PDF GH₵100.
 function priceDigitalExamGuide({ skills }) {
   if (!Number.isInteger(skills) || skills < 1 || skills > 4)
     throw new RangeError("Guide skills must be 1–4");
