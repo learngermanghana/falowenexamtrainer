@@ -99,7 +99,7 @@ export const prepareB1PrintView = () => {
 
   // Unlike multiple-choice question options, these exact words belong only
   // to web actions, progress controls or navigation guidance.
-  const webAction = /^(?:I prepared this part\.?|I practised this section\.?|(?:←\s*)?Previous lesson|Next lesson\s*→?|Back to workbook\s*›?|Ready for the next lesson\?|Show model|Hide model|Check answers?|Reset answers?|Start timer|Reset timer|Open writing video on YouTube)$/i;
+  const webAction = /^(?:I prepared this part\.?|I practised this section\.?|(?:←\s*)?Previous lesson|Next lesson\s*→?|Back to workbook\s*›?|(?:←\s*)?Back to Course Book|Ready for the next lesson\?|Show model|Hide model|Check answers?|Reset answers?|Start timer|Reset timer|Open writing video on YouTube)$/i;
   const meta = [
     /^Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook$/i,
     /^Select Grammar,\s*Teil\s*1/i,
@@ -172,6 +172,7 @@ export const findB1PrintFaults = text => {
     ["QR-only missing exercise", /Diese Aufgabe ist nur online verfügbar|vollständigen Aufgaben dieses Abschnitts sind noch nicht/i],
     ["live completion checkbox", /I prepared this part\.?/i],
     ["next-lesson website navigation", /Continue learning|Ready for the next lesson\?|You do not need to return to the Course Book/i],
+    ["coursebook back-navigation", /Back\s+to\s+Course\s+Book/i],
     ["workbook redirect card", /Grammar book\s*[·•-]\s*continue to workbook|You do not need to search again in the Course Book/i],
     ["workbook web guidance", /Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook/i],
     ["workbook tab instructions", /Select Grammar,\s*Teil\s*1/i],
