@@ -25,15 +25,17 @@ export const isA1ChapterResourceHubRequest = ({ level = "", search = "" } = {}) 
 export const resolveA1ChapterResourceHubEntry = ({ day = "", chapter = "" } = {}) => {
   const requestedChapter = normalizeChapter(chapter);
   if (!requestedChapter) return null;
+  // Legacy Day 2 Kapitel 1.1 links now lead to the combined chapter 0.2.
+  const canonicalChapter = Number(day) === 2 && requestedChapter === "1.1" ? "0.2" : requestedChapter;
 
   const entry = findCourseBookEntry({
     entries: courseSchedules.A1 || [],
     day,
-    chapter: requestedChapter,
+    chapter: canonicalChapter,
     level: "A1",
   });
   const resolvedChapter = normalizeChapter(entry?.displayChapter || entry?.chapter);
-  return resolvedChapter === requestedChapter ? entry : null;
+  return resolvedChapter === canonicalChapter ? entry : null;
 };
 
 const getScheduleLessonIdentity = (entry = {}) =>
@@ -132,13 +134,14 @@ export const shouldNormalizeA1ChapterResourceHubState = ({
 
   const expectedState = buildA1ChapterResourceHubState({ level, day, search });
   const requestedChapter = getRequestedA1Chapter(search);
+  const canonicalChapter = Number(day) === 2 && requestedChapter === "1.1" ? "0.2" : requestedChapter;
   const stateChapter = normalizeChapter(state?.entry?.displayChapter || state?.entry?.chapter);
 
   return (
     !state ||
     normalizeLevel(state.level) !== expectedState.level ||
     normalizeDay(state.day) !== expectedState.day ||
-    (Boolean(expectedState.entry) && stateChapter !== requestedChapter) ||
+    (Boolean(expectedState.entry) && stateChapter !== canonicalChapter) ||
     (!expectedState.entry && Boolean(state?.entry))
   );
 };
