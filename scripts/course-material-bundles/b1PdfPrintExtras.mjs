@@ -31,6 +31,12 @@ export const prepareB1PrintView = () => {
   if (window.__b1PrintChanges) throw new Error("B1 print view already active");
   const undo = [];
   const normalize = value => String(value || "").replace(/\s+/g, " ").trim();
+  // Playwright serializes this function into the browser page. Keep the
+  // expression local: imported module helpers are unavailable in page.evaluate.
+  const isB1WorkbookGuideLabel = value =>
+    /^Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook$/i
+      .test(normalize(value));
+
   const swap = (node, replacement = document.createElement("span")) => {
     if (!node?.isConnected || node === document.body || node.tagName === "MAIN") return;
     node.replaceWith(replacement);
