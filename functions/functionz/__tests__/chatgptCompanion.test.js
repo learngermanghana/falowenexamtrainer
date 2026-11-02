@@ -238,11 +238,14 @@ describe("A1 and A2 canonical Course Book exports for ChatGPT", () => {
     expect(grammar.material.noteLinks[0].url).toContain("/campus/course/");
   });
 
-  test("A1 assigns distinct verified workbook chapters to their actual days", () => {
+  test("A1 exposes the single active Day 2 assessment without reviving old chapter assignments", () => {
     const day2 = lessonContentResponse("A1", 2, "workbook");
     expect(day2.available).toBe(true);
-    expect(day2.material.chapters.map(x => x.assignmentId)).toEqual(
-      expect.arrayContaining(["A1-0.2", "A1-1.1"]));
+    expect(day2.material.chapters.map(x => x.assignmentId)).toEqual(["A1-0.2_1.1"]);
+    expect(day2.material.chapters[0].route).toBe("/campus/course/a1-day-2-foundations-workbook");
+    expect(day2.material.chapters[0].sections).toHaveLength(5);
+    const day3 = lessonContentResponse("A1", 3, "workbook");
+    expect(day3.material.chapters.map(x => x.assignmentId)).toEqual(["A1-1.2"]);
     const day22 = lessonContentResponse("A1", 22, "workbook");
     expect(day22.material.chapters.some(x => x.assignmentId === "A1-14.1")).toBe(true);
     expect(day22.material.chapters.every(x => x.route.startsWith("/campus/"))).toBe(true);
@@ -297,15 +300,16 @@ describe("Original Falowen grammar teaching and remaining workbook gaps", () => 
     expect(JSON.stringify(day1.material.sections)).toMatch(/Präsens|Perfekt/);
   });
 
-  test("shows original A1 Day 2 Hören and Schreiben tasks without answers", () => {
+  test("A1 Day 2 never exposes archived Hören/video; writing refers to new combined workbook", () => {
     const listening = lessonContentResponse("A1", 2, "listening");
-    expect(listening.available).toBe(true);
-    expect(listening.material.chapter).toBe("1.1");
-    expect(listening.material.questions).toHaveLength(4);
-    expect(listening.material.questions[0].question).toMatch(/Wie heißt sie/);
-    expect(listening.material.questions[0]).not.toHaveProperty("answer");
+    expect(listening.available).toBe(false);
     const writing = lessonContentResponse("A1", 2, "writing");
-    expect(writing.material.prompt).toMatch(/introducing yourself/);
+    expect(writing.available).toBe(true);
+    expect(writing.material.chapter).toBe("0.2");
+    expect(writing.material.prompt).toMatch(/four short German sentences/);
+    expect(JSON.stringify(writing.material)).toContain("A1-0.2_1.1");
+    const overview = lessonContentResponse("A1", 3, "overview");
+    expect(overview.grammarFocus).toMatch(/wie, wo, woher/);
   });
 
   test("shows source-literal A1 Day 3 Lesen and Hören while preserving blanks", () => {
