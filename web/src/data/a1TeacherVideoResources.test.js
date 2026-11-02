@@ -32,7 +32,7 @@ describe("standardized A1 teacher videos", () => {
     }
   );
 
-  test("unified Day 2 includes both original teacher videos", () => {
+  test("Day 2 has no legacy teacher videos while unified replacement is pending", () => {
     const lesson = normalizeLesson(
       {
         day: 2,
@@ -46,10 +46,7 @@ describe("standardized A1 teacher videos", () => {
       `${video.key} ${video.title}`.toLowerCase().includes("teacher")
     );
 
-    expect(teacherVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/uhFgKp4WVEc",
-      "https://youtu.be/xyRogEAA9qM",
-    ]);
+    expect(teacherVideos).toEqual([]);
   });
 
   test("Day 3 Chapter 1.2 uses the latest canonical teacher lecture", () => {
@@ -190,32 +187,19 @@ describe("standardized A1 teacher videos", () => {
   });
 
   test("chapter lookup returns only the canonical resources for that chapter", () => {
-    expect(getA1TeacherVideoResources(2, "0.2").map((video) => video.chapter)).toEqual([
-      "0.2",
-      "0.2",
-    ]);
+    expect(getA1TeacherVideoResources(2, "0.2")).toEqual([]);
     expect(getA1TeacherVideoResources(2, "1.1")).toHaveLength(0);
   });
 
   test("returns all teacher resources for a multi-chapter A1 day when chapter is omitted", () => {
-    expect(getA1TeacherVideoResources(2).map((video) => video.chapter)).toEqual([
-      "0.2",
-      "0.2",
-    ]);
+    expect(getA1TeacherVideoResources(2)).toEqual([]);
   });
 });
 
 
-test("Day 2's second teacher video teaches pronouns in the unified chapter", () => {
-  const configuredVideo = getCanonicalA1TeacherVideoResource(2, "0.2", 2);
-  expect(configuredVideo).toEqual(expect.objectContaining({
-    chapter: "0.2",
-    videoNumber: 2,
-    topic: "Personal Pronouns and Verb Conjugation",
-    url: "https://youtu.be/xyRogEAA9qM",
-  }));
-  const urls = A1_TEACHER_VIDEO_RESOURCES.map((video) => video.url);
-  expect(urls).not.toContain("https://youtu.be/AjsnO1hxDs4");
+test("Day 2 no longer declares either original teacher lecture", () => {
+  expect(getCanonicalA1TeacherVideoResource(2, "0.2", 2)).toBeNull();
+  expect(A1_TEACHER_VIDEO_RESOURCES.some(item => Number(item.day) === 2)).toBe(false);
 });
 
 test("A1 Day 4 chapter 2 uses the assigned teacher lecture without changing the AI video", () => {
