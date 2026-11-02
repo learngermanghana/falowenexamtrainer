@@ -41,6 +41,11 @@ describe("A1 self-learning journey standardization", () => {
       // self-practice on the same day/chapter, so the generic day/chapter Course
       // Book lookup intentionally belongs to the graded card. The explicit
       // practice catalog identity owns the self-practice route instead.
+      if (practice.routeKey === "1.1-practice") {
+        // Historical Day 3 practice keeps a working direct link, but no active course card.
+        expect(getA1CourseBookCard({ displayDay: 3, chapter: "1.1" })).toBeNull();
+        return;
+      }
       if (practice.routeKey === "1.2-practice") {
         expect(practice.destination).toBe("/campus/course/a1-day-3-kapitel-1-2-workbook");
         return;
