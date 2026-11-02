@@ -58,12 +58,22 @@ test("B1 printed-text coverage audit excludes web shell but detects missing actu
   assert.throws(() => assertB1PrintedContent(lesson, "Ein kleiner Abschnitt ohne Inhalt"));
 });
 
+test("short but substantive B1 grammar pages pass while missing content still fails",()=>{
+  const short = "Träume Wörter Umwelt Menschen Freunde Kinder Gespräche Lernen Sprache Arbeiten Fragen Antworten.";
+  assert.doesNotThrow(() => assertB1PrintedContent(short,short));
+  assert.throws(() => assertB1PrintedContent(short,"Audio wird geladen"),/empty or insufficient/);
+  const long = Array.from({length:70},(_,i)=>"Beispielwort"+i).join(" ");
+  assert.throws(() => assertB1PrintedContent(long,"Ein leerer Absatz ohne Aufgaben"),/empty or insufficient/);
+  assert.match(prepareB1PrintView.toString(),/Audio wird geladen/);
+});
+
 test("B1 retail PDF flags forbidden QR-only and live website messages",()=>{
   assert.ok(findB1PrintFaults("Diese Aufgabe ist nur online verfügbar").length);
   assert.ok(findB1PrintFaults("I prepared this part.").length);
   assert.ok(findB1PrintFaults("Continue learning Ready for the next lesson?").length);
   assert.ok(findB1PrintFaults("Day 8 · B1 workbook · how to complete this workbook").length);
   assert.ok(findB1PrintFaults("Draft saved").length);
+  assert.ok(findB1PrintFaults("Back to Course Book").length);
   assert.deepEqual(findB1PrintFaults("Teil 3 · Lesen – Lies den Text und beantworte die Fragen"),[]);
   assert.match(B1_PRINT_CSS,/overflow: visible !important/);
   assert.match(B1_PRINT_CSS,/header\.app-header--compact/);
