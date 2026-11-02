@@ -137,7 +137,7 @@ if (level === "B1") {
   const faults = findB1PrintFaults(text);
   if (faults.length) throw new Error("B1 retail PDF preflight failed: " + faults.join(", "));
   const audit = scanPdfPageContent(text, pdf.getPageCount());
-  if (audit.faults.length) throw new Error("B1 retail PDF page audit failed:\\n" + audit.faults.join("\\n"));
+  if (audit.faults.length) throw new Error("B1 retail PDF page audit failed:\n" + audit.faults.join("\n"));
   // These complete public exercises were formerly QR-only placeholders. Check
   // the assembled PDF, not just a unit-test rendering of the HTML.
   const expectedReadingExcerpts = [
@@ -149,7 +149,7 @@ if (level === "B1") {
     "Der Staat sollte Paaren in Fernbeziehungen",
   ];
   for (const excerpt of expectedReadingExcerpts) {
-    if (!text.replace(/\\s+/g, " ").includes(excerpt))
+    if (!text.replace(/\s+/g, " ").includes(excerpt))
       throw new Error("B1 retail PDF missing complete source-owned reading text: " + excerpt);
   }
   const diagnosticsPath = path.join(outputDir, "render-diagnostics.json");
@@ -209,7 +209,7 @@ for (const [day, sections] of expectedByDay) {
   for (const section of sections) {
     const label = section === "grammar" ? "GRAMMAR" : "WORKBOOK";
     const marker = new RegExp(
-      `${level}\\s*[·•]?\\s*Day\\s+${day}\\b[\\s\\S]{0,500}\\b${label}\\b`,
+      `${level}\s*[·•]?\s*Day\s+${day}\b[\s\S]{0,500}\b${label}\b`,
       "i",
     );
     if (!marker.test(text)) missing.push(`Day ${day} ${label}`);

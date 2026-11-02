@@ -26,7 +26,7 @@ export const B1_PRINT_CSS = `
 export const prepareB1PrintView = () => {
   if (window.__b1PrintChanges) throw new Error("B1 print view already active");
   const undo = [];
-  const normalize = value => String(value || "").replace(/\\s+/g, " ").trim();
+  const normalize = value => String(value || "").replace(/\s+/g, " ").trim();
   const swap = (node, replacement = document.createElement("span")) => {
     if (!node?.isConnected || node === document.body || node.tagName === "MAIN") return;
     node.replaceWith(replacement);
@@ -51,8 +51,8 @@ export const prepareB1PrintView = () => {
   for (const el of [...root.querySelectorAll("header,div,aside")]) {
     if (!el.isConnected || el.querySelector("input,textarea,fieldset,h1,h2,h3")) continue;
     const t = normalize(el.textContent);
-    if (t.length > 85 || !/\\bFalowen\\b/.test(t) || !/\\bFA\\b/.test(t)) continue;
-    if (/\\b(?:Workbook|Grammar Notes|Kapitel|Lesson|Day\\s*\\d+)\\b/i.test(t)) continue;
+    if (t.length > 85 || !/\bFalowen\b/.test(t) || !/\bFA\b/.test(t)) continue;
+    if (/\b(?:Workbook|Grammar Notes|Kapitel|Lesson|Day\s*\d+)\b/i.test(t)) continue;
     const rect = el.getBoundingClientRect?.();
     if (rect && rect.height > 160) continue;
     swap(el);
@@ -63,21 +63,21 @@ export const prepareB1PrintView = () => {
   const cards = [...root.querySelectorAll("div,section,article,aside")].filter(el => {
     const t = normalize(el.textContent);
     if (t.length < 45 || t.length > 950) return false;
-    return (/Grammar book\\s*[·•-]\\s*continue to workbook/i.test(t) &&
+    return (/Grammar book\s*[·•-]\s*continue to workbook/i.test(t) &&
       /You do not need to search again in the Course Book/i.test(t)) ||
-      (/Ready for the next lesson\\?/i.test(t) &&
+      (/Ready for the next lesson\?/i.test(t) &&
       /You do not need to return to the Course Book/i.test(t));
   });
   for (const el of cards.filter(node => !cards.some(inner => inner !== node && node.contains(inner)))) swap(el);
 
   // Unlike multiple-choice question options, these exact words belong only
   // to web actions, progress controls or navigation guidance.
-  const webAction = /^(?:I prepared this part\\.?|I practised this section\\.?|(?:←\\s*)?Previous lesson|Next lesson\\s*→?|Back to workbook\\s*›?|Ready for the next lesson\\?|Show model|Hide model|Check answers?|Reset answers?|Start timer|Reset timer|Open writing video on YouTube)$/i;
+  const webAction = /^(?:I prepared this part\.?|I practised this section\.?|(?:←\s*)?Previous lesson|Next lesson\s*→?|Back to workbook\s*›?|Ready for the next lesson\?|Show model|Hide model|Check answers?|Reset answers?|Start timer|Reset timer|Open writing video on YouTube)$/i;
   const meta = [
-    /^Day\\s*\\d+\\s*[·•-]\\s*B1 workbook\\s*[·•-]\\s*how to complete this workbook$/i,
-    /^Select Grammar,\\s*Teil\\s*1/i,
-    /^The highlighted card at the top of each section tells you exactly what to answer\\.?$/i,
-    /^Choose one answer for each question Click an answer option\\./i,
+    /^Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook$/i,
+    /^Select Grammar,\s*Teil\s*1/i,
+    /^The highlighted card at the top of each section tells you exactly what to answer\.?$/i,
+    /^Choose one answer for each question Click an answer option\./i,
   ];
   for (const el of [...root.querySelectorAll("a,button,label,p,span,small")]) {
     if (!el.isConnected) continue;
@@ -119,14 +119,14 @@ export const restoreB1PrintView = () => {
 export const findB1PrintFaults = text => {
   const forbidden = [
     ["QR-only missing exercise", /Diese Aufgabe ist nur online verfügbar|vollständigen Aufgaben dieses Abschnitts sind noch nicht/i],
-    ["live completion checkbox", /I prepared this part\\.?/i],
-    ["next-lesson website navigation", /Continue learning|Ready for the next lesson\\?|You do not need to return to the Course Book/i],
-    ["workbook redirect card", /Grammar book\\s*[·•-]\\s*continue to workbook|You do not need to search again in the Course Book/i],
-    ["workbook web guidance", /Day\\s*\\d+\\s*[·•-]\\s*B1 workbook\\s*[·•-]\\s*how to complete this workbook/i],
-    ["workbook tab instructions", /Select Grammar,\\s*Teil\\s*1/i],
+    ["live completion checkbox", /I prepared this part\.?/i],
+    ["next-lesson website navigation", /Continue learning|Ready for the next lesson\?|You do not need to return to the Course Book/i],
+    ["workbook redirect card", /Grammar book\s*[·•-]\s*continue to workbook|You do not need to search again in the Course Book/i],
+    ["workbook web guidance", /Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook/i],
+    ["workbook tab instructions", /Select Grammar,\s*Teil\s*1/i],
     ["saved learner state", /Draft saved|Your saved answers|Recognised speech|Recognized speech|Your corrected sentences/i],
     ["unhydrated lesson", /Loading grammar notes|Loading the app|Unexpected Application Error/i],
-    ["private media token", /X-Amz-(?:Signature|Credential)|[?&](?:token|signature|access_token)=|r2\\.cloudflarestorage\\.com/i],
+    ["private media token", /X-Amz-(?:Signature|Credential)|[?&](?:token|signature|access_token)=|r2\.cloudflarestorage\.com/i],
   ];
   return forbidden.filter(([,regex])=>regex.test(String(text))).map(([name])=>name);
 };

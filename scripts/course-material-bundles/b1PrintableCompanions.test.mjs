@@ -78,7 +78,7 @@ test("B1 publication includes complete former online-only questions with no mode
       "Die Überhöhung des Partners", "Der Staat sollte Paaren"]) {
     assert.ok(expertReading.includes(excerpt), "Missing Day 22 Teil 4 " + excerpt);
   }
-  assert.doesNotMatch(expertReading, /data-b1-pdf-online-only|<h2>Fragen<\\/h2>/);
+  assert.doesNotMatch(expertReading, /data-b1-pdf-online-only|<h2>Fragen/);
   assert.doesNotMatch(expertReading, /Antwortschlüssel|Lösungsschlüssel/);
 });
 

@@ -21,7 +21,7 @@ test("B1 print-only transcriptions preserve 7 / 7 / 3 questions from the actual 
     assert.equal(data.questions.length,questionCount,"Day " + day + " complete questions");
     for (const paragraph of data.paragraphs) {
       assert.ok(paragraph.length > 10);
-      assert.ok(js.includes(paragraph.replace(/\\n/g,"<br />")) || js.includes(paragraph),
+      assert.ok(js.includes(paragraph.replace(/\n/g,"<br />")) || js.includes(paragraph),
         "Day " + day + " has text missing from its original lesson: " + paragraph.slice(0,50));
     }
     for (const question of data.questions) {
@@ -52,5 +52,5 @@ test("B1 retail PDF flags forbidden QR-only and live website messages",()=>{
   assert.ok(findB1PrintFaults("Draft saved").length);
   assert.deepEqual(findB1PrintFaults("Teil 3 · Lesen – Lies den Text und beantworte die Fragen"),[]);
   assert.match(B1_PRINT_CSS,/overflow: visible !important/);
-  assert.match(B1_PRINT_CSS,/header\\.app-header--compact/);
+  assert.match(B1_PRINT_CSS,/header\.app-header--compact/);
 });

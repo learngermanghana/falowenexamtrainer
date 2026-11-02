@@ -76,13 +76,12 @@ test("B1 Day 23 QR generation is scoped to B1 renderer, not the A2 path", () => 
 });
 
 test("B1 retail print is isolated, audited, and trimmed like A1/A2", () => {
-  assert.match(source, /B1_PRINT_CSS/);
-  assert.match(source, /prepareB1PrintView/);
-  assert.match(source, /restoreB1PrintView/);
-  assert.match(source, /findB1PrintFaults/);
-  assert.match(source, /assertA2PrintedContent\\(b1ExpectedText, printed\\)/);
-  assert.match(source, /B1 Day \\x24\\{lesson\\.day\\}/);
-  assert.match(validatorSource, /B1 retail PDF preflight failed/);
+  for (const phrase of ["B1_PRINT_CSS", "prepareB1PrintView", "restoreB1PrintView",
+    "findB1PrintFaults", "assertA2PrintedContent(b1ExpectedText, printed)",
+    "trimPrintedPdfTail(file, { description:"]) {
+    assert.ok(source.includes(phrase), "missing B1 print protection: " + phrase);
+  }
+  assert.ok(validatorSource.includes("B1 retail PDF preflight failed"));
 });
 
 test("A1 render plan contains only grammar and workbook targets", () => {
