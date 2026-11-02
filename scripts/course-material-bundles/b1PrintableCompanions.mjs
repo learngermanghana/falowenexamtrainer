@@ -75,16 +75,39 @@ const writing = async (day) => {
   return pageHtml({ day, section: "Teil 2 · Schreiben", title: task.title, body });
 };
 
-const reading = async (day) => {
+// Some older B1 preserved workbook panels keep their full exercises in JSX,
+// while the shared canonical task registry has metadata only. Never invent
+// questions or silently skip a locked tab: provide an explicit online-only
+// companion until those panels are migrated into canonical print data.
+const onlineOnly = ({ day, section, title, instructions = "", lessonUrl, audioQrDataUrl }) => {
+  if (!lessonUrl || !audioQrDataUrl) {
+    throw new Error("B1 Day " + day + " " + section + ": authenticated online-only QR required");
+  }
+  const body = '<div data-b1-pdf-online-only="true"><h2>Diese Aufgabe ist nur online verfügbar</h2>' +
+    '<p>Die vollständigen Aufgaben dieses Abschnitts sind noch nicht als eigenständige Druckquelle hinterlegt. ' +
+    'Öffnen Sie die authentifizierte Falowen-Lektion und bearbeiten Sie dort ' + escapeHtml(section) + '.</p>' +
+    (instructions ? paragraph(instructions) : "") +
+    '<aside style="display:flex;align-items:center;gap:12px;padding:12px;background:#eff6ff;border:1px solid #bfd3eb">' +
+    '<img width="90" height="90" src="' + escapeHtml(audioQrDataUrl) + '" alt="B1 online lesson QR">' +
+    '<div><strong>Vollständige Aufgabe online öffnen</strong><p>' + escapeHtml(lessonUrl) + '</p></div></aside></div>';
+  return pageHtml({ day, section, title, body });
+};
+
+const reading = async (day, lessonUrl, audioQrDataUrl) => {
   const { getB1ReadingTask } = await canonical("b1ReadingTasks.js");
   const task = getB1ReadingTask(day);
   if (!task) throw new Error("B1 Day " + day + ": canonical reading task missing");
   const source = task.text;
   const paragraphs = typeof source === "string" ? [source] : source?.paragraphs;
   const prompts = source?.questions || task.questions;
-  if (!Array.isArray(paragraphs) || !paragraphs.length ||
-      paragraphs.some(p => typeof p !== "string" || !p.trim())) {
-    throw new Error("B1 Day " + day + ": canonical reading passage missing");
+  if (!Array.isArray(paragraphs) || !paragraphs.length || !Array.isArray(prompts) || !prompts.length) {
+    return onlineOnly({
+      day, section: "Teil 3 · Lesen", title: task.title || "Lesen",
+      instructions: task.instructions, lessonUrl, audioQrDataUrl,
+    });
+  }
+  if (paragraphs.some(p => typeof p !== "string" || !p.trim())) {
+    throw new Error("B1 Day " + day + ": canonical reading passage is incomplete");
   }
   const body = (task.instructions ? paragraph(task.instructions) : "") +
     "<h2>" + escapeHtml(source?.title || "Lesetext") + "</h2>" +
@@ -107,6 +130,15 @@ const listening = async (day, lessonUrl, audioQrDataUrl) => {
       '<div><strong>Audio in der Falowen-Lektion</strong><p>QR-Code scannen, anmelden und Teil 4 öffnen.</p>' +
       '<p>' + escapeHtml(lessonUrl) + '</p></div></aside>'
     : "";
+  if (!Array.isArray(task.questions) || !task.questions.length) {
+    if (isReadingFallback) {
+      return onlineOnly({
+        day, section: "Teil 4 · Lesen", title: task.title || "Lesen",
+        instructions: task.instructions, lessonUrl, audioQrDataUrl,
+      });
+    }
+    throw new Error("B1 Day " + day + ": canonical listening questions missing");
+  }
   const body = (task.instructions ? paragraph(task.instructions) : "") +
     audio + "<h2>Fragen</h2>" + questions(task.questions, "B1 Day " + day + " Teil 4");
   // Never embed the raw R2 audio key, transcript, correct answers, or a user session.
@@ -144,7 +176,7 @@ export async function buildB1ReadOnlyPrintHtml({ day, part, lessonUrl = "", audi
   if (!Number.isInteger(day) || day < 1 || day > 28) throw new Error("Invalid B1 print day: " + day);
   switch (part) {
     case "teil-2": return writing(day);
-    case "teil-3": return reading(day);
+    case "teil-3": return reading(day, lessonUrl, audioQrDataUrl);
     case "teil-4": return listening(day, lessonUrl, audioQrDataUrl);
     default: throw new Error("Missing B1 print companion: " + part);
   }
