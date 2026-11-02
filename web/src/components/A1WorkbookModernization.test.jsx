@@ -60,7 +60,7 @@ describe("A1 workbook modernization", () => {
     expect(within(header).getByText("Day 2")).toBeInTheDocument();
     expect(within(header).getByText("Kapitel 0.2")).toBeInTheDocument();
     expect(within(header).getByText("Assignment A1-0.2")).toBeInTheDocument();
-    expect(within(header).getByText("Assignment 2 of 19")).toBeInTheDocument();
+    expect(within(header).getByText("Assignment 2 of 18")).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "A1 assignment progress" })).toHaveAttribute("aria-valuenow", "11");
 
     expect(screen.queryByRole("region", { name: "A1 lesson videos" })).not.toBeInTheDocument();
