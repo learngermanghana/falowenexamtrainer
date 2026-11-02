@@ -451,7 +451,9 @@ const renderReadOnlyA2Section = async (page, lesson, part, filename = part) => {
 // Print the exact public exercise fields from canonical B1 source instead.
 const renderReadOnlyB1Section = async (page, lesson, part, filename = part) => {
   const lessonUrl = getB1PdfLessonCompanionUrl(lesson.route, baseUrl);
-  const audioQrDataUrl = part === "teil-4"
+  // Older B1 reading tasks can be online-only; both Teil 3 and Teil 4
+  // require an authenticated lesson QR when canonical printable content is absent.
+  const audioQrDataUrl = ["teil-3", "teil-4"].includes(part)
     ? await QRCode.toDataURL(lessonUrl, { width: 160, margin: 1, errorCorrectionLevel: "M" }) : "";
   const html = await buildB1ReadOnlyPrintHtml({ day: lesson.day, part, lessonUrl, audioQrDataUrl });
   const file = path.join(renderDir, String(lesson.day).padStart(2, "0") + "-" + filename + ".pdf");
