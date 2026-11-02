@@ -441,151 +441,161 @@
       "level": "A2",
       "day": 14,
       "assignmentKey": "A2-5.14",
-      "title": "Pläne für mein Leben",
-      "lyrics": "[Verse 1]\nIch arbeite seit zwei Jahren im Büro,\ndie Arbeit macht mir meistens Spaß.\nIch schreibe E-Mails, plane Termine,\nund spreche täglich mit den Kunden.\n\nManchmal ist die Arbeit stressig,\nund manchmal fehlt mir Erfahrung.\nDoch ich möchte besser werden,\ndenn ich habe große Ziele.\n\n[Chorus]\nIch habe Pläne für mein Leben,\nich möchte lernen und mehr verstehen.\nIch will im Beruf erfolgreich sein,\nund meine Zukunft selbst gestalten.\n\n[Verse 2]\nNächstes Jahr mache ich eine Weiterbildung,\ndamit ich neue Dinge lernen kann.\nIch möchte besser Deutsch sprechen,\ndenn das hilft mir auch im Beruf.\n\nVielleicht werde ich einmal Teamleiter,\nund übernehme mehr Verantwortung.\nIch spare Geld für meine Zukunft,\nund suche neue Möglichkeiten.\n\n[Chorus]\nIch habe Pläne für mein Leben,\nich möchte lernen und mehr verstehen.\nIch will im Beruf erfolgreich sein,\nund meine Zukunft selbst gestalten.\n\n[Outro]\nIch weiß, der Weg ist manchmal schwer,\ndoch meine Ziele bleiben klar.\nIch lerne heute für die Zukunft,\nund freue mich auf das nächste Jahr.",
-      "recordingObjectKey": "music/a2/day-14/Pläne für mein Leben.mp3",
-      "recordingSha256": "479a69d10c7231ace8e8e7689cdbe62f2f9349601c7ab76e613e8388ec4e12fe",
+      "title": "Mein Traumberuf",
+      "lyrics": "[Verse 1]\nSchon als Kind hatte ich einen Traum,\nich wollte Häuser und Brücken bauen.\nHeute weiß ich, was ich werden will,\nIngenieur zu sein, das ist mein Ziel.\n\n[Bridge]\nDer Weg ist lang, das weiß ich gut,\ndoch meine Träume machen Mut.\n\n[Chorus]\nMein Traumberuf, mein großer Plan,\nich glaube fest, dass ich es kann.\nIch lerne heute für meine Zukunft,\nund hoffe auf eine gute Chance.\n\n[Verse 2]\nZurzeit besuche ich einen Deutschkurs,\ndenn später möchte ich studieren.\nMathe übe ich jeden Tag,\nweil ich mit Zahlen arbeiten mag.\nEin Praktikum steht auch auf dem Plan,\ndort sehe ich mir die Arbeit an.\nSpäter möchte ich im Team arbeiten,\nund eigene Projekte leiten.\n\n[Chorus]\nMein Traumberuf, mein großer Plan,\nich glaube fest, dass ich es kann.\nIch lerne heute für meine Zukunft,\nund hoffe auf eine gute Chance.\nMein Traumberuf, mein großes Ziel,\ndafür lerne ich jeden Tag viel.\nIch will im Beruf erfolgreich sein,\nund stolz auf meine Arbeit sein.\n\n[Outro]\nIch gebe meinen Traum nicht auf,\nmeine Zukunft nimmt ihren Lauf.\nEin guter Beruf, ein schönes Leben,\ndafür will ich mein Bestes geben.",
+      "recordingObjectKey": "music/a2/day-14/Mein Traumberuf.mp3",
+      "recordingSha256": "9c97516632a35b75629e865ee5eb97b44acbda7f91ca3a23fa3155bde5c93530",
       "timingStatus": "estimated",
       "cues": [
         {
-          "start": 15.9,
-          "end": 19.2,
-          "text": "Ich arbeite seit zwei Jahren im Büro,"
+          "start": 23.1,
+          "end": 27.7,
+          "text": "Schon als Kind hatte ich einen Traum,"
         },
         {
-          "start": 19.45,
-          "end": 22.2,
-          "text": "die Arbeit macht mir meistens Spaß."
+          "start": 28.05,
+          "end": 32.05,
+          "text": "ich wollte Häuser und Brücken bauen."
         },
         {
-          "start": 22.45,
-          "end": 25.6,
-          "text": "Ich schreibe E-Mails, plane Termine,"
+          "start": 32.42,
+          "end": 36.4,
+          "text": "Heute weiß ich, was ich werden will,"
         },
         {
-          "start": 25.9,
-          "end": 29.1,
-          "text": "und spreche täglich mit den Kunden."
+          "start": 36.86,
+          "end": 41.8,
+          "text": "Ingenieur zu sein, das ist mein Ziel."
         },
         {
-          "start": 29.9,
-          "end": 33.1,
-          "text": "Manchmal ist die Arbeit stressig,"
+          "start": 43.05,
+          "end": 47.8,
+          "text": "Der Weg ist lang, das weiß ich gut,"
         },
         {
-          "start": 33.35,
-          "end": 36.35,
-          "text": "und manchmal fehlt mir Erfahrung."
+          "start": 48.22,
+          "end": 52.5,
+          "text": "doch meine Träume machen Mut."
         },
         {
-          "start": 36.7,
-          "end": 40.05,
-          "text": "Doch ich möchte besser werden,"
+          "start": 54.05,
+          "end": 58.78,
+          "text": "Mein Traumberuf, mein großer Plan,"
         },
         {
-          "start": 40.45,
-          "end": 43.9,
-          "text": "denn ich habe große Ziele."
+          "start": 59.1,
+          "end": 63.7,
+          "text": "ich glaube fest, dass ich es kann."
         },
         {
-          "start": 44.85,
-          "end": 48.15,
-          "text": "Ich habe Pläne für mein Leben,"
+          "start": 64.02,
+          "end": 69.05,
+          "text": "Ich lerne heute für meine Zukunft,"
         },
         {
-          "start": 48.55,
-          "end": 51.7,
-          "text": "ich möchte lernen und mehr verstehen."
+          "start": 69.45,
+          "end": 74.65,
+          "text": "und hoffe auf eine gute Chance."
         },
         {
-          "start": 52.05,
-          "end": 55.3,
+          "start": 87.05,
+          "end": 91.7,
+          "text": "Zurzeit besuche ich einen Deutschkurs,"
+        },
+        {
+          "start": 92.2,
+          "end": 96.25,
+          "text": "denn später möchte ich studieren."
+        },
+        {
+          "start": 96.8,
+          "end": 100.55,
+          "text": "Mathe übe ich jeden Tag,"
+        },
+        {
+          "start": 100.92,
+          "end": 105.3,
+          "text": "weil ich mit Zahlen arbeiten mag."
+        },
+        {
+          "start": 106.02,
+          "end": 110.05,
+          "text": "Ein Praktikum steht auch auf dem Plan,"
+        },
+        {
+          "start": 110.42,
+          "end": 114.42,
+          "text": "dort sehe ich mir die Arbeit an."
+        },
+        {
+          "start": 114.85,
+          "end": 119.05,
+          "text": "Später möchte ich im Team arbeiten,"
+        },
+        {
+          "start": 119.35,
+          "end": 123.95,
+          "text": "und eigene Projekte leiten."
+        },
+        {
+          "start": 125.42,
+          "end": 129.3,
+          "text": "Mein Traumberuf, mein großer Plan,"
+        },
+        {
+          "start": 129.55,
+          "end": 133.5,
+          "text": "ich glaube fest, dass ich es kann."
+        },
+        {
+          "start": 133.88,
+          "end": 138.1,
+          "text": "Ich lerne heute für meine Zukunft,"
+        },
+        {
+          "start": 138.48,
+          "end": 142.75,
+          "text": "und hoffe auf eine gute Chance."
+        },
+        {
+          "start": 143.05,
+          "end": 146.65,
+          "text": "Mein Traumberuf, mein großes Ziel,"
+        },
+        {
+          "start": 147,
+          "end": 150.65,
+          "text": "dafür lerne ich jeden Tag viel."
+        },
+        {
+          "start": 150.92,
+          "end": 154.85,
           "text": "Ich will im Beruf erfolgreich sein,"
         },
         {
-          "start": 55.65,
-          "end": 59.05,
-          "text": "und meine Zukunft selbst gestalten."
+          "start": 155.3,
+          "end": 159.75,
+          "text": "und stolz auf meine Arbeit sein."
         },
         {
-          "start": 71.9,
-          "end": 75.4,
-          "text": "Nächstes Jahr mache ich eine Weiterbildung,"
+          "start": 162.25,
+          "end": 166.32,
+          "text": "Ich gebe meinen Traum nicht auf,"
         },
         {
-          "start": 75.65,
-          "end": 78.7,
-          "text": "damit ich neue Dinge lernen kann."
+          "start": 166.72,
+          "end": 170.75,
+          "text": "meine Zukunft nimmt ihren Lauf."
         },
         {
-          "start": 79.05,
-          "end": 82.25,
-          "text": "Ich möchte besser Deutsch sprechen,"
+          "start": 171.05,
+          "end": 175.7,
+          "text": "Ein guter Beruf, ein schönes Leben,"
         },
         {
-          "start": 82.6,
-          "end": 85.75,
-          "text": "denn das hilft mir auch im Beruf."
-        },
-        {
-          "start": 86.25,
-          "end": 89.8,
-          "text": "Vielleicht werde ich einmal Teamleiter,"
-        },
-        {
-          "start": 90.05,
-          "end": 93.4,
-          "text": "und übernehme mehr Verantwortung."
-        },
-        {
-          "start": 93.75,
-          "end": 97.1,
-          "text": "Ich spare Geld für meine Zukunft,"
-        },
-        {
-          "start": 97.4,
-          "end": 100.65,
-          "text": "und suche neue Möglichkeiten."
-        },
-        {
-          "start": 101.5,
-          "end": 104.75,
-          "text": "Ich habe Pläne für mein Leben,"
-        },
-        {
-          "start": 105.05,
-          "end": 108.15,
-          "text": "ich möchte lernen und mehr verstehen."
-        },
-        {
-          "start": 108.5,
-          "end": 111.7,
-          "text": "Ich will im Beruf erfolgreich sein,"
-        },
-        {
-          "start": 112.05,
-          "end": 115.55,
-          "text": "und meine Zukunft selbst gestalten."
-        },
-        {
-          "start": 120.55,
-          "end": 123.55,
-          "text": "Ich weiß, der Weg ist manchmal schwer,"
-        },
-        {
-          "start": 124,
-          "end": 126.85,
-          "text": "doch meine Ziele bleiben klar."
-        },
-        {
-          "start": 127.25,
-          "end": 130,
-          "text": "Ich lerne heute für die Zukunft,"
-        },
-        {
-          "start": 130.35,
-          "end": 134.95,
-          "text": "und freue mich auf das nächste Jahr."
+          "start": 176.08,
+          "end": 181.75,
+          "text": "dafür will ich mein Bestes geben."
         }
       ]
     },
