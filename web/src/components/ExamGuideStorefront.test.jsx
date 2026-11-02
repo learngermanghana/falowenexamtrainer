@@ -44,7 +44,7 @@ test("new A2 book is discoverable with the correct private digital edition",asyn
   "href","/books/deutsch-a2-course-workbook/checkout?edition=a2-course-workbook-digital"
  );
  expect(screen.getByText("GH₵99.00")).toBeInTheDocument();
- expect(screen.getByText(/Audio is accessed through Falowen/)).toBeInTheDocument();
+ expect(screen.getByText(/Preview selected contents, grammar and reading excerpts/)).toBeInTheDocument();
  expect(screen.getByRole("radio",{name:/Printed on demand/})).toBeInTheDocument();
  const printed=screen.getByRole("radio",{name:/Printed on demand/});
  printed.click();
