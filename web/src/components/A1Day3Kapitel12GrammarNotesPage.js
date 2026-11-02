@@ -127,7 +127,7 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
           A1 · Day 3 · Kapitel 1.2 · German Subject Pronouns, Verb Conjugation and Introducing Yourself
         </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Learn all German subject pronouns, conjugate useful everyday verbs, distinguish informal and formal “you,” and introduce yourself.
+          Practise conjugation in everyday sentences and learn three starter W-question words (wie, wo and woher). Day 5 covers more question words.
         </p>
       </header>
 
@@ -206,8 +206,43 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
         </div>
       </section>
 
+      <section style={sectionStyle} data-a1-day3-starter-w-questions="true">
+        <h2 style={{ margin: 0 }}>3) Three W-words for simple questions</h2>
+        <p style={{ margin: 0 }}>
+          You have practised verb endings. Now use just three <strong>W-Fragewörter</strong>
+          (question words) to ask about a name, place, or origin. We will study the
+          wider set of W-questions in Day 5.
+        </p>
+        <div style={{ overflowX: "auto" }}>
+          <table style={tableStyle}>
+            <thead>
+              <tr><th style={thTdStyle}>W-word</th><th style={thTdStyle}>Meaning</th><th style={thTdStyle}>Question</th><th style={thTdStyle}>Answer</th></tr>
+            </thead>
+            <tbody>
+              {[
+                ["Wie?", "How? / What? (with a name)", "Wie heißt du?", "Ich heiße Anna."],
+                ["Wo?", "Where? (location)", "Wo wohnst du?", "Ich wohne in Accra."],
+                ["Woher?", "Where from? (origin)", "Woher kommen Sie?", "Ich komme aus Ghana."],
+              ].map((row) => (
+                <tr key={row[0]}>{row.map((cell, index) => <td key={index} style={thTdStyle}>{cell}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}>
+            <strong>Word order:</strong> W-word + conjugated verb + subject.
+            For example: <strong>Wo</strong> + <strong>wohnst</strong> + <strong>du</strong>?
+          </p>
+          <p style={{ margin: "8px 0 0" }}>
+            Compare <strong>Wo wohnst du?</strong> (one friend) with
+            <strong> Wo wohnen Sie?</strong> (formal). The verb changes with the pronoun.
+          </p>
+        </div>
+      </section>
+
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>3) ihr means “you guys / you all”</h2>
+        <h2 style={{ margin: 0 }}>4) ihr means “you guys / you all”</h2>
         <div style={noteStyle}>
           <p style={{ margin: 0 }}>
             Use <strong>ihr</strong> when speaking informally to <strong>two or more people</strong>. It is the plural partner of <strong>du</strong>.
@@ -223,7 +258,7 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>4) How to distinguish sie, Sie and ihr</h2>
+        <h2 style={{ margin: 0 }}>5) How to distinguish sie, Sie and ihr</h2>
         <div style={noteStyle}>
           <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 10, lineHeight: 1.65 }}>
             <li><strong>sie + singular -t verb</strong> usually means <strong>she</strong>: sie kommt, sie wohnt, sie arbeitet.</li>
@@ -248,7 +283,7 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>5) Introducing yourself</h2>
+        <h2 style={{ margin: 0 }}>6) Introducing yourself</h2>
         <div style={noteStyle}>
           <p style={{ margin: 0 }}><strong>Useful patterns:</strong></p>
           <ul style={{ margin: "8px 0 0", paddingLeft: 20, lineHeight: 1.7 }}>
@@ -265,7 +300,7 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>6) Multiple-choice knowledge test</h2>
+        <h2 style={{ margin: 0 }}>7) Multiple-choice knowledge test</h2>
         <p style={{ margin: 0, color: "#475569" }}>
           Choose one answer for every question. Then check your score.
         </p>
