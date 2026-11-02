@@ -209,7 +209,7 @@ for (const [day, sections] of expectedByDay) {
   for (const section of sections) {
     const label = section === "grammar" ? "GRAMMAR" : "WORKBOOK";
     const marker = new RegExp(
-      `${level}\s*[·•]?\s*Day\s+${day}\b[\s\S]{0,500}\b${label}\b`,
+      `${level}\\s*[·•]?\\s*Day\\s+${day}\\b[\\s\\S]{0,500}\\b${label}\\b`,
       "i",
     );
     if (!marker.test(text)) missing.push(`Day ${day} ${label}`);
