@@ -104,6 +104,7 @@ describe("A1 full Course Book consolidation", () => {
     });
 
     for (let day = 1; day <= 22; day += 1) {
+      if (day === 2) continue; // Video withheld until the unified lesson is recorded.
       expect(getA1TeacherVideoResources(day).length).toBeGreaterThan(0);
     }
     expect(getA1TeacherVideoResources(23)).toHaveLength(0);
