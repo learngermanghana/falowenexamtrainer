@@ -12,7 +12,7 @@ const titles = [
     status: "available", bookIds: ["writing-skills-a1-c2-digital"] },
 ];
 const offers = [
-  { id: "a1-digital", format: "digital", priceGhs: 99 },
+  { id: "a1-digital", format: "digital", priceGhs: 100 },
   { id: "a1-printed", format: "printed", priceGhs: 800 },
   { id: "writing-skills-a1-c2-digital", format: "digital", priceGhs: 39 },
 ];
@@ -62,12 +62,12 @@ test("only the published A2 course book appears when old guide data is still cac
    formats:["digital"],pages:50,status:"available",bookIds:[id+"-digital"]})),
  ];
  const offers=[
-  {id:"a2-course-workbook-digital",format:"digital",priceGhs:99},
+  {id:"a2-course-workbook-digital",format:"digital",priceGhs:100},
   ...retired.map(id=>({id:id+"-digital",format:"digital",priceGhs:39})),
  ];
  render(<BooksCatalog catalogTitles={titles} books={offers}/>);
  expect(screen.getByText("1 book found")).toBeInTheDocument();
- expect(screen.getByText("GH₵99.00")).toBeInTheDocument();
+ expect(screen.getByText("GH₵100.00")).toBeInTheDocument();
  expect(screen.getByRole("link",{name:"View Book"}))
   .toHaveAttribute("href","/books/deutsch-a2-course-workbook");
  for(const name of retired)expect(screen.queryByText(name)).not.toBeInTheDocument();

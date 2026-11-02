@@ -34,7 +34,7 @@ test("checkout validates quantities and delivery, charges server total and verif
   assert.equal(saved.unitPriceGhs,800);assert.equal(saved.quantity,3);assert.equal(saved.deliveryAddress,"Accra, Example Street");
   const verified=await processBookWebhook({admin,data:{domain:"live",status:"success",reference:saved.reference,currency:"GHS",amount:240000,customer:{email:saved.email},metadata:initialization.metadata}});
   assert.equal(verified.body.status,"synced");assert.equal(receipt.amountGhs,2400);
-  const a2=await invoke({bookId:"a2-course-workbook-digital"});assert.equal(a2.code,200);assert.equal(initialization.amount,9900);assert.equal(saved.format,"digital");
+  const a2=await invoke({bookId:"a2-course-workbook-digital"});assert.equal(a2.code,200);assert.equal(initialization.amount,10000);assert.equal(saved.format,"digital");
   // Printed A2 follows the existing A1 paystack path, no digital download SKU.
   const a2Printed=await invoke({bookId:"a2-course-workbook-printed",quantity:2,deliveryMethod:"delivery",deliveryAddress:"Accra, Example Street",priceGhs:1});
   assert.equal(a2Printed.code,200);
@@ -49,7 +49,7 @@ test("checkout validates quantities and delivery, charges server total and verif
   const a2PrintedReceipt=await processBookWebhook({admin,data:{domain:"live",status:"success",reference:saved.reference,currency:"GHS",amount:210000,customer:{email:saved.email},metadata:initialization.metadata}});
   assert.equal(a2PrintedReceipt.body.status,"synced");
   assert.equal(receipt.amountGhs,2100);
-  const legacy=await invoke({bookId:"a1-digital"});assert.equal(legacy.code,200);assert.equal(initialization.amount,9900);assert.equal(saved.quantity,1);
+  const legacy=await invoke({bookId:"a1-digital"});assert.equal(legacy.code,200);assert.equal(initialization.amount,10000);assert.equal(saved.quantity,1);
  } finally {
   global.fetch=oldFetch;
   for(const [key,value] of [["FALOWEN_BOOK_PAYMENTS_ENABLED",oldEnabled],["PAYSTACK_SECRET",oldSecret]]) if(value===undefined) delete process.env[key];else process.env[key]=value;

@@ -25,7 +25,7 @@ export default function A1CourseBookOffer() {
       <div style={{ display: "grid", gap: 4, flex: "1 1 180px", minWidth: 0 }}>
         <strong style={{ fontSize: 13, color: "#172554" }}>Complete A1 Course & Workbook</strong>
         <span style={{ fontSize: 12, color: "#475569", lineHeight: 1.45 }}>
-          Optional 250-page offline book · Digital GH₵99 · Printed on demand GH₵800
+          Optional 250-page offline book · Digital GH₵100 · Printed on demand GH₵800
         </span>
         <a
           href="/books/deutsch-a1-course-workbook"

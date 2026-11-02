@@ -14,7 +14,7 @@ test("A1 complete textbook offer is optional and never asks to buy before using 
   const card = screen.getByRole("complementary", { name: "Complete A1 course book" });
   expect(card).toHaveAttribute("data-pdf-exclude", "a1-course-book-offer");
   expect(card).toHaveTextContent("250-page");
-  expect(card).toHaveTextContent("Digital GH₵99");
+  expect(card).toHaveTextContent("Digital GH₵100");
   expect(card).toHaveTextContent("Printed on demand GH₵800");
   expect(screen.getByRole("link", { name: /View complete A1 book/ })).toHaveAttribute(
     "href", "/books/deutsch-a1-course-workbook"
