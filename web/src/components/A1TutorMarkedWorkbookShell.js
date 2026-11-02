@@ -182,7 +182,7 @@ const A1TutorMarkedWorkbookShell = ({
       {assignment.assignmentKey === "A1-13" ? <A1Day21WeatherResources /> : null}
       {isFirstA1Workbook ? firstWorkbookOverview : <A1TutorMarkedOverviewGuidance />}
       {overviewNodes}
-      <PublishedHoerenPractice assignmentKey={assignment.assignmentKey} />
+      {assignment.assignmentKey !== "A1-0.2_1.1" ? <PublishedHoerenPractice assignmentKey={assignment.assignmentKey} /> : null}
     </div>
   );
 
