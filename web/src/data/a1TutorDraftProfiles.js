@@ -40,7 +40,7 @@ const profiles = {
   // New storage identity; old Day 2 drafts and grades stay under their original IDs.
   "A1-0.2_1.1": {
     sections: {
-      "teil-1": section([...choiceItems(4), { number: 5, type: "short", placeholder: "Ä or A-Umlaut" }], { label: "Phonetic word decoding" }),
+      "teil-1": section([...choiceItems(4), { number: 5, type: "short", placeholder: "Type the letter name" }], { label: "Phonetic word decoding" }),
       "teil-2": section(choiceItems(5, ["A", "B", "C"]), { label: "du, ihr oder Sie?" }),
       "teil-3": section(choiceItems(5), { label: "Personal pronouns" }),
       "teil-4": section(shortItems(5, "Write the correct verb form"), { label: "Verb conjugation" }),
