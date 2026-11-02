@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import BooksCatalog, { indicativeUsd, matchCatalogTitles } from "./BooksCatalog";
+import BooksCatalog, { indicativeUsd, matchCatalogTitles, BOOK_PAGES } from "./BooksCatalog";
 
 const titles = [
   { id: "a1-course-workbook", title: "Deutsch A1 — Course & Workbook", description: "Beginner grammar course",
@@ -95,4 +95,11 @@ test("book landing cards link all three exam guides with the same covers and wit
  }
  expect(screen.getAllByRole("img",{name:/cover/i})).toHaveLength(3);
  expect(screen.queryByRole("button",{name:/Continue to Paystack/})).not.toBeInTheDocument();
+});
+test("A2 Course Book replaces the three old exam guides in the real product page map",()=>{
+ expect(BOOK_PAGES["a2-course-workbook"]).toEqual({
+  href:"/books/deutsch-a2-course-workbook",cover:"/books/a2-cover.svg"
+ });
+ for(const hidden of ["a1-writing-model-exams","a2-four-skills-exam-guide","b1-four-skills-exam-guide"])
+  expect(BOOK_PAGES[hidden]).toBeUndefined();
 });
