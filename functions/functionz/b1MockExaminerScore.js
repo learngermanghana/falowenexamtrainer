@@ -38,9 +38,10 @@ async function scoreB1ExaminerSnapshots({
     // Mock 02 must assess its actual teacher-supplied tasks, not generic B1
     // practice with a spoofed mock ID. Topic A and B are both valid in Teil 2.
     const promptMatches=mockId!=="b1-mock-02" || (
-      i===0 ? prompt.includes("Frau Keller") && prompt.includes("Firmenjubiläum") :
-      i===1 ? /Bio-Produkte|Verreisen: Lieber alleine/.test(prompt) :
-      /Feedback/.test(prompt) && /Präsentation/.test(prompt)
+      i===0 ? prompt.includes("interkulturelles Nachbarschaftsfest") && prompt.includes("Integration") :
+      i===1 ? /Sprach- und Integrationskurse|Sport- und Kulturvereine/.test(prompt) :
+      /Feedback/.test(prompt) && /Präsentation/.test(prompt) &&
+        /Sprach- und Integrationskurse|Sport- und Kulturvereine/.test(prompt)
     );
     if(!receipts[i]?.exists || receipt?.uid!==uid || receipt?.sessionId!==id ||
        receipt?.mockAttemptId!==attemptId ||
