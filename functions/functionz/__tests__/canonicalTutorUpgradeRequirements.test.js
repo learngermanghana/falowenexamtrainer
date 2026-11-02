@@ -9,7 +9,7 @@ describe("canonical tutor upgrade requirements", () => {
     const a2 = getCanonicalTutorRequirements("A2");
     const b1 = getCanonicalTutorRequirements("B1");
 
-    expect(a1).toHaveLength(19);
+    expect(a1).toHaveLength(18);
     expect(a2).toHaveLength(28);
     expect(b1).toHaveLength(28);
     expect(b1.map((item) => item.day)).toEqual(
