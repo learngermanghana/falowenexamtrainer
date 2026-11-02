@@ -58,12 +58,16 @@ test("unanswered parts receive zero only when explicitly null at timeout",async(
   expect(r.score).toBe(6.8);
   expect(r.parts.teil3.score).toBe(0);
 });
-test("Frau Keller and partner-presentation tasks are selected server-side",()=>{
-  const plan=createExaminerFlow("B1",{id:"b1-mock-02-speaking-teil-1",teil:"Teil 1",prompt:"Frau Keller feiert Firmenjubiläum: eine Überraschungsfeier planen"},"simulation");
-  expect(plan.planningPoints.map(x=>x.id)).toEqual(["time_place","guests","gift_budget","food_decoration"]);
-  expect(profileFor(plan).decisionPoints).toEqual(["time_place","guests","gift_budget","food_decoration"]);
-  const discussion=createExaminerFlow("B1",{id:"b1-mock-02-speaking-teil-3",teil:"Teil 3",prompt:"Feedback und Fragen zur Präsentation",keywords:"Sollte man im Alltag mehr Bio-Produkte kaufen?"},"simulation");
-  expect(currentStep(discussion,0).instruction).toContain("Online Deutsch lernen");
+test("B1 Mock 2 partner plans the neighborhood festival and discusses the other topic",()=>{
+  const plan=createExaminerFlow("B1",{id:"b1-mock-02-speaking-teil-1",teil:"Teil 1",prompt:"Interkulturelles Nachbarschaftsfest organisieren"},"simulation");
+  expect(plan.planningPoints.map(x=>x.id)).toEqual(["time_place","invitations","catering","programme","responsibilities"]);
+  expect(profileFor(plan).decisionPoints).toEqual(["time_place","invitations","catering","programme","responsibilities"]);
+  const discussion=createExaminerFlow("B1",{id:"b1-mock-02-speaking-teil-3",teil:"Teil 3",prompt:"Feedback und Fragen zur Präsentation",keywords:"Sollten Sprach- und Integrationskurse für alle Zugewanderten verpflichtend sein?"},"simulation");
+  expect(discussion.discussion.topic).toContain("Sport- und Kulturvereine");
+  expect(currentStep(discussion,0).instruction).toContain("Sport- und Kulturvereine");
   expect(currentStep(discussion,0).action).toBe("feedback-and-question");
-  expect(currentStep(discussion,1).instruction).toContain("Bio-Produkte");
+  expect(currentStep(discussion,1).instruction).toContain("Sprach- und Integrationskurse");
+  const alternative=createExaminerFlow("B1",{id:"b1-mock-02-speaking-teil-3",teil:"Teil 3",prompt:"Feedback und Fragen zur Präsentation",keywords:"Braucht man Sport- und Kulturvereine für ein gutes Zusammenleben in der Stadt?"},"simulation");
+  expect(alternative.discussion.topic).toContain("Sprach- und Integrationskurse");
+  expect(currentStep(alternative,0).instruction).toContain("Sprach- und Integrationskurse");
 });
