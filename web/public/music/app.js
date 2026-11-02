@@ -1,4 +1,5 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
+import { coverForTrack } from "./cover-art.js?v=20261102-covers";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
@@ -234,6 +235,13 @@ function setPlayer(track, start = false) {
   }
   current = track;
   audio.dataset.trackId = track.id;
+  const cover=byId("player-cover");
+  if(cover){
+    const src=coverForTrack(track);
+    cover.replaceChildren();cover.textContent=src?"":"♫";
+    if(src){const photo=el("img","player-cover-img");photo.src=src;photo.alt="";
+      photo.onerror=()=>{cover.replaceChildren();cover.textContent="♫";};cover.append(photo);}
+  }
   byId("now-title").textContent = track.title;
   byId("now-meta").textContent = [track.level === "ALL" ? "All levels" : track.level, track.day ? "Day " + track.day : track.type].join(" · ");
   byId("player-error").textContent = "";
@@ -295,6 +303,14 @@ function card(track) {
   const badge = el("span", "track-badge", track.level === "ALL" ? "CLASS MUSIC" : track.level + " · DAY " + track.day);
   const circle = el("span", "art-circle", track.category === "lesson" ? "♫" : "♪");
   circle.setAttribute("aria-hidden", "true");
+  const cover=coverForTrack(track);
+  if(cover){
+    const photo=el("img","track-cover-img");
+    photo.src=cover;photo.alt="";photo.loading="lazy";photo.decoding="async";
+    photo.width=900;photo.height=600;
+    photo.onerror=()=>{photo.remove();art.classList.remove("has-cover");circle.hidden=false;};
+    art.classList.add("has-cover");art.append(photo);
+  }
   art.append(badge, circle);
   const body = el("div", "track-body");
   body.append(el("span", "track-topic", track.topic), el("h3", "", track.title),
@@ -652,6 +668,11 @@ function renderDetail(track) {
   const hasLesson = Boolean(lesson && Array.isArray(lesson.questions) && (!lyricPack || JSON.stringify(lyricLines(lyricPack.lyrics)) === JSON.stringify(lyricLines(lesson.lyrics))));
   byId("detail-eyebrow").textContent = track.level === "ALL" ? "FALOWEN · CLASSROOM MUSIC" : "FALOWEN · " + track.level + " · DAY " + track.day;
   byId("detail-title").textContent = track.title;
+  const detailCover=byId("detail-cover");
+  if(detailCover){const url=coverForTrack(track);detailCover.hidden=!url;
+    if(url){detailCover.src=url;detailCover.alt="Artwork for "+track.title;
+      detailCover.onerror=()=>{detailCover.hidden=true;};}}
+
   byId("song-detail").dataset.level = String(track.level || "all").toLowerCase();
   updateDetailFavorite();
   byId("detail-meta").textContent = [track.topic, track.genre || track.type, track.language].join(" · ");

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" role="img" aria-label="PLANS music illustration">
+<defs><linearGradient id="cover4bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a8755a"/><stop offset="1" stop-color="#333c53"/></linearGradient><radialGradient id="cover4light"><stop stop-color="#dbf7a9" stop-opacity=".45"/><stop offset="1" stop-color="#dbf7a9" stop-opacity="0"/></radialGradient><linearGradient id="cover4shade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#122630" stop-opacity="0"/><stop offset="1" stop-color="#0b2029" stop-opacity=".82"/></linearGradient></defs>
+<rect width="900" height="600" fill="url(#cover4bg)"/><circle cx="668" cy="172" r="270" fill="url(#cover4light)"/>
+<path d="M0 452Q180 370 335 440T650 422T900 390V600H0Z" fill="#0b2930" opacity=".19"/>
+<g fill="none" stroke="#ebf8e7" stroke-width="2" opacity=".2"><circle cx="36" cy="35" r="11"/><circle cx="146" cy="72" r="18"/><circle cx="256" cy="109" r="25"/><circle cx="366" cy="35" r="32"/><circle cx="476" cy="72" r="11"/><circle cx="586" cy="109" r="18"/><circle cx="696" cy="35" r="25"/><circle cx="806" cy="72" r="32"/><circle cx="916" cy="109" r="11"/></g>
+<circle cx="243" cy="286" r="194" fill="#ffffff" opacity=".075"/><g stroke="#dbf7a9" stroke-width="15" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="126" y="184" width="249" height="196" rx="22"/><path d="M126 242h249M187 155v61M306 155v61M181 290h36M261 290h36M181 339h36M261 339h36"/></g>
+<g><path d="M507 600q0-150 44-181 55-43 138-40 91 1 145 46 31 34 46 175Z" fill="#e7bd87"/><path d="M623 381q-11 53 64 93 68-46 59-93Z" fill="#955038"/>
+<ellipse cx="686" cy="287" rx="91" ry="110" fill="#955038"/>
+<path d="M594 274q-22-66 12-122 26-49 98-46 71 0 96 60 13 33-18 105-15-47-38-75-54 18-108-5-18 45-42 83z" fill="#1b262a"/>
+<g fill="#1b262a"><circle cx="631" cy="191" r="29"/><circle cx="664" cy="191" r="29"/><circle cx="697" cy="204" r="29"/><circle cx="728" cy="178" r="29"/><circle cx="753" cy="191" r="29"/></g>
+<path d="M646 289q14-9 31 1m23 0q14-10 30 0" stroke="#292020" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M668 344q20 14 41-2" fill="none" stroke="#5c302a" stroke-width="7" stroke-linecap="round"/>
+<path d="M589 459q95 67 194-2" stroke="#fff" opacity=".25" fill="none" stroke-width="7"/></g>
+<rect width="900" height="600" fill="url(#cover4shade)"/>
+<rect x="22" y="20" width="218" height="42" rx="20" fill="#0c262d" opacity=".84"/>
+<text x="40" y="48" font-size="22" font-family="Arial,Helvetica,sans-serif" font-weight="700" fill="#f0f8ee" letter-spacing="1.4">A1 · DAY 21</text>
+<text x="32" y="556" font-size="30" font-family="Arial,Helvetica,sans-serif" font-weight="800" fill="#f9fff4" letter-spacing="3">PLANS</text>
+<text x="861" y="551" text-anchor="end" font-size="18" font-family="Arial,Helvetica,sans-serif" font-weight="700" fill="#e2eddd" letter-spacing="2.6">FALOWEN MUSIC</text>
+</svg>
