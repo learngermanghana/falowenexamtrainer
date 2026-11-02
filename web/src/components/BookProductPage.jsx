@@ -16,7 +16,8 @@ async function request(path, options = {}) {
 function PreviewSlides({productId, title, cover}) {
   const track = useRef(null);
   const [current, setCurrent] = useState(0);
-  const pages = productId === "a1-course-workbook" ? [1,2,3]
+  const pages = productId === "a2-course-workbook" ? [] // No public sample pages until excerpts are editorially approved.
+    : productId === "a1-course-workbook" ? [1,2,3]
     : productId === "a1-writing-model-exams" ? [5,11,21]
     : productId === "writing-skills-a1-c2" ? [5,7,9] : [5,21,31];
   const move = index => track.current?.scrollTo({left:index * track.current.clientWidth, behavior:"smooth"});
@@ -37,7 +38,9 @@ function PreviewSlides({productId, title, cover}) {
       <span aria-live="polite">{current+1} / {pages.length+1}</span>
       <button type="button" aria-label="Next preview" disabled={current===pages.length} onClick={()=>move(current+1)}>→</button>
     </div>
-    <p className="fb-muted">Swipe to preview · Tap a page to enlarge.{productId === "b1-four-skills-exam-guide" && " Preview backgrounds adjusted for readability."}</p>
+    <p className="fb-muted">{productId === "a2-course-workbook"
+      ? "Full 328-page PDF is delivered privately after verified payment. Audio is accessed through Falowen."
+      : "Swipe to preview · Tap a page to enlarge."}</p>
   </section>;
 }
 export default function BookProductPage({slug, checkout=false, basePath="/books"}) {
