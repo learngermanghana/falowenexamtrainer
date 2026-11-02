@@ -33,3 +33,21 @@ test("Mock 2 cannot publish an invented writing or speaking score",()=>{
    verifiedSections:{schreiben:{score:25},sprechen:{verified:true,score:25}}
  })).toThrow(/Server-verified schreiben/);
 });
+
+test("November B1 Mock 2 Lesen answer keys for Aufgaben 1–12 are server-owned and exact",()=>{
+ const expected=[
+  "richtig","richtig","falsch","falsch","richtig","richtig",
+  "b","a","c","b","a","b"
+ ];
+ const values=[...Array.from({length:6},(_,i)=>B1_MOCK2_READING_KEY[`t1-${i+1}`]),
+  ...Array.from({length:6},(_,i)=>B1_MOCK2_READING_KEY[`t2-${i+7}`])];
+ expect(values).toEqual(expected);
+ expect(Object.keys(B1_MOCK2_READING_KEY)).toHaveLength(30);
+ const modified={...B1_MOCK2_READING_KEY,"t1-2":"falsch","t2-8":"c"};
+ const full=buildVerifiedB1MockScore({
+  mockId:"b1-mock-02",state:{lesenAnswers:modified,hoerenAnswers},
+  verifiedSections
+ });
+ expect(full.objective.lesen.correct).toBe(28);
+ expect(full.sectionScores.lesen).toBeCloseTo(28/30*25,1);
+});
