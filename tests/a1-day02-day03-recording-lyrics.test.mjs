@@ -6,6 +6,7 @@ import {lyricLines} from '../web/public/music/lyrics-timing.js';
 const require=createRequire(import.meta.url);
 const {createLyricsHandler}=require('../server/musicLyrics.cjs');
 const {musicTrackFromKey,musicKeyFromAutoId}=require('../server/musicDiscovery.cjs');
+const estimates=require('../web/public/music/estimated-timings.json').recordings;
 const allRecordings=require('../web/public/music/approved-recording-lyrics.json').recordings;
 const recordings=allRecordings.filter(pack=>['A1-0.2','A1-1.1'].includes(pack.assignmentKey));
 const response=()=>({headers:{},setHeader(k,v){this.headers[k]=v;},status(code){this.code=code;return this;},json(body){this.body=body;return this;}});
@@ -26,12 +27,14 @@ test('exact Day 2 and 3 music keys retain punctuation, correct lesson identity a
  assert.match(recordings[0].lyrics,/B – I – N – A/);assert.match(recordings[0].lyrics,/beginnt am Montag/);
  assert.match(recordings[1].lyrics,/komme aus Berlin/);assert.match(recordings[1].lyrics,/wohne hier in Bonn/);
 });
-test('missing or unavailable sidecars return exact owner lyrics and zero cues; reviewed sidecars take precedence',async()=>{
+test('missing or unavailable sidecars return labeled acoustic drafts; reviewed sidecars take precedence',async()=>{
  for(const pack of recordings){
   for(const fail of ['missing','unavailable']){
    const res=response();const handler=createLyricsHandler({env,fetchImpl:async()=>{if(fail==='unavailable')throw Error('offline');return new Response('',{status:404});}});
    await handler({method:'GET',query:{track:pack.trackId}},res);
-   assert.equal(res.code,200);assert.equal(res.body.objectKey,pack.objectKey);assert.equal(res.body.lyrics,pack.lyrics);assert.deepEqual(res.body.cues,[]);assert.equal(res.body.timingStatus,'missing');
+   assert.equal(res.code,200);assert.equal(res.body.objectKey,pack.objectKey);const estimate=estimates.find(row=>row.objectKey===pack.objectKey);
+   assert.ok(estimate);assert.equal(res.body.lyrics,estimate.lyrics);assert.deepEqual(res.body.cues,estimate.cues);
+   assert.equal(res.body.timingStatus,'estimated');assert.equal(res.body.transcriptionStatus,'automatic');assert.equal(res.body.referenceOnly,true);
   }
   const reviewed={objectKey:pack.objectKey,lyrics:pack.lyrics,cues:lyricLines(pack.lyrics).map((text,index)=>({text,start:index+1}))};
   const res=response();await createLyricsHandler({env,fetchImpl:async()=>new Response(JSON.stringify(reviewed))})({method:'GET',query:{track:pack.trackId}},res);
