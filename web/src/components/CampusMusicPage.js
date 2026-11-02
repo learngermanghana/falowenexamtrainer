@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { auth } from "../firebase";
+import { normalizeCampusMusicPractice, saveCampusMusicPractice } from "./musicPracticeTracking";
 
 /**
  * Reuses the existing Falowen Music app through the SAME ORIGIN.
@@ -10,6 +12,22 @@ import React from "react";
  * Do not duplicate music catalogues, R2 credentials or music API requests.
  */
 export default function CampusMusicPage() {
+  const iframeRef = useRef(null);
+
+  useEffect(() => {
+    const onMusicEvent = event => {
+      // Reject cross-origin messages and frames not owned by this Campus page.
+      if (event.origin !== window.location.origin || event.source !== iframeRef.current?.contentWindow) return;
+      const data = normalizeCampusMusicPractice(event.data);
+      const student = auth?.currentUser;
+      if (!data || !student || student.isAnonymous) return;
+      // Deliberately best effort: a reporting outage must not interrupt lessons.
+      saveCampusMusicPractice(student, data).catch(() => {});
+    };
+    window.addEventListener('message', onMusicEvent);
+    return () => window.removeEventListener('message', onMusicEvent);
+  }, []);
+
   return (
     <section aria-label="Falowen Music" data-campus-music="true" style={{ display: "grid", gap: 12 }}>
       <header style={{
@@ -27,7 +45,11 @@ export default function CampusMusicPage() {
           Open public Music site ↗
         </a>
       </header>
+      <p style={{ margin: 0, fontSize: 12, color: '#475569' }}>
+        Your song starts, listening time and completed listens in Campus Music are saved to your Falowen learning account so authorised staff can follow your practice. Public Music listening stays anonymous.
+      </p>
       <iframe
+        ref={iframeRef}
         title="Falowen Music — German listening room"
         src="/music/index.html?embedded=1"
         loading="eager"
