@@ -4741,6 +4741,8 @@ app.post("/writing/a2-mock-score", async (req, res) => {
   }
 });
 
+const {validateB1Mock2Teil3Rubric,normalizedB1Mock2Teil3Score}=require("./b1Mock2WritingRubric");
+
 app.post("/writing/b1-mock-score", async (req, res) => {
   let authedUser;
   let pendingQuotaDate = "";
@@ -4804,15 +4806,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
         {
            partKeys: ["teil1", "teil2", "teil3"],
            pointCounts: { teil1: 3, teil2: 3, teil3: 3 },
-           validateResult: mockId !== "b1-mock-02" ? undefined : (assessment) => {
-             const rubric = assessment?.parts?.teil3?.rubric_scores;
-             const maxima = {task_fulfilment:4,cohesion:4,vocabulary:6,grammar:6};
-             if (!rubric || Object.entries(maxima).some(([name,max]) =>
-               typeof rubric[name] !== "number" || !Number.isFinite(rubric[name]) ||
-               rubric[name] < 0 || rubric[name] > max)) {
-               throw Object.assign(new Error("Incomplete B1 Mock 2 Teil 3 writing rubric."), {code:"INVALID_MOCK_ASSESSMENT"});
-             }
-           },
+           validateResult: mockId !== "b1-mock-02" ? undefined : validateB1Mock2Teil3Rubric,
          },
       );
       const cleanedReply = String(reply || "")
@@ -4839,7 +4833,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
         const missingCaps = maxScore === 5 ? [4, 2, 0.5] : [7, 4, 1];
         const rubric=mockId==="b1-mock-02" && key==="teil3" ? part.rubric_scores : null;
         const rubricScore=rubric
-          ? Number(((rubric.task_fulfilment+rubric.cohesion+rubric.vocabulary+rubric.grammar)/4).toFixed(1))
+          ? normalizedB1Mock2Teil3Score(rubric)
           : Number(part.score);
         const rawScore = Math.max(0, Math.min(maxScore, rubricScore || 0));
         const cappedScore = missing ? Math.min(rawScore, missingCaps[Math.min(missing, 3) - 1]) : rawScore;
