@@ -7,8 +7,9 @@ const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
   "a1-printed": Object.freeze({ id: "a1-printed", title: "Falowen Deutsch A1 – Printed Course & Workbook", format: "printed", priceGhs: 800 }),
   "writing-skills-a1-c2-digital": Object.freeze({ id: "writing-skills-a1-c2-digital", title: "How to Unlock Your German Writing Skills (A1–C2)", format: "digital", priceGhs: 39 }),
-  // Digital-only A2 course book; same established GHS price as the A1 digital edition.
+  // The digital price matches A1; printed A2 uses the existing 250-page A1 retail benchmark.
   "a2-course-workbook-digital": Object.freeze({ id: "a2-course-workbook-digital", title: "Falowen Deutsch A2 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
+  "a2-course-workbook-printed": Object.freeze({ id: "a2-course-workbook-printed", title: "Falowen Deutsch A2 – Printed Course & Workbook", format: "printed", priceGhs: pricePrintedGuide(328) }),
   "a1-writing-model-exams-digital": Object.freeze({ id: "a1-writing-model-exams-digital", title: "Falowen A1 Writing Model Exams & Practice Workbook — PDF", format: "digital", priceGhs: priceDigitalExamGuide({skills:1}) }),
   "a1-writing-model-exams-printed": Object.freeze({ id: "a1-writing-model-exams-printed", title: "Falowen A1 Writing Model Exams & Practice Workbook — Printed", format: "printed", priceGhs: pricePrintedGuide(30) }),
   "a2-four-skills-exam-guide-digital": Object.freeze({ id: "a2-four-skills-exam-guide-digital", title: "Falowen A2 Four-Skills Exam Preparation Guide — PDF", format: "digital", priceGhs: priceDigitalExamGuide({skills:4}) }),
@@ -48,10 +49,10 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     description: "The complete 328-page Falowen A2 course book, covering all 28 learning days with grammar notes, guided workbook practice, a clickable contents page and lesson-linked Hören QR codes. Audio and graded submissions are accessed through your Falowen account; audio files are not embedded in the PDF.",
     levelTags: ["A2"],
     topics: ["a2", "grammar", "course workbook", "speaking", "writing", "reading", "listening", "hoeren", "hören", "practice"],
-    formats: ["digital"],
+    formats: ["digital", "printed"],
     pages: 328,
     status: "available",
-    bookIds: ["a2-course-workbook-digital"],
+    bookIds: ["a2-course-workbook-digital", "a2-course-workbook-printed"],
   }),
 ]);
 const CALLBACK_ORIGIN = "https://www.falowen.app";

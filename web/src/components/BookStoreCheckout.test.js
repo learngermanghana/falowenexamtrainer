@@ -37,6 +37,40 @@ test("coming soon blocks detail and direct checkout purchases",async()=>{
  await screen.findByText(/Coming Soon · Unavailable/);
  expect(screen.queryByLabelText("Full name")).toBeNull();
 });
+test("A2 printed edition uses the published unit price, quantity and address fields",async()=>{
+ const a2Catalog={
+  paymentsEnabled:true,
+  catalogTitles:[{id:"a2-course-workbook",title:"Deutsch A2 — Course & Workbook",status:"available",
+    bookIds:["a2-course-workbook-digital","a2-course-workbook-printed"],pages:328,levelTags:["A2"]}],
+  books:[{id:"a2-course-workbook-digital",format:"digital",priceGhs:99},
+    {id:"a2-course-workbook-printed",format:"printed",priceGhs:1050}],
+ };
+ window.history.replaceState({},"",
+   "/books/deutsch-a2-course-workbook/checkout?edition=a2-course-workbook-printed");
+ global.fetch=jest.fn(async url=>String(url).includes("/books/checkout")
+  ? {ok:false,json:async()=>({error:"Test payment response"})}
+  : {ok:true,json:async()=>String(url).includes("/books/catalog")?a2Catalog:{usdToGhs:10}});
+ render(<BookStoreCheckout slug="deutsch-a2-course-workbook" checkout/>);
+ expect(await screen.findByLabelText("Quantity")).toHaveValue(1);
+ expect(screen.getByLabelText("Quantity")).toBeEnabled();
+ expect(screen.getByRole("radio",{name:/Printed on demand/})).toBeChecked();
+ expect(screen.getByRole("button",{name:"Continue to Paystack · GH₵1050.00"})).toBeEnabled();
+ for(const [label,value] of [["Full name","Test Reader"],["Email address","reader@example.com"],
+   ["Phone / WhatsApp","+233241234567"],["Quantity","2"]])
+  fireEvent.change(screen.getByLabelText(label),{target:{value}});
+ fireEvent.change(screen.getByLabelText("Collection or delivery"),{target:{value:"delivery"}});
+ fireEvent.change(screen.getByLabelText("Delivery address"),
+  {target:{value:"Accra, Example Street"}});
+ fireEvent.click(screen.getByRole("button",{name:"Continue to Paystack · GH₵2100.00"}));
+ await screen.findByRole("alert");
+ const call=global.fetch.mock.calls.find(([url])=>String(url).includes("/books/checkout"));
+ expect(JSON.parse(call[1].body)).toEqual({
+  bookId:"a2-course-workbook-printed",name:"Test Reader",
+  email:"reader@example.com",phone:"+233241234567",
+  quantity:2,deliveryMethod:"delivery",deliveryAddress:"Accra, Example Street",
+ });
+});
+
 test("digital checkout restricts quantity to one and hides delivery address",async()=>{
  render(<BookStoreCheckout checkout/>);await screen.findByLabelText("Quantity");
  expect(screen.getByLabelText("Quantity")).toBeDisabled();

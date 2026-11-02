@@ -13,10 +13,53 @@ async function request(path, options = {}) {
   if (!response.ok) throw Error(data.error || "Unable to load the bookstore. Please try again.");
   return data;
 }
+// Short, source-checked excerpts from the 328-page clean A2 PDF (pages 2, 7, 14).
+// Do not publish or fetch the private full PDF from the public storefront.
+function A2BookPreviewSample({page}) {
+  return <article className="fb-slide-paper fb-a2-preview" aria-label={`A2 book sample from page ${page}`}>
+    <div className="fb-a2-preview-top"><strong>FALOWEN</strong><span>A2 COURSE BOOK · SAMPLE</span></div>
+    {page === 2 ? <>
+      <h2>Contents</h2>
+      <p className="fb-a2-preview-lead">Grammar Notes &amp; Workbook · 28 learning days</p>
+      <dl className="fb-a2-preview-contents">
+        <div><dt>Day 1 · Small Talk 1.1</dt><dd>5</dd></div>
+        <div><dt>Grammar</dt><dd>5</dd></div>
+        <div><dt>Workbook</dt><dd>10</dd></div>
+        <div><dt>Day 2 · Personen beschreiben 1.2</dt><dd>18</dd></div>
+        <div><dt>Day 3 · Dinge und Personen vergleichen 1.3</dt><dd>31</dd></div>
+        <div><dt>Day 4 · Wo möchten wir uns treffen? 2.4</dt><dd>45</dd></div>
+      </dl>
+    </> : page === 7 ? <>
+      <p className="fb-a2-preview-lead">A2 · Day 1 · Grammar Notes</p>
+      <h2>weil: the verb goes to the end</h2>
+      <p><strong>weil</strong> introduces a subordinate clause (<em>Nebensatz</em>).
+        The conjugated verb moves to the end of the clause.</p>
+      <div className="fb-a2-preview-example">
+        <p>Ich lerne Deutsch, weil ich in Deutschland arbeiten möchte.</p>
+        <p>Ich bleibe heute zu Hause, weil ich krank bin.</p>
+        <p>Ich bin entspannt, weil ich heute frei habe.</p>
+      </div>
+      <p>With a modal verb, the modal verb comes at the end.</p>
+    </> : <>
+      <p className="fb-a2-preview-lead">A2 · Day 1 · Teil 3 · Lesen</p>
+      <h2>Neu im Büro</h2>
+      <p>Lies zuerst die Fragen. Suche dann im Text nach Namen, Uhrzeiten, Orten und Gründen.</p>
+      <div className="fb-a2-preview-example">
+        <strong>Lesetext</strong>
+        <p>Hallo Ben,</p>
+        <p>ich bin seit Montag neu bei der Firma Keller. Meine Kollegin Jana sitzt neben mir und hilft mir oft.</p>
+        <p>In der Mittagspause essen wir meistens in der Kantine.</p>
+      </div>
+      <p className="fb-a2-preview-lead">Weitere Aufgaben findest du im vollständigen Kursbuch.</p>
+    </>}
+    <div className="fb-a2-preview-footer"><span>Selected excerpt · not a full PDF page</span><span>{page} / 328</span></div>
+  </article>;
+}
+
 function PreviewSlides({productId, title, cover}) {
   const track = useRef(null);
   const [current, setCurrent] = useState(0);
-  const pages = productId === "a2-course-workbook" ? [] // No public sample pages until excerpts are editorially approved.
+  const pages = productId === "a2-course-workbook" ? [2,7,14] // Selected, verified excerpts; the complete PDF remains private.
     : productId === "a1-course-workbook" ? [1,2,3]
     : productId === "a1-writing-model-exams" ? [5,11,21]
     : productId === "writing-skills-a1-c2" ? [5,7,9] : [5,21,31];
@@ -28,9 +71,10 @@ function PreviewSlides({productId, title, cover}) {
     }}>
       <div className="fb-slide"><img src={cover} alt={`${title} cover`} width="300" height="425" /></div>
       {pages.map(page=><div className="fb-slide" key={page}>
-        <a href={`/books/previews/${productId}-${page}.webp`} target="_blank" rel="noopener noreferrer" aria-label={`Enlarge preview page ${page}`}>
-          <img src={`/books/previews/${productId}-${page}.webp`} alt={`${title} · Preview page ${page}`} loading="lazy" width="950" height="1344" />
-        </a>
+        {productId === "a2-course-workbook" ? <A2BookPreviewSample page={page} />
+          : <a href={`/books/previews/${productId}-${page}.webp`} target="_blank" rel="noopener noreferrer" aria-label={`Enlarge preview page ${page}`}>
+              <img src={`/books/previews/${productId}-${page}.webp`} alt={`${title} · Preview page ${page}`} loading="lazy" width="950" height="1344" />
+            </a>}
       </div>)}
     </div>
     <div className="fb-slides-controls">
@@ -39,7 +83,7 @@ function PreviewSlides({productId, title, cover}) {
       <button type="button" aria-label="Next preview" disabled={current===pages.length} onClick={()=>move(current+1)}>→</button>
     </div>
     <p className="fb-muted">{productId === "a2-course-workbook"
-      ? "Full 328-page PDF is delivered privately after verified payment. Audio is accessed through Falowen."
+      ? "Preview selected contents, grammar and reading excerpts · The full 328-page PDF is delivered privately after verified payment."
       : "Swipe to preview · Tap a page to enlarge."}</p>
   </section>;
 }
@@ -106,7 +150,7 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
             <fieldset className="fb-product-editions"><legend>Choose your format</legend>
               {offers.map(book=><label key={book.id} className="fb-edition">
                 <input type="radio" name="edition" checked={book.id===selected.id} onChange={()=>{setEdition(book.id);setQuantity(1);}} />
-                <span>{book.format==="digital"?"Digital PDF":"Printed book"}</span>
+                <span>{book.format==="digital"?"Digital PDF":productId==="a2-course-workbook"?"Printed on demand":"Printed book"}</span>
                 <strong>{money(book.priceGhs)}<small>{indicativeUsd(book.priceGhs,fx)}</small></strong>
               </label>)}
             </fieldset>

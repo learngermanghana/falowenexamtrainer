@@ -5,6 +5,7 @@ const {A1_PRINT_BENCHMARK,pricePrintedGuide,priceDigitalExamGuide} = require("./
 test("print prices scale from Academy GH₵660 cost / GH₵800 retail for 250 pages",()=>{
   assert.equal(A1_PRINT_BENCHMARK.printerCostGhs,660);
   assert.equal(pricePrintedGuide(250),800);
+  assert.equal(pricePrintedGuide(328),1050); // 328 / 250 × GH₵800 = 1049.60, rounded up to 50
   assert.equal(pricePrintedGuide(30),100);
   assert.equal(pricePrintedGuide(50),200);
   assert.equal(pricePrintedGuide(441),1450);
