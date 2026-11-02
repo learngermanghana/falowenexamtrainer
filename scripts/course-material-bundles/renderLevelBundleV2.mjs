@@ -12,6 +12,8 @@ import { buildB1ReadOnlyPrintHtml, getB1ReadOnlyParts, getB1PdfLessonCompanionUr
 import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
 import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2PrintSafety, assertA2PrintedContent } from "./a2PdfSafety.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
+import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent } from "./b1PdfPrintExtras.mjs";
+import { addB1RetailCover } from "./b1RetailCover.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -25,6 +27,16 @@ const diagnosticsPath = path.join(outputDir, "render-diagnostics.json");
 
 if (!fs.existsSync(manifestPath)) throw new Error(`Manifest not found: ${manifestPath}`);
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+// The curriculum database has two legacy display labels cut off mid-word.
+// Restore concise, source-grounded titles for the published book only.
+const B1_BOOK_TITLES = Object.freeze({
+  20: "Wie wird man Reiseleiter/in?",
+  21: "Lebensformen heute",
+});
+const getPrintableLessons = () => manifest.lessons
+  .filter(lesson => lesson.printKind !== "excluded")
+  .map(lesson => level === "B1" && B1_BOOK_TITLES[lesson.day]
+    ? { ...lesson, title: B1_BOOK_TITLES[lesson.day] } : lesson);
 if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not ready for PDF generation.`);
 
 fs.rmSync(renderDir, { recursive: true, force: true });
@@ -256,7 +268,7 @@ const injectPrintMode = async (page) => {
     [data-a2-pdf-hide] { display: none !important; }
     [data-course-inline-practice="speaking"], .speaking-compact-timer, [aria-label="Teil 1 speaking timer"], [data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture], [data-a2-day18-teacher-lecture] { display: none !important; }
     a { color: inherit !important; text-decoration: none !important; }
-    ${level === "A2" ? A2_PRINT_CSS : ""}
+    ${level === "A2" ? A2_PRINT_CSS : level === "B1" ? B1_PRINT_CSS : ""}
   ` });
 };
 
@@ -273,6 +285,7 @@ const suppressPdfChromeText = async (page) => page.evaluate(() => {
     [/The tabs stay visible at the top of the workbook\.?/gi, ""],
     [/Supporting\s+materials/gi, ""],
     [/Download\s+this\s+workbook\s+as\s+PDF/gi, ""],
+    [/Day\s+\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook/gi, ""],
     [/\b\d+\s+of\s+\d+\s+answered\b/gi, ""],
   ];
   const changes = [];
@@ -307,7 +320,10 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   // the newer data-pdf-exclude React markers.
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
-    if (level === "B1") await suppressPdfChromeText(page);
+    if (level === "B1") {
+      await page.evaluate(prepareB1PrintView);
+      await suppressPdfChromeText(page);
+    }
     if (level === "A2") {
       const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
       const qrDataUrl = suffix === "workbook-teil-4"
@@ -318,7 +334,10 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       assertA2PrintSafety(printableText);
       await suppressPdfChromeText(page);
     }
-    await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, scale: level === "A2" ? 0.95 : 1, timeout: 30000 });
+    const b1ExpectedText = level === "B1" ? await page.locator("body").innerText() : "";
+    // The actual printed PDF, not screen-mode DOM text, is the publication gate.
+    await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true,
+      scale: level === "A2" || level === "B1" ? 0.95 : 1, timeout: 30000 });
     if (level === "A2") {
       // Fail on the first affected lesson instead of rebuilding all 28 days
       // before discovering the same leaked website controls in the final PDF.
@@ -330,7 +349,17 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       if (leaks.length) throw new Error(`A2 Day ${lesson.day} ${suffix} print contains excluded UI: ${leaks.join(", ")}.`);
       await trimPrintedPdfTail(file, { description: `A2 Day ${lesson.day} ${suffix}` });
     }
+    if (level === "B1") {
+      const printed = execFileSync("pdftotext", ["-layout", file, "-"],
+        { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+      const faults = findB1PrintFaults(printed);
+      if (faults.length) throw new Error("B1 Day " + lesson.day + " " + suffix +
+        " printed website/private content: " + faults.join(", "));
+      assertB1PrintedContent(b1ExpectedText, printed);
+      await trimPrintedPdfTail(file, { description: `B1 Day ${lesson.day} ${suffix}` });
+    }
   } finally {
+    if (level === "B1") await page.evaluate(restoreB1PrintView).catch(() => {});
     if (level === "A2") await page.evaluate(restoreA2SafePrintView).catch(() => {});
     if (level === "A2") await page.evaluate(restoreA2PrintDocument).catch(() => {});
     if (level === "A2" || level === "B1") await restorePdfChromeText(page).catch(() => {});
@@ -467,6 +496,10 @@ const renderReadOnlyB1Section = async (page, lesson, part, filename = part) => {
     if (printedText.replace(/\s+/g, " ").trim().length < 140) {
       throw new Error("B1 Day " + lesson.day + " " + part + ": printed companion is empty");
     }
+    const faults = findB1PrintFaults(printedText);
+    if (faults.length) throw new Error("B1 Day " + lesson.day + " " + part +
+      " companion contains excluded content: " + faults.join(", "));
+    assertA2PrintedContent(expectedText, printedText);
     await trimPrintedPdfTail(file, { description: "B1 Day " + lesson.day + " " + part + " companion" });
   } finally {
     await printPage.close();
@@ -578,6 +611,10 @@ const renderLesson = async (page, lesson) => {
 };
 
 const addCover = async (output) => {
+  if (level === "B1") {
+    await addB1RetailCover(output);
+    return;
+  }
   const font = await output.embedFont(StandardFonts.Helvetica);
   const bold = await output.embedFont(StandardFonts.HelveticaBold);
   const cover = output.addPage([595.28, 841.89]);
@@ -618,7 +655,7 @@ const appendPdfFile = async (output, file) => {
 
 const mergeBundle = async (renderedLessons) => {
   const output = await PDFDocument.create();
-  const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
+  const printableLessons = getPrintableLessons();
   await addCover(output);
 
   if (level === "A2" || level === "B1") {
@@ -670,7 +707,7 @@ const context = await browser.newContext({ viewport: { width: 1440, height: 1800
 const page = await context.newPage();
 page.setDefaultTimeout(15000);
 page.setDefaultNavigationTimeout(45000);
-const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
+const printableLessons = getPrintableLessons();
 const renderedLessons = new Map();
 
 // Only navigation timeouts are retried. Incorrect or incomplete lesson content

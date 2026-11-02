@@ -9,6 +9,7 @@ import { findA1PrintChromeLeaks } from "./a1PdfPrintChrome.mjs";
 import { assertA2PrintSafety } from "./a2PdfSafety.mjs";
 import { getA2ReadOnlyParts } from "./a2PrintableCompanions.mjs";
 import { getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
+import { findB1PrintFaults } from "./b1PdfPrintExtras.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -132,6 +133,32 @@ if (level === "A2") {
   console.log("A2 print page density: " + shortPages.length + " low-text pages (manual review): " +
     shortPages.slice(0, 35).map(page => page.index).join(", "));
 }
+if (level === "B1") {
+  const faults = findB1PrintFaults(text);
+  if (faults.length) throw new Error("B1 retail PDF preflight failed: " + faults.join(", "));
+  const audit = scanPdfPageContent(text, pdf.getPageCount());
+  if (audit.faults.length) throw new Error("B1 retail PDF page audit failed:\n" + audit.faults.join("\n"));
+  // These complete public exercises were formerly QR-only placeholders. Check
+  // the assembled PDF, not just a unit-test rendering of the HTML.
+  const expectedReadingExcerpts = [
+    "Warum war Felix vor dem Gespräch sehr nervös?",
+    "Berufsbild · Wie wird man eigentlich Reiseleiter/in?",
+    "Wie lernen sich viele junge Erwachsene heute kennen?",
+    "Zukunft der Partnerschaft: Fernbeziehung und getrenntes Wohnen",
+    "Die Überhöhung des Partners aus der Distanz",
+    "Der Staat sollte Paaren in Fernbeziehungen",
+  ];
+  for (const excerpt of expectedReadingExcerpts) {
+    if (!text.replace(/\s+/g, " ").includes(excerpt))
+      throw new Error("B1 retail PDF missing complete source-owned reading text: " + excerpt);
+  }
+  const diagnosticsPath = path.join(outputDir, "render-diagnostics.json");
+  if (!fs.existsSync(diagnosticsPath)) throw new Error("B1 PDF: render diagnostics missing");
+  const diagnostics = JSON.parse(fs.readFileSync(diagnosticsPath, "utf8"));
+  if (!diagnostics.completedAt || diagnostics.lessons.filter(item => item.status === "rendered").length !== 28)
+    throw new Error("B1 PDF: all 28 days must complete rendering before publication");
+}
+
 if (!/Contents/i.test(text)) throw new Error(`${level} PDF is missing its contents page.`);
 
 const expectedByDay = new Map();
@@ -182,7 +209,7 @@ for (const [day, sections] of expectedByDay) {
   for (const section of sections) {
     const label = section === "grammar" ? "GRAMMAR" : "WORKBOOK";
     const marker = new RegExp(
-      `${level}\\s*[·•]?\\s*Day\\s+${day}\\b[\\s\\S]{0,500}\\b${label}\\b`,
+      `${level}\s*[·•]?\s*Day\s+${day}\b[\s\S]{0,500}\b${label}\b`,
       "i",
     );
     if (!marker.test(text)) missing.push(`Day ${day} ${label}`);
