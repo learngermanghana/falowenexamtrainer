@@ -182,11 +182,10 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
   },
   "a2-mock-08": {
     id:"a2-mock-08", level:"A2", title:"A2 Mock 8", shortTitle:"A2 Mock 8",
-    description:"Published A2 Kombiprüfung · Lesen, Schreiben and Sprechen with verified /75 score. Hören will be added later.",
-    durationLabel:"about 75 min · 3 modules", status:"ready",
+    description:"Four-module A2 Kombiprüfung · Lesen, Hören, Schreiben and Sprechen with verified /100 scoring for new attempts. Earlier /75 results remain unchanged.",
+    durationLabel:"about 105 min · 4 modules", status:"ready",
     route:"/campus/course/a2-kombi-mock-8", mode:"kombi",
-    questionSetId:"a2-mock-08", sections:["Lesen","Schreiben","Sprechen"],
-    futureOptionalSection:"Hören",
+    questionSetId:"a2-mock-08", sections:["Lesen","Hören","Schreiben","Sprechen"],
   },
   "a2-mock-03-hoeren": {
     // Keep the standalone listening route accessible, but do not confuse it with the full mock.
