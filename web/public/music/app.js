@@ -59,6 +59,7 @@ let current = null;
 if (embedded && window.parent !== window && audio) {
   let startedAt = 0;
   let playingTrack = null;
+  let activeTrackId = '';
   const postPractice = (kind, track, seconds = 0) => {
     if (!track?.id) return;
     window.parent.postMessage({
@@ -81,11 +82,14 @@ if (embedded && window.parent !== window && audio) {
     playingTrack = current;
     if (!playingTrack) return;
     startedAt = Date.now();
-    postPractice('start', playingTrack, 0);
+    if (activeTrackId !== playingTrack.id) {
+      activeTrackId = playingTrack.id;
+      postPractice('start', playingTrack, 0);
+    }
   });
-  audio.addEventListener('pause', () => { if (!audio.ended) finishSegment(); });
-  audio.addEventListener('ended', () => finishSegment('complete'));
-  audio.addEventListener('emptied', () => finishSegment());
+  audio.addEventListener('pause', () => finishSegment(audio.ended ? 'complete' : 'progress'));
+  audio.addEventListener('ended', () => { finishSegment('complete'); activeTrackId = ''; });
+  audio.addEventListener('emptied', () => { finishSegment(); activeTrackId = ''; });
 }
 
 let selected = null;
