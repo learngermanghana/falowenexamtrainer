@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { B1_PRESERVED_READING_PRINT_DATA, B1_DAY22_SECOND_READING_PRINT_DATA } from "./b1PreservedReadingPrintData.mjs";
 
 const dataDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/src/data");
 const modules = new Map();
@@ -58,7 +59,7 @@ const pageHtml = ({ day, section, title, body, intro = "" }) => {
     '</style></head><body><header><small>FALOWEN · B1 · Tag ' + day + '</small><h1>' +
     escapeHtml(title) + '</h1><div>' + escapeHtml(section) + '</div></header>' +
     (intro ? '<div class="hint">' + paragraph(intro) + '</div>' : "") +
-    '<main>' + body + '</main><footer>Offline practice only. Complete and submit graded work in Falowen.</footer></body></html>';
+    '<main>' + body + '</main><footer>Schriftliche Übungen können Sie auf Papier bearbeiten. Audio und benotete Abgabe bleiben in der Falowen-Lektion.</footer></body></html>';
 };
 
 const writing = async (day) => {
@@ -97,20 +98,24 @@ const reading = async (day, lessonUrl, audioQrDataUrl) => {
   const { getB1ReadingTask } = await canonical("b1ReadingTasks.js");
   const task = getB1ReadingTask(day);
   if (!task) throw new Error("B1 Day " + day + ": canonical reading task missing");
-  const source = task.text;
-  const paragraphs = typeof source === "string" ? [source] : source?.paragraphs;
-  const prompts = source?.questions || task.questions;
+  // Some preserved graded workbooks hold the complete reading exercise in
+  // their original React lesson, while the central registry only has metadata.
+  // The source-controlled print transcription is derived from those exact
+  // public passages and question choices; never guess missing exercises.
+  const preserved = B1_PRESERVED_READING_PRINT_DATA[day];
+  const source = preserved || task.text;
+  const paragraphs = preserved?.paragraphs || (typeof source === "string" ? [source] : source?.paragraphs);
+  const prompts = preserved?.questions || source?.questions || task.questions;
   if (!Array.isArray(paragraphs) || !paragraphs.length || !Array.isArray(prompts) || !prompts.length) {
-    return onlineOnly({
-      day, section: "Teil 3 · Lesen", title: task.title || "Lesen",
-      instructions: task.instructions, lessonUrl, audioQrDataUrl,
-    });
+    throw new Error("B1 Day " + day + ": full printable reading exercise is required for publication");
   }
   if (paragraphs.some(p => typeof p !== "string" || !p.trim())) {
     throw new Error("B1 Day " + day + ": canonical reading passage is incomplete");
   }
-  const body = (task.instructions ? paragraph(task.instructions) : "") +
-    "<h2>" + escapeHtml(source?.title || "Lesetext") + "</h2>" +
+  const body = (preserved ? paragraph(day === 22
+    ? "Empfohlene Arbeitszeit: 15 Minuten. Lesen Sie den Text und die Aufgaben 1–3. Welche Lösung (a, b oder c) ist jeweils richtig?"
+    : task.instructions) : (task.instructions ? paragraph(task.instructions) : "")) +
+    "<h2>" + escapeHtml(preserved?.passageTitle || source?.title || "Lesetext") + "</h2>" +
     paragraphs.map(paragraph).join("") +
     "<h2>" + escapeHtml(source?.questionTitle || "Fragen") + "</h2>" +
     questions(prompts, "B1 Day " + day + " Lesen");
@@ -130,14 +135,22 @@ const listening = async (day, lessonUrl, audioQrDataUrl) => {
       '<div><strong>Audio in der Falowen-Lektion</strong><p>QR-Code scannen, anmelden und Teil 4 öffnen.</p>' +
       '<p>' + escapeHtml(lessonUrl) + '</p></div></aside>'
     : "";
+  // B1 Day 22 Teil 4 is a second printed reading task, not missing audio.
+  // Its three expert views and seven matching statements are taken from the
+  // preserved Day 22 workbook, without answer keys.
+  if (day === 22 && isReadingFallback) {
+    const source = B1_DAY22_SECOND_READING_PRINT_DATA;
+    if (source.experts.length !== 3 || source.statements.length !== 7)
+      throw new Error("B1 Day 22 Teil 4: incomplete preserved second reading");
+    const body = paragraph(source.instructions) +
+      "<h2>" + escapeHtml(source.title) + "</h2>" +
+      source.experts.map(expert => "<h3>" + escapeHtml(expert.name) + "</h3>" + paragraph(expert.text)).join("") +
+      "<h2>Aussagen 1–7</h2>" + paragraph("Welche Person äußert das? Wählen Sie A, B, C oder 0 (passt zu keiner Person).") +
+      orderedList(source.statements);
+    return pageHtml({ day, section:"Teil 4 · Lesen", title:source.title, body });
+  }
   if (!Array.isArray(task.questions) || !task.questions.length) {
-    if (isReadingFallback) {
-      return onlineOnly({
-        day, section: "Teil 4 · Lesen", title: task.title || "Lesen",
-        instructions: task.instructions, lessonUrl, audioQrDataUrl,
-      });
-    }
-    throw new Error("B1 Day " + day + ": canonical listening questions missing");
+    throw new Error("B1 Day " + day + ": full printable Teil 4 exercise is required for publication");
   }
   const body = (task.instructions ? paragraph(task.instructions) : "") +
     audio + "<h2>Fragen</h2>" + questions(task.questions, "B1 Day " + day + " Teil 4");
@@ -181,11 +194,11 @@ const b1SpeakingMockPage = async (part, lessonUrl, audioQrDataUrl) => {
     'Die benotete Online-Prüfung wählt Aufgaben zufällig aus. ' +
     'Hier wird kein Prüfungsversuch gestartet und keine Leistung bewertet.</p>';
   const body = part === "grammar"
-    ? intro + "<h2>Prüfungsaufbau</h2>" +
+    ? intro + link + "<h2>Prüfungsaufbau</h2>" +
       "<ol><li>Gemeinsam etwas planen</li><li>Ein Thema präsentieren</li><li>Fragen beantworten</li></ol>" +
       "<p>Üben Sie Vorschläge, begründete Meinungen und passende Antworten auf Rückfragen.</p>" + link
-    : intro + samples + "<h2>Notizen zur Übung</h2>" +
-      Array(6).fill("<p>___________________________________________________</p>").join("") + link;
+    : intro + link + samples + "<h2>Notizen zur Übung</h2>" +
+      Array(4).fill("<p>___________________________________________________</p>").join("");
   return pageHtml({ day:23, section:part === "grammar" ? "Grammar · Sprechprüfung vorbereiten" : "Workbook · Sprechprüfung üben",
     title:metadata.title, body });
 };
