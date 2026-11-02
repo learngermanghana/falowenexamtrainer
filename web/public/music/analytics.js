@@ -61,11 +61,17 @@
         event('music_play', track);
       }
     });
-    audio.addEventListener('ended', () => {
+    const recordCompletion = () => {
       const track = trackedSong();
       if (track && playbackId === track.id) event('music_complete', track);
       playbackId = null;
-    });
+    };
+    // Native looping keeps iOS playback alive, so the browser no longer emits
+    // 'ended' for ordinary songs. The handoff dispatches this custom event
+    // before switching the track, preserving consented completion analytics.
+    audio.addEventListener('falowen:music-complete', recordCompletion);
+    audio.addEventListener('ended', recordCompletion); // unexpected no-loop fallback
+
     audio.addEventListener('emptied', () => { playbackId = null; });
   }
 
