@@ -16,7 +16,7 @@ export const B1_PRINT_CSS = `
     min-height: 0 !important; max-height: none !important;
     overflow: visible !important; contain: none !important;
   }
-  h1, h2, h3, h4 { break-after: avoid; }
+  h1, h2, h3, h4 { break-after: avoid; overflow-wrap: anywhere; white-space: normal !important; }
   p, li { orphans: 3; widows: 3; }
   table { max-width: 100% !important; }
   pre { white-space: pre-wrap !important; overflow-wrap: anywhere; }
@@ -27,7 +27,7 @@ export const isB1WorkbookGuideLabel = value =>
   /^Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook$/i
     .test(String(value || "").replace(/\s+/g, " ").trim());
 
-export const prepareB1PrintView = ({ section = "", lessonUrl = "", audioQrDataUrl = "" } = {}) => {
+export const prepareB1PrintView = ({ section = "", lessonUrl = "", audioQrDataUrl = "", day = 0 } = {}) => {
   if (window.__b1PrintChanges) throw new Error("B1 print view already active");
   const undo = [];
   const normalize = value => String(value || "").replace(/\s+/g, " ").trim();
@@ -91,11 +91,18 @@ export const prepareB1PrintView = ({ section = "", lessonUrl = "", audioQrDataUr
 
   // Unlike multiple-choice question options, these exact words belong only
   // to web actions, progress controls or navigation guidance.
-  const webAction = /^(?:I prepared this part\.?|I practised this section\.?|(?:←\s*)?Previous lesson|Next lesson\s*→?|Back to workbook\s*›?|Ready for the next lesson\?|Show model|Hide model|Check answers?|Reset answers?|Start timer|Reset timer|Open writing video on YouTube)$/i;
+  const webAction = /^(?:←|I prepared this part\.?|I practised this section\.?|(?:←\s*)?Previous lesson|Next lesson\s*→?|Back to workbook\s*›?|Ready for the next lesson\?|Show model|Hide model|Check answers?|Reset answers?|Start timer|Reset timer|Open writing video on YouTube)$/i;
   const meta = [
     /^Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook$/i,
     /^Select Grammar,\s*Teil\s*1/i,
     /^The highlighted card at the top of each section tells you exactly what to answer\.?$/i,
+    /^Choose one answer for each question\.?$/i,
+    /^Click an answer option\.\s*Your choice is saved automatically/i,
+    /^Your choice is saved automatically to Submit\b/i,
+    /^Planning notes \(optional\)$/i,
+    /^Write your German text$/i,
+    /^Turn your points into one complete German text\./i,
+    /^The starter text is already inside the writing box\./i,
     /^Choose one answer for each question Click an answer option\./i,
   ];
   for (const el of [...root.querySelectorAll("a,button,label,p,span,small,div,section,h2,h3")]) {
@@ -134,9 +141,13 @@ export const prepareB1PrintView = ({ section = "", lessonUrl = "", audioQrDataUr
   let textNode;
   while ((textNode = walker.nextNode())) {
     const before = textNode.textContent || "";
-    const after = before
+    let after = before
       .replace(/Audio wird geladen\s*(?:…|\.{2,3})?/gi, "Audio online in der Falowen-Lektion")
       .replace(/Falowen bereitet die geschützte Aufnahme für die Wiedergabe vor\./gi, "");
+    if (Number(day) === 20) {
+      after = after.replace(/B1 Workbook\s*·\s*Wie wird man\s*…\?/g,
+        "B1 Workbook · Wie wird man Reiseleiter/in?");
+    }
     if (after !== before) {
       const originalNode = textNode;
       originalNode.textContent = after;
@@ -162,8 +173,10 @@ export const prepareB1PrintView = ({ section = "", lessonUrl = "", audioQrDataUr
     link.textContent = "QR-Code scannen, anmelden und Audio online anhören: " + lessonUrl;
     note.append(heading, link);
     panel.append(qr, note);
-    const container = document.querySelector("main") || root;
-    container.prepend(panel);
+    const lessonHeading = [...root.querySelectorAll("h2,h3")].find(el =>
+      /^Teil\\s*4\\b/i.test(normalize(el.textContent)) && el.isConnected);
+    const target = lessonHeading?.closest("section") || document.querySelector("main") || root;
+    target.insertBefore(panel, target.firstChild);
     undo.push(() => panel.remove());
   }
 
