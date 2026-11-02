@@ -150,7 +150,7 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
             <fieldset className="fb-product-editions"><legend>Choose your format</legend>
               {offers.map(book=><label key={book.id} className="fb-edition">
                 <input type="radio" name="edition" checked={book.id===selected.id} onChange={()=>{setEdition(book.id);setQuantity(1);}} />
-                <span>{book.format==="digital"?"Digital PDF":"Printed book"}</span>
+                <span>{book.format==="digital"?"Digital PDF":productId==="a2-course-workbook"?"Printed on demand":"Printed book"}</span>
                 <strong>{money(book.priceGhs)}<small>{indicativeUsd(book.priceGhs,fx)}</small></strong>
               </label>)}
             </fieldset>
