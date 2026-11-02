@@ -56,7 +56,7 @@ export default function A1Day2UnifiedWorkbookPage() {
     >
       <section style={block}>
         <h2 style={{ margin: 0 }}>Teil 1 · Alphabet und Buchstabieren — 20 Punkte</h2>
-        <p style={{ margin: 0 }}>Übung 1 · Phonetisches Wörter-Rätsel. Read the German letter names in the sequence and identify the spelled word. Example: kah – ah – tay – tset – ay → Katze. The sequence for question 2 spells S-A-L-Z (without an extra T).</p>
+        <p style={{ margin: 0 }}>Übung 1 · Phonetisches Wörter-Rätsel. Read the German letter names in the sequence and identify the spelled word.</p>
         <MultipleChoice items={quiz} />
         <div style={question}><strong>5. Which letter is A with two dots above it (as in Apfel → Äpfel)?</strong><span>Write the German letter or its name (A-Umlaut) in your answer box below.</span></div>
       </section>
