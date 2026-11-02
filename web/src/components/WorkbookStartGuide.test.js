@@ -42,6 +42,10 @@ describe("WorkbookStartGuide video cards", () => {
       "href",
       "/campus/course/a1-day-1-greetings-workbook"
     );
+    expect(screen.getByRole("link", { name: /View complete A1 book/ })).toHaveAttribute(
+      "href", "/books/deutsch-a1-course-workbook"
+    );
+    expect(screen.queryByRole("button", { name: "Download / Print PDF" })).not.toBeInTheDocument();
   });
 
   test("B1 workbook guide does not label an AI video as a teacher lecture", () => {
