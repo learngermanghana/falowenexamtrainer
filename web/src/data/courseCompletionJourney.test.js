@@ -57,7 +57,8 @@ describe("canonical course completion engine", () => {
       progressByAssignmentId: {
         ...allRegular,
         "A1-FINAL-MOCK": {
-          status: "passed", passed: true, submitted: true, bestScore: 70, hasResult: true,
+          status: "passed", passed: true, submitted: true, bestScore: 70,
+          hasResult: true, verifiedFinalMockResult: true,
         },
       },
     });
