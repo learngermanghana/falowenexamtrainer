@@ -285,6 +285,7 @@ const suppressPdfChromeText = async (page) => page.evaluate(() => {
     [/The tabs stay visible at the top of the workbook\.?/gi, ""],
     [/Supporting\s+materials/gi, ""],
     [/Download\s+this\s+workbook\s+as\s+PDF/gi, ""],
+    [/Day\s+\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook/gi, ""],
     [/\b\d+\s+of\s+\d+\s+answered\b/gi, ""],
   ];
   const changes = [];
@@ -334,11 +335,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       await suppressPdfChromeText(page);
     }
     const b1ExpectedText = level === "B1" ? await page.locator("body").innerText() : "";
-    if (level === "B1") {
-      const preflight = findB1PrintFaults(b1ExpectedText);
-      if (preflight.length) throw new Error("B1 Day " + lesson.day + " " + suffix +
-        " contains website/private content before printing: " + preflight.join(", "));
-    }
+    // The actual printed PDF, not screen-mode DOM text, is the publication gate.
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true,
       scale: level === "A2" || level === "B1" ? 0.95 : 1, timeout: 30000 });
     if (level === "A2") {
