@@ -105,7 +105,7 @@ export const prepareB1PrintView = ({ section = "", lessonUrl = "", audioQrDataUr
     /^The starter text is already inside the writing box\./i,
     /^Choose one answer for each question Click an answer option\./i,
   ];
-  for (const el of [...root.querySelectorAll("a,button,label,p,span,small,div,section,h2,h3")]) {
+  for (const el of [...root.querySelectorAll("a,button,label,p,span,small,strong,summary,legend,div,section,h2,h3,h4")]) {
     if (!el.isConnected) continue;
     const t = normalize(el.textContent);
     if (!t || t.length > 320 || el.querySelector("fieldset,textarea,input[type=text]")) continue;
