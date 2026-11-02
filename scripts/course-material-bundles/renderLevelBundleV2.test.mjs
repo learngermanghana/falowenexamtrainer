@@ -75,6 +75,16 @@ test("B1 Day 23 QR generation is scoped to B1 renderer, not the A2 path", () => 
   assert.ok(b1.includes("QRCode.toDataURL(lessonUrl"));
 });
 
+test("B1 retail print is isolated, audited, and trimmed like A1/A2", () => {
+  assert.match(source, /B1_PRINT_CSS/);
+  assert.match(source, /prepareB1PrintView/);
+  assert.match(source, /restoreB1PrintView/);
+  assert.match(source, /findB1PrintFaults/);
+  assert.match(source, /assertA2PrintedContent\\(b1ExpectedText, printed\\)/);
+  assert.match(source, /B1 Day \\x24\\{lesson\\.day\\}/);
+  assert.match(validatorSource, /B1 retail PDF preflight failed/);
+});
+
 test("A1 render plan contains only grammar and workbook targets", () => {
   const plan = JSON.parse(
     fs.readFileSync(path.join(__dirname, "a1RenderPlan.json"), "utf8"),
