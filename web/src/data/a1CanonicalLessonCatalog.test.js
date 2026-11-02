@@ -33,7 +33,7 @@ describe("A1 canonical lesson catalog", () => {
     expect(getA1CanonicalLesson("1.1")).toMatchObject({
       routeKey: "0.2",
       day: 2,
-      assignmentKey: "A1-0.2-1.1",
+      assignmentKey: "A1-0.2_1.1",
       destination: "/campus/course/a1-day-2-foundations-workbook",
     });
     expect(getA1CanonicalLesson("A1-1.1-PRACTICE")).toMatchObject({
