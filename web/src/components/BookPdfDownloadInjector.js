@@ -321,6 +321,8 @@ const WorkbookVideoCard = ({ resource, kind }) => {
   );
 };
 
+// Students keep all in-app workbook exercises. A2's complete book is offered
+// once in Supporting Materials (WorkbookStartGuide), not again in this toolbar.
 const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
   const { level, day, chapter, title } = context;
   const resources = getLessonVideoResources(level, day);
@@ -365,9 +367,11 @@ const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
       </div>
 
       <div style={actionRowStyle}>
-        <button type="button" style={primaryActionStyle} onClick={onPrint} aria-label="Download or print workbook PDF">
-          Download / Print PDF
-        </button>
+        {level !== "A2" ? (
+          <button type="button" style={primaryActionStyle} onClick={onPrint} aria-label="Download or print workbook PDF">
+            Download / Print PDF
+          </button>
+        ) : null}
         <button
           type="button"
           style={previousDestination ? inlineButtonStyle : disabledActionStyle}
