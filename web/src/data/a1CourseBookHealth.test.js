@@ -106,7 +106,10 @@ describe("A1 Course Book health", () => {
     const resourceKeys = new Set();
 
     A1_TEACHER_VIDEO_RESOURCES.forEach((resource) => {
-      expect(configuredCardKeys.has(cardKey(resource.day, resource.chapter))).toBe(true);
+      // Chapter 1.1 on Day 3 is archived; do not show it in the current Course Book.
+      if (Number(resource.day) !== 3 || resource.chapter !== "1.1") {
+        expect(configuredCardKeys.has(cardKey(resource.day, resource.chapter))).toBe(true);
+      }
       expect(resource.url).toMatch(/^https:\/\/youtu\.be\//);
       expect(resourceKeys.has(resource.key)).toBe(false);
       resourceKeys.add(resource.key);
