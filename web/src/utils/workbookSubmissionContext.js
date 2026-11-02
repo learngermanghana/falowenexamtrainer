@@ -1,15 +1,14 @@
 const WORKBOOK_SUBMISSION_LEVELS = new Set(["A1", "A2", "B1", "B2", "C1"]);
 
 const normalizeLevel = (value) => String(value || "").trim().toUpperCase();
-const normalizeAssignmentKey = (value) =>
-  String(value || "")
-    .trim()
-    .toUpperCase()
-    .replace(/_/g, (match, offset, whole) => whole === "A1-0.2_1.1" ? "_" : "-")
-    .replace(/\s+/g, "");
+const normalizeAssignmentKey = (value) => {
+  const token = String(value || "").trim().toUpperCase().replace(/\s+/g, "");
+  return token === "A1-0.2_1.1" ? token : token.replace(/_/g, "-");
+};
 const normalizeChapter = (value) => String(value || "").trim().toLowerCase();
 
 const chapterFromAssignmentKey = (assignmentKey) =>
+  normalizeAssignmentKey(assignmentKey) === "A1-0.2_1.1" ? "0.2" :
   normalizeAssignmentKey(assignmentKey).match(/-(\d+(?:\.\d+)?)$/)?.[1] || "";
 
 export const resolveWorkbookSubmissionContext = ({
