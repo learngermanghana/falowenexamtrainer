@@ -1,5 +1,6 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
 import { coverForTrack } from "./cover-art.js?v=20261102-covers";
+import { songStoryForTrack } from "./song-story.js?v=20261102-bilingual";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
@@ -29,6 +30,7 @@ let pinnedTracks = [];
 let learning = {};
 let studioDrafts = [];
 let englishTranslations = {recordings:[]};
+let editorialStories = {byObjectKey:{},byTrackId:{}};
 let showEnglish = false;
 let activeEnglishPack = null;
 const normalizedTitle = value => String(value || "").toLocaleLowerCase("de-DE")
@@ -661,6 +663,13 @@ function checkAnswers() {
     ? correct + " of " + questions.length + " correct. Practise again whenever you like."
     : answered + " of " + questions.length + " answered. Finish the remaining question(s).";
 }
+function renderBehindTheSong(track) {
+  const story=songStoryForTrack(track,editorialStories);
+  byId("story-de").textContent=story.storyDe;
+  byId("story-en").textContent=story.storyEn;
+  byId("story-focus-de").textContent=story.focusDe;
+  byId("story-focus-en").textContent=story.focusEn;
+}
 function renderDetail(track) {
   const lesson = lessonFor(track);
   const lyricPack = publishedLyrics.get(track.id) || (lesson?.assignmentKey === track.assignmentKey ? lesson : null) || referenceLyricsFor(track);
@@ -676,6 +685,7 @@ function renderDetail(track) {
   byId("song-detail").dataset.level = String(track.level || "all").toLowerCase();
   updateDetailFavorite();
   byId("detail-meta").textContent = [track.topic, track.genre || track.type, track.language].join(" · ");
+  renderBehindTheSong(track);
   byId("listen-prompt").textContent = hasLesson
     ? "First listen without reading. " + lesson.summary + ". Which key words can you hear?"
     : "Listen, relax and enjoy this Falowen classroom song. You can play it again with the repeat control.";
@@ -819,8 +829,11 @@ Promise.all([
     .catch(() => ({ tracks: [] })),
   fetch("/music/english-translations.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : {recordings:[]})
     .catch(() => ({recordings:[]})),
-]).then(([data, lessons, drafts, translations]) => {
+  fetch("/music/song-stories.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : {byObjectKey:{},byTrackId:{}})
+    .catch(() => ({byObjectKey:{},byTrackId:{}})),
+]).then(([data, lessons, drafts, translations, stories]) => {
   englishTranslations = Array.isArray(translations?.recordings) ? translations : {recordings:[]};
+  editorialStories = stories && typeof stories==="object" ? stories : {byObjectKey:{},byTrackId:{}};
   pinnedTracks = (Array.isArray(data.tracks) ? data.tracks : [])
     .filter(row => row.retired !== true)
     .map(safeTrack).filter(Boolean);
