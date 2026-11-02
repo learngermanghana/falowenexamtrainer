@@ -1,7 +1,6 @@
 const ROUTE_ENTRIES = [
   [1, "0.1", "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1"],
   [2, "0.2", "/campus/course/a1-day-2-unified-grammar"],
-  [2, "1.1", "/campus/course/singular-pronouns-verb-conjugation-day-2"],
   [3, "1.2", "/campus/course/a1-day-3-kapitel-1-2-grammar-notes"],
   [4, "2", "/campus/course/german-numbers-1-10-with-pronunciation"],
   [7, "3", "/campus/course/a1-day-7-asking-about-prices-and-preferences"],
