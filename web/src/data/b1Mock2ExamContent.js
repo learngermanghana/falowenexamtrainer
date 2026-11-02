@@ -3,54 +3,176 @@
 const mc=(number,question,a,b,c)=>({number,question,options:[["a",a],["b",b],["c",c]]});
 export const B1_MOCK2_READING=Object.freeze({
   teil1:{
-    title:"Teil 1",time:"10 Minuten",
-    intro:"Lesen Sie den Text und die Aufgaben 1 bis 6 dazu. Sind die Aussagen Richtig oder Falsch?",
-    heading:"Blogbeitrag: Mein Intensivkurs in Wien",
-    subheading:"Hallo ihr Lieben,",
-    date:"",
-    paragraphs:[
-      "heute möchte ich euch von meinem vierwöchigen Deutschkurs erzählen, den ich letzten Monat in Wien gemacht habe. Ich studiere in Mailand und brauche für mein Masterstudium zwingend ein B2-Zertifikat in Deutsch. Deshalb habe ich mich spontan entschieden, den Sommer in Österreich zu verbringen.",
-      "Am Anfang hatte ich etwas Angst vor dem Wiener Dialekt. Im Alltag beim Einkaufen oder in der U-Bahn war die Aussprache für mich tatsächlich gewöhnungsbedürftig. Im Sprachinstitut sprachen die Lehrkräfte aber zum Glück ein sehr deutliches Hochdeutsch, sodass ich dem Unterricht ohne Probleme folgen konnte.",
-      "Gewohnt habe ich bei einer sehr netten Gastfamilie im 5. Bezirk. Das war die beste Entscheidung! Abends haben wir fast immer zusammen gegessen und über meinen Tag gesprochen. Dadurch habe ich nicht nur im Unterricht, sondern auch beim Abendessen enorm viel Deutsch gelernt.",
-      "Der Unterricht fand immer morgens von 09:00 bis 12:30 Uhr statt. Am Nachmittag hatte ich viel Freizeit und bin gemeinsam mit anderen Kursteilnehmern durch die Stadt geschlendert oder wir haben die berühmten Wiener Museen besucht.",
-      "Der Monat ist wie im Flug vergangen. Meine Sprachkenntnisse haben sich riesig verbessert und ich habe sogar schon eine Zusage für ein Praktikum in Wien für den kommenden Sommer!",
-      "Eure Laura"
+    "title": "Teil 1",
+    "time": "10 Minuten",
+    "intro": "Lesen Sie den Text und die Aufgaben 1 bis 6 dazu. Sind die Aussagen Richtig oder Falsch? Markieren Sie die richtige Antwort.",
+    "accommodationNote": "Die Prüfungszeit für Prüfungsteilnehmende mit spezifischem Bedarf ist in den „Durchführungsbestimmungen“ geregelt.",
+    "heading": "Gemeinsam leben – Integration in unserer Gesellschaft",
+    "subheading": "",
+    "date": "",
+    "paragraphs": [
+      "In der heutigen Zeit wird in vielen Städten intensiv über die Themen Gesellschaft und Integration gesprochen. Da immer mehr Menschen aus unterschiedlichen Ländern und Kulturen zusammenkommen, spielen Sprache, gemeinsame Teilhabe und gegenseitiger Respekt eine zentrale Rolle im Alltag.",
+      "Ein wichtiger Baustein für eine gelungene Integration ist die Sprache. Wer Deutsch versteht und spricht, kann sich im Alltag selbstständiger bewegen, schneller soziale Kontakte knüpfen, eine Ausbildung beginnen und Arbeit finden. Um diesen Schritt zu erleichtern, stellen Städte und Organisationen flexible und bezahlbare Sprachkurse bereit. Diese Angebote helfen Zugewanderten, Aufgaben bei Behörden oder im Beruf ohne fremde Hilfe zu bewältigen.",
+      "Neben Sprachkursen sind Begegnungsprojekte und Vereine von großer Bedeutung. Wenn Menschen verschiedener Herkunft bei gemeinsamen sportlichen oder kulturellen Aktivitäten Zeit miteinander verbringen, lernen sie sich persönlich kennen. Dadurch lassen sich Missverständnisse vermeiden und Vorurteile abbauen.",
+      "Allerdings wird oft betont, dass Integration eine gemeinsame Aufgabe ist. Der Staat und die Kommunen müssen faire Chancen sowie Beratungsstellen schaffen. Gleichzeitig müssen aber auch die Zugewanderten bereit sein, die Sprache zu lernen und offen auf die Gesellschaft zuzugehen. Nur wenn beide Seiten Verantwortung übernehmen, kann ein friedliches Zusammenleben gelingen."
     ],
-    questions:[
-      {number:1,question:"Laura hat den Sprachkurs gemacht, weil sie das Deutsch-Zertifikat für ihr Studium braucht."},
-      {number:2,question:"Im Unterricht hatte Laura große Probleme, die Lehrer zu verstehen."},
-      {number:3,question:"Laura hat während ihres Aufenthalts in einem Studentenwohnheim gewohnt."},
-      {number:4,question:"Laura hat sich abends meistens selbst Essen zubereitet."},
-      {number:5,question:"Die Kurse an der Sprachschule dauerten jeden Tag bis zum Nachmittag."},
-      {number:6,question:"Laura kehrt nächsten Sommer für eine Arbeitsstelle nach Wien zurück."}
+    "questions": [
+      {
+        "number": 1,
+        "question": "Sprachkenntnisse sind eine wichtige Voraussetzung, um im Alltagsleben Kontakte zu knüpfen und Arbeit zu finden."
+      },
+      {
+        "number": 2,
+        "question": "Bezahlbare Sprachkurse führen dazu, dass Zugewanderte im Alltag weniger auf fremde Hilfe angewiesen sind."
+      },
+      {
+        "number": 3,
+        "question": "In Sport- und Kulturvereinen nehmen vor allem Einheimische teil, weshalb dort kaum Vorurteile abgebaut werden."
+      },
+      {
+        "number": 4,
+        "question": "Für eine erfolgreiche Integration reichen staatliche Maßnahmen und Beratungsangebote allein aus."
+      },
+      {
+        "number": 5,
+        "question": "Missverständnisse zwischen Menschen unterschiedlicher Herkunft lassen sich durch persönlichen Kontakt verringern."
+      },
+      {
+        "number": 6,
+        "question": "Laut Text müssen sowohl der Staat als auch die Zugewanderten einen Beitrag zur Integration leisten."
+      }
     ]
   },
   teil2:{
-    title:"Teil 2 · Text 1",time:"20 Minuten · Text 1 und 2",
-    heading:"Urban Gardening – Gemeinsam gärtnern mitten in der Großstadt",
-    paragraphs:[
-      "Immer mehr Menschen in deutschen Großstädten entdecken das Gärtnern für sich. Da viele Bewohner von Mietwohnungen keinen eigenen Garten besitzen, schließen sie sich sogenannten „Urban Gardening“-Projekten an. Auf ungenutzten städtischen Flächen pflanzen sie gemeinsam Gemüse, Kräuter und Blumen an.",
-      "Das Projekt geht jedoch über das bloße Anbauen von Lebensmitteln hinaus. Für die meisten Teilnehmer steht der soziale Aspekt im Vordergrund. Alt und Jung, Nachbarn und Neuangekommene arbeiten zusammen, tauschen Tipps aus und verbringen ihre Freizeit an der frischen Luft.",
-      "Auch für die Umwelt bieten die Gemeinschaftsgärten große Vorteile: Sie verbessern das Mikroklima in den Städten und bieten Bienen und anderen Insekten wichtigen Lebensraum. Viele Städte unterstützen diese Initiativen deshalb, indem sie freie Grundstücke kostenlos zur Verfügung stellen."
+    "title": "Teil 2 · Text A",
+    "time": "20 Minuten · Text A und B",
+    "intro": "Lesen Sie die Texte und die Aufgaben 7 bis 12. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
+    "heading": "Die Plattform „SprachPaten“ – Neue Wege beim Deutschlernen",
+    "paragraphs": [
+      "Seit zwei Jahren bringt das Projekt „SprachPaten“ Zugewanderte und deutschsprachige Freiwillige zusammen. Anstatt in einem klassischen Schulungsraum Grammatik zu büffeln, treffen sich die Paare zweimal wöchentlich an ganz normalen Orten: im Supermarkt, im Sportverein oder im Café.",
+      "Die Idee dahinter ist einfach: Die Sprache wird direkt im Alltag angewendet. „Viele Kursteilnehmer kennen zwar die Grammatikregeln, haben aber Angst, frei zu sprechen“, erklärt die Mitgründerin Sarah Meyer. Durch die ungezwungene Atmosphäre beim Kaffeetrinken oder Einkaufen schwindet diese Hemmschwelle schnell.",
+      "Das Programm richtet sich an alle Menschen mit ersten Grundkenntnissen. Die Teilnahme ist kostenlos, da das Projekt durch Spenden und städtische Fördergelder finanziert wird. Mittlerweile nehmen über 500 Tandem-Paare in der Region teil, und die Nachfrage steigt weiter."
     ],
-    questions:[
-      mc(7,"Was steht bei den Gemeinschaftsgärten für die Teilnehmer vor allem im Mittelpunkt?","Sie möchten durch den Anbau von Gemüse möglichst viel Geld sparen.","Sie schätzen das gemeinsame Arbeiten und den Kontakt mit anderen.","Sie wollen lernen, wie man professionell Landwirtschaft betreibt."),
-      mc(8,"Welcher ökologische Vorteil wird im Text genannt?","Die Gärten schützen vor Überschwemmungen bei Starkregen.","Der CO₂-Ausstoß der Großstädte wird halbiert.","Sie schaffen Lebensräume für Insekten und verbessern das Stadtklima."),
-      mc(9,"Wie greifen viele Städte den Projekten unter die Arme?","Sie überlassen den Initiativen Flächen ohne Mietkosten.","Sie bezahlen den Teilnehmern ein monatliches Honorar.","Sie stellen kostenloses Saatgut und Gartengeräte bereit.")
+    "questions": [
+      {
+        "number": 7,
+        "question": "Was ist das Besondere am Projekt „SprachPaten“?",
+        "options": [
+          [
+            "a",
+            "Der Unterricht findet in modernen Sprachschulen statt."
+          ],
+          [
+            "b",
+            "Die Teilnehmer lernen die Sprache direkt in alltäglichen Situationen."
+          ],
+          [
+            "c",
+            "Man konzentriert sich hauptsächlich auf das Auswendiglernen von Grammatik."
+          ]
+        ]
+      },
+      {
+        "number": 8,
+        "question": "Laut Sarah Meyer hilft das Projekt den Teilnehmern vor allem dabei, ...",
+        "options": [
+          [
+            "a",
+            "die Angst vor dem Sprechen zu überwinden."
+          ],
+          [
+            "b",
+            "eine kostenlose Arbeitsstelle zu finden."
+          ],
+          [
+            "c",
+            "neue Grammatikregeln schneller aufzuschreiben."
+          ]
+        ]
+      },
+      {
+        "number": 9,
+        "question": "Für die Teilnahme an dem Projekt muss man ...",
+        "options": [
+          [
+            "a",
+            "eine monatliche Gebühr bezahlen."
+          ],
+          [
+            "b",
+            "bereits perfekt Deutsch sprechen können."
+          ],
+          [
+            "c",
+            "zumindest schon ein paar Grundkenntnisse in Deutsch haben."
+          ]
+        ]
+      }
     ],
-    text2:{
-      title:"Teil 2 · Text 2",
-      intro:"Lesen Sie den Text aus der Presse und die Aufgaben 10 bis 12. Wählen Sie jeweils a, b oder c.",
-      heading:"Digital Detox – Urlaub ohne Smartphone und Internet",
-      paragraphs:[
-        "Immer mehr Reiseveranstalter bieten sogenannte „Digital Detox“-Reisen an. Das Ziel dieser Urlaube ist es, das Smartphone, den Laptop und andere digitale Geräte für einige Tage komplett auszuschalten und sich ohne ständige Benachrichtigungen zu erholen.",
-        "Studien zeigen, dass die ständige Erreichbarkeit im Beruf und Alltag bei vielen Menschen zu Stress und Schlafstörungen führt. Selbst im Urlaub schauen viele mehrmals pro Stunde auf ihr Handy, um E-Mails zu lesen oder soziale Medien zu überprüfen. Bei einer Digital-Detox-Reise geben die Gäste ihre elektronischen Geräte direkt bei der Ankunft im Hotel ab und bekommen sie erst am Abreisetag zurück.",
-        "Stattdessen stehen Aktivitäten in der Natur, Wandern, Yoga und gemeinsame Gespräche auf dem Programm. Viele Teilnehmer berichten, dass es ihnen am ersten Tag zwar schwerfiel, auf das Smartphone zu verzichten, sie sich aber schon nach kurzer Zeit deutlich entspannter und erholter fühlten."
+    "text2": {
+      "title": "Teil 2 · Text B",
+      "intro": "Lesen Sie Text B und die Aufgaben 10 bis 12. Wählen Sie a, b oder c.",
+      "heading": "Begegnungsstätten in Wohnvierteln",
+      "paragraphs": [
+        "In immer mehr Stadtvierteln entstehen sogenannte „Stadtteil-Treffs“. Diese offenen Zentren bieten Raum für Nachbarschaftsfeste, gemeinsame Kochabende und Hausaufgabenhilfe für Kinder. Ziel ist es, das Miteinander von Einheimischen und neu zugezogenen Familien zu stärken.",
+        "Ein besonderer Schwerpunkt liegt auf dem Kulturaustausch: Einmal im Monat kochen Anwohner Gerichte aus ihren Herkunftsländern und erzählen von ihren Traditionen. „Solche Veranstaltungen bauen Barrieren ab. Man stellt fest, wie viele gemeinsame Interessen man eigentlich hat“, berichtet ein Ehrenamtlicher.",
+        "Zusätzlich gibt es kostenlose Sprach-Cafés, in denen Zugewanderte Unterstützung beim Ausfüllen von Formularen oder beim Schreiben von Bewerbungen erhalten. Der Stadtteil-Treff steht allen Bewohnern offen und verlangt keinen Mitgliedsbeitrag."
       ],
-      questions:[
-        mc(10,"Was ist das Hauptziel einer „Digital Detox“-Reise?","Man lernt, wie man Smartphones im Beruf effektiver nutzt.","Man verzichtet im Urlaub vollständig auf die Nutzung digitaler Geräte.","Man sucht in der Natur nach Orten mit besonders gutem WLAN-Empfang."),
-        mc(11,"Was geschieht mit den Geräten der Urlauber?","Sie werden während des Aufenthalts im Hotel verwahrt.","Sie dürfen jeden Abend für eine Stunde genutzt werden.","Sie werden von Technikern auf Viren überprüft."),
-        mc(12,"Welche Erfahrung machen viele Teilnehmer während des Urlaubs?","Der Verzicht fällt ihnen von der ersten Minute an sehr leicht.","Sie spüren nach anfänglicher Umgewöhnung eine deutliche Entspannung.","Sie vermissen berufliche E-Mails so sehr, dass sie früher abreisen.")
+      "questions": [
+        {
+          "number": 10,
+          "question": "Was ist das Hauptziel der „Stadtteil-Treffs“?",
+          "options": [
+            [
+              "a",
+              "Kinderkurse gegen Bezahlung anzubieten."
+            ],
+            [
+              "b",
+              "Das Zusammenleben aller Nachbarn im Viertel zu fördern."
+            ],
+            [
+              "c",
+              "Neue Restaurants im Stadtteil zu eröffnen."
+            ]
+          ]
+        },
+        {
+          "number": 11,
+          "question": "Beim monatlichen Kulturaustausch ...",
+          "options": [
+            [
+              "a",
+              "kochen Anwohner gemeinsam Speisen aus verschiedenen Ländern."
+            ],
+            [
+              "b",
+              "halten Experten wissenschaftliche Vorträge über Kultur."
+            ],
+            [
+              "c",
+              "lernen die Teilnehmer professionell zu kochen."
+            ]
+          ]
+        },
+        {
+          "number": 12,
+          "question": "In den Sprach-Cafés bekommen Zugewanderte Hilfe, wenn sie ...",
+          "options": [
+            [
+              "a",
+              "Verträge kündigen möchten."
+            ],
+            [
+              "b",
+              "Hilfe bei Formularen oder Bewerbungen brauchen."
+            ],
+            [
+              "c",
+              "finanzielle Unterstützung vom Stadtteil beantragen wollen."
+            ]
+          ]
+        }
       ]
     }
   },
