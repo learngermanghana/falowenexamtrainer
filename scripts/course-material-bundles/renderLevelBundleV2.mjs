@@ -328,7 +328,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       const b1AudioQrDataUrl = b1NeedsLiveAudio
         ? await QRCode.toDataURL(b1LessonUrl, { width: 150, margin: 1, errorCorrectionLevel: "M" }) : "";
       await page.evaluate(prepareB1PrintView, {
-        section: suffix, lessonUrl: b1LessonUrl, audioQrDataUrl: b1AudioQrDataUrl,
+        section: suffix, lessonUrl: b1LessonUrl, audioQrDataUrl: b1AudioQrDataUrl, day: lesson.day,
       });
       await suppressPdfChromeText(page);
     }
