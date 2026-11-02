@@ -896,7 +896,7 @@ const RAW_COURSE_SCHEDULES = {
         grammarbook_link: "/campus/course/a1-day-2-unified-grammar",
         workbook_link: "/campus/course/a1-day-2-foundations-workbook",
         assignment: true,
-        assignmentId: "A1-0.2-1.1",
+        assignmentId: "A1-0.2_1.1",
       },
     },
     {
