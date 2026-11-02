@@ -1,5 +1,6 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
+import { installLoopHandoff } from "./loop-handoff.js?v=20261102-ios-loop";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
 import { matchingEnglishTranslation, matchingDraftEnglishTranslation } from "./english-translations.js?v=20261101-draft";
@@ -67,6 +68,7 @@ let queueScope = "all"; // All published songs by default, not a one-song filter
 let shuffleEnabled = true;
 let playbackRequested = false;
 let playAttemptToken = 0;
+let trackTransitionPending = false;
 let pendingBackgroundDetail = false;
 const failedTrackIds = new Set();
 try {
@@ -82,7 +84,8 @@ function rebuildPlaybackQueue(track = current || selected) {
 function setShuffle(enabled) {
   shuffleEnabled = enabled;
   byId("shuffle").checked = enabled;
-  if (enabled) { byId("repeat").checked = false; audio.loop = false; }
+  if (enabled) { byId("repeat").checked = false; }
+  // Native audio looping remains enabled regardless of Shuffle or Repeat.
   rebuildPlaybackQueue();
   try { localStorage.setItem("falowen_music_shuffle", enabled ? "1" : "0"); } catch {}
 }
@@ -210,6 +213,9 @@ function playCurrentTrack() {
   const attempt = ++playAttemptToken;
   playbackRequested = true;
   try {
+    if (navigator.audioSession && "type" in navigator.audioSession) {
+      try { navigator.audioSession.type = "playback"; } catch {}
+    }
     const started = audio.play();
     if (started && typeof started.catch === "function") {
       started.catch(error => { if (attempt === playAttemptToken) handlePlaybackFailure(error); });
@@ -224,13 +230,16 @@ function setPlayer(track, start = false) {
   // Browsing lyrics should not download an entire MP3 until Play is requested.
   audio.preload = start ? "auto" : "none";
   if (changed) {
-    // Reuse the same <audio> element so the OS retains the audio session.
-    // Changing src automatically starts loading; avoid a redundant pause/load
-    // cycle at every song boundary, especially while the phone is locked.
+    // Pausing before swapping a still-looped source avoids WebKit closing its
+    // session at natural end; the same audio element is reused for all songs.
+    trackTransitionPending = start;
+    audio.pause();
     ++playAttemptToken;
+    loopHandoff.reset();
     audio.src = track.audioUrl;
   } else if (start && audio.ended) {
-    audio.currentTime = 0; // A one-track playlist should replay rather than stop.
+    loopHandoff.reset();
+    audio.currentTime = 0;
   }
   current = track;
   audio.dataset.trackId = track.id;
@@ -238,7 +247,9 @@ function setPlayer(track, start = false) {
   byId("now-meta").textContent = [track.level === "ALL" ? "All levels" : track.level, track.day ? "Day " + track.day : track.type].join(" · ");
   byId("player-error").textContent = "";
   audio.playbackRate = Number(byId("speed").value) || 1;
-  audio.loop = byId("repeat").checked;
+  // Always loop in the media engine. The Repeat switch only controls whether
+  // to stay on this track when the native loop boundary is detected.
+  audio.loop = true;
   player.hidden = false;
   document.body.classList.add("has-player");
   updateMediaSession(track);
@@ -433,28 +444,53 @@ function setupLockScreenControls() {
     previoustrack: () => moveTrack(-1),
     seekto: details => {
       if (Number.isFinite(details.seekTime)) {
+        loopHandoff.markUserSeek();
         audio.currentTime = Math.min(Number.isFinite(audio.duration) ? audio.duration : details.seekTime,
           Math.max(0, details.seekTime));
       }
     },
-    seekbackward: details => { audio.currentTime = Math.max(0, audio.currentTime - (details.seekOffset || 10)); },
-    seekforward: details => {
-      const target = audio.currentTime + (details.seekOffset || 10);
-      audio.currentTime = Number.isFinite(audio.duration) ? Math.min(audio.duration, target) : target;
-    },
+    // Relative seeking competes with the actual Previous/Next track buttons
+    // on iOS, so those actions are cleared once Now Playing has started.
   };
   for (const [action, handler] of Object.entries(actions)) {
     try { session.setActionHandler(action, handler); } catch {} // Support varies by browser.
   }
+  for (const action of ["seekbackward", "seekforward"]) {
+    try { session.setActionHandler(action, null); } catch {}
+  }
 }
+const loopHandoff = installLoopHandoff(audio, {
+  isActive: () => playbackRequested,
+  shouldAdvance: () => !byId("repeat").checked && playbackQueue.length > 1,
+  onComplete: () => audio.dispatchEvent(new Event("falowen:music-complete")),
+  onAdvance: () => moveTrack(1),
+});
+audio.loop = true;
 setupLockScreenControls();
-audio.addEventListener("playing", () => { failedTrackIds.clear(); playbackRequested = true; updateMediaSession(current); });
+audio.addEventListener("playing", () => {
+  trackTransitionPending = false;
+  failedTrackIds.clear();
+  playbackRequested = true;
+  setupLockScreenControls(); // iOS requires handlers after Now Playing exists.
+  updateMediaSession(current);
+});
 audio.addEventListener("play", () => updateMediaSession(current));
-audio.addEventListener("pause", () => { if (!audio.ended) playbackRequested = false; updateMediaSession(current); });
+audio.addEventListener("pause", () => {
+  if (!trackTransitionPending && !audio.ended) playbackRequested = false;
+  updateMediaSession(current);
+});
 audio.addEventListener("loadedmetadata", updateMediaPosition);
 audio.addEventListener("seeked", updateMediaPosition);
 audio.addEventListener("ratechange", updateMediaPosition);
-audio.addEventListener("ended", () => { if (!audio.loop) moveTrack(1); });
+// Defensive fallback for browsers that still report a natural completion.
+audio.addEventListener("ended", () => {
+  if (byId("repeat").checked || playbackQueue.length <= 1) {
+    audio.currentTime = 0;
+    playCurrentTrack();
+  } else {
+    moveTrack(1);
+  }
+});
 document.addEventListener("visibilitychange", () => {
   if (document.hidden || !pendingBackgroundDetail || !selected) return;
   pendingBackgroundDetail = false;
@@ -525,9 +561,13 @@ function renderLyrics(lesson) {
       if (!selected) return;
       if (current?.id !== selected.id) setPlayer(selected, false);
       const trackId = selected.id;
-      const seek = () => { if (current?.id === trackId) { audio.currentTime = cue.start; updateLyricHighlight(); } };
+      const seek = () => { if (current?.id === trackId) {
+        loopHandoff.markUserSeek();
+        audio.currentTime = cue.start;
+        updateLyricHighlight();
+      } };
       if (audio.readyState >= 1) seek(); else audio.addEventListener("loadedmetadata", seek, {once:true});
-      audio.play().catch(() => {});
+      playCurrentTrack();
     });
     const pair = el("div", "lyric-pair");
     pair.append(line);
@@ -740,7 +780,7 @@ byId("show-english").addEventListener("change", () => {
 byId("speed").addEventListener("change", () => { audio.playbackRate = Number(byId("speed").value) || 1; });
 byId("repeat").addEventListener("change", () => {
   if (byId("repeat").checked) setShuffle(false);
-  audio.loop = byId("repeat").checked;
+  audio.loop = true; // Native loop is never disabled by the UI.
 });
 audio.addEventListener("error", () => handlePlaybackFailure(audio.error));
 window.addEventListener("popstate", () => {
