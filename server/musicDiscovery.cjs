@@ -6,6 +6,9 @@ const crypto = require('node:crypto');
 const approvedRecordingLyrics = require('../web/public/music/approved-recording-lyrics.json');
 const { getR2AudioConfig } = require('../functions/functionz/r2CourseAudio');
 const LEVELS = new Set(['A1','A2','B1','B2','C1','C2']);
+// A2 Day 14 recording was replaced by owner-approved Mein Traumberuf.mp3.
+// Keep a stale R2 MP3 out of discovery and prevent matching new lyrics to it.
+const RETIRED_MUSIC_KEYS = new Set(['music/a2/day-14/Pläne für mein Leben.mp3']);
 const OBJECT_KEY = /^music\/(a1|a2|b1|b2|c1|c2)\/day-(0[1-9]|1[0-9]|2[0-8])\/([^/\\\u0000-\u001f\u007f]{1,150})\.(mp3)$/i;
 const AUTO_ID = /^r2-(a1|a2|b1|b2|c1|c2)-day-(0[1-9]|1[0-9]|2[0-8])-([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const enc = value => encodeURIComponent(String(value)).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase());
@@ -24,6 +27,7 @@ function musicKeyFromAutoId(id) {
   return match ? 'music/' + match[1] + '/day-' + match[2] + '/' + match[3] + '.mp3' : '';
 }
 function musicTrackFromKey(key) {
+  if (RETIRED_MUSIC_KEYS.has(String(key || ''))) return null;
   const match = String(key || '').match(OBJECT_KEY);
   if (!match || !match[3].trim() || match[3] !== match[3].trim()) return null;
   const level = match[1].toUpperCase();

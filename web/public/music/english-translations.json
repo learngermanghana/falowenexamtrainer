@@ -2838,119 +2838,149 @@
       ]
     },
     {
-      "objectKey": "music/a2/day-14/Pläne für mein Leben.mp3",
+      "objectKey": "music/a2/day-14/Mein Traumberuf.mp3",
       "lines": [
         {
-          "de": "Ich arbeite seit zwei Jahren im Büro,",
-          "en": "I've been working in an office for two years,"
+          "de": "Schon als Kind hatte ich einen Traum,",
+          "en": "Even as a child, I had a dream,"
         },
         {
-          "de": "die Arbeit macht mir meistens Spaß.",
-          "en": "I usually enjoy the work."
+          "de": "ich wollte Häuser und Brücken bauen.",
+          "en": "I wanted to build houses and bridges."
         },
         {
-          "de": "Ich schreibe E-Mails, plane Termine,",
-          "en": "I write emails and schedule appointments,"
+          "de": "Heute weiß ich, was ich werden will,",
+          "en": "Today I know what I want to become,"
         },
         {
-          "de": "und spreche täglich mit den Kunden.",
-          "en": "and speak with customers every day."
+          "de": "Ingenieur zu sein, das ist mein Ziel.",
+          "en": "to be an engineer, that is my goal."
         },
         {
-          "de": "Manchmal ist die Arbeit stressig,",
-          "en": "Sometimes the work is stressful,"
+          "de": "Der Weg ist lang, das weiß ich gut,",
+          "en": "The path is long, I know that well,"
         },
         {
-          "de": "und manchmal fehlt mir Erfahrung.",
-          "en": "and sometimes I lack experience."
+          "de": "doch meine Träume machen Mut.",
+          "en": "but my dreams give me courage."
         },
         {
-          "de": "Doch ich möchte besser werden,",
-          "en": "But I want to improve,"
+          "de": "Mein Traumberuf, mein großer Plan,",
+          "en": "My dream job, my big plan,"
         },
         {
-          "de": "denn ich habe große Ziele.",
-          "en": "because I have big goals."
+          "de": "ich glaube fest, dass ich es kann.",
+          "en": "I firmly believe I can do it."
         },
         {
-          "de": "Ich habe Pläne für mein Leben,",
-          "en": "I have plans for my life,"
+          "de": "Ich lerne heute für meine Zukunft,",
+          "en": "Today I study for my future,"
         },
         {
-          "de": "ich möchte lernen und mehr verstehen.",
-          "en": "I want to learn and understand more."
+          "de": "und hoffe auf eine gute Chance.",
+          "en": "and hope for a good opportunity."
+        },
+        {
+          "de": "Zurzeit besuche ich einen Deutschkurs,",
+          "en": "Right now I am taking a German course,"
+        },
+        {
+          "de": "denn später möchte ich studieren.",
+          "en": "because later I want to study at university."
+        },
+        {
+          "de": "Mathe übe ich jeden Tag,",
+          "en": "I practise maths every day,"
+        },
+        {
+          "de": "weil ich mit Zahlen arbeiten mag.",
+          "en": "because I enjoy working with numbers."
+        },
+        {
+          "de": "Ein Praktikum steht auch auf dem Plan,",
+          "en": "An internship is also part of my plan,"
+        },
+        {
+          "de": "dort sehe ich mir die Arbeit an.",
+          "en": "there I get to see what the work is like."
+        },
+        {
+          "de": "Später möchte ich im Team arbeiten,",
+          "en": "Later I would like to work in a team,"
+        },
+        {
+          "de": "und eigene Projekte leiten.",
+          "en": "and lead my own projects."
+        },
+        {
+          "de": "Mein Traumberuf, mein großer Plan,",
+          "en": "My dream job, my big plan,"
+        },
+        {
+          "de": "ich glaube fest, dass ich es kann.",
+          "en": "I firmly believe I can do it."
+        },
+        {
+          "de": "Ich lerne heute für meine Zukunft,",
+          "en": "Today I study for my future,"
+        },
+        {
+          "de": "und hoffe auf eine gute Chance.",
+          "en": "and hope for a good opportunity."
+        },
+        {
+          "de": "Mein Traumberuf, mein großes Ziel,",
+          "en": "My dream job, my great goal,"
+        },
+        {
+          "de": "dafür lerne ich jeden Tag viel.",
+          "en": "I study hard for it every day."
         },
         {
           "de": "Ich will im Beruf erfolgreich sein,",
-          "en": "I want to succeed in my career,"
+          "en": "I want to be successful in my career,"
         },
         {
-          "de": "und meine Zukunft selbst gestalten.",
-          "en": "and shape my own future."
+          "de": "und stolz auf meine Arbeit sein.",
+          "en": "and be proud of my work."
         },
         {
-          "de": "Nächstes Jahr mache ich eine Weiterbildung,",
-          "en": "Next year I'm going to take further training,"
+          "de": "Ich gebe meinen Traum nicht auf,",
+          "en": "I will not give up my dream,"
         },
         {
-          "de": "damit ich neue Dinge lernen kann.",
-          "en": "so that I can learn new things."
+          "de": "meine Zukunft nimmt ihren Lauf.",
+          "en": "my future is taking its course."
         },
         {
-          "de": "Ich möchte besser Deutsch sprechen,",
-          "en": "I want to speak better German,"
+          "de": "Ein guter Beruf, ein schönes Leben,",
+          "en": "A good career, a beautiful life,"
         },
         {
-          "de": "denn das hilft mir auch im Beruf.",
-          "en": "because that also helps me at work."
+          "de": "dafür will ich mein Bestes geben.",
+          "en": "that is what I want to give my best for."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "der Traumberuf",
+          "en": "dream job"
         },
         {
-          "de": "Vielleicht werde ich einmal Teamleiter,",
-          "en": "Perhaps one day I'll become a team leader,"
+          "de": "der Ingenieur",
+          "en": "engineer"
         },
         {
-          "de": "und übernehme mehr Verantwortung.",
-          "en": "and take on more responsibility."
+          "de": "ein Praktikum machen",
+          "en": "to do an internship"
         },
         {
-          "de": "Ich spare Geld für meine Zukunft,",
-          "en": "I'm saving money for my future,"
+          "de": "Projekte leiten",
+          "en": "to lead projects"
         },
         {
-          "de": "und suche neue Möglichkeiten.",
-          "en": "and looking for new opportunities."
-        },
-        {
-          "de": "Ich habe Pläne für mein Leben,",
-          "en": "I have plans for my life,"
-        },
-        {
-          "de": "ich möchte lernen und mehr verstehen.",
-          "en": "I want to learn and understand more."
-        },
-        {
-          "de": "Ich will im Beruf erfolgreich sein,",
-          "en": "I want to succeed in my career,"
-        },
-        {
-          "de": "und meine Zukunft selbst gestalten.",
-          "en": "and shape my own future."
-        },
-        {
-          "de": "Ich weiß, der Weg ist manchmal schwer,",
-          "en": "I know the road is sometimes difficult,"
-        },
-        {
-          "de": "doch meine Ziele bleiben klar.",
-          "en": "but my goals remain clear."
-        },
-        {
-          "de": "Ich lerne heute für die Zukunft,",
-          "en": "I'm studying today for the future,"
-        },
-        {
-          "de": "und freue mich auf das nächste Jahr.",
-          "en": "and look forward to next year."
+          "de": "die Zukunft",
+          "en": "future"
         }
       ]
     },
