@@ -75,3 +75,9 @@ on Vercel, Firebase, R2 or on a timer; no paid AI API requests and no
 recurring student playback costs are introduced. CPU time and the model's
 one-time download are borne by whichever machine runs this command. Never
 treat automated singing transcription as teacher-certified without listening.
+
+## A2 Day 1.1 replacement — 2 November 2026
+
+The teacher-supplied 158.4-second `Ein nettes Gespräch.mp3` replaces the old `Hallo, das bin ich!` Small Talk draft in the **A2-1.1** learner music slot. The exact music-only object key is `music/a2/day-01/Ein nettes Gespräch.mp3` and its audio SHA-256 is `edb408a57611d459cad14f2e13dd57d67ae5e726a665573cf8cfb47618daf928`. The catalog pins this as the canonical Day 1 track, so older auto-discovered MP3s on that day are not listed on the public music site. The outdated studio draft was removed; **this change does not delete objects in Cloudflare R2**.
+
+The recording-bound pack contains 28 German lyric lines (4 verse + 4 chorus + 8 verse + 8 chorus including variation + 4 outro), 28 estimated start/end cues and matching line-by-line English translations. Cue intervals leave both instrumental passages unhighlighted. Timing is labeled `estimated` because waveform-guided estimates require teacher listening review; only approve as exact after checking every lyric boundary during playback. Existing Firestore, private Hören audio and all other levels/days remain unchanged.
