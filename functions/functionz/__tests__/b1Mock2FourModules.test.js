@@ -1,5 +1,5 @@
 "use strict";
-const {B1_MOCK2_READING_KEY}=require("../b1Mock2ReadingKey");
+const {B1_MOCK2_READING_KEY,B1_MOCK2_READING_EXPLANATIONS}=require("../b1Mock2ReadingKey");
 const {QUESTIONS}=require("../b1Mock2Hoeren");
 const {buildVerifiedB1MockScore}=require("../b1MockCompletionSync");
 const verifiedSections={schreiben:{verified:true,score:22},sprechen:{verified:true,score:18}};
@@ -43,6 +43,8 @@ test("November B1 Mock 2 Lesen answer keys for Aufgaben 1–12 are server-owned 
   ...Array.from({length:6},(_,i)=>B1_MOCK2_READING_KEY[`t2-${i+7}`])];
  expect(values).toEqual(expected);
  expect(Object.keys(B1_MOCK2_READING_KEY)).toHaveLength(30);
+ expect(Object.keys(B1_MOCK2_READING_EXPLANATIONS)).toHaveLength(12);
+ expect(B1_MOCK2_READING_EXPLANATIONS["t1-6"]).toContain("Verantwortung");
  const modified={...B1_MOCK2_READING_KEY,"t1-2":"falsch","t2-8":"c"};
  const full=buildVerifiedB1MockScore({
   mockId:"b1-mock-02",state:{lesenAnswers:modified,hoerenAnswers},
