@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Editor-authored English translations for exactly matching published German lyric lines. No automatic translations; studio drafts never qualify.",
+  "description": "Editor-authored English for exact recording keys and matching German lines. Course-draft translations are separately bound to draft identity and remain explicitly unverified against the audio.",
   "recordings": [
     {
       "objectKey": "music/a1/day-02/Ich heiße Bina.mp3",
@@ -3577,6 +3577,3100 @@
         {
           "de": "vier Wände",
           "en": "four walls (a home or room)"
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-01/Guten Morgen, guten Tag.mp3",
+      "level": "A1",
+      "day": 1,
+      "assignmentKey": "A1-0.1",
+      "draftTitle": "Hallo, wie geht's?",
+      "lines": [
+        {
+          "de": "Ich sehe Mia vor dem Haus.",
+          "en": "I see Mia in front of the house."
+        },
+        {
+          "de": "Sie winkt und ruft: Hallo!",
+          "en": "She waves and calls: Hello!"
+        },
+        {
+          "de": "Ich sage: Guten Morgen, Mia!",
+          "en": "I say: Good morning, Mia!"
+        },
+        {
+          "de": "Sie fragt mich: Wie geht es dir?",
+          "en": "She asks me: How are you?"
+        },
+        {
+          "de": "Hallo, hallo, wie geht es dir?",
+          "en": "Hello, hello, how are you?"
+        },
+        {
+          "de": "Mir geht es gut, danke dir!",
+          "en": "I'm well, thank you!"
+        },
+        {
+          "de": "Und wie geht es heute dir?",
+          "en": "And how are you today?"
+        },
+        {
+          "de": "Mein Freund Ben kommt auch dazu.",
+          "en": "My friend Ben joins us too."
+        },
+        {
+          "de": "Er sagt: Mir geht es nicht gut.",
+          "en": "He says: I'm not feeling well."
+        },
+        {
+          "de": "Wir fragen: Brauchst du Hilfe?",
+          "en": "We ask: Do you need help?"
+        },
+        {
+          "de": "Er sagt: Ein bisschen Ruhe.",
+          "en": "He says: A little rest."
+        },
+        {
+          "de": "Hallo, hallo, wie geht es dir?",
+          "en": "Hello, hello, how are you?"
+        },
+        {
+          "de": "Mir geht es gut, danke dir!",
+          "en": "I'm well, thank you!"
+        },
+        {
+          "de": "Und wie geht es heute dir?",
+          "en": "And how are you today?"
+        },
+        {
+          "de": "Wir sagen: Gute Besserung!",
+          "en": "We say: Get well soon!"
+        },
+        {
+          "de": "Bis morgen, macht es gut!",
+          "en": "See you tomorrow, take care!"
+        },
+        {
+          "de": "Bei Falowen sage ich freundlich Hallo.",
+          "en": "At Falowen, I say a friendly hello."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-05/Schön, dich kennenzulernen.mp3",
+      "level": "A1",
+      "day": 5,
+      "assignmentKey": "A1-1.3",
+      "draftTitle": "Ich heiße Sara",
+      "lines": [
+        {
+          "de": "Hallo, ich heiße Sara.",
+          "en": "Hello, my name is Sara."
+        },
+        {
+          "de": "Ich komme aus Accra.",
+          "en": "I come from Accra."
+        },
+        {
+          "de": "Ich wohne jetzt in Berlin.",
+          "en": "I live in Berlin now."
+        },
+        {
+          "de": "Und ich lerne gern Deutsch.",
+          "en": "And I enjoy learning German."
+        },
+        {
+          "de": "Wie heißt du? Woher kommst du?",
+          "en": "What's your name? Where do you come from?"
+        },
+        {
+          "de": "Wo wohnst du? Was machst du?",
+          "en": "Where do you live? What do you do?"
+        },
+        {
+          "de": "Wir lernen uns heute kennen.",
+          "en": "We're getting to know each other today."
+        },
+        {
+          "de": "Das ist mein Freund Karim.",
+          "en": "This is my friend Karim."
+        },
+        {
+          "de": "Er hat einen kleinen Hund.",
+          "en": "He has a little dog."
+        },
+        {
+          "de": "Karim sagt: Das ist Bello.",
+          "en": "Karim says: This is Bello."
+        },
+        {
+          "de": "Bello spielt vor dem Haus.",
+          "en": "Bello plays in front of the house."
+        },
+        {
+          "de": "Wie heißt du? Woher kommst du?",
+          "en": "What's your name? Where do you come from?"
+        },
+        {
+          "de": "Wo wohnst du? Was machst du?",
+          "en": "Where do you live? What do you do?"
+        },
+        {
+          "de": "Wir lernen uns heute kennen.",
+          "en": "We're getting to know each other today."
+        },
+        {
+          "de": "Wir sagen alle: Willkommen!",
+          "en": "We all say: Welcome!"
+        },
+        {
+          "de": "Unser Kurs ist wie ein Team.",
+          "en": "Our class is like a team."
+        },
+        {
+          "de": "Bei Falowen stelle ich mich vor.",
+          "en": "At Falowen, I introduce myself."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-06/Ein Sonntag mit meiner Familie.mp3",
+      "level": "A1",
+      "day": 6,
+      "assignmentKey": "A1-2.3",
+      "draftTitle": "Sonntag mit meiner Familie",
+      "lines": [
+        {
+          "de": "Am Sonntag bin ich zu Hause.",
+          "en": "On Sunday, I'm at home."
+        },
+        {
+          "de": "Meine Mutter macht den Tee.",
+          "en": "My mother makes the tea."
+        },
+        {
+          "de": "Mein Bruder spielt Gitarre.",
+          "en": "My brother plays the guitar."
+        },
+        {
+          "de": "Ich singe ein Lied dazu.",
+          "en": "I sing a song along with it."
+        },
+        {
+          "de": "Was machst du gern? Was machst du gern?",
+          "en": "What do you enjoy doing? What do you enjoy doing?"
+        },
+        {
+          "de": "Ich singe gern, du spielst gern.",
+          "en": "I like singing, you like playing."
+        },
+        {
+          "de": "Zusammen sind wir froh.",
+          "en": "We're happy together."
+        },
+        {
+          "de": "Mein Vater liest ein Buch.",
+          "en": "My father reads a book."
+        },
+        {
+          "de": "Meine Schwester malt ein Bild.",
+          "en": "My sister paints a picture."
+        },
+        {
+          "de": "Wir lachen und essen zusammen.",
+          "en": "We laugh and eat together."
+        },
+        {
+          "de": "Dann gehen wir in den Park.",
+          "en": "Then we go to the park."
+        },
+        {
+          "de": "Was machst du gern? Was machst du gern?",
+          "en": "What do you enjoy doing? What do you enjoy doing?"
+        },
+        {
+          "de": "Ich singe gern, du spielst gern.",
+          "en": "I like singing, you like playing."
+        },
+        {
+          "de": "Zusammen sind wir froh.",
+          "en": "We're happy together."
+        },
+        {
+          "de": "Das ist mein schöner Sonntag.",
+          "en": "That's my lovely Sunday."
+        },
+        {
+          "de": "Ich mag meine Familie sehr.",
+          "en": "I love my family very much."
+        },
+        {
+          "de": "Mit Falowen erzähle ich von zu Haus.",
+          "en": "With Falowen, I talk about home."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-07/Was kostet das_.mp3",
+      "level": "A1",
+      "day": 7,
+      "assignmentKey": "A1-3",
+      "draftTitle": "Wie viel kostet das?",
+      "lines": [
+        {
+          "de": "Auf dem Markt sehe ich Äpfel.",
+          "en": "At the market, I see apples."
+        },
+        {
+          "de": "Ich frage: Was kostet das?",
+          "en": "I ask: How much does that cost?"
+        },
+        {
+          "de": "Der Mann sagt: Zwei Euro.",
+          "en": "The man says: Two euros."
+        },
+        {
+          "de": "Ich sage: Das ist gut.",
+          "en": "I say: That's good."
+        },
+        {
+          "de": "Wie viel kostet das?",
+          "en": "How much does that cost?"
+        },
+        {
+          "de": "Ich möchte bitte zwei Stück.",
+          "en": "I'd like two, please."
+        },
+        {
+          "de": "Danke schön und auf Wiedersehen.",
+          "en": "Thank you and goodbye."
+        },
+        {
+          "de": "Mia möchte rote Blumen.",
+          "en": "Mia would like red flowers."
+        },
+        {
+          "de": "Sie fragt: Haben Sie Rosen?",
+          "en": "She asks: Do you have roses?"
+        },
+        {
+          "de": "Die Frau sagt: Ja, hier bitte.",
+          "en": "The woman says: Yes, here you are."
+        },
+        {
+          "de": "Mia sagt: Die mag ich gern.",
+          "en": "Mia says: I really like those."
+        },
+        {
+          "de": "Wie viel kostet das?",
+          "en": "How much does that cost?"
+        },
+        {
+          "de": "Ich möchte bitte zwei Stück.",
+          "en": "I'd like two, please."
+        },
+        {
+          "de": "Danke schön und auf Wiedersehen.",
+          "en": "Thank you and goodbye."
+        },
+        {
+          "de": "Wir tragen unsere Taschen heim.",
+          "en": "We carry our bags home."
+        },
+        {
+          "de": "Und trinken zu Hause Tee.",
+          "en": "And drink tea at home."
+        },
+        {
+          "de": "Bei Falowen frage ich nach Preisen.",
+          "en": "At Falowen, I ask about prices."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-08/Viele Länder, viele Sprachen.mp3",
+      "level": "A1",
+      "day": 8,
+      "assignmentKey": "A1-4",
+      "draftTitle": "Woher kommst du?",
+      "lines": [
+        {
+          "de": "Im Kurs sitzt mein Freund Sam.",
+          "en": "My friend Sam is sitting in class."
+        },
+        {
+          "de": "Er fragt: Woher kommst du?",
+          "en": "He asks: Where do you come from?"
+        },
+        {
+          "de": "Ich sage: Aus Ghana.",
+          "en": "I say: From Ghana."
+        },
+        {
+          "de": "Und du? Aus Österreich.",
+          "en": "And you? From Austria."
+        },
+        {
+          "de": "Woher kommst du? Welche Sprache sprichst du?",
+          "en": "Where do you come from? What language do you speak?"
+        },
+        {
+          "de": "Ich spreche Deutsch und Englisch.",
+          "en": "I speak German and English."
+        },
+        {
+          "de": "Wir verstehen uns jeden Tag.",
+          "en": "We understand each other every day."
+        },
+        {
+          "de": "Mia kommt aus Italien.",
+          "en": "Mia comes from Italy."
+        },
+        {
+          "de": "Sie spricht Italienisch.",
+          "en": "She speaks Italian."
+        },
+        {
+          "de": "Wir sprechen heute Deutsch.",
+          "en": "We're speaking German today."
+        },
+        {
+          "de": "Und lernen neue Wörter.",
+          "en": "And learning new words."
+        },
+        {
+          "de": "Woher kommst du? Welche Sprache sprichst du?",
+          "en": "Where do you come from? What language do you speak?"
+        },
+        {
+          "de": "Ich spreche Deutsch und Englisch.",
+          "en": "I speak German and English."
+        },
+        {
+          "de": "Wir verstehen uns jeden Tag.",
+          "en": "We understand each other every day."
+        },
+        {
+          "de": "Viele Länder, viele Sprachen.",
+          "en": "Many countries, many languages."
+        },
+        {
+          "de": "Ein Kurs, ein schönes Hallo.",
+          "en": "One class, a lovely hello."
+        },
+        {
+          "de": "Mit Falowen spreche ich über Länder.",
+          "en": "With Falowen, I talk about countries."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-09/Der kleine Hund.mp3",
+      "level": "A1",
+      "day": 9,
+      "assignmentKey": "A1-5",
+      "draftTitle": "Ich sehe den Hund",
+      "lines": [
+        {
+          "de": "Im Garten steht ein Hund.",
+          "en": "A dog is standing in the garden."
+        },
+        {
+          "de": "Der Hund ist klein und braun.",
+          "en": "The dog is small and brown."
+        },
+        {
+          "de": "Ich sehe den Hund dort.",
+          "en": "I see the dog over there."
+        },
+        {
+          "de": "Er läuft schnell zu mir.",
+          "en": "He runs quickly towards me."
+        },
+        {
+          "de": "Wer ist da? Der Hund ist da.",
+          "en": "Who's there? The dog is there."
+        },
+        {
+          "de": "Wen sehe ich? Den kleinen Hund.",
+          "en": "Who do I see? The little dog."
+        },
+        {
+          "de": "Er möchte mit mir spielen.",
+          "en": "He wants to play with me."
+        },
+        {
+          "de": "Eine Frau kommt aus dem Haus.",
+          "en": "A woman comes out of the house."
+        },
+        {
+          "de": "Sie hat einen roten Ball.",
+          "en": "She has a red ball."
+        },
+        {
+          "de": "Ich nehme den Ball in die Hand.",
+          "en": "I take the ball in my hand."
+        },
+        {
+          "de": "Ich werfe den Ball ins Gras.",
+          "en": "I throw the ball into the grass."
+        },
+        {
+          "de": "Wer ist da? Der Hund ist da.",
+          "en": "Who's there? The dog is there."
+        },
+        {
+          "de": "Wen sehe ich? Den kleinen Hund.",
+          "en": "Who do I see? The little dog."
+        },
+        {
+          "de": "Er möchte mit mir spielen.",
+          "en": "He wants to play with me."
+        },
+        {
+          "de": "Der Hund läuft glücklich nach Hause.",
+          "en": "The dog runs home happily."
+        },
+        {
+          "de": "Ich winke ihm noch nach.",
+          "en": "I give him another wave."
+        },
+        {
+          "de": "Bei Falowen übe ich neue Sätze.",
+          "en": "At Falowen, I practise new sentences."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-10/Das gehört mir.mp3",
+      "level": "A1",
+      "day": 10,
+      "assignmentKey": "A1-6",
+      "draftTitle": "Ist das deine blaue Tasche?",
+      "lines": [
+        {
+          "de": "Im Bus liegt eine Tasche.",
+          "en": "There's a bag on the bus."
+        },
+        {
+          "de": "Sie ist blau und ziemlich klein.",
+          "en": "It's blue and quite small."
+        },
+        {
+          "de": "Ich frage: Ist das deine Tasche?",
+          "en": "I ask: Is that your bag?"
+        },
+        {
+          "de": "Mia sagt: Nein, meine ist rot.",
+          "en": "Mia says: No, mine is red."
+        },
+        {
+          "de": "Meine Tasche, deine Tasche.",
+          "en": "My bag, your bag."
+        },
+        {
+          "de": "Mein Buch, dein grüner Stift.",
+          "en": "My book, your green pen."
+        },
+        {
+          "de": "Jeder findet seine Sachen.",
+          "en": "Everyone finds their things."
+        },
+        {
+          "de": "Ben sucht seinen schwarzen Schal.",
+          "en": "Ben is looking for his black scarf."
+        },
+        {
+          "de": "Er liegt auf meinem Stuhl.",
+          "en": "It's on my chair."
+        },
+        {
+          "de": "Ich sage: Ben, hier ist er!",
+          "en": "I say: Ben, here it is!"
+        },
+        {
+          "de": "Ben lacht: Ja, das ist mein Schal.",
+          "en": "Ben laughs: Yes, that's my scarf."
+        },
+        {
+          "de": "Meine Tasche, deine Tasche.",
+          "en": "My bag, your bag."
+        },
+        {
+          "de": "Mein Buch, dein grüner Stift.",
+          "en": "My book, your green pen."
+        },
+        {
+          "de": "Jeder findet seine Sachen.",
+          "en": "Everyone finds their things."
+        },
+        {
+          "de": "Nun hat jeder seine Sachen.",
+          "en": "Now everyone has their things."
+        },
+        {
+          "de": "Und unser Bus fährt los.",
+          "en": "And our bus sets off."
+        },
+        {
+          "de": "Mit Falowen lerne ich neue Farben.",
+          "en": "With Falowen, I learn new colours."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-11/Mein Tag – Von morgens bis.mp3",
+      "level": "A1",
+      "day": 11,
+      "assignmentKey": "A1-7",
+      "draftTitle": "Um sieben stehe ich auf",
+      "lines": [
+        {
+          "de": "Um sieben stehe ich auf.",
+          "en": "I get up at seven."
+        },
+        {
+          "de": "Um acht trinke ich Tee.",
+          "en": "I drink tea at eight."
+        },
+        {
+          "de": "Um neun beginnt mein Deutschkurs.",
+          "en": "My German class starts at nine."
+        },
+        {
+          "de": "Ich gehe zu Fuß dorthin.",
+          "en": "I walk there."
+        },
+        {
+          "de": "Wie spät ist es? Wie spät ist es?",
+          "en": "What time is it? What time is it?"
+        },
+        {
+          "de": "Es ist zehn, wir lernen jetzt.",
+          "en": "It's ten, we're learning now."
+        },
+        {
+          "de": "Am Abend bin ich wieder da.",
+          "en": "I'll be back in the evening."
+        },
+        {
+          "de": "Um zwölf esse ich zu Mittag.",
+          "en": "I eat lunch at twelve."
+        },
+        {
+          "de": "Um vier gehe ich nach Haus.",
+          "en": "I go home at four."
+        },
+        {
+          "de": "Um sechs rufe ich Mama an.",
+          "en": "I call Mum at six."
+        },
+        {
+          "de": "Dann mache ich das Licht aus.",
+          "en": "Then I turn out the light."
+        },
+        {
+          "de": "Wie spät ist es? Wie spät ist es?",
+          "en": "What time is it? What time is it?"
+        },
+        {
+          "de": "Es ist zehn, wir lernen jetzt.",
+          "en": "It's ten, we're learning now."
+        },
+        {
+          "de": "Am Abend bin ich wieder da.",
+          "en": "I'll be back in the evening."
+        },
+        {
+          "de": "Morgen geht der Tag von vorn los.",
+          "en": "Tomorrow, the day starts all over again."
+        },
+        {
+          "de": "Und ich bin wieder dabei.",
+          "en": "And I'll be there again."
+        },
+        {
+          "de": "Bei Falowen übe ich die Uhrzeit.",
+          "en": "At Falowen, I practise telling the time."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-12/Zeit und Datum.mp3",
+      "level": "A1",
+      "day": 12,
+      "assignmentKey": "A1-8",
+      "draftTitle": "Der Termin um achtzehn Uhr",
+      "lines": [
+        {
+          "de": "Mein Handy zeigt sechzehn Uhr.",
+          "en": "My phone shows four in the afternoon."
+        },
+        {
+          "de": "Ich habe heute einen Termin.",
+          "en": "I have an appointment today."
+        },
+        {
+          "de": "Mia fragt: Wann treffen wir uns?",
+          "en": "Mia asks: When are we meeting?"
+        },
+        {
+          "de": "Ich sage: Um achtzehn Uhr.",
+          "en": "I say: At six in the evening."
+        },
+        {
+          "de": "Um achtzehn Uhr, am dritten Mai.",
+          "en": "At six in the evening, on the third of May."
+        },
+        {
+          "de": "Ich schreibe Zeit und Datum auf.",
+          "en": "I write down the time and date."
+        },
+        {
+          "de": "Dann bin ich pünktlich da.",
+          "en": "Then I'll be there on time."
+        },
+        {
+          "de": "Mia schreibt den Tag ins Handy.",
+          "en": "Mia enters the day on her phone."
+        },
+        {
+          "de": "Heute ist der dritte Mai.",
+          "en": "Today is the third of May."
+        },
+        {
+          "de": "Sie sagt: Bis um achtzehn Uhr!",
+          "en": "She says: See you at six!"
+        },
+        {
+          "de": "Ich sage: Ja, bis dann.",
+          "en": "I say: Yes, see you then."
+        },
+        {
+          "de": "Um achtzehn Uhr, am dritten Mai.",
+          "en": "At six in the evening, on the third of May."
+        },
+        {
+          "de": "Ich schreibe Zeit und Datum auf.",
+          "en": "I write down the time and date."
+        },
+        {
+          "de": "Dann bin ich pünktlich da.",
+          "en": "Then I'll be there on time."
+        },
+        {
+          "de": "Am Abend treffen wir uns.",
+          "en": "We meet in the evening."
+        },
+        {
+          "de": "Der Termin klappt genau.",
+          "en": "The appointment goes exactly to plan."
+        },
+        {
+          "de": "Mit Falowen bin ich pünktlich da.",
+          "en": "With Falowen, I'm there on time."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-15/Bei Falowen übe ich das.mp3",
+      "level": "A1",
+      "day": 15,
+      "assignmentKey": "A1-4.7",
+      "draftTitle": "Ich bin bereit zu sprechen",
+      "lines": [
+        {
+          "de": "Vor der Prüfung bin ich nervös.",
+          "en": "I'm nervous before the exam."
+        },
+        {
+          "de": "Mia sagt: Du schaffst das.",
+          "en": "Mia says: You can do it."
+        },
+        {
+          "de": "Ich sage: Ich heiße Ben.",
+          "en": "I say: My name is Ben."
+        },
+        {
+          "de": "Ich komme aus Berlin.",
+          "en": "I come from Berlin."
+        },
+        {
+          "de": "Ich höre zu, ich frage nach.",
+          "en": "I listen, I ask for clarification."
+        },
+        {
+          "de": "Ich sage: Können Sie das wiederholen?",
+          "en": "I say: Could you repeat that?"
+        },
+        {
+          "de": "Ganz ruhig, ich bin bereit.",
+          "en": "Nice and calm, I'm ready."
+        },
+        {
+          "de": "Ich sehe eine Karte: Wasser.",
+          "en": "I see a card: Water."
+        },
+        {
+          "de": "Ich frage: Möchten Sie Wasser?",
+          "en": "I ask: Would you like some water?"
+        },
+        {
+          "de": "Mia sagt: Ja, bitte.",
+          "en": "Mia says: Yes, please."
+        },
+        {
+          "de": "Ich antworte: Hier, bitte schön.",
+          "en": "I reply: Here you are."
+        },
+        {
+          "de": "Ich höre zu, ich frage nach.",
+          "en": "I listen, I ask for clarification."
+        },
+        {
+          "de": "Ich sage: Können Sie das wiederholen?",
+          "en": "I say: Could you repeat that?"
+        },
+        {
+          "de": "Ganz ruhig, ich bin bereit.",
+          "en": "Nice and calm, I'm ready."
+        },
+        {
+          "de": "Die Prüfung macht mir weniger Angst.",
+          "en": "The exam frightens me less now."
+        },
+        {
+          "de": "Denn ich kann schon viel sagen.",
+          "en": "Because I can already say a lot."
+        },
+        {
+          "de": "Bei Falowen übe ich das Sprechen.",
+          "en": "At Falowen, I practise speaking."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-17/Wo ist der Bahnhof_.mp3",
+      "level": "A1",
+      "day": 17,
+      "assignmentKey": "A1-11",
+      "draftTitle": "Wie komme ich zum Bahnhof?",
+      "lines": [
+        {
+          "de": "Ich stehe vor dem Rathaus.",
+          "en": "I'm standing in front of the town hall."
+        },
+        {
+          "de": "Ich suche den Bahnhof.",
+          "en": "I'm looking for the train station."
+        },
+        {
+          "de": "Ich frage eine nette Frau:",
+          "en": "I ask a nice woman:"
+        },
+        {
+          "de": "Wie komme ich dorthin?",
+          "en": "How do I get there?"
+        },
+        {
+          "de": "Gehen Sie geradeaus.",
+          "en": "Go straight ahead."
+        },
+        {
+          "de": "Dann gehen Sie nach links.",
+          "en": "Then turn left."
+        },
+        {
+          "de": "Der Bahnhof ist gleich da.",
+          "en": "The station is just there."
+        },
+        {
+          "de": "Die Frau sagt: Gehen Sie weiter.",
+          "en": "The woman says: Keep going."
+        },
+        {
+          "de": "An der Ampel nach rechts.",
+          "en": "Turn right at the traffic lights."
+        },
+        {
+          "de": "Ich sage: Vielen Dank!",
+          "en": "I say: Thank you very much!"
+        },
+        {
+          "de": "Sie lächelt: Gern geschehen.",
+          "en": "She smiles: You're welcome."
+        },
+        {
+          "de": "Gehen Sie geradeaus.",
+          "en": "Go straight ahead."
+        },
+        {
+          "de": "Dann gehen Sie nach links.",
+          "en": "Then turn left."
+        },
+        {
+          "de": "Der Bahnhof ist gleich da.",
+          "en": "The station is just there."
+        },
+        {
+          "de": "Jetzt sehe ich den Bahnhof.",
+          "en": "Now I can see the station."
+        },
+        {
+          "de": "Mein Zug kommt gerade an.",
+          "en": "My train is just arriving."
+        },
+        {
+          "de": "Mit Falowen finde ich den Weg.",
+          "en": "With Falowen, I find my way."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-18/Wo ist mein Schlüssel_.mp3",
+      "level": "A1",
+      "day": 18,
+      "assignmentKey": "A1-12.1",
+      "draftTitle": "Wo ist mein Schlüssel?",
+      "lines": [
+        {
+          "de": "Ich suche meinen Schlüssel.",
+          "en": "I'm looking for my key."
+        },
+        {
+          "de": "Er liegt nicht auf dem Tisch.",
+          "en": "It's not on the table."
+        },
+        {
+          "de": "Mia fragt: Ist er in der Tasche?",
+          "en": "Mia asks: Is it in the bag?"
+        },
+        {
+          "de": "Ich sehe in die Tasche.",
+          "en": "I look inside the bag."
+        },
+        {
+          "de": "Auf dem Tisch, in der Tasche.",
+          "en": "On the table, in the bag."
+        },
+        {
+          "de": "Unter dem Stuhl, neben mir.",
+          "en": "Under the chair, next to me."
+        },
+        {
+          "de": "Wo ist er? Jetzt sehe ich ihn!",
+          "en": "Where is it? Now I can see it!"
+        },
+        {
+          "de": "Mein Schlüssel liegt unter dem Buch.",
+          "en": "My key is under the book."
+        },
+        {
+          "de": "Ich nehme ihn in die Hand.",
+          "en": "I take it in my hand."
+        },
+        {
+          "de": "Dann gehe ich mit Mia",
+          "en": "Then I go with Mia"
+        },
+        {
+          "de": "zum Bäcker um die Ecke.",
+          "en": "to the bakery around the corner."
+        },
+        {
+          "de": "Auf dem Tisch, in der Tasche.",
+          "en": "On the table, in the bag."
+        },
+        {
+          "de": "Unter dem Stuhl, neben mir.",
+          "en": "Under the chair, next to me."
+        },
+        {
+          "de": "Wo ist er? Jetzt sehe ich ihn!",
+          "en": "Where is it? Now I can see it!"
+        },
+        {
+          "de": "Jetzt habe ich meinen Schlüssel.",
+          "en": "Now I have my key."
+        },
+        {
+          "de": "Und wir sind schon unterwegs.",
+          "en": "And we're already on our way."
+        },
+        {
+          "de": "Bei Falowen weiß ich, wo es liegt.",
+          "en": "At Falowen, I know where it is."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-19/So sprechen wir auf Deutsch.mp3",
+      "level": "A1",
+      "day": 19,
+      "assignmentKey": "A1-5.9",
+      "draftTitle": "Bitte, darf ich fragen?",
+      "lines": [
+        {
+          "de": "Ich stehe vor meiner Prüfung.",
+          "en": "I'm about to take my exam."
+        },
+        {
+          "de": "Auf dem Tisch liegt eine Karte.",
+          "en": "There's a card on the table."
+        },
+        {
+          "de": "Das Wort auf der Karte: Brot.",
+          "en": "The word on the card: Bread."
+        },
+        {
+          "de": "Ich frage: Möchten Sie Brot?",
+          "en": "I ask: Would you like some bread?"
+        },
+        {
+          "de": "Ich frage freundlich, du antwortest.",
+          "en": "I ask politely, you answer."
+        },
+        {
+          "de": "Bitte schön, ja, vielen Dank.",
+          "en": "Here you are, yes, thank you very much."
+        },
+        {
+          "de": "So sprechen wir auf Deutsch.",
+          "en": "That's how we speak in German."
+        },
+        {
+          "de": "Dann sehe ich eine Tasche.",
+          "en": "Then I see a bag."
+        },
+        {
+          "de": "Ich sage: Geben Sie mir die Tasche, bitte.",
+          "en": "I say: Give me the bag, please."
+        },
+        {
+          "de": "Mia gibt sie mir und lächelt.",
+          "en": "Mia gives it to me and smiles."
+        },
+        {
+          "de": "Ich sage: Danke, das ist nett.",
+          "en": "I say: Thank you, that's kind."
+        },
+        {
+          "de": "Ich frage freundlich, du antwortest.",
+          "en": "I ask politely, you answer."
+        },
+        {
+          "de": "Bitte schön, ja, vielen Dank.",
+          "en": "Here you are, yes, thank you very much."
+        },
+        {
+          "de": "So sprechen wir auf Deutsch.",
+          "en": "That's how we speak in German."
+        },
+        {
+          "de": "Ich kann fragen und antworten.",
+          "en": "I can ask and answer questions."
+        },
+        {
+          "de": "Jetzt bin ich wirklich bereit.",
+          "en": "Now I'm really ready."
+        },
+        {
+          "de": "Mit Falowen frage ich ganz freundlich.",
+          "en": "With Falowen, I ask very politely."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-02/Maria ist wunderbar.mp3",
+      "level": "A2",
+      "day": 2,
+      "assignmentKey": "A2-1.2",
+      "draftTitle": "Maria, meine Mama",
+      "lines": [
+        {
+          "de": "Ich erzähle von einer lieben Frau,",
+          "en": "I'm telling you about a lovely woman,"
+        },
+        {
+          "de": "Maria heißt sie, ich kenn sie genau.",
+          "en": "Maria is her name, I know her well."
+        },
+        {
+          "de": "Ihre Augen sind warm und braun,",
+          "en": "Her eyes are warm and brown,"
+        },
+        {
+          "de": "ihr Lächeln ist wunderbar.",
+          "en": "her smile is wonderful."
+        },
+        {
+          "de": "Und wenn der Tag zu Ende geht,",
+          "en": "And when the day comes to an end,"
+        },
+        {
+          "de": "weiß ich, dass sie mich versteht.",
+          "en": "I know that she understands me."
+        },
+        {
+          "de": "Maria ist freundlich, immer da,",
+          "en": "Maria is friendly, always there,"
+        },
+        {
+          "de": "sie hört mir zu, ist mir so nah.",
+          "en": "she listens to me and is so close to me."
+        },
+        {
+          "de": "An schweren Tagen macht sie Mut,",
+          "en": "On difficult days, she encourages me,"
+        },
+        {
+          "de": "bei ihr wird alles wieder gut.",
+          "en": "with her, everything gets better again."
+        },
+        {
+          "de": "Sie arbeitet im Krankenhaus,",
+          "en": "She works at the hospital,"
+        },
+        {
+          "de": "am Abend kommt sie müde nach Haus.",
+          "en": "in the evening, she comes home tired."
+        },
+        {
+          "de": "Maria kocht gern Reis und Gemüse,",
+          "en": "Maria likes cooking rice and vegetables,"
+        },
+        {
+          "de": "und hört Musik in aller Ruhe.",
+          "en": "and listening to music in peace."
+        },
+        {
+          "de": "Am Sonntag geht sie gern spazieren,",
+          "en": "On Sundays, she likes going for a walk,"
+        },
+        {
+          "de": "wir reden viel und lachen dabei.",
+          "en": "we talk a lot and laugh together."
+        },
+        {
+          "de": "Geduldig ist sie, manchmal streng,",
+          "en": "She's patient, sometimes strict,"
+        },
+        {
+          "de": "doch hilft sie mir, wenn's schwierig wird.",
+          "en": "but she helps me when things get difficult."
+        },
+        {
+          "de": "Maria ist freundlich, immer da,",
+          "en": "Maria is friendly, always there,"
+        },
+        {
+          "de": "sie hört mir zu, ist mir so nah.",
+          "en": "she listens to me and is so close to me."
+        },
+        {
+          "de": "An schweren Tagen macht sie Mut,",
+          "en": "On difficult days, she encourages me,"
+        },
+        {
+          "de": "bei ihr wird alles wieder gut.",
+          "en": "with her, everything gets better again."
+        },
+        {
+          "de": "Maria ist stark und wunderbar,",
+          "en": "Maria is strong and wonderful,"
+        },
+        {
+          "de": "sie hilft mir immer, Jahr für Jahr.",
+          "en": "she always helps me, year after year."
+        },
+        {
+          "de": "An meine Träume glaubt sie fest,",
+          "en": "She firmly believes in my dreams,"
+        },
+        {
+          "de": "bei ihr fühl ich mich nie allein.",
+          "en": "with her, I never feel alone."
+        },
+        {
+          "de": "Danke, Mama, für deine Zeit,",
+          "en": "Thank you, Mum, for your time,"
+        },
+        {
+          "de": "Maria, Maria, du bist so wunderbar.",
+          "en": "Maria, Maria, you are so wonderful."
+        },
+        {
+          "de": "Maria, Maria, ich hab dich so lieb,",
+          "en": "Maria, Maria, I love you so much,"
+        },
+        {
+          "de": "du bist mein Vorbild, Jahr für Jahr.",
+          "en": "you are my role model, year after year."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-04/Der neue Treffpunkt.mp3",
+      "level": "A2",
+      "day": 4,
+      "assignmentKey": "A2-2.4",
+      "draftTitle": "Treffen wir uns um fünf?",
+      "lines": [
+        {
+          "de": "Mia und ich wollen uns treffen.",
+          "en": "Mia and I want to meet up."
+        },
+        {
+          "de": "Am Nachmittag habe ich endlich Zeit.",
+          "en": "I finally have time in the afternoon."
+        },
+        {
+          "de": "Ich schlage das Café am Markt vor.",
+          "en": "I suggest the café by the market."
+        },
+        {
+          "de": "Mia sagt: Dort ist es oft zu laut.",
+          "en": "Mia says: It's often too loud there."
+        },
+        {
+          "de": "Wo möchten wir uns treffen?",
+          "en": "Where would we like to meet?"
+        },
+        {
+          "de": "Vielleicht im Park, vielleicht am See.",
+          "en": "Maybe in the park, maybe by the lake."
+        },
+        {
+          "de": "Wir finden einen Ort für uns.",
+          "en": "We'll find a place for us."
+        },
+        {
+          "de": "Sie schlägt die kleine Bibliothek vor.",
+          "en": "She suggests the small library."
+        },
+        {
+          "de": "Dort gibt es einen ruhigen Garten.",
+          "en": "There's a quiet garden there."
+        },
+        {
+          "de": "Wir treffen uns um fünf am Eingang.",
+          "en": "We meet at the entrance at five."
+        },
+        {
+          "de": "Ich bringe Tee in einer Flasche mit.",
+          "en": "I bring tea in a bottle."
+        },
+        {
+          "de": "Wo möchten wir uns treffen?",
+          "en": "Where would we like to meet?"
+        },
+        {
+          "de": "Vielleicht im Park, vielleicht am See.",
+          "en": "Maybe in the park, maybe by the lake."
+        },
+        {
+          "de": "Wir finden einen Ort für uns.",
+          "en": "We'll find a place for us."
+        },
+        {
+          "de": "Wir sitzen draußen und reden lange.",
+          "en": "We sit outside and talk for a long time."
+        },
+        {
+          "de": "Der neue Treffpunkt gefällt uns beiden.",
+          "en": "We both like the new meeting place."
+        },
+        {
+          "de": "Bei Falowen lerne ich, Treffen zu planen.",
+          "en": "At Falowen, I learn to arrange meetings."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-05/Der Samstag wunderbar.mp3",
+      "level": "A2",
+      "day": 5,
+      "assignmentKey": "A2-2.5",
+      "draftTitle": "Samstag ist mein Tag",
+      "lines": [
+        {
+          "de": "Nach einer langen Woche bin ich frei.",
+          "en": "After a long week, I have time off."
+        },
+        {
+          "de": "Morgens schlafe ich ein wenig länger.",
+          "en": "In the morning, I sleep a little longer."
+        },
+        {
+          "de": "Dann gehe ich mit Ben schwimmen.",
+          "en": "Then I go swimming with Ben."
+        },
+        {
+          "de": "Er macht lieber Sport als Fernsehen.",
+          "en": "He prefers doing sport to watching TV."
+        },
+        {
+          "de": "In meiner Freizeit finde ich Zeit",
+          "en": "In my free time, I find time"
+        },
+        {
+          "de": "für Freunde, Sport und neue Ideen.",
+          "en": "for friends, sport and new ideas."
+        },
+        {
+          "de": "So wird der Samstag wunderbar.",
+          "en": "That's how Saturday becomes wonderful."
+        },
+        {
+          "de": "Am Mittag treffen wir noch Sara.",
+          "en": "At lunchtime, we meet Sara too."
+        },
+        {
+          "de": "Sie hat gestern einen Kuchen gebacken.",
+          "en": "She baked a cake yesterday."
+        },
+        {
+          "de": "Wir essen draußen in der Sonne.",
+          "en": "We eat outside in the sunshine."
+        },
+        {
+          "de": "Am Abend höre ich Musik zu Hause.",
+          "en": "In the evening, I listen to music at home."
+        },
+        {
+          "de": "In meiner Freizeit finde ich Zeit",
+          "en": "In my free time, I find time"
+        },
+        {
+          "de": "für Freunde, Sport und neue Ideen.",
+          "en": "for friends, sport and new ideas."
+        },
+        {
+          "de": "So wird der Samstag wunderbar.",
+          "en": "That's how Saturday becomes wonderful."
+        },
+        {
+          "de": "Am Sonntag plane ich die neue Woche.",
+          "en": "On Sunday, I plan the new week."
+        },
+        {
+          "de": "Ich freue mich schon aufs Wochenende.",
+          "en": "I'm already looking forward to the weekend."
+        },
+        {
+          "de": "Mit Falowen erzähle ich gern vom Wochenende.",
+          "en": "With Falowen, I enjoy talking about the weekend."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-06/Ein Platz für dich.mp3",
+      "level": "A2",
+      "day": 6,
+      "assignmentKey": "A2-3.6",
+      "draftTitle": "Das neue Zimmer",
+      "lines": [
+        {
+          "de": "Meine Schwester bekommt ein neues Zimmer.",
+          "en": "My sister is getting a new room."
+        },
+        {
+          "de": "Wir tragen den Tisch ins Haus.",
+          "en": "We carry the table into the house."
+        },
+        {
+          "de": "Das Bett steht neben dem Fenster.",
+          "en": "The bed is next to the window."
+        },
+        {
+          "de": "Die Lampe kommt auf den Schreibtisch.",
+          "en": "The lamp goes on the desk."
+        },
+        {
+          "de": "Ein Platz für dich, ein Platz für mich,",
+          "en": "A place for you, a place for me,"
+        },
+        {
+          "de": "ein helles Zimmer wird gemütlich.",
+          "en": "a bright room becomes cosy."
+        },
+        {
+          "de": "Mit kleinen Dingen fühlt es sich gut an.",
+          "en": "Little things make it feel good."
+        },
+        {
+          "de": "Der Schrank passt nicht an die Wand.",
+          "en": "The wardrobe doesn't fit against the wall."
+        },
+        {
+          "de": "Also stellen wir ihn neben die Tür.",
+          "en": "So we put it next to the door."
+        },
+        {
+          "de": "Dann hängen wir ein Bild auf.",
+          "en": "Then we hang up a picture."
+        },
+        {
+          "de": "Meine Schwester sagt: Jetzt ist es schön.",
+          "en": "My sister says: Now it's lovely."
+        },
+        {
+          "de": "Ein Platz für dich, ein Platz für mich,",
+          "en": "A place for you, a place for me,"
+        },
+        {
+          "de": "ein helles Zimmer wird gemütlich.",
+          "en": "a bright room becomes cosy."
+        },
+        {
+          "de": "Mit kleinen Dingen fühlt es sich gut an.",
+          "en": "Little things make it feel good."
+        },
+        {
+          "de": "Wir sitzen noch eine Weile zusammen.",
+          "en": "We sit together for a little while longer."
+        },
+        {
+          "de": "Das neue Zimmer ist endlich fertig.",
+          "en": "The new room is finally ready."
+        },
+        {
+          "de": "Bei Falowen beschreibe ich mein neues Zimmer.",
+          "en": "At Falowen, I describe my new room."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-07/Eine Wohnung zu uns passen.mp3",
+      "level": "A2",
+      "day": 7,
+      "assignmentKey": "A2-3.7",
+      "draftTitle": "Eine Wohnung für uns",
+      "lines": [
+        {
+          "de": "Wir suchen seit Wochen eine Wohnung.",
+          "en": "We've been looking for a flat for weeks."
+        },
+        {
+          "de": "Heute sehen wir uns eine neue an.",
+          "en": "Today, we're viewing a new one."
+        },
+        {
+          "de": "Die Küche ist groß und hell.",
+          "en": "The kitchen is big and bright."
+        },
+        {
+          "de": "Aber die Straße ist ziemlich laut.",
+          "en": "But the street is quite noisy."
+        },
+        {
+          "de": "Eine Wohnung soll zu uns passen,",
+          "en": "A flat should suit us,"
+        },
+        {
+          "de": "nicht nur schön auf Fotos sein.",
+          "en": "not just look nice in photos."
+        },
+        {
+          "de": "Wir schauen genau und fragen nach.",
+          "en": "We look carefully and ask questions."
+        },
+        {
+          "de": "Die zweite Wohnung liegt am Park.",
+          "en": "The second flat is by the park."
+        },
+        {
+          "de": "Sie ist kleiner, aber ruhiger.",
+          "en": "It's smaller, but quieter."
+        },
+        {
+          "de": "Der Vermieter beantwortet alle Fragen.",
+          "en": "The landlord answers all our questions."
+        },
+        {
+          "de": "Am Abend schicken wir unsere Bewerbung.",
+          "en": "In the evening, we send our application."
+        },
+        {
+          "de": "Eine Wohnung soll zu uns passen,",
+          "en": "A flat should suit us,"
+        },
+        {
+          "de": "nicht nur schön auf Fotos sein.",
+          "en": "not just look nice in photos."
+        },
+        {
+          "de": "Wir schauen genau und fragen nach.",
+          "en": "We look carefully and ask questions."
+        },
+        {
+          "de": "Zwei Tage später kommt die Zusage.",
+          "en": "Two days later, we get accepted."
+        },
+        {
+          "de": "Jetzt können wir endlich umziehen.",
+          "en": "Now we can finally move."
+        },
+        {
+          "de": "Mit Falowen kann ich nach Wohnungen fragen.",
+          "en": "With Falowen, I can ask about flats."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-09/Ein kleiner Urlaub.mp3",
+      "level": "A2",
+      "day": 9,
+      "assignmentKey": "A2-4.9",
+      "draftTitle": "Drei Tage am Meer",
+      "lines": [
+        {
+          "de": "Letzten Sommer war ich am Meer.",
+          "en": "Last summer, I was at the seaside."
+        },
+        {
+          "de": "Meine Freundin war auch dabei.",
+          "en": "My friend came along too."
+        },
+        {
+          "de": "Wir sind früh mit dem Zug gefahren.",
+          "en": "We travelled early by train."
+        },
+        {
+          "de": "Am Abend haben wir den Strand gesehen.",
+          "en": "In the evening, we saw the beach."
+        },
+        {
+          "de": "Ein kleiner Urlaub, weit vom Alltag,",
+          "en": "A little holiday, far from everyday life,"
+        },
+        {
+          "de": "die Luft ist warm, das Wasser blau.",
+          "en": "the air is warm, the water blue."
+        },
+        {
+          "de": "Diese Tage bleiben in Erinnerung.",
+          "en": "These days will stay in our memories."
+        },
+        {
+          "de": "Am zweiten Tag hat es geregnet.",
+          "en": "On the second day, it rained."
+        },
+        {
+          "de": "Wir sind deshalb ins Museum gegangen.",
+          "en": "So we went to the museum."
+        },
+        {
+          "de": "Dort haben wir viel Neues entdeckt.",
+          "en": "There, we discovered lots of new things."
+        },
+        {
+          "de": "Am letzten Tag kam die Sonne zurück.",
+          "en": "On the last day, the sun returned."
+        },
+        {
+          "de": "Ein kleiner Urlaub, weit vom Alltag,",
+          "en": "A little holiday, far from everyday life,"
+        },
+        {
+          "de": "die Luft ist warm, das Wasser blau.",
+          "en": "the air is warm, the water blue."
+        },
+        {
+          "de": "Diese Tage bleiben in Erinnerung.",
+          "en": "These days will stay in our memories."
+        },
+        {
+          "de": "Wir haben viele Fotos gemacht.",
+          "en": "We took lots of photos."
+        },
+        {
+          "de": "Nächstes Jahr fahren wir wieder hin.",
+          "en": "Next year, we'll go there again."
+        },
+        {
+          "de": "Mit Falowen kann ich von Reisen erzählen.",
+          "en": "With Falowen, I can talk about trips."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-13/Bewerbungsgespräch.mp3",
+      "level": "A2",
+      "day": 13,
+      "assignmentKey": "A2-5.13",
+      "draftTitle": "Das Gespräch am Montag",
+      "lines": [
+        {
+          "de": "Am Montag habe ich ein Bewerbungsgespräch.",
+          "en": "On Monday, I have a job interview."
+        },
+        {
+          "de": "Ich bin nervös und komme früh.",
+          "en": "I'm nervous and arrive early."
+        },
+        {
+          "de": "Die Chefin begrüßt mich freundlich.",
+          "en": "The boss greets me warmly."
+        },
+        {
+          "de": "Sie fragt nach meiner Erfahrung.",
+          "en": "She asks about my experience."
+        },
+        {
+          "de": "Guten Tag, schön, dass Sie hier sind.",
+          "en": "Hello, it's nice that you're here."
+        },
+        {
+          "de": "Ich höre zu und antworte klar.",
+          "en": "I listen and answer clearly."
+        },
+        {
+          "de": "Ich zeige, was ich gerne mache.",
+          "en": "I show what I enjoy doing."
+        },
+        {
+          "de": "Ich erzähle von meinem letzten Praktikum.",
+          "en": "I talk about my last internship."
+        },
+        {
+          "de": "Dort habe ich im Team gearbeitet.",
+          "en": "There, I worked as part of a team."
+        },
+        {
+          "de": "Dann frage ich nach den Arbeitszeiten.",
+          "en": "Then I ask about the working hours."
+        },
+        {
+          "de": "Die Chefin erklärt mir alles in Ruhe.",
+          "en": "The boss explains everything calmly."
+        },
+        {
+          "de": "Guten Tag, schön, dass Sie hier sind.",
+          "en": "Hello, it's nice that you're here."
+        },
+        {
+          "de": "Ich höre zu und antworte klar.",
+          "en": "I listen and answer clearly."
+        },
+        {
+          "de": "Ich zeige, was ich gerne mache.",
+          "en": "I show what I enjoy doing."
+        },
+        {
+          "de": "Am Freitag bekomme ich eine Nachricht.",
+          "en": "On Friday, I receive a message."
+        },
+        {
+          "de": "Ich darf nächste Woche anfangen.",
+          "en": "I can start next week."
+        },
+        {
+          "de": "Mit Falowen bereite ich mich gut vor.",
+          "en": "With Falowen, I prepare well."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-19/Die richtige Wahl.mp3",
+      "level": "A2",
+      "day": 19,
+      "assignmentKey": "A2-7.19",
+      "draftTitle": "Lieber online oder im Laden?",
+      "lines": [
+        {
+          "de": "Mia braucht neue Schuhe für den Winter.",
+          "en": "Mia needs new shoes for winter."
+        },
+        {
+          "de": "Online findet sie ein günstiges Paar.",
+          "en": "She finds an inexpensive pair online."
+        },
+        {
+          "de": "Doch sie kennt ihre Größe nicht genau.",
+          "en": "But she doesn't know her exact size."
+        },
+        {
+          "de": "Darum gehen wir zuerst in ein Geschäft.",
+          "en": "So first we go to a shop."
+        },
+        {
+          "de": "Wo kaufen wir am besten ein?",
+          "en": "Where's the best place for us to shop?"
+        },
+        {
+          "de": "Wir schauen, fragen, vergleichen.",
+          "en": "We look, ask and compare."
+        },
+        {
+          "de": "Dann treffen wir die richtige Wahl.",
+          "en": "Then we make the right choice."
+        },
+        {
+          "de": "Im Geschäft probiert Mia zwei Paare.",
+          "en": "In the shop, Mia tries on two pairs."
+        },
+        {
+          "de": "Das zweite sitzt viel bequemer.",
+          "en": "The second pair fits much more comfortably."
+        },
+        {
+          "de": "Der Preis ist auch in Ordnung.",
+          "en": "The price is fine too."
+        },
+        {
+          "de": "Mia kauft es gleich und ist zufrieden.",
+          "en": "Mia buys it straight away and is happy."
+        },
+        {
+          "de": "Wo kaufen wir am besten ein?",
+          "en": "Where's the best place for us to shop?"
+        },
+        {
+          "de": "Wir schauen, fragen, vergleichen.",
+          "en": "We look, ask and compare."
+        },
+        {
+          "de": "Dann treffen wir die richtige Wahl.",
+          "en": "Then we make the right choice."
+        },
+        {
+          "de": "Zu Hause stellt sie die Schuhe ins Regal.",
+          "en": "At home, she puts the shoes on the shelf."
+        },
+        {
+          "de": "Jetzt kann der Winter kommen.",
+          "en": "Now winter can come."
+        },
+        {
+          "de": "Mit Falowen kann ich Preise vergleichen.",
+          "en": "With Falowen, I can compare prices."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-21/Endlich Wochenende.mp3",
+      "level": "A2",
+      "day": 21,
+      "assignmentKey": "A2-8.21",
+      "draftTitle": "Ein Wochenende in den Bergen",
+      "lines": [
+        {
+          "de": "Am Freitag fragen wir unsere Freunde:",
+          "en": "On Friday, we ask our friends:"
+        },
+        {
+          "de": "Habt ihr am Wochenende schon etwas vor?",
+          "en": "Have you got any plans for the weekend?"
+        },
+        {
+          "de": "Ben möchte in die Berge fahren.",
+          "en": "Ben wants to go to the mountains."
+        },
+        {
+          "de": "Mia bleibt lieber in der Nähe.",
+          "en": "Mia would rather stay nearby."
+        },
+        {
+          "de": "Was machen wir am Wochenende?",
+          "en": "What are we doing at the weekend?"
+        },
+        {
+          "de": "Wir hören zu und planen zusammen.",
+          "en": "We listen and plan together."
+        },
+        {
+          "de": "Für alle soll etwas dabei sein.",
+          "en": "There should be something for everyone."
+        },
+        {
+          "de": "Am Ende fahren wir am Samstag zum See.",
+          "en": "In the end, we go to the lake on Saturday."
+        },
+        {
+          "de": "Dort gibt es einen kurzen Wanderweg.",
+          "en": "There's a short hiking trail there."
+        },
+        {
+          "de": "Am Sonntag besuchen wir ein kleines Café.",
+          "en": "On Sunday, we visit a little café."
+        },
+        {
+          "de": "Alle sind mit dem Plan zufrieden.",
+          "en": "Everyone is happy with the plan."
+        },
+        {
+          "de": "Was machen wir am Wochenende?",
+          "en": "What are we doing at the weekend?"
+        },
+        {
+          "de": "Wir hören zu und planen zusammen.",
+          "en": "We listen and plan together."
+        },
+        {
+          "de": "Für alle soll etwas dabei sein.",
+          "en": "There should be something for everyone."
+        },
+        {
+          "de": "Wir schicken die Zeiten in unsere Gruppe.",
+          "en": "We send the times to our group."
+        },
+        {
+          "de": "Jetzt kann das Wochenende kommen.",
+          "en": "Now the weekend can come."
+        },
+        {
+          "de": "Mit Falowen planen wir einen schönen Ausflug.",
+          "en": "With Falowen, we plan a lovely outing."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-22/Zeit für mich.mp3",
+      "level": "A2",
+      "day": 22,
+      "assignmentKey": "A2-8.22",
+      "draftTitle": "Der Plan für unsere Woche",
+      "lines": [
+        {
+          "de": "Am Montag habe ich einen Deutschkurs.",
+          "en": "On Monday, I have a German class."
+        },
+        {
+          "de": "Am Dienstag muss ich länger arbeiten.",
+          "en": "On Tuesday, I have to work longer."
+        },
+        {
+          "de": "Mia fragt, wann wir uns treffen können.",
+          "en": "Mia asks when we can meet."
+        },
+        {
+          "de": "Ich schaue in meinen Kalender.",
+          "en": "I look at my calendar."
+        },
+        {
+          "de": "Montag, Dienstag, Mittwoch und mehr,",
+          "en": "Monday, Tuesday, Wednesday and more,"
+        },
+        {
+          "de": "wir planen unsere Tage.",
+          "en": "we plan our days."
+        },
+        {
+          "de": "Dann bleibt auch Zeit für Freunde.",
+          "en": "Then there's time for friends too."
+        },
+        {
+          "de": "Am Donnerstag ist mein Abend noch frei.",
+          "en": "My Thursday evening is still free."
+        },
+        {
+          "de": "Wir wollen zusammen etwas kochen.",
+          "en": "We want to cook something together."
+        },
+        {
+          "de": "Am Freitag gehe ich zum Sport.",
+          "en": "On Friday, I do sport."
+        },
+        {
+          "de": "Am Samstag besuche ich meine Familie.",
+          "en": "On Saturday, I visit my family."
+        },
+        {
+          "de": "Montag, Dienstag, Mittwoch und mehr,",
+          "en": "Monday, Tuesday, Wednesday and more,"
+        },
+        {
+          "de": "wir planen unsere Tage.",
+          "en": "we plan our days."
+        },
+        {
+          "de": "Dann bleibt auch Zeit für Freunde.",
+          "en": "Then there's time for friends too."
+        },
+        {
+          "de": "Jetzt sind alle Termine eingetragen.",
+          "en": "Now all the appointments are entered."
+        },
+        {
+          "de": "Und ich habe weniger Stress.",
+          "en": "And I'm less stressed."
+        },
+        {
+          "de": "Bei Falowen spreche ich über meine Woche.",
+          "en": "At Falowen, I talk about my week."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-26/Wie ich mich fühle.mp3",
+      "level": "A2",
+      "day": 26,
+      "assignmentKey": "A2-10.26",
+      "draftTitle": "Heute bin ich aufgeregt",
+      "lines": [
+        {
+          "de": "Morgen habe ich eine wichtige Prüfung.",
+          "en": "Tomorrow, I have an important exam."
+        },
+        {
+          "de": "Heute bin ich ziemlich nervös.",
+          "en": "Today, I'm quite nervous."
+        },
+        {
+          "de": "Mein Freund merkt das sofort.",
+          "en": "My friend notices straight away."
+        },
+        {
+          "de": "Er fragt: Was macht dir Sorgen?",
+          "en": "He asks: What's worrying you?"
+        },
+        {
+          "de": "Manchmal bin ich froh, manchmal traurig,",
+          "en": "Sometimes I'm happy, sometimes sad,"
+        },
+        {
+          "de": "manchmal habe ich ein bisschen Angst.",
+          "en": "sometimes I'm a little scared."
+        },
+        {
+          "de": "Ich darf sagen, wie ich mich fühle.",
+          "en": "I'm allowed to say how I feel."
+        },
+        {
+          "de": "Wir sprechen lange über meine Gedanken.",
+          "en": "We talk for a long time about my thoughts."
+        },
+        {
+          "de": "Er erzählt von seiner letzten Prüfung.",
+          "en": "He tells me about his last exam."
+        },
+        {
+          "de": "Danach fühle ich mich ruhiger.",
+          "en": "Afterwards, I feel calmer."
+        },
+        {
+          "de": "Ich weiß: Ich habe viel gelernt.",
+          "en": "I know: I've learnt a lot."
+        },
+        {
+          "de": "Manchmal bin ich froh, manchmal traurig,",
+          "en": "Sometimes I'm happy, sometimes sad,"
+        },
+        {
+          "de": "manchmal habe ich ein bisschen Angst.",
+          "en": "sometimes I'm a little scared."
+        },
+        {
+          "de": "Ich darf sagen, wie ich mich fühle.",
+          "en": "I'm allowed to say how I feel."
+        },
+        {
+          "de": "Am Morgen gehe ich mit neuem Mut los.",
+          "en": "In the morning, I set off with fresh courage."
+        },
+        {
+          "de": "Egal was kommt, ich versuche es.",
+          "en": "Whatever happens, I'll give it a try."
+        },
+        {
+          "de": "Bei Falowen kann ich sagen, wie ich mich fühle.",
+          "en": "At Falowen, I can say how I feel."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-27/Handys weg.mp3",
+      "level": "A2",
+      "day": 27,
+      "assignmentKey": "A2-10.27",
+      "draftTitle": "Eine Nachricht kommt zu spät",
+      "lines": [
+        {
+          "de": "Mia schreibt mir eine Nachricht.",
+          "en": "Mia sends me a message."
+        },
+        {
+          "de": "Sie fragt, ob ich heute Zeit habe.",
+          "en": "She asks whether I have time today."
+        },
+        {
+          "de": "Ich bin unterwegs und sehe sie nicht.",
+          "en": "I'm out and don't see it."
+        },
+        {
+          "de": "Erst am Abend öffne ich mein Handy.",
+          "en": "I don't open my phone until the evening."
+        },
+        {
+          "de": "Eine Nachricht, ein kleiner Gruß,",
+          "en": "A message, a little greeting,"
+        },
+        {
+          "de": "wir bleiben in Kontakt.",
+          "en": "we stay in touch."
+        },
+        {
+          "de": "Doch manchmal braucht man auch eine Pause.",
+          "en": "But sometimes you need a break too."
+        },
+        {
+          "de": "Ich schreibe: Entschuldige die späte Antwort.",
+          "en": "I write: Sorry for the late reply."
+        },
+        {
+          "de": "Mia sagt: Kein Problem, ich verstehe.",
+          "en": "Mia says: No problem, I understand."
+        },
+        {
+          "de": "Wir machen einen Termin für morgen.",
+          "en": "We arrange to meet tomorrow."
+        },
+        {
+          "de": "Dann legen wir beide das Handy weg.",
+          "en": "Then we both put our phones away."
+        },
+        {
+          "de": "Eine Nachricht, ein kleiner Gruß,",
+          "en": "A message, a little greeting,"
+        },
+        {
+          "de": "wir bleiben in Kontakt.",
+          "en": "we stay in touch."
+        },
+        {
+          "de": "Doch manchmal braucht man auch eine Pause.",
+          "en": "But sometimes you need a break too."
+        },
+        {
+          "de": "Am nächsten Tag reden wir persönlich.",
+          "en": "The next day, we talk in person."
+        },
+        {
+          "de": "Das ist manchmal einfach schöner.",
+          "en": "Sometimes, that's simply nicer."
+        },
+        {
+          "de": "Mit Falowen schreibe ich klare Nachrichten.",
+          "en": "With Falowen, I write clear messages."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-28/Ein kleiner Plan.mp3",
+      "level": "A2",
+      "day": 28,
+      "assignmentKey": "A2-10.28",
+      "draftTitle": "Nächstes Jahr möchte ich",
+      "lines": [
+        {
+          "de": "Am Ende des Jahres denke ich nach.",
+          "en": "At the end of the year, I reflect."
+        },
+        {
+          "de": "Was habe ich in den letzten Monaten gelernt?",
+          "en": "What have I learnt in the last few months?"
+        },
+        {
+          "de": "Ich habe viele neue Menschen getroffen.",
+          "en": "I've met lots of new people."
+        },
+        {
+          "de": "Mein Deutsch ist schon viel besser geworden.",
+          "en": "My German has already improved a lot."
+        },
+        {
+          "de": "Nächstes Jahr möchte ich weiterlernen,",
+          "en": "Next year, I want to keep learning,"
+        },
+        {
+          "de": "etwas Neues ausprobieren.",
+          "en": "try something new."
+        },
+        {
+          "de": "Ein kleiner Plan wird ein neuer Weg.",
+          "en": "A little plan becomes a new path."
+        },
+        {
+          "de": "Mia möchte einen Deutschkurs besuchen.",
+          "en": "Mia wants to take a German class."
+        },
+        {
+          "de": "Ben will eine neue Arbeit finden.",
+          "en": "Ben wants to find a new job."
+        },
+        {
+          "de": "Wir sprechen über unsere Wünsche.",
+          "en": "We talk about our wishes."
+        },
+        {
+          "de": "Dann schreiben wir unsere Ziele auf.",
+          "en": "Then we write down our goals."
+        },
+        {
+          "de": "Nächstes Jahr möchte ich weiterlernen,",
+          "en": "Next year, I want to keep learning,"
+        },
+        {
+          "de": "etwas Neues ausprobieren.",
+          "en": "try something new."
+        },
+        {
+          "de": "Ein kleiner Plan wird ein neuer Weg.",
+          "en": "A little plan becomes a new path."
+        },
+        {
+          "de": "Morgen fangen wir mit dem ersten Schritt an.",
+          "en": "Tomorrow, we'll start with the first step."
+        },
+        {
+          "de": "Ich freue mich auf die Zukunft.",
+          "en": "I'm looking forward to the future."
+        },
+        {
+          "de": "Bei Falowen spreche ich über meine Zukunft.",
+          "en": "At Falowen, I talk about my future."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-01/Ein Traum geht nicht verloren(1).mp3",
+      "level": "B1",
+      "day": 1,
+      "assignmentKey": "B1-1.1",
+      "draftTitle": "Der Traum im alten Koffer",
+      "lines": [
+        {
+          "de": "Im Keller finde ich einen alten Koffer.",
+          "en": "In the cellar, I find an old suitcase."
+        },
+        {
+          "de": "Darin liegt mein Reisebuch von damals.",
+          "en": "Inside is my travel book from back then."
+        },
+        {
+          "de": "Als Kind wollte ich um die Welt fahren,",
+          "en": "As a child, I wanted to travel the world,"
+        },
+        {
+          "de": "doch später blieb für Träume kaum Zeit.",
+          "en": "but later there was hardly any time for dreams."
+        },
+        {
+          "de": "Ein Traum geht nicht einfach verloren,",
+          "en": "A dream doesn't simply disappear,"
+        },
+        {
+          "de": "auch wenn die Jahre weiterziehen.",
+          "en": "even as the years go by."
+        },
+        {
+          "de": "Heute mach ich wieder einen Schritt.",
+          "en": "Today, I'm taking another step."
+        },
+        {
+          "de": "Ich erzähle Mia von meinem großen Wunsch.",
+          "en": "I tell Mia about my big dream."
+        },
+        {
+          "de": "Sie sagt, dass ich noch immer reisen kann.",
+          "en": "She says that I can still travel."
+        },
+        {
+          "de": "Wir suchen gemeinsam nach günstigen Tickets,",
+          "en": "Together, we look for cheap tickets,"
+        },
+        {
+          "de": "obwohl die Reise noch weit entfernt ist.",
+          "en": "although the trip is still a long way off."
+        },
+        {
+          "de": "Ein Traum geht nicht einfach verloren,",
+          "en": "A dream doesn't simply disappear,"
+        },
+        {
+          "de": "auch wenn die Jahre weiterziehen.",
+          "en": "even as the years go by."
+        },
+        {
+          "de": "Heute mach ich wieder einen Schritt.",
+          "en": "Today, I'm taking another step."
+        },
+        {
+          "de": "Am Abend liegt ein kleiner Plan auf dem Tisch.",
+          "en": "In the evening, a little plan lies on the table."
+        },
+        {
+          "de": "Der erste Ort auf meiner Liste heißt Wien.",
+          "en": "The first place on my list is Vienna."
+        },
+        {
+          "de": "Mit Falowen finde ich neue Worte für alte Träume.",
+          "en": "With Falowen, I find new words for old dreams."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-02/Freundschaft am Fluss.mp3",
+      "level": "B1",
+      "day": 2,
+      "assignmentKey": "B1-1.2",
+      "draftTitle": "Die Bank am Fluss",
+      "lines": [
+        {
+          "de": "Früher saßen wir oft am Fluss.",
+          "en": "We used to sit by the river often."
+        },
+        {
+          "de": "Ben und ich erzählten uns alles.",
+          "en": "Ben and I told each other everything."
+        },
+        {
+          "de": "Dann ist er in eine andere Stadt gezogen,",
+          "en": "Then he moved to another city,"
+        },
+        {
+          "de": "und unser Kontakt wurde immer seltener.",
+          "en": "and we were in touch less and less."
+        },
+        {
+          "de": "Gute Freunde bleiben nicht nur im Bild,",
+          "en": "Good friends aren't just in the picture,"
+        },
+        {
+          "de": "sie hören zu, wenn das Leben laut wird.",
+          "en": "they listen when life gets loud."
+        },
+        {
+          "de": "Ein Anruf kann uns wieder näherbringen.",
+          "en": "A phone call can bring us closer again."
+        },
+        {
+          "de": "Heute rufe ich ihn nach langer Zeit an.",
+          "en": "Today, I call him after a long time."
+        },
+        {
+          "de": "Er sagt, dass er oft an mich gedacht hat.",
+          "en": "He says that he has thought of me often."
+        },
+        {
+          "de": "Wir lachen über unsere Schulzeit",
+          "en": "We laugh about our school days"
+        },
+        {
+          "de": "und planen ein Treffen im nächsten Monat.",
+          "en": "and plan to meet next month."
+        },
+        {
+          "de": "Gute Freunde bleiben nicht nur im Bild,",
+          "en": "Good friends aren't just in the picture,"
+        },
+        {
+          "de": "sie hören zu, wenn das Leben laut wird.",
+          "en": "they listen when life gets loud."
+        },
+        {
+          "de": "Ein Anruf kann uns wieder näherbringen.",
+          "en": "A phone call can bring us closer again."
+        },
+        {
+          "de": "An der alten Bank am Fluss warten wir.",
+          "en": "We wait by the old bench at the river."
+        },
+        {
+          "de": "Manche Freundschaften finden zurück.",
+          "en": "Some friendships find their way back."
+        },
+        {
+          "de": "Bei Falowen erzähle ich, was Freundschaft für mich bedeutet.",
+          "en": "At Falowen, I talk about what friendship means to me."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-03/Ein kleiner Erfolg.mp3",
+      "level": "B1",
+      "day": 3,
+      "assignmentKey": "B1-1.3",
+      "draftTitle": "Mein erster kleiner Erfolg",
+      "lines": [
+        {
+          "de": "Als Sara ihren ersten Kurs begann,",
+          "en": "When Sara started her first class,"
+        },
+        {
+          "de": "konnte sie kaum einen Satz sagen.",
+          "en": "she could barely say a sentence."
+        },
+        {
+          "de": "Sie machte Fehler und schämte sich,",
+          "en": "She made mistakes and felt embarrassed,"
+        },
+        {
+          "de": "obwohl sie jeden Abend fleißig übte.",
+          "en": "although she practised hard every evening."
+        },
+        {
+          "de": "Ein kleiner Erfolg verändert viel,",
+          "en": "A little success changes a lot,"
+        },
+        {
+          "de": "auch wenn noch nicht alles gelingt.",
+          "en": "even if not everything works yet."
+        },
+        {
+          "de": "Ich bleibe dran und glaube an mich.",
+          "en": "I keep going and believe in myself."
+        },
+        {
+          "de": "Eines Tages hielt sie einen kurzen Vortrag.",
+          "en": "One day, she gave a short presentation."
+        },
+        {
+          "de": "Sie zitterte, doch sie sprach bis zum Schluss.",
+          "en": "She was shaking, but spoke to the end."
+        },
+        {
+          "de": "Die Gruppe hörte aufmerksam zu.",
+          "en": "The group listened attentively."
+        },
+        {
+          "de": "Danach sagte jemand: Das hast du gut gemacht.",
+          "en": "Afterwards, someone said: You did that well."
+        },
+        {
+          "de": "Ein kleiner Erfolg verändert viel,",
+          "en": "A little success changes a lot,"
+        },
+        {
+          "de": "auch wenn noch nicht alles gelingt.",
+          "en": "even if not everything works yet."
+        },
+        {
+          "de": "Ich bleibe dran und glaube an mich.",
+          "en": "I keep going and believe in myself."
+        },
+        {
+          "de": "Sara ging lächelnd nach Hause.",
+          "en": "Sara went home smiling."
+        },
+        {
+          "de": "Sie wusste, dass Übung wirklich hilft.",
+          "en": "She knew that practice really helps."
+        },
+        {
+          "de": "Mit Falowen wachsen meine Sätze und mein Mut.",
+          "en": "With Falowen, my sentences and my courage grow."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-07/Unser Mittelweg.mp3",
+      "level": "B1",
+      "day": 7,
+      "assignmentKey": "B1-3.7",
+      "draftTitle": "Heute kochen wir selbst",
+      "lines": [
+        {
+          "de": "Nach der Arbeit wollen wir etwas essen.",
+          "en": "After work, we want something to eat."
+        },
+        {
+          "de": "Ben schlägt wieder schnelle Burger vor.",
+          "en": "Ben suggests quick burgers again."
+        },
+        {
+          "de": "Ich sage, dass wir auch kochen könnten,",
+          "en": "I say that we could cook instead,"
+        },
+        {
+          "de": "denn zu Hause steht noch frisches Gemüse.",
+          "en": "because there's still fresh veg at home."
+        },
+        {
+          "de": "Schnell und einfach ist nicht immer besser,",
+          "en": "Quick and easy isn't always better,"
+        },
+        {
+          "de": "doch gesund muss nicht kompliziert sein.",
+          "en": "but healthy doesn't have to be complicated."
+        },
+        {
+          "de": "Wir finden heute unseren Mittelweg.",
+          "en": "Today, we find our middle ground."
+        },
+        {
+          "de": "Wir schneiden Tomaten, Zwiebeln und Paprika.",
+          "en": "We chop tomatoes, onions and peppers."
+        },
+        {
+          "de": "Ben würzt den Reis mit frischen Kräutern.",
+          "en": "Ben seasons the rice with fresh herbs."
+        },
+        {
+          "de": "Es dauert etwas länger als Bestellen,",
+          "en": "It takes a little longer than ordering,"
+        },
+        {
+          "de": "aber wir reden und lachen dabei.",
+          "en": "but we talk and laugh as we go."
+        },
+        {
+          "de": "Schnell und einfach ist nicht immer besser,",
+          "en": "Quick and easy isn't always better,"
+        },
+        {
+          "de": "doch gesund muss nicht kompliziert sein.",
+          "en": "but healthy doesn't have to be complicated."
+        },
+        {
+          "de": "Wir finden heute unseren Mittelweg.",
+          "en": "Today, we find our middle ground."
+        },
+        {
+          "de": "Am Ende schmeckt uns das Essen besonders gut.",
+          "en": "In the end, the food tastes especially good."
+        },
+        {
+          "de": "Morgen kochen wir vielleicht wieder gemeinsam.",
+          "en": "Tomorrow, perhaps we'll cook together again."
+        },
+        {
+          "de": "Mit Falowen begründe ich, was für mich gesund ist.",
+          "en": "With Falowen, I explain what's healthy for me."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-08/Gesund bleiben im Kleinen.mp3",
+      "level": "B1",
+      "day": 8,
+      "assignmentKey": "B1-3.8",
+      "draftTitle": "Kleine Schritte für die Gesundheit",
+      "lines": [
+        {
+          "de": "Seit einigen Wochen schlafe ich schlecht.",
+          "en": "I've been sleeping badly for a few weeks."
+        },
+        {
+          "de": "Ich bin oft müde bei der Arbeit.",
+          "en": "I'm often tired at work."
+        },
+        {
+          "de": "Beim Arzt spreche ich über meinen Alltag,",
+          "en": "At the doctor's, I talk about my daily life,"
+        },
+        {
+          "de": "weil ich etwas verändern möchte.",
+          "en": "because I want to change something."
+        },
+        {
+          "de": "Gesund bleiben beginnt im Kleinen,",
+          "en": "Staying healthy starts with little things,"
+        },
+        {
+          "de": "mit Ruhe, Bewegung und Zeit.",
+          "en": "with rest, movement and time."
+        },
+        {
+          "de": "Ich höre auf, was mein Körper braucht.",
+          "en": "I pay attention to what my body needs."
+        },
+        {
+          "de": "Die Ärztin empfiehlt regelmäßige Pausen.",
+          "en": "The doctor recommends regular breaks."
+        },
+        {
+          "de": "Ich gehe nun jeden Abend spazieren.",
+          "en": "Now I go for a walk every evening."
+        },
+        {
+          "de": "Außerdem lege ich das Handy früher weg,",
+          "en": "I also put my phone away earlier,"
+        },
+        {
+          "de": "obwohl das anfangs nicht leicht war.",
+          "en": "although it wasn't easy at first."
+        },
+        {
+          "de": "Gesund bleiben beginnt im Kleinen,",
+          "en": "Staying healthy starts with little things,"
+        },
+        {
+          "de": "mit Ruhe, Bewegung und Zeit.",
+          "en": "with rest, movement and time."
+        },
+        {
+          "de": "Ich höre auf, was mein Körper braucht.",
+          "en": "I pay attention to what my body needs."
+        },
+        {
+          "de": "Heute fühle ich mich schon viel wacher.",
+          "en": "Today, I already feel much more alert."
+        },
+        {
+          "de": "Ich möchte auf mich achten.",
+          "en": "I want to take care of myself."
+        },
+        {
+          "de": "Bei Falowen finde ich Worte für mein Wohlbefinden.",
+          "en": "At Falowen, I find words for my wellbeing."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-09/Zeit für mich(1).mp3",
+      "level": "B1",
+      "day": 9,
+      "assignmentKey": "B1-3.9",
+      "draftTitle": "Nach Feierabend",
+      "lines": [
+        {
+          "de": "Am Morgen beginnt mein Postfach zu klingeln.",
+          "en": "In the morning, my inbox starts ringing."
+        },
+        {
+          "de": "Schon vor acht kommen neue Aufgaben.",
+          "en": "New tasks arrive even before eight."
+        },
+        {
+          "de": "Ich arbeite gern mit meinem Team,",
+          "en": "I enjoy working with my team,"
+        },
+        {
+          "de": "doch abends bin ich oft zu erschöpft.",
+          "en": "but in the evening, I'm often too exhausted."
+        },
+        {
+          "de": "Es gibt Zeit für Arbeit und Zeit für mich,",
+          "en": "There's time for work and time for me,"
+        },
+        {
+          "de": "für Menschen, die mir wichtig sind.",
+          "en": "for people who matter to me."
+        },
+        {
+          "de": "Ich muss nicht alles heute schaffen.",
+          "en": "I don't have to do everything today."
+        },
+        {
+          "de": "Ich spreche offen mit meiner Chefin.",
+          "en": "I speak openly with my boss."
+        },
+        {
+          "de": "Wir planen die Aufgaben besser zusammen.",
+          "en": "We plan the tasks better together."
+        },
+        {
+          "de": "Jetzt schalte ich nach Feierabend ab,",
+          "en": "Now I switch off after work,"
+        },
+        {
+          "de": "auch wenn noch Nachrichten auf mich warten.",
+          "en": "even when messages are still waiting for me."
+        },
+        {
+          "de": "Es gibt Zeit für Arbeit und Zeit für mich,",
+          "en": "There's time for work and time for me,"
+        },
+        {
+          "de": "für Menschen, die mir wichtig sind.",
+          "en": "for people who matter to me."
+        },
+        {
+          "de": "Ich muss nicht alles heute schaffen.",
+          "en": "I don't have to do everything today."
+        },
+        {
+          "de": "Heute esse ich mit meiner Familie.",
+          "en": "Today, I'm eating with my family."
+        },
+        {
+          "de": "Zum ersten Mal seit Tagen bin ich wirklich da.",
+          "en": "For the first time in days, I'm really present."
+        },
+        {
+          "de": "Mit Falowen sage ich klar, was ich brauche.",
+          "en": "With Falowen, I clearly say what I need."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-11/Nicht einer allein.mp3",
+      "level": "B1",
+      "day": 11,
+      "assignmentKey": "B1-4.11",
+      "draftTitle": "Wir gewinnen zusammen",
+      "lines": [
+        {
+          "de": "Beim Sportfest werden zwei Teams gebildet.",
+          "en": "At the sports day, two teams are formed."
+        },
+        {
+          "de": "Einige kennen die Spiele noch nicht.",
+          "en": "Some people don't know the games yet."
+        },
+        {
+          "de": "Ben möchte alles allein entscheiden,",
+          "en": "Ben wants to decide everything on his own,"
+        },
+        {
+          "de": "doch dadurch wird unsere Gruppe unsicher.",
+          "en": "but that makes our group feel unsure."
+        },
+        {
+          "de": "Nicht einer allein, wir schaffen es zusammen,",
+          "en": "Not one person alone, we do it together,"
+        },
+        {
+          "de": "jeder bringt eine Stärke mit.",
+          "en": "everyone brings a strength."
+        },
+        {
+          "de": "Wir hören zu und geben nicht auf.",
+          "en": "We listen and don't give up."
+        },
+        {
+          "de": "Wir verteilen die Aufgaben nach unseren Fähigkeiten.",
+          "en": "We divide the tasks according to our abilities."
+        },
+        {
+          "de": "Sara läuft schnell, Mia behält den Überblick.",
+          "en": "Sara runs fast, Mia keeps track of things."
+        },
+        {
+          "de": "Als jemand einen Fehler macht,",
+          "en": "When someone makes a mistake,"
+        },
+        {
+          "de": "helfen wir weiter statt uns zu ärgern.",
+          "en": "we help rather than get annoyed."
+        },
+        {
+          "de": "Nicht einer allein, wir schaffen es zusammen,",
+          "en": "Not one person alone, we do it together,"
+        },
+        {
+          "de": "jeder bringt eine Stärke mit.",
+          "en": "everyone brings a strength."
+        },
+        {
+          "de": "Wir hören zu und geben nicht auf.",
+          "en": "We listen and don't give up."
+        },
+        {
+          "de": "Am Ende gewinnen wir nicht den ersten Preis.",
+          "en": "In the end, we don't win first prize."
+        },
+        {
+          "de": "Doch unser Team ist richtig zusammengewachsen.",
+          "en": "But our team has really grown together."
+        },
+        {
+          "de": "Mit Falowen wird aus Zuhören gutes Zusammenspiel.",
+          "en": "With Falowen, listening becomes good teamwork."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-15/Echte Gespräche.mp3",
+      "level": "B1",
+      "day": 15,
+      "assignmentKey": "B1-5.15",
+      "draftTitle": "Das Büro ist heute zu Hause",
+      "lines": [
+        {
+          "de": "Heute arbeite ich wieder von zu Hause.",
+          "en": "Today, I'm working from home again."
+        },
+        {
+          "de": "Der Computer steht am Küchentisch.",
+          "en": "The computer is on the kitchen table."
+        },
+        {
+          "de": "Um neun beginnt unsere Videokonferenz,",
+          "en": "Our video conference starts at nine,"
+        },
+        {
+          "de": "doch plötzlich fällt meine Verbindung aus.",
+          "en": "but suddenly my connection drops."
+        },
+        {
+          "de": "Auch wenn der Bildschirm uns verbindet,",
+          "en": "Even though the screen connects us,"
+        },
+        {
+          "de": "brauchen wir Zeit für echte Gespräche.",
+          "en": "we need time for real conversations."
+        },
+        {
+          "de": "Ich finde meinen Rhythmus jeden Tag.",
+          "en": "I find my rhythm every day."
+        },
+        {
+          "de": "Ich rufe meine Kollegin schnell an.",
+          "en": "I quickly call my colleague."
+        },
+        {
+          "de": "Sie erklärt mir die wichtigsten Aufgaben.",
+          "en": "She explains the most important tasks to me."
+        },
+        {
+          "de": "In der Pause gehe ich kurz nach draußen,",
+          "en": "During the break, I go outside briefly,"
+        },
+        {
+          "de": "damit ich mich wieder besser konzentrieren kann.",
+          "en": "so that I can concentrate better again."
+        },
+        {
+          "de": "Auch wenn der Bildschirm uns verbindet,",
+          "en": "Even though the screen connects us,"
+        },
+        {
+          "de": "brauchen wir Zeit für echte Gespräche.",
+          "en": "we need time for real conversations."
+        },
+        {
+          "de": "Ich finde meinen Rhythmus jeden Tag.",
+          "en": "I find my rhythm every day."
+        },
+        {
+          "de": "Am Abend schließe ich meinen Laptop.",
+          "en": "In the evening, I close my laptop."
+        },
+        {
+          "de": "Die Arbeit bleibt heute wirklich im Büro.",
+          "en": "Today, work really stays in the office."
+        },
+        {
+          "de": "Mit Falowen kann ich auch digitale Probleme erklären.",
+          "en": "With Falowen, I can explain digital problems too."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-16/Atme Ein und Atme Aus.mp3",
+      "level": "B1",
+      "day": 16,
+      "assignmentKey": "B1-5.16",
+      "draftTitle": "Vor der Prüfung",
+      "lines": [
+        {
+          "de": "Morgen schreibe ich meine Deutschprüfung.",
+          "en": "Tomorrow, I'm taking my German exam."
+        },
+        {
+          "de": "Die Wörter kenne ich eigentlich gut.",
+          "en": "I actually know the words well."
+        },
+        {
+          "de": "Trotzdem kann ich kaum schlafen,",
+          "en": "Even so, I can barely sleep,"
+        },
+        {
+          "de": "weil ich ständig an mögliche Fehler denke.",
+          "en": "because I keep thinking about possible mistakes."
+        },
+        {
+          "de": "Ich atme ein und atme aus,",
+          "en": "I breathe in and breathe out,"
+        },
+        {
+          "de": "ein Fehler macht mich nicht klein.",
+          "en": "a mistake doesn't diminish me."
+        },
+        {
+          "de": "Ich habe gelernt und gebe mein Bestes.",
+          "en": "I've studied and I'm doing my best."
+        },
+        {
+          "de": "Meine Lehrerin erinnert mich an meine Fortschritte.",
+          "en": "My teacher reminds me of my progress."
+        },
+        {
+          "de": "Ich mache eine Pause und gehe spazieren.",
+          "en": "I take a break and go for a walk."
+        },
+        {
+          "de": "Danach wiederhole ich nur die wichtigsten Themen,",
+          "en": "Afterwards, I only revise the key topics,"
+        },
+        {
+          "de": "anstatt bis tief in die Nacht zu lernen.",
+          "en": "instead of studying late into the night."
+        },
+        {
+          "de": "Ich atme ein und atme aus,",
+          "en": "I breathe in and breathe out,"
+        },
+        {
+          "de": "ein Fehler macht mich nicht klein.",
+          "en": "a mistake doesn't diminish me."
+        },
+        {
+          "de": "Ich habe gelernt und gebe mein Bestes.",
+          "en": "I've studied and I'm doing my best."
+        },
+        {
+          "de": "Am Morgen gehe ich ruhig zur Prüfung.",
+          "en": "In the morning, I go to the exam calmly."
+        },
+        {
+          "de": "Ich bin bereit für diesen Schritt.",
+          "en": "I'm ready for this step."
+        },
+        {
+          "de": "Bei Falowen wächst mein Mut vor jeder Prüfung.",
+          "en": "At Falowen, my courage grows before every exam."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-17/Jeder lernt auf seine Weise.mp3",
+      "level": "B1",
+      "day": 17,
+      "assignmentKey": "B1-5.17",
+      "draftTitle": "So lerne ich am besten",
+      "lines": [
+        {
+          "de": "Ben lernt Vokabeln mit kleinen Karten.",
+          "en": "Ben learns vocabulary with little cards."
+        },
+        {
+          "de": "Mia hört kurze Geschichten auf Deutsch.",
+          "en": "Mia listens to short stories in German."
+        },
+        {
+          "de": "Ich muss neue Sätze laut sagen,",
+          "en": "I need to say new sentences out loud,"
+        },
+        {
+          "de": "damit sie in meinem Kopf bleiben.",
+          "en": "so that they stay in my head."
+        },
+        {
+          "de": "Jeder lernt auf seine Weise,",
+          "en": "Everyone learns in their own way,"
+        },
+        {
+          "de": "mit Zeit, Geduld und guten Fragen.",
+          "en": "with time, patience and good questions."
+        },
+        {
+          "de": "Wir finden, was uns wirklich hilft.",
+          "en": "We find what really helps us."
+        },
+        {
+          "de": "Wir treffen uns einmal in der Woche.",
+          "en": "We meet once a week."
+        },
+        {
+          "de": "Zuerst erklären wir uns die schwierigen Regeln.",
+          "en": "First, we explain the difficult rules to each other."
+        },
+        {
+          "de": "Dann spielen wir eine kleine Alltagsszene.",
+          "en": "Then we act out a little everyday scene."
+        },
+        {
+          "de": "So merken wir, was wir schon können.",
+          "en": "That's how we see what we can already do."
+        },
+        {
+          "de": "Jeder lernt auf seine Weise,",
+          "en": "Everyone learns in their own way,"
+        },
+        {
+          "de": "mit Zeit, Geduld und guten Fragen.",
+          "en": "with time, patience and good questions."
+        },
+        {
+          "de": "Wir finden, was uns wirklich hilft.",
+          "en": "We find what really helps us."
+        },
+        {
+          "de": "Niemand kann alles sofort verstehen.",
+          "en": "Nobody can understand everything straight away."
+        },
+        {
+          "de": "Aber zusammen kommen wir weiter.",
+          "en": "But together, we make more progress."
+        },
+        {
+          "de": "Mit Falowen finde ich meine eigene Lernmethode.",
+          "en": "With Falowen, I find my own way of learning."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-26/Richtig fragen.mp3",
+      "level": "B1",
+      "day": 26,
+      "assignmentKey": "B1-9.26",
+      "draftTitle": "Der Zug fährt nicht",
+      "lines": [
+        {
+          "de": "Wir wollen heute nach Hamburg reisen.",
+          "en": "We want to travel to Hamburg today."
+        },
+        {
+          "de": "Am Bahnhof steht plötzlich eine große Anzeige.",
+          "en": "At the station, a big notice suddenly appears."
+        },
+        {
+          "de": "Unser Zug fällt wegen einer Störung aus,",
+          "en": "Our train is cancelled because of a disruption,"
+        },
+        {
+          "de": "und Mia wird langsam richtig nervös.",
+          "en": "and Mia is gradually getting really nervous."
+        },
+        {
+          "de": "Ein Plan kann sich ganz schnell ändern,",
+          "en": "A plan can change very quickly,"
+        },
+        {
+          "de": "doch eine Lösung gibt es oft.",
+          "en": "but there's often a solution."
+        },
+        {
+          "de": "Wir bleiben ruhig und fragen nach.",
+          "en": "We stay calm and ask for information."
+        },
+        {
+          "de": "Ein Mitarbeiter erklärt uns die Alternativen.",
+          "en": "A staff member explains the alternatives to us."
+        },
+        {
+          "de": "Wir nehmen einen anderen Zug über Hannover.",
+          "en": "We take another train via Hanover."
+        },
+        {
+          "de": "Obwohl wir eine Stunde später ankommen,",
+          "en": "Although we arrive an hour later,"
+        },
+        {
+          "de": "schaffen wir noch den Termin am Abend.",
+          "en": "we still make our evening appointment."
+        },
+        {
+          "de": "Ein Plan kann sich ganz schnell ändern,",
+          "en": "A plan can change very quickly,"
+        },
+        {
+          "de": "doch eine Lösung gibt es oft.",
+          "en": "but there's often a solution."
+        },
+        {
+          "de": "Wir bleiben ruhig und fragen nach.",
+          "en": "We stay calm and ask for information."
+        },
+        {
+          "de": "Mia lacht, als wir endlich aussteigen.",
+          "en": "Mia laughs when we finally get off."
+        },
+        {
+          "de": "Aus dem Problem wurde eine kleine Geschichte.",
+          "en": "The problem became a little story."
+        },
+        {
+          "de": "Bei Falowen lerne ich, ruhig nach Lösungen zu fragen.",
+          "en": "At Falowen, I learn to ask calmly for solutions."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-27/Vor unserer Tür.mp3",
+      "level": "B1",
+      "day": 27,
+      "assignmentKey": "B1-10.27",
+      "draftTitle": "Ein guter Schritt für unsere Straße",
+      "lines": [
+        {
+          "de": "Vor unserem Haus liegt oft viel Müll.",
+          "en": "There's often a lot of litter outside our house."
+        },
+        {
+          "de": "Manche Nachbarn ärgern sich darüber,",
+          "en": "Some neighbours get annoyed about it,"
+        },
+        {
+          "de": "doch lange hat niemand etwas gemacht,",
+          "en": "but for a long time, nobody did anything,"
+        },
+        {
+          "de": "weil alle nur auf andere gewartet haben.",
+          "en": "because everyone just waited for others."
+        },
+        {
+          "de": "Die Umwelt beginnt vor unserer Tür,",
+          "en": "The environment starts outside our door,"
+        },
+        {
+          "de": "mit kleinen Schritten jeden Tag.",
+          "en": "with little steps every day."
+        },
+        {
+          "de": "Gemeinsam können wir etwas verändern.",
+          "en": "Together, we can change something."
+        },
+        {
+          "de": "Wir laden die Nachbarn zum Aufräumen ein.",
+          "en": "We invite the neighbours to help clean up."
+        },
+        {
+          "de": "Am Samstag kommen mehr Menschen als erwartet.",
+          "en": "On Saturday, more people come than expected."
+        },
+        {
+          "de": "Wir trennen den Müll und pflanzen Blumen,",
+          "en": "We sort the rubbish and plant flowers,"
+        },
+        {
+          "de": "damit unsere Straße wieder schöner wird.",
+          "en": "so that our street looks nicer again."
+        },
+        {
+          "de": "Die Umwelt beginnt vor unserer Tür,",
+          "en": "The environment starts outside our door,"
+        },
+        {
+          "de": "mit kleinen Schritten jeden Tag.",
+          "en": "with little steps every day."
+        },
+        {
+          "de": "Gemeinsam können wir etwas verändern.",
+          "en": "Together, we can change something."
+        },
+        {
+          "de": "Am Abend sitzen wir zusammen im Hof.",
+          "en": "In the evening, we sit together in the courtyard."
+        },
+        {
+          "de": "Aus einer Idee ist etwas Gutes geworden.",
+          "en": "An idea has turned into something good."
+        },
+        {
+          "de": "Mit Falowen kann ich gemeinsam Veränderungen anstoßen.",
+          "en": "With Falowen, I can help bring about change together."
+        }
+      ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/b1/day-28/Ein kleiner Weg.mp3",
+      "level": "B1",
+      "day": 28,
+      "assignmentKey": "B1-10.28",
+      "draftTitle": "Morgen etwas grüner",
+      "lines": [
+        {
+          "de": "Mein Vater fährt für jeden Weg mit dem Auto.",
+          "en": "My father takes the car for every journey."
+        },
+        {
+          "de": "Ich habe ihm von meiner Idee erzählt:",
+          "en": "I told him about my idea:"
+        },
+        {
+          "de": "Vielleicht können wir öfter den Bus nehmen,",
+          "en": "Perhaps we could take the bus more often,"
+        },
+        {
+          "de": "wenn das Wetter und die Zeit es erlauben.",
+          "en": "when the weather and our schedules allow."
+        },
+        {
+          "de": "Wir müssen nicht alles heute ändern,",
+          "en": "We don't have to change everything today,"
+        },
+        {
+          "de": "doch morgen können wir anfangen.",
+          "en": "but tomorrow, we can start."
+        },
+        {
+          "de": "Ein kleiner Weg führt uns weiter.",
+          "en": "A little path takes us further."
+        },
+        {
+          "de": "Am Sonntag fahren wir mit dem Fahrrad zum Markt.",
+          "en": "On Sunday, we cycle to the market."
+        },
+        {
+          "de": "Wir kaufen Gemüse aus der Region.",
+          "en": "We buy locally grown vegetables."
+        },
+        {
+          "de": "Später sprechen wir über unseren Stromverbrauch,",
+          "en": "Later, we talk about our electricity use,"
+        },
+        {
+          "de": "ohne dass jemand alles perfekt machen muss.",
+          "en": "without anyone having to do everything perfectly."
+        },
+        {
+          "de": "Wir müssen nicht alles heute ändern,",
+          "en": "We don't have to change everything today,"
+        },
+        {
+          "de": "doch morgen können wir anfangen.",
+          "en": "but tomorrow, we can start."
+        },
+        {
+          "de": "Ein kleiner Weg führt uns weiter.",
+          "en": "A little path takes us further."
+        },
+        {
+          "de": "Unser Alltag sieht noch fast gleich aus.",
+          "en": "Our daily life still looks almost the same."
+        },
+        {
+          "de": "Aber wir achten jetzt bewusster auf die Zukunft.",
+          "en": "But now we think more consciously about the future."
+        },
+        {
+          "de": "Bei Falowen lerne ich, über unsere Zukunft nachzudenken.",
+          "en": "At Falowen, I learn to think about our future."
         }
       ]
     }

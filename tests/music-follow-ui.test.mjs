@@ -23,6 +23,27 @@ async function room(track,pack,{studio=null,translations=null}={}){
  for(let i=0;i<8;i++)await new Promise(r=>setImmediate(r));
  return {w,a,dom,click:id=>w.document.getElementById(id).click()};
 }
+test('all translated live course drafts expose matching English without enabling fake timed lines',async()=>{
+ const translations=JSON.parse(read('web/public/music/english-translations.json'));
+ const studio=JSON.parse(read('web/public/music/studio-drafts.json')).tracks;
+ for(const row of translations.drafts){
+  const source=studio.find(x=>x.level===row.level&&x.day===row.day&&x.assignmentKey===row.assignmentKey&&x.title===row.draftTitle);
+  const track={id:'draft-'+row.level+'-'+row.day,objectKey:row.objectKey,level:row.level,day:row.day,title:row.objectKey.split('/').at(-1).slice(0,-4),autoDiscovered:true,coursebook:true,audioUrl:'/api/music?track=draft'};
+  const {w,dom}=await room(track,null,{studio:[source],translations});
+  try {
+   const d=w.document;
+   d.querySelector('[data-tab="lyrics"]').click();
+   const toggle=d.getElementById('show-english');
+   assert.equal(toggle.disabled,false,row.objectKey);
+   assert.match(d.getElementById('english-status').textContent,/COURSE DRAFT TRANSLATION/);
+   const lines=d.querySelectorAll('.english-line');
+   assert.deepEqual(Array.from(lines,x=>x.textContent),row.lines.map(x=>x.en),row.objectKey);
+   if(!toggle.checked) toggle.click();
+   assert.ok(Array.from(lines).every(x=>!x.hidden));
+   if(!source.cues?.length) assert.ok(Array.from(d.querySelectorAll('.lyric-line')).every(x=>x.disabled),'translation must not manufacture timing');
+  } finally {dom.window.close();}
+ }
+});
 for(const [level,day] of [['A2',18],['B1',24],['A1',14],['A1',13]])test(level+' Day '+day+' public music follows exact cues, seeks, repeats and marks quiz answers',async()=>{
  const pack=recordings.find(p=>p.objectKey.startsWith('music/'+level.toLowerCase()+'/day-'+String(day).padStart(2,'0')+'/'));
  const track={id:'r2-test-'+level,level,day,title:'Test '+level,objectKey:pack.objectKey,autoDiscovered:true,coursebook:true,audioUrl:'https://www.falowen.app/api/music?track=r2-test-'+level};
