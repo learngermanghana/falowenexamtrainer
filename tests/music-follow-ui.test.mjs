@@ -12,11 +12,11 @@ import {approximateScrollTop} from '../web/public/music/follow-lyrics.js';
 import {matchingEnglishTranslation,matchingDraftEnglishTranslation} from '../web/public/music/english-translations.js';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const recordings=JSON.parse(read('web/public/music/timings.json')).recordings;
-async function room(track,pack,{studio=null,translations=null}={}){
+async function room(track,pack,{studio=null,translations=null,classTimings=null}={}){
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
  const w=dom.window;
  Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,coverForTrack,songStoryForTrack,approximateScrollTop,matchingEnglishTranslation,matchingDraftEnglishTranslation,
-  matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
+  matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('class-timings')?{recordings:classTimings||[]}:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:classTimings?[track]:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
  const a=w.document.getElementById('audio');
  a.play=()=>Promise.resolve(); a.pause=()=>{};a.load=()=>{};Object.defineProperty(a,'readyState',{value:1});
  w.eval(read('web/public/music/app.js').replace(/^import .*;\n/gm,''));
@@ -117,4 +117,39 @@ test('B1 Day 4 course draft can follow estimated lines without claiming a verifi
  assert.equal(d.querySelectorAll('.lyric-line:disabled').length,0,'estimated cues allow seeking to each sung line');
  assert.equal(d.querySelector('.lyric-line.is-active'),null,'no line is highlighted in instrumental intro');
  dom.window.close();
+});
+
+test('all 48 new acoustic packs highlight the played line and retain estimate labels',async()=>{
+ const rows=JSON.parse(read('web/public/music/estimated-timings.json')).recordings;
+ for(const pack of rows){
+  const [,level,day]=pack.objectKey.match(/^music\/(a1|a2|b1)\/day-(\d+)/);
+  const track={id:pack.trackId,level:level.toUpperCase(),day:Number(day),title:pack.objectKey.split('/').at(-1).slice(0,-4),objectKey:pack.objectKey,autoDiscovered:true,coursebook:true,audioUrl:'/api/music?track='+pack.trackId};
+  const {w,a,dom}=await room(track,pack);
+  try{
+   const d=w.document;d.querySelector('[data-tab="lyrics"]').click();
+   assert.equal(d.getElementById('follow-lyrics').disabled,false,pack.objectKey);
+   const root=d.getElementById('lyrics-text');
+   for(const i of [0,pack.cues.length-1]){
+    a.currentTime=(pack.cues[i].start+pack.cues[i].end)/2;a.dispatchEvent(new w.Event('timeupdate'));
+    assert.equal(root.querySelector('[aria-current="true"]')?.dataset.line,String(i),pack.objectKey);
+   }
+   if(pack.transcriptionStatus==='automatic')assert.match(root.textContent,/AUTOMATIC TRANSCRIPT DRAFT/);
+   else assert.match(root.textContent,/DRAFT/);
+  }finally{dom.window.close();}
+ }
+});
+test('both catalogued class songs have native line timing tied to the exact audio URL',async()=>{
+ const rows=JSON.parse(read('web/public/music/class-timings.json')).recordings;
+ const catalog=JSON.parse(read('web/public/music/catalog.json')).tracks;
+ assert.equal(rows.length,2);
+ for(const pack of rows){
+  const track=catalog.find(t=>t.id===pack.trackId);
+  const {w,a,dom}=await room(track,null,{classTimings:[pack]});
+  try{
+   const d=w.document;d.querySelector('[data-tab="lyrics"]').click();
+   assert.equal(d.getElementById('follow-lyrics').disabled,false);
+   a.currentTime=(pack.cues[2].start+pack.cues[2].end)/2;a.dispatchEvent(new w.Event('timeupdate'));
+   assert.equal(d.querySelector('[aria-current="true"]')?.dataset.line,'2');
+  }finally{dom.window.close();}
+ }
 });

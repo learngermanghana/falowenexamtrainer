@@ -4,6 +4,8 @@ const { signObject } = require('./courseMusic.cjs');
 const catalog = require('../web/public/music/catalog.json');
 const builtInTimings = require('../web/public/music/timings.json');
 const approvedRecordingLyrics = require('../web/public/music/approved-recording-lyrics.json');
+const estimatedTimings = require('../web/public/music/estimated-timings.json');
+const studioDrafts = require('../web/public/music/studio-drafts.json');
 function validateLyrics(data, objectKey) {
   if (!data || data.objectKey !== objectKey) return null;
   if (data.cues !== undefined && !Array.isArray(data.cues)) return null;
@@ -34,6 +36,47 @@ function sameSungLines(a,b) {
     .map(s=>s.trim()).filter(s=>s&&!(s.startsWith('[')&&s.endsWith(']')));
   return JSON.stringify(lines(a))===JSON.stringify(lines(b));
 }
+function validateEstimate(pack, objectKey, approved, studio=studioDrafts) {
+  if (pack?.timingStatus !== 'estimated' || !/^[a-f0-9]{64}$/.test(pack.recordingSha256 || '') ||
+      !Number.isFinite(pack.duration) || pack.duration <= 0 || pack.duration > 7200) return null;
+  const checked=validateLyrics(pack,objectKey);
+  if (!checked?.cues.length || checked.cues.some((cue,i)=>!Number.isFinite(cue.end) ||
+      cue.end>pack.duration || (i>0 && cue.start<checked.cues[i-1].end))) return null;
+  if (pack.transcriptionStatus === 'automatic') {
+    const words=pack.wordTimestamps;
+    if (!pack.referenceOnly || !Array.isArray(words) || !words.length || words.length>4000) return null;
+    if (words.some((word,i)=>typeof word.text!=='string' || !word.text.trim() ||
+      !Number.isFinite(word.start) || !Number.isFinite(word.end) || word.start<0 ||
+      word.end<=word.start || word.end>pack.duration || (i>0 && word.start<words[i-1].start))) return null;
+    let cursor=0;
+    for (const cue of checked.cues) {
+      const first=cursor;
+      let text='';
+      while (cursor<words.length && text.length<cue.text.length) {
+        text+=(text?' ':'')+words[cursor++].text;
+      }
+      if (text!==cue.text || cursor===first ||
+        Math.abs(cue.start-words[first].start)>.015 ||
+        Math.abs(cue.end-words[cursor-1].end)>.015) return null;
+    }
+    if (cursor!==words.length) return null;
+    return {...checked,referenceOnly:true,transcriptionStatus:'automatic',
+      timingStatus:'estimated',recordingSha256:pack.recordingSha256};
+  }
+  if (!Number.isFinite(pack.matchCoverage) || pack.matchCoverage < .70 ||
+      !Number.isFinite(pack.weakestLineCoverage) || pack.weakestLineCoverage < .45) return null;
+  let draft=null;
+  if (approved) {
+    if (!sameSungLines(checked.lyrics,approved.lyrics)) return null;
+  } else {
+    draft=studio.tracks?.find(row=>row.assignmentKey===pack.assignmentKey && row.title===pack.draftTitle);
+    if (!pack.referenceOnly || !draft || !objectKey.startsWith(
+      `music/${draft.level.toLowerCase()}/day-${String(draft.day).padStart(2,'0')}/`) ||
+      !sameSungLines(checked.lyrics,draft.lyrics)) return null;
+  }
+  return {...checked,timingStatus:'estimated',recordingSha256:pack.recordingSha256,
+    ...(draft ? {referenceOnly:true,assignmentKey:pack.assignmentKey,draftTitle:pack.draftTitle} : {})};
+}
 async function readBounded(response) {
   if (Number(response.headers.get('content-length')) > 100000) throw Error('Lyrics file too large');
   const reader=response.body.getReader(); const chunks=[]; let size=0;
@@ -41,7 +84,7 @@ async function readBounded(response) {
   finally { await reader.cancel().catch(()=>{}); }
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
-function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTimings,approvedLyrics=approvedRecordingLyrics}={}) {
+function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTimings,approvedLyrics=approvedRecordingLyrics,estimates=estimatedTimings}={}) {
   return async (req,res) => {
     res.setHeader('Access-Control-Allow-Origin','*');
     res.setHeader('X-Content-Type-Options','nosniff');
@@ -58,10 +101,12 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
     // approved text remain read-only fallbacks if no matching sidecar exists.
     const approved = approvedLyrics.recordings?.find(pack => pack.objectKey === objectKey);
     const ownerFallback = approved ? validateLyrics(approved, objectKey) : null;
-    const fallback = checkedRecording || ownerFallback;
+    const estimate=validateEstimate(estimates.recordings?.find(pack=>pack.objectKey===objectKey),objectKey,approved);
+    const fallback = checkedRecording?.cues.length ? checkedRecording
+      : ownerFallback?.cues.length ? ownerFallback : estimate || checkedRecording || ownerFallback;
     const sendFallback = () => res.status(200).json({...fallback,
-      source:checkedRecording ? 'bundled' : 'owner-supplied',
-      timingStatus:checkedRecording ? 'published' : approved?.timingStatus || 'missing'});
+      source:fallback===estimate ? 'acoustic-estimate' : checkedRecording ? 'bundled' : 'owner-supplied',
+      timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? 'published' : approved?.timingStatus || 'missing'});
     try {
       const timingKey=objectKey.replace(/\.mp3$/i,'.lyrics.json');
       const signed=signObject({key:timingKey},env);
@@ -77,10 +122,10 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
         return fallback ? sendFallback() : res.status(422).json({error:'Stale lyrics for published recording'});
       // An exact-wording but untimed sidecar must not disable waveform-guided
       // fallback cues for this fingerprinted recording. Reviewed R2 cues still win.
-      if(fallback?.cues?.length && !checked.cues?.length)
+      if(fallback?.cues?.length && !checked.cues?.length && sameSungLines(checked.lyrics,fallback.lyrics))
         return sendFallback();
       return res.status(200).json(checked);
     } catch { if(fallback) return sendFallback(); res.setHeader('Cache-Control','no-store'); return res.status(503).json({error:'Lyrics temporarily unavailable'}); }
   };
 }
-module.exports={validateLyrics,sameSungLines,createLyricsHandler};
+module.exports={validateLyrics,sameSungLines,validateEstimate,createLyricsHandler};
