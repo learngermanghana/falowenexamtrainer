@@ -213,6 +213,13 @@ def run(args):
                          args.level,args.day,args.track,args.all,args.limit)
     existing={r.get("objectKey") for r in built_in["recordings"] if r.get("cues")}
     existing.update(r.get("objectKey") for r in approved["recordings"] if r.get("cues"))
+    existing.update(r.get("recordingObjectKey") for r in studio["tracks"] if r.get("cues"))
+    # A bounded, one-time batch may split the same public library into shards.
+    # Exclude already timed audio first so each shard has comparable work.
+    if not args.force:
+        tracks=[track for track in tracks if track["objectKey"] not in existing]
+    tracks=[track for index,track in enumerate(tracks)
+            if index % args.shard_count == args.shard_index]
     whisper=None
     counts={"candidate":0,"skipped":0,"review":0}
     for track in tracks:
@@ -222,13 +229,16 @@ def run(args):
             counts["skipped"]+=1
             continue
         source, kind=known_lyrics(track,approved,studio,args.include_drafts)
-        if not source:
+        if not source and not args.include_drafts:
             print("No reviewed lyrics:",key,"(add --include-drafts to inspect studio text)")
             counts["skipped"]+=1
             continue
+        source=source or {}
         report={"trackId":track["id"],"objectKey":key,"level":track["level"],
                 "day":track["day"],"source":kind,"status":"review-only",
-                "lyrics":source["lyrics"]}
+                "lyrics":source.get("lyrics", ""),
+                "assignmentKey":source.get("assignmentKey", ""),
+                "draftTitle":source.get("title", "")}
         with tempfile.TemporaryDirectory(prefix="falowen-alignment-") as tmp:
             mp3=Path(tmp)/"song.mp3"
             try:
@@ -246,6 +256,29 @@ def run(args):
                                                vad_filter=False,beam_size=5,condition_on_previous_text=False)
                 words=[(w.word,w.start,w.end) for segment in segments for w in segment.words or []]
                 duration=info.duration
+                # Retain the acoustic evidence even when the written draft
+                # differs from the recording and automatic matching refuses it.
+                report["words"]=words
+                report["duration"]=round(duration,3)
+                if not report["lyrics"]:
+                    # Ambiguous same-day drafts are resolved only by a strong
+                    # acoustic match, never by their position in a songbook.
+                    matches=[]
+                    for draft in studio["tracks"]:
+                        if draft.get("level")==track["level"] and draft.get("day")==track["day"]:
+                            try:
+                                match=match_transcript(draft["lyrics"],words,duration)
+                                matches.append((match["matchCoverage"],draft))
+                            except ValueError:
+                                pass
+                    matches.sort(key=lambda row:row[0],reverse=True)
+                    if not matches or (len(matches)>1 and matches[0][0]-matches[1][0]<.1):
+                        raise ValueError("No unique acoustically matching source draft")
+                    source=matches[0][1]
+                    kind="draft-review-only"
+                    report.update({"source":kind,"lyrics":source["lyrics"],
+                                   "assignmentKey":source["assignmentKey"],
+                                   "draftTitle":source["title"]})
                 result=match_transcript(source["lyrics"],words,duration)
                 report.update(result)
                 report["duration"]=round(duration,3)
@@ -278,11 +311,15 @@ def main():
     parser.add_argument("--force",action="store_true",help="Reprocess existing timed recording")
     parser.add_argument("--model",default="small",help="Locally installed or downloaded Whisper model")
     parser.add_argument("--output",default="/tmp/falowen-music-timing-review")
+    parser.add_argument("--shard-count",type=int,default=1)
+    parser.add_argument("--shard-index",type=int,default=0)
     parser.add_argument("--apply-report",help="Path to a saved, listened-to candidate JSON report")
     parser.add_argument("--reviewed",action="store_true",help="Teacher confirms listening review of saved report")
     args=parser.parse_args()
     if args.limit<1 or args.limit>200: parser.error("--limit must be between 1 and 200")
     if args.day and not 1<=args.day<=28: parser.error("Day must be 1–28")
+    if not 1<=args.shard_count<=12 or not 0<=args.shard_index<args.shard_count:
+        parser.error("Use 1–12 shards and a zero-based index smaller than the shard count")
     if args.apply_report:
         if not args.reviewed:
             parser.error("--apply-report needs --reviewed (listen before publishing)")
