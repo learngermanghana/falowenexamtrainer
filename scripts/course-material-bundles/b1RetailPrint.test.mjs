@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B1_PRESERVED_READING_PRINT_DATA, B1_DAY22_SECOND_READING_PRINT_DATA } from "./b1PreservedReadingPrintData.mjs";
-import { B1_PRINT_CSS, findB1PrintFaults } from "./b1PdfPrintExtras.mjs";
+import { B1_PRINT_CSS, findB1PrintFaults, isB1WorkbookGuideLabel } from "./b1PdfPrintExtras.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/src/components");
 const sourceFor = day => fs.readFileSync(path.join(root, ({
@@ -42,6 +42,12 @@ test("B1 Day 22 original second reading includes three expert texts and seven st
     assert.ok(source.includes(expert.text));
   }
   for (const claim of part.statements) assert.ok(source.includes(claim));
+});
+
+test("B1 print-only accordion guide identifier matches the real Day 1 label", () => {
+  assert.equal(isB1WorkbookGuideLabel("Day 1 · B1 workbook · how to complete this workbook"), true);
+  assert.equal(isB1WorkbookGuideLabel("Day 21 · B1 workbook · how to complete this workbook"), true);
+  assert.equal(isB1WorkbookGuideLabel("Day 1 · B1 workbook · Lesen Teil 3"), false);
 });
 
 test("B1 retail PDF flags forbidden QR-only and live website messages",()=>{

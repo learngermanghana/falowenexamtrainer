@@ -23,6 +23,10 @@ export const B1_PRINT_CSS = `
   a { color: inherit !important; text-decoration: none !important; }
 `;
 
+export const isB1WorkbookGuideLabel = value =>
+  /^Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook$/i
+    .test(String(value || "").replace(/\s+/g, " ").trim());
+
 export const prepareB1PrintView = () => {
   if (window.__b1PrintChanges) throw new Error("B1 print view already active");
   const undo = [];
@@ -63,7 +67,7 @@ export const prepareB1PrintView = () => {
   // The closed summary survived the generic paragraph scrub in earlier proofs.
   for (const details of [...root.querySelectorAll("details")]) {
     const label = normalize(details.querySelector(":scope > summary")?.textContent);
-    if (/^Day\\s*\\d+\\s*[·•-]\\s*B1 workbook\\s*[·•-]\\s*how to complete this workbook$/i.test(label))
+    if (isB1WorkbookGuideLabel(label))
       swap(details);
   }
 
