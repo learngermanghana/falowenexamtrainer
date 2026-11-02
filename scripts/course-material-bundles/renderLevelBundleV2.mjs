@@ -12,6 +12,7 @@ import { buildB1ReadOnlyPrintHtml, getB1ReadOnlyParts, getB1PdfLessonCompanionUr
 import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
 import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2PrintSafety, assertA2PrintedContent } from "./a2PdfSafety.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
+import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults } from "./b1PdfPrintExtras.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -256,7 +257,7 @@ const injectPrintMode = async (page) => {
     [data-a2-pdf-hide] { display: none !important; }
     [data-course-inline-practice="speaking"], .speaking-compact-timer, [aria-label="Teil 1 speaking timer"], [data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture], [data-a2-day18-teacher-lecture] { display: none !important; }
     a { color: inherit !important; text-decoration: none !important; }
-    ${level === "A2" ? A2_PRINT_CSS : ""}
+    ${level === "A2" ? A2_PRINT_CSS : level === "B1" ? B1_PRINT_CSS : ""}
   ` });
 };
 
@@ -307,7 +308,10 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   // the newer data-pdf-exclude React markers.
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
-    if (level === "B1") await suppressPdfChromeText(page);
+    if (level === "B1") {
+      await page.evaluate(prepareB1PrintView);
+      await suppressPdfChromeText(page);
+    }
     if (level === "A2") {
       const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
       const qrDataUrl = suffix === "workbook-teil-4"
@@ -318,7 +322,14 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       assertA2PrintSafety(printableText);
       await suppressPdfChromeText(page);
     }
-    await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, scale: level === "A2" ? 0.95 : 1, timeout: 30000 });
+    const b1ExpectedText = level === "B1" ? await page.locator("body").innerText() : "";
+    if (level === "B1") {
+      const preflight = findB1PrintFaults(b1ExpectedText);
+      if (preflight.length) throw new Error("B1 Day " + lesson.day + " " + suffix +
+        " contains website/private content before printing: " + preflight.join(", "));
+    }
+    await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true,
+      scale: level === "A2" || level === "B1" ? 0.95 : 1, timeout: 30000 });
     if (level === "A2") {
       // Fail on the first affected lesson instead of rebuilding all 28 days
       // before discovering the same leaked website controls in the final PDF.
@@ -330,7 +341,17 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       if (leaks.length) throw new Error(`A2 Day ${lesson.day} ${suffix} print contains excluded UI: ${leaks.join(", ")}.`);
       await trimPrintedPdfTail(file, { description: `A2 Day ${lesson.day} ${suffix}` });
     }
+    if (level === "B1") {
+      const printed = execFileSync("pdftotext", ["-layout", file, "-"],
+        { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+      const faults = findB1PrintFaults(printed);
+      if (faults.length) throw new Error("B1 Day " + lesson.day + " " + suffix +
+        " printed website/private content: " + faults.join(", "));
+      assertA2PrintedContent(b1ExpectedText, printed);
+      await trimPrintedPdfTail(file, { description: `B1 Day ${lesson.day} ${suffix}` });
+    }
   } finally {
+    if (level === "B1") await page.evaluate(restoreB1PrintView).catch(() => {});
     if (level === "A2") await page.evaluate(restoreA2SafePrintView).catch(() => {});
     if (level === "A2") await page.evaluate(restoreA2PrintDocument).catch(() => {});
     if (level === "A2" || level === "B1") await restorePdfChromeText(page).catch(() => {});
@@ -467,6 +488,10 @@ const renderReadOnlyB1Section = async (page, lesson, part, filename = part) => {
     if (printedText.replace(/\s+/g, " ").trim().length < 140) {
       throw new Error("B1 Day " + lesson.day + " " + part + ": printed companion is empty");
     }
+    const faults = findB1PrintFaults(printedText);
+    if (faults.length) throw new Error("B1 Day " + lesson.day + " " + part +
+      " companion contains excluded content: " + faults.join(", "));
+    assertA2PrintedContent(expectedText, printedText);
     await trimPrintedPdfTail(file, { description: "B1 Day " + lesson.day + " " + part + " companion" });
   } finally {
     await printPage.close();
