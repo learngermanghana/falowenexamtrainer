@@ -35,6 +35,20 @@ test("checkout validates quantities and delivery, charges server total and verif
   const verified=await processBookWebhook({admin,data:{domain:"live",status:"success",reference:saved.reference,currency:"GHS",amount:240000,customer:{email:saved.email},metadata:initialization.metadata}});
   assert.equal(verified.body.status,"synced");assert.equal(receipt.amountGhs,2400);
   const a2=await invoke({bookId:"a2-course-workbook-digital"});assert.equal(a2.code,200);assert.equal(initialization.amount,9900);assert.equal(saved.format,"digital");
+  // Printed A2 follows the existing A1 paystack path, no digital download SKU.
+  const a2Printed=await invoke({bookId:"a2-course-workbook-printed",quantity:2,deliveryMethod:"delivery",deliveryAddress:"Accra, Example Street",priceGhs:1});
+  assert.equal(a2Printed.code,200);
+  assert.equal(initialization.amount,210000); // 2 x GH₵1050 in pesewas
+  assert.equal(initialization.metadata.bookId,"a2-course-workbook-printed");
+  assert.equal(saved.priceGhs,2100);
+  assert.equal(saved.unitPriceGhs,1050);
+  assert.equal(saved.quantity,2);
+  assert.equal(saved.format,"printed");
+  assert.equal(saved.deliveryMethod,"delivery");
+  assert.equal(saved.deliveryAddress,"Accra, Example Street");
+  const a2PrintedReceipt=await processBookWebhook({admin,data:{domain:"live",status:"success",reference:saved.reference,currency:"GHS",amount:210000,customer:{email:saved.email},metadata:initialization.metadata}});
+  assert.equal(a2PrintedReceipt.body.status,"synced");
+  assert.equal(receipt.amountGhs,2100);
   const legacy=await invoke({bookId:"a1-digital"});assert.equal(legacy.code,200);assert.equal(initialization.amount,9900);assert.equal(saved.quantity,1);
  } finally {
   global.fetch=oldFetch;
