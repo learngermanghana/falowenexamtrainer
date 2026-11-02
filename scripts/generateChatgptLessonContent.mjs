@@ -19,7 +19,7 @@ import { B2_WRITING_TASKS } from "../web/src/data/b2WritingTasks.js";
 import { B2_REVIEW_KEY_POINTS } from "../web/src/data/b2ReviewKeyPoints.js";
 import { getB2SkillFocus, getB2DayTabs } from "../web/src/data/b2SkillCycle.js";
 import { B1_READING_TASKS } from "../web/src/data/b1ReadingTasks.js";
-import { A1_ASSIGNMENT_REGISTRY } from "../web/src/data/a1AssignmentRegistry.js";
+import { A1_ASSIGNMENT_ORDER, A1_ASSIGNMENT_REGISTRY } from "../web/src/data/a1AssignmentRegistry.js";
 import { A1_GRAMMAR_ROUTE_ENTRIES } from "../web/src/data/a1GrammarRoutes.js";
 import { A2_GRAMMAR_ROUTE_ENTRIES } from "../web/src/data/a2GrammarRoutes.js";
 import { A2_READING_TASKS } from "../web/src/data/a2ReadingTasks.js";
@@ -46,8 +46,9 @@ const publicQuestions = (items) => (Array.isArray(items) ? items : []).slice(0, 
 
 
 // A1 is a chapter-based course; one day may contain multiple assignments.
-// Export each actual workbook chapter and its exact section labels. Never
-// reassign a chapter to another day or invent a textbook exercise.
+// Export only current tutor-marked workbooks in canonical assignment order.
+// Archived records remain available in Campus for history, but must never be
+// presented as additional assignments in the learner's active ChatGPT lesson.
 const A1 = {};
 const a1Entries = curriculumManifest.getCurriculumEntriesForLevel("A1");
 for (const day of [...new Set(a1Entries.map((entry) =>
@@ -56,7 +57,9 @@ for (const day of [...new Set(a1Entries.map((entry) =>
   const source = a1Entries.filter((entry) =>
     Number(entry.day ?? entry.assignmentDay ?? entry.displayDay) === day);
   const primary = source.find((entry) => entry.submissionRequired) || source[0];
-  const assignments = Object.values(A1_ASSIGNMENT_REGISTRY).filter((entry) => Number(entry.day) === day);
+  const assignments = A1_ASSIGNMENT_ORDER
+    .map((assignmentKey) => A1_ASSIGNMENT_REGISTRY[assignmentKey])
+    .filter((entry) => entry && Number(entry.day) === day);
   const grammarRoutes = A1_GRAMMAR_ROUTE_ENTRIES.filter((entry) => Number(entry.day) === day);
   A1[String(day)] = {
     level: "A1", day,
@@ -120,20 +123,23 @@ if (!A1["1"]) throw new Error("Canonical A1 Day 1 lesson missing");
 A1["1"].reading = extractA1Day1(a1Day1Workbook);
 // Source-literal exercises from the original tutor workbooks, without answers.
 if (!A1["2"] || !A1["3"]) throw new Error("A1 canonical Day 2/3 missing");
-const a1Day2 = loadWorkbookSource(path.join(root, "web/src/components/A1Day2Kapitel11WorkbookPage.js"));
-A1["2"].listening = {
-  title: "Kapitel 1.1 · Teil 1 Hören", chapter: "1.1",
-  task: "Watch and listen to the original video on introducing yourself and a friend.",
-  audioAvailableInCampus: true, mediaUrl: "https://youtu.be/nih5h7B48NY",
-  questions: extractLiteralQuestions(a1Day2, "questions", 4),
-};
+// Day 2 now has one graded workbook: alphabet, pronouns and first verbs.
+// There is no published Hören task or teacher/AI video for this lesson
+// pending the unified replacement. Do not export old Kapitel 0.2/1.1 tasks.
+A1["2"].goal = "Spell German words and names, use personal pronouns, and form simple first-verb sentences.";
+A1["2"].grammar.focus = "German alphabet and special letters Ä/Ö/Ü/ß; ich/du/er/sie/es/wir/ihr/sie/Sie; first verb forms.";
+A1["2"].grammarFocus = A1["2"].grammar.focus;
 A1["2"].writing = {
-  chapter: "1.1", prompt: "Write a short text introducing yourself.",
+  chapter: "0.2",
+  prompt: "Write four short German sentences: a greeting, your name, where you live, and that you learn German. Also spell your name.",
   instructions: [
-    "Include your name, where you come from, where you live, a greeting and a farewell.",
-    "Submit your final writing and listening answers through the A1-1.1 Campus workbook.",
+    "Use the new combined Day 2 assignment A1-0.2_1.1, Teil 5. The other four sections practise letters, formality, pronouns and verb conjugation.",
+    "Complete and submit all five parts in Falowen Campus. Previous A1-0.2 and A1-1.1 assignments are historical records, not current coursework.",
   ],
 };
+A1["3"].goal = "Practise present-tense verb conjugation and ask a few simple W-questions.";
+A1["3"].grammar.focus = "Present tense with three introductory W-words (wie, wo, woher). Full W-question teaching is scheduled for Day 5.";
+A1["3"].grammarFocus = A1["3"].grammar.focus;
 const a1Day3 = loadWorkbookSource(path.join(root, "web/src/components/A1Day3PronounsIntroducingYourselfWorkbookPage.js"));
 A1["3"].reading = extractA1Day3Reading(a1Day3);
 A1["3"].listening = {
