@@ -4,8 +4,10 @@ test("B1 Mock 2 reading has all five exam parts and numbered tasks 1 to 30",()=>
  const questions=[...r.teil1.questions,...r.teil2.questions,...r.teil2.text2.questions,
  ...r.teil3.situations,...r.teil4.comments,...r.teil5.questions];
  expect(questions.map(q=>q.number)).toEqual(Array.from({length:30},(_,i)=>i+1));
- expect(r.teil3.ads).toHaveLength(10);
- expect(r.teil3.ads.find(a=>a[0]==="E")[1]).toContain("Fahrrad");
+ expect(r.teil3.ads).toHaveLength(6);
+ expect(r.teil3.ads.map(([letter])=>letter)).toEqual(["A","B","C","D","E","F"]);
+ expect(r.teil3.ads.find(a=>a[0]==="E")[1]).toContain("Tischlein");
+ expect(r.teil3.noMatchValue).toBe("x");
  expect(questions.every(q=>!Object.prototype.hasOwnProperty.call(q,"answer"))).toBe(true);
 });
 test("B1 Mock 2 writing and speaking use the latest teacher prompts",()=>{
@@ -35,4 +37,27 @@ test("B1 Mock 2 Lesen Teil 1 and 2 use the November teacher source without brows
  expect([...r.teil2.questions,...r.teil2.text2.questions].every(q=>
    q.options.map(([id])=>id).join("")==="abc")).toBe(true);
  expect(JSON.stringify([r.teil1,r.teil2])).not.toMatch(/"answer"|"solution"|"correct"/i);
+});
+
+test("November teacher B1 Mock 2 Lesen Teile 3–5 have exact numbering and content",()=>{
+ const r=B1_MOCK2_READING;
+ expect(r.teil3.time).toBe("10 Minuten");
+ expect(r.teil3.context).toContain("13 bis 17");
+ expect(r.teil3.context).toContain("ein x");
+ expect(r.teil3.situations.map(q=>q.number)).toEqual([13,14,15,16,17]);
+ expect(r.teil3.situations[0].text).toContain("Markus (28)");
+ expect(r.teil3.situations[4].text).toContain("Fatima (24)");
+ expect(r.teil3.ads[0][1]).toContain("Plauderecke");
+ expect(r.teil3.ads[3][1]).toContain("Veritas");
+ expect(r.teil3.ads[4][2]).toContain("Einmal im Monat");
+ expect(r.teil4.time).toBe("15 Minuten");
+ expect(r.teil4.context).toContain("verpflichtend");
+ expect(r.teil4.comments.map(q=>q.number)).toEqual([18,19,20,21,22,23,24]);
+ expect(r.teil4.comments.map(q=>q.person.split(" (")[0])).toEqual(["Jonas","Maria","Hasan","Claudia","Tim","Elena","Markus"]);
+ expect(r.teil5.time).toBe("10 Minuten");
+ expect(r.teil5.heading).toBe("Haus- und Nutzungsordnung: Bürgerzentrum „Vielfalt“");
+ expect(r.teil5.sections).toHaveLength(5);
+ expect(r.teil5.questions.map(q=>q.number)).toEqual([25,26,27,28,29,30]);
+ expect(r.teil5.questions.every(q=>q.options.map(([id])=>id).join("")==="abc")).toBe(true);
+ expect(JSON.stringify([r.teil3,r.teil4,r.teil5])).not.toMatch(/"answer"|"solution"|"correct"/i);
 });
