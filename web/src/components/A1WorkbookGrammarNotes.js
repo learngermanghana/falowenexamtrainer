@@ -25,7 +25,7 @@ const A1Day20GoetheWritingGrammarPage = lazy(() =>
 
 const A1_GRAMMAR_NOTES_BY_ASSIGNMENT = {
   "A1-0.1": A1Day1GreetingsGrammarPage,
-  "A1-0.2-1.1": A1Day2UnifiedGrammarPage,
+  "A1-0.2_1.1": A1Day2UnifiedGrammarPage,
   "A1-0.2": GermanAlphabetGrammarNotesPage,
   "A1-1.1": SingularPronounsConjugationPage,
   "A1-1.2": A1Day3Kapitel12GrammarNotesPage,
