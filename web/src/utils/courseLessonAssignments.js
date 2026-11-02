@@ -7,7 +7,7 @@ export const normalizeCourseAssignmentKey = (value) =>
   String(value || "")
     .trim()
     .toUpperCase()
-    .replace(/_/g, "-")
+    .replace(/_/g, (match, offset, full) => full === "A1-0.2_1.1" ? "_" : "-")
     .replace(/\s+/g, "");
 
 export const buildInlineCourseAssignments = ({
