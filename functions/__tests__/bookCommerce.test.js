@@ -84,9 +84,10 @@ test("new A2 course book is the only A2 shop product and old guides cannot be so
   assert.ok(a2);
   assert.equal(a2.pages, 328);
   assert.equal(a2.status, "available");
-  assert.deepEqual(a2.bookIds, ["a2-course-workbook-digital"]);
-  assert.deepEqual(a2.formats, ["digital"]);
+  assert.deepEqual(a2.bookIds, ["a2-course-workbook-digital", "a2-course-workbook-printed"]);
+  assert.deepEqual(a2.formats, ["digital", "printed"]);
   assert.equal(BOOKS["a2-course-workbook-digital"].priceGhs, 99);
+  assert.equal(BOOKS["a2-course-workbook-printed"].priceGhs, 1050);
   const hiddenIds = [
     "a1-writing-model-exams",
     "a2-four-skills-exam-guide",
@@ -101,7 +102,7 @@ test("new A2 course book is the only A2 shop product and old guides cannot be so
   assert.equal(BOOKS["a1-digital"].priceGhs, 99);
   assert.equal(BOOKS["a1-printed"].priceGhs, 800);
   assert.equal(BOOKS["writing-skills-a1-c2-digital"].priceGhs, 39);
-  assert.equal(Object.keys(BOOKS).length, 10);
+  assert.equal(Object.keys(BOOKS).length, 11);
 });
 
 test("public books catalog does not expose the historical unlisted exam-guide SKUs", () => {
@@ -120,6 +121,6 @@ test("public books catalog does not expose the historical unlisted exam-guide SK
     "a1-course-workbook", "writing-skills-a1-c2", "a2-course-workbook"
   ]);
   assert.deepEqual(payload.books.map(book => book.id).sort(), [
-    "a1-digital", "a1-printed", "writing-skills-a1-c2-digital", "a2-course-workbook-digital"
+    "a1-digital", "a1-printed", "writing-skills-a1-c2-digital", "a2-course-workbook-digital", "a2-course-workbook-printed"
   ].sort());
 });
