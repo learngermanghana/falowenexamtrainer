@@ -43,6 +43,16 @@ test("B1 locked graded tabs use canonical source without starting assessment att
   assert.match(source, /canonical-read-only/);
 });
 
+test("B1 locked reading and listening companions both receive authenticated lesson QR codes", () => {
+  const start = source.indexOf("const renderReadOnlyB1Section = async");
+  const end = source.indexOf("const getWorkbookTabAvailability =", start);
+  assert.ok(start >= 0 && end > start, "B1 print renderer must be present");
+  const renderer = source.slice(start, end);
+  assert.match(renderer, /\\["teil-3", "teil-4"\\]\\.includes\\(part\\)/);
+  assert.match(renderer, /QRCode\\.toDataURL\\(lessonUrl/);
+  assert.match(renderer, /buildB1ReadOnlyPrintHtml\\(\\{ day: lesson\\.day, part, lessonUrl, audioQrDataUrl \\}\\)/);
+});
+
 test("A1 render plan contains only grammar and workbook targets", () => {
   const plan = JSON.parse(
     fs.readFileSync(path.join(__dirname, "a1RenderPlan.json"), "utf8"),
