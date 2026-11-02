@@ -1,0 +1,55 @@
+# Temporary branch-only full PDF test; delete before merging PR #3330.
+name: Temporary B1 PDF verification (no deployment)
+on:
+  push:
+    branches:
+      - fix/b1-print-teil3-online-qr-2026-11-02
+
+permissions:
+  contents: read
+
+jobs:
+  b1-pdf:
+    name: Build and validate full B1 PDF
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build B1 manifest
+        run: node scripts/course-material-bundles/buildLevelManifest.mjs B1
+      - name: Install PDF dependencies
+        run: npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1 qrcode@1.5.4
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Install PDF validator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+      - name: Render B1 PDF
+        run: node scripts/course-material-bundles/renderLevelBundleV2.mjs B1
+        env:
+          FALOWEN_PDF_BASE_URL: https://www.falowen.app
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+          FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+      - name: Validate generated B1 PDF
+        run: node scripts/course-material-bundles/validateGeneratedBundle.mjs B1
+      - name: Upload B1 PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-B1-course-materials-pdf-verified
+          path: artifacts/course-material-bundles/B1/Falowen-B1-Course-Materials.pdf
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-B1-verification-diagnostics
+          path: |
+            artifacts/course-material-bundles/B1/Falowen-B1-Course-Materials-manifest.json
+            artifacts/course-material-bundles/B1/render-diagnostics.json
+          retention-days: 7
