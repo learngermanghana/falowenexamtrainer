@@ -77,7 +77,7 @@ test("B1 Day 23 QR generation is scoped to B1 renderer, not the A2 path", () => 
 
 test("B1 retail print is isolated, audited, and trimmed like A1/A2", () => {
   for (const phrase of ["B1_PRINT_CSS", "prepareB1PrintView", "restoreB1PrintView",
-    "findB1PrintFaults", "assertA2PrintedContent(b1ExpectedText, printed)",
+    "findB1PrintFaults", "assertB1PrintedContent(b1ExpectedText, printed)",
     "trimPrintedPdfTail(file, { description:"]) {
     assert.ok(source.includes(phrase), "missing B1 print protection: " + phrase);
   }

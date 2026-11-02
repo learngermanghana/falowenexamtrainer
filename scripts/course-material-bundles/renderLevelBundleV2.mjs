@@ -12,7 +12,7 @@ import { buildB1ReadOnlyPrintHtml, getB1ReadOnlyParts, getB1PdfLessonCompanionUr
 import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
 import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2PrintSafety, assertA2PrintedContent } from "./a2PdfSafety.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
-import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults } from "./b1PdfPrintExtras.mjs";
+import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent } from "./b1PdfPrintExtras.mjs";
 import { addB1RetailCover } from "./b1RetailCover.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -355,7 +355,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       const faults = findB1PrintFaults(printed);
       if (faults.length) throw new Error("B1 Day " + lesson.day + " " + suffix +
         " printed website/private content: " + faults.join(", "));
-      assertA2PrintedContent(b1ExpectedText, printed);
+      assertB1PrintedContent(b1ExpectedText, printed);
       await trimPrintedPdfTail(file, { description: `B1 Day ${lesson.day} ${suffix}` });
     }
   } finally {

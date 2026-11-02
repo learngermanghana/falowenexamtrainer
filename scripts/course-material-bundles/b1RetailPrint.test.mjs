@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B1_PRESERVED_READING_PRINT_DATA, B1_DAY22_SECOND_READING_PRINT_DATA } from "./b1PreservedReadingPrintData.mjs";
-import { B1_PRINT_CSS, findB1PrintFaults, isB1WorkbookGuideLabel, prepareB1PrintView } from "./b1PdfPrintExtras.mjs";
+import { B1_PRINT_CSS, findB1PrintFaults, isB1WorkbookGuideLabel, prepareB1PrintView, assertB1PrintedContent } from "./b1PdfPrintExtras.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/src/components");
 const sourceFor = day => fs.readFileSync(path.join(root, ({
@@ -49,6 +49,13 @@ test("B1 print-only accordion guide identifier matches the real Day 1 label", ()
   assert.equal(isB1WorkbookGuideLabel("Day 21 · B1 workbook · how to complete this workbook"), true);
   assert.equal(isB1WorkbookGuideLabel("Day 1 · B1 workbook · Lesen Teil 3"), false);
   assert.ok(prepareB1PrintView.toString().includes("const isB1WorkbookGuideLabel = value =>"));
+});
+
+test("B1 printed-text coverage audit excludes web shell but detects missing actual content", () => {
+  const lesson = "Die Schülerinnen lernen heute gemeinsam einen interessanten Wortschatz über Beruf, Arbeitsvertrag, Kommunikation, Ausbildung, Bewerbung, Vorstellungsgespräch, Personalabteilung, Kollegen, Zeitplanung, Projektarbeit, Weiterbildung und Erfahrungen.";
+  const printed = lesson + " Deutschunterricht mit Beispielen und praktischen Aufgaben für alle Teilnehmer.";
+  assert.doesNotThrow(() => assertB1PrintedContent(lesson + " Website navigation Help Login Back", printed));
+  assert.throws(() => assertB1PrintedContent(lesson, "Ein kleiner Abschnitt ohne Inhalt"));
 });
 
 test("B1 retail PDF flags forbidden QR-only and live website messages",()=>{

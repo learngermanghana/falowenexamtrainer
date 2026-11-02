@@ -137,6 +137,25 @@ export const restoreB1PrintView = () => {
   delete window.__b1PrintChanges;
 };
 
+// B1 live pages include a nested website lesson shell that Chromium's print
+// layout intentionally suppresses. Compare meaningful printable vocabulary
+// coverage rather than requiring every website-shell character in the PDF.
+export const assertB1PrintedContent = (expected, printed) => {
+  const words = input => new Set((String(input || "").normalize("NFKC").toLowerCase()
+    .match(/[\p{L}\p{N}]{4,}/gu) || []));
+  const before = words(expected), after = words(printed);
+  if (String(printed).replace(/\s+/g, "").length < 140 || after.size < 22) {
+    throw new Error("B1 PDF printed content is empty or insufficient");
+  }
+  if (before.size >= 35) {
+    let matched = 0;
+    for (const word of before) if (after.has(word)) matched++;
+    if (matched / before.size < 0.66) {
+      throw new Error("B1 PDF lost a substantial share of its visible lesson content");
+    }
+  }
+};
+
 export const findB1PrintFaults = text => {
   const forbidden = [
     ["QR-only missing exercise", /Diese Aufgabe ist nur online verfügbar|vollständigen Aufgaben dieses Abschnitts sind noch nicht/i],
