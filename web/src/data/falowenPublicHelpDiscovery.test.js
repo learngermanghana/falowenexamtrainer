@@ -197,7 +197,8 @@ describe("Falowen public help and AI discovery", () => {
     expect(c2ScheduleHtml).toContain("What is Falowen C2 Day 28?");
 
     expect((scheduleMarkdown.match(/\*\*Question:\*\* What is Falowen A1 Day 2\?/g) || [])).toHaveLength(1);
-    expect((a1ScheduleHtml.match(/What is Falowen A1 Day 2\?/g) || [])).toHaveLength(1);
+    // One JSON-LD FAQ and one visible FAQ refer to the same consolidated Day 2.
+    expect((a1ScheduleHtml.match(/What is Falowen A1 Day 2\?/g) || [])).toHaveLength(2);
     expect(scheduleMarkdown).toContain("German Alphabet");
     expect(scheduleMarkdown).toContain("Personal Pronouns and First Verbs");
 
