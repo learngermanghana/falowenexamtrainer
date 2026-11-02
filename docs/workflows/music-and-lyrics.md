@@ -92,3 +92,10 @@ The player highlights a single active line, leaves instrumental gaps clear,
 and labels estimates and automatic transcripts. It never returns to scrolling
 lyrics by track-duration percentage. All generated wording/timings remain
 unverified until listening review; this is timing coverage, not certification.
+
+## Admin catalog access — 2 November 2026
+
+The public music-library endpoint allows the Music and Admin browser origins,
+with `Vary: Origin` on cached responses. This lets Admin Lyrics Video Studio
+select published recordings and request their existing recording-specific lyrics
+and cues. It does not change private audio discovery or approve estimated timing.
