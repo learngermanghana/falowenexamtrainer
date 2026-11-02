@@ -12,11 +12,11 @@ import {approximateScrollTop} from '../web/public/music/follow-lyrics.js';
 import {matchingEnglishTranslation,matchingDraftEnglishTranslation} from '../web/public/music/english-translations.js';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const recordings=JSON.parse(read('web/public/music/timings.json')).recordings;
-async function room(track,pack,{studio=null,translations=null}={}){
+async function room(track,pack,{studio=null,translations=null,catalogTracks=null}={}){
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
  const w=dom.window;
  Object.assign(w,{buildPlaybackQueue,advancePlaybackQueue,installLoopHandoff,prefersNativeLoop,installEndedHandoff,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,approximateScrollTop,matchingEnglishTranslation,matchingDraftEnglishTranslation,
-  matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
+  matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:catalogTracks||[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
  const a=w.document.getElementById('audio');
  a.play=()=>Promise.resolve(); a.pause=()=>{};a.load=()=>{};Object.defineProperty(a,'readyState',{value:1});
  w.eval(read('web/public/music/app.js').replace(/^import .*;\n/gm,''));
@@ -95,5 +95,25 @@ test('B1 Day 4 course draft can follow estimated lines without claiming a verifi
  assert.equal(studio.cues.length,17,'B1 Day4 was aligned against the real MP3');
  assert.equal(d.querySelectorAll('.lyric-line:disabled').length,0,'estimated cues allow seeking to each sung line');
  assert.equal(d.querySelector('.lyric-line.is-active'),null,'no line is highlighted in instrumental intro');
+ dom.window.close();
+});
+
+test('Android background ended event starts the next MP3 synchronously in the real player',async()=>{
+ const track={id:'test-android-one',title:'Android first',level:'A2',day:1,type:'Learning story',coursebook:true,
+  audioUrl:'https://www.falowen.app/api/music?track=test-android-one'};
+ const second={...track,id:'test-android-two',title:'Android second',day:2,
+  audioUrl:'https://www.falowen.app/api/music?track=test-android-two'};
+ const {w,a,dom,click}=await room(track,null,{catalogTracks:[track,second]});
+ let plays=0;
+ a.play=()=>{plays++;return Promise.resolve();};
+ click('detail-play');
+ assert.equal(a.loop,false,'Android must not suppress the ended event');
+ assert.equal(a.dataset.trackId,track.id);
+ assert.equal(plays,1);
+ Object.defineProperty(w.document,'hidden',{value:true,configurable:true});
+ a.dispatchEvent(new w.Event('ended'));
+ assert.equal(a.dataset.trackId,second.id,'advance while page is hidden');
+ assert.equal(plays,2,'start next MP3 inside the ended event dispatch');
+ assert.equal(a.getAttribute('src'),second.audioUrl);
  dom.window.close();
 });
