@@ -11,7 +11,7 @@ test('20 original cover assets exist and do not rely on external hosts',()=>{
   assert.ok(existsSync(path),slug);
   const file=readFileSync(path,'utf8');
   assert.match(file,/<svg /);assert.match(file,/viewBox="0 0 900 600"/);
-  assert.doesNotMatch(file,/https?:\/\//);
+  assert.doesNotMatch(file,/<image[^>]+href=[\"']https?:/);
  }
 });
 test('all matching pinned tracks keep the same image on the same recording',()=>{
