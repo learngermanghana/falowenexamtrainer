@@ -48,7 +48,7 @@ const collectRouteFields = (value, routes = []) => {
 
 describe("A1 route integrity", () => {
   it("uses only internal registered routes on every displayed A1 Course Book card", () => {
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(26);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(25);
 
     A1_COURSE_BOOK_CARDS.forEach((card) => {
       [card.grammarPage, card.workbookRoute].filter(Boolean).forEach((route) => {
