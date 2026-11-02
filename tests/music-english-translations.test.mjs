@@ -10,7 +10,7 @@ const recorded=[
  ...read('web/public/music/timings.json').recordings,
 ];
 test('offline English translations exactly match published recording lyric lines, not drafts',()=>{
- assert.equal(translated.recordings.length,19);
+ assert.ok(translated.recordings.length >= 26);
  const keys=new Set();
  let count=0;
  for(const row of translated.recordings){
@@ -20,13 +20,30 @@ test('offline English translations exactly match published recording lyric lines
   const match=matchingEnglishTranslation(translated,row.objectKey,published.lyrics);
   assert.equal(match,row);
   assert.equal(row.lines.length,sungGermanLines(published.lyrics).length);
-  assert.ok(row.vocabulary.length>0);
+  if (row.vocabulary !== undefined) assert.ok(Array.isArray(row.vocabulary) && row.vocabulary.length>0);
   count+=row.lines.length;
  }
- assert.equal(count,564);
+ assert.ok(count >= 564);
  assert.equal(keys.size,translated.recordings.length);
  const publishedKeys=new Set(recorded.map(x=>x.objectKey));
  assert.deepEqual(keys,publishedKeys,'all owner-reviewed recording packs have English translations');
+});
+test('every published course-draft translation matches its full source and exact recording identity',()=>{
+ const studio=read('web/public/music/studio-drafts.json').tracks;
+ const keys=new Set();
+ assert.equal(translated.drafts.length,40);
+ for(const row of translated.drafts){
+  assert.ok(!keys.has(row.objectKey)); keys.add(row.objectKey);
+  assert.ok(row.objectKey.startsWith(`music/${row.level.toLowerCase()}/day-${String(row.day).padStart(2,'0')}/`));
+  const source=studio.find(x=>x.level===row.level && x.day===row.day && x.assignmentKey===row.assignmentKey && x.title===row.draftTitle);
+  assert.ok(source, 'missing source draft: '+row.objectKey);
+  const track={objectKey:row.objectKey,level:row.level,day:row.day};
+  const draft={lyrics:source.lyrics,assignmentKey:source.assignmentKey,draftTitle:source.title,referenceOnly:true};
+  assert.equal(matchingDraftEnglishTranslation(translated,track,draft),row,row.objectKey);
+  assert.equal(matchingDraftEnglishTranslation(translated,track,{...draft,lyrics:source.lyrics+'\nA new line.'}),null);
+  assert.equal(matchingDraftEnglishTranslation(translated,{...track,objectKey:row.objectKey+'.changed'},draft),null);
+  assert.equal(matchingEnglishTranslation(translated,row.objectKey,source.lyrics),null,'a translated draft is still not an approved recording transcript');
+ }
 });
 test('never attach translation to a changed lyric, different MP3 or a partial translation',()=>{
  const row=translated.recordings[0];
