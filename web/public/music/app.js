@@ -54,6 +54,40 @@ function lyricsFor(track) {
   return publishedLyrics.get(track.id) || lessonFor(track) || referenceLyricsFor(track);
 }
 let current = null;
+// Signed-in Campus practice is reported only to the same-origin React parent.
+// Public music.falowen.app remains fully anonymous, including its GA4 events.
+if (embedded && window.parent !== window && audio) {
+  let startedAt = 0;
+  let playingTrack = null;
+  const postPractice = (kind, track, seconds = 0) => {
+    if (!track?.id) return;
+    window.parent.postMessage({
+      type: 'falowen:music-practice:v1',
+      kind, trackId: track.id, title: track.title,
+      level: track.level, day: track.day,
+      seconds: Math.max(0, Math.min(600, Math.floor(seconds))),
+    }, window.location.origin);
+  };
+  const elapsed = () => Math.min(600, Math.max(0, Math.floor((Date.now() - startedAt) / 1000)));
+  const finishSegment = (kind = 'progress') => {
+    if (!startedAt || !playingTrack) return;
+    const seconds = elapsed();
+    postPractice(kind, playingTrack, seconds);
+    startedAt = 0;
+    playingTrack = null;
+  };
+  audio.addEventListener('play', () => {
+    if (startedAt) return; // a pause/resume segment must not start twice
+    playingTrack = current;
+    if (!playingTrack) return;
+    startedAt = Date.now();
+    postPractice('start', playingTrack, 0);
+  });
+  audio.addEventListener('pause', () => { if (!audio.ended) finishSegment(); });
+  audio.addEventListener('ended', () => finishSegment('complete'));
+  audio.addEventListener('emptied', () => finishSegment());
+}
+
 let selected = null;
 let category = "all";
 let featured = null;
