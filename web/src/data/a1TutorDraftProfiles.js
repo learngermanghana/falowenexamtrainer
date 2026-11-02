@@ -37,6 +37,16 @@ const profiles = {
       "teil-2": section(shortItems(5, "Complete the word"), { label: "Hören" }),
     },
   },
+  // New storage identity; old Day 2 drafts and grades stay under their original IDs.
+  "A1-0.2_1.1": {
+    sections: {
+      "teil-1": section(choiceItems(5), { label: "Alphabet and spelling" }),
+      "teil-2": section(shortItems(5, "Write the whole German word"), { label: "Hören and spelling" }),
+      "teil-3": section(choiceItems(5), { label: "Personal pronouns" }),
+      "teil-4": section(shortItems(5, "Write the correct verb form"), { label: "Verb conjugation" }),
+      "teil-5": section([], { label: "First sentences", writing: true, placeholder: "Write four German sentences and spell your name." }),
+    },
+  },
   "A1-1.1": {
     sections: {
       "teil-1": section(choiceItems(4), { label: "Hören" }),
