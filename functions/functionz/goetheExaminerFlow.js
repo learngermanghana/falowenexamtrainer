@@ -224,7 +224,7 @@ function partnerInstructions(session,plan) {
       "To withdraw a previous decision, return {point, quote, withdrawn:true}. " +
       "Allowed decision points: " + JSON.stringify(profile.decisionPoints) + ". " : "Use an empty decisions array. ") +
     (flow.key === "B1-3" && flow.mockPresentationFeedback
-      ? "First answer the candidate's actual question about your short Online Deutsch lernen presentation, then ask exactly ONE new relevant question about their own presentation topic: " + JSON.stringify(flow.contextTopic) + ". Do not repeat the presentation. " : "") +
+      ? "First answer the candidate's actual question about your partner's short presentation, then ask exactly ONE new relevant question about their own presentation topic: " + JSON.stringify(flow.contextTopic) + ". Do not repeat the presentation. " : "") +
     (flow.key === "B1-1" ? "German Termin intent: 'Ich habe frei', 'Da habe ich Zeit', 'Da kann ich', 'Samstag geht bei mir' and 'Das klappt' can affirm a concrete appointment proposed by the partner. Never require the word 'passen'. When the learner only expresses availability but no definite time and place has been agreed, ACKNOWLEDGE that availability and ask ONE specific question for the missing detail, without repeating the opening. 'Ich kann nicht', 'keine Zeit', 'leider', and a conflicting day or hour must never count as acceptance. A proposal by the student does not alone mean the partner has agreed. For 'wann und wo' both time and place are needed. " : "") +
     (flow.key === "A2-3" ? "Your private free times are " + JSON.stringify(flow.calendar?.partnerCalendar || profile.partnerCalendar) +
       ". You cannot meet outside those times. The student's card is separate. Do not reveal your whole calendar. " : "") +
