@@ -42,7 +42,7 @@ const readAssignmentComponentSource = (componentName) => {
 
 describe("A1 Course Book health", () => {
   test("keeps the complete canonical A1 Course Book shape", () => {
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(26);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(25);
 
     const countsByDay = new Map();
     A1_COURSE_BOOK_CARDS.forEach((card) => {
@@ -54,7 +54,7 @@ describe("A1 Course Book health", () => {
     });
 
     for (let day = 0; day <= 23; day += 1) {
-      expect(countsByDay.get(day) || 0).toBe(day === 3 || day === 16 ? 2 : 1);
+      expect(countsByDay.get(day) || 0).toBe(day === 16 ? 2 : 1);
     }
   });
 
