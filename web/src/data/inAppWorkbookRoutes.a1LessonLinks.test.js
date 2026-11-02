@@ -86,8 +86,10 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
   });
 
   it("keeps the Day 2 Chapter 1.1 resources configured for their separate stages", () => {
-    expect(getTeacherVideoUrls(2, "1.1")).toEqual(["https://youtu.be/xyRogEAA9qM"]);
-    expect(getAiVideoUrls(2, "1.1")).toContain("https://youtu.be/kqagu9qsOcc");
+    expect(getTeacherVideoUrls(2, "1.1")).toEqual([]);
+    expect(getTeacherVideoUrls(2, "0.2")).toEqual([]);
+    expect(getAiVideoUrls(2, "0.2")).toEqual([]);
+    expect(getAiVideoUrls(2, "1.1")).toEqual([]);
     expect(getA1GrammarRoute({ day: 2, chapter: "1.1" })).toBe(
       "/campus/course/singular-pronouns-verb-conjugation-day-2",
     );
