@@ -14,7 +14,7 @@ const payment = {
   customer: { email: order.email },
   metadata: { productType: "falowen_book", orderId, bookId: order.bookId, format: "printed", priceGhs: 800 },
 };
-function fakeAdmin({ existingReceipt = false } = {}) {
+function fakeAdmin({ existingReceipt = false, existingOrder = order } = {}) {
   const calls = [];
   const db = {
     collection(name) {
@@ -23,7 +23,7 @@ function fakeAdmin({ existingReceipt = false } = {}) {
     async runTransaction(handler) {
       const tx = {
         async get(ref) {
-          if (ref.name === "bookOrders") return { exists: true, data: () => order };
+          if (ref.name === "bookOrders") return { exists: true, data: () => existingOrder };
           if (ref.name === "bookPayments") return { exists: existingReceipt };
           throw new Error("Unexpected collection");
         },
@@ -51,6 +51,24 @@ test("valid signed-event payload is reconciled once, without changing tuition", 
   assert.equal(admin.calls.length, 2);
   assert.equal(admin.calls.find(x => x.type === "update").data.status, "paid");
   assert.deepEqual(admin.calls.map(x => x.ref.name).sort(), ["bookOrders", "bookPayments"]);
+});
+
+test("existing GH₵99 digital orders can still be verified after the price increases to GH₵100", async () => {
+  const oldOrder = {
+    ...order, bookId: "a1-digital", title: BOOKS["a1-digital"].title,
+    format: "digital", priceGhs: 99, checkoutPesewas: 9900,
+    reference: "historic_a1_digital_99",
+  };
+  const oldPayment = {
+    ...payment, reference: oldOrder.reference, amount: 9900,
+    metadata: { productType: "falowen_book", orderId, bookId: oldOrder.bookId, format: "digital", priceGhs: 99 },
+  };
+  const admin = fakeAdmin({ existingOrder: oldOrder });
+  const result = await processBookWebhook({ admin, data: oldPayment });
+  assert.equal(result.body.status, "synced");
+  const paidReceipt = admin.calls.find(x => x.type === "create").data;
+  assert.equal(paidReceipt.amountGhs, 99);
+  assert.equal(BOOKS["a1-digital"].priceGhs, 100);
 });
 
 test("duplicate webhook does not create another payment", async () => {
