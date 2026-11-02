@@ -55,9 +55,10 @@ function createExaminerFlow(level, task, mode="guided") {
   if (key === "B1-1" && task?.id === "b1-mock-02-speaking-teil-1") {
     flow.planningPoints=[
       {id:"time_place",text:"Wann und wo findet das Nachbarschaftsfest statt?"},
-      {id:"guests",text:"Wen laden wir ein, Mitschüler und Lehrkräfte?"},
+      {id:"invitations",text:"Wen laden wir ein und wie informieren wir die Nachbarschaft?"},
       {id:"catering",text:"Was bringen wir für das interkulturelle Buffet mit?"},
-      {id:"food_decoration",text:"Wer besorgt Essen, Getränke und Dekoration?"},
+      {id:"programme",text:"Welche Aktivitäten oder Spiele organisieren wir?"},
+      {id:"responsibilities",text:"Wer übernimmt welche Vorbereitungen?"},
     ];
   }
   if (key === "B1-2" && /^b1-mock-0[12]-speaking-teil-2$/.test(task?.id || "")) {
