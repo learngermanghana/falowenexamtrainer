@@ -728,11 +728,11 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
 
           <ReadingPart title="Teil 3" time="10 Minuten">
             <p>{reading.teil3.context}</p>
-            {isSecond?<p>{reading.teil3.example}</p>:null}
+            {reading.teil3.example ? <p>{reading.teil3.example}</p> : null}
             <div className="b1-final-ads">
               {reading.teil3.ads.map(([letter, title, copy]) => (
-                <article key={letter} className={letter === (isSecond ? "E" : "C") ? "example" : ""}>
-                  <span>Anzeige {letter}{letter === (isSecond ? "E" : "C") ? " · Beispiel" : ""}</span>
+                <article key={letter} className={!isSecond && letter === "C" ? "example" : ""}>
+                  <span>Anzeige {letter}{!isSecond && letter === "C" ? " · Beispiel" : ""}</span>
                   <h3>{title}</h3>
                   <p>{copy}</p>
                 </article>
@@ -747,8 +747,8 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
                     onChange={(event) => setLesen(`t3-${q.number}`, event.target.value)}
                   >
                     <option value="">Anzeige wählen</option>
-                    <option value="0">0 · keine passende Anzeige</option>
-                    {"ABCDEFGHIJ".split("").filter((letter) => letter !== (isSecond ? "E" : "C")).map((letter) => (
+                    <option value={reading.teil3.noMatchValue || "0"}>{reading.teil3.noMatchValue || "0"} · keine passende Anzeige</option>
+                    {reading.teil3.ads.map(([letter]) => letter).filter((letter) => isSecond || letter !== "C").map((letter) => (
                       <option value={letter.toLowerCase()} key={letter}>{letter}</option>
                     ))}
                   </select>
