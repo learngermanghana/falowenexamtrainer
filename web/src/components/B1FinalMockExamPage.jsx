@@ -31,6 +31,7 @@ const SECTION_DURATIONS = Object.freeze({
   schreiben: 75 * 60,
   sprechen: 20 * 60,
 });
+const B1_MOCK2_SECTION_DURATIONS = Object.freeze({ ...SECTION_DURATIONS, schreiben: 60 * 60 });
 
 const SECTION_LABELS = Object.freeze({
   lesen: "Lesen",
@@ -220,6 +221,7 @@ const ReadingPart = ({ children, title, time }) => (
 
 export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
   const isSecond = mockId === "b1-mock-02";
+  const sectionDurations = isSecond ? B1_MOCK2_SECTION_DURATIONS : SECTION_DURATIONS;
   const reading = isSecond ? B1_MOCK2_READING : B1_READING;
   const writingTasks = isSecond ? B1_MOCK2_WRITING_TASKS : B1_WRITING_TASKS;
   const speakingData = isSecond ? B1_MOCK2_SPEAKING : undefined;
@@ -374,22 +376,22 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
   );
 
   const secondsLeft = useMemo(() => {
-    if (!exam.sectionDeadlineMs || !SECTION_DURATIONS[exam.stage]) return 0;
+    if (!exam.sectionDeadlineMs || !sectionDurations[exam.stage]) return 0;
     return Math.max(0, Math.ceil((Number(exam.sectionDeadlineMs) - now) / 1000));
-  }, [exam.sectionDeadlineMs, exam.stage, now]);
+  }, [exam.sectionDeadlineMs, exam.stage, now, sectionDurations]);
 
   const moveToSection = useCallback((stage, patch = {}) => {
     setExam((current) => ({
       ...current,
       ...patch,
       stage,
-      sectionDeadlineMs: Date.now() + SECTION_DURATIONS[stage] * 1000,
+      sectionDeadlineMs: Date.now() + sectionDurations[stage] * 1000,
     }));
     timeoutHandledRef.current = "";
     const previousSection = { hoeren: "Lesen", schreiben: "Hören", sprechen: "Schreiben" }[stage];
     if (previousSection) announceExamSuccess(`${previousSection} completed successfully. Continue to ${{ hoeren: "Hören", schreiben: "Schreiben", sprechen: "Sprechen" }[stage]}.`);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  }, [sectionDurations]);
 
   const startExam = async ({ forceNew = false } = {}) => {
     if (busy) return;
@@ -538,7 +540,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
   }, []);
 
   useEffect(() => {
-    if (!SECTION_DURATIONS[exam.stage] || exam.stage === "sprechen" || secondsLeft > 0) return;
+    if (!sectionDurations[exam.stage] || exam.stage === "sprechen" || secondsLeft > 0) return;
     if (timeoutHandledRef.current === exam.stage) return;
     timeoutHandledRef.current = exam.stage;
     if (exam.stage === "lesen") submitLesen();
@@ -593,7 +595,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
           <div className="b1-final-duration-grid">
             <div><strong>Lesen</strong><span>65 min</span></div>
             <div><strong>Hören</strong><span>40 min</span></div>
-            <div><strong>Schreiben</strong><span>75 min</span></div>
+            <div><strong>Schreiben</strong><span>{isSecond ? "60" : "75"} min</span></div>
             <div><strong>Sprechen</strong><span>20 min</span></div>
           </div>
           <p><strong>How it works:</strong> Finish Lesen (1 of 4), then Hören (2 of 4), Schreiben (3 of 4), and Sprechen (4 of 4). Hören contains four audio Teile, and Sprechen has three speaking tasks.</p>
@@ -851,7 +853,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
         <>
           <header className="b1-final-module-header">
             <p>GOETHE-ZERTIFIKAT B1</p><h1>Schreiben</h1>
-            <span>Gesamtdauer: 75 Minuten · Keine Wörterbücher oder Mobiltelefone.</span>
+            <span>Gesamtdauer: {isSecond ? "60" : "75"} Minuten · Keine Wörterbücher oder Mobiltelefone.</span>
           </header>
           {writingTasks.map((task) => {
             const text = exam.schreiben?.[task.id] || "";
@@ -860,6 +862,13 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
                 <div className="b1-final-part-heading"><h2>{task.title}</h2><span>{task.meta}</span></div>
                 <p>{task.prompt}</p>
                 <ul>{task.points.map((point) => <li key={point}>{point}</li>)}</ul>
+                {task.rubric ? <details>
+                  <summary>Bewertungskriterien für diesen Prüfungsteil</summary>
+                  <ul>{task.rubric.criteria.map((criterion) => (
+                    <li key={criterion.label}>{criterion.label}: {criterion.maxScore} Punkte</li>
+                  ))}</ul>
+                  <small>Die Teil-3-Bewertung mit 20 Rohpunkten wird für das Falowen-Gesamtergebnis auf 5 Punkte umgerechnet.</small>
+                </details> : null}
                 <div className="b1-final-writing-label">
                   <strong>Ihre Antwort</strong><span>{wordCount(text)} Wörter · ca. {task.target}</span>
                 </div>
