@@ -1747,6 +1747,162 @@
       "source": "Owner-provided 'Zwei Städte.mp3' and matching exact text, Nov 1, 2026; R2 object key independently confirmed by live discovery. Remote R2 bytes not SHA-compared.",
       "timingStatus": "estimated",
       "timingMethod": "Approximate vocal line windows against supplied recording, including both separately sung choruses and instrumental breaks. Needs manual playback review; not word-level or ear-certified."
+    },
+    {
+      "trackId": "r2-a2-day-01-b64_RWluIG5ldHRlcyBHZXNwcsOkY2gubXAz",
+      "objectKey": "music/a2/day-01/Ein nettes Gespräch.mp3",
+      "assignmentKey": "A2-1.1",
+      "title": "Ein nettes Gespräch",
+      "genre": "German Acoustic Pop / Afro-Soul",
+      "lyrics": "[Verse 1]\nAm Freitagabend gehe ich ins Restaurant,\ndort treffe ich jemanden, den ich noch nicht gut kannte.\nWir begrüßen uns freundlich und setzen uns hin,\nich frage: Wie geht's dir? Wie war dein Tag bisher?\n\n[Chorus]\nEin nettes Gespräch, wir lernen uns kennen,\nwir haben viel zu erzählen und lachen zusammen.\nWir sprechen über das Leben und unsere Freizeit,\ndie Stunden vergehen, wir vergessen die Zeit.\n\n[Verse 2]\nSie fragt mich: Was machst du in deiner Freizeit?\nIch sage: Ich höre Musik und treibe gern Sport.\nDann frage ich: Wie lange wohnst du schon hier?\nSie sagt: Seit zwei Jahren, die Stadt gefällt mir.\nWir bestellen Pizza und etwas zu trinken\nund sprechen über Reisen und unsere Familien.\nSie erzählt von ihrem Studium und ihrem Beruf,\nich höre ihr zu und erzähle auch von mir.\n\n[Chorus]\nEin nettes Gespräch, wir lernen uns kennen,\nwir haben viel zu erzählen und lachen zusammen.\nWir sprechen über das Leben und unsere Freizeit,\ndie Stunden vergehen, wir vergessen die Zeit.\nEin schönes Gespräch, wir lernen uns besser kennen,\nwir haben so viel Spaß und lachen zusammen.\nWir reden über das Leben und unsere Freizeit,\ndie Stunden vergehen, wir genießen die Zeit.\n\n[Outro]\nWir zahlen und gehen, der Abend ist vorbei.\nSie sagt: Es war schön, ich komme gern wieder.\nWir tauschen Nummern und lächeln dabei,\nbis nächste Woche, sagen wir zwei.",
+      "cues": [
+        {
+          "start": 16.1,
+          "end": 19.25,
+          "text": "Am Freitagabend gehe ich ins Restaurant,"
+        },
+        {
+          "start": 19.95,
+          "end": 23.95,
+          "text": "dort treffe ich jemanden, den ich noch nicht gut kannte."
+        },
+        {
+          "start": 24.45,
+          "end": 28.4,
+          "text": "Wir begrüßen uns freundlich und setzen uns hin,"
+        },
+        {
+          "start": 30.1,
+          "end": 36.15,
+          "text": "ich frage: Wie geht's dir? Wie war dein Tag bisher?"
+        },
+        {
+          "start": 38.18,
+          "end": 41.58,
+          "text": "Ein nettes Gespräch, wir lernen uns kennen,"
+        },
+        {
+          "start": 42.12,
+          "end": 45.2,
+          "text": "wir haben viel zu erzählen und lachen zusammen."
+        },
+        {
+          "start": 45.66,
+          "end": 52.2,
+          "text": "Wir sprechen über das Leben und unsere Freizeit,"
+        },
+        {
+          "start": 54.1,
+          "end": 59.25,
+          "text": "die Stunden vergehen, wir vergessen die Zeit."
+        },
+        {
+          "start": 67.75,
+          "end": 71.55,
+          "text": "Sie fragt mich: Was machst du in deiner Freizeit?"
+        },
+        {
+          "start": 72,
+          "end": 75.55,
+          "text": "Ich sage: Ich höre Musik und treibe gern Sport."
+        },
+        {
+          "start": 75.95,
+          "end": 79.35,
+          "text": "Dann frage ich: Wie lange wohnst du schon hier?"
+        },
+        {
+          "start": 82.25,
+          "end": 85.6,
+          "text": "Sie sagt: Seit zwei Jahren, die Stadt gefällt mir."
+        },
+        {
+          "start": 85.95,
+          "end": 89.7,
+          "text": "Wir bestellen Pizza und etwas zu trinken"
+        },
+        {
+          "start": 90.15,
+          "end": 93.85,
+          "text": "und sprechen über Reisen und unsere Familien."
+        },
+        {
+          "start": 94.1,
+          "end": 97.3,
+          "text": "Sie erzählt von ihrem Studium und ihrem Beruf,"
+        },
+        {
+          "start": 97.6,
+          "end": 100.35,
+          "text": "ich höre ihr zu und erzähle auch von mir."
+        },
+        {
+          "start": 100.65,
+          "end": 103.85,
+          "text": "Ein nettes Gespräch, wir lernen uns kennen,"
+        },
+        {
+          "start": 104.2,
+          "end": 107.45,
+          "text": "wir haben viel zu erzählen und lachen zusammen."
+        },
+        {
+          "start": 107.75,
+          "end": 111.15,
+          "text": "Wir sprechen über das Leben und unsere Freizeit,"
+        },
+        {
+          "start": 112.45,
+          "end": 115.55,
+          "text": "die Stunden vergehen, wir vergessen die Zeit."
+        },
+        {
+          "start": 115.9,
+          "end": 119.05,
+          "text": "Ein schönes Gespräch, wir lernen uns besser kennen,"
+        },
+        {
+          "start": 119.4,
+          "end": 122.05,
+          "text": "wir haben so viel Spaß und lachen zusammen."
+        },
+        {
+          "start": 122.35,
+          "end": 125.55,
+          "text": "Wir reden über das Leben und unsere Freizeit,"
+        },
+        {
+          "start": 125.83,
+          "end": 128.05,
+          "text": "die Stunden vergehen, wir genießen die Zeit."
+        },
+        {
+          "start": 143.25,
+          "end": 145.9,
+          "text": "Wir zahlen und gehen, der Abend ist vorbei."
+        },
+        {
+          "start": 146.15,
+          "end": 149.15,
+          "text": "Sie sagt: Es war schön, ich komme gern wieder."
+        },
+        {
+          "start": 150.25,
+          "end": 153.15,
+          "text": "Wir tauschen Nummern und lächeln dabei,"
+        },
+        {
+          "start": 153.6,
+          "end": 156.15,
+          "text": "bis nächste Woche, sagen wir zwei."
+        }
+      ],
+      "strictRecordingLyrics": true,
+      "recordingSha256": "edb408a57611d459cad14f2e13dd57d67ae5e726a665573cf8cfb47618daf928",
+      "duration": 158.4,
+      "timingStatus": "estimated",
+      "timingMethod": "Waveform-guided approximate line windows for uploaded 158.4-second MP3; teacher listening review required, especially starts and ends",
+      "source": "Teacher-supplied replacement A2 Day 1.1 audio and lyric narrative, 2026-11-02"
     }
   ]
 }
