@@ -48,6 +48,20 @@ test("B1 print companions reject missing or unsupported sources rather than inve
   await assert.rejects(() => getB1ReadOnlyParts(0));
 });
 
+test("B1 Day 23 speaking mock prints only source-owned preparation without starting graded attempts", async () => {
+  const lessonUrl = getB1PdfLessonCompanionUrl("/campus/course/lesson/B1/23");
+  const qr = "data:image/png;base64,AA";
+  const guide = await buildB1ReadOnlyPrintHtml({ day: 23, part: "grammar", lessonUrl, audioQrDataUrl:qr });
+  const practice = await buildB1ReadOnlyPrintHtml({ day: 23, part: "workbook", lessonUrl, audioQrDataUrl:qr });
+  assert.match(guide, /Goethe B1 Speaking Mock/);
+  assert.match(guide, /Gemeinsam etwas planen/);
+  assert.match(practice, /Ein Thema präsentieren/);
+  assert.match(practice, /Fragen beantworten/);
+  assert.match(practice, /Authenticated B1 speaking mock QR/);
+  assert.doesNotMatch(practice, /studentUid|attemptId|sessionId|Start speaking mock/);
+  await assert.rejects(() => buildB1ReadOnlyPrintHtml({day:23,part:"workbook",lessonUrl}));
+});
+
 test("B1 later-course canonical reading and listening material remains accessible for printing", async () => {
   for (const day of [19, 20, 21, 22, 23, 24, 25, 26, 27, 28]) {
     const parts = await getB1ReadOnlyParts(day);

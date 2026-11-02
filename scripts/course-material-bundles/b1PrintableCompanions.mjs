@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const dataDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/src/data");
 const modules = new Map();
-const allowedSources = new Set(["b1WritingTasks.js", "b1ReadingTasks.js", "b1ListeningTasks.js", "b1WritingSchedule.js"]);
+const allowedSources = new Set(["b1WritingTasks.js", "b1ReadingTasks.js", "b1ListeningTasks.js", "b1WritingSchedule.js", "speakingDictionary.js", "b1Days23To28LessonMetadata.js"]);
 
 // Read the same canonical B1 lesson data the student application uses, without
 // loading React, opening a graded tab, or reading any student's saved work.
@@ -146,6 +146,50 @@ const listening = async (day, lessonUrl, audioQrDataUrl) => {
     title: task.title || (isReadingFallback ? "Lesen" : "Hören"), body });
 };
 
+
+/**
+ * B1 Day 23 is a three-part graded speaking mock, not a normal tabbed
+ * workbook. Print read-only preparation and canonical example topic cards.
+ * Never start an attempt, inspect student state, or present sample cards as
+ * the actual randomly selected online exam questions.
+ */
+const b1SpeakingMockPage = async (part, lessonUrl, audioQrDataUrl) => {
+  if (!lessonUrl || !audioQrDataUrl) throw new Error("B1 Day 23 print QR to authenticated speaking mock required");
+  const [{ speakingQuestionDictionary }, { getB1Days23To28LessonMetadata }] =
+    await Promise.all([canonical("speakingDictionary.js"), canonical("b1Days23To28LessonMetadata.js")]);
+  const metadata = getB1Days23To28LessonMetadata(23);
+  if (!metadata?.goal || !metadata?.instruction) throw new Error("B1 Day 23 canonical speaking mock metadata is missing");
+  const parts = [
+    ["teil-1", "Gemeinsam etwas planen"],
+    ["teil-2", "Ein Thema präsentieren"],
+    ["teil-3", "Fragen beantworten"],
+  ];
+  const samples = parts.map(([id, heading]) => {
+    const candidates = speakingQuestionDictionary.filter(item => item.level === "B1" && item.teilId === id);
+    if (!candidates.length) throw new Error("B1 Day 23 missing canonical speaking " + id + " prompts");
+    const chosen = candidates[0];
+    return "<h2>" + escapeHtml(id.replace("teil-", "Teil ")) + " · " + escapeHtml(heading) + "</h2>" +
+      paragraph(chosen.topicPrompt || chosen.text) +
+      (chosen.keywordSubtopic ? paragraph(chosen.keywordSubtopic) : "") +
+      (chosen.hint ? paragraph(chosen.hint) : "");
+  }).join("");
+  const link = '<aside style="padding:12px;border:1px solid #bfd3eb;background:#eff6ff">' +
+    '<img width="90" height="90" src="' + escapeHtml(audioQrDataUrl) + '" alt="Authenticated B1 speaking mock QR">' +
+    '<p><strong>Prüfung nur online starten:</strong> ' + escapeHtml(lessonUrl) + '</p></aside>';
+  const intro = paragraph(metadata.goal) + paragraph(metadata.instruction) +
+    '<p>Dies ist eine Vorbereitung mit Beispielen aus dem Falowen B1-Aufgabenpool. ' +
+    'Die benotete Online-Prüfung wählt Aufgaben zufällig aus. ' +
+    'Hier wird kein Prüfungsversuch gestartet und keine Leistung bewertet.</p>';
+  const body = part === "grammar"
+    ? intro + "<h2>Prüfungsaufbau</h2>" +
+      "<ol><li>Gemeinsam etwas planen</li><li>Ein Thema präsentieren</li><li>Fragen beantworten</li></ol>" +
+      "<p>Üben Sie Vorschläge, begründete Meinungen und passende Antworten auf Rückfragen.</p>" + link
+    : intro + samples + "<h2>Notizen zur Übung</h2>" +
+      Array(6).fill("<p>___________________________________________________</p>").join("") + link;
+  return pageHtml({ day:23, section:part === "grammar" ? "Grammar · Sprechprüfung vorbereiten" : "Workbook · Sprechprüfung üben",
+    title:metadata.title, body });
+};
+
 export const getB1PdfLessonCompanionUrl = (route, baseUrl = "https://www.falowen.app") => {
   const origin = new URL(baseUrl);
   const url = new URL(route, baseUrl);
@@ -174,6 +218,8 @@ export const getB1ReadOnlyParts = async day => {
 export async function buildB1ReadOnlyPrintHtml({ day, part, lessonUrl = "", audioQrDataUrl = "" }) {
   day = Number(day);
   if (!Number.isInteger(day) || day < 1 || day > 28) throw new Error("Invalid B1 print day: " + day);
+  if (day === 23 && (part === "grammar" || part === "workbook"))
+    return b1SpeakingMockPage(part, lessonUrl, audioQrDataUrl);
   switch (part) {
     case "teil-2": return writing(day);
     case "teil-3": return reading(day, lessonUrl, audioQrDataUrl);

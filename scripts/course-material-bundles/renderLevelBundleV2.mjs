@@ -451,7 +451,9 @@ const renderReadOnlyA2Section = async (page, lesson, part, filename = part) => {
 // Print the exact public exercise fields from canonical B1 source instead.
 const renderReadOnlyB1Section = async (page, lesson, part, filename = part) => {
   const lessonUrl = getB1PdfLessonCompanionUrl(lesson.route, baseUrl);
-  const audioQrDataUrl = part === "teil-4"
+  // Older B1 reading tasks can be online-only; both Teil 3 and Teil 4
+  // require an authenticated lesson QR when canonical printable content is absent.
+  const audioQrDataUrl = (["teil-3", "teil-4"].includes(part) || (Number(lesson.day) === 23 && ["grammar", "workbook"].includes(part)))
     ? await QRCode.toDataURL(lessonUrl, { width: 160, margin: 1, errorCorrectionLevel: "M" }) : "";
   const html = await buildB1ReadOnlyPrintHtml({ day: lesson.day, part, lessonUrl, audioQrDataUrl });
   const file = path.join(renderDir, String(lesson.day).padStart(2, "0") + "-" + filename + ".pdf");
@@ -479,6 +481,13 @@ const getWorkbookTabAvailability = async (page, name) => {
   return (await tab.isEnabled().catch(() => false)) ? "available" : "locked";
 };
 const renderA2B1Lesson = async (page, lesson) => {
+  // B1 Day 23 is a graded speaking mock, not a normal tabbed workbook.
+  // Source-only print preparation avoids opening or starting an assessment.
+  if (level === "B1" && Number(lesson.day) === 23) {
+    const grammar = await renderReadOnlyB1Section(page, lesson, "grammar", "grammar");
+    const workbook = await renderReadOnlyB1Section(page, lesson, "workbook", "workbook");
+    return [grammar, workbook];
+  }
   // A2 Day 22 is a graded interactive speaking mock, not a tabbed lesson.
   // Print only offline preparation from canonical speaking prompts.
   if (level === "A2" && Number(lesson.day) === 22) {

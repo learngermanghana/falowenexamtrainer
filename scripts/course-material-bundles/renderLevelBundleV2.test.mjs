@@ -43,6 +43,38 @@ test("B1 locked graded tabs use canonical source without starting assessment att
   assert.match(source, /canonical-read-only/);
 });
 
+test("B1 locked reading and listening companions both receive authenticated lesson QR codes", () => {
+  const start = source.indexOf("const renderReadOnlyB1Section = async");
+  const end = source.indexOf("const getWorkbookTabAvailability =", start);
+  assert.ok(start >= 0 && end > start, "B1 print renderer must be present");
+  const renderer = source.slice(start, end);
+  assert.ok(renderer.includes('["teil-3", "teil-4"].includes(part)'));
+  assert.ok(renderer.includes("QRCode.toDataURL(lessonUrl"));
+  assert.ok(renderer.includes("buildB1ReadOnlyPrintHtml({ day: lesson.day, part, lessonUrl, audioQrDataUrl })"));
+});
+
+test("B1 Day 23 uses source-only speaking mock pages, never opens a graded attempt", () => {
+  const start = source.indexOf("const renderA2B1Lesson = async");
+  const end = source.indexOf("await ensureAuthenticatedLesson(page, lesson);", start);
+  assert.ok(start >= 0 && end > start);
+  const preflight = source.slice(start, end);
+  assert.match(preflight, /level === "B1" && Number\(lesson\.day\) === 23/);
+  assert.match(preflight, /renderReadOnlyB1Section\(page, lesson, "grammar", "grammar"\)/);
+  assert.match(preflight, /renderReadOnlyB1Section\(page, lesson, "workbook", "workbook"\)/);
+});
+
+test("B1 Day 23 QR generation is scoped to B1 renderer, not the A2 path", () => {
+  const a2start = source.indexOf("const renderReadOnlyA2Section = async");
+  const b1start = source.indexOf("const renderReadOnlyB1Section = async");
+  const end = source.indexOf("const getWorkbookTabAvailability =", b1start);
+  assert.ok(a2start >= 0 && b1start > a2start && end > b1start);
+  const a2 = source.slice(a2start, b1start);
+  const b1 = source.slice(b1start, end);
+  assert.ok(!a2.includes('["grammar", "workbook"].includes(part)'));
+  assert.ok(b1.includes('Number(lesson.day) === 23 && ["grammar", "workbook"].includes(part)'));
+  assert.ok(b1.includes("QRCode.toDataURL(lessonUrl"));
+});
+
 test("A1 render plan contains only grammar and workbook targets", () => {
   const plan = JSON.parse(
     fs.readFileSync(path.join(__dirname, "a1RenderPlan.json"), "utf8"),
