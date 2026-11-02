@@ -62,6 +62,26 @@ test("B1 Day 23 speaking mock prints only source-owned preparation without start
   await assert.rejects(() => buildB1ReadOnlyPrintHtml({day:23,part:"workbook",lessonUrl}));
 });
 
+test("B1 publication includes complete former online-only questions with no model answers", async () => {
+  const titles = new Map([
+    [19, ["E-Mail von Felix an seine Freundin Sarah", "Warum war Felix vor dem Gespräch sehr nervös?"]],
+    [20, ["Berufsbild · Wie wird man eigentlich Reiseleiter/in?", "Warum ist der Beruf des Reiseleiters für viele attraktiv?"]],
+    [22, ["Beziehungen im Wandel: Online-Dating", "Wie lernen sich viele junge Erwachsene heute kennen?"]],
+  ]);
+  for (const [day, excerpts] of titles) {
+    const html = await buildB1ReadOnlyPrintHtml({day, part:"teil-3"});
+    for (const excerpt of excerpts) assert.ok(html.includes(excerpt), "Day " + day + ": missing " + excerpt);
+    assert.doesNotMatch(html, /data-b1-pdf-online-only|Diese Aufgabe ist nur online verfügbar/);
+  }
+  const expertReading = await buildB1ReadOnlyPrintHtml({day:22,part:"teil-4"});
+  for (const excerpt of ["Person A:", "Person B:", "Person C:",
+      "Die Überhöhung des Partners", "Der Staat sollte Paaren"]) {
+    assert.ok(expertReading.includes(excerpt), "Missing Day 22 Teil 4 " + excerpt);
+  }
+  assert.doesNotMatch(expertReading, /data-b1-pdf-online-only|<h2>Fragen<\\/h2>/);
+  assert.doesNotMatch(expertReading, /Antwortschlüssel|Lösungsschlüssel/);
+});
+
 test("B1 later-course canonical reading and listening material remains accessible for printing", async () => {
   for (const day of [19, 20, 21, 22, 23, 24, 25, 26, 27, 28]) {
     const parts = await getB1ReadOnlyParts(day);
@@ -70,8 +90,8 @@ test("B1 later-course canonical reading and listening material remains accessibl
       lessonUrl: getB1PdfLessonCompanionUrl("/campus/course/lesson/B1/" + day),
       audioQrDataUrl: "data:image/png;base64,AA" });
     assert.ok(read.includes("Teil 3 · Lesen"));
-    if ([19, 20, 22].includes(day)) assert.match(read, /nur online verfügbar/);
-    else assert.doesNotMatch(read, /data-b1-pdf-online-only/);
+    assert.doesNotMatch(read, /data-b1-pdf-online-only|nur online verfügbar/);
+    assert.match(read, /<ol class="questions">/);
     if (parts.includes("teil-4")) {
       const listen = await buildB1ReadOnlyPrintHtml({
         day, part: "teil-4",
