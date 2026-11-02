@@ -177,60 +177,243 @@ export const B1_MOCK2_READING=Object.freeze({
     }
   },
   teil3:{
-    title:"Teil 3",time:"10 Minuten",
-    context:"Lesen Sie die Situationen 13 bis 19 und die Anzeigen A bis J. Jede Anzeige nur einmal; Beispiel E ist vergeben. Für eine Situation gibt es keine passende Anzeige: Wählen Sie 0.",
-    example:"Beispiel 0: Herr Schneider sucht am Wochenende eine geführte Fahrradtour für sich und seine Frau. Lösung: E.",
-    situations:[
-      {number:13,text:"Manuel möchte sich beruflich verändern und sucht einen Kurs im Bereich Grafikdesign, den er abends nach der Arbeit besuchen kann."},
-      {number:14,text:"Sandra plant eine Feier im Garten und möchte dafür Stehtische und ein großes Partyzelt für ein Wochenende mieten."},
-      {number:15,text:"Herr Meier möchte sein altes, aber funktionsfähiges Klavier verschenken und sucht jemanden, der es kostenlos bei ihm abholt."},
-      {number:16,text:"Laura sucht für ihre 12-jährige Tochter eine Tanzgruppe am Samstagnachmittag."},
-      {number:17,text:"Sven möchte sein altes Auto schnell verkaufen und sucht einen Händler, der ihm das Geld direkt bar auszahlt."},
-      {number:18,text:"Familie Becker sucht für den Sommerurlaub eine Ferienwohnung an der Nordsee, in der auch ihr Hund willkommen ist."},
-      {number:19,text:"Claudia sucht für ihren Haushalt eine angemeldete und legale Reinigungskraft für zwei Stunden pro Woche."}
+    "title": "Teil 3",
+    "time": "10 Minuten",
+    "context": "Lesen Sie die Aufgaben 13 bis 17 und die Anzeigen A bis F. Welche Anzeige passt zu welcher Situation? Für eine Situation gibt es keine passende Anzeige. Markieren Sie in diesem Fall ein x.",
+    "situations": [
+      {
+        "number": 13,
+        "text": "Markus (28) möchte abends ohne Leistungsdruck Deutsch sprechen üben. Er sucht ein ungezwungenes Treffen ohne Kursgebühren."
+      },
+      {
+        "number": 14,
+        "text": "Elena (35) sucht für ihre 8-jährige Tochter Unterstützung bei den Schularbeiten und Freizeitangebote im Stadtteil."
+      },
+      {
+        "number": 15,
+        "text": "Sora (42) möchte sich ehrenamtlich engagieren und neu angekommene Familien bei Behördengängen und im Alltag unterstützen."
+      },
+      {
+        "number": 16,
+        "text": "David (31) sucht einen Intensivkurs für B2-Deutsch mit einem offiziellen Zertifikat für seine Arbeitssuche."
+      },
+      {
+        "number": 17,
+        "text": "Fatima (24) sucht eine professionelle Kochschule, die jeden Samstag kostenpflichtige Kochkurse für internationale Küche anbietet."
+      }
     ],
-    ads:[
-      ["A","Autohaus & Ankauf „Express-Car“","Wir kaufen Ihr gebrauchtes Fahrzeug unabhängig von Marke und Alter! Schnelle Abwicklung, kostenlose Abmeldung und sofortige Barauszahlung vor Ort."],
-      ["B","Nordsee-Ferienhaus „Dünentraum“","Gemütliche Ferienwohnung für 2–4 Personen direkt hinter dem Deich. Mit großer Terrasse und eingezäuntem Garten. Hunde sind bei uns herzlich willkommen!"],
-      ["C","Volkshochschule (VHS) – Abendkurse","Lernen Sie Grundlagen der digitalen Bildbearbeitung und des Grafikdesigns. Jeden Dienstag und Donnerstag von 18:30 bis 20:45 Uhr. Start ab nächsten Monat!"],
-      ["D","Tanzstudio „Motion“","Hip-Hop und Jazz Dance für Kinder und Jugendliche (10–14 Jahre). Immer samstags von 15:00 bis 16:30 Uhr. Probestunde kostenlos!"],
-      ["E","Fahrradverleih & Touren „GrünLand“","Geführte E-Bike-Touren durch das Naturschutzgebiet an jedem Samstag und Sonntag. Perfekt für Paare und Familien!"],
-      ["F","Event-Verleih „Party-Service Müller“","Wir vermieten Partyzelte, Stehtische, Geschirr und Musikanlagen für Ihre Gartenfeier. Günstige Wochenendtarife inklusive Lieferung."],
-      ["G","Musikschule & Instrumenten-Börse","Klavier-, Gitarren- und Gesangsunterricht für Anfänger und Fortgeschrittene. An- und Verkauf von gebrauchten Musikinstrumenten mit Garantie."],
-      ["H","Haushaltshilfe gesucht? „Sauber & Fair“","Vermittlung von qualifizierten und legal angemeldeten Reinigungskräften für Privathaushalte. Zuverlässig, haftpflichtversichert und flexibel."],
-      ["I","Sportverein „Eintracht“","Tennis-Intensivkurse für Erwachsene an Wochentagen morgens von 09:00 bis 11:00 Uhr. Schläger und Bälle können geliehen werden."],
-      ["J","Kleinanzeigen – Gebrauchte Möbel","Biete gut erhaltene Einbauküche und Wohnzimmerschrank günstig zum Verkauf an. Nur Selbstabholung in der Innenstadt."]
-    ]
+    "ads": [
+      [
+        "A",
+        "Sprach-Café „Plauderecke“",
+        "Freie Gespräche bei Kaffee und Tee! Jeden Donnerstag ab 18:00 Uhr. Keine Anmeldung, keine Gebühren. Willkommen sind alle, die ihr Deutsch im Alltag ganz entspannt verbessern möchten."
+      ],
+      [
+        "B",
+        "Nachbarschaftstreff „Kunterbunt“",
+        "Wir bieten kostenlose Hausaufgabenhilfe für Grundschulkinder sowie Nachmittagsaktivitäten (Basteln, Spiel & Sport) an. Jeden Mo–Do von 14:00 bis 17:00 Uhr."
+      ],
+      [
+        "C",
+        "Freiwilligenagentur Stadtmitte",
+        "Helfen Sie mit! Wir suchen Integrationspaten, die neu Zuwandernde ehrenamtlich zum Amt, zur Schule oder zum Arzt begleiten. Kontakt: info@freiwillige-stadt.de"
+      ],
+      [
+        "D",
+        "Sprachinstitut Veritas",
+        "B2-Intensivkurse für den Beruf mit anerkanntem Goethe-Zertifikat. Tages- und Abendkurse. Erfahrene Lehrkräfte, staatlich förderbar."
+      ],
+      [
+        "E",
+        "Kulturverein „Tischlein deck dich“",
+        "Einmal im Monat kochen wir gemeinsam internationale Gerichte im Stadtteilzentrum. Eintritt frei! Ein gemütlicher Abend zum Kennenlernen für die ganze Nachbarschaft."
+      ],
+      [
+        "F",
+        "Sportverein Vorwärts",
+        "Integratives Fußball- und Volleyballtraining für Jugendliche und Erwachsene. Training zweimal pro Woche. Mitgliedsbeitrag: 15 €/Monat."
+      ]
+    ],
+    "noMatchValue": "x"
   },
   teil4:{
-    title:"Teil 4",time:"15 Minuten",
-    context:"Lesen Sie die Beiträge 20 bis 26 aus dem Online-Forum „Sollten Hausaufgaben an Schulen komplett abgeschafft werden?“ Ja = dafür, Nein = dagegen. Beispiel 0: Katrin möchte keine Hausaufgaben mehr. Lösung: Ja.",
-    comments:[
-      {number:20,person:"Markus (42)",text:"Durch Hausaufgaben lernen Kinder, selbstständig zu arbeiten und ihre Zeit zu planen. Sie gehören einfach zu einer guten Schulausbildung dazu."},
-      {number:21,person:"Nina (28)",text:"Ein langer Schultag ist für Kinder anstrengend genug. Ausreichend Freizeit am Nachmittag ist für ihre Entwicklung und Gesundheit viel wichtiger als noch mehr Arbeitsblätter."},
-      {number:22,person:"Christoph (50)",text:"Ohne das regelmäßige Wiederholen zu Hause vergessen die Schüler den im Unterricht gelernten Stoff viel zu schnell wieder."},
-      {number:23,person:"Sarah (34)",text:"Hausaufgaben schaffen Ungerechtigkeit: Kinder, deren Eltern abends keine Zeit haben, um ihnen zu helfen, sind gegenüber anderen Schülern benachteiligt."},
-      {number:24,person:"Thomas (45)",text:"Für Eltern bieten Hausaufgaben eine tolle Gelegenheit zu sehen, was die Kinder in der Schule gerade lernen und wo sie eventuell noch Unterstützung brauchen."},
-      {number:25,person:"Julia (17)",text:"Ich finde, der gesamte Lernstoff sollte direkt im Unterricht geübt werden, anstatt ihn auf den Nachmittag zu Hause zu verschieben."},
-      {number:26,person:"Andreas (38)",text:"Eine vollständige Abschaffung halte ich für falsch. Lehrkräfte sollten selbst entscheiden dürfen, wann zusätzliche Übungen zu Hause sinnvoll sind."}
+    "title": "Teil 4",
+    "time": "15 Minuten",
+    "context": "In einer Online-Zeitschrift lesen Sie Kommentare zur Frage: „Sollte die Teilnahme an Sprach- und Integrationskursen für alle Zugewanderten verpflichtend sein?“ Lesen Sie die Aufgaben 18 bis 24. Äußert sich die Person positiv (Ja) oder negativ (Nein) zur Pflichtteilnahme?",
+    "comments": [
+      {
+        "number": 18,
+        "person": "Jonas (32, Köln)",
+        "text": "Ich finde verpflichtende Kurse absolut notwendig. Ohne Deutschkenntnisse bleibt man isoliert, findet kaum Arbeit und versteht wichtige Dokumente nicht. Der Staat bietet die Kurse an, also sollte man diese Chance auch verpflichtend nutzen müssen."
+      },
+      {
+        "number": 19,
+        "person": "Maria (41, München)",
+        "text": "Zwang bringt meiner Meinung nach überhaupt nichts. Wenn jemand gegen seinen Willen in einem Kurs sitzt, lernt er schlecht und verliert die Motivation. Man sollte lieber Anreize schaffen, wie zum Beispiel bessere Berufs- und Weiterbildungschancen nach Abschluss eines Sprachkurses."
+      },
+      {
+        "number": 20,
+        "person": "Hasan (29, Bremen)",
+        "text": "Als ich nach Deutschland kam, war ich froh über die Pflicht zur Kursteilnahme. Am Anfang fehlt vielen der Überblick im neuen Land. Durch die feste Struktur im Kurs lernt man schnell die Sprache und findet sofort erste Freunde."
+      },
+      {
+        "number": 21,
+        "person": "Claudia (50, Dresden)",
+        "text": "Für viele Menschen mit kleinen Kindern oder vollen Arbeitszeiten ist ein Pflichtkurs zeitlich kaum machbar. Solange es nicht genügend flexible Online-Kurse und Kinderbetreuung gibt, sollte man niemanden dazu zwingen."
+      },
+      {
+        "number": 22,
+        "person": "Tim (24, Leipzig)",
+        "text": "Sprache ist die Grundlage für jedes funktionierende Zusammenleben in der Gesellschaft. Wer in ein neues Land zieht, muss bereit sein, die Landessprache zu lernen. Eine gesetzliche Pflicht stellt sicher, dass alle dieselben Chancen erhalten."
+      },
+      {
+        "number": 23,
+        "person": "Elena (38, Stuttgart)",
+        "text": "Ich halte eine allgemeine Pflicht für zu starr. Manche Menschen lernen Sprachen sehr gut selbstständig im Beruf oder durch private Kontakte. Ein verpflichtender Kurs ist für sie reine Zeitverschwendung."
+      },
+      {
+        "number": 24,
+        "person": "Markus (45, Hannover)",
+        "text": "Integration ist keine Einbahnstraße. Eine Pflichtteilnahme gibt allen ein klares Signal: Wer hier lebt, macht aktiv mit. Das stärkt das Vertrauen auf beiden Seiten und verringert Missverständnisse im Alltag."
+      }
     ]
   },
   teil5:{
-    title:"Teil 5",time:"10 Minuten",
-    context:"Lesen Sie die Benutzungsordnung der Stadtbibliothek und die Aufgaben 27–30. Wählen Sie a, b oder c.",
-    heading:"Benutzungsordnung und Regeln der Stadtbibliothek",
-    sections:[
-      ["Willkommen","Sehr geehrte Leserinnen und Leser, herzlich willkommen in der Stadtbibliothek! Um allen Besuchern ein ungestörtes Lernen und Lesen zu ermöglichen, bitten wir Sie um die Einhaltung folgender Regeln:"],
-      ["1. Bibliotheksausweis","Für das Entleihen von Medien benötigen Sie einen gültigen Bibliotheksausweis. Dieser ist persönlich und darf nicht an dritte Personen weitergegeben werden. Sollten Sie Ihren Ausweis verlieren, melden Sie dies bitte umgehend der Information, damit das Konto gesperrt werden kann."],
-      ["2. Leihfristen und Verlängerungen","Die reguläre Leihfrist für Bücher beträgt vier Wochen, für Filme (DVDs) und Hörbücher zwei Wochen. Sie können die Leihfrist bis zu zweimal online verlängern, sofern keine Vormerkung von anderen Lesern vorliegt. Bei verspäteter Rückgabe fallen Gebühren an."],
-      ["3. Verhalten in den Lesesälen","Bitte verhalten Sie sich im gesamten Gebäude ruhig. Das Essen von Speisen ist in den Unterrichts- und Lesesälen nicht gestattet. Das Trinken von Wasser aus wiederverschließbaren Flaschen ist erlaubt."],
-      ["4. Nutzung der Computerarbeitsplätze","Die Computer mit Internetzugang stehen angemeldeten Nutzern täglich für maximal 60 Minuten kostenlos zur Verfügung. Das Ausdrucken von Dokumenten ist kostenpflichtig (0,15 € pro Seite) und muss an der Hauptkasse beglichen werden."]
+    "title": "Teil 5",
+    "time": "10 Minuten",
+    "context": "Sie informieren sich über die Nutzung des neuen Integrations- und Kulturzentrums in Ihrer Stadt. Lesen Sie den Text und die Aufgaben 25 bis 30. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
+    "heading": "Haus- und Nutzungsordnung: Bürgerzentrum „Vielfalt“",
+    "sections": [
+      [
+        "1. Allgemeine Nutzung & Öffnungszeiten",
+        "Das Bürgerzentrum steht allen Einwohnern und Vereinen der Stadt offen. Die Räumlichkeiten können montags bis samstags von 08:00 bis 22:00 Uhr genutzt werden. Sonn- und feiertags bleibt das Zentrum geschlossen, außer bei vorher genehmigten Kulturveranstaltungen."
+      ],
+      [
+        "2. Raumreservierung für Gruppen und Kurse",
+        "Gemeinnützige Vereine und Initiativen können Räume für Sprachkurse, Lerngruppen oder Nachbarschaftstreffen kostenlos reservieren. Die Buchung muss mindestens zwei Wochen im Voraus schriftlich oder online erfolgen. Stornierungen sind bis zu 48 Stunden vor dem Termin kostenfrei möglich."
+      ],
+      [
+        "3. Essen und Trinken",
+        "Im Café-Bereich im Erdgeschoss sind Speisen und Getränke erhältlich. Das Mitbringen eigener Verpflegung ist in den Seminarräumen gestattet, sofern die Räume nach der Nutzung sauber hinterlassen werden. Müll muss eigenständig getrennt und entsorgt werden."
+      ],
+      [
+        "4. Ruhe und gegenseitige Rücksichtnahme",
+        "Um andere Kurse und Veranstaltungen nicht zu stören, ist ab 20:00 Uhr Zimmerlautstärke einzuhalten. Das Abspielen von lauter Musik im Innenhof ist grundsätzlich untersagt."
+      ],
+      [
+        "5. Sicherheit und Haftung",
+        "Für persönliche Gegenstände und Wertsachen übernimmt das Bürgerzentrum keine Haftung. Fundsachen sind unverzüglich am Empfang im Erdgeschoss abzugeben."
+      ]
     ],
-    questions:[
-      mc(27,"Was soll man tun, wenn der Bibliotheksausweis verloren geht?","Einen neuen Ausweis bei der Polizei als gestohlen melden.","Die Bibliothek sofort informieren, damit der Ausweis gesperrt wird.","Eine Bearbeitungsgebühr von 10 Euro an der Kasse bezahlen."),
-      mc(28,"Welche Regel gilt für die Ausleihe von DVDs und Hörbüchern?","Sie dürfen grundsätzlich nicht online verlängert werden.","Die reguläre Ausleihdauer beträgt zwei Wochen.","Man darf sie höchstens für vier Wochen behalten."),
-      mc(29,"Was ist bezüglich Verpflegung im Gebäude gestattet?","Das Trinken von Wasser aus verschließbaren Flaschen.","Der Verzehr von kleinen Snacks in den Lesesälen.","Alle kalten Getränke dürfen an den Leseplätzen getrunken werden."),
-      mc(30,"Wie ist die Nutzung der Internet-Computer geregelt?","Die Nutzung ist für alle Besucher ohne zeitliche Begrenzung gratis.","Angemeldete Nutzer können die Computer eine Stunde pro Tag kostenlos nutzen.","Das Ausdrucken von Seiten ist im Ausweisbeitrag bereits enthalten.")
+    "questions": [
+      {
+        "number": 25,
+        "question": "Wann ist das Bürgerzentrum in der Regel geöffnet?",
+        "options": [
+          [
+            "a",
+            "Jeden Tag von 08:00 bis 22:00 Uhr."
+          ],
+          [
+            "b",
+            "Von Montag bis Samstag."
+          ],
+          [
+            "c",
+            "Nur an Sonn- und Feiertagen bei Kulturveranstaltungen."
+          ]
+        ]
+      },
+      {
+        "number": 26,
+        "question": "Wie müssen Räume für Sprachkurse gebucht werden?",
+        "options": [
+          [
+            "a",
+            "Spätestens zwei Wochen vor dem Termin."
+          ],
+          [
+            "b",
+            "Mindestens 48 Stunden vorher per Telefon."
+          ],
+          [
+            "c",
+            "Direkt am selben Tag an der Rezeption."
+          ]
+        ]
+      },
+      {
+        "number": 27,
+        "question": "Was gilt für das Mitbringen von eigenem Essen?",
+        "options": [
+          [
+            "a",
+            "Es ist im gesamten Gebäude streng verboten."
+          ],
+          [
+            "b",
+            "Es ist nur im Café im Erdgeschoss erlaubt."
+          ],
+          [
+            "c",
+            "Man darf eigene Speisen in den Seminarräumen essen, muss aber danach aufräumen."
+          ]
+        ]
+      },
+      {
+        "number": 28,
+        "question": "Ab wann muss im Gebäude besonders auf Ruhe geachtet werden?",
+        "options": [
+          [
+            "a",
+            "Ab 18:00 Uhr im Innenhof."
+          ],
+          [
+            "b",
+            "Ab 20:00 Uhr gilt Zimmerlautstärke."
+          ],
+          [
+            "c",
+            "Während der gesamten Öffnungszeit darf keine Musik gespielt werden."
+          ]
+        ]
+      },
+      {
+        "number": 29,
+        "question": "Was passiert bei Verlust von persönlichen Wertsachen?",
+        "options": [
+          [
+            "a",
+            "Das Bürgerzentrum bezahlt den Schaden."
+          ],
+          [
+            "b",
+            "Das Zentrum übernimmt keine Verantwortung für Verlust oder Diebstahl."
+          ],
+          [
+            "c",
+            "Wertsachen müssen beim Empfang abgegeben werden."
+          ]
+        ]
+      },
+      {
+        "number": 30,
+        "question": "Wie viel kostet die Raummiete für gemeinnützige Vereine?",
+        "options": [
+          [
+            "a",
+            "Sie ist vollkommen gebührenfrei."
+          ],
+          [
+            "b",
+            "Sie kostet eine geringe Gebühr pro Stunde."
+          ],
+          [
+            "c",
+            "Die Raumnutzung ist nur gegen eine Kaution möglich."
+          ]
+        ]
+      }
     ]
   }
 });
