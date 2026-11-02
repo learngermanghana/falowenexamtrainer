@@ -14,6 +14,7 @@ export const shouldShowTeacherLectureVideo = (level, day) => {
   if (["A2", "B1"].includes(normalizedLevel)) {
     return hasTeacherLectureVideoResources(normalizedLevel, day);
   }
+  if (normalizedLevel === "A1" && Number(day) === 2) return false;
   return ["A1", "B2", "C1"].includes(normalizedLevel);
 };
 
@@ -472,6 +473,7 @@ const sortVideoResourcesByLessonOrder = (resources = [], entries = []) => {
 export const getLessonVideoResources = (level, day, entry = {}) => {
   const normalizedLevel = normalizeLevel(level);
   const dayKey = String(Number(day || entry?.day || entry?.assignmentDay || 0));
+  if (normalizedLevel === "A1" && dayKey === "2") return [];
   const showTeacherVideos = shouldShowTeacherLectureVideo(normalizedLevel, dayKey) && dayKey !== "0";
   const dictionaryEntry =
     LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
