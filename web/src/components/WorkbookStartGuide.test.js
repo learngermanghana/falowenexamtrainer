@@ -78,7 +78,7 @@ describe("WorkbookStartGuide video cards", () => {
       }}
     />);
     expect(screen.getByRole("heading", { name: "Supporting materials" })).toBeInTheDocument();
-    expect(screen.getByText("Complete A2 Course & Workbook · 328 pages")).toBeInTheDocument();
+    expect(screen.getByText(/Complete A2 Course & Workbook · 328 pages/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /View complete A2 book/ })).toHaveAttribute(
       "href", "/books/deutsch-a2-course-workbook"
     );
