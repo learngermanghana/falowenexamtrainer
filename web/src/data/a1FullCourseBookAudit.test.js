@@ -34,7 +34,7 @@ const isMountedCourseRoute = (route = "") => {
 const cardKey = (day, chapter) => `${Number(day)}:${String(chapter || "").trim()}`;
 describe("A1 full Course Book consolidation", () => {
   test("covers the complete A1 programme from Day 0 through the Day 23 Final Mock", () => {
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(26);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(25);
     const counts = new Map();
     A1_COURSE_BOOK_CARDS.forEach((card) => {
       counts.set(Number(card.displayDay), (counts.get(Number(card.displayDay)) || 0) + 1);
