@@ -14,7 +14,7 @@ describe("canonical A1 assignment registry", () => {
   test("has 18 current assignments and preserves two archived Day 2 assessment identities", () => {
     expect(Object.keys(A1_ASSIGNMENT_REGISTRY)).toHaveLength(20);
     expect(A1_ASSIGNMENT_ORDER).toHaveLength(18);
-    expect(A1_ASSIGNMENT_ORDER).toContain("A1-0.2-1.1");
+    expect(A1_ASSIGNMENT_ORDER).toContain("A1-0.2_1.1");
     expect(A1_ASSIGNMENT_ORDER).not.toContain("A1-0.2");
     expect(A1_ASSIGNMENT_ORDER).not.toContain("A1-1.1");
     expect(new Set(A1_ASSIGNMENT_ORDER).size).toBe(18);
@@ -23,7 +23,7 @@ describe("canonical A1 assignment registry", () => {
   test.each(A1_ASSIGNMENT_ORDER)("%s has deterministic identity, route and sections", (key) => {
     const assignment = A1_ASSIGNMENT_REGISTRY[key];
     expect(assignment.assignmentKey).toBe(key);
-    expect(assignment.chapter).toBe(key === "A1-0.2-1.1" ? "0.2" : key.slice(3));
+    expect(assignment.chapter).toBe(key === "A1-0.2_1.1" ? "0.2" : key.slice(3));
     expect(assignment.lessonRoute).toBe(buildA1CanonicalChapterLessonRoute(assignment.chapter));
     expect(assignment.lessonRoute).not.toContain("?chapter=");
     expect(assignment.legacyLessonRoute).toBe(
@@ -56,7 +56,7 @@ describe("canonical A1 assignment registry", () => {
     expect(getA1AssignmentByDayAndChapter(16, "9")?.assignmentKey).toBe("A1-9");
     expect(getA1AssignmentByDayAndChapter(16, "10")?.assignmentKey).toBe("A1-10");
     expect(getA1AssignmentByDayAndChapter(3, "1.1")).toBeNull();
-    expect(getA1AssignmentByDayAndChapter(2, "1.1")?.assignmentKey).toBe("A1-1.1");
+    expect(getA1AssignmentByDayAndChapter(2, "1.1")?.assignmentKey).toBe("A1-0.2_1.1");
   });
 
   test("builds the same canonical tutor context used by the Day 1 workbook", () => {
@@ -79,8 +79,8 @@ describe("canonical A1 assignment registry", () => {
   });
 
   test("new Day 2 has five required sections and separate identity", () => {
-    expect(A1_ASSIGNMENT_REGISTRY["A1-0.2-1.1"].chapter).toBe("0.2");
-    expect(A1_ASSIGNMENT_REGISTRY["A1-0.2-1.1"].sections).toHaveLength(5);
+    expect(A1_ASSIGNMENT_REGISTRY["A1-0.2_1.1"].chapter).toBe("0.2");
+    expect(A1_ASSIGNMENT_REGISTRY["A1-0.2_1.1"].sections).toHaveLength(5);
   });
 
   test("gives dotted chapters the requested short, permanent aliases", () => {
