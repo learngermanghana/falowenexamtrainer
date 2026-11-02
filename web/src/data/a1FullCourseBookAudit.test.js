@@ -41,7 +41,7 @@ describe("A1 full Course Book consolidation", () => {
     });
 
     for (let day = 0; day <= 23; day += 1) {
-      const expected = [3, 16].includes(day) ? 2 : 1;
+      const expected = [16].includes(day) ? 2 : 1;
       expect(counts.get(day) || 0).toBe(expected);
     }
   });
@@ -99,7 +99,10 @@ describe("A1 full Course Book consolidation", () => {
     );
 
     A1_TEACHER_VIDEO_RESOURCES.forEach((resource) => {
-      expect(cardKeys.has(cardKey(resource.day, resource.chapter))).toBe(true);
+      // Retired Day 3 chapter 1.1 remains available for historic links, not as an active card.
+      if (Number(resource.day) !== 3 || resource.chapter !== "1.1") {
+        expect(cardKeys.has(cardKey(resource.day, resource.chapter))).toBe(true);
+      }
       expect(resource.url).toMatch(/^https:\/\/youtu\.be\//);
     });
 
