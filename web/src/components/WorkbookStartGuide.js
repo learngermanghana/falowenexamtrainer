@@ -162,13 +162,23 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, workbookUrl, mode = "workb
       <div style={{ display: "grid", gap: 6 }}>
         <LessonResourceItem number="1" icon="🎬" title="Teacher lecture video" actionLabel="Watch teacher video" url={teacherVideo?.url} />
         <LessonResourceItem number="2" icon="🤖" title="AI lecture / grammar video" actionLabel="Watch AI video" url={aiVideo?.url} />
-        <LessonResourceItem
-          number="3"
-          icon="📄"
-          title={isGrammarMode ? "Download this grammar book as PDF" : "Download this workbook as PDF"}
-          actionLabel="Download / Print PDF"
-          onClick={() => window.print()}
-        />
+        {normalizeLevel(level) === "A2" ? (
+          <LessonResourceItem
+            number="3"
+            icon="📘"
+            title="Complete A2 Course & Workbook · 328 pages"
+            actionLabel="View complete A2 book · Digital or printed on demand"
+            url="/books/deutsch-a2-course-workbook"
+          />
+        ) : (
+          <LessonResourceItem
+            number="3"
+            icon="📄"
+            title={isGrammarMode ? "Download this grammar book as PDF" : "Download this workbook as PDF"}
+            actionLabel="Download / Print PDF"
+            onClick={() => window.print()}
+          />
+        )}
         <LessonResourceItem
           number="4"
           icon={isGrammarMode ? "📝" : "📘"}
