@@ -18,7 +18,7 @@ const pronounQuiz = [
   ["4. Kojo und ich lernen Deutsch. ___ lernen Deutsch.", ["A) Wir", "B) Du", "C) Er", "D) Ihr"]],
   ["5. Wie heißen ___? (formal, one person)", ["A) du", "B) er", "C) Sie", "D) ich"]],
 ];
-const listening = ["1. W _ _ s _ _ r", "2. K _ _ f _", "3. B _ _ _ _", "4. S _ _ _ _ _", "5. T _ _ _ _"];
+const listening = ["1. W _ _ _ _ r", "2. K _ _ _ _ _", "3. B _ _ _ _", "4. S _ _ _ _ _", "5. T _ _ _ _"];
 const verbs = [
   "1. Ich ___ Deutsch. (lernen)",
   "2. Du ___ in Accra. (wohnen)",
