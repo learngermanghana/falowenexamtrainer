@@ -67,7 +67,7 @@ function createExaminerFlow(level, task, mode="guided") {
   if (key === "B1-3" && /^b1-mock-0[12]-speaking-teil-3$/.test(task?.id || "")) {
     flow.contextTopic=clean(task?.keywords || "Präsentation",180);
     flow.discussion={
-      topic:"Online Deutsch lernen",
+      topic:task?.id === "b1-mock-02-speaking-teil-3" ? "Integration" : "Online Deutsch lernen",
       presentation:catalogue.profiles["B1-3"].partnerPresentation,
     };
     flow.mockPresentationFeedback=true;
