@@ -5,7 +5,7 @@ const originalFetch=global.fetch;
 const catalog={paymentsEnabled:true,catalogTitles:[
  {id:"a1-course-workbook",title:"A1 Course",status:"available",bookIds:["a1-digital","a1-printed"],pages:250},
  {id:"writing-skills-a1-c2",title:"Writing guide",status:"coming_soon",bookIds:["writing-skills-a1-c2-digital"],pages:32}
-],books:[{id:"a1-digital",format:"digital",priceGhs:99},{id:"a1-printed",format:"printed",priceGhs:800},{id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:39}]};
+],books:[{id:"a1-digital",format:"digital",priceGhs:100},{id:"a1-printed",format:"printed",priceGhs:800},{id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:39}]};
 beforeEach(()=>{window.history.replaceState({},"","/books");global.fetch=jest.fn(async url=>({ok:true,json:async()=>String(url).includes("/books/catalog")?catalog:{usdToGhs:10}}));});
 afterEach(()=>{global.fetch=originalFetch;});
 test("detail uses actual selected pages, separate checkout and related books without customer fields",async()=>{
@@ -42,7 +42,7 @@ test("A2 printed edition uses the published unit price, quantity and address fie
   paymentsEnabled:true,
   catalogTitles:[{id:"a2-course-workbook",title:"Deutsch A2 — Course & Workbook",status:"available",
     bookIds:["a2-course-workbook-digital","a2-course-workbook-printed"],pages:328,levelTags:["A2"]}],
-  books:[{id:"a2-course-workbook-digital",format:"digital",priceGhs:99},
+  books:[{id:"a2-course-workbook-digital",format:"digital",priceGhs:100},
     {id:"a2-course-workbook-printed",format:"printed",priceGhs:1050}],
  };
  window.history.replaceState({},"",
