@@ -4801,7 +4801,19 @@ app.post("/writing/b1-mock-score", async (req, res) => {
           { role: "user", content: "Return the strict B1 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
-        { partKeys: ["teil1", "teil2", "teil3"], pointCounts: { teil1: 3, teil2: 3, teil3: 3 } },
+        {
+           partKeys: ["teil1", "teil2", "teil3"],
+           pointCounts: { teil1: 3, teil2: 3, teil3: 3 },
+           validateResult: mockId !== "b1-mock-02" ? undefined : (assessment) => {
+             const rubric = assessment?.parts?.teil3?.rubric_scores;
+             const maxima = {task_fulfilment:4,cohesion:4,vocabulary:6,grammar:6};
+             if (!rubric || Object.entries(maxima).some(([name,max]) =>
+               typeof rubric[name] !== "number" || !Number.isFinite(rubric[name]) ||
+               rubric[name] < 0 || rubric[name] > max)) {
+               throw Object.assign(new Error("Incomplete B1 Mock 2 Teil 3 writing rubric."), {code:"INVALID_MOCK_ASSESSMENT"});
+             }
+           },
+         },
       );
       const cleanedReply = String(reply || "")
         .trim()
@@ -4825,7 +4837,11 @@ app.post("/writing/b1-mock-score", async (req, res) => {
         const flags = [0, 1, 2].map((index) => rawFlags[index] === true);
         const missing = flags.filter((value) => !value).length;
         const missingCaps = maxScore === 5 ? [4, 2, 0.5] : [7, 4, 1];
-        const rawScore = Math.max(0, Math.min(maxScore, Number(part.score) || 0));
+        const rubric=mockId==="b1-mock-02" && key==="teil3" ? part.rubric_scores : null;
+        const rubricScore=rubric
+          ? Number(((rubric.task_fulfilment+rubric.cohesion+rubric.vocabulary+rubric.grammar)/4).toFixed(1))
+          : Number(part.score);
+        const rawScore = Math.max(0, Math.min(maxScore, rubricScore || 0));
         const cappedScore = missing ? Math.min(rawScore, missingCaps[Math.min(missing, 3) - 1]) : rawScore;
         result.parts = result.parts || {};
         result.parts[key] = {
