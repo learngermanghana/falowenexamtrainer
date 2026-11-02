@@ -3,7 +3,6 @@ import { coverForTrack } from "./cover-art.js?v=20261102-covers";
 import { songStoryForTrack } from "./song-story.js?v=20261102-bilingual";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
-import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
 import { matchingEnglishTranslation, matchingDraftEnglishTranslation } from "./english-translations.js?v=20261101-draft";
 // Never autoplay on initial load; continue only after a listener starts a song.
 // Falowen Music's static listening room. No authentication, AI calls,
@@ -550,21 +549,20 @@ function renderLyrics(lesson) {
         ? "English translation of this unverified course draft is not available yet."
         : "English translation has not been published for this recording yet.";
   highlightedLine = -1;
-  // Every song with lyrics supports following the page. Only exact published
-  // cue packs support per-line highlighting and seeking.
-  byId("follow-lyrics").disabled = false;
-  byId("follow-lyrics").checked = followLyrics;
+  // Follow means real line timing. Never scroll untimed lyrics by duration.
+  byId("follow-lyrics").disabled = !renderedCues.length;
+  byId("follow-lyrics").checked = Boolean(renderedCues.length && followLyrics);
   byId("follow-label").textContent = renderedCues.length
     ? (lesson.referenceOnly ? "Follow lyrics (estimated)" : "Follow lyrics")
-    : "Follow lyrics (approximate scroll)";
+    : "Line highlighting unavailable";
   const note = el("p", "detail-note", lesson.referenceOnly
     ? (renderedCues.length
        ? "COURSE DRAFT — Whisper has estimated these line timings from this MP3, but the German words have not been teacher-verified. The highlighted lines are approximate and need a listening review."
-       : "COURSE DRAFT — These lyrics have not been checked against this MP3. Follow lyrics scrolls the page approximately with playback; it does not synchronize individual words or lines.")
+       : "COURSE DRAFT — These lyrics have not been checked against this MP3. Line highlighting is unavailable until matching recording timestamps are published.")
     : lesson.timingStatus === "estimated" && renderedCues.length
       ? "TIMING DRAFT — The highlighted lines use estimated cues for this recording. Exact starts still need a listening review."
       : renderedCues.length ? "Follow the highlighted line, or tap a line to replay it."
-      : "The recording has lyrics but no line timestamps yet. Follow lyrics scrolls approximately with playback; precise line highlighting is unavailable.");
+      : "The recording has lyrics but no line timestamps yet. Line highlighting is unavailable until matching recording timestamps are published.");
   root.append(note);
   let index = 0;
   for (const raw of String(lesson.lyrics || "").replace(/\\n/g, "\n").split(/\r?\n/)) {
@@ -608,14 +606,6 @@ function renderLyrics(lesson) {
   }
 }
 function updateLyricHighlight() {
-  // An untimed recording still has useful, user-controlled page follow.
-  // Never synthesize line cues or present a course draft as matched lyrics.
-  if (!renderedCues.length && followLyrics && selected?.id === current?.id
-      && !byId("detail-lyrics").hidden) {
-    const root = byId("lyrics-text");
-    const target = approximateScrollTop(audio.currentTime, audio.duration, root.scrollHeight, root.clientHeight);
-    if (target !== null) root.scrollTop = target;
-  }
   const active = selected?.id === current?.id && !audio.ended ? activeLyricIndex(renderedCues, audio.currentTime) : -1;
   if (active === highlightedLine) return;
   highlightedLine = active;

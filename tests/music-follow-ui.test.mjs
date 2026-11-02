@@ -73,22 +73,22 @@ for(const [level,day] of [['A2',18],['B1',24],['A1',14],['A1',13]])test(level+' 
  click('check-answers');assert.match(d.getElementById('practice-feedback').textContent,/1 of 2 correct/);
  dom.window.close();
 });
-test('untimed A1 recording still permits approximate page follow without pretending line cues exist',async()=>{
- const track={id:'r2-a1-day-14',title:'Einsteigen',level:'A1',day:14,autoDiscovered:true,coursebook:true,objectKey:'music/a1/day-14/Einsteigen.mp3',audioUrl:'https://www.falowen.app/api/music?track=r2-a1-day-14'};
+for (const [level,day,title,key] of [['A1',14,'Einsteigen','music/a1/day-14/Einsteigen.mp3'],['B1',2,'Freundschaft am Fluss','music/b1/day-02/Freundschaft am Fluss.mp3']]) test(`untimed ${level} Day ${day} stays still and never substitutes duration scrolling for line timing`,async()=>{
+ const track={id:'r2-untimed-'+level,title,level,day,autoDiscovered:true,coursebook:true,objectKey:key,audioUrl:'https://www.falowen.app/api/music?track=r2-untimed'};
  const {w,a,dom}=await room(track,null);const d=w.document;d.querySelector('[data-tab="lyrics"]').click();
  const root=d.getElementById('lyrics-text');
  Object.defineProperty(root,'scrollHeight',{value:1000,configurable:true});
  Object.defineProperty(root,'clientHeight',{value:300,configurable:true});
  Object.defineProperty(a,'duration',{value:140,configurable:true});
  a.currentTime=70;a.dispatchEvent(new w.Event('timeupdate'));
- assert.equal(d.getElementById('follow-lyrics').disabled,false);
- assert.equal(d.getElementById('follow-lyrics').checked,true);
- assert.match(d.getElementById('follow-label').textContent,/approximate scroll/);
- assert.ok(root.scrollTop>0,'untimed song auto-scrolls the draft with audio progress');
+ assert.equal(d.getElementById('follow-lyrics').disabled,true);
+ assert.equal(d.getElementById('follow-lyrics').checked,false);
+ assert.match(d.getElementById('follow-label').textContent,/Line highlighting unavailable/);
+ assert.equal(root.scrollTop,0,'untimed lyrics must not scroll with elapsed duration');
  assert.equal(root.querySelector('[aria-current="true"]'),null,'no fake line highlight');
- const at=root.scrollTop;d.getElementById('follow-lyrics').click();
+ root.scrollTop=120; const at=root.scrollTop;
  a.currentTime=90;a.dispatchEvent(new w.Event('timeupdate'));
- assert.equal(root.scrollTop,at,'listener can disable approximate follow');
+ assert.equal(root.scrollTop,at,'manual reading position stays fixed while audio plays');
  assert.equal(d.getElementById('lyrics-next').hidden,true);dom.window.close();
 });
 

@@ -48,3 +48,13 @@ so no cue boundaries, MP3 fingerprints or lyric approval states were changed.
 Validation: translation contracts and the public-player DOM matrix check
 English visibility, unchanged draft labels and the absence of fabricated
 click-to-seek cues for untimed drafts. They do not verify acoustic alignment.
+
+## Follow behaviour — 2 November 2026
+
+Follow now uses only complete, text-matched cue intervals. Untimed lyrics stay
+at the listener's manual reading position; the duration-based approximate page
+scroll has been removed. The control is disabled with “Line highlighting
+unavailable” until matching timestamps are published. Timed recordings retain
+per-line highlighting, seeking, instrumental gaps and repeat behaviour.
+B1 Day 2 `Freundschaft am Fluss.mp3` currently has no published recording lyric
+pack: removing page scroll does not supply its missing acoustic alignment.
