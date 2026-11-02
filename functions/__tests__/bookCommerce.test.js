@@ -41,7 +41,7 @@ function fakeAdmin({ existingReceipt = false } = {}) {
 
 test("A1 printed order has a fixed 800 cedi price", () => {
   assert.equal(BOOKS["a1-printed"].priceGhs, 800);
-  assert.equal(BOOKS["a1-digital"].priceGhs, 99);
+  assert.equal(BOOKS["a1-digital"].priceGhs, 100);
 });
 
 test("valid signed-event payload is reconciled once, without changing tuition", async () => {
@@ -86,7 +86,7 @@ test("new A2 course book is the only A2 shop product and old guides cannot be so
   assert.equal(a2.status, "available");
   assert.deepEqual(a2.bookIds, ["a2-course-workbook-digital", "a2-course-workbook-printed"]);
   assert.deepEqual(a2.formats, ["digital", "printed"]);
-  assert.equal(BOOKS["a2-course-workbook-digital"].priceGhs, 99);
+  assert.equal(BOOKS["a2-course-workbook-digital"].priceGhs, 100);
   assert.equal(BOOKS["a2-course-workbook-printed"].priceGhs, 1050);
   const hiddenIds = [
     "a1-writing-model-exams",
@@ -99,7 +99,7 @@ test("new A2 course book is the only A2 shop product and old guides cannot be so
     assert.ok(BOOKS[id + "-digital"]);
     assert.ok(BOOKS[id + "-printed"]);
   }
-  assert.equal(BOOKS["a1-digital"].priceGhs, 99);
+  assert.equal(BOOKS["a1-digital"].priceGhs, 100);
   assert.equal(BOOKS["a1-printed"].priceGhs, 800);
   assert.equal(BOOKS["writing-skills-a1-c2-digital"].priceGhs, 39);
   assert.equal(Object.keys(BOOKS).length, 11);
