@@ -1,0 +1,28 @@
+name: Authenticated Campus music practice checks
+on:
+  pull_request:
+    paths:
+      - "web/src/components/CampusMusicPage.js"
+      - "web/src/components/musicPracticeTracking.js"
+      - "web/src/components/musicPracticeTracking.test.mjs"
+      - "web/public/music/app.js"
+      - "web/public/music/index.html"
+      - ".github/workflows/campus-music-practice.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/components/CampusMusicPage.js"
+      - "web/src/components/musicPracticeTracking.js"
+      - "web/src/components/musicPracticeTracking.test.mjs"
+      - "web/public/music/app.js"
+      - "web/public/music/index.html"
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check web/public/music/app.js
+      - run: node --test web/src/components/musicPracticeTracking.test.mjs
