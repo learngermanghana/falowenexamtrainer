@@ -8,7 +8,7 @@ import {
 } from "./a1CanonicalLessonCatalog";
 
 const EXPECTED_ROUTE_KEYS = [
-  "0.1", "0.2", "1.1", "1.2", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
+  "0.1", "0.2", "1.2", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
   "12.1", "12.3", "13", "14.1",
   "1.1-practice", "1.2-practice", "1.3", "2.3", "3.5", "3.6", "4.7", "5.9", "5.10",
 ];
@@ -29,12 +29,12 @@ describe("A1 canonical lesson catalog", () => {
     expect(A1_CANONICAL_LESSON_CATALOG.every((lesson) => lesson.destination.startsWith("/campus/course/"))).toBe(true);
   });
 
-  test("keeps graded Kapitel 1.1 and its later self-practice resource separate", () => {
+  test("redirects retired Day 2 chapters into one lesson, while keeping Day 3 practice separate", () => {
     expect(getA1CanonicalLesson("1.1")).toMatchObject({
-      routeKey: "1.1",
+      routeKey: "0.2",
       day: 2,
-      assignmentKey: "A1-1.1",
-      destination: "/campus/course/a1-day-2-kapitel-1-1-workbook",
+      assignmentKey: "A1-0.2-1.1",
+      destination: "/campus/course/a1-day-2-foundations-workbook",
     });
     expect(getA1CanonicalLesson("A1-1.1-PRACTICE")).toMatchObject({
       routeKey: "1.1-practice",
@@ -42,7 +42,7 @@ describe("A1 canonical lesson catalog", () => {
       assignmentKey: null,
       destination: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
     });
-    expect(getA1CanonicalLessonsForChapter("1.1")).toHaveLength(2);
+    expect(getA1CanonicalLessonsForChapter("1.1")).toHaveLength(1);
   });
 
   test("keeps tutor-marked Kapitel 1.2 and its self-practice route separate", () => {
@@ -69,8 +69,8 @@ describe("A1 canonical lesson catalog", () => {
 
   test("uses the legacy day and explicit PRACTICE identity to disambiguate split resources", () => {
     expect(getA1CanonicalLessonForLegacyRoute({ day: 2, identity: "1.1" })).toMatchObject({
-      routeKey: "1.1",
-      destination: "/campus/course/a1-day-2-kapitel-1-1-workbook",
+      routeKey: "0.2",
+      destination: "/campus/course/a1-day-2-foundations-workbook",
     });
     expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "1.1" })).toMatchObject({
       routeKey: "1.1-practice",
@@ -132,8 +132,8 @@ describe("A1 canonical lesson catalog", () => {
 
   test("resolves every permanent route identity to one deterministic catalog entry", () => {
     [
-      ["0.2", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook"],
-      ["1.1", "/campus/course/a1-day-2-kapitel-1-1-workbook"],
+      ["0.2", "/campus/course/a1-day-2-foundations-workbook"],
+      ["1.1", "/campus/course/a1-day-2-foundations-workbook"],
       ["1.1-PRACTICE", "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"],
       ["1.2-PRACTICE", "/campus/course/a1-day-3-kapitel-1-2-workbook"],
       ["1.3", "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"],
