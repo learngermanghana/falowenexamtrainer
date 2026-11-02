@@ -539,6 +539,10 @@
       "dest": "/api/music-lyrics.js"
     },
     {
+      "src": "/api/music-lyrics-save",
+      "dest": "/api/music-lyrics-save.js"
+    },
+    {
       "src": "/api/music",
       "dest": "/api/approved-music.js"
     },
