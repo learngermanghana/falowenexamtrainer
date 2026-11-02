@@ -20,15 +20,15 @@ beforeEach(()=>{
     score:20,maxScore:25,assessmentIdentity:"b1-mock-02-examiner-verified",
   });
 });
-test("B1 Mock 2 uses the same A2 live examiner with Frau Keller and the selected presentation",async()=>{
+test("B1 Mock 2 uses the same A2 live examiner with the intercultural festival and selected integration presentation",async()=>{
   const finished=jest.fn(),onProgress=jest.fn();
   render(<B1MockConversationalSpeaking mockId="b1-mock-02" attemptId="attempt-b1-mock2"
     externalSecondsLeft={900} onProgress={onProgress} onComplete={finished}/>);
-  fireEvent.click(screen.getByLabelText(/Thema B: Verreisen/));
+  fireEvent.click(screen.getByLabelText(/Thema B: Braucht man Sport-/));
   fireEvent.click(screen.getByRole("button",{name:/Start full speaking exam/}));
-  expect(screen.getByTestId("examiner-topic")).toHaveTextContent("Frau Keller");
+  expect(screen.getByTestId("examiner-topic")).toHaveTextContent("interkulturelles Nachbarschaftsfest");
   fireEvent.click(screen.getByText("Complete AI examiner Teil"));
-  expect(screen.getByTestId("examiner-topic")).toHaveTextContent("Verreisen");
+  expect(screen.getByTestId("examiner-topic")).toHaveTextContent("Sport- und Kulturvereine");
   fireEvent.click(screen.getByText("Complete AI examiner Teil"));
   expect(screen.getByTestId("examiner-topic")).toHaveTextContent("Feedback");
   fireEvent.click(screen.getByText("Complete AI examiner Teil"));
@@ -45,9 +45,9 @@ test("B1 Mock 2 uses the same A2 live examiner with Frau Keller and the selected
 });
 test("Mock 1 is equally conversational but keeps its original task cards",()=>{
   expect(makeB1MockSpeakingTasks("b1-mock-01")[1].prompt).toContain("gedruckte Bücher");
-  expect(makeB1MockSpeakingTasks("b1-mock-02","b")[1].prompt).toContain("Verreisen");
-  expect(makeB1MockSpeakingTasks("b1-mock-02","a")[1].prompt).toContain("Bio-Produkte");
-  expect(makeB1MockSpeakingTasks("b1-mock-02")[0].prompt).toContain("Frau Keller");
+  expect(makeB1MockSpeakingTasks("b1-mock-02","b")[1].prompt).toContain("Sport- und Kulturvereine");
+  expect(makeB1MockSpeakingTasks("b1-mock-02","a")[1].prompt).toContain("Sprach- und Integrationskurse");
+  expect(makeB1MockSpeakingTasks("b1-mock-02")[0].prompt).toContain("interkulturelles Nachbarschaftsfest");
 });
 test("No final B1 mark is released when server verification fails",async()=>{
   scoreB1MockSpeaking.mockRejectedValueOnce(new Error("Unverified examiner receipt"));
