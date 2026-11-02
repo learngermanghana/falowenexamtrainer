@@ -4,11 +4,12 @@ import { A2_MOCK_04_HOEREN } from "../data/a2Mock04Hoeren";
 import { A2_MOCK_05_HOEREN } from "../data/a2Mock05Hoeren";
 import { A2_MOCK_06_HOEREN } from "../data/a2Mock06Hoeren";
 import { A2_MOCK_07_HOEREN } from "../data/a2Mock07Hoeren";
+import { A2_MOCK_08_HOEREN } from "../data/a2Mock08Hoeren";
 import "./A2Mock2Hoeren.css";
 
 // No answer key or transcript is shipped to the student browser.
 export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value = {}, onChange, onSubmit, timeRemaining, submitLabel = "Hören abgeben → Schreiben", submitDisabled = false, readOnly = false }) {
-  const parts = mockId === "a2-mock-07" ? A2_MOCK_07_HOEREN : mockId === "a2-mock-06" ? A2_MOCK_06_HOEREN : mockId === "a2-mock-05" ? A2_MOCK_05_HOEREN : A2_MOCK_04_HOEREN;
+  const parts = mockId === "a2-mock-08" ? A2_MOCK_08_HOEREN : mockId === "a2-mock-07" ? A2_MOCK_07_HOEREN : mockId === "a2-mock-06" ? A2_MOCK_06_HOEREN : mockId === "a2-mock-05" ? A2_MOCK_05_HOEREN : A2_MOCK_04_HOEREN;
   const [active,setActive] = useState(0);
   const [urls,setUrls] = useState({});
   const [loading,setLoading] = useState(false);
