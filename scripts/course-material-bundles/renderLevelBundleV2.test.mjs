@@ -63,6 +63,18 @@ test("B1 Day 23 uses source-only speaking mock pages, never opens a graded attem
   assert.match(preflight, /renderReadOnlyB1Section\(page, lesson, "workbook", "workbook"\)/);
 });
 
+test("B1 Day 23 QR generation is scoped to B1 renderer, not the A2 path", () => {
+  const a2start = source.indexOf("const renderReadOnlyA2Section = async");
+  const b1start = source.indexOf("const renderReadOnlyB1Section = async");
+  const end = source.indexOf("const getWorkbookTabAvailability =", b1start);
+  assert.ok(a2start >= 0 && b1start > a2start && end > b1start);
+  const a2 = source.slice(a2start, b1start);
+  const b1 = source.slice(b1start, end);
+  assert.ok(!a2.includes('["grammar", "workbook"].includes(part)'));
+  assert.ok(b1.includes('Number(lesson.day) === 23 && ["grammar", "workbook"].includes(part)'));
+  assert.ok(b1.includes("QRCode.toDataURL(lessonUrl"));
+});
+
 test("A1 render plan contains only grammar and workbook targets", () => {
   const plan = JSON.parse(
     fs.readFileSync(path.join(__dirname, "a1RenderPlan.json"), "utf8"),
