@@ -8,6 +8,7 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
 import { buildPdfLessonTargetUrl } from "./pdfLessonRoute.mjs";
 import { buildA2ReadOnlyPrintHtml, getA2ReadOnlyParts } from "./a2PrintableCompanions.mjs";
+import { buildB1ReadOnlyPrintHtml, getB1ReadOnlyParts, getB1PdfLessonCompanionUrl } from "./b1PrintableCompanions.mjs";
 import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
 import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2PrintSafety, assertA2PrintedContent } from "./a2PdfSafety.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
@@ -29,7 +30,7 @@ if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not r
 fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
-const diagnostics = { level, rendererVersion: 9, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level, rendererVersion: 10, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const storageStateFromEnv = () => {
@@ -445,6 +446,32 @@ const renderReadOnlyA2Section = async (page, lesson, part, filename = part) => {
   return { tab: filename, file, origin: "canonical-read-only" };
 };
 
+// A B1 graded panel can be locked until an authenticated learner starts an
+// attempt. The PDF exporter must not initiate attempts or unlock grades.
+// Print the exact public exercise fields from canonical B1 source instead.
+const renderReadOnlyB1Section = async (page, lesson, part, filename = part) => {
+  const lessonUrl = getB1PdfLessonCompanionUrl(lesson.route, baseUrl);
+  const audioQrDataUrl = part === "teil-4"
+    ? await QRCode.toDataURL(lessonUrl, { width: 160, margin: 1, errorCorrectionLevel: "M" }) : "";
+  const html = await buildB1ReadOnlyPrintHtml({ day: lesson.day, part, lessonUrl, audioQrDataUrl });
+  const file = path.join(renderDir, String(lesson.day).padStart(2, "0") + "-" + filename + ".pdf");
+  const printPage = await page.context().newPage();
+  try {
+    await printPage.setContent(html, { waitUntil: "load" });
+    const expectedText = (await printPage.locator("body").innerText()).trim();
+    if (expectedText.length < 140) throw new Error("B1 Day " + lesson.day + " " + part + ": empty print companion");
+    await printPage.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+    const printedText = execFileSync("pdftotext", ["-layout", file, "-"], { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+    if (printedText.replace(/\s+/g, " ").trim().length < 140) {
+      throw new Error("B1 Day " + lesson.day + " " + part + ": printed companion is empty");
+    }
+    await trimPrintedPdfTail(file, { description: "B1 Day " + lesson.day + " " + part + " companion" });
+  } finally {
+    await printPage.close();
+  }
+  return { tab: filename, file, origin: "canonical-read-only" };
+};
+
 const getWorkbookTabAvailability = async (page, name) => {
   const tab = page.getByRole("tab", { name: new RegExp("^\\s*" + name + "(?:\\s*[·:–—-].*)?\\s*$", "i") }).first();
   if (!(await tab.count())) return "absent";
@@ -500,7 +527,15 @@ const renderA2B1Lesson = async (page, lesson) => {
     if (availability === "hidden")
       throw new Error(`${level} Day ${lesson.day}: ${tabSpec.names[0]} unexpectedly hidden.`);
     if (availability === "locked") {
-      if (level !== "A2") throw new Error(`${level} Day ${lesson.day}: locked ${tabSpec.names[0]} has no print companion.`);
+      if (level === "B1") {
+        const availableCompanions = await getB1ReadOnlyParts(lesson.day);
+        if (!availableCompanions.includes(tabSpec.key)) {
+          throw new Error(`B1 Day ${lesson.day}: locked ${tabSpec.names[0]} has no canonical print source.`);
+        }
+        workbookParts.push(await renderReadOnlyB1Section(page, lesson, tabSpec.key, `workbook-${tabSpec.key}`));
+        console.log(`B1 Day ${lesson.day}: printed locked ${tabSpec.names[0]} read-only from canonical source.`);
+        continue;
+      }
       const printable = await renderReadOnlyA2Section(page, lesson, tabSpec.key, `workbook-${tabSpec.key}`);
       workbookParts.push(printable);
       console.log(`A2 Day ${lesson.day}: printed locked ${tabSpec.names[0]} read-only from canonical data.`);
