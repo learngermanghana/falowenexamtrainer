@@ -5,7 +5,7 @@ const normalizeAssignmentKey = (value) =>
   String(value || "")
     .trim()
     .toUpperCase()
-    .replace(/_/g, "-")
+    .replace(/_/g, (match, offset, whole) => whole === "A1-0.2_1.1" ? "_" : "-")
     .replace(/\s+/g, "");
 const normalizeChapter = (value) => String(value || "").trim().toLowerCase();
 
