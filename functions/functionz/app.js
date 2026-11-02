@@ -2824,11 +2824,12 @@ const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "", mockId="
   "",
   "AUFGABE 3 — formal email, 5 points; use the canonical word target.",
   "Use formal address/register and an appropriate closing.",
+  "For MOCK 02, report required_points_met as three booleans per part following the ordered points below. Do not penalise reasonable differences of opinion. In Teil 3, evaluate the four criterion weights 4/4/6/6 and scale their sum by 1/4 to the 5-point Falowen part score.",
   "",
   mockId==="b1-mock-02" ? [
-    "MOCK 02 TASK 1: Informal email to Julian. Thank him for birthday invitation, decline and explain why, suggest another meeting date; ca. 80 words.",
-    "MOCK 02 TASK 2: Online discussion: cashless payments everywhere? Reply to Laura, 26: pays by card or smartphone because faster and thinks cash outdated. Give own opinion, reasons, personal experience or home-country situation; ca. 80 words.",
-    "MOCK 02 TASK 3: Formal email to Frau Sommer, VHS customer-service leader: forgot library card yesterday in course room. Identify item and room, ask staff to find it and leave it at reception, formal register; ca. 40 words."
+    "MOCK 02 TASK 1: Informal email to a friend who was too ill to attend the learner's birthday party a week ago. Exactly THREE required points, in this order: (1) describe how the birthday celebration went; (2) say which gift was especially great and why; (3) propose meeting the friend. Include an informal salutation and closing. Target circa 80 words. Do NOT judge against the old Julian invitation scenario.",
+    "MOCK 02 TASK 2: Online guestbook entry responding to Tanja (15.01., 16:55) on Persönliche Kontakte und Internet. She believes online contact is useful for distant friends but cannot replace in-person meetings. Exactly THREE required points: (1) refer to her opinion and the subject; (2) state the learner's own view and justify it with an example or everyday experience; (3) end with a brief conclusion. The learner may agree OR disagree; neither viewpoint is automatically more correct. Target circa 80 words. Do NOT judge against the old cashless payment scenario.",
+    "MOCK 02 TASK 3: Brief formal email to Kursleiterin Frau Müller. The learner was invited to a meeting about personal learning goals but cannot attend. Exactly THREE required points: (1) apologise politely for missing the meeting; (2) explain why they cannot attend; (3) use polite Sie-register with appropriate salutation and sign-off. A replacement meeting proposal is optional, not compulsory. Target circa 40 words. Assess diagnostic criteria on a 20-point scale: task fulfilment 0–4, cohesion 0–4, vocabulary 0–6, grammatical structures 0–6; report the four criterion marks as teil3.rubric_scores and report normalized teil3.score out of 5 for Falowen's /25 mock writing score. Do NOT judge against the old lost library card scenario."
   ].join("\\n") : mockTaskPrompt("B1", "writing"),
   "Return JSON only, no markdown, using this shape:",
   JSON.stringify({
@@ -2852,6 +2853,7 @@ const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "", mockId="
       },
       teil3: {
         score: 0, maxScore: 5,
+        rubric_scores: { task_fulfilment: 0, cohesion: 0, vocabulary: 0, grammar: 0 },
         required_points_met: [false, false, false],
         feedback_en: "English feedback.",
         corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
