@@ -429,17 +429,29 @@ export const B1_MOCK2_WRITING_TASKS=Object.freeze([
     points:["Erklären Sie höflich, was Sie vergessen haben und in welchem Raum.","Bitten Sie darum, nach dem Ausweis zu suchen und ihn an der Rezeption zu hinterlegen.","Verwenden Sie die Sie-Form, eine passende Anrede und eine Grußformel."]}
 ]);
 export const B1_MOCK2_SPEAKING=Object.freeze({
-  teil1:{id:"teil1",title:"Aufgabe 1 · Gemeinsam planen",
-    situation:"Frau Keller aus Ihrem Sprachkurs feiert nächste Woche ihr 10-jähriges Firmenjubiläum. Sie und Ihr Partner möchten eine Überraschungsfeier im Kursraum organisieren.",
-    points:["Wann und wo findet die Feier statt?","Wen laden Sie ein (Mitschüler, Lehrkräfte)?","Was schenken Sie ihr (Idee und Budget)?","Wer besorgt Essen, Getränke und Dekoration?"],
-    instruction:"Planen Sie gemeinsam, machen Sie Vorschläge, fragen Sie nach, reagieren Sie und einigen Sie sich auf einen Plan.",
-    maxRecordingSeconds:240},
-  teil2:{id:"teil2",title:"Aufgabe 2 · Präsentation",
-    topic:"Sollte man im Alltag mehr Bio-Produkte kaufen?",
-    alternativeTopic:"Verreisen: Lieber alleine oder in einer Gruppe?",
-    points:["Einleitung: Thema vorstellen und Aufbau erklären.","Eigene Erfahrungen schildern.","Situation im Heimatland beschreiben.","Vor- und Nachteile nennen und Ihre Meinung äußern.","Abschluss und Dank an die Zuhörer."],
-    prepSeconds:300,maxRecordingSeconds:240},
-  teil3:{id:"teil3",title:"Aufgabe 3 · Reagieren",
-    prompt:"Geben Sie Ihrem Partner Feedback zu seiner Präsentation, stellen Sie eine passende Zusatzfrage und beantworten Sie eine Frage zu Ihrer eigenen Präsentation.",
+  teil1:{id:"teil1",title:"Teil 1 · Gemeinsam etwas planen",
+    situation:"Sie und Ihre Gesprächspartnerin oder Ihr Gesprächspartner möchten ein interkulturelles Nachbarschaftsfest im Stadtteil organisieren, um die Integration und den Austausch von Menschen unterschiedlicher Herkunft zu fördern.",
+    points:[
+      "Wann und wo findet das Nachbarschaftsfest statt?",
+      "Wen laden Sie ein und wie informieren Sie die Nachbarschaft?",
+      "Welche Speisen und Getränke bieten Sie an, zum Beispiel ein Mitbring-Buffet?",
+      "Welche Aktivitäten oder Spiele stehen auf dem Programm?",
+      "Wer kümmert sich um welche Vorbereitungen?"
+    ],
+    instruction:"Planen Sie die Veranstaltung gemeinsam. Machen Sie Vorschläge, fragen Sie nach, reagieren Sie auf Ihren Gesprächspartner und einigen Sie sich auf konkrete Aufgaben.",
+    maxRecordingSeconds:180},
+  teil2:{id:"teil2",title:"Teil 2 · Ein Thema präsentieren",
+    topic:"Sollten Sprach- und Integrationskurse für alle Zugewanderten verpflichtend sein?",
+    alternativeTopic:"Braucht man Sport- und Kulturvereine für ein gutes Zusammenleben in der Stadt?",
+    points:[
+      "Einleitung: Nennen Sie Ihr Thema und beschreiben Sie die Struktur Ihrer Präsentation.",
+      "Persönliche Erfahrung: Berichten Sie von Ihren eigenen Erfahrungen mit diesem Thema.",
+      "Heimatland: Beschreiben Sie die Situation in Ihrem Heimatland.",
+      "Vor- und Nachteile und eigene Meinung: Nennen Sie Vor- und Nachteile und äußern Sie Ihre persönliche Meinung.",
+      "Abschluss: Beenden Sie Ihre Präsentation und bedanken Sie sich beim Publikum."
+    ],
+    prepSeconds:300,maxRecordingSeconds:180},
+  teil3:{id:"teil3",title:"Teil 3 · Über ein Thema sprechen",
+    prompt:"Reagieren Sie auf die Präsentation Ihrer Partnerin oder Ihres Partners: Geben Sie Feedback und sagen Sie, was Ihnen gut gefallen hat. Stellen Sie eine passende Ergänzungsfrage zum Thema der Präsentation. Beantworten Sie anschließend die Frage Ihrer Partnerin oder Ihres Partners zu Ihrer eigenen Präsentation.",
     maxRecordingSeconds:120}
 });
