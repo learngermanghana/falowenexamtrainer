@@ -1,7 +1,7 @@
 name: Temporary B1 retail PDF proof (no deployment)
 on:
   push:
-    branches: [fix/b1-retail-pdf-publishing-2026-11-02]
+    branches: [fix/b1-pdf-publication-audit-2026-11-02]
 permissions:
   contents: read
 jobs:
@@ -36,6 +36,20 @@ jobs:
           FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
           FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
           FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+      - name: Audit B1 publication page density (counts only, no student content)
+        run: |
+          python3 - <<'PY'
+          import re, subprocess
+          fn = "artifacts/course-material-bundles/B1/Falowen-B1-Course-Materials.pdf"
+          content = subprocess.check_output(["pdftotext","-layout",fn,"-"]).decode("utf8","replace").split("\\f")
+          for no, page in enumerate(content,1):
+              if not page.strip(): continue
+              cleaned = re.sub(r"Falowen Learning Hub\\s+\\d+\\s*/\\s*\\d+","",page,flags=re.I)
+              short = len(cleaned.strip()) < 12
+              audio = bool(re.search(r"Audio wird geladen",page,re.I))
+              if short or audio:
+                  print(f"Page {no}: remaining_chars={len(cleaned.strip())}, lines={len(page.splitlines())}, footer={bool(re.search('Falowen Learning Hub',page))}, audio_loading={audio}, blank_except_footer={short}")
+          PY
       - name: Validate full B1 retail proof
         run: node scripts/course-material-bundles/validateGeneratedBundle.mjs B1
       - name: Upload B1 retail proof
