@@ -68,7 +68,9 @@ function createExaminerFlow(level, task, mode="guided") {
     flow.contextTopic=clean(task?.keywords || "Präsentation",180);
     flow.discussion={
       topic:task?.id === "b1-mock-02-speaking-teil-3" ? (/Sprach- und Integrationskurse/i.test(task?.keywords || "") ? "Sport- und Kulturvereine" : "Sprach- und Integrationskurse") : "Online Deutsch lernen",
-      presentation:catalogue.profiles["B1-3"].partnerPresentation,
+      presentation:task?.id === "b1-mock-02-speaking-teil-3"
+        ? "Ich möchte über das Zusammenleben in unserer Stadt sprechen. In meinem Stadtteil treffen sich Menschen verschiedener Herkunft in Sport- und Kulturvereinen und Sprachkursen. Dabei lernen sie einander kennen und üben Deutsch. Ein Nachteil ist, dass manche wegen ihrer Arbeit wenig Zeit haben. Meiner Meinung nach brauchen wir flexible Angebote und offene Begegnungen. Vielen Dank fürs Zuhören."
+        : catalogue.profiles["B1-3"].partnerPresentation,
     };
     flow.mockPresentationFeedback=true;
   }
