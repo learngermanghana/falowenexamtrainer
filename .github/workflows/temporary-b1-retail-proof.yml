@@ -44,7 +44,7 @@ jobs:
           content = subprocess.check_output(["pdftotext","-layout",fn,"-"]).decode("utf8","replace").split(chr(12))
           for no, page in enumerate(content,1):
               if not page.strip(): continue
-              cleaned = re.sub(r"Falowen Learning Hub\\s+\\d+\\s*/\\s*\\d+","",page,flags=re.I)
+              cleaned = re.sub(r"Falowen Learning Hub\s+\d+\s*/\s*\d+","",page,flags=re.I)
               short = len(cleaned.strip()) < 12
               audio = bool(re.search(r"Audio wird geladen",page,re.I))
               nav = "Back to Course Book" in page

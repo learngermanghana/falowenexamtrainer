@@ -82,7 +82,7 @@ export const prepareB1PrintView = () => {
   // never hide the task prompt or the numbered Hören questions.
   for (const node of [...root.querySelectorAll("span,p,small,div")]) {
     if (!node.isConnected || node.children.length || node.querySelector("input,textarea")) continue;
-    if (/^Audio wird geladen\\s*(?:…|\\.{2,3})?$/i.test(normalize(node.textContent))) swap(node);
+    if (/^Audio wird geladen\s*(?:…|\.{2,3})?$/i.test(normalize(node.textContent))) swap(node);
   }
 
   // The Course Book contains several 'next lesson' and workbook-link cards.
