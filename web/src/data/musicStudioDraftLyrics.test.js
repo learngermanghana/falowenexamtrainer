@@ -4,14 +4,18 @@ const { validateLyrics } = require("../../../server/musicLyrics.cjs");
 const read = file => fs.readFileSync(path.resolve(process.cwd(),file),"utf8");
 
 describe("Falowen Music studio lyrics for published R2 tracks", () => {
-  test("shares all 84 original Admin drafts as visibly unverified reference texts", () => {
+  test("shares 83 current Admin reference drafts after retiring the old A2-1.1 placeholder as visibly unverified reference texts", () => {
     const drafts=JSON.parse(read("public/music/studio-drafts.json"));
-    expect(drafts.tracks).toHaveLength(84);
+    expect(drafts.tracks).toHaveLength(83);
     const day13=drafts.tracks.filter(entry=>entry.level==="A1"&&entry.day===13);
     expect(day13).toHaveLength(1);
     expect(day13[0]).toMatchObject({assignmentKey:"A1-3.5",title:"Die Rechnung im Café"});
     expect(day13[0].lyrics).toContain("Zwei Tees, vier Euro");
     expect(drafts.source).toMatch(/NOT verified/);
+    const maria=drafts.tracks.find(entry=>entry.assignmentKey==="A2-1.2");
+    expect(maria.title).toBe("Maria, meine Mama");
+    expect(maria.lyrics).toContain("Danke, Mama, für deine Zeit,");
+    expect(maria.lyrics).not.toContain("Die neue Kollegin");
   });
   test("public player prefers exact published lyrics and labels fallback as draft", () => {
     const app=read("public/music/app.js");
