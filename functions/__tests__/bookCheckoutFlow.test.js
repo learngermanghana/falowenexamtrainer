@@ -20,6 +20,11 @@ test("checkout validates quantities and delivery, charges server total and verif
  };
  try {
   for(const quantity of [0,-1,1.5,21,"2",null]) assert.equal((await invoke({quantity})).code,400);
+  for (const hidden of [
+    "a1-writing-model-exams-digital", "a1-writing-model-exams-printed",
+    "a2-four-skills-exam-guide-digital", "a2-four-skills-exam-guide-printed",
+    "b1-four-skills-exam-guide-digital", "b1-four-skills-exam-guide-printed",
+  ]) assert.equal((await invoke({bookId:hidden})).code,400);
   assert.equal((await invoke({bookId:"a1-digital",quantity:2})).code,400);
   assert.equal((await invoke({deliveryMethod:"delivery",deliveryAddress:""})).code,400);
   assert.equal((await invoke({bookId:"unknown"})).code,400);
@@ -29,6 +34,7 @@ test("checkout validates quantities and delivery, charges server total and verif
   assert.equal(saved.unitPriceGhs,800);assert.equal(saved.quantity,3);assert.equal(saved.deliveryAddress,"Accra, Example Street");
   const verified=await processBookWebhook({admin,data:{domain:"live",status:"success",reference:saved.reference,currency:"GHS",amount:240000,customer:{email:saved.email},metadata:initialization.metadata}});
   assert.equal(verified.body.status,"synced");assert.equal(receipt.amountGhs,2400);
+  const a2=await invoke({bookId:"a2-course-workbook-digital"});assert.equal(a2.code,200);assert.equal(initialization.amount,9900);assert.equal(saved.format,"digital");
   const legacy=await invoke({bookId:"a1-digital"});assert.equal(legacy.code,200);assert.equal(initialization.amount,9900);assert.equal(saved.quantity,1);
  } finally {
   global.fetch=oldFetch;

@@ -219,18 +219,8 @@
     <changefreq>monthly</changefreq><priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.falowen.app/books/goethe-a1-writing-model-exams</loc>
+    <loc>https://www.falowen.app/books/deutsch-a2-course-workbook</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.falowen.app/books/goethe-a2-four-skills-exam-guide</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.falowen.app/books/goethe-b1-four-skills-exam-guide</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
 </urlset>

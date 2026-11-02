@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import BooksCatalog, { indicativeUsd, matchCatalogTitles } from "./BooksCatalog";
+import BooksCatalog, { indicativeUsd, matchCatalogTitles, BOOK_PAGES } from "./BooksCatalog";
 
 const titles = [
   { id: "a1-course-workbook", title: "Deutsch A1 — Course & Workbook", description: "Beginner grammar course",
@@ -53,46 +53,29 @@ describe("Falowen Books discovery, currency and checkout safety", () => {
   });
 });
 
-test("priced A1 A2 B1 guide catalog cards show editions and direct buyers to each own page", () => {
-  const titles = [
-    ["a1-writing-model-exams","goethe-a1-writing-model-exams","A1",30,29,100],
-    ["a2-four-skills-exam-guide","goethe-a2-four-skills-exam-guide","A2",50,39,200],
-    ["b1-four-skills-exam-guide","goethe-b1-four-skills-exam-guide","B1",50,39,200],
-  ];
-  const items = titles.map(([id,,level,pages])=>({
-    id,title:"Falowen "+level+" Exam Guide",description:"Independent exam guide",
-    levelTags:[level],topics:["exam"],formats:["digital","printed"],pages,
-    status:"available",bookIds:[id+"-digital",id+"-printed"],
-  }));
-  const offers = titles.flatMap(([id,,,,pdf,print])=>[
-    {id:id+"-digital",format:"digital",priceGhs:pdf},
-    {id:id+"-printed",format:"printed",priceGhs:print},
-  ]);
-  render(<BooksCatalog catalogTitles={items} books={offers} onSelectBook={jest.fn()} />);
-  for(const [id,slug] of titles) {
-    const link=screen.getAllByRole("link",{name:"View Book"})
-      .find(a=>a.getAttribute("href")==="/books/"+slug);
-    expect(link).toBeTruthy();
-  }
-  expect(screen.getAllByText("GH₵200.00")).toHaveLength(2);
-  expect(screen.queryByText(/Coming soon/)).not.toBeInTheDocument();
-  expect(screen.getAllByText("Printed on demand")).toHaveLength(3);
+test("only the published A2 course book appears when old guide data is still cached",()=>{
+ const retired=["a1-writing-model-exams","a2-four-skills-exam-guide","b1-four-skills-exam-guide"];
+ const titles=[
+  {id:"a2-course-workbook",title:"Deutsch A2 — Course & Workbook",description:"328-page course book",
+   levelTags:["A2"],formats:["digital"],pages:328,status:"available",bookIds:["a2-course-workbook-digital"]},
+  ...retired.map(id=>({id,title:id,description:"Retired exam guide",levelTags:["A2"],
+   formats:["digital"],pages:50,status:"available",bookIds:[id+"-digital"]})),
+ ];
+ const offers=[
+  {id:"a2-course-workbook-digital",format:"digital",priceGhs:99},
+  ...retired.map(id=>({id:id+"-digital",format:"digital",priceGhs:39})),
+ ];
+ render(<BooksCatalog catalogTitles={titles} books={offers}/>);
+ expect(screen.getByText("1 book found")).toBeInTheDocument();
+ expect(screen.getByText("GH₵99.00")).toBeInTheDocument();
+ expect(screen.getByRole("link",{name:"View Book"}))
+  .toHaveAttribute("href","/books/deutsch-a2-course-workbook");
+ for(const name of retired)expect(screen.queryByText(name)).not.toBeInTheDocument();
 });
-
-test("book landing cards link all three exam guides with the same covers and without checkout controls",()=>{
- const titles=["a1-writing-model-exams","a2-four-skills-exam-guide","b1-four-skills-exam-guide"]
-   .map((id,i)=>({id,title:["A1 Writing","A2 Four Skills","B1 Four Skills"][i],
-     description:"Independent exam preparation",levelTags:[["A1","A2","B1"][i]],
-     formats:["digital","printed"],pages:i?50:30,status:"available",
-     bookIds:[id+"-digital",id+"-printed"]}));
- const books=titles.flatMap((title,i)=>[
-  {id:title.id+"-digital",format:"digital",priceGhs:i?39:29},
-  {id:title.id+"-printed",format:"printed",priceGhs:i?200:100},
- ]);
- render(<BooksCatalog catalogTitles={titles} books={books}/>);
- for(const slug of ["goethe-a1-writing-model-exams","goethe-a2-four-skills-exam-guide","goethe-b1-four-skills-exam-guide"]){
-  expect(screen.getAllByRole("link",{name:"View Book"}).some(a=>a.getAttribute("href")==="/books/"+slug)).toBe(true);
- }
- expect(screen.getAllByRole("img",{name:/cover/i})).toHaveLength(3);
- expect(screen.queryByRole("button",{name:/Continue to Paystack/})).not.toBeInTheDocument();
+test("A2 Course Book replaces the three old exam guides in the real product page map",()=>{
+ expect(BOOK_PAGES["a2-course-workbook"]).toEqual({
+  href:"/books/deutsch-a2-course-workbook",cover:"/books/a2-cover.svg"
+ });
+ for(const hidden of ["a1-writing-model-exams","a2-four-skills-exam-guide","b1-four-skills-exam-guide"])
+  expect(BOOK_PAGES[hidden]).toBeUndefined();
 });

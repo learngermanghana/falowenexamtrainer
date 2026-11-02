@@ -27,9 +27,7 @@ export const matchCatalogTitles = (titles = [], search = "", level = "all", form
 export const BOOK_PAGES = Object.freeze({
   "a1-course-workbook": {href:"/books/deutsch-a1-course-workbook",cover:"/books/a1-cover.svg"},
   "writing-skills-a1-c2": {href:"/books/how-to-unlock-your-german-writing-skills-a1-c2",cover:"/books/writing-skills-a1-c2-cover.svg"},
-  "a1-writing-model-exams": {href:"/books/goethe-a1-writing-model-exams",cover:"/books/a1-writing-exams-cover.svg"},
-  "a2-four-skills-exam-guide": {href:"/books/goethe-a2-four-skills-exam-guide",cover:"/books/a2-exam-guide-cover.svg"},
-  "b1-four-skills-exam-guide": {href:"/books/goethe-b1-four-skills-exam-guide",cover:"/books/b1-exam-guide-cover.svg"},
+  "a2-course-workbook": {href:"/books/deutsch-a2-course-workbook",cover:"/books/a2-cover.svg"},
 });
 
 export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook, basePath = "/books" }) {
@@ -38,7 +36,9 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
   const [level, setLevel] = useState("all");
   const [format, setFormat] = useState("all");
   const results = useMemo(
-    () => matchCatalogTitles(catalogTitles, search, level, format),
+    // Filter locally as well: a newly deployed front end must never show
+    // retired products while the Firebase API deployment catches up.
+    () => matchCatalogTitles(catalogTitles.filter(item => BOOK_PAGES[item.id]), search, level, format),
     [catalogTitles, search, level, format],
   );
   return <section className="fb-library" id="fb-library" aria-label="Browse Falowen books">
