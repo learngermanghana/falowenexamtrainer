@@ -13,8 +13,7 @@ jest.mock("./CourseWorkbookSubmissionTabs", () => () => null);
 
 const A1_ASSIGNMENT_WORKBOOK_CASES = [
   ["A1-0.1", "/campus/course/a1-day-1-greetings-workbook", ""],
-  ["A1-0.2", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook", ""],
-  ["A1-1.1", "/campus/course/a1-day-2-kapitel-1-1-workbook", ""],
+  ["A1-0.2_1.1", "/campus/course/a1-day-2-foundations-workbook", ""],
   ["A1-1.2", "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook", ""],
   ["A1-2", "/campus/course/a1-day-4-numbers-for-beginners-workbook", ""],
   ["A1-3", "/campus/course/a1-chapter-3-asking-about-prices-workbook", ""],

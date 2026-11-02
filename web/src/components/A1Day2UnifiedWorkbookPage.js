@@ -4,12 +4,19 @@ import { styles } from "../styles";
 
 const block = { ...styles.card, display: "grid", gap: 12 };
 const question = { border: "1px solid #e2e8f0", background: "#fff", borderRadius: 10, padding: 12, display: "grid", gap: 6 };
+// Keep these items in the same order as the registered Day 2 marking key.
 const quiz = [
-  ["1. Wie viele Grundbuchstaben hat das deutsche Alphabet?", ["A) 24", "B) 26", "C) 30", "D) 32"]],
-  ["2. Welche Buchstaben sind deutsche Umlaute?", ["A) Ä, Ö, Ü", "B) E, I, U", "C) S, T, V", "D) A, B, C"]],
-  ["3. Wie nennt man ß?", ["A) Umlaut", "B) Doppel-U", "C) Eszett", "D) I-Punkt"]],
-  ["4. Welcher Buchstabe kommt nach J?", ["A) K", "B) L", "C) H", "D) Z"]],
-  ["5. Was bedeutet „Wie schreibt man das?“", ["A) How old are you?", "B) How do you spell that?", "C) Where do you live?", "D) What's your name?"]],
+  ["1. Which German word is spelled ha – uh – en – day?", ["A) Hase", "B) Hund", "C) Heiß", "D) Hagel"]],
+  ["2. Which German word is spelled es – ah – el – tset?", ["A) Sauer", "B) Sitz", "C) Scharf", "D) Salz"]],
+  ["3. Which German word is spelled kah – ah – tay – tset – ay?", ["A) Katze", "B) Käse", "C) Kaffee", "D) Kamin"]],
+  ["4. Which character represents a double 's' sound and is called scharfes S?", ["A) Ä", "B) Ö", "C) Ü", "D) ß"]],
+];
+const formalityQuiz = [
+  ["1. You are speaking formally to a teacher or business partner. Which pronoun do you use?", ["A) du", "B) ihr", "C) Sie"]],
+  ["2. You are talking to your best friend at university. Which pronoun do you use?", ["A) du", "B) ihr", "C) Sie"]],
+  ["3. You are addressing a group of three close friends. Which pronoun do you use?", ["A) du", "B) ihr", "C) Sie"]],
+  ["4. Guten Tag, Frau Müller! Wie heißen _____?", ["A) du", "B) Sie", "C) sie"]],
+  ["5. You are asking two customers politely: Woher kommen _____?", ["A) ihr", "B) du", "C) Sie"]],
 ];
 const pronounQuiz = [
   ["1. ___ lerne Deutsch.", ["A) Ich", "B) Du", "C) Er", "D) Wir"]],
@@ -18,7 +25,6 @@ const pronounQuiz = [
   ["4. Kojo und ich lernen Deutsch. ___ lernen Deutsch.", ["A) Wir", "B) Du", "C) Er", "D) Ihr"]],
   ["5. Wie heißen ___? (formal, one person)", ["A) du", "B) er", "C) Sie", "D) ich"]],
 ];
-const listening = ["1. W _ _ _ _ r", "2. K _ _ _ _ _", "3. B _ _ _ _", "4. S _ _ _ _ _", "5. T _ _ _ _"];
 const verbs = [
   "1. Ich ___ Deutsch. (lernen)",
   "2. Du ___ in Accra. (wohnen)",
@@ -46,19 +52,18 @@ export default function A1Day2UnifiedWorkbookPage() {
       subtitle="One combined assignment · Five sections · 100 marks"
       assignmentIntro="Complete every section and use Review & Submit once. Each of the five parts is worth 20 marks. Earlier Kapitel 0.2 and 1.1 submissions remain separate historical records."
       submitTitle="Submit A1 · Day 2 Combined Assignment"
-      submitDescription="Include all five parts in your submission: Teil 1 (1–5), Teil 2 Hören (1–5), Teil 3 (1–5), Teil 4 (1–5), then your Teil 5 short text. This is a new assignment; previous chapter scores are not transferred."
+      submitDescription="Include all five parts in your submission: Teil 1 (1–5), Teil 2 formality (1–5), Teil 3 (1–5), Teil 4 (1–5), then your Teil 5 short text. This is a new assignment; previous chapter scores are not transferred."
     >
       <section style={block}>
         <h2 style={{ margin: 0 }}>Teil 1 · Alphabet und Buchstabieren — 20 Punkte</h2>
-        <p style={{ margin: 0 }}>Choose A, B, C or D for each question. Use the German letter names from the grammar notes.</p>
+        <p style={{ margin: 0 }}>Übung 1 · Phonetisches Wörter-Rätsel. Read the German letter names in the sequence and identify the spelled word.</p>
         <MultipleChoice items={quiz} />
+        <div style={question}><strong>5. Which letter is A with two dots above it (as in Apfel → Äpfel)?</strong><span>Write the German letter or its name (A-Umlaut) in your answer box below.</span></div>
       </section>
       <section style={block}>
-        <h2 style={{ margin: 0 }}>Teil 2 · Hören und Buchstabieren — 20 Punkte</h2>
-        <p style={{ margin: 0 }}>Listen to the approved Day 2 alphabet exercise video, then complete the five missing words. Write the full word for each numbered item.</p>
-        <a href="https://youtu.be/DeE6LKXyLWs" target="_blank" rel="noreferrer" style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}>Open the Hören video</a>
-        <iframe title="Day 2 German alphabet Hören exercise" src="https://www.youtube-nocookie.com/embed/DeE6LKXyLWs?rel=0&playsinline=1" style={{ width: "100%", minHeight: 280, border: 0, borderRadius: 10 }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
-        {listening.map(item => <div key={item} style={question}><strong>{item}</strong></div>)}
+        <h2 style={{ margin: 0 }}>Teil 2 · du, ihr oder Sie? — 20 Punkte</h2>
+        <p style={{ margin: 0 }}>Übung 4 · Formality & Context Choice. Choose du, ihr, or Sie for each situation. Use formal Sie when speaking politely, including to more than one customer.</p>
+        <MultipleChoice items={formalityQuiz} />
       </section>
       <section style={block}>
         <h2 style={{ margin: 0 }}>Teil 3 · Personalpronomen — 20 Punkte</h2>

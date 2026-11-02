@@ -13,72 +13,38 @@ import {
 describe("course book task entries", () => {
   const combinedDay = {
     day: 2,
-    topic: "German Alphabet + Personal Pronouns",
-    chapter: "0.2_1.1",
-    lesen_hören: [
-      { chapter: "0.2", title: "German Alphabet", assignment: true, assignmentId: "A1-0.2" },
-      { chapter: "1.1", title: "Personal Pronouns", assignment: true, assignmentId: "A1-1.1" },
-    ],
+    topic: "German Alphabet, Personal Pronouns and First Verbs",
+    chapter: "0.2",
+    lesen_hören: {
+      chapter: "0.2",
+      title: "German Alphabet, Personal Pronouns and First Verbs",
+      assignment: true,
+      assignmentId: "A1-0.2_1.1",
+    },
   };
 
-  it("creates one standardized card per task on a multi-task day", () => {
-    const entries = expandCourseBookEntries([combinedDay]);
-    expect(entries).toHaveLength(2);
-    expect(entries.map((entry) => entry.displayChapter)).toEqual(["0.2", "1.1"]);
-    expect(entries.map((entry) => entry.lessonTitle)).toEqual([
-      "German Alphabet",
-      "Personal Pronouns and Basic Verb Conjugation",
-    ]);
-    expect(entries.map((entry) => entry.topic)).toEqual([
-      "German Alphabet",
-      "Personal Pronouns and Basic Verb Conjugation",
-    ]);
-    expect(entries.every((entry) => entry.day === 2 && entry.displayDay === 2)).toBe(true);
-    expect(entries.every((entry) => entry.resourceType === COURSE_BOOK_RESOURCE_TYPES.readingListening)).toBe(true);
-    expect(entries.every((entry) => entry.assessmentType === COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked)).toBe(true);
-    expect(entries.map((entry) => entry.assignment_id)).toEqual(["A1-0.2", "A1-1.1"]);
+  it("creates exactly one card for the unified A1 Day 2", () => {
+    const entries = expandCourseBookEntries([combinedDay], { level: "A1" });
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toEqual(expect.objectContaining({
+      day: 2, displayChapter: "0.2", assignmentId: "A1-0.2_1.1",
+      lessonTitle: "German Alphabet, Personal Pronouns and First Verbs",
+    }));
+    expect(entries[0].assessmentType).toBe(COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked);
+    expect(entries[0].resourceType).toBe(COURSE_BOOK_RESOURCE_TYPES.readingListening);
   });
 
-  it("gives inherited A1 Day 2 child cards their individual titles", () => {
-    const entries = expandCourseBookEntries(
-      [{
-        day: 2,
-        topic: "German Alphabet + Personal Pronouns and Verb Conjugation",
-        chapter: "0.2_1.1",
-        lesen_hören: [
-          { chapter: "0.2", assignment: true },
-          { chapter: "1.1", assignment: true },
-        ],
-      }],
-      { level: "A1" }
-    );
-
-    expect(entries.map((entry) => entry.displayChapter)).toEqual(["0.2", "1.1"]);
-    expect(entries.map((entry) => entry.lessonTitle)).toEqual([
-      "German Alphabet",
-      "Personal Pronouns and Basic Verb Conjugation",
-    ]);
-    expect(entries.map((entry) => entry.assignmentId)).toEqual(["A1-0.2", "A1-1.1"]);
-    expect(entries.map((entry) => entry.topic)).toEqual([
-      "German Alphabet",
-      "Personal Pronouns and Basic Verb Conjugation",
-    ]);
-  });
-
-  it("keeps generated A1 catalog cards separated by chapter and title", () => {
+  it("keeps Day 2 combined in the canonical catalog while leaving Day 16 multi-chapter", () => {
     const entries = expandCourseBookEntries(getCurriculumEntriesForLevel("A1"), { level: "A1" });
     const byDay = (day) => entries.filter((entry) => Number(entry.displayDay) === Number(day));
 
     expect(byDay(2).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
-      ["0.2", "German Alphabet"],
-      ["1.1", "Personal Pronouns and Basic Verb Conjugation"],
+      ["0.2", "German Alphabet, Personal Pronouns and First Verbs"],
     ]);
-
     expect(byDay(16).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
       ["9", "Negation"],
       ["10", "Food"],
     ]);
-
     expect(byDay(18).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
       ["12.1", "Two-Way and Dative Prepositions"],
     ]);
@@ -262,6 +228,6 @@ describe("course book task entries", () => {
 
   it("finds an exact card by day and chapter instead of returning the first task", () => {
     expect(findCourseBookEntry({ entries: [combinedDay], day: 2, chapter: "1.1", level: "A1" }))
-      .toEqual(expect.objectContaining({ displayChapter: "1.1", assignmentId: "A1-1.1" }));
+      .toEqual(expect.objectContaining({ displayChapter: "0.2", assignmentId: "A1-0.2_1.1" }));
   });
 });

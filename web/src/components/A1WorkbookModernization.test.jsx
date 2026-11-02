@@ -42,10 +42,8 @@ describe("A1 workbook modernization", () => {
     const chapter02 = getA1WorkbookMediaResources({ day: 2, chapter: "0.2" });
     const chapter11 = getA1WorkbookMediaResources({ day: 2, chapter: "1.1" });
 
-    expect(chapter02.some(({ url }) => url.includes("uhFgKp4WVEc"))).toBe(true);
-    expect(chapter02.some(({ url }) => url.includes("xyRogEAA9qM"))).toBe(false);
-    expect(chapter11.some(({ url }) => url.includes("xyRogEAA9qM"))).toBe(true);
-    expect(chapter11.some(({ url }) => url.includes("uhFgKp4WVEc"))).toBe(false);
+    expect(chapter02).toEqual([]);
+    expect(chapter11).toEqual([]);
   });
 
   test("parses supported YouTube links for privacy-enhanced embeds", () => {
@@ -62,13 +60,10 @@ describe("A1 workbook modernization", () => {
     expect(within(header).getByText("Day 2")).toBeInTheDocument();
     expect(within(header).getByText("Kapitel 0.2")).toBeInTheDocument();
     expect(within(header).getByText("Assignment A1-0.2")).toBeInTheDocument();
-    expect(within(header).getByText("Assignment 2 of 19")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: "A1 assignment progress" })).toHaveAttribute("aria-valuenow", "11");
+    expect(within(header).getByText("Assignment 1 of 18")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "A1 assignment progress" })).toHaveAttribute("aria-valuenow", "6");
 
-    const media = screen.getByRole("region", { name: "A1 lesson videos" });
-    expect(media).toBeInTheDocument();
-    const teacherFrame = within(media).getByTitle("Teacher lecture · A1 Day 2");
-    expect(teacherFrame).toHaveAttribute("src", "https://www.youtube-nocookie.com/embed/uhFgKp4WVEc");
+    expect(screen.queryByRole("region", { name: "A1 lesson videos" })).not.toBeInTheDocument();
 
     const sectionProgress = screen.getByRole("progressbar", { name: "A1 workbook section progress" });
     expect(sectionProgress).toHaveAttribute("aria-valuenow", "20");

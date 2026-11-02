@@ -79,7 +79,7 @@ export const getYouTubeVideoId = (url = "") => {
 
 export const getA1WorkbookMediaResources = ({ day, chapter } = {}) => {
   const numericDay = Number(day || 0);
-  if (!numericDay) return [];
+  if (!numericDay || numericDay === 2) return [];
 
   const exactTeacherResources = getA1TeacherVideoResources(numericDay, chapter)
     .filter((resource) => chapterMatches(resource, chapter, numericDay));
@@ -111,6 +111,8 @@ const A1WorkbookMediaPanel = ({ day, chapter, teacherVideo = null, aiVideo = nul
   const resources = useMemo(() => {
     const suppressAiVideo = shouldSuppressA1WorkbookAiVideo(day, chapter);
     const canonicalResources = getA1WorkbookMediaResources({ day, chapter });
+    // No provisional Day 2 media. A unified video will be published separately.
+    if (Number(day) === 2) return [];
     const canonicalTeacherResources = canonicalResources.filter(
       (resource) => resource.kind === "teacher"
     );

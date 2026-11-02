@@ -18,8 +18,8 @@ import {
 
 const A1_RESOURCE_HUB_CASES = [
   [1, "0.1", "/campus/course/a1-day-1-greetings-workbook"],
-  [2, "0.2", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook"],
-  [2, "1.1", "/campus/course/a1-day-2-kapitel-1-1-workbook"],
+  [2, "0.2", "/campus/course/a1-day-2-foundations-workbook"],
+  [2, "1.1", "/campus/course/a1-day-2-foundations-workbook"],
   [3, "1.1", "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"],
   [3, "1.2", "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook"],
   [4, "2", "/campus/course/a1-day-4-numbers-for-beginners-workbook"],
@@ -86,13 +86,13 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
   });
 
   it("keeps the Day 2 Chapter 1.1 resources configured for their separate stages", () => {
-    expect(getTeacherVideoUrls(2, "1.1")).toEqual(["https://youtu.be/xyRogEAA9qM"]);
-    expect(getAiVideoUrls(2, "1.1")).toContain("https://youtu.be/kqagu9qsOcc");
-    expect(getA1GrammarRoute({ day: 2, chapter: "1.1" })).toBe(
-      "/campus/course/singular-pronouns-verb-conjugation-day-2",
-    );
+    expect(getTeacherVideoUrls(2, "1.1")).toEqual([]);
+    expect(getTeacherVideoUrls(2, "0.2")).toEqual([]);
+    expect(getAiVideoUrls(2, "0.2")).toEqual([]);
+    expect(getAiVideoUrls(2, "1.1")).toEqual([]);
+    expect(getA1GrammarRoute({ day: 2, chapter: "1.1" })).toBe("");
     expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 2, chapter: "1.1" })).toBe(
-      "/campus/course/a1-day-2-kapitel-1-1-workbook",
+      "/campus/course/a1-day-2-foundations-workbook",
     );
   });
 
@@ -120,10 +120,10 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     const entry = resolveA1ChapterResourceHubEntry({ day: 2, chapter: "1.1" });
     const state = buildA1ChapterResourceHubState({ level: "A1", day: 2, search });
 
-    expect(entry).toEqual(expect.objectContaining({ chapter: "1.1" }));
+    expect(entry).toEqual(expect.objectContaining({ chapter: "0.2" }));
     expect(entry.topic).toMatch(/Personal Pronouns/i);
-    expect(state.entry).toEqual(expect.objectContaining({ chapter: "1.1" }));
-    expect(state.entry.chapter).not.toBe("0.2");
+    expect(state.entry).toEqual(expect.objectContaining({ chapter: "0.2" }));
+    expect(state.entry.chapter).toBe("0.2");
   });
 
   it("embeds the approved YouTube Hören video in A1 Day 3 Kapitel 1.2 and removes Drive", () => {

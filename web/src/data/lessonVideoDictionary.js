@@ -14,6 +14,7 @@ export const shouldShowTeacherLectureVideo = (level, day) => {
   if (["A2", "B1"].includes(normalizedLevel)) {
     return hasTeacherLectureVideoResources(normalizedLevel, day);
   }
+  if (normalizedLevel === "A1" && Number(day) === 2) return false;
   return ["A1", "B2", "C1"].includes(normalizedLevel);
 };
 
@@ -41,26 +42,7 @@ export const LESSON_VIDEO_DICTIONARY = {
     1: {
       ai_grammar_video: "https://youtu.be/5WIMkENgdGE",
     },
-    2: {
-      videoResources: [
-        {
-          key: "ai-grammar-video-0-2",
-          chapter: "0.2",
-          title: "Kapitel 0.2 · Alphabet · AI video",
-          description:
-            "AI video lesson for the German alphabet, letter names, umlauts and spelling practice.",
-          url: "https://youtu.be/pCQVdJGsvtk",
-        },
-        {
-          key: "ai-grammar-video-1-1-pronouns-conjugation",
-          chapter: "1.1",
-          title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
-          description:
-            "AI video lesson for German subject pronouns and basic verb conjugation.",
-          url: "https://youtu.be/kqagu9qsOcc",
-        },
-      ],
-    },
+    2: { videoResources: [] },
     3: {
       videoResources: [
         {
@@ -491,6 +473,7 @@ const sortVideoResourcesByLessonOrder = (resources = [], entries = []) => {
 export const getLessonVideoResources = (level, day, entry = {}) => {
   const normalizedLevel = normalizeLevel(level);
   const dayKey = String(Number(day || entry?.day || entry?.assignmentDay || 0));
+  if (normalizedLevel === "A1" && dayKey === "2") return [];
   const showTeacherVideos = shouldShowTeacherLectureVideo(normalizedLevel, dayKey) && dayKey !== "0";
   const dictionaryEntry =
     LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};

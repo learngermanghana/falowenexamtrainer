@@ -2030,18 +2030,18 @@
     "format": "mixed",
     "answers": {
       "Teil 1": {
-        "Answer1": "B) 26",
-        "Answer2": "A) Ä, Ö, Ü",
-        "Answer3": "C) Eszett",
-        "Answer4": "A) K",
-        "Answer5": "B) How do you spell that?"
+        "Answer1": "B) Hund",
+        "Answer2": "D) Salz",
+        "Answer3": "A) Katze",
+        "Answer4": "D) ß",
+        "Answer5": "A-Umlaut"
       },
       "Teil 2": {
-        "Answer1": "Wasser",
-        "Answer2": "Kaffee",
-        "Answer3": "Blume",
-        "Answer4": "Schule",
-        "Answer5": "Tisch"
+        "Answer1": "C) Sie",
+        "Answer2": "A) du",
+        "Answer3": "B) ihr",
+        "Answer4": "B) Sie",
+        "Answer5": "C) Sie"
       },
       "Teil 3": {
         "Answer1": "A) Ich",
@@ -2058,7 +2058,7 @@
         "Answer5": "ist"
       }
     },
-    "workbookVersion": "A1-DAY2-FOUNDATIONS-V1",
+    "workbookVersion": "A1-DAY2-FOUNDATIONS-V2",
     "answerLayout": "multipart",
     "expectedParts": [
       "teil1",
@@ -2094,16 +2094,16 @@
     },
     "partGrading": {
       "teil1": {
-        "label": "Alphabet und Buchstabieren · 20 marks",
+        "label": "Phonetic word decoding · 20 marks",
         "hasReferenceAnswers": true,
         "gradingMode": "answer_key",
-        "instruction": "Score exactly the five alphabet multiple-choice answers. 4 marks per correct answer; total 20. Use only the current combined Day 2 workbook, not the archived alphabet assignment."
+        "instruction": "Grade exactly five phonetic-alphabet tasks, 4 marks each: Hund, Salz, Katze, ß, and A-Umlaut (Ä). Questions 1-4 are multiple choice; question 5 is a short answer. Accept 'Ä' as equivalent to 'A-Umlaut' in question 5. Only the learner's actual written response counts."
       },
       "teil2": {
-        "label": "Hören und Buchstabieren · 20 marks",
+        "label": "du, ihr oder Sie? · 20 marks",
         "hasReferenceAnswers": true,
         "gradingMode": "answer_key",
-        "instruction": "Score five completed German words from the published Day 2 spelling video. 4 marks per word; total 20. Accept normal capitalization but do not fabricate audio answers."
+        "instruction": "Grade five formal/informal context multiple-choice questions, 4 marks per correct answer: C (Sie for teacher/business partner), A (du for one friend), B (ihr for familiar group), B (Sie for Frau Müller), C (Sie for customers). Require formal capitalization Sie where writing is involved."
       },
       "teil3": {
         "label": "Personalpronomen · 20 marks",

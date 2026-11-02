@@ -129,7 +129,7 @@ describe("all tutor-marked A1 through C1 assignments", () => {
         const chapter = String(entry.chapter || "").trim();
         const assignmentKey = String(entry.assignment_id || entry.assignmentId || "").trim();
 
-        expect(assignmentKey).toBe(level + "-" + chapter);
+        expect(assignmentKey).toBe(level === "A1" && day === 2 ? "A1-0.2_1.1" : level + "-" + chapter);
 
         const route = getConfiguredInAppWorkbookResourceRoute({ level, day, chapter });
         expect(route).toMatch(/^\/campus\/course\//);

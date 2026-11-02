@@ -16,25 +16,9 @@ const expectRequestedAiVideo = (day, expected) => {
   );
 };
 
-test("A1 Day 2 provides both alphabet and pronoun videos in one lesson", () => {
+test("A1 Day 2 has no teacher or AI video until the new unified lecture is provided", () => {
   const lesson = normalizeLesson(getA1Lesson(2), "A1");
-  const videos = aiVideos(lesson);
-
-  expect(videos).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({
-        chapter: "0.2",
-        title: "Kapitel 0.2 · Alphabet · AI video",
-        url: "https://youtu.be/pCQVdJGsvtk",
-      }),
-      expect.objectContaining({
-        chapter: "0.2",
-        title: "Day 2 · Pronouns & Verb Conjugation · AI video",
-        url: "https://youtu.be/kqagu9qsOcc",
-      }),
-    ]),
-  );
-  expect(videos.some((video) => video.title.includes("Kapitel 0.2 + 1.1"))).toBe(false);
+  expect(lesson.resources.videos).toEqual([]);
 });
 
 test("A1 Day 8 uses the canonical Countries and Languages teacher video", () => {

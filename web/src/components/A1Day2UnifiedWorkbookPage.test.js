@@ -19,6 +19,8 @@ describe("A1 Day 2 unified foundations assignment", () => {
     const profile = getA1TutorDraftProfile(assignment.assignmentKey);
     expect(Object.keys(profile.sections)).toEqual(assignment.sections.map(s => s.key));
     expect(profile.sections["teil-5"].writing).toBe(true);
+    expect(profile.sections["teil-1"].items[4]).toMatchObject({ number: 5, type: "short" });
+    expect(profile.sections["teil-2"].items.every(item => item.type === "choice")).toBe(true);
     for (const key of ["teil-1", "teil-2", "teil-3", "teil-4"]) {
       expect(profile.sections[key].items).toHaveLength(5);
     }
@@ -26,5 +28,9 @@ describe("A1 Day 2 unified foundations assignment", () => {
     expect(source).toContain("100 marks");
     expect(source).toContain("Review & Submit");
     expect(source).toContain('fallbackAssignmentKey="A1-0.2_1.1"');
+    expect(source).toContain("Phonetisches Wörter-Rätsel");
+    expect(source).toContain("du, ihr oder Sie?");
+    expect(source).toContain("kah – ah – tay – tset – ay");
+    expect(source).not.toContain("DeE6LKXyLWs");
   });
 });

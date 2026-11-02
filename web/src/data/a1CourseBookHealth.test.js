@@ -113,8 +113,10 @@ describe("A1 Course Book health", () => {
     });
 
     for (let day = 1; day <= 22; day += 1) {
+      if (day === 2) continue; // New unified Day 2 video is not available yet.
       expect(getA1TeacherVideoResources(day).length).toBeGreaterThan(0);
     }
+    expect(getA1TeacherVideoResources(2)).toHaveLength(0);
     expect(getA1TeacherVideoResources(23)).toHaveLength(0);
   });
 

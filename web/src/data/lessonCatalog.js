@@ -53,11 +53,9 @@ const lessonCatalog = Object.freeze([
     "kind": "lesen_hören",
     "grammarPage": "/campus/course/a1-day-2-unified-grammar",
     "workbookRoute": "/campus/course/a1-day-2-foundations-workbook",
-    "video": "https://youtu.be/uhFgKp4WVEc",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published",
-    "teacherVideo": "https://youtu.be/uhFgKp4WVEc"
+    "contentStatus": "published"
   },
   {
     "id": "A1-1.1-practice",
