@@ -25,7 +25,7 @@ export default function A1Day2UnifiedGrammarPage() {
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={section}>
-        <AppBackButton label="Back to Day 2" fallbackPath="/campus/course/lesson/A1/2?chapter=0.2_1.1" />
+        <AppBackButton label="Back to Day 2" fallbackPath="/campus/course/lesson/A1/2?chapter=0.2" />
         <p style={{ margin: 0, color: "#475569", fontWeight: 700 }}>A1.1 · Foundations · Day 2</p>
         <h1 style={{ ...styles.title, margin: 0 }}>Das Alphabet, Personalpronomen und erste Verben</h1>
         <p style={{ margin: 0, lineHeight: 1.6 }}>One lesson: spell names, choose the right personal pronoun and build your first German sentences.</p>
