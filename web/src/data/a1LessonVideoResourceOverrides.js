@@ -143,26 +143,8 @@ const standardizeA1TeacherVideos = (a1 = {}) => {
 export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
   const a1 = dictionary.A1 || (dictionary.A1 = {});
 
-  a1[2] = {
-    videoResources: [
-      {
-        key: "a1-day2-kapitel-0-2-alphabet-ai-video",
-        chapter: "0.2",
-        title: "Kapitel 0.2 · Alphabet · AI video",
-        description:
-          "AI video lesson for the German alphabet, letter names, umlauts and spelling practice.",
-        url: "https://youtu.be/pCQVdJGsvtk",
-      },
-      {
-        key: "a1-day2-pronouns-conjugation-ai-video",
-        chapter: "0.2",
-        title: "Day 2 · Pronouns & Verb Conjugation · AI video",
-        description:
-          "AI video lesson for German subject pronouns and basic verb conjugation.",
-        url: "https://youtu.be/kqagu9qsOcc",
-      },
-    ],
-  };
+  // Day 2 has no published videos while the unified replacement is being produced.
+  a1[2] = { videoResources: [] };
 
   a1[3] = {
     videoResources: [
