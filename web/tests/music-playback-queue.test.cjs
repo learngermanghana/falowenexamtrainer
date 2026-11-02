@@ -55,7 +55,7 @@ test('the music page wires all-song shuffle and platform media controls', () => 
   assert.match(app, /queueScope = "all"/);
   assert.match(app, /advancePlaybackQueue\(playbackQueue/);
   assert.match(app, /session\.setActionHandler\(action, handler\)/);
-  assert.match(app, /audio\.addEventListener\("ended"/);
+  assert.match(app, /installEndedHandoff\(audio,/);
   assert.match(app, /audio\.addEventListener\("error", \(\) => handlePlaybackFailure/);
   assert.match(html, /id="queue-scope"/);
   assert.match(html, /id="play-all"/);
