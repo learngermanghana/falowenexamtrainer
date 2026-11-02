@@ -54,7 +54,6 @@ describe("A1 workbook modernization", () => {
   });
 
   test("renders modern metadata, progress, teacher media and canonical submission", () => {
-    const printSpy = jest.spyOn(window, "print").mockImplementation(() => {});
     renderAlphabetWorkbook();
 
     const header = document.querySelector('[data-a1-modern-workbook-header="true"]');
@@ -74,13 +73,15 @@ describe("A1 workbook modernization", () => {
     const sectionProgress = screen.getByRole("progressbar", { name: "A1 workbook section progress" });
     expect(sectionProgress).toHaveAttribute("aria-valuenow", "20");
     expect(screen.getByText("Section 1 of 5")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Save Overview as PDF" }));
-    expect(printSpy).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("button", { name: "Save Overview as PDF" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /View complete A1 book/ })).toHaveAttribute(
+      "href", "/books/deutsch-a1-course-workbook"
+    );
 
     fireEvent.click(screen.getByRole("tab", { name: "Grammar" }));
     expect(screen.getByText("Grammar notes")).toBeVisible();
     expect(sectionProgress).toHaveAttribute("aria-valuenow", "40");
-    expect(screen.getByRole("button", { name: "Save Grammar as PDF" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Save Grammar as PDF" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("tab", { name: "Teil 1 · Reading and Questions" }));
     expect(screen.getByText("Finished this Teil? Continue to the next required Teil before reviewing and submitting the assignment.")).toBeVisible();
@@ -110,6 +111,5 @@ describe("A1 workbook modernization", () => {
     expect(screen.queryByRole("button", { name: /Save .* as PDF/ })).not.toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Back to Course Book" })).toBeInTheDocument();
-    printSpy.mockRestore();
   });
 });

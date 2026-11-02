@@ -136,8 +136,7 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(screen.getByText(SCHOOL_PRINT_STAMP)).toBeInTheDocument();
   });
 
-  it("shows an inline print action on legacy A1 workbook routes", () => {
-    const printSpy = jest.spyOn(window, "print").mockImplementation(() => {});
+  it("removes the redundant top PDF action on legacy A1 workbook routes", () => {
 
     render(
       <MemoryRouter initialEntries={["/campus/course/a1-day-1-greetings-workbook"]}>
@@ -148,10 +147,7 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(needsInlineA1PdfAction("/campus/course/a1-day-1-greetings-workbook")).toBe(true);
     expect(needsInlineA1PdfAction("/campus/course/a2-day-1-greetings-workbook")).toBe(false);
 
-    fireEvent.click(screen.getByRole("button", { name: "Download or print PDF" }));
-    expect(printSpy).toHaveBeenCalledTimes(1);
-
-    printSpy.mockRestore();
+    expect(screen.queryByRole("button", { name: "Download or print PDF" })).not.toBeInTheDocument();
   });
 
   it("hides A2 per-section Save PDF actions without hiding B1 section printing", () => {

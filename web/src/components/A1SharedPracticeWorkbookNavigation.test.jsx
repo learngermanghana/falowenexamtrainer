@@ -93,6 +93,10 @@ describe("A1 shared self-practice navigation", () => {
     expect(screen.getByRole("tab", { name: "Teil 3" })).toBeVisible();
     expect(screen.queryByRole("tab", { name: "Submit" })).not.toBeInTheDocument();
     expect(screen.getByText(/Nothing on this page is sent for tutor marking/i)).toBeVisible();
+    expect(screen.getByRole("link", { name: /View complete A1 book/ })).toHaveAttribute(
+      "href", "/books/deutsch-a1-course-workbook"
+    );
+    expect(screen.getAllByRole("complementary", { name: "Complete A1 course book" })).toHaveLength(1);
 
     await waitFor(() => expect(screen.getByTestId("practice-section-1")).toBeVisible());
     expect(screen.getByTestId("practice-section-2")).not.toBeVisible();

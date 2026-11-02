@@ -6,6 +6,7 @@ import { styles } from "../styles";
 import { getInlineCourseAssignments, normalizeCourseAssignmentKey } from "../utils/courseLessonAssignments";
 import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
 import WorkbookDayMusic from "./WorkbookDayMusic";
+import A1CourseBookOffer from "./A1CourseBookOffer";
 import {
   buildA1WorkbookContentGroups,
   findA1WorkbookTeilSections,
@@ -555,6 +556,8 @@ export default function A1UnifiedTutorWorkbookNavigation() {
           </button>
         ))}
       </div>
+
+      <div style={{ marginTop: 12 }}><A1CourseBookOffer /></div>
 
       {hasSections && activeView === "overview" ? (
         <div
