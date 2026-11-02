@@ -72,6 +72,9 @@ test("B1 retail PDF flags forbidden QR-only and live website messages",()=>{
   assert.ok(findB1PrintFaults("Continue learning Ready for the next lesson?").length);
   assert.ok(findB1PrintFaults("Day 8 · B1 workbook · how to complete this workbook").length);
   assert.ok(findB1PrintFaults("Draft saved").length);
+  assert.ok(findB1PrintFaults("Choose one answer for each question").length);
+  assert.ok(findB1PrintFaults("Your choice is saved automatically to Submit").length);
+  assert.ok(findB1PrintFaults("Planning notes (optional)").length);
   assert.deepEqual(findB1PrintFaults("Teil 3 · Lesen – Lies den Text und beantworte die Fragen"),[]);
   assert.match(B1_PRINT_CSS,/overflow: visible !important/);
   assert.match(B1_PRINT_CSS,/header\.app-header--compact/);

@@ -218,6 +218,8 @@ export const findB1PrintFaults = text => {
     ["next-lesson website navigation", /Continue learning|Ready for the next lesson\?|You do not need to return to the Course Book/i],
     ["workbook redirect card", /Grammar book\s*[·•-]\s*continue to workbook|You do not need to search again in the Course Book/i],
     ["workbook web guidance", /Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook/i],
+    ["web-only saved-answer notice", /Choose one answer for each question|Your choice is saved automatically/i],
+    ["web-only writing input notice", /Planning notes \(optional\)|^Write your German text$/mi],
     ["workbook tab instructions", /Select Grammar,\s*Teil\s*1/i],
     ["saved learner state", /Draft saved|Your saved answers|Recognised speech|Recognized speech|Your corrected sentences/i],
     ["unhydrated lesson", /Loading grammar notes|Loading the app|Unexpected Application Error/i],
