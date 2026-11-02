@@ -12,9 +12,9 @@ test("B1 Mock 2 reading has all five exam parts and numbered tasks 1 to 30",()=>
 });
 test("B1 Mock 2 writing and speaking use the latest teacher prompts",()=>{
  expect(B1_MOCK2_WRITING_TASKS.map(q=>q.target)).toEqual([80,80,40]);
- expect(B1_MOCK2_WRITING_TASKS[0].prompt).toContain("Julian");
- expect(B1_MOCK2_WRITING_TASKS[1].prompt).toContain("Laura");
- expect(B1_MOCK2_WRITING_TASKS[2].prompt).toContain("Frau Sommer");
+ expect(B1_MOCK2_WRITING_TASKS[0].prompt).toContain("Geburtstag gefeiert");
+ expect(B1_MOCK2_WRITING_TASKS[1].prompt).toContain("Persönliche Kontakte und Internet");
+ expect(B1_MOCK2_WRITING_TASKS[2].prompt).toContain("Frau Müller");
  expect(B1_MOCK2_SPEAKING.teil1.situation).toContain("interkulturelles Nachbarschaftsfest");
  expect(B1_MOCK2_SPEAKING.teil1.points).toHaveLength(5);
  expect(B1_MOCK2_SPEAKING.teil1.points.join(" ")).toContain("Mitbring-Buffet");
@@ -68,4 +68,27 @@ test("November teacher B1 Mock 2 Lesen Teile 3–5 have exact numbering and cont
  expect(r.teil5.questions.map(q=>q.number)).toEqual([25,26,27,28,29,30]);
  expect(r.teil5.questions.every(q=>q.options.map(([id])=>id).join("")==="abc")).toBe(true);
  expect(JSON.stringify([r.teil3,r.teil4,r.teil5])).not.toMatch(/"answer"|"solution"|"correct"/i);
+});
+
+test("November B1 Mock 2 Schreiben uses all three new teacher tasks and 60-minute timing",()=>{
+ const tasks=B1_MOCK2_WRITING_TASKS;
+ expect(tasks.map(t=>t.id)).toEqual(["teil1","teil2","teil3"]);
+ expect(tasks.map(t=>t.target)).toEqual([80,80,40]);
+ expect(tasks.map(t=>t.points.length)).toEqual([3,3,3]);
+ expect(tasks.map(t=>Number(t.meta.match(/\\d+/)[0]))).toEqual([20,25,15]);
+ expect(tasks[0].prompt).toContain("krank");
+ expect(tasks[0].points[0]).toContain("Feier");
+ expect(tasks[0].points[1]).toContain("Geschenk");
+ expect(tasks[0].points[2]).toContain("Treffen");
+ expect(tasks[1].prompt).toContain("Tanja");
+ expect(tasks[1].prompt).toContain("persönliche Treffen");
+ expect(tasks[1].points[1]).toContain("persönlichen Beispiel");
+ expect(tasks[2].prompt).toContain("Lernziele");
+ expect(tasks[2].points[0]).toContain("Entschuldigen");
+ expect(tasks[2].points[1]).toContain("warum");
+ expect(tasks[2].points[2]).toContain("Sie-Form");
+ expect(tasks[2].rubric.maxScore).toBe(20);
+ expect(tasks[2].rubric.criteria.map(c=>c.maxScore)).toEqual([4,4,6,6]);
+ expect(JSON.stringify(tasks)).not.toContain("Frau Sommer");
+ expect(JSON.stringify(tasks)).not.toContain("bargeldloses");
 });
