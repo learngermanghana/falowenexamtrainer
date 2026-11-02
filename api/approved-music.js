@@ -1,3 +1,5 @@
+const { Readable, Transform } = require('node:stream');
+const { pipeline } = require('node:stream/promises');
 // Public playback of explicitly approved Falowen MUSIC in the otherwise
 // private course-audio R2 bucket. The published catalog is the single source
 // for approved IDs; uploading an object alone never exposes it to listeners.
@@ -54,10 +56,32 @@ async function approvedMusicHandler(req, res) {
       ? signTrack(trackId).url
       : autoKey ? signObject({ id: trackId, key: autoKey }).url
       : signedStudioUrl({ method: 'GET', key: objectKey, expires: 900 });
+    // Export needs readable bytes, whereas ordinary <audio> can follow an R2
+    // redirect without CORS access. Stream only this already validated music key.
+    if (req.query?.download === '1' && req.method === 'GET') {
+      const upstream = await fetch(location, {signal:AbortSignal.timeout(30000),redirect:'error'});
+      if (!upstream.ok || !upstream.body) throw Error('Music download unavailable');
+      const maximum = 40_000_000;
+      if (Number(upstream.headers.get('content-length')) > maximum) {
+        await upstream.body.cancel();
+        return res.status(413).json({error:'Music export supports MP3 files up to 40 MB.'});
+      }
+      let size=0;
+      const bounded = new Transform({transform(chunk, encoding, done) {
+        size+=chunk.length;
+        done(size>maximum ? Error('Music export exceeds 40 MB.') : null, chunk);
+      }});
+      res.setHeader('Content-Type','audio/mpeg');
+      res.status(200);
+      await pipeline(Readable.fromWeb(upstream.body),bounded,res);
+      return;
+    }
     res.setHeader('Location', location);
     return res.status(302).end();
   } catch (error) {
-    console.error('Approved Falowen music URL unavailable', error?.code || error?.message);
+    // Never log a signed storage URL or return it in an export error.
+    console.error('Approved Falowen music URL unavailable', error?.code || 'unavailable');
+    if (res.headersSent || res.destroyed) { res.destroy(); return; }
     return res.status(503).json({ error: 'Music playback is temporarily unavailable' });
   }
 }
