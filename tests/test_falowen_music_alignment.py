@@ -11,6 +11,12 @@ spec.loader.exec_module(align)
 
 
 class LocalMusicAlignmentTests(unittest.TestCase):
+    def test_adjacent_word_windows_do_not_create_overlapping_line_padding(self):
+        result=align.match_transcript('Hallo Welt\nGuten Tag',[
+            ('Hallo',1,1.5),('Welt',1.5,2),('Guten',2,2.5),('Tag',2.5,3)],4)
+        first,second=result['cues']
+        self.assertLessEqual(first['end'],second['start'])
+
     def test_german_tokenization_and_verse_headers(self):
         self.assertEqual(align.tokens("Straße, schöne Häuser!"), ["strasse", "schone", "hauser"])
         self.assertEqual(align.sung_lines("[Verse 1]\nHallo!\n\n[Chorus]\nNoch einmal!"),

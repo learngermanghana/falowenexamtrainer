@@ -78,7 +78,9 @@ def match_transcript(lyrics, recognized, duration, minimum_coverage=0.70, minimu
         start = max(0, row[0][0]-0.12)
         end = min(float(duration), row[-1][1]+0.16)
         if i+1 < len(matched):
-            end = min(end, matched[i+1][0][0]-0.06)
+            # The next line also starts 120 ms before its first word. Use
+            # that same boundary so padded cues cannot overlap by 60 ms.
+            end = min(end, matched[i+1][0][0]-0.12)
         if cues and start <= cues[-1]["start"]:
             raise ValueError("Non-increasing line timing at line %d" % (i+1))
         if end <= start:

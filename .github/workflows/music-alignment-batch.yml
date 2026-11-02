@@ -2,7 +2,7 @@ name: One-time requested recording alignment
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
     paths:
       - '.github/workflows/music-alignment-batch.yml'
 
@@ -25,17 +25,22 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install local CPU transcription dependencies
+        if: hashFiles('web/public/music/estimated-timings.json') == ''
         run: python -m pip install 'faster-whisper==1.2.1' 'av==16.1.0'
       - name: Align untimed public music to German words
+        if: hashFiles('web/public/music/estimated-timings.json') == ''
         run: >-
           python -u scripts/align_falowen_music.py --all --include-drafts
           --limit 100 --shard-count 6 --shard-index ${{ matrix.shard }}
           --output /tmp/falowen-music-timing-review
       - name: Preserve candidate timings and acoustic mismatch evidence
-        if: always()
+        if: always() && hashFiles('web/public/music/estimated-timings.json') == ''
         uses: actions/upload-artifact@v4
         with:
           name: music-alignment-review-${{ matrix.shard }}
           path: /tmp/falowen-music-timing-review/*.json
           if-no-files-found: error
           retention-days: 14
+      - name: Validate completed estimates without transcribing again
+        if: hashFiles('web/public/music/estimated-timings.json') != ''
+        run: node --test tests/music-acoustic-estimates.test.mjs

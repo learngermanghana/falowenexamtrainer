@@ -162,7 +162,15 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, workbookUrl, mode = "workb
       <div style={{ display: "grid", gap: 6 }}>
         <LessonResourceItem number="1" icon="🎬" title="Teacher lecture video" actionLabel="Watch teacher video" url={teacherVideo?.url} />
         <LessonResourceItem number="2" icon="🤖" title="AI lecture / grammar video" actionLabel="Watch AI video" url={aiVideo?.url} />
-        {normalizeLevel(level) === "A2" ? (
+        {normalizeLevel(level) === "A1" ? (
+          <LessonResourceItem
+            number="3"
+            icon="📘"
+            title="Complete A1 Course & Workbook · 250 pages"
+            actionLabel="View complete A1 book · Digital or printed on demand"
+            url="/books/deutsch-a1-course-workbook"
+          />
+        ) : normalizeLevel(level) === "A2" ? (
           <LessonResourceItem
             number="3"
             icon="📘"

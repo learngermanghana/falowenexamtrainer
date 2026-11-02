@@ -45,6 +45,8 @@ export function recordingQuestions(lyrics) {
   return [...questions,{type:'speaking',prompt:'Worum geht es in diesem Lied? Erzähle in deinen eigenen Worten.',hint:'Benutze einen Ausdruck aus dem Lied.'}];
 }
 export function resolveRecordingLesson(track, lessons, pinned, pack) {
+  // Acoustic timing does not approve a course draft's comprehension answers.
+  if (pack?.referenceOnly) return null;
   const identity=pinned.find(row=>row.objectKey && row.objectKey===track.objectKey);
   const saved=lessons[track.id] || (identity && lessons[identity.id]);
   const bound=pack?.objectKey===track.objectKey && typeof pack.lyrics==='string' && pack.lyrics.trim();

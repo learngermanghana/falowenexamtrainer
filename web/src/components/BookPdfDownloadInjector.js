@@ -405,7 +405,6 @@ export default function BookPdfDownloadInjector() {
   const navigate = useNavigate();
   const bookKind = getPrintableBookKind(location.pathname, location.search);
   const isBookRoute = Boolean(bookKind);
-  const showInlineA1Action = needsInlineA1PdfAction(location.pathname);
   const a2B1Context = getA2B1WorkbookExperienceContext(location.pathname, location.search);
   const title = useMemo(() => humanizeBookTitle(location.pathname), [location.pathname]);
   const printedAt = useMemo(
@@ -427,17 +426,6 @@ export default function BookPdfDownloadInjector() {
       <style>{`@media print { .book-pdf-download-action { display: none !important; } }`}</style>
       {a2B1Context ? (
         <A2B1WorkbookExperience context={a2B1Context} onPrint={() => window.print()} onNavigate={navigate} />
-      ) : showInlineA1Action ? (
-        <div className="book-pdf-download-action" style={inlineActionStyle}>
-          <button
-            type="button"
-            style={inlineButtonStyle}
-            onClick={() => window.print()}
-            aria-label="Download or print PDF"
-          >
-            Download / Print PDF
-          </button>
-        </div>
       ) : null}
       <div className="book-print-stamp" style={stampStyle} aria-hidden="true">
         <strong>{SCHOOL_PRINT_STAMP}</strong>

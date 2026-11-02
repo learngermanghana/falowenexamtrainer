@@ -58,3 +58,37 @@ unavailable” until matching timestamps are published. Timed recordings retain
 per-line highlighting, seeking, instrumental gaps and repeat behaviour.
 B1 Day 2 `Freundschaft am Fluss.mp3` currently has no published recording lyric
 pack: removing page scroll does not supply its missing acoustic alignment.
+
+## Full-library acoustic timing — 2 November 2026
+
+The one-time six-shard CPU batch in PR 3328 transcribed all 48 remaining
+untimed public course MP3s with Whisper small German word timestamps. Its
+review artifacts retain the raw words, recording SHA-256, duration and match
+results. There are no paid AI requests or playback-time transcription jobs.
+
+`estimated-timings.json` is separate from approved recording text and the
+original songwriting drafts. Twenty-three recordings pass the unchanged
+70% overall / 45% weakest-line text-match gates. Twenty-five use separately
+labelled **automatic transcript drafts**, grouped directly from the recognizer's
+positive-duration word windows; unrelated saved words are never assigned
+invented times. Automatic words may contain recognition errors and need teacher
+listening review. Their original lyric files and translations remain intact;
+old English translations are not attached to different automatic German words.
+
+The lyrics API preserves reviewed sidecar and already-timed pack precedence,
+validates fingerprints and cue boundaries, and exposes estimate/draft metadata.
+An untimed sidecar only reuses estimates when its German lines match exactly.
+Automatic transcript text and time windows are validated against their stored
+word evidence. Unverified transcript drafts do not authorize recording quizzes.
+
+All 65 currently discovered course recordings now have complete cue packs
+(the existing 17 plus 48 new estimates). `class-timings.json` also supplies
+word-derived transcript drafts for the two catalogued motivation recordings,
+bound to their exact catalog ID and public audio URL. `timing-coverage.json`
+records the 67-song audit scope. New or replaced MP3s require a new acoustic
+run; the saved fingerprint is not a live per-listen audio checksum.
+
+The player highlights a single active line, leaves instrumental gaps clear,
+and labels estimates and automatic transcripts. It never returns to scrolling
+lyrics by track-duration percentage. All generated wording/timings remain
+unverified until listening review; this is timing coverage, not certification.

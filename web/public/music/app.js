@@ -535,13 +535,15 @@ function renderLyrics(lesson) {
   const root = byId("lyrics-text");
   root.replaceChildren();
   renderedCues = validateCues(lesson.cues, lesson.lyrics);
-  activeEnglishPack = lesson.referenceOnly
+  activeEnglishPack = lesson.transcriptionStatus === "automatic" ? null : lesson.referenceOnly
     ? matchingDraftEnglishTranslation(englishTranslations, selected, lesson)
     : matchingEnglishTranslation(englishTranslations, selected?.objectKey, lesson.lyrics);
   const translateControl = byId("show-english");
   translateControl.disabled = !activeEnglishPack;
   translateControl.checked = Boolean(activeEnglishPack && showEnglish);
-  byId("english-status").textContent = activeEnglishPack?.source === "course-draft"
+  byId("english-status").textContent = lesson.transcriptionStatus === "automatic"
+    ? "English for this automatic transcript has not been reviewed yet."
+    : activeEnglishPack?.source === "course-draft"
     ? "COURSE DRAFT TRANSLATION — English explains the displayed German draft, not a verified transcription of this recording."
     : activeEnglishPack
       ? "English is a learning aid; German remains the main lyric."
@@ -555,7 +557,9 @@ function renderLyrics(lesson) {
   byId("follow-label").textContent = renderedCues.length
     ? (lesson.referenceOnly ? "Follow lyrics (estimated)" : "Follow lyrics")
     : "Line highlighting unavailable";
-  const note = el("p", "detail-note", lesson.referenceOnly
+  const note = el("p", "detail-note", lesson.transcriptionStatus === "automatic"
+    ? "AUTOMATIC TRANSCRIPT DRAFT — These German words and line times were estimated from this recording. Recognition errors are possible; teacher review is required. Original course lyrics remain separate."
+    : lesson.referenceOnly
     ? (renderedCues.length
        ? "COURSE DRAFT — Whisper has estimated these line timings from this MP3, but the German words have not been teacher-verified. The highlighted lines are approximate and need a listening review."
        : "COURSE DRAFT — These lyrics have not been checked against this MP3. Line highlighting is unavailable until matching recording timestamps are published.")
@@ -859,13 +863,21 @@ Promise.all([
     .catch(() => ({recordings:[]})),
   fetch("/music/song-stories.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : {byObjectKey:{},byTrackId:{}})
     .catch(() => ({byObjectKey:{},byTrackId:{}})),
-]).then(([data, lessons, drafts, translations, stories]) => {
+  fetch("/music/class-timings.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : {recordings:[]})
+    .catch(() => ({recordings:[]})),
+]).then(([data, lessons, drafts, translations, stories, classTimings]) => {
   englishTranslations = Array.isArray(translations?.recordings) ? translations : {recordings:[]};
   editorialStories = stories && typeof stories==="object" ? stories : {byObjectKey:{},byTrackId:{}};
   pinnedTracks = (Array.isArray(data.tracks) ? data.tracks : [])
     .filter(row => row.retired !== true)
     .map(safeTrack).filter(Boolean);
   catalog = [...pinnedTracks];
+  for (const pack of classTimings?.recordings || []) {
+    const track=pinnedTracks.find(row=>row.level==="ALL" && row.id===pack.trackId && row.audioUrl===pack.audioUrl);
+    if (track && pack.referenceOnly && pack.transcriptionStatus==="automatic" &&
+      pack.timingStatus==="estimated" && /^[a-f0-9]{64}$/.test(pack.recordingSha256 || "") &&
+      validateCues(pack.cues,pack.lyrics).length) publishedLyrics.set(track.id,pack);
+  }
   learning = lessons && typeof lessons.lessons === "object" && lessons.lessons ? lessons.lessons : {};
   studioDrafts = Array.isArray(drafts?.tracks) ? drafts.tracks.filter(item =>
     ["A1","A2","B1"].includes(item.level) && Number.isInteger(item.day)

@@ -48,12 +48,12 @@ const StatefulAdvancedNav = ({ day = 16 }) => {
 };
 
 describe("universal lesson section deep links", () => {
-  test("keeps a section-specific PDF action beside the shared navigation", () => {
+  test("keeps a section-specific PDF action beside the B1 shared navigation", () => {
     const printSpy = jest.spyOn(window, "print").mockImplementation(() => {});
 
     render(
-      <MemoryRouter initialEntries={["/campus/course/a2-day-6-moebel-und-raeume-workbook"]}>
-        <StatefulWorkbookNav ariaLabel="A2 Day 6 workbook sections" tabs={STANDARD_WORKBOOK_TABS} />
+      <MemoryRouter initialEntries={["/campus/course/b1-day-6-workbook"]}>
+        <StatefulWorkbookNav ariaLabel="B1 Day 6 workbook sections" tabs={STANDARD_WORKBOOK_TABS} />
       </MemoryRouter>,
     );
 

@@ -7,7 +7,7 @@ The existing **Course material bundle** GitHub Actions workflow owns PDF renderi
 The printable lesson list is built from shared/curriculumCanonical.json by buildLevelManifest.mjs.
 
 - **A1 Course Book:** Day 0 orientation and Day 23 final mock are excluded. A1 teaching Days 1–22 are selected by a1RenderPlan.json. validateA1RenderPlan.mjs refuses mismatches or non-course routes.
-- **A2/B1:** Their existing grammar and workbook tabs are rendered together by renderLevelBundleV2.mjs.
+- **A2/B1:** Their existing grammar and workbook tabs are rendered together by renderLevelBundleV2.mjs. When a B1 graded Teil 2/3/4 tab is locked in the authenticated export session, the PDF builder prints its question-only, read-only companion from canonical `web/src/data/b1WritingTasks.js`, `b1ReadingTasks.js`, or `b1ListeningTasks.js` instead of unlocking or starting an assessment. B1 audio appears as a QR link back to the authenticated lesson, never as a private R2 object link. If an older B1 panel has only metadata in the canonical registry (for example, some preserved Day 19/20/22 reading tasks), the generated workbook includes a clearly labeled online-only QR companion rather than inventing or silently omitting its exercises. This incomplete print section must be reviewed before retail publishing. Invalid or incomplete canonical question sets still fail the job. These GitHub Actions artifacts do not require a Vercel deployment.
 - **B2/C1:** Continue using the existing guided lesson export path.
 - **C2:** Not yet supported by the workflow; add it only after confirming a complete manifest and renderer.
 

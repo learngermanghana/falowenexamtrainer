@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { A1_CANONICAL_LESSON_CATALOG } from "../data/a1CanonicalLessonCatalog";
 import { styles } from "../styles";
+import A1CourseBookOffer from "./A1CourseBookOffer";
 
 const NAV_ATTRIBUTE = "data-a1-shared-practice-navigation";
 const MANAGED_ATTRIBUTE = "data-a1-practice-nav-managed";
@@ -331,6 +332,7 @@ export default function A1SharedPracticeWorkbookNavigation() {
           </button>
         ))}
       </div>
+      <div style={{ marginTop: 12 }}><A1CourseBookOffer /></div>
     </section>,
     navMount,
   );

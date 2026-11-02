@@ -1,0 +1,3557 @@
+{
+  "version": 1,
+  "recordings": [
+    {
+      "objectKey": "catalog:gemeinsam-schaffen-wir-das",
+      "recordingSha256": "d67e82641c5f577298fb52e44ea1a4b346f1a6270f5524839754395c138af68c",
+      "duration": 263.96,
+      "trackId": "gemeinsam-schaffen-wir-das",
+      "timingStatus": "estimated",
+      "timingMethod": "Whisper small German word timestamps; teacher listening review required",
+      "lyrics": "I know you're more than I know you're\ntough A little more courage than yesterday You\nhave a goal,\nyou have a dream And every step will\nlead the way Sometimes you the words, sometimes\nyou don't know what to say But with\nevery new word, you're getting stronger every day\nHave no courage, never give up Every journey\nhas its time We're going this way together\nYour dreams and mine will shine Together we'll\nmake it\nTogether we can\nTogether we grow Step by step we'll go\non There's so much more for us to\nknow Together we'll it Even if the path\nisn't easy With Verloven we'll find our way\nA new beginning every day\nA new beginning every day\nA new word, a new sentence, a new\nbeginning starts with you Du lernst und wechst\nmit jedem Tag And every little dream comes\ntrue Hab keine Angst vor kleinen Feiern They're\npart of learning something new Du bist stärker\nals du denkst Just keep believing in you\nWir glauben an das, was morgen kommt In\neverything that we can be Mit Geduld und\nZuversicht We'll find the strength to reach our\ndream Meinsam schaffen wir das Together we can,\ntogether we grow Step by step we go\non There's so much more for us to\nknow Together we'll it Even if the path\nisn't easy We'll follow, we'll find our way\nA new beginning every day\nWhen you fall, stand up again Tomorrow brings\nanother chance Every step brings you forward Your\nfuture is in your hands You're not alone\non this journey We are here to cheer\nyou on Here at Fallow, we together And\ntogether we belong\nTogether we can Together we can\nTogether we grow Step by step, we go\non There's so much more for us to\nknow Reminds I'm shoving near us Wir glauben\nfest an unser Ziel We'll follow,\nwe'll find our way\nTogether we can\nEvery day\nEvery day\nWe come by follow\nWe're happy you're here Dein Deutschkurs begin gleich,\nyour German journey continues here\nGemeinsam schaffen wir das\nYou",
+      "cues": [
+        {
+          "text": "I know you're more than I know you're",
+          "start": 19.68,
+          "end": 23.58
+        },
+        {
+          "text": "tough A little more courage than yesterday You",
+          "start": 23.58,
+          "end": 29.14
+        },
+        {
+          "text": "have a goal,",
+          "start": 29.14,
+          "end": 31.24
+        },
+        {
+          "text": "you have a dream And every step will",
+          "start": 31.78,
+          "end": 36.52
+        },
+        {
+          "text": "lead the way Sometimes you the words, sometimes",
+          "start": 36.52,
+          "end": 42.64
+        },
+        {
+          "text": "you don't know what to say But with",
+          "start": 42.64,
+          "end": 45.58
+        },
+        {
+          "text": "every new word, you're getting stronger every day",
+          "start": 45.58,
+          "end": 49.64
+        },
+        {
+          "text": "Have no courage, never give up Every journey",
+          "start": 49.64,
+          "end": 53.18
+        },
+        {
+          "text": "has its time We're going this way together",
+          "start": 53.18,
+          "end": 56.48
+        },
+        {
+          "text": "Your dreams and mine will shine Together we'll",
+          "start": 57.06,
+          "end": 61.54
+        },
+        {
+          "text": "make it",
+          "start": 61.54,
+          "end": 62.72
+        },
+        {
+          "text": "Together we can",
+          "start": 63.46,
+          "end": 65.32
+        },
+        {
+          "text": "Together we grow Step by step we'll go",
+          "start": 65.86,
+          "end": 69.5
+        },
+        {
+          "text": "on There's so much more for us to",
+          "start": 69.5,
+          "end": 72.24
+        },
+        {
+          "text": "know Together we'll it Even if the path",
+          "start": 72.24,
+          "end": 76.26
+        },
+        {
+          "text": "isn't easy With Verloven we'll find our way",
+          "start": 76.26,
+          "end": 81.2
+        },
+        {
+          "text": "A new beginning every day",
+          "start": 81.2,
+          "end": 84.94
+        },
+        {
+          "text": "A new beginning every day",
+          "start": 91.78,
+          "end": 95.5
+        },
+        {
+          "text": "A new word, a new sentence, a new",
+          "start": 102.86,
+          "end": 106.42
+        },
+        {
+          "text": "beginning starts with you Du lernst und wechst",
+          "start": 106.42,
+          "end": 109.6
+        },
+        {
+          "text": "mit jedem Tag And every little dream comes",
+          "start": 109.6,
+          "end": 112.8
+        },
+        {
+          "text": "true Hab keine Angst vor kleinen Feiern They're",
+          "start": 112.8,
+          "end": 116.04
+        },
+        {
+          "text": "part of learning something new Du bist stärker",
+          "start": 116.04,
+          "end": 119.5
+        },
+        {
+          "text": "als du denkst Just keep believing in you",
+          "start": 119.5,
+          "end": 123.08
+        },
+        {
+          "text": "Wir glauben an das, was morgen kommt In",
+          "start": 123.08,
+          "end": 126.12
+        },
+        {
+          "text": "everything that we can be Mit Geduld und",
+          "start": 126.12,
+          "end": 129.34
+        },
+        {
+          "text": "Zuversicht We'll find the strength to reach our",
+          "start": 129.34,
+          "end": 132.98
+        },
+        {
+          "text": "dream Meinsam schaffen wir das Together we can,",
+          "start": 132.98,
+          "end": 138.74
+        },
+        {
+          "text": "together we grow Step by step we go",
+          "start": 139.02,
+          "end": 142.94
+        },
+        {
+          "text": "on There's so much more for us to",
+          "start": 142.94,
+          "end": 145.7
+        },
+        {
+          "text": "know Together we'll it Even if the path",
+          "start": 145.7,
+          "end": 149.7
+        },
+        {
+          "text": "isn't easy We'll follow, we'll find our way",
+          "start": 149.7,
+          "end": 155.12
+        },
+        {
+          "text": "A new beginning every day",
+          "start": 155.12,
+          "end": 158.58
+        },
+        {
+          "text": "When you fall, stand up again Tomorrow brings",
+          "start": 161.78,
+          "end": 165.74
+        },
+        {
+          "text": "another chance Every step brings you forward Your",
+          "start": 165.74,
+          "end": 169.64
+        },
+        {
+          "text": "future is in your hands You're not alone",
+          "start": 169.64,
+          "end": 173.04
+        },
+        {
+          "text": "on this journey We are here to cheer",
+          "start": 173.04,
+          "end": 175.92
+        },
+        {
+          "text": "you on Here at Fallow, we together And",
+          "start": 175.92,
+          "end": 179.84
+        },
+        {
+          "text": "together we belong",
+          "start": 179.84,
+          "end": 181.62
+        },
+        {
+          "text": "Together we can Together we can",
+          "start": 182.68,
+          "end": 187.86
+        },
+        {
+          "text": "Together we grow Step by step, we go",
+          "start": 188.38,
+          "end": 191.82
+        },
+        {
+          "text": "on There's so much more for us to",
+          "start": 191.82,
+          "end": 194.58
+        },
+        {
+          "text": "know Reminds I'm shoving near us Wir glauben",
+          "start": 194.58,
+          "end": 198.04
+        },
+        {
+          "text": "fest an unser Ziel We'll follow,",
+          "start": 198.04,
+          "end": 200.86
+        },
+        {
+          "text": "we'll find our way",
+          "start": 201.36,
+          "end": 203.72
+        },
+        {
+          "text": "Together we can",
+          "start": 205.38,
+          "end": 206.78
+        },
+        {
+          "text": "Every day",
+          "start": 207.84,
+          "end": 209.5
+        },
+        {
+          "text": "Every day",
+          "start": 210.44,
+          "end": 212.78
+        },
+        {
+          "text": "We come by follow",
+          "start": 216.06,
+          "end": 218.6
+        },
+        {
+          "text": "We're happy you're here Dein Deutschkurs begin gleich,",
+          "start": 219.66,
+          "end": 223.68
+        },
+        {
+          "text": "your German journey continues here",
+          "start": 224.24,
+          "end": 226.27
+        },
+        {
+          "text": "Gemeinsam schaffen wir das",
+          "start": 233.74,
+          "end": 236.1
+        },
+        {
+          "text": "You",
+          "start": 256.8,
+          "end": 258.2
+        }
+      ],
+      "wordTimestamps": [
+        {
+          "text": "I",
+          "start": 19.68,
+          "end": 20.44
+        },
+        {
+          "text": "know",
+          "start": 20.44,
+          "end": 20.68
+        },
+        {
+          "text": "you're",
+          "start": 20.68,
+          "end": 20.92
+        },
+        {
+          "text": "more",
+          "start": 20.92,
+          "end": 21.3
+        },
+        {
+          "text": "than",
+          "start": 21.3,
+          "end": 21.56
+        },
+        {
+          "text": "I",
+          "start": 21.56,
+          "end": 22.8
+        },
+        {
+          "text": "know",
+          "start": 22.8,
+          "end": 23.08
+        },
+        {
+          "text": "you're",
+          "start": 23.08,
+          "end": 23.58
+        },
+        {
+          "text": "tough",
+          "start": 23.58,
+          "end": 23.72
+        },
+        {
+          "text": "A",
+          "start": 23.72,
+          "end": 25.4
+        },
+        {
+          "text": "little",
+          "start": 25.4,
+          "end": 25.6
+        },
+        {
+          "text": "more",
+          "start": 25.6,
+          "end": 25.88
+        },
+        {
+          "text": "courage",
+          "start": 25.88,
+          "end": 26.42
+        },
+        {
+          "text": "than",
+          "start": 26.42,
+          "end": 27.16
+        },
+        {
+          "text": "yesterday",
+          "start": 27.16,
+          "end": 28.28
+        },
+        {
+          "text": "You",
+          "start": 28.28,
+          "end": 29.14
+        },
+        {
+          "text": "have",
+          "start": 29.14,
+          "end": 30.44
+        },
+        {
+          "text": "a",
+          "start": 30.44,
+          "end": 30.76
+        },
+        {
+          "text": "goal,",
+          "start": 30.76,
+          "end": 31.24
+        },
+        {
+          "text": "you",
+          "start": 31.78,
+          "end": 32.34
+        },
+        {
+          "text": "have",
+          "start": 32.34,
+          "end": 32.54
+        },
+        {
+          "text": "a",
+          "start": 32.54,
+          "end": 33.18
+        },
+        {
+          "text": "dream",
+          "start": 33.18,
+          "end": 33.66
+        },
+        {
+          "text": "And",
+          "start": 33.66,
+          "end": 35.2
+        },
+        {
+          "text": "every",
+          "start": 35.2,
+          "end": 35.52
+        },
+        {
+          "text": "step",
+          "start": 35.52,
+          "end": 35.94
+        },
+        {
+          "text": "will",
+          "start": 35.94,
+          "end": 36.52
+        },
+        {
+          "text": "lead",
+          "start": 36.52,
+          "end": 37.38
+        },
+        {
+          "text": "the",
+          "start": 37.38,
+          "end": 37.88
+        },
+        {
+          "text": "way",
+          "start": 37.88,
+          "end": 38.56
+        },
+        {
+          "text": "Sometimes",
+          "start": 38.56,
+          "end": 40.36
+        },
+        {
+          "text": "you",
+          "start": 40.36,
+          "end": 41.36
+        },
+        {
+          "text": "the",
+          "start": 41.36,
+          "end": 41.58
+        },
+        {
+          "text": "words,",
+          "start": 41.58,
+          "end": 42.14
+        },
+        {
+          "text": "sometimes",
+          "start": 42.18,
+          "end": 42.64
+        },
+        {
+          "text": "you",
+          "start": 42.64,
+          "end": 43.0
+        },
+        {
+          "text": "don't",
+          "start": 43.0,
+          "end": 43.32
+        },
+        {
+          "text": "know",
+          "start": 43.32,
+          "end": 43.58
+        },
+        {
+          "text": "what",
+          "start": 43.58,
+          "end": 43.9
+        },
+        {
+          "text": "to",
+          "start": 43.9,
+          "end": 44.06
+        },
+        {
+          "text": "say",
+          "start": 44.06,
+          "end": 44.58
+        },
+        {
+          "text": "But",
+          "start": 44.58,
+          "end": 45.4
+        },
+        {
+          "text": "with",
+          "start": 45.4,
+          "end": 45.58
+        },
+        {
+          "text": "every",
+          "start": 45.58,
+          "end": 45.9
+        },
+        {
+          "text": "new",
+          "start": 45.9,
+          "end": 46.26
+        },
+        {
+          "text": "word,",
+          "start": 46.26,
+          "end": 46.64
+        },
+        {
+          "text": "you're",
+          "start": 46.94,
+          "end": 47.42
+        },
+        {
+          "text": "getting",
+          "start": 47.42,
+          "end": 47.7
+        },
+        {
+          "text": "stronger",
+          "start": 47.7,
+          "end": 48.24
+        },
+        {
+          "text": "every",
+          "start": 48.24,
+          "end": 48.94
+        },
+        {
+          "text": "day",
+          "start": 48.94,
+          "end": 49.64
+        },
+        {
+          "text": "Have",
+          "start": 49.64,
+          "end": 50.04
+        },
+        {
+          "text": "no",
+          "start": 50.04,
+          "end": 50.24
+        },
+        {
+          "text": "courage,",
+          "start": 50.24,
+          "end": 50.7
+        },
+        {
+          "text": "never",
+          "start": 50.88,
+          "end": 51.22
+        },
+        {
+          "text": "give",
+          "start": 51.22,
+          "end": 51.42
+        },
+        {
+          "text": "up",
+          "start": 51.42,
+          "end": 51.78
+        },
+        {
+          "text": "Every",
+          "start": 51.78,
+          "end": 52.6
+        },
+        {
+          "text": "journey",
+          "start": 52.6,
+          "end": 53.18
+        },
+        {
+          "text": "has",
+          "start": 53.18,
+          "end": 53.58
+        },
+        {
+          "text": "its",
+          "start": 53.58,
+          "end": 53.8
+        },
+        {
+          "text": "time",
+          "start": 53.8,
+          "end": 54.26
+        },
+        {
+          "text": "We're",
+          "start": 54.26,
+          "end": 54.92
+        },
+        {
+          "text": "going",
+          "start": 54.92,
+          "end": 54.98
+        },
+        {
+          "text": "this",
+          "start": 54.98,
+          "end": 55.28
+        },
+        {
+          "text": "way",
+          "start": 55.28,
+          "end": 55.72
+        },
+        {
+          "text": "together",
+          "start": 55.72,
+          "end": 56.48
+        },
+        {
+          "text": "Your",
+          "start": 57.06,
+          "end": 57.66
+        },
+        {
+          "text": "dreams",
+          "start": 57.66,
+          "end": 58.24
+        },
+        {
+          "text": "and",
+          "start": 58.24,
+          "end": 58.64
+        },
+        {
+          "text": "mine",
+          "start": 58.64,
+          "end": 59.22
+        },
+        {
+          "text": "will",
+          "start": 59.22,
+          "end": 59.76
+        },
+        {
+          "text": "shine",
+          "start": 59.76,
+          "end": 60.54
+        },
+        {
+          "text": "Together",
+          "start": 60.54,
+          "end": 61.04
+        },
+        {
+          "text": "we'll",
+          "start": 61.04,
+          "end": 61.54
+        },
+        {
+          "text": "make",
+          "start": 61.54,
+          "end": 61.86
+        },
+        {
+          "text": "it",
+          "start": 61.86,
+          "end": 62.72
+        },
+        {
+          "text": "Together",
+          "start": 63.46,
+          "end": 64.04
+        },
+        {
+          "text": "we",
+          "start": 64.04,
+          "end": 64.78
+        },
+        {
+          "text": "can",
+          "start": 64.78,
+          "end": 65.32
+        },
+        {
+          "text": "Together",
+          "start": 65.86,
+          "end": 66.5
+        },
+        {
+          "text": "we",
+          "start": 66.5,
+          "end": 67.24
+        },
+        {
+          "text": "grow",
+          "start": 67.24,
+          "end": 67.8
+        },
+        {
+          "text": "Step",
+          "start": 67.8,
+          "end": 68.38
+        },
+        {
+          "text": "by",
+          "start": 68.38,
+          "end": 68.72
+        },
+        {
+          "text": "step",
+          "start": 68.72,
+          "end": 69.04
+        },
+        {
+          "text": "we'll",
+          "start": 69.04,
+          "end": 69.4
+        },
+        {
+          "text": "go",
+          "start": 69.4,
+          "end": 69.5
+        },
+        {
+          "text": "on",
+          "start": 69.5,
+          "end": 70.14
+        },
+        {
+          "text": "There's",
+          "start": 70.14,
+          "end": 70.72
+        },
+        {
+          "text": "so",
+          "start": 70.72,
+          "end": 70.86
+        },
+        {
+          "text": "much",
+          "start": 70.86,
+          "end": 71.1
+        },
+        {
+          "text": "more",
+          "start": 71.1,
+          "end": 71.4
+        },
+        {
+          "text": "for",
+          "start": 71.4,
+          "end": 71.76
+        },
+        {
+          "text": "us",
+          "start": 71.76,
+          "end": 72.04
+        },
+        {
+          "text": "to",
+          "start": 72.04,
+          "end": 72.24
+        },
+        {
+          "text": "know",
+          "start": 72.24,
+          "end": 72.66
+        },
+        {
+          "text": "Together",
+          "start": 72.66,
+          "end": 73.38
+        },
+        {
+          "text": "we'll",
+          "start": 73.38,
+          "end": 74.48
+        },
+        {
+          "text": "it",
+          "start": 74.48,
+          "end": 75.04
+        },
+        {
+          "text": "Even",
+          "start": 75.04,
+          "end": 75.4
+        },
+        {
+          "text": "if",
+          "start": 75.4,
+          "end": 75.72
+        },
+        {
+          "text": "the",
+          "start": 75.72,
+          "end": 76.1
+        },
+        {
+          "text": "path",
+          "start": 76.1,
+          "end": 76.26
+        },
+        {
+          "text": "isn't",
+          "start": 76.26,
+          "end": 76.64
+        },
+        {
+          "text": "easy",
+          "start": 76.64,
+          "end": 77.36
+        },
+        {
+          "text": "With",
+          "start": 77.36,
+          "end": 78.22
+        },
+        {
+          "text": "Verloven",
+          "start": 78.22,
+          "end": 79.12
+        },
+        {
+          "text": "we'll",
+          "start": 79.12,
+          "end": 79.78
+        },
+        {
+          "text": "find",
+          "start": 79.78,
+          "end": 80.2
+        },
+        {
+          "text": "our",
+          "start": 80.2,
+          "end": 80.76
+        },
+        {
+          "text": "way",
+          "start": 80.76,
+          "end": 81.2
+        },
+        {
+          "text": "A",
+          "start": 81.2,
+          "end": 82.86
+        },
+        {
+          "text": "new",
+          "start": 82.86,
+          "end": 83.16
+        },
+        {
+          "text": "beginning",
+          "start": 83.16,
+          "end": 83.78
+        },
+        {
+          "text": "every",
+          "start": 83.78,
+          "end": 84.36
+        },
+        {
+          "text": "day",
+          "start": 84.36,
+          "end": 84.94
+        },
+        {
+          "text": "A",
+          "start": 91.78,
+          "end": 92.62
+        },
+        {
+          "text": "new",
+          "start": 92.62,
+          "end": 92.94
+        },
+        {
+          "text": "beginning",
+          "start": 92.94,
+          "end": 93.58
+        },
+        {
+          "text": "every",
+          "start": 93.58,
+          "end": 94.24
+        },
+        {
+          "text": "day",
+          "start": 94.24,
+          "end": 95.5
+        },
+        {
+          "text": "A",
+          "start": 102.86,
+          "end": 103.7
+        },
+        {
+          "text": "new",
+          "start": 103.7,
+          "end": 103.98
+        },
+        {
+          "text": "word,",
+          "start": 103.98,
+          "end": 104.4
+        },
+        {
+          "text": "a",
+          "start": 104.82,
+          "end": 104.96
+        },
+        {
+          "text": "new",
+          "start": 104.96,
+          "end": 105.18
+        },
+        {
+          "text": "sentence,",
+          "start": 105.18,
+          "end": 105.6
+        },
+        {
+          "text": "a",
+          "start": 105.84,
+          "end": 106.2
+        },
+        {
+          "text": "new",
+          "start": 106.2,
+          "end": 106.42
+        },
+        {
+          "text": "beginning",
+          "start": 106.42,
+          "end": 106.96
+        },
+        {
+          "text": "starts",
+          "start": 106.96,
+          "end": 107.4
+        },
+        {
+          "text": "with",
+          "start": 107.4,
+          "end": 107.78
+        },
+        {
+          "text": "you",
+          "start": 107.78,
+          "end": 108.12
+        },
+        {
+          "text": "Du",
+          "start": 108.12,
+          "end": 108.64
+        },
+        {
+          "text": "lernst",
+          "start": 108.64,
+          "end": 109.02
+        },
+        {
+          "text": "und",
+          "start": 109.02,
+          "end": 109.18
+        },
+        {
+          "text": "wechst",
+          "start": 109.18,
+          "end": 109.6
+        },
+        {
+          "text": "mit",
+          "start": 109.6,
+          "end": 109.74
+        },
+        {
+          "text": "jedem",
+          "start": 109.74,
+          "end": 110.12
+        },
+        {
+          "text": "Tag",
+          "start": 110.12,
+          "end": 110.6
+        },
+        {
+          "text": "And",
+          "start": 110.6,
+          "end": 111.0
+        },
+        {
+          "text": "every",
+          "start": 111.0,
+          "end": 111.38
+        },
+        {
+          "text": "little",
+          "start": 111.38,
+          "end": 112.04
+        },
+        {
+          "text": "dream",
+          "start": 112.04,
+          "end": 112.36
+        },
+        {
+          "text": "comes",
+          "start": 112.36,
+          "end": 112.8
+        },
+        {
+          "text": "true",
+          "start": 112.8,
+          "end": 113.22
+        },
+        {
+          "text": "Hab",
+          "start": 113.22,
+          "end": 113.46
+        },
+        {
+          "text": "keine",
+          "start": 113.46,
+          "end": 113.82
+        },
+        {
+          "text": "Angst",
+          "start": 113.82,
+          "end": 114.38
+        },
+        {
+          "text": "vor",
+          "start": 114.38,
+          "end": 114.62
+        },
+        {
+          "text": "kleinen",
+          "start": 114.62,
+          "end": 115.06
+        },
+        {
+          "text": "Feiern",
+          "start": 115.06,
+          "end": 115.66
+        },
+        {
+          "text": "They're",
+          "start": 115.66,
+          "end": 116.04
+        },
+        {
+          "text": "part",
+          "start": 116.04,
+          "end": 116.32
+        },
+        {
+          "text": "of",
+          "start": 116.32,
+          "end": 116.5
+        },
+        {
+          "text": "learning",
+          "start": 116.5,
+          "end": 116.98
+        },
+        {
+          "text": "something",
+          "start": 116.98,
+          "end": 117.42
+        },
+        {
+          "text": "new",
+          "start": 117.42,
+          "end": 118.3
+        },
+        {
+          "text": "Du",
+          "start": 118.3,
+          "end": 118.58
+        },
+        {
+          "text": "bist",
+          "start": 118.58,
+          "end": 118.82
+        },
+        {
+          "text": "stärker",
+          "start": 118.82,
+          "end": 119.5
+        },
+        {
+          "text": "als",
+          "start": 119.5,
+          "end": 119.88
+        },
+        {
+          "text": "du",
+          "start": 119.88,
+          "end": 120.12
+        },
+        {
+          "text": "denkst",
+          "start": 120.12,
+          "end": 120.6
+        },
+        {
+          "text": "Just",
+          "start": 120.6,
+          "end": 120.76
+        },
+        {
+          "text": "keep",
+          "start": 120.76,
+          "end": 121.08
+        },
+        {
+          "text": "believing",
+          "start": 121.08,
+          "end": 121.8
+        },
+        {
+          "text": "in",
+          "start": 121.8,
+          "end": 122.32
+        },
+        {
+          "text": "you",
+          "start": 122.32,
+          "end": 123.08
+        },
+        {
+          "text": "Wir",
+          "start": 123.08,
+          "end": 123.78
+        },
+        {
+          "text": "glauben",
+          "start": 123.78,
+          "end": 124.16
+        },
+        {
+          "text": "an",
+          "start": 124.16,
+          "end": 124.46
+        },
+        {
+          "text": "das,",
+          "start": 124.46,
+          "end": 124.7
+        },
+        {
+          "text": "was",
+          "start": 124.78,
+          "end": 124.86
+        },
+        {
+          "text": "morgen",
+          "start": 124.86,
+          "end": 125.48
+        },
+        {
+          "text": "kommt",
+          "start": 125.48,
+          "end": 125.8
+        },
+        {
+          "text": "In",
+          "start": 125.8,
+          "end": 126.12
+        },
+        {
+          "text": "everything",
+          "start": 126.12,
+          "end": 126.38
+        },
+        {
+          "text": "that",
+          "start": 126.38,
+          "end": 126.84
+        },
+        {
+          "text": "we",
+          "start": 126.84,
+          "end": 127.06
+        },
+        {
+          "text": "can",
+          "start": 127.06,
+          "end": 127.42
+        },
+        {
+          "text": "be",
+          "start": 127.42,
+          "end": 128.1
+        },
+        {
+          "text": "Mit",
+          "start": 128.1,
+          "end": 128.44
+        },
+        {
+          "text": "Geduld",
+          "start": 128.44,
+          "end": 129.06
+        },
+        {
+          "text": "und",
+          "start": 129.06,
+          "end": 129.34
+        },
+        {
+          "text": "Zuversicht",
+          "start": 129.34,
+          "end": 130.28
+        },
+        {
+          "text": "We'll",
+          "start": 130.28,
+          "end": 130.58
+        },
+        {
+          "text": "find",
+          "start": 130.58,
+          "end": 130.92
+        },
+        {
+          "text": "the",
+          "start": 130.92,
+          "end": 131.16
+        },
+        {
+          "text": "strength",
+          "start": 131.16,
+          "end": 131.54
+        },
+        {
+          "text": "to",
+          "start": 131.54,
+          "end": 132.02
+        },
+        {
+          "text": "reach",
+          "start": 132.02,
+          "end": 132.54
+        },
+        {
+          "text": "our",
+          "start": 132.54,
+          "end": 132.98
+        },
+        {
+          "text": "dream",
+          "start": 132.98,
+          "end": 134.06
+        },
+        {
+          "text": "Meinsam",
+          "start": 134.06,
+          "end": 134.86
+        },
+        {
+          "text": "schaffen",
+          "start": 134.86,
+          "end": 135.26
+        },
+        {
+          "text": "wir",
+          "start": 135.26,
+          "end": 135.72
+        },
+        {
+          "text": "das",
+          "start": 135.72,
+          "end": 136.18
+        },
+        {
+          "text": "Together",
+          "start": 136.18,
+          "end": 137.52
+        },
+        {
+          "text": "we",
+          "start": 137.52,
+          "end": 138.22
+        },
+        {
+          "text": "can,",
+          "start": 138.22,
+          "end": 138.74
+        },
+        {
+          "text": "together",
+          "start": 139.02,
+          "end": 140.1
+        },
+        {
+          "text": "we",
+          "start": 140.1,
+          "end": 140.7
+        },
+        {
+          "text": "grow",
+          "start": 140.7,
+          "end": 141.2
+        },
+        {
+          "text": "Step",
+          "start": 141.2,
+          "end": 141.82
+        },
+        {
+          "text": "by",
+          "start": 141.82,
+          "end": 142.14
+        },
+        {
+          "text": "step",
+          "start": 142.14,
+          "end": 142.48
+        },
+        {
+          "text": "we",
+          "start": 142.48,
+          "end": 142.8
+        },
+        {
+          "text": "go",
+          "start": 142.8,
+          "end": 142.94
+        },
+        {
+          "text": "on",
+          "start": 142.94,
+          "end": 143.56
+        },
+        {
+          "text": "There's",
+          "start": 143.76,
+          "end": 144.2
+        },
+        {
+          "text": "so",
+          "start": 144.2,
+          "end": 144.32
+        },
+        {
+          "text": "much",
+          "start": 144.32,
+          "end": 144.54
+        },
+        {
+          "text": "more",
+          "start": 144.54,
+          "end": 144.9
+        },
+        {
+          "text": "for",
+          "start": 144.9,
+          "end": 145.24
+        },
+        {
+          "text": "us",
+          "start": 145.24,
+          "end": 145.48
+        },
+        {
+          "text": "to",
+          "start": 145.48,
+          "end": 145.7
+        },
+        {
+          "text": "know",
+          "start": 145.7,
+          "end": 146.14
+        },
+        {
+          "text": "Together",
+          "start": 146.14,
+          "end": 146.82
+        },
+        {
+          "text": "we'll",
+          "start": 146.82,
+          "end": 147.94
+        },
+        {
+          "text": "it",
+          "start": 147.94,
+          "end": 148.36
+        },
+        {
+          "text": "Even",
+          "start": 148.36,
+          "end": 148.92
+        },
+        {
+          "text": "if",
+          "start": 148.92,
+          "end": 149.2
+        },
+        {
+          "text": "the",
+          "start": 149.2,
+          "end": 149.5
+        },
+        {
+          "text": "path",
+          "start": 149.5,
+          "end": 149.7
+        },
+        {
+          "text": "isn't",
+          "start": 149.7,
+          "end": 150.04
+        },
+        {
+          "text": "easy",
+          "start": 150.04,
+          "end": 150.74
+        },
+        {
+          "text": "We'll",
+          "start": 150.74,
+          "end": 151.74
+        },
+        {
+          "text": "follow,",
+          "start": 151.74,
+          "end": 152.12
+        },
+        {
+          "text": "we'll",
+          "start": 152.56,
+          "end": 153.2
+        },
+        {
+          "text": "find",
+          "start": 153.2,
+          "end": 153.66
+        },
+        {
+          "text": "our",
+          "start": 153.66,
+          "end": 154.16
+        },
+        {
+          "text": "way",
+          "start": 154.16,
+          "end": 155.12
+        },
+        {
+          "text": "A",
+          "start": 155.12,
+          "end": 156.24
+        },
+        {
+          "text": "new",
+          "start": 156.24,
+          "end": 156.58
+        },
+        {
+          "text": "beginning",
+          "start": 156.58,
+          "end": 157.24
+        },
+        {
+          "text": "every",
+          "start": 157.24,
+          "end": 157.8
+        },
+        {
+          "text": "day",
+          "start": 157.8,
+          "end": 158.58
+        },
+        {
+          "text": "When",
+          "start": 161.78,
+          "end": 162.66
+        },
+        {
+          "text": "you",
+          "start": 162.66,
+          "end": 162.98
+        },
+        {
+          "text": "fall,",
+          "start": 162.98,
+          "end": 163.32
+        },
+        {
+          "text": "stand",
+          "start": 163.58,
+          "end": 163.7
+        },
+        {
+          "text": "up",
+          "start": 163.7,
+          "end": 164.34
+        },
+        {
+          "text": "again",
+          "start": 164.34,
+          "end": 164.56
+        },
+        {
+          "text": "Tomorrow",
+          "start": 164.56,
+          "end": 165.1
+        },
+        {
+          "text": "brings",
+          "start": 165.1,
+          "end": 165.74
+        },
+        {
+          "text": "another",
+          "start": 165.74,
+          "end": 166.22
+        },
+        {
+          "text": "chance",
+          "start": 166.22,
+          "end": 167.18
+        },
+        {
+          "text": "Every",
+          "start": 167.18,
+          "end": 167.54
+        },
+        {
+          "text": "step",
+          "start": 167.54,
+          "end": 168.06
+        },
+        {
+          "text": "brings",
+          "start": 168.06,
+          "end": 168.48
+        },
+        {
+          "text": "you",
+          "start": 168.48,
+          "end": 168.84
+        },
+        {
+          "text": "forward",
+          "start": 168.84,
+          "end": 169.28
+        },
+        {
+          "text": "Your",
+          "start": 169.28,
+          "end": 169.64
+        },
+        {
+          "text": "future",
+          "start": 169.64,
+          "end": 170.18
+        },
+        {
+          "text": "is",
+          "start": 170.18,
+          "end": 170.92
+        },
+        {
+          "text": "in",
+          "start": 170.92,
+          "end": 171.18
+        },
+        {
+          "text": "your",
+          "start": 171.18,
+          "end": 171.5
+        },
+        {
+          "text": "hands",
+          "start": 171.5,
+          "end": 171.92
+        },
+        {
+          "text": "You're",
+          "start": 171.92,
+          "end": 172.2
+        },
+        {
+          "text": "not",
+          "start": 172.2,
+          "end": 172.48
+        },
+        {
+          "text": "alone",
+          "start": 172.48,
+          "end": 173.04
+        },
+        {
+          "text": "on",
+          "start": 173.04,
+          "end": 173.28
+        },
+        {
+          "text": "this",
+          "start": 173.28,
+          "end": 173.66
+        },
+        {
+          "text": "journey",
+          "start": 173.66,
+          "end": 174.42
+        },
+        {
+          "text": "We",
+          "start": 174.42,
+          "end": 174.84
+        },
+        {
+          "text": "are",
+          "start": 174.84,
+          "end": 175.06
+        },
+        {
+          "text": "here",
+          "start": 175.06,
+          "end": 175.48
+        },
+        {
+          "text": "to",
+          "start": 175.48,
+          "end": 175.7
+        },
+        {
+          "text": "cheer",
+          "start": 175.7,
+          "end": 175.92
+        },
+        {
+          "text": "you",
+          "start": 175.92,
+          "end": 176.24
+        },
+        {
+          "text": "on",
+          "start": 176.24,
+          "end": 176.68
+        },
+        {
+          "text": "Here",
+          "start": 176.68,
+          "end": 176.96
+        },
+        {
+          "text": "at",
+          "start": 176.96,
+          "end": 177.06
+        },
+        {
+          "text": "Fallow,",
+          "start": 177.06,
+          "end": 177.5
+        },
+        {
+          "text": "we",
+          "start": 177.72,
+          "end": 178.22
+        },
+        {
+          "text": "together",
+          "start": 178.22,
+          "end": 178.96
+        },
+        {
+          "text": "And",
+          "start": 179.4,
+          "end": 179.84
+        },
+        {
+          "text": "together",
+          "start": 179.84,
+          "end": 180.16
+        },
+        {
+          "text": "we",
+          "start": 180.16,
+          "end": 180.86
+        },
+        {
+          "text": "belong",
+          "start": 180.86,
+          "end": 181.62
+        },
+        {
+          "text": "Together",
+          "start": 182.68,
+          "end": 183.56
+        },
+        {
+          "text": "we",
+          "start": 183.56,
+          "end": 184.44
+        },
+        {
+          "text": "can",
+          "start": 184.44,
+          "end": 184.96
+        },
+        {
+          "text": "Together",
+          "start": 184.96,
+          "end": 185.6
+        },
+        {
+          "text": "we",
+          "start": 185.6,
+          "end": 187.14
+        },
+        {
+          "text": "can",
+          "start": 187.14,
+          "end": 187.86
+        },
+        {
+          "text": "Together",
+          "start": 188.38,
+          "end": 188.82
+        },
+        {
+          "text": "we",
+          "start": 188.82,
+          "end": 189.56
+        },
+        {
+          "text": "grow",
+          "start": 189.56,
+          "end": 190.02
+        },
+        {
+          "text": "Step",
+          "start": 190.02,
+          "end": 190.7
+        },
+        {
+          "text": "by",
+          "start": 190.7,
+          "end": 190.98
+        },
+        {
+          "text": "step,",
+          "start": 190.98,
+          "end": 191.38
+        },
+        {
+          "text": "we",
+          "start": 191.48,
+          "end": 191.64
+        },
+        {
+          "text": "go",
+          "start": 191.64,
+          "end": 191.82
+        },
+        {
+          "text": "on",
+          "start": 191.82,
+          "end": 192.64
+        },
+        {
+          "text": "There's",
+          "start": 192.64,
+          "end": 192.98
+        },
+        {
+          "text": "so",
+          "start": 192.98,
+          "end": 193.16
+        },
+        {
+          "text": "much",
+          "start": 193.16,
+          "end": 193.42
+        },
+        {
+          "text": "more",
+          "start": 193.42,
+          "end": 193.76
+        },
+        {
+          "text": "for",
+          "start": 193.76,
+          "end": 194.08
+        },
+        {
+          "text": "us",
+          "start": 194.08,
+          "end": 194.36
+        },
+        {
+          "text": "to",
+          "start": 194.36,
+          "end": 194.58
+        },
+        {
+          "text": "know",
+          "start": 194.58,
+          "end": 194.96
+        },
+        {
+          "text": "Reminds",
+          "start": 194.96,
+          "end": 195.84
+        },
+        {
+          "text": "I'm",
+          "start": 195.84,
+          "end": 195.98
+        },
+        {
+          "text": "shoving",
+          "start": 195.98,
+          "end": 196.58
+        },
+        {
+          "text": "near",
+          "start": 196.58,
+          "end": 196.9
+        },
+        {
+          "text": "us",
+          "start": 196.9,
+          "end": 197.42
+        },
+        {
+          "text": "Wir",
+          "start": 197.42,
+          "end": 197.7
+        },
+        {
+          "text": "glauben",
+          "start": 197.7,
+          "end": 198.04
+        },
+        {
+          "text": "fest",
+          "start": 198.04,
+          "end": 198.56
+        },
+        {
+          "text": "an",
+          "start": 198.56,
+          "end": 198.96
+        },
+        {
+          "text": "unser",
+          "start": 198.96,
+          "end": 199.32
+        },
+        {
+          "text": "Ziel",
+          "start": 199.32,
+          "end": 199.92
+        },
+        {
+          "text": "We'll",
+          "start": 199.92,
+          "end": 200.5
+        },
+        {
+          "text": "follow,",
+          "start": 200.5,
+          "end": 200.86
+        },
+        {
+          "text": "we'll",
+          "start": 201.36,
+          "end": 202.04
+        },
+        {
+          "text": "find",
+          "start": 202.04,
+          "end": 202.48
+        },
+        {
+          "text": "our",
+          "start": 202.48,
+          "end": 203.0
+        },
+        {
+          "text": "way",
+          "start": 203.0,
+          "end": 203.72
+        },
+        {
+          "text": "Together",
+          "start": 205.38,
+          "end": 205.84
+        },
+        {
+          "text": "we",
+          "start": 205.84,
+          "end": 206.32
+        },
+        {
+          "text": "can",
+          "start": 206.32,
+          "end": 206.78
+        },
+        {
+          "text": "Every",
+          "start": 207.84,
+          "end": 208.76
+        },
+        {
+          "text": "day",
+          "start": 208.76,
+          "end": 209.5
+        },
+        {
+          "text": "Every",
+          "start": 210.44,
+          "end": 210.9
+        },
+        {
+          "text": "day",
+          "start": 210.9,
+          "end": 212.78
+        },
+        {
+          "text": "We",
+          "start": 216.06,
+          "end": 216.98
+        },
+        {
+          "text": "come",
+          "start": 216.98,
+          "end": 217.9
+        },
+        {
+          "text": "by",
+          "start": 217.9,
+          "end": 218.22
+        },
+        {
+          "text": "follow",
+          "start": 218.22,
+          "end": 218.6
+        },
+        {
+          "text": "We're",
+          "start": 219.66,
+          "end": 220.12
+        },
+        {
+          "text": "happy",
+          "start": 220.12,
+          "end": 220.34
+        },
+        {
+          "text": "you're",
+          "start": 220.34,
+          "end": 220.68
+        },
+        {
+          "text": "here",
+          "start": 220.68,
+          "end": 221.22
+        },
+        {
+          "text": "Dein",
+          "start": 221.22,
+          "end": 222.52
+        },
+        {
+          "text": "Deutschkurs",
+          "start": 222.52,
+          "end": 223.0
+        },
+        {
+          "text": "begin",
+          "start": 223.0,
+          "end": 223.26
+        },
+        {
+          "text": "gleich,",
+          "start": 223.26,
+          "end": 223.68
+        },
+        {
+          "text": "your",
+          "start": 224.24,
+          "end": 224.44
+        },
+        {
+          "text": "German",
+          "start": 224.44,
+          "end": 224.78
+        },
+        {
+          "text": "journey",
+          "start": 224.78,
+          "end": 225.12
+        },
+        {
+          "text": "continues",
+          "start": 225.12,
+          "end": 225.8
+        },
+        {
+          "text": "here",
+          "start": 225.8,
+          "end": 226.27
+        },
+        {
+          "text": "Gemeinsam",
+          "start": 233.74,
+          "end": 234.68
+        },
+        {
+          "text": "schaffen",
+          "start": 234.68,
+          "end": 235.1
+        },
+        {
+          "text": "wir",
+          "start": 235.1,
+          "end": 235.56
+        },
+        {
+          "text": "das",
+          "start": 235.56,
+          "end": 236.1
+        },
+        {
+          "text": "You",
+          "start": 256.8,
+          "end": 258.2
+        }
+      ],
+      "referenceOnly": true,
+      "transcriptionStatus": "automatic",
+      "audioUrl": "https://admin.falowen.app/Gemeinsam%20schaffen%20wir%20das.mp3"
+    },
+    {
+      "objectKey": "catalog:schritt-fuer-schritt",
+      "recordingSha256": "000cd8df46b05204e7721b1eeb8c42f9c3629469b8a9697e65e4b4336b2a74c9",
+      "duration": 233.96,
+      "trackId": "schritt-fuer-schritt",
+      "timingStatus": "estimated",
+      "timingMethod": "Whisper small German word timestamps; teacher listening review required",
+      "lyrics": "Hello, hello,\nwelcome today.\nWelcome, we're glad you're here.\nGood morning means good morning.\nGood evening,\nmy dear.\nEvery little word you're learning is another step,\nanother sign Schritt für Schritt, step by step,\ntake your time, don't forget Ich kann das,\nyes, I can,\nkeep on going,\nthat's the plan Give me stuff, don't give\nup\nEvery day you're growing strong We schaffen das\nWe can do it At Verloben, you belong\nPlease thank me, thank you Yes means yes\nand no means no I learn German, I'm\nlearning German Little by little, watch me grow\nI understand,\nI understand\nOnce more, one more time\nIf it's difficult, keep on trying\nEvery mountain takes a climb Schritt für Schritt\nstep by step Take your time, don't forget\nIch kann das, yes I can Keep on\ngoing,\nthat's the plan Gib nicht auch, don't give\nup Every day you're growing strong Wir schaffen\ndas,\nwe can do it At Verloben, you belong\nSome days the words won't come Some days\nthe road feels long Failures aren't okay Mistakes\nare okay Keep learning, you're growing strong You're\nnot alone You're not alone We learn together,\nwe learn together Your teacher is here Your\nfriends are here We keep on learning together\nStep by step,\none more word, one more breath I can\ndo this, yes I can\nI'll keep learning,\nthat's my plan Give me a thought,\ndon't give up Let your confidence shine through\nFollow me, we're learning together And we believe\nin you\nYou",
+      "cues": [
+        {
+          "text": "Hello, hello,",
+          "start": 13.52,
+          "end": 15.16
+        },
+        {
+          "text": "welcome today.",
+          "start": 15.7,
+          "end": 17.1
+        },
+        {
+          "text": "Welcome, we're glad you're here.",
+          "start": 17.48,
+          "end": 19.72
+        },
+        {
+          "text": "Good morning means good morning.",
+          "start": 20.52,
+          "end": 23.3
+        },
+        {
+          "text": "Good evening,",
+          "start": 23.88,
+          "end": 24.8
+        },
+        {
+          "text": "my dear.",
+          "start": 26.16,
+          "end": 26.78
+        },
+        {
+          "text": "Every little word you're learning is another step,",
+          "start": 33.8,
+          "end": 38.78
+        },
+        {
+          "text": "another sign Schritt für Schritt, step by step,",
+          "start": 38.98,
+          "end": 43.96
+        },
+        {
+          "text": "take your time, don't forget Ich kann das,",
+          "start": 44.06,
+          "end": 48.98
+        },
+        {
+          "text": "yes, I can,",
+          "start": 49.44,
+          "end": 50.56
+        },
+        {
+          "text": "keep on going,",
+          "start": 51.16,
+          "end": 52.4
+        },
+        {
+          "text": "that's the plan Give me stuff, don't give",
+          "start": 52.98,
+          "end": 57.1
+        },
+        {
+          "text": "up",
+          "start": 57.1,
+          "end": 57.46
+        },
+        {
+          "text": "Every day you're growing strong We schaffen das",
+          "start": 58.1,
+          "end": 62.58
+        },
+        {
+          "text": "We can do it At Verloben, you belong",
+          "start": 62.92,
+          "end": 67.66
+        },
+        {
+          "text": "Please thank me, thank you Yes means yes",
+          "start": 84.1,
+          "end": 88.4
+        },
+        {
+          "text": "and no means no I learn German, I'm",
+          "start": 88.4,
+          "end": 92.4
+        },
+        {
+          "text": "learning German Little by little, watch me grow",
+          "start": 92.4,
+          "end": 96.9
+        },
+        {
+          "text": "I understand,",
+          "start": 97.5,
+          "end": 98.42
+        },
+        {
+          "text": "I understand",
+          "start": 99.06,
+          "end": 99.8
+        },
+        {
+          "text": "Once more, one more time",
+          "start": 100.94,
+          "end": 103.84
+        },
+        {
+          "text": "If it's difficult, keep on trying",
+          "start": 104.38,
+          "end": 107.3
+        },
+        {
+          "text": "Every mountain takes a climb Schritt für Schritt",
+          "start": 107.94,
+          "end": 112.48
+        },
+        {
+          "text": "step by step Take your time, don't forget",
+          "start": 112.48,
+          "end": 117.28
+        },
+        {
+          "text": "Ich kann das, yes I can Keep on",
+          "start": 117.28,
+          "end": 122.14
+        },
+        {
+          "text": "going,",
+          "start": 122.14,
+          "end": 122.72
+        },
+        {
+          "text": "that's the plan Gib nicht auch, don't give",
+          "start": 123.26,
+          "end": 127.36
+        },
+        {
+          "text": "up Every day you're growing strong Wir schaffen",
+          "start": 127.36,
+          "end": 132.2
+        },
+        {
+          "text": "das,",
+          "start": 132.2,
+          "end": 132.82
+        },
+        {
+          "text": "we can do it At Verloben, you belong",
+          "start": 133.42,
+          "end": 137.86
+        },
+        {
+          "text": "Some days the words won't come Some days",
+          "start": 140.68,
+          "end": 145.04
+        },
+        {
+          "text": "the road feels long Failures aren't okay Mistakes",
+          "start": 145.04,
+          "end": 149.36
+        },
+        {
+          "text": "are okay Keep learning, you're growing strong You're",
+          "start": 149.36,
+          "end": 154.16
+        },
+        {
+          "text": "not alone You're not alone We learn together,",
+          "start": 154.16,
+          "end": 158.3
+        },
+        {
+          "text": "we learn together Your teacher is here Your",
+          "start": 158.3,
+          "end": 162.42
+        },
+        {
+          "text": "friends are here We keep on learning together",
+          "start": 162.42,
+          "end": 167.0
+        },
+        {
+          "text": "Step by step,",
+          "start": 167.0,
+          "end": 170.66
+        },
+        {
+          "text": "one more word, one more breath I can",
+          "start": 171.2,
+          "end": 175.22
+        },
+        {
+          "text": "do this, yes I can",
+          "start": 175.22,
+          "end": 177.42
+        },
+        {
+          "text": "I'll keep learning,",
+          "start": 177.96,
+          "end": 179.3
+        },
+        {
+          "text": "that's my plan Give me a thought,",
+          "start": 179.78,
+          "end": 182.52
+        },
+        {
+          "text": "don't give up Let your confidence shine through",
+          "start": 183.0,
+          "end": 187.9
+        },
+        {
+          "text": "Follow me, we're learning together And we believe",
+          "start": 188.94,
+          "end": 193.62
+        },
+        {
+          "text": "in you",
+          "start": 193.62,
+          "end": 194.96
+        },
+        {
+          "text": "You",
+          "start": 226.4,
+          "end": 227.8
+        }
+      ],
+      "wordTimestamps": [
+        {
+          "text": "Hello,",
+          "start": 13.52,
+          "end": 14.52
+        },
+        {
+          "text": "hello,",
+          "start": 14.88,
+          "end": 15.16
+        },
+        {
+          "text": "welcome",
+          "start": 15.7,
+          "end": 16.42
+        },
+        {
+          "text": "today.",
+          "start": 16.42,
+          "end": 17.1
+        },
+        {
+          "text": "Welcome,",
+          "start": 17.48,
+          "end": 17.98
+        },
+        {
+          "text": "we're",
+          "start": 18.32,
+          "end": 18.62
+        },
+        {
+          "text": "glad",
+          "start": 18.62,
+          "end": 18.9
+        },
+        {
+          "text": "you're",
+          "start": 18.9,
+          "end": 19.4
+        },
+        {
+          "text": "here.",
+          "start": 19.4,
+          "end": 19.72
+        },
+        {
+          "text": "Good",
+          "start": 20.52,
+          "end": 21.06
+        },
+        {
+          "text": "morning",
+          "start": 21.06,
+          "end": 21.52
+        },
+        {
+          "text": "means",
+          "start": 21.52,
+          "end": 22.44
+        },
+        {
+          "text": "good",
+          "start": 22.44,
+          "end": 22.7
+        },
+        {
+          "text": "morning.",
+          "start": 22.7,
+          "end": 23.3
+        },
+        {
+          "text": "Good",
+          "start": 23.88,
+          "end": 24.5
+        },
+        {
+          "text": "evening,",
+          "start": 24.5,
+          "end": 24.8
+        },
+        {
+          "text": "my",
+          "start": 26.16,
+          "end": 26.32
+        },
+        {
+          "text": "dear.",
+          "start": 26.32,
+          "end": 26.78
+        },
+        {
+          "text": "Every",
+          "start": 33.8,
+          "end": 34.84
+        },
+        {
+          "text": "little",
+          "start": 34.84,
+          "end": 35.4
+        },
+        {
+          "text": "word",
+          "start": 35.4,
+          "end": 35.98
+        },
+        {
+          "text": "you're",
+          "start": 35.98,
+          "end": 36.46
+        },
+        {
+          "text": "learning",
+          "start": 36.46,
+          "end": 37.06
+        },
+        {
+          "text": "is",
+          "start": 37.06,
+          "end": 37.78
+        },
+        {
+          "text": "another",
+          "start": 37.78,
+          "end": 38.2
+        },
+        {
+          "text": "step,",
+          "start": 38.2,
+          "end": 38.78
+        },
+        {
+          "text": "another",
+          "start": 38.98,
+          "end": 39.48
+        },
+        {
+          "text": "sign",
+          "start": 39.48,
+          "end": 40.6
+        },
+        {
+          "text": "Schritt",
+          "start": 40.6,
+          "end": 41.16
+        },
+        {
+          "text": "für",
+          "start": 41.16,
+          "end": 41.62
+        },
+        {
+          "text": "Schritt,",
+          "start": 41.62,
+          "end": 42.18
+        },
+        {
+          "text": "step",
+          "start": 42.24,
+          "end": 42.66
+        },
+        {
+          "text": "by",
+          "start": 42.66,
+          "end": 43.22
+        },
+        {
+          "text": "step,",
+          "start": 43.22,
+          "end": 43.96
+        },
+        {
+          "text": "take",
+          "start": 44.06,
+          "end": 44.58
+        },
+        {
+          "text": "your",
+          "start": 44.58,
+          "end": 45.12
+        },
+        {
+          "text": "time,",
+          "start": 45.12,
+          "end": 45.7
+        },
+        {
+          "text": "don't",
+          "start": 45.82,
+          "end": 46.36
+        },
+        {
+          "text": "forget",
+          "start": 46.36,
+          "end": 46.98
+        },
+        {
+          "text": "Ich",
+          "start": 46.98,
+          "end": 48.02
+        },
+        {
+          "text": "kann",
+          "start": 48.02,
+          "end": 48.34
+        },
+        {
+          "text": "das,",
+          "start": 48.34,
+          "end": 48.98
+        },
+        {
+          "text": "yes,",
+          "start": 49.44,
+          "end": 49.76
+        },
+        {
+          "text": "I",
+          "start": 49.98,
+          "end": 50.12
+        },
+        {
+          "text": "can,",
+          "start": 50.12,
+          "end": 50.56
+        },
+        {
+          "text": "keep",
+          "start": 51.16,
+          "end": 51.48
+        },
+        {
+          "text": "on",
+          "start": 51.48,
+          "end": 51.88
+        },
+        {
+          "text": "going,",
+          "start": 51.88,
+          "end": 52.4
+        },
+        {
+          "text": "that's",
+          "start": 52.98,
+          "end": 53.42
+        },
+        {
+          "text": "the",
+          "start": 53.42,
+          "end": 53.54
+        },
+        {
+          "text": "plan",
+          "start": 53.54,
+          "end": 54.1
+        },
+        {
+          "text": "Give",
+          "start": 54.1,
+          "end": 54.9
+        },
+        {
+          "text": "me",
+          "start": 54.9,
+          "end": 55.16
+        },
+        {
+          "text": "stuff,",
+          "start": 55.16,
+          "end": 55.8
+        },
+        {
+          "text": "don't",
+          "start": 56.1,
+          "end": 56.86
+        },
+        {
+          "text": "give",
+          "start": 56.86,
+          "end": 57.1
+        },
+        {
+          "text": "up",
+          "start": 57.1,
+          "end": 57.46
+        },
+        {
+          "text": "Every",
+          "start": 58.1,
+          "end": 58.66
+        },
+        {
+          "text": "day",
+          "start": 58.66,
+          "end": 59.1
+        },
+        {
+          "text": "you're",
+          "start": 59.1,
+          "end": 59.78
+        },
+        {
+          "text": "growing",
+          "start": 59.78,
+          "end": 60.18
+        },
+        {
+          "text": "strong",
+          "start": 60.18,
+          "end": 61.08
+        },
+        {
+          "text": "We",
+          "start": 61.08,
+          "end": 61.5
+        },
+        {
+          "text": "schaffen",
+          "start": 61.5,
+          "end": 61.9
+        },
+        {
+          "text": "das",
+          "start": 61.9,
+          "end": 62.58
+        },
+        {
+          "text": "We",
+          "start": 62.92,
+          "end": 63.42
+        },
+        {
+          "text": "can",
+          "start": 63.42,
+          "end": 63.82
+        },
+        {
+          "text": "do",
+          "start": 63.82,
+          "end": 64.32
+        },
+        {
+          "text": "it",
+          "start": 64.32,
+          "end": 64.82
+        },
+        {
+          "text": "At",
+          "start": 64.82,
+          "end": 65.28
+        },
+        {
+          "text": "Verloben,",
+          "start": 65.28,
+          "end": 66.24
+        },
+        {
+          "text": "you",
+          "start": 66.24,
+          "end": 66.94
+        },
+        {
+          "text": "belong",
+          "start": 66.94,
+          "end": 67.66
+        },
+        {
+          "text": "Please",
+          "start": 84.1,
+          "end": 84.32
+        },
+        {
+          "text": "thank",
+          "start": 84.32,
+          "end": 85.78
+        },
+        {
+          "text": "me,",
+          "start": 85.78,
+          "end": 86.2
+        },
+        {
+          "text": "thank",
+          "start": 86.26,
+          "end": 86.6
+        },
+        {
+          "text": "you",
+          "start": 86.6,
+          "end": 87.16
+        },
+        {
+          "text": "Yes",
+          "start": 87.16,
+          "end": 87.72
+        },
+        {
+          "text": "means",
+          "start": 87.72,
+          "end": 88.02
+        },
+        {
+          "text": "yes",
+          "start": 88.02,
+          "end": 88.4
+        },
+        {
+          "text": "and",
+          "start": 88.4,
+          "end": 88.82
+        },
+        {
+          "text": "no",
+          "start": 88.82,
+          "end": 89.1
+        },
+        {
+          "text": "means",
+          "start": 89.1,
+          "end": 89.38
+        },
+        {
+          "text": "no",
+          "start": 89.38,
+          "end": 90.12
+        },
+        {
+          "text": "I",
+          "start": 90.12,
+          "end": 91.06
+        },
+        {
+          "text": "learn",
+          "start": 91.06,
+          "end": 91.42
+        },
+        {
+          "text": "German,",
+          "start": 91.42,
+          "end": 91.98
+        },
+        {
+          "text": "I'm",
+          "start": 92.0,
+          "end": 92.4
+        },
+        {
+          "text": "learning",
+          "start": 92.4,
+          "end": 92.94
+        },
+        {
+          "text": "German",
+          "start": 92.94,
+          "end": 93.56
+        },
+        {
+          "text": "Little",
+          "start": 93.56,
+          "end": 94.4
+        },
+        {
+          "text": "by",
+          "start": 94.4,
+          "end": 94.8
+        },
+        {
+          "text": "little,",
+          "start": 94.8,
+          "end": 95.32
+        },
+        {
+          "text": "watch",
+          "start": 95.46,
+          "end": 96.06
+        },
+        {
+          "text": "me",
+          "start": 96.06,
+          "end": 96.34
+        },
+        {
+          "text": "grow",
+          "start": 96.34,
+          "end": 96.9
+        },
+        {
+          "text": "I",
+          "start": 97.5,
+          "end": 97.96
+        },
+        {
+          "text": "understand,",
+          "start": 97.96,
+          "end": 98.42
+        },
+        {
+          "text": "I",
+          "start": 99.06,
+          "end": 99.36
+        },
+        {
+          "text": "understand",
+          "start": 99.36,
+          "end": 99.8
+        },
+        {
+          "text": "Once",
+          "start": 100.94,
+          "end": 101.4
+        },
+        {
+          "text": "more,",
+          "start": 101.4,
+          "end": 102.14
+        },
+        {
+          "text": "one",
+          "start": 102.2,
+          "end": 102.94
+        },
+        {
+          "text": "more",
+          "start": 102.94,
+          "end": 103.18
+        },
+        {
+          "text": "time",
+          "start": 103.18,
+          "end": 103.84
+        },
+        {
+          "text": "If",
+          "start": 104.38,
+          "end": 104.84
+        },
+        {
+          "text": "it's",
+          "start": 104.84,
+          "end": 105.26
+        },
+        {
+          "text": "difficult,",
+          "start": 105.26,
+          "end": 105.72
+        },
+        {
+          "text": "keep",
+          "start": 106.12,
+          "end": 106.32
+        },
+        {
+          "text": "on",
+          "start": 106.32,
+          "end": 106.68
+        },
+        {
+          "text": "trying",
+          "start": 106.68,
+          "end": 107.3
+        },
+        {
+          "text": "Every",
+          "start": 107.94,
+          "end": 108.4
+        },
+        {
+          "text": "mountain",
+          "start": 108.4,
+          "end": 109.12
+        },
+        {
+          "text": "takes",
+          "start": 109.12,
+          "end": 109.82
+        },
+        {
+          "text": "a",
+          "start": 109.82,
+          "end": 110.16
+        },
+        {
+          "text": "climb",
+          "start": 110.16,
+          "end": 110.68
+        },
+        {
+          "text": "Schritt",
+          "start": 110.68,
+          "end": 111.54
+        },
+        {
+          "text": "für",
+          "start": 111.54,
+          "end": 111.96
+        },
+        {
+          "text": "Schritt",
+          "start": 111.96,
+          "end": 112.48
+        },
+        {
+          "text": "step",
+          "start": 112.48,
+          "end": 112.98
+        },
+        {
+          "text": "by",
+          "start": 112.98,
+          "end": 113.54
+        },
+        {
+          "text": "step",
+          "start": 113.54,
+          "end": 114.32
+        },
+        {
+          "text": "Take",
+          "start": 114.32,
+          "end": 114.9
+        },
+        {
+          "text": "your",
+          "start": 114.9,
+          "end": 115.44
+        },
+        {
+          "text": "time,",
+          "start": 115.44,
+          "end": 115.92
+        },
+        {
+          "text": "don't",
+          "start": 116.16,
+          "end": 116.58
+        },
+        {
+          "text": "forget",
+          "start": 116.58,
+          "end": 117.28
+        },
+        {
+          "text": "Ich",
+          "start": 117.28,
+          "end": 118.32
+        },
+        {
+          "text": "kann",
+          "start": 118.32,
+          "end": 118.68
+        },
+        {
+          "text": "das,",
+          "start": 118.68,
+          "end": 119.2
+        },
+        {
+          "text": "yes",
+          "start": 119.6,
+          "end": 119.9
+        },
+        {
+          "text": "I",
+          "start": 119.9,
+          "end": 120.4
+        },
+        {
+          "text": "can",
+          "start": 120.4,
+          "end": 120.84
+        },
+        {
+          "text": "Keep",
+          "start": 120.84,
+          "end": 121.76
+        },
+        {
+          "text": "on",
+          "start": 121.76,
+          "end": 122.14
+        },
+        {
+          "text": "going,",
+          "start": 122.14,
+          "end": 122.72
+        },
+        {
+          "text": "that's",
+          "start": 123.26,
+          "end": 123.68
+        },
+        {
+          "text": "the",
+          "start": 123.68,
+          "end": 123.86
+        },
+        {
+          "text": "plan",
+          "start": 123.86,
+          "end": 124.6
+        },
+        {
+          "text": "Gib",
+          "start": 124.6,
+          "end": 125.18
+        },
+        {
+          "text": "nicht",
+          "start": 125.18,
+          "end": 125.56
+        },
+        {
+          "text": "auch,",
+          "start": 125.56,
+          "end": 126.1
+        },
+        {
+          "text": "don't",
+          "start": 126.42,
+          "end": 127.16
+        },
+        {
+          "text": "give",
+          "start": 127.16,
+          "end": 127.36
+        },
+        {
+          "text": "up",
+          "start": 127.36,
+          "end": 127.88
+        },
+        {
+          "text": "Every",
+          "start": 127.88,
+          "end": 128.96
+        },
+        {
+          "text": "day",
+          "start": 128.96,
+          "end": 129.44
+        },
+        {
+          "text": "you're",
+          "start": 129.44,
+          "end": 130.14
+        },
+        {
+          "text": "growing",
+          "start": 130.14,
+          "end": 130.5
+        },
+        {
+          "text": "strong",
+          "start": 130.5,
+          "end": 131.4
+        },
+        {
+          "text": "Wir",
+          "start": 131.4,
+          "end": 131.8
+        },
+        {
+          "text": "schaffen",
+          "start": 131.8,
+          "end": 132.2
+        },
+        {
+          "text": "das,",
+          "start": 132.2,
+          "end": 132.82
+        },
+        {
+          "text": "we",
+          "start": 133.42,
+          "end": 133.7
+        },
+        {
+          "text": "can",
+          "start": 133.7,
+          "end": 134.12
+        },
+        {
+          "text": "do",
+          "start": 134.12,
+          "end": 134.6
+        },
+        {
+          "text": "it",
+          "start": 134.6,
+          "end": 135.14
+        },
+        {
+          "text": "At",
+          "start": 135.14,
+          "end": 135.56
+        },
+        {
+          "text": "Verloben,",
+          "start": 135.56,
+          "end": 136.54
+        },
+        {
+          "text": "you",
+          "start": 136.66,
+          "end": 137.26
+        },
+        {
+          "text": "belong",
+          "start": 137.26,
+          "end": 137.86
+        },
+        {
+          "text": "Some",
+          "start": 140.68,
+          "end": 141.24
+        },
+        {
+          "text": "days",
+          "start": 141.24,
+          "end": 141.6
+        },
+        {
+          "text": "the",
+          "start": 141.6,
+          "end": 141.92
+        },
+        {
+          "text": "words",
+          "start": 141.92,
+          "end": 142.26
+        },
+        {
+          "text": "won't",
+          "start": 142.26,
+          "end": 142.72
+        },
+        {
+          "text": "come",
+          "start": 142.72,
+          "end": 143.44
+        },
+        {
+          "text": "Some",
+          "start": 143.44,
+          "end": 144.32
+        },
+        {
+          "text": "days",
+          "start": 144.32,
+          "end": 145.04
+        },
+        {
+          "text": "the",
+          "start": 145.04,
+          "end": 145.36
+        },
+        {
+          "text": "road",
+          "start": 145.36,
+          "end": 145.7
+        },
+        {
+          "text": "feels",
+          "start": 145.7,
+          "end": 146.1
+        },
+        {
+          "text": "long",
+          "start": 146.1,
+          "end": 146.76
+        },
+        {
+          "text": "Failures",
+          "start": 146.76,
+          "end": 147.74
+        },
+        {
+          "text": "aren't",
+          "start": 147.74,
+          "end": 148.02
+        },
+        {
+          "text": "okay",
+          "start": 148.02,
+          "end": 148.46
+        },
+        {
+          "text": "Mistakes",
+          "start": 148.46,
+          "end": 149.36
+        },
+        {
+          "text": "are",
+          "start": 149.36,
+          "end": 149.68
+        },
+        {
+          "text": "okay",
+          "start": 149.68,
+          "end": 150.28
+        },
+        {
+          "text": "Keep",
+          "start": 150.28,
+          "end": 151.22
+        },
+        {
+          "text": "learning,",
+          "start": 151.22,
+          "end": 151.84
+        },
+        {
+          "text": "you're",
+          "start": 152.02,
+          "end": 152.36
+        },
+        {
+          "text": "growing",
+          "start": 152.36,
+          "end": 152.76
+        },
+        {
+          "text": "strong",
+          "start": 152.76,
+          "end": 153.4
+        },
+        {
+          "text": "You're",
+          "start": 153.4,
+          "end": 154.16
+        },
+        {
+          "text": "not",
+          "start": 154.16,
+          "end": 154.22
+        },
+        {
+          "text": "alone",
+          "start": 154.22,
+          "end": 155.2
+        },
+        {
+          "text": "You're",
+          "start": 155.2,
+          "end": 156.06
+        },
+        {
+          "text": "not",
+          "start": 156.06,
+          "end": 156.32
+        },
+        {
+          "text": "alone",
+          "start": 156.32,
+          "end": 157.08
+        },
+        {
+          "text": "We",
+          "start": 157.08,
+          "end": 157.5
+        },
+        {
+          "text": "learn",
+          "start": 157.5,
+          "end": 157.86
+        },
+        {
+          "text": "together,",
+          "start": 157.86,
+          "end": 158.3
+        },
+        {
+          "text": "we",
+          "start": 158.3,
+          "end": 159.1
+        },
+        {
+          "text": "learn",
+          "start": 159.1,
+          "end": 159.58
+        },
+        {
+          "text": "together",
+          "start": 159.58,
+          "end": 160.24
+        },
+        {
+          "text": "Your",
+          "start": 160.24,
+          "end": 160.92
+        },
+        {
+          "text": "teacher",
+          "start": 160.92,
+          "end": 161.3
+        },
+        {
+          "text": "is",
+          "start": 161.3,
+          "end": 161.68
+        },
+        {
+          "text": "here",
+          "start": 161.68,
+          "end": 162.12
+        },
+        {
+          "text": "Your",
+          "start": 162.12,
+          "end": 162.42
+        },
+        {
+          "text": "friends",
+          "start": 162.42,
+          "end": 162.88
+        },
+        {
+          "text": "are",
+          "start": 162.88,
+          "end": 163.32
+        },
+        {
+          "text": "here",
+          "start": 163.32,
+          "end": 163.86
+        },
+        {
+          "text": "We",
+          "start": 164.3,
+          "end": 164.76
+        },
+        {
+          "text": "keep",
+          "start": 164.76,
+          "end": 165.1
+        },
+        {
+          "text": "on",
+          "start": 165.1,
+          "end": 165.3
+        },
+        {
+          "text": "learning",
+          "start": 165.3,
+          "end": 166.02
+        },
+        {
+          "text": "together",
+          "start": 166.02,
+          "end": 167.0
+        },
+        {
+          "text": "Step",
+          "start": 167.0,
+          "end": 168.08
+        },
+        {
+          "text": "by",
+          "start": 168.08,
+          "end": 170.16
+        },
+        {
+          "text": "step,",
+          "start": 170.16,
+          "end": 170.66
+        },
+        {
+          "text": "one",
+          "start": 171.2,
+          "end": 171.54
+        },
+        {
+          "text": "more",
+          "start": 171.54,
+          "end": 171.88
+        },
+        {
+          "text": "word,",
+          "start": 171.88,
+          "end": 172.5
+        },
+        {
+          "text": "one",
+          "start": 172.92,
+          "end": 173.24
+        },
+        {
+          "text": "more",
+          "start": 173.24,
+          "end": 173.62
+        },
+        {
+          "text": "breath",
+          "start": 173.62,
+          "end": 174.18
+        },
+        {
+          "text": "I",
+          "start": 174.18,
+          "end": 174.82
+        },
+        {
+          "text": "can",
+          "start": 174.82,
+          "end": 175.22
+        },
+        {
+          "text": "do",
+          "start": 175.22,
+          "end": 175.6
+        },
+        {
+          "text": "this,",
+          "start": 175.6,
+          "end": 176.24
+        },
+        {
+          "text": "yes",
+          "start": 176.26,
+          "end": 176.62
+        },
+        {
+          "text": "I",
+          "start": 176.62,
+          "end": 177.02
+        },
+        {
+          "text": "can",
+          "start": 177.02,
+          "end": 177.42
+        },
+        {
+          "text": "I'll",
+          "start": 177.96,
+          "end": 178.44
+        },
+        {
+          "text": "keep",
+          "start": 178.44,
+          "end": 178.68
+        },
+        {
+          "text": "learning,",
+          "start": 178.68,
+          "end": 179.3
+        },
+        {
+          "text": "that's",
+          "start": 179.78,
+          "end": 180.1
+        },
+        {
+          "text": "my",
+          "start": 180.1,
+          "end": 180.48
+        },
+        {
+          "text": "plan",
+          "start": 180.48,
+          "end": 181.42
+        },
+        {
+          "text": "Give",
+          "start": 181.42,
+          "end": 181.76
+        },
+        {
+          "text": "me",
+          "start": 181.76,
+          "end": 182.06
+        },
+        {
+          "text": "a",
+          "start": 182.06,
+          "end": 182.32
+        },
+        {
+          "text": "thought,",
+          "start": 182.32,
+          "end": 182.52
+        },
+        {
+          "text": "don't",
+          "start": 183.0,
+          "end": 183.54
+        },
+        {
+          "text": "give",
+          "start": 183.54,
+          "end": 183.98
+        },
+        {
+          "text": "up",
+          "start": 183.98,
+          "end": 184.4
+        },
+        {
+          "text": "Let",
+          "start": 184.4,
+          "end": 185.22
+        },
+        {
+          "text": "your",
+          "start": 185.22,
+          "end": 185.52
+        },
+        {
+          "text": "confidence",
+          "start": 185.52,
+          "end": 186.56
+        },
+        {
+          "text": "shine",
+          "start": 186.56,
+          "end": 187.36
+        },
+        {
+          "text": "through",
+          "start": 187.36,
+          "end": 187.9
+        },
+        {
+          "text": "Follow",
+          "start": 188.94,
+          "end": 189.42
+        },
+        {
+          "text": "me,",
+          "start": 189.42,
+          "end": 190.08
+        },
+        {
+          "text": "we're",
+          "start": 190.2,
+          "end": 191.0
+        },
+        {
+          "text": "learning",
+          "start": 191.0,
+          "end": 191.58
+        },
+        {
+          "text": "together",
+          "start": 191.58,
+          "end": 192.18
+        },
+        {
+          "text": "And",
+          "start": 192.18,
+          "end": 192.76
+        },
+        {
+          "text": "we",
+          "start": 192.76,
+          "end": 193.08
+        },
+        {
+          "text": "believe",
+          "start": 193.08,
+          "end": 193.62
+        },
+        {
+          "text": "in",
+          "start": 193.62,
+          "end": 194.34
+        },
+        {
+          "text": "you",
+          "start": 194.34,
+          "end": 194.96
+        },
+        {
+          "text": "You",
+          "start": 226.4,
+          "end": 227.8
+        }
+      ],
+      "referenceOnly": true,
+      "transcriptionStatus": "automatic",
+      "audioUrl": "https://admin.falowen.app/Schritt%20f%C3%BCr%20Schritt.mp3"
+    }
+  ]
+}
