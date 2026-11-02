@@ -10,7 +10,7 @@ import {
  * deliberately not inferred from a day or chapter number.
  */
 export const A1_ASSIGNMENT_ORDER = Object.freeze([
-  "A1-0.1", "A1-0.2_1.1", "A1-1.2", "A1-2", "A1-3", "A1-4",
+  "A1-0.1", "A1-0.2-1.1", "A1-1.2", "A1-2", "A1-3", "A1-4",
   "A1-5", "A1-6", "A1-7", "A1-8", "A1-9", "A1-10", "A1-11",
   "A1-12.1", "A1-5.9", "A1-12.3", "A1-13", "A1-14.1",
 ]);
@@ -48,7 +48,7 @@ const records = [
   ["A1-0.2", 2, "0.2", "German Alphabet", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook", "A1Day3GermanAlphabetReviewingWorkbookPage", [[1, "Teil 1 · Reading and Questions"], [2, "Teil 2 · Hören"]]],
   ["A1-1.1", 2, "1.1", "Personal Pronouns and Basic Verb Conjugation", "/campus/course/a1-day-2-kapitel-1-1-workbook", "A1Day2Kapitel11WorkbookPage", ["Teil 1 · Hören", "Teil 2 · Schreiben"]],
   // New Day 2 assessment ID: never reuse historical A1-0.2 or A1-1.1 grades/drafts.
-  ["A1-0.2_1.1", 2, "0.2_1.1", "Alphabet, Personal Pronouns and First Verbs", "/campus/course/a1-day-2-foundations-workbook", "A1Day2UnifiedWorkbookPage", ["Teil 1 · Alphabet und Buchstabieren", "Teil 2 · Hören und Buchstabieren", "Teil 3 · Personalpronomen", "Teil 4 · Verbkonjugation", "Teil 5 · Erste Sätze"]],
+  ["A1-0.2-1.1", 2, "0.2", "Alphabet, Personal Pronouns and First Verbs", "/campus/course/a1-day-2-foundations-workbook", "A1Day2UnifiedWorkbookPage", ["Teil 1 · Alphabet und Buchstabieren", "Teil 2 · Hören und Buchstabieren", "Teil 3 · Personalpronomen", "Teil 4 · Verbkonjugation", "Teil 5 · Erste Sätze"]],
   ["A1-1.2", 3, "1.2", "Present-Tense Verb Conjugation Practice", "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook", "A1Day3PronounsIntroducingYourselfWorkbookPage", ["Teil 1 · Lesen", "Teil 2 · Schreiben (Exercise)", "Teil 3 · Hören"]],
   ["A1-2", 4, "2", "Numbers", "/campus/course/a1-day-4-numbers-for-beginners-workbook", "A1Day4NumbersForBeginnersWorkbookPage", ["Teil 1 · Formular ausfüllen", "Teil 2 · Zahlen als Wörter", "Teil 3 · Sprechen: Telefonnummer"]],
   ["A1-3", 7, "3", "Asking About Prices", "/campus/course/a1-chapter-3-asking-about-prices-workbook", "A1Chapter3AskingAboutPricesWorkbookPage", ["Teil 1: Preise und Kosten (Exercise 1)", "Teil 2: Sprechen über die Familie (Exercise 2)", "Teil 3: gern oder mögen? (Exercise 3)"]],
@@ -99,9 +99,11 @@ export const getA1Assignment = (assignmentKey) => A1_ASSIGNMENT_REGISTRY[assignm
 export const getA1AssignmentByChapter = (chapter = "") => {
   const normalizedChapter = normalizeA1Chapter(chapter);
   if (!normalizedChapter) return null;
-  return Object.values(A1_ASSIGNMENT_REGISTRY).find(
-    (entry) => normalizeA1Chapter(entry.chapter) === normalizedChapter,
-  ) || null;
+  // Favor current assignments, then fall back to archived definitions for historical links.
+  const active = A1_ASSIGNMENT_ORDER.map((key) => A1_ASSIGNMENT_REGISTRY[key]);
+  return active.find((entry) => normalizeA1Chapter(entry.chapter) === normalizedChapter)
+    || Object.values(A1_ASSIGNMENT_REGISTRY).find((entry) => normalizeA1Chapter(entry.chapter) === normalizedChapter)
+    || null;
 };
 
 export const getA1AssignmentByDayAndChapter = (day, chapter = "") => {
