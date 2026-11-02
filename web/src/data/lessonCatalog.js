@@ -58,24 +58,6 @@ const lessonCatalog = Object.freeze([
     "contentStatus": "published"
   },
   {
-    "id": "A1-1.1-practice",
-    "level": "A1",
-    "sequence": 5,
-    "day": 3,
-    "chapter": "1.1",
-    "title": "Personal Information, Articles, Adjectives and W-Questions",
-    "assignmentType": "Schreiben & Sprechen",
-    "kind": "schreiben_sprechen",
-    "workbookRoute": "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
-    "video": "https://youtu.be/iZDv1rcYWsQ",
-    "submissionRequired": false,
-    "progressionEligible": false,
-    "grammarPage": "",
-    "contentStatus": "published",
-    "assignmentId": "A1-1.1-practice",
-    "teacherVideo": "https://youtu.be/iZDv1rcYWsQ"
-  },
-  {
     "id": "A1-1.2",
     "level": "A1",
     "sequence": 6,
