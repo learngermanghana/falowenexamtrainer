@@ -918,7 +918,7 @@ const RAW_COURSE_SCHEDULES = {
         },
       ],
     },
-        {
+    {
       day: 4,
       topic: "Numbers",
       chapter: "2",
