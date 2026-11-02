@@ -29,14 +29,14 @@ describe("buildInlineCourseAssignments", () => {
 
   it("uses the visible course-book day when canonical entries have different internal day numbers", () => {
     const entries = [
-      { assignmentDay: 2, displayDay: 2, topic: "Alphabet", assignment: true, chapter: "0.2", assignment_id: "A1-0.2" },
-      { assignmentDay: 3, displayDay: 2, topic: "Pronouns", assignment: true, chapter: "1.1", assignment_id: "A1-1.1" },
+      { assignmentDay: 2, displayDay: 2, topic: "Alphabet and Pronouns", assignment: true, chapter: "0.2", assignment_id: "A1-0.2_1.1" },
+      { assignmentDay: 2, displayDay: 2, topic: "Archived Alphabet", assignment: false, chapter: "0.2", assignment_id: "A1-0.2" },
+      { assignmentDay: 3, displayDay: 2, topic: "Archived Pronouns", assignment: false, chapter: "1.1", assignment_id: "A1-1.1" },
       { assignmentDay: 6, displayDay: 4, topic: "Numbers", assignment: true, chapter: "2", assignment_id: "A1-2" },
     ];
 
     expect(buildAssignments("A1", 2, entries).map((assignment) => assignment.assignmentKey)).toEqual([
-      "A1-0.2",
-      "A1-1.1",
+      "A1-0.2_1.1",
     ]);
     expect(buildAssignments("A1", 4, entries)).toEqual([
       expect.objectContaining({ assignmentKey: "A1-2", chapter: "2", day: 4 }),
