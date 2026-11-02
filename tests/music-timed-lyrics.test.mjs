@@ -48,7 +48,7 @@ test('all currently built-in recorded cue packs remain valid and respect instrum
    assert.equal(activeLyricIndex(cues,(c.start+c.end)/2),i);
    if(i+1<cues.length && cues[i+1].start>c.end+.1)assert.equal(activeLyricIndex(cues,c.end+.05),-1);
   }
-  const r=res();await createLyricsHandler({fetchImpl:()=>{throw Error('built-in timing must not call storage');}})({method:'GET',query:{track:pack.trackId}},r);
+  const r=res();await createLyricsHandler({fetchImpl:()=>new Response('',{status:404})})({method:'GET',query:{track:pack.trackId}},r);
   assert.equal(r.code,200);assert.deepEqual(r.body.cues,pack.cues);
  }
 });
@@ -59,4 +59,15 @@ test('recorded versions include repeated phrases and omit a closing line absent 
  assert.ok(travel,'approved A1 Day 14 recording needs its own exact-object timing pack');
  assert.equal(travel.cues.length,lyricLines(travel.lyrics).length);
  assert.ok(travel.cues.some(c=>c.text.includes('Hannover')));
+});
+
+test('an owner-reviewed R2 sidecar replaces bundled timing for the same exact MP3',async()=>{
+ const original=published.recordings[0];
+ const revised={objectKey:original.objectKey,lyrics:original.lyrics,
+   cues:original.cues.map(c=>({...c,start:c.start+0.1,...(c.end!==undefined?{end:c.end+0.1}:{})}))};
+ const r=res();
+ await createLyricsHandler({env,fetchImpl:async()=>new Response(JSON.stringify(revised))})
+   ({method:'GET',query:{key:original.objectKey}},r);
+ assert.equal(r.code,200);
+ assert.deepEqual(r.body.cues,revised.cues);
 });

@@ -21,7 +21,8 @@ function signTrack(id, env = process.env, now = new Date()) {
   if (!track) throw Object.assign(new Error('Unknown classroom song.'), { status: 404 });
   return signObject(track, env, now);
 }
-function signObject(track, env = process.env, now = new Date()) {
+function signObject(track, env = process.env, now = new Date(), method = 'GET') {
+  if (!['GET','PUT'].includes(method)) throw Object.assign(new Error('Unsupported music storage operation.'), { status: 400 });
   for (const key of ['R2_ACCOUNT_ID','R2_ACCESS_KEY_ID','R2_SECRET_ACCESS_KEY','R2_AUDIO_BUCKET']) {
     if (!String(env[key] || '').trim()) throw Object.assign(new Error('Classroom music storage is not configured.'), { status: 503 });
   }
@@ -37,7 +38,7 @@ function signObject(track, env = process.env, now = new Date()) {
     'X-Amz-Credential':`${String(env.R2_ACCESS_KEY_ID).trim()}/${scope}`, 'X-Amz-Date':stamp,
     'X-Amz-Expires':'3600', 'X-Amz-SignedHeaders':'host',
   }).sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>`${encode(k)}=${encode(v)}`).join('&');
-  const canonical = ['GET',uri,query,`host:${host}\n`,'host','UNSIGNED-PAYLOAD'].join('\n');
+  const canonical = [method,uri,query,`host:${host}\n`,'host','UNSIGNED-PAYLOAD'].join('\n');
   const toSign = ['AWS4-HMAC-SHA256',stamp,scope,crypto.createHash('sha256').update(canonical).digest('hex')].join('\n');
   const signingKey = hmac(hmac(hmac(hmac(`AWS4${String(env.R2_SECRET_ACCESS_KEY).trim()}`,date),'auto'),'s3'),'aws4_request');
   return { ...track, url:`https://${host}${uri}?${query}&X-Amz-Signature=${hmac(signingKey,toSign).toString('hex')}`,
