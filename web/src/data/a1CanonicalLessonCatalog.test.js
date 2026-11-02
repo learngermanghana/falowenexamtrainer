@@ -89,12 +89,17 @@ describe("A1 canonical lesson catalog", () => {
     });
   });
 
-  test("course sequence includes assignments and self-practice exactly once", () => {
-    expect(A1_COURSE_LESSON_ORDER).toHaveLength(A1_CANONICAL_LESSON_CATALOG.length);
+  test("navigation shows one Day 3 graded lesson; archived practice pages remain accessible via old links", () => {
     expect(new Set(A1_COURSE_LESSON_ORDER).size).toBe(A1_COURSE_LESSON_ORDER.length);
+    expect(A1_COURSE_LESSON_ORDER).not.toContain("1.1-practice");
+    expect(A1_COURSE_LESSON_ORDER).not.toContain("1.2-practice");
     expect([...A1_COURSE_LESSON_ORDER].sort()).toEqual(
-      A1_CANONICAL_LESSON_CATALOG.map((lesson) => lesson.routeKey).sort(),
+      A1_CANONICAL_LESSON_CATALOG
+        .filter(lesson => !["1.1-practice", "1.2-practice"].includes(lesson.routeKey))
+        .map(lesson => lesson.routeKey).sort(),
     );
+    expect(getA1CourseLessonNeighbors("0.2").next).toMatchObject({ routeKey: "1.2", day: 3, kind: "assignment" });
+    expect(getA1CourseLessonNeighbors("1.2").next).toMatchObject({ routeKey: "2", day: 4 });
   });
 
   test("Day 7 Asking About Prices navigates back to Day 6 self-practice instead of the previous tutor assignment", () => {

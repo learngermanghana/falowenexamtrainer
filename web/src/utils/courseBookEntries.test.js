@@ -136,46 +136,13 @@ describe("course book task entries", () => {
     expect(entry.workbook_link).toBe("/campus/course/lesson/B2/2?view=workbook");
   });
 
-  it("corrects the A1 Day 3 titles and separates practice from assignment", () => {
-    const entries = expandCourseBookEntries([{
-      day: 3,
-      displayDay: 3,
-      chapter: "1.1",
-      topic: "Personal Pronouns and Verb Conjugation",
-      assignmentId: "A1-1.1",
-      schreiben_sprechen: {
-        chapter: "1.1",
-        title: "Personal Pronouns and Verb Conjugation",
-        assignment: false,
-        assignmentId: "A1-1.1",
-        grammarbook_link: "/campus/course/singular-pronouns-verb-conjugation-day-2",
-        workbook_link: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
-      },
-      lesen_hören: {
-        chapter: "1.2",
-        title: "Personal Information, Articles, Adjectives and W-Questions",
-        assignment: true,
-        assignmentId: "A1-1.2",
-        grammarbook_link: "/campus/course/singular-pronouns-verb-conjugation-day-2",
-        workbook_link: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
-      },
-    }], { level: "A1" });
-
-    const chapter11 = entries.find((entry) => entry.chapter === "1.1");
-    const chapter12 = entries.find((entry) => entry.chapter === "1.2");
-
-    expect(chapter11).toEqual(expect.objectContaining({
-      lessonTitle: "Personal Information, Articles, Adjectives and W-Questions",
-      topic: "Personal Information, Articles, Adjectives and W-Questions",
-      assignmentId: "A1-1.1-practice",
-      assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.selfPractice,
-      tutorMarked: false,
-      submissionRequired: false,
-      grammarbook_link: null,
-    }));
-    expect(chapter12).toEqual(expect.objectContaining({
+  it("shows one Kapitel 1.2 graded card on A1 Day 3, without the retired practice", () => {
+    const day3 = courseSchedules.A1.find(row => row.day === 3);
+    const entries = expandCourseBookEntries([day3], { level: "A1" });
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toEqual(expect.objectContaining({
+      displayChapter: "1.2",
       lessonTitle: "Present-Tense Verb Conjugation Practice",
-      topic: "Present-Tense Verb Conjugation Practice",
       assignmentId: "A1-1.2",
       assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
       tutorMarked: true,
@@ -209,14 +176,8 @@ describe("course book task entries", () => {
     expect(entries[0]).toMatchObject({ assignmentId: "A1-12.1", submissionRequired: true });
   });
 
-  it("returns the corrected Day 3 titles from the assignment dictionary", () => {
-    expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.1-practice" })).toEqual(
-      expect.objectContaining({
-        assignment_id: "A1-1.1-practice",
-        title: "Personal Information, Articles, Adjectives and W-Questions",
-        grammarPage: "",
-      })
-    );
+  it("keeps the Kapitel 1.2 assignment dictionary entry and archives the separate practice", () => {
+    expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.1-practice" })).toBeNull();
     expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.2" })).toEqual(
       expect.objectContaining({
         assignment_id: "A1-1.2",

@@ -34,14 +34,14 @@ const isMountedCourseRoute = (route = "") => {
 const cardKey = (day, chapter) => `${Number(day)}:${String(chapter || "").trim()}`;
 describe("A1 full Course Book consolidation", () => {
   test("covers the complete A1 programme from Day 0 through the Day 23 Final Mock", () => {
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(26);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(25);
     const counts = new Map();
     A1_COURSE_BOOK_CARDS.forEach((card) => {
       counts.set(Number(card.displayDay), (counts.get(Number(card.displayDay)) || 0) + 1);
     });
 
     for (let day = 0; day <= 23; day += 1) {
-      const expected = [3, 16].includes(day) ? 2 : 1;
+      const expected = [16].includes(day) ? 2 : 1;
       expect(counts.get(day) || 0).toBe(expected);
     }
   });
@@ -99,7 +99,10 @@ describe("A1 full Course Book consolidation", () => {
     );
 
     A1_TEACHER_VIDEO_RESOURCES.forEach((resource) => {
-      expect(cardKeys.has(cardKey(resource.day, resource.chapter))).toBe(true);
+      // Retired Day 3 chapter 1.1 remains available for historic links, not as an active card.
+      if (Number(resource.day) !== 3 || resource.chapter !== "1.1") {
+        expect(cardKeys.has(cardKey(resource.day, resource.chapter))).toBe(true);
+      }
       expect(resource.url).toMatch(/^https:\/\/youtu\.be\//);
     });
 

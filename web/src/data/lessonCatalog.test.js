@@ -10,55 +10,39 @@ import {
 const findLesson = (id) => getLessonById(id);
 
 describe("lessonCatalog canonical curriculum", () => {
-  test("keeps A1 early lessons in original student-facing order without display duplicates", () => {
-    expect(getLessonsByLevel("A1").slice(0, 6).map(({ id, day, chapter, title, sequence }) => ({ id, day, chapter, title, sequence }))).toEqual([
-      { id: "A1-Tutorial", sequence: 1, day: 0, chapter: "Tutorial", title: "Tutorial" },
-      { id: "A1-0.1", sequence: 2, day: 1, chapter: "0.1", title: "Greetings and Asking About Well-being" },
-      { id: "A1-0.2", sequence: 3, day: 2, chapter: "0.2", title: "German Alphabet" },
-      { id: "A1-1.1", sequence: 4, day: 2, chapter: "1.1", title: "Personal Pronouns and Verb Conjugation" },
-      { id: "A1-1.1-practice", sequence: 5, day: 3, chapter: "1.1", title: "Personal Information, Articles, Adjectives and W-Questions" },
-      { id: "A1-1.2", sequence: 6, day: 3, chapter: "1.2", title: "Personal Pronouns and Verb Conjugation" },
+  test("keeps A1 Days 1–4 as one student-facing card per day", () => {
+    expect(getLessonsByLevel("A1").slice(0, 5).map(({ id, day, chapter }) => ({ id, day, chapter }))).toEqual([
+      { id: "A1-Tutorial", day: 0, chapter: "Tutorial" },
+      { id: "A1-0.1", day: 1, chapter: "0.1" },
+      { id: "A1-0.2_1.1", day: 2, chapter: "0.2" },
+      { id: "A1-1.2", day: 3, chapter: "1.2" },
+      { id: "A1-2", day: 4, chapter: "2" },
     ]);
+    expect(getLessonsByLevel("A1").filter(({ day }) => day === 3)).toHaveLength(1);
+    expect(findLesson("A1-1.1-practice")).toBeNull();
   });
 
-  test("generates display fields and legacy resources from canonical A1 lessons", () => {
-    const alphabet = findLesson("A1-0.2");
-    expect(getLessonDisplayData(alphabet)).toEqual({ displayDay: 2, displayChapter: "0.2", displayLabel: "Day 2 0.2" });
-    expect(toLegacyResource(alphabet)).toMatchObject({
+  test("generates display fields and legacy resources from active Day 2", () => {
+    const lesson = findLesson("A1-0.2_1.1");
+    expect(getLessonDisplayData(lesson)).toEqual({ displayDay: 2, displayChapter: "0.2", displayLabel: "Day 2 0.2" });
+    expect(toLegacyResource(lesson)).toMatchObject({
       chapter: "0.2",
-      title: "German Alphabet",
-      workbookRoute: "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
+      title: "German Alphabet, Personal Pronouns and First Verbs",
+      workbookRoute: "/campus/course/a1-day-2-foundations-workbook",
       submissionRequired: true,
-      assignmentId: "A1-0.2",
+      assignmentId: "A1-0.2_1.1",
     });
   });
 
-  test("keeps required and self-practice A1 assignment identities distinct", () => {
-    expect(findLesson("A1-1.1")).toMatchObject({
-      day: 2,
-      chapter: "1.1",
-      title: "Personal Pronouns and Verb Conjugation",
-      assignmentId: "A1-1.1",
+  test("keeps the Day 3 graded assignment but excludes retired practice from active catalog", () => {
+    expect(findLesson("A1-1.2")).toMatchObject({
+      day: 3,
+      chapter: "1.2",
+      assignmentId: "A1-1.2",
       submissionRequired: true,
       progressionEligible: true,
     });
-    expect(findLesson("A1-1.1-practice")).toMatchObject({
-      day: 3,
-      chapter: "1.1",
-      title: "Personal Information, Articles, Adjectives and W-Questions",
-      workbookRoute: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
-      submissionRequired: false,
-      progressionEligible: false,
-    });
-  });
-
-  test("orders the distinct A1 Day 2 and Day 3 records by explicit sequence", () => {
-    const ids = getLessonsByLevel("A1").map((lesson) => lesson.id);
-    expect(ids.slice(ids.indexOf("A1-1.1"), ids.indexOf("A1-1.2") + 1)).toEqual([
-      "A1-1.1",
-      "A1-1.1-practice",
-      "A1-1.2",
-    ]);
+    expect(getLessonsByLevel("A1").map(({id}) => id)).not.toContain("A1-1.1-practice");
   });
 
   test("preserves final assignment IDs for A2 and B1", () => {
@@ -73,48 +57,22 @@ describe("lessonCatalog canonical curriculum", () => {
     ]));
   });
 
-  test("verifies exact early A1 canonical records", () => {
-    expect(findLesson("A1-0.2")).toMatchObject({ assignmentId: "A1-0.2", chapter: "0.2", title: "German Alphabet" });
-    expect(findLesson("A1-1.1")).toMatchObject({ assignmentId: "A1-1.1", day: 2, chapter: "1.1", title: "Personal Pronouns and Verb Conjugation", submissionRequired: true, progressionEligible: true });
-    expect(findLesson("A1-1.1-practice")).toMatchObject({
-      day: 3,
-      chapter: "1.1",
-      title: "Personal Information, Articles, Adjectives and W-Questions",
-      assignmentId: "A1-1.1-practice",
-      grammarPage: "",
-      workbookRoute: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
-      submissionRequired: false,
-      progressionEligible: false,
-    });
+  test("verifies the single active Day 3 chapter, workbook and grammar routes", () => {
+    expect(findLesson("A1-0.2_1.1")).toMatchObject({ assignmentId: "A1-0.2_1.1", chapter: "0.2" });
     expect(findLesson("A1-1.2")).toMatchObject({
       day: 3,
       chapter: "1.2",
-      title: "Personal Pronouns and Verb Conjugation",
       assignmentId: "A1-1.2",
       grammarPage: "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
       workbookRoute: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
       submissionRequired: true,
       progressionEligible: true,
     });
-  });
-
-  test("resolves direct Day 3 workbook and grammar routes to the correct canonical lesson", () => {
     const lessonForRoute = (route) => getLessonsByLevel("A1").find(
       (lesson) => lesson.workbookRoute === route || lesson.grammarPage === route
     );
-
-    expect(lessonForRoute("/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook")).toMatchObject({
-      id: "A1-1.1-practice",
-      title: "Personal Information, Articles, Adjectives and W-Questions",
-    });
-    expect(lessonForRoute("/campus/course/a1-day-3-pronouns-introducing-yourself-workbook")).toMatchObject({
-      id: "A1-1.2",
-      title: "Personal Pronouns and Verb Conjugation",
-    });
-    expect(lessonForRoute("/campus/course/a1-day-3-kapitel-1-2-grammar-notes")).toMatchObject({
-      id: "A1-1.2",
-      title: "Personal Pronouns and Verb Conjugation",
-    });
+    expect(lessonForRoute("/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook")).toBeUndefined();
+    expect(lessonForRoute("/campus/course/a1-day-3-kapitel-1-2-grammar-notes")?.id).toBe("A1-1.2");
   });
 
   test("display fields are generated from canonical day and chapter", () => {
@@ -132,7 +90,7 @@ describe("lessonCatalog canonical curriculum", () => {
   });
 
   test("legacy records resolve with assignmentId or assignment_id naming", () => {
-    ["A1-0.2", "A1-1.1", "A1-1.2", "A2-10.28", "B1-10.28"].forEach((assignmentId) => {
+    ["A1-0.2_1.1", "A1-1.2", "A2-10.28", "B1-10.28"].forEach((assignmentId) => {
       const lesson = lessonCatalog.find((candidate) => candidate.assignmentId === assignmentId);
       expect(lesson).toBeTruthy();
       expect([lesson.assignmentId, lesson.assignment_id].filter(Boolean)).toContain(assignmentId);

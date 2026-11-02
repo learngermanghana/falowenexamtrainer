@@ -3,12 +3,10 @@ import { resolveAssignmentCanonicalKey } from "./assignmentIdentity";
 
 const INLINE_SUBMISSION_LEVELS = new Set(["A1", "A2", "B1"]);
 
-export const normalizeCourseAssignmentKey = (value) =>
-  String(value || "")
-    .trim()
-    .toUpperCase()
-    .replace(/_/g, "-")
-    .replace(/\s+/g, "");
+export const normalizeCourseAssignmentKey = (value) => {
+  const token = String(value || "").trim().toUpperCase().replace(/\s+/g, "");
+  return token === "A1-0.2_1.1" ? token : token.replace(/_/g, "-");
+};
 
 export const buildInlineCourseAssignments = ({
   level,
@@ -31,11 +29,14 @@ export const buildInlineCourseAssignments = ({
 
     const title = String(entry?.topic || entry?.title || `Day ${numericDay} assignment`).trim();
     const assignmentId = entry?.assignment_id || entry?.assignmentId || entry?.assignmentKey || "";
-    const assignmentKey = resolveCanonicalKey({
-      level: normalizedLevel,
-      assignmentId,
-      assignmentTitle: title,
-    });
+    // Day 2 is one compound assignment, not two legacy chapter IDs.
+    const assignmentKey = normalizedLevel === "A1" && numericDay === 2 && String(entry?.chapter) === "0.2"
+      ? "A1-0.2_1.1"
+      : resolveCanonicalKey({
+          level: normalizedLevel,
+          assignmentId,
+          assignmentTitle: title,
+        });
     const normalizedKey = normalizeCourseAssignmentKey(assignmentKey);
 
     if (!normalizedKey || seenKeys.has(normalizedKey)) return assignments;

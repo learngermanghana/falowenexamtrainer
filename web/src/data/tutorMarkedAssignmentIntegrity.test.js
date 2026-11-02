@@ -177,7 +177,8 @@ describe("all tutor-marked A1 through C1 assignments", () => {
 
   test("A1 self-practice is not accidentally classified as tutor-marked", () => {
     const pathname = "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook";
-    expect(workbookRouteIndex.get(pathname)).toBeTruthy();
+    // This retired practice URL is intentionally absent from current course routes.
+    expect(workbookRouteIndex.get(pathname)).toBeUndefined();
     expect(
       resolveTutorMarkedWorkbookAssignment({
         level: "A1",

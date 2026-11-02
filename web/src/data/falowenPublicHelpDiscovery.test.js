@@ -80,8 +80,8 @@ describe("Falowen public help and AI discovery", () => {
   });
 
   test("publishes the generated A1-C2 lesson map with exact level rules", () => {
-    expect(courseMap.counts).toMatchObject({ A1: 27, A2: 29, B1: 29, B2: 29, C1: 29, C2: 28 });
-    expect(courseMap.lessons).toHaveLength(171);
+    expect(courseMap.counts).toMatchObject({ A1: 25, A2: 29, B1: 29, B2: 29, C1: 29, C2: 28 });
+    expect(courseMap.lessons).toHaveLength(169);
     // Chapter 12.2 is a standalone resource, not a separate tutor-marked course-map assignment.
     const a1Days = courseMap.lessons.filter((lesson) => lesson.level === "A1").map((lesson) => lesson.day);
     expect(a1Days).toContain(0);
@@ -197,7 +197,8 @@ describe("Falowen public help and AI discovery", () => {
     expect(c2ScheduleHtml).toContain("What is Falowen C2 Day 28?");
 
     expect((scheduleMarkdown.match(/\*\*Question:\*\* What is Falowen A1 Day 2\?/g) || [])).toHaveLength(1);
-    expect((a1ScheduleHtml.match(/What is Falowen A1 Day 2\?/g) || [])).toHaveLength(1);
+    // One JSON-LD FAQ and one visible FAQ refer to the same consolidated Day 2.
+    expect((a1ScheduleHtml.match(/What is Falowen A1 Day 2\?/g) || [])).toHaveLength(2);
     expect(scheduleMarkdown).toContain("German Alphabet");
     expect(scheduleMarkdown).toContain("Personal Pronouns and First Verbs");
 

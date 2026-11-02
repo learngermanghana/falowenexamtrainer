@@ -42,7 +42,7 @@ const readAssignmentComponentSource = (componentName) => {
 
 describe("A1 Course Book health", () => {
   test("keeps the complete canonical A1 Course Book shape", () => {
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(26);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(25);
 
     const countsByDay = new Map();
     A1_COURSE_BOOK_CARDS.forEach((card) => {
@@ -54,7 +54,7 @@ describe("A1 Course Book health", () => {
     });
 
     for (let day = 0; day <= 23; day += 1) {
-      expect(countsByDay.get(day) || 0).toBe(day === 3 || day === 16 ? 2 : 1);
+      expect(countsByDay.get(day) || 0).toBe(day === 16 ? 2 : 1);
     }
   });
 
@@ -106,7 +106,10 @@ describe("A1 Course Book health", () => {
     const resourceKeys = new Set();
 
     A1_TEACHER_VIDEO_RESOURCES.forEach((resource) => {
-      expect(configuredCardKeys.has(cardKey(resource.day, resource.chapter))).toBe(true);
+      // Chapter 1.1 on Day 3 is archived; do not show it in the current Course Book.
+      if (Number(resource.day) !== 3 || resource.chapter !== "1.1") {
+        expect(configuredCardKeys.has(cardKey(resource.day, resource.chapter))).toBe(true);
+      }
       expect(resource.url).toMatch(/^https:\/\/youtu\.be\//);
       expect(resourceKeys.has(resource.key)).toBe(false);
       resourceKeys.add(resource.key);

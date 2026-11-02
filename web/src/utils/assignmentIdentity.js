@@ -63,6 +63,10 @@ const resolveFromTextWithManifest = ({ level, text }) => {
 
 export const toCanonicalAssignmentId = ({ assignmentId, level }) => {
   const normalizedLevel = normalizeLevel(level);
+  // Use the exact published assignment key before older chapter-token parsing.
+  // Compound keys such as A1-0.2_1.1 must not be split into 0.2 and 1.1.
+  const exact = String(assignmentId || "").trim().replace(/\s+/g, "").toUpperCase();
+  if (normalizedLevel && getValidCanonicalIdsForLevel(normalizedLevel).has(exact)) return exact;
   const token = normalizeAssignmentToken(assignmentId);
 
   if (!token || !normalizedLevel) return "";
@@ -74,6 +78,8 @@ export const toCanonicalAssignmentId = ({ assignmentId, level }) => {
 export const resolveAssignmentCanonicalKey = ({ level, assignmentId, assignmentTitle }) => {
   const normalizedLevel = normalizeLevel(level);
   if (!normalizedLevel) return "";
+  const exact = String(assignmentId || "").trim().replace(/\s+/g, "").toUpperCase();
+  if (getValidCanonicalIdsForLevel(normalizedLevel).has(exact)) return exact;
 
   const fromId = resolveFromTextWithManifest({ level: normalizedLevel, text: assignmentId });
   if (fromId) return fromId;
