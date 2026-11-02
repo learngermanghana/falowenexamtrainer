@@ -26,7 +26,7 @@ test("course bundle renderer allows Firebase auth hydration after hard lesson na
 });
 
 test("renderer version identifies the grammar-workbook bundle contract", () => {
-  assert.match(source, /rendererVersion: 9/);
+  assert.match(source, /rendererVersion: 10/);
 });
 
 test("A2 and B1 bundle renderer exposes only Grammar and one merged Workbook resource", () => {
@@ -34,6 +34,13 @@ test("A2 and B1 bundle renderer exposes only Grammar and one merged Workbook res
   assert.match(source, /const workbookTabSpecs = \[/);
   assert.ok(source.includes('return [grammar, { tab: "workbook", file: workbookFile,'));
   assert.doesNotMatch(source, /\{ key: "ref", names: \["Ref"\] \}/);
+});
+
+test("B1 locked graded tabs use canonical source without starting assessment attempts", () => {
+  assert.match(source, /buildB1ReadOnlyPrintHtml/);
+  assert.match(source, /getB1ReadOnlyParts\(lesson\.day\)/);
+  assert.match(source, /renderReadOnlyB1Section\(page, lesson, tabSpec\.key/);
+  assert.match(source, /canonical-read-only/);
 });
 
 test("A1 render plan contains only grammar and workbook targets", () => {
