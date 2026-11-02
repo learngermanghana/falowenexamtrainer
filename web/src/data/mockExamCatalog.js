@@ -189,6 +189,8 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     futureOptionalSection:"Hören",
   },
   "a2-mock-03-hoeren": {
+    // Keep the standalone listening route accessible, but do not confuse it with the full mock.
+    showInMockLibrary: false,
     id: "a2-mock-03-hoeren",
     level: "A2",
     title: "A2 Mock 3 · Hören Teile 1–4",
