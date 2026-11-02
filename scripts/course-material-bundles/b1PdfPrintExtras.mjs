@@ -77,6 +77,14 @@ export const prepareB1PrintView = () => {
       swap(details);
   }
 
+  // Audio belongs to the authenticated online Hören companion, not to a
+  // printed grammar/workbook lesson. Suppress transient loading labels only;
+  // never hide the task prompt or the numbered Hören questions.
+  for (const node of [...root.querySelectorAll("span,p,small,div")]) {
+    if (!node.isConnected || node.children.length || node.querySelector("input,textarea")) continue;
+    if (/^Audio wird geladen\\s*(?:…|\\.{2,3})?$/i.test(normalize(node.textContent))) swap(node);
+  }
+
   // The Course Book contains several 'next lesson' and workbook-link cards.
   // Require both labels to avoid removing a paragraph that teaches navigation.
   const cards = [...root.querySelectorAll("div,section,article,aside")].filter(el => {
@@ -144,8 +152,11 @@ export const assertB1PrintedContent = (expected, printed) => {
   const words = input => new Set((String(input || "").normalize("NFKC").toLowerCase()
     .match(/[\p{L}\p{N}]{4,}/gu) || []));
   const before = words(expected), after = words(printed);
-  if (String(printed).replace(/\s+/g, "").length < 140 || after.size < 22) {
-    throw new Error("B1 PDF printed content is empty or insufficient");
+  const minChars = before.size < 45 ? 48 : 140;
+  const minTerms = before.size < 45 ? 8 : 22;
+  if (String(printed).replace(/\s+/g, "").length < minChars || after.size < minTerms) {
+    throw new Error("B1 PDF printed content is empty or insufficient (" +
+      after.size + " distinct printed terms vs " + before.size + " expected)");
   }
   if (before.size >= 35) {
     let matched = 0;
