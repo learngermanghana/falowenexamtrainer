@@ -25,7 +25,7 @@ export function makeB1MockSpeakingTasks(mockId, topicChoice = "a") {
     {
       teil:"2",title:"Ein Thema präsentieren",
       english:"Give a structured presentation without interruption, covering your experiences, home country, pros and cons, opinion and conclusion.",
-      prompt:`Thema: ${selectedTopic}. ${points} Halten Sie eine zusammenhängende Präsentation, ca. 3–4 Minuten.`,
+      prompt:`Thema: ${selectedTopic}. ${points} Halten Sie eine zusammenhängende Präsentation, ca. 3 Minuten.`,
       keywords:selectedTopic,
       hint:"Introduction, experience, home country, advantages and disadvantages, opinion and closing.",
     },
