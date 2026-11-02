@@ -109,10 +109,9 @@ export const A1_CANONICAL_LESSON_CATALOG = Object.freeze(
 export const A1_COURSE_LESSON_ORDER = Object.freeze([
   "0.1",
   "0.2",
-  // The retired Day 3 chapter 1.1 practice remains deep-linkable for history,
+  // Retired Day 3 practice pages remain deep-linkable for history,
   // but is no longer part of the student learning sequence.
   "1.2",
-  "1.2-practice",
   "2",
   "1.3",
   "2.3",
