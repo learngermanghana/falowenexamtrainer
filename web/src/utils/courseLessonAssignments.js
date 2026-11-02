@@ -3,12 +3,10 @@ import { resolveAssignmentCanonicalKey } from "./assignmentIdentity";
 
 const INLINE_SUBMISSION_LEVELS = new Set(["A1", "A2", "B1"]);
 
-export const normalizeCourseAssignmentKey = (value) =>
-  String(value || "")
-    .trim()
-    .toUpperCase()
-    .replace(/_/g, (match, offset, full) => full === "A1-0.2_1.1" ? "_" : "-")
-    .replace(/\s+/g, "");
+export const normalizeCourseAssignmentKey = (value) => {
+  const token = String(value || "").trim().toUpperCase().replace(/\s+/g, "");
+  return token === "A1-0.2_1.1" ? token : token.replace(/_/g, "-");
+};
 
 export const buildInlineCourseAssignments = ({
   level,
