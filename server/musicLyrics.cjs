@@ -5,6 +5,7 @@ const catalog = require('../web/public/music/catalog.json');
 const builtInTimings = require('../web/public/music/timings.json');
 const approvedRecordingLyrics = require('../web/public/music/approved-recording-lyrics.json');
 const estimatedTimings = require('../web/public/music/estimated-timings.json');
+const englishTranslations = require('../web/public/music/english-translations.json');
 const studioDrafts = require('../web/public/music/studio-drafts.json');
 function validateLyrics(data, objectKey) {
   if (!data || data.objectKey !== objectKey) return null;
@@ -77,6 +78,17 @@ function validateEstimate(pack, objectKey, approved, studio=studioDrafts) {
   return {...checked,timingStatus:'estimated',recordingSha256:pack.recordingSha256,
     ...(draft ? {referenceOnly:true,assignmentKey:pack.assignmentKey,draftTitle:pack.draftTitle} : {})};
 }
+// Recording identity comes from the exact storage path, never its display title.
+function withEnglishTranslation(pack, translations=englishTranslations) {
+  const lines=String(pack.lyrics||'').replace(/\\n/g,'\n').split(/\r?\n/)
+    .map(line=>line.trim()).filter(line=>line&&!/^\[.*\]$/.test(line));
+  const candidates=[...(translations.recordings||[]),
+    ...(pack.referenceOnly && pack.transcriptionStatus!=='automatic' ? translations.drafts||[] : [])];
+  const match=candidates.find(row=>row.objectKey===pack.objectKey &&
+    Array.isArray(row.lines) && lines.length>0 && row.lines.length===lines.length &&
+    row.lines.every((line,i)=>line.de===lines[i] && typeof line.en==='string' && line.en.trim()));
+  return match ? {...pack,englishTranslation:{source:match.source||'recording',lines:match.lines}} : pack;
+}
 async function readBounded(response) {
   if (Number(response.headers.get('content-length')) > 100000) throw Error('Lyrics file too large');
   const reader=response.body.getReader(); const chunks=[]; let size=0;
@@ -104,9 +116,9 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
     const estimate=validateEstimate(estimates.recordings?.find(pack=>pack.objectKey===objectKey),objectKey,approved);
     const fallback = checkedRecording?.cues.length ? checkedRecording
       : ownerFallback?.cues.length ? ownerFallback : estimate || checkedRecording || ownerFallback;
-    const sendFallback = () => res.status(200).json({...fallback,
+    const sendFallback = () => res.status(200).json(withEnglishTranslation({...fallback,
       source:fallback===estimate ? 'acoustic-estimate' : checkedRecording ? 'bundled' : 'owner-supplied',
-      timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? 'published' : approved?.timingStatus || 'missing'});
+      timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? 'published' : approved?.timingStatus || 'missing'}));
     try {
       const timingKey=objectKey.replace(/\.mp3$/i,'.lyrics.json');
       const signed=signObject({key:timingKey},env);
@@ -124,8 +136,8 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
       // fallback cues for this fingerprinted recording. Reviewed R2 cues still win.
       if(fallback?.cues?.length && !checked.cues?.length && sameSungLines(checked.lyrics,fallback.lyrics))
         return sendFallback();
-      return res.status(200).json(checked);
+      return res.status(200).json(withEnglishTranslation(checked));
     } catch { if(fallback) return sendFallback(); res.setHeader('Cache-Control','no-store'); return res.status(503).json({error:'Lyrics temporarily unavailable'}); }
   };
 }
-module.exports={validateLyrics,sameSungLines,validateEstimate,createLyricsHandler};
+module.exports={withEnglishTranslation,validateLyrics,sameSungLines,validateEstimate,createLyricsHandler};

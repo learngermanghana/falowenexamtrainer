@@ -99,3 +99,19 @@ The public music-library endpoint allows the Music and Admin browser origins,
 with `Vary: Origin` on cached responses. This lets Admin Lyrics Video Studio
 select published recordings and request their existing recording-specific lyrics
 and cues. It does not change private audio discovery or approve estimated timing.
+
+## Path-based video translations — 2 November 2026
+
+The music-lyrics API includes `englishTranslation` when the shared translation
+registry contains the exact MP3 object key and every returned German sung line
+matches in order. It contains `source` and `{de,en}` lines. Course-draft English
+remains labeled and is only attached to matching reference text, never to a
+different automatic transcript. Display titles do not identify translations.
+The Admin video exporter consumes this metadata; no playback-time AI call is
+added. Missing translations stay unavailable and can be entered manually.
+
+Published video exports request `download=1` on the existing public music audio
+API. It streams only the validated public music track, with a 40 MB limit and
+30-second upstream timeout, so the browser need not read a signed R2 redirect.
+Normal audio playback still redirects. Uploaded local audio remains local.
+Export network failures now identify the MP3 download stage.
