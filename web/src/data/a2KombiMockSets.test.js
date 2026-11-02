@@ -24,17 +24,18 @@ test("all five extracted A2 paper versions have 20 questions, no answer leakage 
     expect(paper.speaking.teil3.points).toHaveLength(4);
     expect(library.status).toBe("ready");
     expect(library.mode).toBe("kombi");
-    expect(library.sections).toEqual([0,2,3].includes(index)?["Lesen","Hören","Schreiben","Sprechen"]:["Lesen","Schreiben","Sprechen"]);
+    expect(library.sections).toEqual([0,2,3,4].includes(index)?["Lesen","Hören","Schreiben","Sprechen"]:["Lesen","Schreiben","Sprechen"]);
     expect(library.route).toBe(`/campus/course/a2-kombi-mock-${index+4}`);
-    if(![0,2,3].includes(index))expect(library.sections).not.toContain("Hören");
+    if(![0,2,3,4].includes(index))expect(library.sections).not.toContain("Hören");
   });
 });
 
-test("A2 mock library keeps every three-module paper visible without replacing Mock 01–03",()=>{
+test("A2 mock library shows full and three-module papers without duplicating standalone Hören",()=>{
   const ids=getMockExamsForLevel("A2",{includeCourse:true}).map(x=>x.id);
-  ["a2-final-01","a2-mock-02","a2-mock-03-hoeren",...A2_KOMBI_IDS].forEach(id=>{
+  ["a2-final-01","a2-mock-02","a2-mock-03",...A2_KOMBI_IDS].forEach(id=>{
     expect(ids).toContain(id);
   });
+  expect(ids).not.toContain("a2-mock-03-hoeren");
 });
 
 test("each mock and student has private local progress; no audio or answer keys are stored",()=>{
@@ -46,6 +47,7 @@ test("each mock and student has private local progress; no audio or answer keys 
   expect(Object.keys(a)).toEqual(["flow","lesen","hoeren","schreiben","sprechen"]);
   expect(a2KombiKeys("a2-mock-06","student-a").hoeren).toContain(":hoeren");
   expect(a2KombiKeys("a2-mock-07","student-a").hoeren).toContain(":hoeren");
+  expect(a2KombiKeys("a2-mock-08","student-a").hoeren).toContain(":hoeren");
   expect(A2_KOMBI_VERSION).toBe("three-module-v1");
   expect(a2KombiProgress(a).sprechen.done).toBe(false);
 });
