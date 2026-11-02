@@ -36,7 +36,9 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
   const [level, setLevel] = useState("all");
   const [format, setFormat] = useState("all");
   const results = useMemo(
-    () => matchCatalogTitles(catalogTitles, search, level, format),
+    // Filter locally as well: a newly deployed front end must never show
+    // retired products while the Firebase API deployment catches up.
+    () => matchCatalogTitles(catalogTitles.filter(item => BOOK_PAGES[item.id]), search, level, format),
     [catalogTitles, search, level, format],
   );
   return <section className="fb-library" id="fb-library" aria-label="Browse Falowen books">
