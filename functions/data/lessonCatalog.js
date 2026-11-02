@@ -42,13 +42,13 @@ const lessonCatalog = Object.freeze([
     "teacherVideo": "https://youtu.be/CqFbBQG9M3U"
   },
   {
-    "id": "A1-0.2-1.1",
+    "id": "A1-0.2_1.1",
     "level": "A1",
     "sequence": 3,
     "day": 2,
     "chapter": "0.2",
     "title": "German Alphabet, Personal Pronouns and First Verbs",
-    "assignmentId": "A1-0.2-1.1",
+    "assignmentId": "A1-0.2_1.1",
     "assignmentType": "Lesen & Hören",
     "kind": "lesen_hören",
     "grammarPage": "/campus/course/a1-day-2-unified-grammar",
