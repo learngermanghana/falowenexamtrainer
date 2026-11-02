@@ -36,7 +36,7 @@ export default function A1Day2UnifiedGrammarPage() {
 
       <section style={section}>
         <h2 style={{ margin: 0 }}>1 · Das deutsche Alphabet</h2>
-        <p style={{ margin: 0 }}>German uses 26 basic letters, plus Ä, Ö, Ü and ß. Letter names help you spell your name, email address and other words. The English pronunciation hints below are only approximate: listen to the video and repeat.</p>
+        <p style={{ margin: 0 }}>German uses 26 basic letters, plus Ä, Ö, Ü and ß. Letter names help you spell your name, email address and other words. The English pronunciation hints below are only approximate; practise identifying letters and spelling words.</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(76px, 1fr))", gap: 8 }}>
           {alphabet.map(([letter, hint]) => (
             <div key={letter} style={{ border: "1px solid #cbd5e1", borderRadius: 9, padding: 9, textAlign: "center", background: "#f8fafc" }}>
@@ -48,7 +48,6 @@ export default function A1Day2UnifiedGrammarPage() {
         <p style={{ margin: 0 }}><strong>Special letters:</strong> Ä (A-Umlaut), Ö (O-Umlaut), Ü (U-Umlaut), ß (Eszett / scharfes S). Compare <em>schon</em> (already) and <em>schön</em> (beautiful).</p>
         <p style={{ margin: 0 }}><strong>Useful question:</strong> Wie schreibt man das? (How do you spell that?)</p>
         <p style={{ margin: 0 }}><strong>Example:</strong> Wie heißt du? – Ich heiße Ama. – Wie schreibt man das? – A – M – A.</p>
-        <a href="https://youtu.be/uhFgKp4WVEc" target="_blank" rel="noreferrer">Watch the original German alphabet teacher video</a>
       </section>
 
       <section style={section}>
@@ -61,7 +60,6 @@ export default function A1Day2UnifiedGrammarPage() {
           </table>
         </div>
         <p style={{ margin: 0 }}><strong>Remember:</strong> <em>er / sie / es</em> have the same verb ending. <em>sein</em> is irregular, so learn <em>ich bin, du bist, er ist</em> separately.</p>
-        <a href="https://youtu.be/xyRogEAA9qM" target="_blank" rel="noreferrer">Watch the original pronouns and verbs teacher video</a>
       </section>
 
       <section style={section}>
