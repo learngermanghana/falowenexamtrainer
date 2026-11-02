@@ -17,9 +17,9 @@ beforeEach(()=>{
   if(String(url).includes("/books/catalog"))return {ok:true,json:async()=>({
    paymentsEnabled:true,
    catalogTitles:[
-    {id:"a2-course-workbook",title:"Deutsch A2 — Course & Workbook",description:"328 pages of German A2 practice",pages:328,status:"available",bookIds:["a2-course-workbook-digital"],levelTags:["A2"]},
+    {id:"a2-course-workbook",title:"Deutsch A2 — Course & Workbook",description:"328 pages of German A2 practice",pages:328,status:"available",bookIds:["a2-course-workbook-digital","a2-course-workbook-printed"],levelTags:["A2"]},
    ],
-   books:[{id:"a2-course-workbook-digital",priceGhs:99,format:"digital"}],
+   books:[{id:"a2-course-workbook-digital",priceGhs:99,format:"digital"},{id:"a2-course-workbook-printed",priceGhs:1050,format:"printed"}],
   })};
   if(String(url).includes("/fx/usd-ghs"))return {ok:true,json:async()=>({usdToGhs:10})};
   throw Error("Unexpected API call");
@@ -45,8 +45,20 @@ test("new A2 book is discoverable with the correct private digital edition",asyn
  );
  expect(screen.getByText("GH₵99.00")).toBeInTheDocument();
  expect(screen.getByText(/Audio is accessed through Falowen/)).toBeInTheDocument();
- expect(screen.queryByLabelText("Printed book")).not.toBeInTheDocument();
+ expect(screen.getByRole("radio",{name:/Printed book/})).toBeInTheDocument();
+ const printed=screen.getByRole("radio",{name:/Printed book/});
+ printed.click();
+ expect(screen.getByText("GH₵1050.00")).toBeInTheDocument();
+ expect(screen.getByRole("link",{name:"Buy Now"})).toHaveAttribute(
+  "href","/books/deutsch-a2-course-workbook/checkout?edition=a2-course-workbook-printed"
+ );
+ expect(screen.getByRole("button",{name:"Next preview"})).toBeInTheDocument();
+ expect(screen.getByText("1 / 4")).toBeInTheDocument();
+ expect(screen.getByText(/Full 328-page PDF is delivered privately after verified payment/)).toBeInTheDocument();
+
  expect(screen.queryByRole("img",{name:/Preview page/})).not.toBeInTheDocument();
+ expect(screen.getByRole("region",{name:"Book preview slideshow"})).toHaveTextContent("weil: the verb goes to the end");
+ expect(screen.getByRole("region",{name:"Book preview slideshow"})).toHaveTextContent("Neu im Büro");
 });
 
 test("only published product slugs remain in storefront maps",()=>{
