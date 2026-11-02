@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import React from "react";
-import {render, screen, waitFor} from "@testing-library/react";
+import {render, screen, waitFor, fireEvent} from "@testing-library/react";
 import BookProductPage from "./BookProductPage";
 import ExamGuideComingSoon from "./ExamGuideComingSoon";
 import {BOOK_PAGES} from "./BooksCatalog";
@@ -47,14 +47,14 @@ test("new A2 book is discoverable with the correct private digital edition",asyn
  expect(screen.getByText(/Preview selected contents, grammar and reading excerpts/)).toBeInTheDocument();
  expect(screen.getByRole("radio",{name:/Printed on demand/})).toBeInTheDocument();
  const printed=screen.getByRole("radio",{name:/Printed on demand/});
- printed.click();
+ fireEvent.click(printed);
  expect(screen.getByText("GH₵1050.00")).toBeInTheDocument();
  expect(screen.getByRole("link",{name:"Buy Now"})).toHaveAttribute(
   "href","/books/deutsch-a2-course-workbook/checkout?edition=a2-course-workbook-printed"
  );
  expect(screen.getByRole("button",{name:"Next preview"})).toBeInTheDocument();
  expect(screen.getByText("1 / 4")).toBeInTheDocument();
- expect(screen.getByText(/Full 328-page PDF is delivered privately after verified payment/)).toBeInTheDocument();
+ expect(screen.getByText(/full 328-page PDF is delivered privately after verified payment/i)).toBeInTheDocument();
 
  expect(screen.queryByRole("img",{name:/Preview page/})).not.toBeInTheDocument();
  expect(screen.getByRole("region",{name:"Book preview slideshow"})).toHaveTextContent("weil: the verb goes to the end");
