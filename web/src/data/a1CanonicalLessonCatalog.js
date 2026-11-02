@@ -25,7 +25,7 @@ const ASSIGNMENT_LESSONS = A1_ASSIGNMENT_ORDER.map((key) => A1_ASSIGNMENT_REGIST
   destination: assignment.workbookRoute,
   aliases: [
     normalizeA1Chapter(assignment.assignmentKey),
-    ...(assignment.assignmentKey === "A1-0.2-1.1" ? ["0.2", "1.1"] : []),
+    ...(assignment.assignmentKey === "A1-0.2_1.1" ? ["0.2", "1.1"] : []),
     ...(assignment.chapter === "12.1" ? ["12.2", "A1-12.2"] : []),
   ],
   assignmentKey: assignment.assignmentKey,
