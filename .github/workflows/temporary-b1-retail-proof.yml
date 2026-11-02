@@ -38,13 +38,14 @@ jobs:
           FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
       - name: Validate full B1 retail proof
         run: node scripts/course-material-bundles/validateGeneratedBundle.mjs B1
-      - name: Upload B1 retail proof
+      - name: Upload B1 PDF for editorial inspection even when the final audit fails
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: Falowen-B1-retail-publication-proof
+          name: Falowen-B1-retail-inspection-not-for-sale
           path: artifacts/course-material-bundles/B1/Falowen-B1-Course-Materials.pdf
-          if-no-files-found: error
-          retention-days: 30
+          if-no-files-found: warn
+          retention-days: 14
       - name: Upload diagnostics if failed
         if: failure()
         uses: actions/upload-artifact@v4
