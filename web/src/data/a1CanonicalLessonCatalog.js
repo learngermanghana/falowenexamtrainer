@@ -25,7 +25,7 @@ const ASSIGNMENT_LESSONS = A1_ASSIGNMENT_ORDER.map((key) => A1_ASSIGNMENT_REGIST
   destination: assignment.workbookRoute,
   aliases: [
     normalizeA1Chapter(assignment.assignmentKey),
-    ...(assignment.assignmentKey === "A1-0.2_1.1" ? ["0.2", "1.1"] : []),
+    ...(assignment.assignmentKey === "A1-0.2-1.1" ? ["0.2", "1.1"] : []),
     ...(assignment.chapter === "12.1" ? ["12.2", "A1-12.2"] : []),
   ],
   assignmentKey: assignment.assignmentKey,
@@ -108,7 +108,7 @@ export const A1_CANONICAL_LESSON_CATALOG = Object.freeze(
 
 export const A1_COURSE_LESSON_ORDER = Object.freeze([
   "0.1",
-  "0.2_1.1",
+  "0.2",
   "1.1-practice",
   "1.2",
   "1.2-practice",
@@ -169,7 +169,7 @@ export const getA1CanonicalLesson = (identity = "") => {
   // Canonical links to the retired Day 2 chapters now open the new unified lesson.
   // Their legacy workbook routes and submission keys remain intact for history.
   if (normalized === "0.2" || normalized === "1.1") {
-    return A1_COURSE_LESSON_BY_ROUTE_KEY.get("0.2_1.1") || null;
+    return A1_COURSE_LESSON_BY_ROUTE_KEY.get("0.2") || null;
   }
 
   const exactRouteKey = A1_CANONICAL_LESSON_CATALOG.find(
@@ -188,7 +188,7 @@ export const getA1CanonicalLessonForLegacyRoute = ({ day, identity } = {}) => {
   const numericDay = Number(day);
   if (!normalized || !Number.isInteger(numericDay)) return null;
   if (numericDay === 2 && ["0.2", "1.1"].includes(normalized)) {
-    return A1_COURSE_LESSON_BY_ROUTE_KEY.get("0.2_1.1") || null;
+    return A1_COURSE_LESSON_BY_ROUTE_KEY.get("0.2") || null;
   }
 
   const lessonsForDay = A1_CANONICAL_LESSON_CATALOG.filter(
