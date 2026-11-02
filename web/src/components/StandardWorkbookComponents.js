@@ -250,7 +250,7 @@ export const WorkbookTabNav = ({
             </p>
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
               <span style={{ color: "#475569", fontWeight: 800, fontSize: 12 }}>{sectionProgress}% through sections</span>
-              {activeTabDefinition?.key !== "submit" ? (
+              {activeTabDefinition?.key !== "submit" && getA2B1WorkbookContextFromAriaLabel(ariaLabel)?.level !== "A2" ? (
                 <WorkbookSectionPdfAction sectionLabel={activeTabDefinition?.label || "section"} />
               ) : null}
             </div>
