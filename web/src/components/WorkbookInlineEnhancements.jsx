@@ -14,8 +14,7 @@ const INLINE_ENHANCEMENTS_ANCHOR_ATTRIBUTE = "data-workbook-inline-enhancements-
 
 export const A1_TUTOR_MARKED_ASSIGNMENT_KEYS = Object.freeze([
   "A1-0.1",
-  "A1-0.2",
-  "A1-1.1",
+  "A1-0.2_1.1",
   "A1-1.2",
   "A1-2",
   "A1-3",
