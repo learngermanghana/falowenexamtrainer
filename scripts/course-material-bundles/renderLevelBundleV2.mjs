@@ -13,6 +13,7 @@ import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanion
 import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2PrintSafety, assertA2PrintedContent } from "./a2PdfSafety.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults } from "./b1PdfPrintExtras.mjs";
+import { addB1RetailCover } from "./b1RetailCover.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -26,6 +27,16 @@ const diagnosticsPath = path.join(outputDir, "render-diagnostics.json");
 
 if (!fs.existsSync(manifestPath)) throw new Error(`Manifest not found: ${manifestPath}`);
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+// The curriculum database has two legacy display labels cut off mid-word.
+// Restore concise, source-grounded titles for the published book only.
+const B1_BOOK_TITLES = Object.freeze({
+  20: "Wie wird man Reiseleiter/in?",
+  21: "Lebensformen heute",
+});
+const getPrintableLessons = () => manifest.lessons
+  .filter(lesson => lesson.printKind !== "excluded")
+  .map(lesson => level === "B1" && B1_BOOK_TITLES[lesson.day]
+    ? { ...lesson, title: B1_BOOK_TITLES[lesson.day] } : lesson);
 if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not ready for PDF generation.`);
 
 fs.rmSync(renderDir, { recursive: true, force: true });
@@ -603,6 +614,10 @@ const renderLesson = async (page, lesson) => {
 };
 
 const addCover = async (output) => {
+  if (level === "B1") {
+    await addB1RetailCover(output);
+    return;
+  }
   const font = await output.embedFont(StandardFonts.Helvetica);
   const bold = await output.embedFont(StandardFonts.HelveticaBold);
   const cover = output.addPage([595.28, 841.89]);
@@ -643,7 +658,7 @@ const appendPdfFile = async (output, file) => {
 
 const mergeBundle = async (renderedLessons) => {
   const output = await PDFDocument.create();
-  const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
+  const printableLessons = getPrintableLessons();
   await addCover(output);
 
   if (level === "A2" || level === "B1") {
@@ -695,7 +710,7 @@ const context = await browser.newContext({ viewport: { width: 1440, height: 1800
 const page = await context.newPage();
 page.setDefaultTimeout(15000);
 page.setDefaultNavigationTimeout(45000);
-const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
+const printableLessons = getPrintableLessons();
 const renderedLessons = new Map();
 
 // Only navigation timeouts are retried. Incorrect or incomplete lesson content
