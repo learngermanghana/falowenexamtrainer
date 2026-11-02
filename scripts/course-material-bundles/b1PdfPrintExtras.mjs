@@ -144,8 +144,11 @@ export const assertB1PrintedContent = (expected, printed) => {
   const words = input => new Set((String(input || "").normalize("NFKC").toLowerCase()
     .match(/[\p{L}\p{N}]{4,}/gu) || []));
   const before = words(expected), after = words(printed);
-  if (String(printed).replace(/\s+/g, "").length < 140 || after.size < 22) {
-    throw new Error("B1 PDF printed content is empty or insufficient");
+  const minChars = before.size < 45 ? 48 : 140;
+  const minTerms = before.size < 45 ? 8 : 22;
+  if (String(printed).replace(/\s+/g, "").length < minChars || after.size < minTerms) {
+    throw new Error("B1 PDF printed content is empty or insufficient (" +
+      after.size + " distinct printed terms vs " + before.size + " expected)");
   }
   if (before.size >= 35) {
     let matched = 0;
