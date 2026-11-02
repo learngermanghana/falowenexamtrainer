@@ -75,7 +75,7 @@ test("November B1 Mock 2 Schreiben uses all three new teacher tasks and 60-minut
  expect(tasks.map(t=>t.id)).toEqual(["teil1","teil2","teil3"]);
  expect(tasks.map(t=>t.target)).toEqual([80,80,40]);
  expect(tasks.map(t=>t.points.length)).toEqual([3,3,3]);
- expect(tasks.map(t=>Number(t.meta.match(/\\d+/)[0]))).toEqual([20,25,15]);
+ expect(tasks.map(t=>Number(t.meta.match(/[0-9]+/)[0]))).toEqual([20,25,15]);
  expect(tasks[0].prompt).toContain("krank");
  expect(tasks[0].points[0]).toContain("Feier");
  expect(tasks[0].points[1]).toContain("Geschenk");
