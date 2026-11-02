@@ -175,7 +175,22 @@ const getTutorRequirements = (level) => {
       .map((entry) => requirementFromEntry(entry, level)),
   );
 
-  if (level === "A1") return canonicalAssignments;
+  if (level === "A1") {
+    // The Day 23 final mock is an exam, not a nineteenth tutor workbook.
+    // Count its first, fully verified result under its existing score identity,
+    // without ever renaming historical A1-14.1 Health submissions.
+    const finalMock = {
+      level: "A1",
+      day: 23,
+      chapter: "5.10",
+      title: "A1 Final Mock Exam",
+      assignmentKey: "A1-FINAL-MOCK",
+      label: "Kapitel 5.10 – A1 Final Mock Exam",
+      route: "/campus/course/a1-final-mock-exam",
+      kind: "final-mock",
+    };
+    return [...canonicalAssignments, finalMock];
+  }
 
   // A2/B1 have one canonical course assignment per teaching day. Prefer the
   // explicit assignment rows, then fill any manifest gaps with that day's
@@ -225,10 +240,14 @@ export const getCanonicalCourseRequirements = (level = "") => {
 };
 
 const getTutorProgressRecord = (progressByAssignmentId = {}, requirement = {}) => {
-  const candidates = [
-    requirement.assignmentKey,
-    requirement.chapter ? `${requirement.level}-${requirement.chapter}` : "",
-  ].map(normalizeKey).filter(Boolean);
+  // A1-5.10 is a curriculum chapter, not a verified mock score.
+  // Never match a general chapter/practice record to this final requirement.
+  const candidates = (requirement.kind === "final-mock"
+    ? [requirement.assignmentKey]
+    : [
+        requirement.assignmentKey,
+        requirement.chapter ? `${requirement.level}-${requirement.chapter}` : "",
+      ]).map(normalizeKey).filter(Boolean);
 
   for (const key of candidates) {
     if (progressByAssignmentId[key]) return progressByAssignmentId[key];
@@ -322,9 +341,22 @@ export const buildCourseCompletionProgress = ({
   const isTutorMarked = TUTOR_MARKED_LEVELS.has(normalizedLevel);
   const states = requirements.map((requirement) => {
     if (isTutorMarked) {
+      const record = getTutorProgressRecord(progressByAssignmentId, requirement);
+      if (requirement.kind === "final-mock") {
+        // A draft, a partial exam, or an unverified "submitted" flag cannot
+        // unlock completion. The result is created after all four exam parts
+        // have been scored and stored by the server.
+        const isVerifiedResult = record?.hasResult === true
+          && Number.isFinite(Number(record.bestScore ?? record.latestScore))
+          && (record.bestScore !== null || record.latestScore !== null);
+        return {
+          requirement,
+          ...tutorRequirementState(isVerifiedResult ? record : null),
+        };
+      }
       return {
         requirement,
-        ...tutorRequirementState(getTutorProgressRecord(progressByAssignmentId, requirement)),
+        ...tutorRequirementState(record),
       };
     }
     const sectionState = getSelfLearningSectionState(selfLearningProgressByDay[requirement.day] || {});
