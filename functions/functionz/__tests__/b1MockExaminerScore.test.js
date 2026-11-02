@@ -4,7 +4,7 @@ const {createExaminerFlow,currentStep,profileFor}=require("../goetheExaminerFlow
 
 function fixture({mockId="b1-mock-02",uid="learner-1",attemptId="att-1"}={}) {
   const prompts=mockId==="b1-mock-02"
-    ? ["Frau Keller feiert ihr Firmenjubiläum. Gemeinsam planen.","Bio-Produkte kaufen? Präsentation.","Geben Sie Feedback zur Präsentation."]
+    ? ["Ein interkulturelles Nachbarschaftsfest zur Integration gemeinsam planen.","Sollten Sprach- und Integrationskurse verpflichtend sein? Präsentation.","Geben Sie Feedback zur Präsentation zum Thema Sprach- und Integrationskurse."]
     : ["Geburtstagsparty gemeinsam planen.","Bücher oder digital lernen?","Geben Sie Feedback zur Präsentation."];
   const receipts=Object.fromEntries([1,2,3].map((teil,index)=>{
     const id=`session-${teil}`;
