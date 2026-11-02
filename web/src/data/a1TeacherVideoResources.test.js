@@ -32,7 +32,7 @@ describe("standardized A1 teacher videos", () => {
     }
   );
 
-  test("chapter-specific Day 2 pages only receive their own teacher video", () => {
+  test("unified Day 2 includes both original teacher videos", () => {
     const lesson = normalizeLesson(
       {
         day: 2,
@@ -48,6 +48,7 @@ describe("standardized A1 teacher videos", () => {
 
     expect(teacherVideos.map((video) => video.url)).toEqual([
       "https://youtu.be/uhFgKp4WVEc",
+      "https://youtu.be/xyRogEAA9qM",
     ]);
   });
 
@@ -191,54 +192,30 @@ describe("standardized A1 teacher videos", () => {
   test("chapter lookup returns only the canonical resources for that chapter", () => {
     expect(getA1TeacherVideoResources(2, "0.2").map((video) => video.chapter)).toEqual([
       "0.2",
+      "0.2",
     ]);
-    expect(getA1TeacherVideoResources(2, "1.1").map((video) => video.chapter)).toEqual([
-      "1.1",
-    ]);
+    expect(getA1TeacherVideoResources(2, "1.1")).toHaveLength(0);
   });
 
   test("returns all teacher resources for a multi-chapter A1 day when chapter is omitted", () => {
     expect(getA1TeacherVideoResources(2).map((video) => video.chapter)).toEqual([
       "0.2",
-      "1.1",
+      "0.2",
     ]);
   });
 });
 
 
-test("Day 2 Chapter 1.1 uses the replacement teacher lecture and removes the old video", () => {
-  const configuredVideo = getCanonicalA1TeacherVideoResource(2, "1.1");
-
-  expect(configuredVideo).toEqual(
-    expect.objectContaining({
-      chapter: "1.1",
-      topic: "Personal Pronouns and Verb Conjugation",
-      url: "https://youtu.be/xyRogEAA9qM",
-    })
-  );
-
+test("Day 2's second teacher video teaches pronouns in the unified chapter", () => {
+  const configuredVideo = getCanonicalA1TeacherVideoResource(2, "0.2", 2);
+  expect(configuredVideo).toEqual(expect.objectContaining({
+    chapter: "0.2",
+    videoNumber: 2,
+    topic: "Personal Pronouns and Verb Conjugation",
+    url: "https://youtu.be/xyRogEAA9qM",
+  }));
   const urls = A1_TEACHER_VIDEO_RESOURCES.map((video) => video.url);
   expect(urls).not.toContain("https://youtu.be/AjsnO1hxDs4");
-
-  const lesson = normalizeLesson(
-    {
-      day: 2,
-      chapter: "1.1",
-      lesen_hören: {
-        chapter: "1.1",
-        workbook_link: "/campus/course/a1-day-2-kapitel-1-1-workbook",
-      },
-    },
-    "A1"
-  );
-
-  const teacherVideos = lesson.resources.videos.filter((video) =>
-    `${video.key} ${video.title}`.toLowerCase().includes("teacher")
-  );
-
-  expect(teacherVideos.map((video) => video.url)).toEqual([
-    "https://youtu.be/xyRogEAA9qM",
-  ]);
 });
 
 test("A1 Day 4 chapter 2 uses the assigned teacher lecture without changing the AI video", () => {

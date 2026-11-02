@@ -48,7 +48,7 @@ describe("RadioFirstWorkbookGate navigation", () => {
 
 describe("A1 direct Radio destinations", () => {
   test.each([
-    [2, "1.1", "A1-1.1", "/campus/course/a1-day-2-kapitel-1-1-workbook"],
+    [2, "1.1", "A1-0.2_1.1", "/campus/course/a1-day-2-foundations-workbook"],
     [3, "1.2", "A1-1.2", "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook"],
     [9, "5", "A1-5", "/campus/course/a1-chapter-5-german-cases-workbook"],
     [16, "9", "A1-9", "/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook"],

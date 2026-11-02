@@ -12,7 +12,8 @@ const makeSerializedSections = (definition = {}) => new Map(
 
 test("defines shared draft capture for every tutor-marked A1 assignment except page-owned A1-3", () => {
   const expected = A1_ASSIGNMENT_ORDER.filter((key) => !["A1-3", "A1-5.9"].includes(key));
-  expect(Object.keys(A1_TUTOR_DRAFT_PROFILES)).toEqual(expected);
+  expect(Object.keys(A1_TUTOR_DRAFT_PROFILES)).toEqual(expect.arrayContaining(expected));
+  expect(Object.keys(A1_TUTOR_DRAFT_PROFILES).sort()).toEqual([...expected, "A1-0.2", "A1-1.1"].sort());
   expected.forEach((key) => expect(getA1TutorDraftProfile(key)).toBeTruthy());
   expect(getA1TutorDraftProfile("A1-3")).toBeNull();
 });

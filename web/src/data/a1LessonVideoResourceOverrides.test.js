@@ -16,7 +16,7 @@ const expectRequestedAiVideo = (day, expected) => {
   );
 };
 
-test("A1 Day 2 separates Kapitel 0.2 and Kapitel 1.1 AI videos", () => {
+test("A1 Day 2 provides both alphabet and pronoun videos in one lesson", () => {
   const lesson = normalizeLesson(getA1Lesson(2), "A1");
   const videos = aiVideos(lesson);
 
@@ -28,8 +28,8 @@ test("A1 Day 2 separates Kapitel 0.2 and Kapitel 1.1 AI videos", () => {
         url: "https://youtu.be/pCQVdJGsvtk",
       }),
       expect.objectContaining({
-        chapter: "1.1",
-        title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
+        chapter: "0.2",
+        title: "Day 2 · Pronouns & Verb Conjugation · AI video",
         url: "https://youtu.be/kqagu9qsOcc",
       }),
     ]),

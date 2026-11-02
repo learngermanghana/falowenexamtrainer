@@ -8,7 +8,7 @@ describe("authoritative A1 course-book cards", () => {
     );
     const assignmentIds = A1_COURSE_BOOK_CARDS.map((card) => card.assignmentId).filter(Boolean);
 
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(27);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(26);
     expect(new Set(dayChapters).size).toBe(dayChapters.length);
     expect(new Set(assignmentIds).size).toBe(assignmentIds.length);
   });
@@ -28,8 +28,8 @@ describe("authoritative A1 course-book cards", () => {
     expect(chapter122).toBeNull();
   });
 
-  it("replaces the retired 12.2 slot with the required speaking lab and keeps 19 assignments", () => {
-    expect(A1_COURSE_BOOK_CARDS.filter(card => card.submissionRequired)).toHaveLength(19);
+  it("replaces the retired 12.2 slot with the required speaking lab and keeps 18 assignments", () => {
+    expect(A1_COURSE_BOOK_CARDS.filter(card => card.submissionRequired)).toHaveLength(18);
     expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-5.9" })).toMatchObject({ assignment_id: "A1-5.9", submissionRequired: true });
   });
 });

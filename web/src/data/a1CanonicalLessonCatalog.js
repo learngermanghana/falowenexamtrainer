@@ -1,4 +1,4 @@
-import { A1_ASSIGNMENT_REGISTRY } from "./a1AssignmentRegistry";
+import { A1_ASSIGNMENT_ORDER, A1_ASSIGNMENT_REGISTRY } from "./a1AssignmentRegistry";
 import {
   buildA1CanonicalChapterLessonRoute,
   buildA1ShortChapterLessonRoute,
@@ -17,13 +17,17 @@ const practice = ({ routeKey, chapter, day, title, destination, aliases = [], si
   singlePage,
 });
 
-const ASSIGNMENT_LESSONS = Object.values(A1_ASSIGNMENT_REGISTRY).map((assignment) => ({
+const ASSIGNMENT_LESSONS = A1_ASSIGNMENT_ORDER.map((key) => A1_ASSIGNMENT_REGISTRY[key]).map((assignment) => ({
   routeKey: normalizeA1Chapter(assignment.chapter),
   chapter: normalizeA1Chapter(assignment.chapter),
   day: assignment.day,
   title: assignment.title,
   destination: assignment.workbookRoute,
-  aliases: [normalizeA1Chapter(assignment.assignmentKey), ...(assignment.chapter === "12.1" ? ["12.2", "A1-12.2"] : [])],
+  aliases: [
+    normalizeA1Chapter(assignment.assignmentKey),
+    ...(assignment.assignmentKey === "A1-0.2_1.1" ? ["0.2", "1.1"] : []),
+    ...(assignment.chapter === "12.1" ? ["12.2", "A1-12.2"] : []),
+  ],
   assignmentKey: assignment.assignmentKey,
   kind: "assignment",
 }));
@@ -105,7 +109,6 @@ export const A1_CANONICAL_LESSON_CATALOG = Object.freeze(
 export const A1_COURSE_LESSON_ORDER = Object.freeze([
   "0.1",
   "0.2",
-  "1.1",
   "1.1-practice",
   "1.2",
   "1.2-practice",
@@ -163,6 +166,11 @@ const lookupTokens = (lesson) => new Set([
 export const getA1CanonicalLesson = (identity = "") => {
   const normalized = normalizeA1Chapter(identity);
   if (!normalized) return null;
+  // Canonical links to the retired Day 2 chapters now open the new unified lesson.
+  // Their legacy workbook routes and submission keys remain intact for history.
+  if (normalized === "0.2" || normalized === "1.1") {
+    return A1_COURSE_LESSON_BY_ROUTE_KEY.get("0.2") || null;
+  }
 
   const exactRouteKey = A1_CANONICAL_LESSON_CATALOG.find(
     (lesson) => lesson.routeKey === normalized,
@@ -179,6 +187,9 @@ export const getA1CanonicalLessonForLegacyRoute = ({ day, identity } = {}) => {
   const normalized = normalizeA1Chapter(identity);
   const numericDay = Number(day);
   if (!normalized || !Number.isInteger(numericDay)) return null;
+  if (numericDay === 2 && ["0.2", "1.1"].includes(normalized)) {
+    return A1_COURSE_LESSON_BY_ROUTE_KEY.get("0.2") || null;
+  }
 
   const lessonsForDay = A1_CANONICAL_LESSON_CATALOG.filter(
     (lesson) => Number(lesson.day) === numericDay,

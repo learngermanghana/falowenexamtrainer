@@ -2024,5 +2024,105 @@
     "sheet_url": "https://docs.google.com/spreadsheets/d/1fhMpgMdfNWuZcoRnXMvKhGxXBJLYF-cGV4hyPHmcFu4/edit",
     "format": "objective",
     "assignment_id": "A2-4.10"
+  },
+  "A1 Day 2 Unified Foundations 0.2": {
+    "assignment_id": "A1-0.2_1.1",
+    "format": "mixed",
+    "answers": {
+      "Teil 1": {
+        "Answer1": "B) 26",
+        "Answer2": "A) Ä, Ö, Ü",
+        "Answer3": "C) Eszett",
+        "Answer4": "A) K",
+        "Answer5": "B) How do you spell that?"
+      },
+      "Teil 2": {
+        "Answer1": "Wasser",
+        "Answer2": "Kaffee",
+        "Answer3": "Blume",
+        "Answer4": "Schule",
+        "Answer5": "Tisch"
+      },
+      "Teil 3": {
+        "Answer1": "A) Ich",
+        "Answer2": "C) Du",
+        "Answer3": "B) Sie",
+        "Answer4": "A) Wir",
+        "Answer5": "C) Sie"
+      },
+      "Teil 4": {
+        "Answer1": "lerne",
+        "Answer2": "wohnst",
+        "Answer3": "heißt",
+        "Answer4": "kommen",
+        "Answer5": "ist"
+      }
+    },
+    "workbookVersion": "A1-DAY2-FOUNDATIONS-V1",
+    "answerLayout": "multipart",
+    "expectedParts": [
+      "teil1",
+      "teil2",
+      "teil3",
+      "teil4",
+      "teil5"
+    ],
+    "referenceAnswerParts": [
+      "teil1",
+      "teil2",
+      "teil3",
+      "teil4"
+    ],
+    "writingParts": [
+      "teil5"
+    ],
+    "aiGradedParts": [
+      "teil5"
+    ],
+    "speakingParts": [],
+    "partAliases": {
+      "Teil 1": "teil1",
+      "teil1": "Teil 1",
+      "Teil 2": "teil2",
+      "teil2": "Teil 2",
+      "Teil 3": "teil3",
+      "teil3": "Teil 3",
+      "Teil 4": "teil4",
+      "teil4": "Teil 4",
+      "Teil 5": "teil5",
+      "teil5": "Teil 5"
+    },
+    "partGrading": {
+      "teil1": {
+        "label": "Alphabet und Buchstabieren · 20 marks",
+        "hasReferenceAnswers": true,
+        "gradingMode": "answer_key",
+        "instruction": "Score exactly the five alphabet multiple-choice answers. 4 marks per correct answer; total 20. Use only the current combined Day 2 workbook, not the archived alphabet assignment."
+      },
+      "teil2": {
+        "label": "Hören und Buchstabieren · 20 marks",
+        "hasReferenceAnswers": true,
+        "gradingMode": "answer_key",
+        "instruction": "Score five completed German words from the published Day 2 spelling video. 4 marks per word; total 20. Accept normal capitalization but do not fabricate audio answers."
+      },
+      "teil3": {
+        "label": "Personalpronomen · 20 marks",
+        "hasReferenceAnswers": true,
+        "gradingMode": "answer_key",
+        "instruction": "Score five pronoun multiple-choice answers. 4 marks each; total 20. Respect formal capital-S Sie."
+      },
+      "teil4": {
+        "label": "Verbkonjugation · 20 marks",
+        "hasReferenceAnswers": true,
+        "gradingMode": "answer_key",
+        "instruction": "Score the five present-tense forms. 4 marks each; total 20. Accept correct German accents ß and case as appropriate; answers lerne, wohnst, heißt, kommen, ist."
+      },
+      "teil5": {
+        "label": "Erste Sätze · 20 marks",
+        "hasReferenceAnswers": false,
+        "gradingMode": "ai_written_response",
+        "instruction": "Score 20 marks total for beginner A1 writing: greeting (4), correct name sentence with ich heiße (4), where they live with ich wohne (4), learning German with ich lerne (4), and spelling out their name (4). Allow any personal details; accept understandable beginner alternatives with appropriate credit. Required four sentences and one spelled-out name. Do not demand connectors, a full letter, origin or farewell. Hold for tutor review if writing score absent; never issue an objective-only final grade."
+      }
+    }
   }
 }

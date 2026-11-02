@@ -22,8 +22,8 @@ const a2ShellSource = fs.readFileSync(path.join(COMPONENTS, "A2StandardTabbedWor
 const b1ShellSource = fs.readFileSync(path.join(COMPONENTS, "B1StandardWorkbookPage.js"), "utf8");
 const workbookRouteIndex = buildWorkbookRouteIndex();
 
-const EXPECTED_COUNTS = { A1: 19, A2: 28, B1: 28, B2: 28, C1: 28 };
-const EXPECTED_PUBLISHED_COUNTS = { A1: 19, A2: 28, B1: 23, B2: 4, C1: 7 };
+const EXPECTED_COUNTS = { A1: 18, A2: 28, B1: 28, B2: 28, C1: 28 };
+const EXPECTED_PUBLISHED_COUNTS = { A1: 18, A2: 28, B1: 23, B2: 4, C1: 7 };
 
 const tutorAssignments = (level) =>
   getCurriculumEntriesForLevel(level).filter(
@@ -188,7 +188,7 @@ describe("all tutor-marked A1 through C1 assignments", () => {
     ).toBeNull();
   });
 
-  test("all 19 A1 tutor assignments resolve to the native canonical registry", () => {
+  test("all 18 current A1 tutor assignments resolve to the native canonical registry", () => {
     tutorAssignments("A1").forEach((entry) => {
       const assignment = getA1Assignment(entry.assignment_id);
       expect(assignment).toEqual(
