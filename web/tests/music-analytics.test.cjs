@@ -93,3 +93,21 @@ test('build config generator writes valid JavaScript and validates IDs', () => {
     fs.writeFileSync(target, original);
   }
 });
+
+test('iPhone loop handoff counts song completion without an ended event', () => {
+  const runtime = fakeRuntime('accepted');
+  runtime.listeners.play();
+  runtime.listeners['falowen:music-complete'](); // Natural loop wraps in place.
+  runtime.listeners['falowen:music-complete'](); // Duplicate event cannot inflate count.
+  const events = runtime.globals.window.dataLayer
+    .map(args => Array.from(args)).filter(args => args[0] === 'event');
+  assert.equal(events.filter(args => args[1] === 'music_complete').length, 1);
+});
+
+test('loop handoff never starts Google tracking without consent', () => {
+  const runtime = fakeRuntime('declined');
+  runtime.listeners.play();
+  runtime.listeners['falowen:music-complete']();
+  assert.equal(runtime.attached.length, 0);
+  assert.equal(runtime.globals.window.gtag, undefined);
+});
