@@ -15,8 +15,8 @@ test("B1 Mock 2 writing and speaking use the latest teacher prompts",()=>{
  expect(B1_MOCK2_WRITING_TASKS[0].prompt).toContain("Julian");
  expect(B1_MOCK2_WRITING_TASKS[1].prompt).toContain("Laura");
  expect(B1_MOCK2_WRITING_TASKS[2].prompt).toContain("Frau Sommer");
- expect(B1_MOCK2_SPEAKING.teil1.situation).toContain("Frau Keller");
- expect(B1_MOCK2_SPEAKING.teil2.alternativeTopic).toContain("Gruppe");
+ expect(B1_MOCK2_SPEAKING.teil1.situation).toContain("interkulturelles Nachbarschaftsfest");
+ expect(B1_MOCK2_SPEAKING.teil2.alternativeTopic).toContain("Sport- und Kulturvereine");
  expect(B1_MOCK2_SPEAKING.teil3.prompt).toContain("Feedback");
 });
 
