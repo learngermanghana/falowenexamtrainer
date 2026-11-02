@@ -3,7 +3,11 @@
 const { listMusicTracks } = require('../server/musicDiscovery.cjs');
 let cache={ expiresAt:0, tracks:null };
 module.exports = async function musicLibraryHandler(req,res) {
-  res.setHeader('Access-Control-Allow-Origin','https://music.falowen.app');
+  const origin = req.headers?.origin;
+  if (['https://music.falowen.app', 'https://admin.falowen.app'].includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Vary', 'Origin');
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('Cache-Control','public, max-age=30, s-maxage=45, stale-if-error=60');
   if(req.method !== 'GET') return res.status(405).json({error:'Method not allowed'});
