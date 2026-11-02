@@ -14,6 +14,7 @@ const statusLabel = (status, mock) => {
     return status === "ready" ? `${count}-module Kombiprüfung` : `${count}-module Kombiprüfung · preview`;
   }
   if (mock?.id === "a2-mock-02") return "4-module mock · grading verification pending";
+  if (mock?.id === "b1-mock-02") return "Complete 4-module mock";
   if (status === "preview") return "Section practice only";
   if (status === "ready") return "Complete 4-module mock";
   return "Full mock not published";

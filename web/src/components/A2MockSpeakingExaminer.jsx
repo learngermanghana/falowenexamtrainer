@@ -6,7 +6,7 @@ import "./SpeakingExamDesign.css";
 // The same speaking welcome screen and real conversational AI examiner used by
 // A1 Exam Room, with task identity and progress isolated for each A2 mock.
 export default function A2MockSpeakingExaminer({
-  mockId, tasks, savedParts = {}, onSavePart, onComplete, attemptId = "",
+  mockId, tasks, savedParts = {}, onSavePart, onComplete, attemptId = "", level = "A2",
   externalSecondsLeft = null,
 }) {
   const [stage, setStage] = useState("home");
@@ -81,9 +81,9 @@ export default function A2MockSpeakingExaminer({
     }
     const expected = `${mockId}-speaking-teil-${activeTask.teil}`;
     const actualTeil = String(result?.teil || "").match(/\d+/)?.[0];
-    if (result?.taskId !== expected || result?.level !== "A2" || actualTeil !== activeTask.teil ||
+    if (result?.taskId !== expected || result?.level !== level || actualTeil !== activeTask.teil ||
         !result?.sessionId || !result?.feedback) {
-      setError("The examiner's saved answer did not match this A2 mock or speaking part. Your previous work remains available.");
+      setError("The examiner's saved answer did not match this mock or speaking part. Your previous work remains available.");
       return false;
     }
     // The AI examiner evaluates a complete Teil. Do not fabricate a score or
@@ -132,7 +132,7 @@ export default function A2MockSpeakingExaminer({
         {completedCount ? <p role="status" style={{margin:0}}>
           {completedCount} of {tasks.length} speaking parts are saved. You can resume the full exam without repeating completed parts.
         </p> : null}
-        <SpeakingPracticeHome level="A2" teil={selectedTeil} guides={guides}
+        <SpeakingPracticeHome level={level} teil={selectedTeil} guides={guides}
           history={{}} ready onSelectPart={setSelectedTeil} onStart={start}/>
       </> : null}
       {stage === "exam" && activeTask ? <>
@@ -146,7 +146,7 @@ export default function A2MockSpeakingExaminer({
         </p>
         <LiveSpeakPage
           key={`${mockId}-${attemptId}-${activeTask.teil}-${run}`}
-          embedded initialLevel="A2" practiceSource="exam-speaking-practice"
+          embedded initialLevel={level} practiceSource="exam-speaking-practice"
           practiceTopic={activeTask.prompt} examMode="simulation"
           autoStart freshAttempt={run > 0} deferFeedback={fullExam}
           examTask={{
@@ -162,7 +162,7 @@ export default function A2MockSpeakingExaminer({
         />
       </> : null}
       {stage === "results" ? <section className="speaking-run-results" aria-label="A2 mock speaking results">
-        <span className="speaking-eyebrow">A2 · SPEAKING PRACTICE</span>
+        <span className="speaking-eyebrow">{level} · SPEAKING PRACTICE</span>
         <h2>{fullExam ? "All speaking parts completed" : `Teil ${selectedTeil} completed`}</h2>
         <p>{fullExam ? "Your three speaking parts and examiner feedback are saved. Review the complete mock results when available." :
           "This individual practice does not change your full mock score."}</p>

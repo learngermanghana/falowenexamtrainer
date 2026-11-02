@@ -7,10 +7,10 @@ const backendUrl = getBackendUrl();
 const authHeaders = (idToken) =>
   idToken ? { Authorization: `Bearer ${idToken}` } : {};
 
-export const scoreB1MockWriting = async ({ teil1, teil2, teil3, attemptId, idToken }) => {
+export const scoreB1MockWriting = async ({ teil1, teil2, teil3, attemptId, idToken, mockId = "b1-mock-01" }) => {
   const response = await postMockAssessment(
     `${backendUrl}/writing/b1-mock-score`,
-    { teil1, teil2, teil3, attemptId },
+    { teil1, teil2, teil3, attemptId, mockId },
     { headers: authHeaders(idToken) },
   );
   return response.data?.result || response.data;

@@ -11,7 +11,7 @@ function loadLocal(uid){
   try{return JSON.parse(localStorage.getItem(storageKey(uid))||"{}")||{}}
   catch{return {}}
 }
-export default function B1Mock2Hoeren(){
+export default function B1Mock2Hoeren({embedded=false,onComplete,onAnswersChange}){
   const {idToken,user}=useAuth();
   const [exam,setExam]=useState(null);
   const [active,setActive]=useState(0);
@@ -68,6 +68,7 @@ export default function B1Mock2Hoeren(){
       const scored=await scoreB1Mock2Hoeren({idToken,answers});
       if(!scored.saved||!scored.practiceOnly)throw new Error("Der Server hat das Ergebnis nicht bestätigt.");
       setResult(scored);
+      if(embedded) onComplete?.({answers,result:scored});
     }catch(e){setError(e?.response?.data?.error||e.message||"Ergebnis konnte nicht gespeichert werden.");}
     finally{setBusy(false)}
   };
@@ -76,19 +77,17 @@ export default function B1Mock2Hoeren(){
     if(user?.uid)localStorage.removeItem(storageKey(user.uid));
   };
   return <main className="a2-mock2-shell" lang="de" data-b1-mock2-hoeren>
-    <div className="a2-mock2-top">
+    {!embedded?<div className="a2-mock2-top">
       <AppBackButton label="Zurück zu den Probeprüfungen" fallbackPath="/exams/mocks"/>
       <span>B1 · Mock 2 · Hören</span>
-    </div>
+    </div>:null}
     <header className="a2-mock2-progress">
       <div><strong>B1 Mock 2 – Hören Teile 1 bis 4</strong>
         <span>{answered}/{total} Aufgaben beantwortet</span></div>
       <strong>Teil {part?.part||1}</strong>
     </header>
     <p role="note">
-      Hören-Übung mit vier Teilen. Die Auswertung wird nach der Abgabe serverseitig
-      gespeichert. Das Ergebnis ist noch kein vollständiges B1-Mock-Ergebnis
-      für Lesen, Hören, Schreiben und Sprechen.
+      {embedded ? "Modul 2 von 4. Schließen Sie alle vier Hörteile ab; danach öffnet sich Schreiben." : "Hören-Übung mit vier Teilen. Dies allein ist kein vollständiges vierteiliges B1-Mock-Ergebnis."}
     </p>
     {error?<p role="alert">{error}</p>:null}
     {!exam&&!error?<p role="status">Prüfungsaufgaben werden geladen …</p>:null}
@@ -127,7 +126,7 @@ export default function B1Mock2Hoeren(){
         <legend><strong>{q.number}.</strong> {q.question}</legend>
         {q.options.map(o=><label key={o.id} className={answers[q.number]===o.id?"selected":""}>
           <input type="radio" name={`b1mock2-${q.number}`} value={o.id}
-            checked={answers[q.number]===o.id} onChange={()=>setAnswers(prev=>({...prev,[q.number]:o.id}))}/>
+            checked={answers[q.number]===o.id} onChange={()=>{setAnswers(prev=>({...prev,[q.number]:o.id}));onAnswersChange?.(q.number,o.id,part.part);}}/>
           <span>{q.kind==="multiple-choice"?`${o.id}) `:""}{o.label}</span>
         </label>)}
       </fieldset>)}

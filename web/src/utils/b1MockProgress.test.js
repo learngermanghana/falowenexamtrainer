@@ -67,6 +67,7 @@ describe("B1 mock completion guidance and recovery", () => {
     expect(component).toContain("Finish Hören anyway → Schreiben");
     expect(component).toContain("Go back and finish Hören");
     expect(component).toContain('if (exam.stage === "hoeren") submitHoeren();');
-    expect(component).toContain('mockId: B1_FINAL_MOCK_ID');
+    expect(component).toContain('mockId = B1_FINAL_MOCK_ID');
+    expect(component).toContain('mockId === "b1-mock-02"');
   });
 });
