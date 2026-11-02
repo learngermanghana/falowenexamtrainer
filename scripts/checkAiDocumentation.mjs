@@ -50,8 +50,10 @@ const helpDate=help.match(/^Last reviewed:\s*\*\*(\d{1,2} [A-Za-z]+ \d{4})\*\*/m
 if (!llmsDate||!helpDate||Number.isNaN(Date.parse(llmsDate))||Number.isNaN(Date.parse(helpDate))) {
   errors.push("Missing public AI help reviewed dates");
 } else {
-  const l=new Date(llmsDate).toISOString().slice(0,10);
-  const h=new Date(helpDate).toISOString().slice(0,10);
+  // These are calendar dates, not local-midnight instants. Keep the check
+  // stable when the developer's timezone is ahead of UTC.
+  const l=new Date(llmsDate+' UTC').toISOString().slice(0,10);
+  const h=new Date(helpDate+' UTC').toISOString().slice(0,10);
   if (l!==h||l!==nav?.lastReviewed) errors.push("Public AI reviewed date mismatch between llms.txt / help / navigation.json");
 }
 if (!/music\.falowen\.app/.test(llms)||!/falowen-course-map\.json/.test(llms)) errors.push("Public AI discovery missing Music or generated course map");
