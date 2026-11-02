@@ -110,7 +110,14 @@ export const getA1AssignmentByDayAndChapter = (day, chapter = "") => {
   const normalizedChapter = normalizeA1Chapter(chapter);
   const normalizedDay = Number(day);
   if (!Number.isFinite(normalizedDay) || !normalizedChapter) return null;
-  return Object.values(A1_ASSIGNMENT_REGISTRY).find(
+  // Day 2 historical chapter links resolve to the new current assignment.
+  if (normalizedDay === 2 && ["0.2", "1.1"].includes(normalizedChapter)) {
+    return A1_ASSIGNMENT_REGISTRY["A1-0.2-1.1"];
+  }
+  const active = A1_ASSIGNMENT_ORDER.map((key) => A1_ASSIGNMENT_REGISTRY[key]);
+  return active.find(
+    (entry) => Number(entry.day) === normalizedDay && normalizeA1Chapter(entry.chapter) === normalizedChapter,
+  ) || Object.values(A1_ASSIGNMENT_REGISTRY).find(
     (entry) => Number(entry.day) === normalizedDay && normalizeA1Chapter(entry.chapter) === normalizedChapter,
   ) || null;
 };
