@@ -418,15 +418,42 @@ export const B1_MOCK2_READING=Object.freeze({
   }
 });
 export const B1_MOCK2_WRITING_TASKS=Object.freeze([
-  {id:"teil1",title:"Aufgabe 1 · Informelle E-Mail",meta:"20 Minuten · ca. 80 Wörter",target:80,
-    prompt:"Ihr Freund Julian hat Sie zu seiner Geburtstagsparty am nächsten Samstag eingeladen. Sie können aber leider nicht kommen. Schreiben Sie eine E-Mail an Julian.",
-    points:["Bedanken Sie sich für die Einladung.","Sagen Sie ab und begründen Sie, warum Sie nicht kommen können.","Machen Sie einen Vorschlag für ein Treffen an einem anderen Tag. Vergessen Sie nicht Anrede und Grußformel."]},
-  {id:"teil2",title:"Aufgabe 2 · Diskussionsbeitrag",meta:"25 Minuten · ca. 80 Wörter",target:80,
-    prompt:"Thema: „Brauchen wir bargeldloses Bezahlen überall?“ Laura (26 Jahre): „Ich bezahle fast alles nur noch mit Karte oder Smartphone. Das geht viel schneller und man muss nicht ständig zur Bank laufen. Bargeld ist veraltet.“",
-    points:["Äußern Sie Ihre Meinung zum bargeldlosen Bezahlen im Alltag.","Begründen Sie Ihre Haltung.","Nennen Sie persönliche Erfahrungen oder die Situation in Ihrem Heimatland."]},
-  {id:"teil3",title:"Aufgabe 3 · Formelle E-Mail",meta:"15 Minuten · ca. 40 Wörter",target:40,
-    prompt:"Sie nehmen an einem Abendkurs an der Volkshochschule teil. Sie haben gestern Ihren Bibliotheksausweis im Kursraum vergessen. Schreiben Sie eine formelle Nachricht an Frau Sommer, Leiterin des Kundenservice.",
-    points:["Erklären Sie höflich, was Sie vergessen haben und in welchem Raum.","Bitten Sie darum, nach dem Ausweis zu suchen und ihn an der Rezeption zu hinterlegen.","Verwenden Sie die Sie-Form, eine passende Anrede und eine Grußformel."]}
+  {
+    id:"teil1",title:"Aufgabe 1 · Informelle E-Mail",
+    meta:"20 Minuten · circa 80 Wörter",target:80,
+    prompt:"Sie haben vor einer Woche Ihren Geburtstag gefeiert. Ein Freund oder eine Freundin konnte nicht zu Ihrer Feier kommen, weil er oder sie krank war. Schreiben Sie Ihrem Freund oder Ihrer Freundin eine E-Mail (circa 80 Wörter). Schreiben Sie etwas zu allen drei Punkten. Achten Sie auf Anrede, Einleitung, Reihenfolge der Inhaltspunkte und Schluss.",
+    points:[
+      "Beschreiben Sie: Wie war Ihre Geburtstagsfeier?",
+      "Begründen Sie: Welches Geschenk finden Sie besonders toll und warum?",
+      "Machen Sie einen Vorschlag für ein Treffen."
+    ]
+  },
+  {
+    id:"teil2",title:"Aufgabe 2 · Diskussionsbeitrag",
+    meta:"25 Minuten · circa 80 Wörter",target:80,
+    prompt:"Sie haben im Fernsehen eine Diskussionssendung zum Thema „Persönliche Kontakte und Internet“ gesehen. Im Online-Gästebuch schreibt Tanja (15.01., 16:55 Uhr): „Ich finde es schlimm, dass persönliche Treffen immer seltener werden. Freunde wohnen oft sehr weit auseinander. Und da ist man dann schon froh über das Internet. Aber Kontakte im Internet können doch persönliche Treffen nicht ersetzen!“ Schreiben Sie Ihre Meinung dazu in das Online-Gästebuch (circa 80 Wörter).",
+    points:[
+      "Greifen Sie das Thema und Tanjas Meinung kurz auf.",
+      "Sagen Sie, ob Sie Tanja zustimmen, und begründen Sie Ihre Meinung mit einem persönlichen Beispiel.",
+      "Schließen Sie mit einem kurzen Fazit."
+    ]
+  },
+  {
+    id:"teil3",title:"Aufgabe 3 · Formelle E-Mail",
+    meta:"15 Minuten · circa 40 Wörter",target:40,
+    prompt:"Ihre Kursleiterin Frau Müller hat Sie zu einem Gespräch über Ihre persönlichen Lernziele eingeladen. Zu dem Termin können Sie aber nicht kommen. Schreiben Sie an Frau Müller eine kurze formelle E-Mail (circa 40 Wörter). Vergessen Sie die Anrede und den Gruß am Schluss nicht.",
+    points:[
+      "Entschuldigen Sie sich höflich dafür, dass Sie den Termin nicht wahrnehmen können.",
+      "Erklären Sie, warum Sie nicht kommen können.",
+      "Verwenden Sie die Sie-Form, eine passende Anrede und Grußformel."
+    ],
+    rubric:{maxScore:20,criteria:[
+      {label:"Aufgabenerfüllung",maxScore:4},
+      {label:"Kohärenz",maxScore:4},
+      {label:"Wortschatz",maxScore:6},
+      {label:"Grammatische Strukturen",maxScore:6}
+    ]}
+  }
 ]);
 export const B1_MOCK2_SPEAKING=Object.freeze({
   teil1:{id:"teil1",title:"Teil 1 · Gemeinsam etwas planen",
