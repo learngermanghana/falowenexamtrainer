@@ -21,13 +21,13 @@ describe("A1 unified tutor-marked workbook navigation", () => {
   it("resolves every configured tutor-marked workbook from curriculum metadata", () => {
     expect(
       resolveA1UnifiedTutorWorkbookMatch({
-        pathname: "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
+        pathname: "/campus/course/a1-day-2-foundations-workbook",
       }),
     ).toEqual(
       expect.objectContaining({
         level: "A1",
         day: 2,
-        resource: expect.objectContaining({ assignmentKey: "A1-0.2", chapter: "0.2" }),
+        resource: expect.objectContaining({ assignmentKey: "A1-0.2_1.1", chapter: "0.2" }),
       }),
     );
 
