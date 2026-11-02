@@ -899,20 +899,13 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 3,
-      topic: "Personal Pronouns and Verb Conjugation + Introducing Yourself",
-      chapter: "1.1_1.2",
-      goal:
-        "Recap what we have learned so far: be able to introduce yourself in German and know all the pronouns.",
+      topic: "Present-Tense Verb Conjugation and First W-Questions",
+      chapter: "1.2",
+      goal: "Use personal pronouns and conjugated verbs in short statements and simple questions using wie, wo and woher.",
       instruction:
-        "Begin with the practicals at **Schreiben & Sprechen** (writing & speaking). Then, move to **Lesen & Hören** (reading & listening). **Do assignments only at Lesen & Hören.**\n\nSchreiben & Sprechen activities are for self-practice and have answers provided for self-check. Main assignment to be marked is under Lesen & Hören below.",
-      grammar_topic: "Personal Pronouns and Verb Conjugation + Introducing Yourself",
-      schreiben_sprechen: {
-        chapter: "1.1",
-        video: "https://youtu.be/iZDv1rcYWsQ",
-        youtube_link: "https://youtu.be/iZDv1rcYWsQ",
-        workbook_link: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
-        assignment: false,
-      },
+        "Review the Kapitel 1.2 grammar notes, practise the three starter W-words with conjugated verbs, then complete the existing Kapitel 1.2 Lesen, Schreiben and Hören assignment. More W-questions will be taught on Day 5.",
+      grammar_topic: "Present-tense verb forms with starter W-questions (wie, wo, woher)",
+      assignment: true,
       lesen_hören: [
         {
           chapter: "1.2",
@@ -921,10 +914,11 @@ const RAW_COURSE_SCHEDULES = {
           grammarbook_link: "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
           workbook_link: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
           assignment: true,
+          assignmentId: "A1-1.2",
         },
       ],
     },
-    {
+        {
       day: 4,
       topic: "Numbers",
       chapter: "2",
