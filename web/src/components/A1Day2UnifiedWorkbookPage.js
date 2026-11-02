@@ -41,7 +41,7 @@ const MultipleChoice = ({ items }) => (
 export default function A1Day2UnifiedWorkbookPage() {
   return (
     <A1TutorMarkedWorkbookShell
-      fallbackAssignmentKey="A1-0.2-1.1"
+      fallbackAssignmentKey="A1-0.2_1.1"
       title="A1 · Day 2 · Alphabet, Pronouns and First Verbs"
       subtitle="One combined assignment · Five sections · 100 marks"
       assignmentIntro="Complete every section and use Review & Submit once. Each of the five parts is worth 20 marks. Earlier Kapitel 0.2 and 1.1 submissions remain separate historical records."
