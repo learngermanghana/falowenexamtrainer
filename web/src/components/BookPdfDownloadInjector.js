@@ -321,6 +321,38 @@ const WorkbookVideoCard = ({ resource, kind }) => {
   );
 };
 
+// Workbook access is included in a student's course. The shop link is only
+// for an optional complete offline book; it must never gate online exercises.
+export const A2CourseBookOffer = () => (
+  <aside
+    data-a2-course-book-offer="true"
+    aria-label="Complete A2 course book"
+    data-pdf-exclude="a2-course-book-offer"
+    style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
+      padding: 14, border: "1px solid #bfdbfe", borderRadius: 14,
+      background: "#f8fbff", marginTop: 4, flex: "1 1 360px" }}
+  >
+    <img
+      src="/books/a2-cover.svg"
+      alt="Falowen Deutsch A2 Course & Workbook cover"
+      width="54"
+      height="76"
+      loading="lazy"
+      style={{ width: 54, height: 76, objectFit: "contain", borderRadius: 4 }}
+    />
+    <div style={{ display: "grid", gap: 4, flex: "1 1 160px" }}>
+      <strong style={{ color: "#0f172a" }}>Complete A2 Course & Workbook</strong>
+      <span style={{ color: "#475569", fontSize: 12 }}>
+        Optional offline book · All 28 lessons · 328 pages · Digital or printed on demand
+      </span>
+      <a href="/books/deutsch-a2-course-workbook"
+        style={{ color: "#1d4ed8", fontSize: 13, fontWeight: 800, width: "fit-content" }}>
+        View complete A2 book →
+      </a>
+    </div>
+  </aside>
+);
+
 const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
   const { level, day, chapter, title } = context;
   const resources = getLessonVideoResources(level, day);
@@ -365,9 +397,11 @@ const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
       </div>
 
       <div style={actionRowStyle}>
-        <button type="button" style={primaryActionStyle} onClick={onPrint} aria-label="Download or print workbook PDF">
-          Download / Print PDF
-        </button>
+        {level === "A2" ? <A2CourseBookOffer /> : (
+          <button type="button" style={primaryActionStyle} onClick={onPrint} aria-label="Download or print workbook PDF">
+            Download / Print PDF
+          </button>
+        )}
         <button
           type="button"
           style={previousDestination ? inlineButtonStyle : disabledActionStyle}
