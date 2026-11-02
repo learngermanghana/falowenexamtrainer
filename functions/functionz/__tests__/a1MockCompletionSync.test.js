@@ -18,7 +18,7 @@ describe("A1 mock completion Admin + announcement sync", () => {
     },
   };
 
-  test("builds an Admin-visible score row without making the mock certificate-bearing", () => {
+  test("makes the first verified mock count toward A1 completion without auto-sending certificates", () => {
     const artifacts = buildA1MockCompletionArtifacts({
       authedUser: { uid: "uid-1", email: "student@example.com" },
       studentProfile,
@@ -44,13 +44,32 @@ describe("A1 mock completion Admin + announcement sync", () => {
       attempt: 1,
       firstAttempt: true,
       certificateEligible: false,
-      progressionEligible: false,
+      courseRequirementEligible: true,
+      progressionEligible: true,
       strongestArea: "Hören",
       practiseNext: "Schreiben",
       attemptLabel: "First readiness attempt",
       attemptType: "readiness",
     });
     expect(artifacts.scoreDocument.date).toBe("2026-10-04T19:00:00.000Z");
+  });
+
+  test("later mock practice must never replace the required first-attempt result", () => {
+    const attempt = buildA1MockCompletionArtifacts({
+      authedUser: { uid: "uid-1", email: "student@example.com" },
+      studentProfile,
+      attemptId: "attempt-practice-2",
+      attemptNumber: 2,
+      firstAttempt: false,
+      overall: { score: 100, passed: true },
+      sectionScores: { lesen: 25, hoeren: 25, schreiben: 25, sprechen: 25 },
+    });
+    expect(attempt.scoreDocument).toMatchObject({
+      assignmentId: "A1-FINAL-MOCK-PRACTICE-2",
+      courseRequirementEligible: false,
+      certificateEligible: false,
+      progressionEligible: false,
+    });
   });
 
   test("puts the full score summary into a deterministic student announcement", () => {

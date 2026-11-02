@@ -41,6 +41,30 @@ describe("computeCertificateReadiness", () => {
     expect(result.label).toBe("Incomplete");
   });
 
+  it("remains incomplete at 18/19 even if no earlier assignments are missed", () => {
+    const result = computeCertificateReadiness({
+      scoreSummary: {
+        totalAssignments: 19,
+        completedCount: 18,
+        failedAssignments: [],
+        missedAssignments: [],
+        recommendationBlocked: false,
+      },
+    });
+    expect(result.state).toBe("incomplete");
+    expect(result.detail).toMatch(/1 missed item/i);
+  });
+
+  it("returns ready when all 19 results are recorded without failures", () => {
+    const result = computeCertificateReadiness({
+      scoreSummary: {
+        totalAssignments: 19, completedCount: 19, failedAssignments: [],
+        missedAssignments: [], recommendationBlocked: false,
+      },
+    });
+    expect(result.state).toBe("ready");
+  });
+
   it("returns ready when no failed or missed assignments exist", () => {
     const result = computeCertificateReadiness({
       scoreSummary: {

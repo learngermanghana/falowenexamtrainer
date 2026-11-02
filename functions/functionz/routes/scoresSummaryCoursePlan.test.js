@@ -4,17 +4,23 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { getAssignmentSummary, getCanonicalTutorRequirements } = require("./scoresSummaryCoursePlan");
 
-test("A1 split tasks use visible Course Book days and chapters", () => {
+test("A1 Day 2 is one combined assignment and Day 23 is the nineteenth requirement", () => {
   const { lessons, plannedSet } = getAssignmentSummary("A1");
-  const alphabet = lessons.find((item) => item.assignmentId === "A1-0.2");
-  const pronouns = lessons.find((item) => item.assignmentId === "A1-1.1" && item.submissionRequired);
+  const day2 = lessons.filter((item) => item.dayNumber === 2 && item.submissionRequired);
+  assert.equal(day2.length, 1);
+  assert.equal(day2[0].assignmentId, "A1-0.2_1.1");
+  assert.equal(plannedSet.has("A1-0.2"), false);
+  assert.equal(plannedSet.has("A1-1.1"), false);
 
-  assert.equal(alphabet.displayDay, 2);
-  assert.equal(pronouns.displayDay, 2);
-  assert.match(alphabet.label, /^A1 · Day 2 0\.2:/);
-  assert.match(pronouns.label, /^A1 · Day 2 1\.1:/);
-  assert.equal(plannedSet.has("A1-0.2"), true);
-  assert.equal(plannedSet.has("A1-1.1"), true);
+  const health = lessons.find((item) => item.assignmentId === "A1-14.1");
+  assert.equal(health.dayNumber, 22);
+  const mock = lessons.find((item) => item.assignmentId === "A1-FINAL-MOCK");
+  assert.equal(mock.dayNumber, 23);
+  assert.equal(mock.displayChapter, "5.10");
+  assert.equal(mock.assessmentType, "final-mock");
+  assert.equal(mock.submissionRequired, true);
+  assert.equal(plannedSet.has("A1-FINAL-MOCK"), true);
+  assert.equal(plannedSet.size, 19);
 });
 
 test("A2 recommendations are explicitly labelled as A2", () => {
@@ -44,6 +50,10 @@ test("canonical tutor completion requirements match the Course Book totals", () 
   const b1 = getCanonicalTutorRequirements("B1");
 
   assert.equal(a1.length, 19);
+  assert.equal(a1[a1.length - 1].assignmentId, "A1-FINAL-MOCK");
+  assert.equal(a1[a1.length - 1].day, 23);
+  assert.equal(a1.some(x => x.assignmentId === "A1-14.1" && x.day === 22), true);
+  assert.equal(a1.some(x => x.assignmentId === "A1-13.2"), false);
   assert.equal(a2.length, 28);
   assert.equal(b1.length, 28);
   assert.deepEqual(b1.map((item) => item.day), Array.from({ length: 28 }, (_, index) => index + 1));

@@ -100,3 +100,27 @@ test("completed timed lock is not a fabricated Day 19 speaking score", () => {
   expect(progress["A1-12.2"].status).toBe("submitted");
   expect(progress["A1-5.9"]).toBeUndefined();
 });
+
+test("A1 final mock counts only the verified four-part first attempt", () => {
+  const legitimate = {
+    assignmentId: "A1-FINAL-MOCK", level: "A1", source: "a1_final_mock",
+    mockId: "a1-mock-01", firstAttempt: true, attempt: 1, score: 69,
+    scoredModules: ["lesen", "hoeren", "schreiben", "sprechen"],
+  };
+  const first = buildProgressByAssignmentId({ level: "A1", results: [legitimate] });
+  expect(first["A1-FINAL-MOCK"]).toMatchObject({
+    status: "passed", verifiedFinalMockResult: true, hasResult: true,
+  });
+  const unverified = buildProgressByAssignmentId({ level: "A1", results: [
+    { ...legitimate, score: 100, source: "manual_sheet" },
+    { ...legitimate, score: 100, scoredModules: ["lesen", "hoeren"] },
+    { ...legitimate, score: 100, firstAttempt: false, attempt: 2 },
+  ] });
+  expect(unverified["A1-FINAL-MOCK"]).toMatchObject({
+    status: "not_started", verifiedFinalMockResult: false,
+  });
+  const practice = buildProgressByAssignmentId({ level: "A1", results: [
+    { ...legitimate, assignmentId: "A1-FINAL-MOCK-PRACTICE-2", score: 100 },
+  ] });
+  expect(practice["A1-FINAL-MOCK"]).toBeUndefined();
+});

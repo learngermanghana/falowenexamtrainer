@@ -152,9 +152,21 @@ const pickLatest = (rows = [], getMillis) => {
   return sorted[0] || null;
 };
 
+const isVerifiedA1FinalMockResult = (row = {}) => {
+  if (normalizeKey(row.assignmentId || row.assignment_id || row.canonicalAssignmentKey) !== "A1-FINAL-MOCK") return false;
+  if (row.source !== "a1_final_mock" || row.mockId !== "a1-mock-01") return false;
+  if (row.firstAttempt !== true || Number(row.attempt) !== 1) return false;
+  const sections = new Set(Array.isArray(row.scoredModules) ? row.scoredModules : []);
+  if (!["lesen", "hoeren", "schreiben", "sprechen"].every(section => sections.has(section))) return false;
+  const score = toNumber(row.score);
+  return score !== null && score >= 0 && score <= 100;
+};
+
 const buildBucketStatus = ({ assignmentId, submissions = [], results = [] }) => {
   // Replaced coursework: retain the historical workbook score for audit,
   // but evaluate course completion from the new speaking mock when present.
+  const mockResult = normalizeKey(assignmentId) === "A1-FINAL-MOCK";
+  results = mockResult ? results.filter(isVerifiedA1FinalMockResult) : results;
   const preferredResults = ["A2-8.22", "B1-7.23"].includes(normalizeKey(assignmentId))
     && results.some(row => row?.source === "course_speaking_mock")
     ? results.filter(row => row?.source === "course_speaking_mock") : results;
@@ -194,6 +206,7 @@ const buildBucketStatus = ({ assignmentId, submissions = [], results = [] }) => 
     assignmentId,
     assignment_id: assignmentId,
     status,
+    verifiedFinalMockResult: mockResult && scoredResults.length > 0,
     bestScore,
     latestScore,
     passed,

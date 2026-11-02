@@ -4,6 +4,7 @@ const admin = require("firebase-admin");
 
 const { normalizeLevel } = require("../../data/curriculumManifest");
 const { getAssignmentSummary, normalizePracticeKey } = require("./scoresSummaryCoursePlan");
+const { loadVerifiedA1FinalMockScore } = require("./verifiedA1FinalMockRequirement");
 
 // If you're on Node 18+ in Firebase Functions, global fetch exists.
 // If not, uncomment the next line and install node-fetch@2.
@@ -474,6 +475,9 @@ const scoresSummaryHandler = async (req, res) => {
 
       const identifier = resolveIdentifier(row);
       if (!identifier) return;
+      // A1 Final Mock scores are authenticated against Firestore below,
+      // not accepted from an unverified published CSV row.
+      if (level === "A1" && identifier === "A1-FINAL-MOCK") return;
 
       const scoreNum = parseScoreValue(get(row, idx.score));
       if (!Number.isFinite(scoreNum)) return;
@@ -537,7 +541,7 @@ const scoresSummaryHandler = async (req, res) => {
 
         return {
           assignment: assignment || "",
-          identifier,
+          identifier: level === "A1" && identifier === "A1-FINAL-MOCK" ? "" : identifier,
           score: Number.isFinite(scoreNum) ? scoreNum : null,
           dateRaw,
           dateMs,
@@ -551,6 +555,19 @@ const scoresSummaryHandler = async (req, res) => {
         if (!rowLevel) return true;
         return rowLevel === level;
       });
+
+    if (level === "A1") {
+      try {
+        const verifiedMock = await loadVerifiedA1FinalMockScore({
+          db, studentCode, uid: student.uid || decoded?.uid || "",
+        });
+        if (verifiedMock) mine.push(verifiedMock);
+      } catch (error) {
+        // Fail closed: never award the final certificate checkpoint when the
+        // mock verification source is unavailable.
+        console.warn("Could not verify A1 final mock score for course summary", error);
+      }
+    }
 
     const debugRowsForStudent = includeDebug
       ? rows

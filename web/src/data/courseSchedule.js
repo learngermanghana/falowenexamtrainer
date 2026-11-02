@@ -1232,7 +1232,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "A1 Final Mock Exam",
       chapter: "5.10",
       goal: "Complete a full A1 mock exam across Lesen, Hören, Schreiben and Sprechen and identify the areas that still need practice.",
-      instruction: "Start the timed A1 Final Mock Exam. Complete each section in order. Answers and AI feedback are shown only after the full mock is submitted. After the mock, continue in the Falowen Exams Room for focused practice.",
+      instruction: "Required final assessment (19 of 19): complete all four sections of the timed A1 Final Mock Exam (Lesen, Hören, Schreiben and Sprechen). A verified final result counts alongside your 18 regular A1 assignments. Answers and AI feedback are shown only after the full mock is submitted. Your certificate is reviewed only after all requirements are complete.",
       grammar_topic: null,
       assignment: false,
       schreiben_sprechen: {

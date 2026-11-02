@@ -62,7 +62,11 @@ const getCanonicalTutorRequirements = (level = "A1") => {
       }))
   );
 
-  if (normalizedLevel === "A1") return explicitAssignments;
+  if (normalizedLevel === "A1") {
+    // Use the already-published, first-attempt mock score identity. Keep
+    // Day 22 Health as A1-14.1 and ignore later mock practice attempts.
+    return [...explicitAssignments, { day: 23, chapter: "5.10", assignmentId: "A1-FINAL-MOCK" }];
+  }
 
   const byDay = new Map();
   explicitAssignments.forEach((item) => {
@@ -144,8 +148,13 @@ const getAssignmentSummary = (level = "A1") => {
     });
 
   const lessons = entries.map((entry, index) => {
-    const submissionRequired = Boolean(entry.submissionRequired ?? entry.assignment);
-    const assignmentId = normalizePracticeKey(entry.assignment_id || entry.assignmentId || entry.canonicalAssignmentId);
+    // Day 23 uses the verified exam pipeline, not an ordinary tutor workbook.
+    const isRequiredA1FinalMock = normalizedLevel === "A1"
+      && Number(entry.day ?? entry.displayDay) === 23
+      && String(entry.chapter) === "5.10";
+    const submissionRequired = isRequiredA1FinalMock || Boolean(entry.submissionRequired ?? entry.assignment);
+    const assignmentId = isRequiredA1FinalMock ? "A1-FINAL-MOCK"
+      : normalizePracticeKey(entry.assignment_id || entry.assignmentId || entry.canonicalAssignmentId);
     const displayDay = Number(entry.displayDay ?? entry.assignmentDay ?? entry.day ?? 0);
     const displayChapter = String(entry.displayChapter || entry.chapter || "").trim();
     const title = String(entry.topic || entry.title || "Lesson").trim();
@@ -164,6 +173,7 @@ const getAssignmentSummary = (level = "A1") => {
       identifiers: submissionRequired && assignmentId ? [assignmentId] : [],
       submissionRequired,
       selfStudy,
+      assessmentType: isRequiredA1FinalMock ? "final-mock" : submissionRequired ? "tutor-marked" : "practice",
       practiceKeys: selfStudy ? getPracticeKeysForEntry(entry, normalizedLevel) : [],
     };
   });

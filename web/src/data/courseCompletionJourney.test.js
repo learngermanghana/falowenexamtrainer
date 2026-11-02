@@ -15,6 +15,59 @@ describe("canonical course completion engine", () => {
     expect(getCanonicalCourseRequirements("C1")).toHaveLength(COURSE_COMPLETION_TOTALS.C1);
   });
 
+  test("A1 keeps 18 historic workbook identities and adds the separate Day 23 mock as #19", () => {
+    const requirements = getCanonicalCourseRequirements("A1");
+    expect(requirements).toHaveLength(19);
+    expect(requirements[17]).toMatchObject({ assignmentKey: "A1-14.1", day: 22 });
+    expect(requirements[18]).toMatchObject({
+      assignmentKey: "A1-FINAL-MOCK",
+      day: 23,
+      chapter: "5.10",
+      route: "/campus/course/a1-final-mock-exam",
+      kind: "final-mock",
+    });
+    expect(requirements.some(item => item.assignmentKey === "A1-13.2")).toBe(false);
+  });
+
+  test("only the recorded verified final mock result completes the final checkpoint", () => {
+    const required = getCanonicalCourseRequirements("A1");
+    const allRegular = Object.fromEntries(required.slice(0, 18).map(item => [
+      item.assignmentKey, { status: "passed", submitted: true, passed: true, bestScore: 85 },
+    ]));
+    const regularOnly = buildCourseCompletionProgress({ level: "A1", progressByAssignmentId: allRegular });
+    expect(regularOnly.total).toBe(19);
+    expect(regularOnly.completed).toBe(18);
+    expect(regularOnly.courseWorkCompleted).toBe(false);
+    expect(regularOnly.next?.assignmentKey).toBe("A1-FINAL-MOCK");
+
+    const fakeChapter = buildCourseCompletionProgress({
+      level: "A1",
+      progressByAssignmentId: {
+        ...allRegular,
+        "A1-5.10": { status: "passed", passed: true, bestScore: 100, hasResult: true },
+        "A1-FINAL-MOCK-PRACTICE-2": { status: "passed", passed: true, bestScore: 100, hasResult: true },
+        "A1-FINAL-MOCK": { status: "submitted", submitted: true, hasResult: false },
+      },
+    });
+    expect(fakeChapter.completed).toBe(18);
+    expect(fakeChapter.courseWorkCompleted).toBe(false);
+
+    const verified = buildCourseCompletionProgress({
+      level: "A1",
+      progressByAssignmentId: {
+        ...allRegular,
+        "A1-FINAL-MOCK": {
+          status: "passed", passed: true, submitted: true, bestScore: 70,
+          hasResult: true, verifiedFinalMockResult: true,
+        },
+      },
+    });
+    expect(verified.completed).toBe(19);
+    expect(verified.next).toBeNull();
+    expect(verified.courseWorkCompleted).toBe(true);
+    expect(verified.completionPercent).toBe(100);
+  });
+
   test("A1 completion stays completed when marked work needs improvement", () => {
     const requirements = getCanonicalCourseRequirements("A1");
     const progressByAssignmentId = {};

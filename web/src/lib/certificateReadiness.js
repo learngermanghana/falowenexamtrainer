@@ -16,6 +16,14 @@ export const computeCertificateReadiness = ({
   const failedIdentifiers = scoreSummary?.failedIdentifiers || [];
   const blocked = Boolean(scoreSummary?.recommendationBlocked);
   const firstFailed = labelOf(failedAssignments[0]) || failedIdentifiers[0] || "";
+  // Never call a learner certificate-ready solely because nothing is "missed":
+  // the final Day 23 mock cannot be missed until someone has reached it.
+  const required = Number(scoreSummary?.totalAssignments);
+  const completed = Number(scoreSummary?.completedCount);
+  const hasCounts = scoreSummary?.totalAssignments != null
+    && scoreSummary?.completedCount != null
+    && Number.isFinite(required) && required > 0 && Number.isFinite(completed);
+
 
   if (loading) {
     return {
@@ -71,8 +79,8 @@ export const computeCertificateReadiness = ({
     };
   }
 
-  if (missedAssignments.length > 0) {
-    const count = missedAssignments.length;
+  if (missedAssignments.length > 0 || (hasCounts && completed < required)) {
+    const count = Math.max(missedAssignments.length, hasCounts ? required - completed : 0);
     const firstMissed = labelOf(missedAssignments[0]);
     const detail = firstMissed
       ? t("examReadiness.certificate.detailIncompleteWithItem", {

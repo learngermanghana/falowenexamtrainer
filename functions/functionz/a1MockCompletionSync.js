@@ -292,8 +292,12 @@ const buildA1MockCompletionArtifacts = ({
     strongestArea: strongest,
     practiseNext: weakest,
     source: "a1_final_mock",
+    // Only the first, server-verified final mock counts as A1 requirement 19.
+    // This flag alone must never send a certificate: the certificate gate also
+    // needs the other 18 canonical assignments complete and reviewed.
+    courseRequirementEligible: assignmentId === "A1-FINAL-MOCK",
     certificateEligible: false,
-    progressionEligible: false,
+    progressionEligible: assignmentId === "A1-FINAL-MOCK",
   };
 
   const notificationTitle = isKombiMock(mockId) ? `Your A1 Mock ${Number(mockId.slice(-2))} result is ready` : mockId === "a1-mock-03" ? "Your A1 Mock 3 result is ready" : mockId === "a1-mock-02" ? "Your A1 Mock 2 result is ready" : firstAttempt
