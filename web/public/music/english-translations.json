@@ -3312,6 +3312,141 @@
           "en": "but Hamburg suits me a little better."
         }
       ]
+    },
+    {
+      "objectKey": "music/a2/day-01/Ein nettes Gespräch.mp3",
+      "lines": [
+        {
+          "de": "Am Freitagabend gehe ich ins Restaurant,",
+          "en": "On Friday evening I go to the restaurant,"
+        },
+        {
+          "de": "dort treffe ich jemanden, den ich noch nicht gut kannte.",
+          "en": "where I meet someone I didn't know very well yet."
+        },
+        {
+          "de": "Wir begrüßen uns freundlich und setzen uns hin,",
+          "en": "We greet each other warmly and sit down,"
+        },
+        {
+          "de": "ich frage: Wie geht's dir? Wie war dein Tag bisher?",
+          "en": "I ask: How are you? How has your day been so far?"
+        },
+        {
+          "de": "Ein nettes Gespräch, wir lernen uns kennen,",
+          "en": "A nice conversation, we get to know each other,"
+        },
+        {
+          "de": "wir haben viel zu erzählen und lachen zusammen.",
+          "en": "we have a lot to talk about and laugh together."
+        },
+        {
+          "de": "Wir sprechen über das Leben und unsere Freizeit,",
+          "en": "We talk about life and our free time,"
+        },
+        {
+          "de": "die Stunden vergehen, wir vergessen die Zeit.",
+          "en": "the hours pass, and we lose track of time."
+        },
+        {
+          "de": "Sie fragt mich: Was machst du in deiner Freizeit?",
+          "en": "She asks me: What do you do in your free time?"
+        },
+        {
+          "de": "Ich sage: Ich höre Musik und treibe gern Sport.",
+          "en": "I say: I listen to music and enjoy doing sports."
+        },
+        {
+          "de": "Dann frage ich: Wie lange wohnst du schon hier?",
+          "en": "Then I ask: How long have you lived here?"
+        },
+        {
+          "de": "Sie sagt: Seit zwei Jahren, die Stadt gefällt mir.",
+          "en": "She says: Two years, I like the city."
+        },
+        {
+          "de": "Wir bestellen Pizza und etwas zu trinken",
+          "en": "We order pizza and something to drink"
+        },
+        {
+          "de": "und sprechen über Reisen und unsere Familien.",
+          "en": "and talk about travelling and our families."
+        },
+        {
+          "de": "Sie erzählt von ihrem Studium und ihrem Beruf,",
+          "en": "She tells me about her studies and her job,"
+        },
+        {
+          "de": "ich höre ihr zu und erzähle auch von mir.",
+          "en": "I listen to her and tell her about myself too."
+        },
+        {
+          "de": "Ein nettes Gespräch, wir lernen uns kennen,",
+          "en": "A nice conversation, we get to know each other,"
+        },
+        {
+          "de": "wir haben viel zu erzählen und lachen zusammen.",
+          "en": "we have a lot to talk about and laugh together."
+        },
+        {
+          "de": "Wir sprechen über das Leben und unsere Freizeit,",
+          "en": "We talk about life and our free time,"
+        },
+        {
+          "de": "die Stunden vergehen, wir vergessen die Zeit.",
+          "en": "the hours pass, and we lose track of time."
+        },
+        {
+          "de": "Ein schönes Gespräch, wir lernen uns besser kennen,",
+          "en": "A lovely conversation, we get to know each other better,"
+        },
+        {
+          "de": "wir haben so viel Spaß und lachen zusammen.",
+          "en": "we have so much fun and laugh together."
+        },
+        {
+          "de": "Wir reden über das Leben und unsere Freizeit,",
+          "en": "We talk about life and our free time,"
+        },
+        {
+          "de": "die Stunden vergehen, wir genießen die Zeit.",
+          "en": "the hours pass, and we enjoy the time."
+        },
+        {
+          "de": "Wir zahlen und gehen, der Abend ist vorbei.",
+          "en": "We pay and leave; the evening is over."
+        },
+        {
+          "de": "Sie sagt: Es war schön, ich komme gern wieder.",
+          "en": "She says: It was lovely, I'd like to come again."
+        },
+        {
+          "de": "Wir tauschen Nummern und lächeln dabei,",
+          "en": "We exchange numbers and smile as we do,"
+        },
+        {
+          "de": "bis nächste Woche, sagen wir zwei.",
+          "en": "See you next week, we both say."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "kennenlernen",
+          "en": "to get to know someone"
+        },
+        {
+          "de": "die Freizeit",
+          "en": "free time"
+        },
+        {
+          "de": "sich unterhalten",
+          "en": "to have a conversation"
+        },
+        {
+          "de": "Nummern austauschen",
+          "en": "to exchange numbers"
+        }
+      ]
     }
   ],
   "drafts": [
