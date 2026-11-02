@@ -8,8 +8,8 @@ describe("A1 Day 2 archived chapter and merged assignment", () => {
     expect(A1_ASSIGNMENT_ORDER).not.toContain("A1-1.1");
   });
   test("new Day 2 uses one five-section assignment", () => {
-    expect(A1_ASSIGNMENT_ORDER).toContain("A1-0.2-1.1");
-    expect(A1_ASSIGNMENT_REGISTRY["A1-0.2-1.1"].sections.map(s => s.key))
+    expect(A1_ASSIGNMENT_ORDER).toContain("A1-0.2_1.1");
+    expect(A1_ASSIGNMENT_REGISTRY["A1-0.2_1.1"].sections.map(s => s.key))
       .toEqual(["teil-1", "teil-2", "teil-3", "teil-4", "teil-5"]);
   });
 });
