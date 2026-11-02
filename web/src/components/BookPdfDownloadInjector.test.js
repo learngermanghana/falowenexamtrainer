@@ -82,8 +82,7 @@ describe("BookPdfDownloadInjector helpers", () => {
     );
   });
 
-  it("shows teacher-first media, AI revision, PDF and navigation for A2 Day 14", () => {
-    const printSpy = jest.spyOn(window, "print").mockImplementation(() => {});
+  it("keeps A2 Day 14 teacher and AI videos plus navigation, without an individual PDF export", () => {
 
     render(
       <MemoryRouter initialEntries={["/campus/course/a2-day-14-beruf-und-karriere-workbook"]}>
@@ -106,6 +105,19 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(screen.getByRole("button", { name: "← Previous lesson" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Next lesson →" })).toBeEnabled();
 
+    expect(screen.queryByRole("button", { name: "Download or print workbook PDF" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /View complete A2 book/ })).not.toBeInTheDocument();
+    // The bookshop offer belongs only in Supporting Materials to avoid duplicate cards.
+  });
+
+  it("preserves the B1 workbook PDF action while the B1 textbook is being prepared", () => {
+    const printSpy = jest.spyOn(window, "print").mockImplementation(() => {});
+    render(
+      <MemoryRouter initialEntries={["/campus/course/lesson/B1/8?view=workbook"]}>
+        <BookPdfDownloadInjector />
+      </MemoryRouter>
+    );
+    expect(screen.getByLabelText("B1 workbook tools")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Download or print workbook PDF" }));
     expect(printSpy).toHaveBeenCalledTimes(1);
     printSpy.mockRestore();
