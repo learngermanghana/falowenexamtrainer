@@ -58,6 +58,15 @@ export const prepareB1PrintView = () => {
     swap(el);
   }
 
+  // Shared B1 workbooks render an online-only <details> accordion whose
+  // summary is "Day N · B1 workbook · how to complete this workbook".
+  // The closed summary survived the generic paragraph scrub in earlier proofs.
+  for (const details of [...root.querySelectorAll("details")]) {
+    const label = normalize(details.querySelector(":scope > summary")?.textContent);
+    if (/^Day\\s*\\d+\\s*[·•-]\\s*B1 workbook\\s*[·•-]\\s*how to complete this workbook$/i.test(label))
+      swap(details);
+  }
+
   // The Course Book contains several 'next lesson' and workbook-link cards.
   // Require both labels to avoid removing a paragraph that teaches navigation.
   const cards = [...root.querySelectorAll("div,section,article,aside")].filter(el => {
