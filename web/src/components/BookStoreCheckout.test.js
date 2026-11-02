@@ -71,8 +71,10 @@ test("A2 printed edition uses the published unit price, quantity and address fie
  });
 });
 
-test("digital checkout restricts quantity to one and hides delivery address",async()=>{
+test("A1 digital checkout shows flat GH₵100, restricts quantity and hides delivery address",async()=>{
+ window.history.replaceState({},"","/books/deutsch-a1-course-workbook/checkout?edition=a1-digital");
  render(<BookStoreCheckout checkout/>);await screen.findByLabelText("Quantity");
+ expect(screen.getByRole("button",{name:"Continue to Paystack · GH₵100.00"})).toBeEnabled();
  expect(screen.getByLabelText("Quantity")).toBeDisabled();
  expect(screen.queryByLabelText("Collection or delivery")).toBeNull();
 });
