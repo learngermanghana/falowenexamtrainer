@@ -346,9 +346,9 @@ export const buildCourseCompletionProgress = ({
         // A draft, a partial exam, or an unverified "submitted" flag cannot
         // unlock completion. The result is created after all four exam parts
         // have been scored and stored by the server.
-        const isVerifiedResult = record?.hasResult === true
-          && Number.isFinite(Number(record.bestScore ?? record.latestScore))
-          && (record.bestScore !== null || record.latestScore !== null);
+        const isVerifiedResult = record?.verifiedFinalMockResult === true
+          && record?.hasResult === true
+          && Number.isFinite(Number(record.bestScore ?? record.latestScore));
         return {
           requirement,
           ...tutorRequirementState(isVerifiedResult ? record : null),
