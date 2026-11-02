@@ -14,6 +14,7 @@ import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2P
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent } from "./b1PdfPrintExtras.mjs";
 import { addB1RetailCover } from "./b1RetailCover.mjs";
+import { getB1PrintablePageIndices } from "./b1PdfOrphanPages.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -649,7 +650,8 @@ const addLegacyContents = async (output, printableLessons) => {
 
 const appendPdfFile = async (output, file) => {
   const source = await PDFDocument.load(fs.readFileSync(file));
-  const pages = await output.copyPages(source, source.getPageIndices());
+  const indices = level === "B1" ? await getB1PrintablePageIndices(file) : source.getPageIndices();
+  const pages = await output.copyPages(source, indices);
   pages.forEach((page) => output.addPage(page));
 };
 
