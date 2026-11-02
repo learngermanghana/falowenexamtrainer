@@ -45,8 +45,8 @@ test("new A2 book is discoverable with the correct private digital edition",asyn
  );
  expect(screen.getByText("GH₵99.00")).toBeInTheDocument();
  expect(screen.getByText(/Audio is accessed through Falowen/)).toBeInTheDocument();
- expect(screen.getByRole("radio",{name:/Printed book/})).toBeInTheDocument();
- const printed=screen.getByRole("radio",{name:/Printed book/});
+ expect(screen.getByRole("radio",{name:/Printed on demand/})).toBeInTheDocument();
+ const printed=screen.getByRole("radio",{name:/Printed on demand/});
  printed.click();
  expect(screen.getByText("GH₵1050.00")).toBeInTheDocument();
  expect(screen.getByRole("link",{name:"Buy Now"})).toHaveAttribute(
