@@ -2611,7 +2611,7 @@ const a2MockSpeakingScorePrompt = ({ attempts = [], mockId = "a2-mock-01" }) => 
   ].join("\n");
 };
 
-const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
+const b1MockSpeakingScorePrompt = ({ attempts = [], mockId="b1-mock-01" }) => {
   const safeAttempts = attempts.map((attempt) => ({
     id: String(attempt?.id || "").trim(),
     teil: String(attempt?.teil || "").trim(),
@@ -2670,7 +2670,11 @@ const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
       }
     }),
     "",
-    mockTaskPrompt("B1", "speaking"),
+    mockId==="b1-mock-02" ? [
+      "MOCK 02 SPEAKING TASK 1: Plan a surprise celebration for class colleague Frau Keller on her tenth work anniversary. Agree on when, where, guests (learners and teachers), present and budget, food, drinks, decorations and responsibilities.",
+      "MOCK 02 TASK 2: The student chooses ONE of: A Should we buy more organic food in daily life? B Travel alone or with a group? Introduce topic, own experience, home-country situation, advantages/disadvantages and opinion, closing.",
+      "MOCK 02 TASK 3: Give feedback on partner presentation, ask a topical follow-up question, answer the partner's question about own presentation."
+    ].join("\\n") : mockTaskPrompt("B1", "speaking"),
     "Student attempts (client task descriptions are not authoritative; match each id/Teil to the task data above):",
     JSON.stringify(safeAttempts),
   ].join("\n");
@@ -2860,7 +2864,7 @@ const b2MockWritingScorePrompt = ({ teil1 = "", teil2 = "" }) => [
   `Teil 2 formelle Nachricht:\n${String(teil2 || "").trim()}`,
 ].join("\n");
 
-const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "" }) => [
+const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "", mockId="b1-mock-01" }) => [
   "You are a strict Goethe-style B1 writing examiner for a Falowen final mock exam.",
   "Assess the learner's three German writing responses exactly as submitted. Never invent missing content.",
   "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
@@ -2875,8 +2879,13 @@ const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "" }) => [
   "",
   "AUFGABE 3 — formal email, 5 points; use the canonical word target.",
   "Use formal address/register and an appropriate closing.",
+  "For MOCK 02, report required_points_met as three booleans per part following the ordered points below. Do not penalise reasonable differences of opinion. In Teil 3, evaluate the four criterion weights 4/4/6/6 and scale their sum by 1/4 to the 5-point Falowen part score.",
   "",
-  mockTaskPrompt("B1", "writing"),
+  mockId==="b1-mock-02" ? [
+    "MOCK 02 TASK 1: Informal email to a friend who was too ill to attend the learner's birthday party a week ago. Exactly THREE required points, in this order: (1) describe how the birthday celebration went; (2) say which gift was especially great and why; (3) propose meeting the friend. Include an informal salutation and closing. Target circa 80 words. Do NOT judge against the old Julian invitation scenario.",
+    "MOCK 02 TASK 2: Online guestbook entry responding to Tanja (15.01., 16:55) on Persönliche Kontakte und Internet. She believes online contact is useful for distant friends but cannot replace in-person meetings. Exactly THREE required points: (1) refer to her opinion and the subject; (2) state the learner's own view and justify it with an example or everyday experience; (3) end with a brief conclusion. The learner may agree OR disagree; neither viewpoint is automatically more correct. Target circa 80 words. Do NOT judge against the old cashless payment scenario.",
+    "MOCK 02 TASK 3: Brief formal email to Kursleiterin Frau Müller. The learner was invited to a meeting about personal learning goals but cannot attend. Exactly THREE required points: (1) apologise politely for missing the meeting; (2) explain why they cannot attend; (3) use polite Sie-register with appropriate salutation and sign-off. A replacement meeting proposal is optional, not compulsory. Target circa 40 words. Assess diagnostic criteria on a 20-point scale: task fulfilment 0–4, cohesion 0–4, vocabulary 0–6, grammatical structures 0–6; report the four criterion marks as teil3.rubric_scores and report normalized teil3.score out of 5 for Falowen's /25 mock writing score. Do NOT judge against the old lost library card scenario."
+  ].join("\\n") : mockTaskPrompt("B1", "writing"),
   "Return JSON only, no markdown, using this shape:",
   JSON.stringify({
     score: 0,
@@ -2899,6 +2908,7 @@ const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "" }) => [
       },
       teil3: {
         score: 0, maxScore: 5,
+        rubric_scores: { task_fulfilment: 0, cohesion: 0, vocabulary: 0, grammar: 0 },
         required_points_met: [false, false, false],
         feedback_en: "English feedback.",
         corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
@@ -4790,6 +4800,8 @@ app.post("/writing/a2-mock-score", async (req, res) => {
   }
 });
 
+const {validateB1Mock2Teil3Rubric,normalizedB1Mock2Teil3Score}=require("./b1Mock2WritingRubric");
+
 app.post("/writing/b1-mock-score", async (req, res) => {
   let authedUser;
   let pendingQuotaDate = "";
@@ -4811,6 +4823,8 @@ app.post("/writing/b1-mock-score", async (req, res) => {
     const teil2 = String(req.body?.teil2 || "").trim().slice(0, 8000);
     const teil3 = String(req.body?.teil3 || "").trim().slice(0, 6000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    const mockId=String(req.body?.mockId || "b1-mock-01");
+    if (!["b1-mock-01","b1-mock-02"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
 
     let result;
     if (!teil1 && !teil2 && !teil3) {
@@ -4844,11 +4858,15 @@ app.post("/writing/b1-mock-score", async (req, res) => {
 
       const reply = await createMockAssessment(
         [
-          { role: "system", content: b1MockWritingScorePrompt({ teil1, teil2, teil3 }) },
+          { role: "system", content: b1MockWritingScorePrompt({ teil1, teil2, teil3, mockId }) },
           { role: "user", content: "Return the strict B1 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
-        { partKeys: ["teil1", "teil2", "teil3"], pointCounts: { teil1: 3, teil2: 3, teil3: 3 } },
+        {
+           partKeys: ["teil1", "teil2", "teil3"],
+           pointCounts: { teil1: 3, teil2: 3, teil3: 3 },
+           validateResult: mockId !== "b1-mock-02" ? undefined : validateB1Mock2Teil3Rubric,
+         },
       );
       const cleanedReply = String(reply || "")
         .trim()
@@ -4872,7 +4890,11 @@ app.post("/writing/b1-mock-score", async (req, res) => {
         const flags = [0, 1, 2].map((index) => rawFlags[index] === true);
         const missing = flags.filter((value) => !value).length;
         const missingCaps = maxScore === 5 ? [4, 2, 0.5] : [7, 4, 1];
-        const rawScore = Math.max(0, Math.min(maxScore, Number(part.score) || 0));
+        const rubric=mockId==="b1-mock-02" && key==="teil3" ? part.rubric_scores : null;
+        const rubricScore=rubric
+          ? normalizedB1Mock2Teil3Score(rubric)
+          : Number(part.score);
+        const rawScore = Math.max(0, Math.min(maxScore, rubricScore || 0));
         const cappedScore = missing ? Math.min(rawScore, missingCaps[Math.min(missing, 3) - 1]) : rawScore;
         result.parts = result.parts || {};
         result.parts[key] = {
@@ -4907,6 +4929,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
           admin,
           uid: authedUser.uid,
           attemptId,
+          mockId,
           section: "schreiben",
           score: Number(result?.score || 0),
           source: "/writing/b1-mock-score",
@@ -6058,7 +6081,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "b1-mock-01").trim().slice(0, 80);
-    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+    if (!["b1-mock-01","b1-mock-02"].includes(mockId)) return res.status(400).json({ error: "Unsupported B1 mockId" });
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -6071,7 +6094,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
       const userSnap = await tx.get(userRef);
       const userData = userSnap.exists ? userSnap.data() || {} : {};
 
-      const activeAttemptId = String(userData.activeAttemptId || "").trim();
+      const activeAttemptId = String((mockId==="b1-mock-02" ? userData.activeAttemptIdMock2 : userData.activeAttemptId) || "").trim();
       if (activeAttemptId) {
         const activeRef = userRef.collection("attempts").doc(activeAttemptId);
         const activeSnap = await tx.get(activeRef);
@@ -6090,7 +6113,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
+      const attemptCount = Math.max(0, Number((mockId==="b1-mock-02" ? userData.attemptCountMock2 : userData.attemptCount) || 0));
       const attemptNumber = attemptCount + 1;
       const now = admin.firestore.FieldValue.serverTimestamp();
 
@@ -6099,8 +6122,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
         {
           uid: authedUser.uid,
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
-          attemptCount: attemptNumber,
-          activeAttemptId: newAttemptRef.id,
+          ...(mockId==="b1-mock-02" ? {attemptCountMock2:attemptNumber,activeAttemptIdMock2:newAttemptRef.id} : {attemptCount:attemptNumber,activeAttemptId:newAttemptRef.id}),
           updatedAt: now,
         },
         { merge: true },
@@ -6189,6 +6211,10 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
       }
 
       const userData = userSnap.exists ? userSnap.data() || {} : {};
+      if (!["b1-mock-01","b1-mock-02"].includes(existing.mockId) || state.mockId !== existing.mockId) {
+        saveOutcome = {forbidden:true}; return;
+      }
+      const activeField=existing.mockId==="b1-mock-02" ? "activeAttemptIdMock2" : "activeAttemptId";
 
       // Completion is monotonic, but a completed record is only publishable when
       // all four section scores can be reconstructed from server-trusted data.
@@ -6197,7 +6223,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
         try {
           verifiedCompletion = buildVerifiedB1MockScore({
             state: existing.state || {},
-            verifiedSections: existing.verifiedSections || {},
+            verifiedSections: existing.verifiedSections || {},mockId:existing.mockId,
           });
         } catch (verificationError) {
           saveOutcome = {
@@ -6228,8 +6254,8 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
           lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
           updatedAt: now,
         };
-        if (String(userData.activeAttemptId || "") === attemptId) {
-          completedUserPatch.activeAttemptId = null;
+        if (String(userData[activeField] || "") === attemptId) {
+          completedUserPatch[activeField] = null;
         }
         tx.set(userRef, completedUserPatch, { merge: true });
         saveOutcome = {
@@ -6246,7 +6272,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
         try {
           verifiedCompletion = buildVerifiedB1MockScore({
             state,
-            verifiedSections: existing.verifiedSections || {},
+            verifiedSections: existing.verifiedSections || {},mockId:existing.mockId,
           });
         } catch (verificationError) {
           tx.set(
@@ -6294,10 +6320,10 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
           updatedAt: now,
         };
         if (
-          !userData.activeAttemptId ||
-          String(userData.activeAttemptId) === attemptId
+          !userData[activeField] ||
+          String(userData[activeField]) === attemptId
         ) {
-          completedUserPatch.activeAttemptId = null;
+          completedUserPatch[activeField] = null;
         }
         tx.set(userRef, completedUserPatch, { merge: true });
         saveOutcome = { ok: true, attemptId, status: "completed" };
@@ -6330,10 +6356,10 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
 
       const progressUserPatch = { updatedAt: now };
       if (
-        !userData.activeAttemptId ||
-        String(userData.activeAttemptId) === attemptId
+        !userData[activeField] ||
+        String(userData[activeField]) === attemptId
       ) {
-        progressUserPatch.activeAttemptId = attemptId;
+        progressUserPatch[activeField] = attemptId;
       }
       tx.set(userRef, progressUserPatch, { merge: true });
       saveOutcome = { ok: true, attemptId, status: "in_progress" };
@@ -6383,11 +6409,15 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: verifiedOverall,
           sectionScores: verifiedSectionScores,
+          mockId:attemptData.mockId,
           now:
             typeof attemptData.completedAt?.toDate === "function"
               ? attemptData.completedAt.toDate()
               : new Date(),
         });
+
+        completionSync.verifiedOverall = verifiedOverall;
+        completionSync.verifiedSectionScores = verifiedSectionScores;
 
         await attemptRef.set(
           {
@@ -6428,6 +6458,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
     return res.json({
       ...(saveOutcome || { ok: true, attemptId, status }),
       ...(completionSync ? { completionSync } : {}),
+      ...(completionSync?.ok ? {verifiedOverall:completionSync.verifiedOverall,verifiedSectionScores:completionSync.verifiedSectionScores} : {}),
     });
   } catch (err) {
     console.error("/b1-mock/attempt/save error", err);
@@ -6974,6 +7005,36 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
 
     const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    const mockId=String(req.body?.mockId || "b1-mock-01");
+    if (!["b1-mock-01","b1-mock-02"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
+    if (Object.prototype.hasOwnProperty.call(req.body || {}, "examinerSessionIds")) {
+      // Same immutable-snapshot verification used by A2. Never charge for
+      // a second AI grading pass; the examiner has already marked each Teil.
+      const db=getFirestoreSafe();
+      if (!db) return res.status(503).json({error:"B1 mock storage is unavailable."});
+      try {
+        const {scoreB1ExaminerSnapshots}=require("./b1MockExaminerScore");
+        const result=await scoreB1ExaminerSnapshots({
+          db,uid:authedUser.uid,attemptId,mockId,sessionIds:req.body.examinerSessionIds,
+        });
+        await persistVerifiedB1MockSection({
+          db,admin,uid:authedUser.uid,attemptId,mockId,section:"sprechen",
+          score:result.score,source:"/speaking/b1-mock-score:verified-examiner",
+        });
+        res.set("Cache-Control","private, no-store");
+        return res.json({result,saved:true,verified:true});
+      } catch(err) {
+        return res.status(err?.status || (err?.code==="B1_MOCK_ALREADY_COMPLETED" ? 409 : 503))
+          .json({code:err?.code || "B1_MOCK_EXAMINER_VERIFY_FAILED",
+            error:err?.message || "Could not verify your saved B1 speaking parts. Retry verification."});
+      }
+    }
+    // Mock 2 requires real examiner receipts, not unbound user-supplied
+    // transcripts. Mock 1 retains its legacy recorder scoring for saved work.
+    if (mockId==="b1-mock-02") return res.status(400).json({
+      code:"B1_MOCK_EXAMINER_REQUIRED",
+      error:"Use the three saved AI examiner sessions for B1 Mock 2.",
+    });
     if (attempts.length !== 3) {
       return res.status(400).json({ error: "Three speaking responses are required for the complete B1 mock." });
     }
@@ -7009,7 +7070,7 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
 
     const reply = await createMockAssessment(
       [
-        { role: "system", content: b1MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+        { role: "system", content: b1MockSpeakingScorePrompt({ attempts: normalizedAttempts, mockId }) },
         { role: "user", content: "Return the final B1 mock speaking assessment as the required JSON object." },
       ],
       { temperature: 0.1, max_tokens: 1100 },
@@ -7056,6 +7117,7 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
           admin,
           uid: authedUser.uid,
           attemptId,
+          mockId,
           section: "sprechen",
           score: result.score,
           source: "/speaking/b1-mock-score",

@@ -19,7 +19,6 @@ import "./A2GoetheSpeakingMockTeil1Preview.css";
 import "./A2GoetheSpeakingMockTeil2Preview.css";
 import "./A2GoetheSpeakingMockTeil3Preview.css";
 
-const TASKS = [B1_SPEAKING.teil1, B1_SPEAKING.teil2, B1_SPEAKING.teil3];
 
 const formatTime = (seconds) => {
   const safe = Math.max(0, Number(seconds) || 0);
@@ -66,10 +65,14 @@ export default function B1FinalMockSpeaking({
   initialAttempts = {},
   initialResult = null,
   attemptId = "",
+  mockId = "b1-mock-01",
+  speakingData = B1_SPEAKING,
   onProgress,
   onComplete,
 }) {
   const { idToken, user } = useAuth();
+  const TASKS = [speakingData.teil1, speakingData.teil2, speakingData.teil3];
+  const [chosenTopic,setChosenTopic]=useState("a");
   const [attempts, setAttempts] = useState(() =>
     Object.fromEntries(
       Object.entries(initialAttempts || {}).map(([key, attempt]) => [
@@ -86,7 +89,7 @@ export default function B1FinalMockSpeaking({
   const [result, setResult] = useState(initialResult);
   const [partnerAudioUrl, setPartnerAudioUrl] = useState("");
   const [partnerAudioLoading, setPartnerAudioLoading] = useState(false);
-  const [prepSeconds, setPrepSeconds] = useState(Number(B1_SPEAKING.teil2.prepSeconds || 300));
+  const [prepSeconds, setPrepSeconds] = useState(Number(speakingData.teil2.prepSeconds || 300));
   const [prepRunning, setPrepRunning] = useState(false);
 
   const recorderRef = useRef(null);
@@ -198,10 +201,11 @@ export default function B1FinalMockSpeaking({
     if (partnerAudioUrl) return partnerAudioUrl;
     setPartnerAudioLoading(true);
     try {
+      if (!speakingData.teil1.audioObjectKey) return "";
       const response = await fetchB1MockAudioPlaybackUrl({
-        mockId: "mock-01",
+        mockId: mockId==="b1-mock-02" ? "mock-02" : "mock-01",
         part: "sprechen-teil-1",
-        key: B1_SPEAKING.teil1.audioObjectKey,
+        key: speakingData.teil1.audioObjectKey,
         idToken,
       });
       setPartnerAudioUrl(response.url);
@@ -219,7 +223,7 @@ export default function B1FinalMockSpeaking({
     recordingSecondsRef.current = 0;
 
     try {
-      const partnerUrl = playPartner ? await preparePartnerAudio() : "";
+      const partnerUrl = playPartner && speakingData.teil1.audioObjectKey ? await preparePartnerAudio() : "";
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -382,12 +386,13 @@ export default function B1FinalMockSpeaking({
         attempts: TASKS.map((task) => ({
           id: task.id,
           teil: task.id.replace("teil", ""),
-          task: taskPrompt(task),
+          task: taskPrompt(task.id==="teil2" && chosenTopic==="b" && task.alternativeTopic ? {...task,topic:task.alternativeTopic} : task),
           transcript: attemptsRef.current[task.id]?.transcript || "",
           analysisFeedback: attemptsRef.current[task.id]?.analysisFeedback || "",
         })),
         attemptId,
         idToken,
+        mockId,
       });
       setResult(assessment);
       setStatus("Speaking result ready.");
@@ -398,7 +403,7 @@ export default function B1FinalMockSpeaking({
     } finally {
       setMarking(false);
     }
-  }, [attemptId, completedCount, idToken, marking, onComplete, result]);
+  }, [attemptId, completedCount, idToken, marking, onComplete, result, mockId, chosenTopic]);
 
   useEffect(() => {
     if (secondsLeft > 0 || result || marking || timeoutMarkTriggeredRef.current) return;
@@ -477,7 +482,7 @@ export default function B1FinalMockSpeaking({
             <div className="a1-sprechen-prompt">
               {task.id === "teil1" ? (
                 <>
-                  <strong>Überraschungsparty planen</strong>
+                  <strong>{mockId==="b1-mock-02" ? "Frau Kellers Firmenjubiläum planen" : "Überraschungsparty planen"}</strong>
                   <p>{task.situation}</p>
                   <div className="a2-sprechen-t1-cards">{task.points.map((point) => <strong key={point}>{point}</strong>)}</div>
                   <p>{task.instruction}</p>
@@ -487,7 +492,12 @@ export default function B1FinalMockSpeaking({
               {task.id === "teil2" ? (
                 <>
                   <strong>Thema A</strong>
-                  <h3>{task.topic}</h3>
+                  {task.alternativeTopic ? <fieldset aria-label="Präsentationsthema wählen">
+                    <legend>Wählen Sie ein Thema</legend>
+                    <label><input type="radio" name="b1-mock2-topic" checked={chosenTopic==="a"} onChange={()=>setChosenTopic("a")} disabled={Boolean(attempt.submitted)}/> Thema A: {task.topic}</label>
+                    <label><input type="radio" name="b1-mock2-topic" checked={chosenTopic==="b"} onChange={()=>setChosenTopic("b")} disabled={Boolean(attempt.submitted)}/> Thema B: {task.alternativeTopic}</label>
+                  </fieldset> : null}
+                  <h3>{chosenTopic==="b" && task.alternativeTopic ? task.alternativeTopic : task.topic}</h3>
                   <ul>{task.points.map((point) => <li key={point}>{point}</li>)}</ul>
                   <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                     <strong>Vorbereitung: {formatTime(prepSeconds)}</strong>
@@ -521,7 +531,7 @@ export default function B1FinalMockSpeaking({
                   <button
                     type="button"
                     className={active ? "a1-sprechen-record a1-sprechen-recording" : "a1-sprechen-record"}
-                    onClick={() => active ? stopRecording() : startRecorder(task, { playPartner: task.id === "teil1" })}
+                    onClick={() => active ? stopRecording() : startRecorder(task, { playPartner: task.id === "teil1" && mockId === "b1-mock-01" })}
                     disabled={
                       Boolean(recordingTaskId && !active) ||
                       attempt.submitted ||
@@ -535,7 +545,7 @@ export default function B1FinalMockSpeaking({
                       : partnerAudioLoading
                         ? "Preparing partner audio …"
                         : task.id === "teil1"
-                          ? "Start conversation + recording"
+                          ? (mockId==="b1-mock-02" ? "Start planning recording" : "Start conversation + recording")
                           : attempt.audioBlob
                             ? "Record again"
                             : "Record answer"}
