@@ -669,10 +669,11 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
 
           <ReadingPart title="Teil 1" time="10 Minuten">
             <p>{reading.teil1.intro}</p>
+            {reading.teil1.accommodationNote ? <p className="b1-final-small-note">{reading.teil1.accommodationNote}</p> : null}
             <div className="b1-final-reading-text">
               <h3>{reading.teil1.heading}</h3>
-              <em>{reading.teil1.subheading}</em>
-              <strong>{reading.teil1.date}</strong>
+              {reading.teil1.subheading ? <em>{reading.teil1.subheading}</em> : null}
+              {reading.teil1.date ? <strong>{reading.teil1.date}</strong> : null}
               {reading.teil1.paragraphs.map((p) => <p key={p}>{p}</p>)}
               {!isSecond?<p>Bis bald,<br /><em>eure Susanne</em></p>:null}
             </div>
@@ -690,6 +691,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
           </ReadingPart>
 
           <ReadingPart title="Teil 2 · Text 1" time="20 Minuten · gesamter Teil 2">
+            {reading.teil2.intro ? <p>{reading.teil2.intro}</p> : null}
             <div className="b1-final-press-text">
               <small>Text aus der Presse</small>
               <h3>{reading.teil2.heading}</h3>
