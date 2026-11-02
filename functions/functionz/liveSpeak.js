@@ -350,9 +350,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (examTask.id.startsWith("b1-mock-02-")) {
           const part=examTask.id.match(/teil-([123])$/)?.[1];
           const prompt=examTask.prompt;
-          const matches=part==="1" ? prompt.includes("Frau Keller") && prompt.includes("Firmenjubiläum")
-            : part==="2" ? /Bio-Produkte|Verreisen: Lieber alleine/.test(prompt)
-            : /Feedback/.test(prompt) && /Präsentation/.test(prompt);
+          const matches=part==="1" ? prompt.includes("interkulturelles Nachbarschaftsfest") && prompt.includes("Integration")
+            : part==="2" ? /Sprach- und Integrationskurse|Sport- und Kulturvereine/.test(prompt)
+            : /Feedback/.test(prompt) && /Präsentation/.test(prompt) && /Sprach- und Integrationskurse|Sport- und Kulturvereine/.test(prompt);
           if (!matches) return error(res,400,"invalid_mock_task","Use the assigned B1 Mock 2 speaking task.");
         }
         // A full B1 mock cannot start an unbound or cross-mock speaking
