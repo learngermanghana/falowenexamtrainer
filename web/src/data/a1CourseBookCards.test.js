@@ -28,8 +28,8 @@ describe("authoritative A1 course-book cards", () => {
     expect(chapter122).toBeNull();
   });
 
-  it("replaces the retired 12.2 slot with the required speaking lab and keeps 19 assignments", () => {
-    expect(A1_COURSE_BOOK_CARDS.filter(card => card.submissionRequired)).toHaveLength(19);
+  it("replaces the retired 12.2 slot with the required speaking lab and keeps 18 assignments", () => {
+    expect(A1_COURSE_BOOK_CARDS.filter(card => card.submissionRequired)).toHaveLength(18);
     expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-5.9" })).toMatchObject({ assignment_id: "A1-5.9", submissionRequired: true });
   });
 });
