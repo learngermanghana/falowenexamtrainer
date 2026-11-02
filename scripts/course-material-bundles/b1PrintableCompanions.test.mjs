@@ -49,11 +49,15 @@ test("B1 print companions reject missing or unsupported sources rather than inve
 });
 
 test("B1 later-course canonical reading and listening material remains accessible for printing", async () => {
-  for (const day of [19, 20, 21, 22, 24, 25, 26, 27, 28]) {
+  for (const day of [19, 20, 21, 22, 23, 24, 25, 26, 27, 28]) {
     const parts = await getB1ReadOnlyParts(day);
     assert.ok(parts.includes("teil-3"), "Day " + day + " is missing reading source");
-    const read = await buildB1ReadOnlyPrintHtml({ day, part: "teil-3" });
+    const read = await buildB1ReadOnlyPrintHtml({ day, part: "teil-3",
+      lessonUrl: getB1PdfLessonCompanionUrl("/campus/course/lesson/B1/" + day),
+      audioQrDataUrl: "data:image/png;base64,AA" });
     assert.ok(read.includes("Teil 3 · Lesen"));
+    if ([19, 20, 22].includes(day)) assert.match(read, /nur online verfügbar/);
+    else assert.doesNotMatch(read, /data-b1-pdf-online-only/);
     if (parts.includes("teil-4")) {
       const listen = await buildB1ReadOnlyPrintHtml({
         day, part: "teil-4",
