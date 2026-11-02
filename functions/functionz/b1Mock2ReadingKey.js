@@ -1,15 +1,41 @@
 "use strict";
 // Private teacher-approved key for B1 Mock 02 Lesen, Aufgaben 1–30.
 // Aufgaben 1–12: Integration, SprachPaten, Stadtteil-Treffs (teacher update 2026-11-02).
+// Private teacher-approved B1 Mock 02 Lesen solutions and explanations, Aufgaben 1–30 (2026-11-02).
 const B1_MOCK2_READING_KEY = Object.freeze({
-  "t1-1":"richtig","t1-2":"richtig","t1-3":"falsch","t1-4":"falsch","t1-5":"richtig","t1-6":"richtig",
-  "t2-7":"b","t2-8":"a","t2-9":"c","t2-10":"b","t2-11":"a","t2-12":"b",
-  "t3-13":"c","t3-14":"f","t3-15":"0","t3-16":"d","t3-17":"a","t3-18":"b","t3-19":"h",
-  "t4-20":"nein","t4-21":"ja","t4-22":"nein","t4-23":"ja","t4-24":"nein","t4-25":"ja","t4-26":"nein",
-  "t5-27":"b","t5-28":"b","t5-29":"a","t5-30":"b",
+  "t1-1": "richtig",
+  "t1-2": "richtig",
+  "t1-3": "falsch",
+  "t1-4": "falsch",
+  "t1-5": "richtig",
+  "t1-6": "richtig",
+  "t2-7": "b",
+  "t2-8": "a",
+  "t2-9": "c",
+  "t2-10": "b",
+  "t2-11": "a",
+  "t2-12": "b",
+  "t3-13": "a",
+  "t3-14": "b",
+  "t3-15": "c",
+  "t3-16": "d",
+  "t3-17": "x",
+  "t4-18": "ja",
+  "t4-19": "nein",
+  "t4-20": "ja",
+  "t4-21": "nein",
+  "t4-22": "ja",
+  "t4-23": "nein",
+  "t4-24": "ja",
+  "t5-25": "b",
+  "t5-26": "a",
+  "t5-27": "c",
+  "t5-28": "b",
+  "t5-29": "b",
+  "t5-30": "a"
 });
-// Teacher-only feedback explanations for Aufgaben 1–12; do not import in the browser.
-const B1_MOCK2_READING_EXPLANATIONS=Object.freeze({
+// Teacher-only reasoning; do not import into browser bundles.
+const B1_MOCK2_READING_EXPLANATIONS = Object.freeze({
   "t1-1": "Sprachkenntnisse erleichtern soziale Kontakte und die Arbeitssuche.",
   "t1-2": "Bezahlbare Sprachkurse helfen bei Behördengängen und im Beruf ohne fremde Hilfe.",
   "t1-3": "Vereine und Begegnungsprojekte bringen Menschen verschiedener Herkunft zusammen und bauen Vorurteile ab.",
@@ -21,6 +47,24 @@ const B1_MOCK2_READING_EXPLANATIONS=Object.freeze({
   "t2-9": "Das Projekt richtet sich an Menschen mit ersten Grundkenntnissen; die Teilnahme ist kostenlos.",
   "t2-10": "Die Stadtteil-Treffs stärken das Miteinander aller Nachbarn und neu zugezogenen Familien.",
   "t2-11": "Einmal monatlich kochen Anwohner Gerichte aus ihren verschiedenen Herkunftsländern.",
-  "t2-12": "Die Sprach-Cafés unterstützen beim Ausfüllen von Formularen und beim Schreiben von Bewerbungen."
+  "t2-12": "Die Sprach-Cafés unterstützen beim Ausfüllen von Formularen und beim Schreiben von Bewerbungen.",
+  "t3-13": "Sprach-Café A bietet entspannte Gespräche abends um 18 Uhr ohne Anmeldung oder Kosten.",
+  "t3-14": "Nachbarschaftstreff B bietet kostenlose Hausaufgabenhilfe und Freizeitangebote für Grundschulkinder.",
+  "t3-15": "Freiwilligenagentur C sucht ehrenamtliche Integrationspaten für Begleitungen zum Amt, zur Schule oder zum Arzt.",
+  "t3-16": "Sprachinstitut D bietet B2-Intensivkurse für den Beruf mit anerkanntem Goethe-Zertifikat.",
+  "t3-17": "Keine Anzeige passt: E bietet nur einen kostenlosen monatlichen Kochabend, keinen professionellen kostenpflichtigen Samstagskurs.",
+  "t4-18": "Jonas unterstützt verpflichtende Kurse wegen der Vorteile für Beruf und Alltag.",
+  "t4-19": "Maria lehnt Zwang ab und bevorzugt positive Anreize.",
+  "t4-20": "Hasan bewertet Pflichtkurse wegen Struktur und neuer Kontakte positiv.",
+  "t4-21": "Claudia lehnt die Pflicht ohne flexible Kurszeiten und Kinderbetreuung ab.",
+  "t4-22": "Tim befürwortet die Pflicht als Grundlage für Chancengleichheit.",
+  "t4-23": "Elena hält Pflichtkurse für selbstständige Lerner für Zeitverschwendung.",
+  "t4-24": "Markus sieht die Pflicht als Signal für aktive Teilnahme und gegenseitiges Vertrauen.",
+  "t5-25": "Die Räume sind in der Regel montags bis samstags von 08:00 bis 22:00 Uhr nutzbar.",
+  "t5-26": "Die Buchung muss mindestens zwei Wochen vorher schriftlich oder online erfolgen.",
+  "t5-27": "Eigene Speisen sind in Seminarräumen erlaubt, wenn danach aufgeräumt wird.",
+  "t5-28": "Ab 20:00 Uhr gilt Zimmerlautstärke.",
+  "t5-29": "Für persönliche Gegenstände und Wertsachen übernimmt das Zentrum keine Haftung.",
+  "t5-30": "Gemeinnützige Vereine und Initiativen können Räume kostenlos reservieren."
 });
 module.exports = {B1_MOCK2_READING_KEY,B1_MOCK2_READING_EXPLANATIONS};
