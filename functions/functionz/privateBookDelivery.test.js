@@ -17,11 +17,12 @@ const paidOrder={id:"91869b22-88b0-46f4-b0ac-f224e8275604",
 const receipt={status:"paid",reference:"paystack_ok",checkoutPesewas:9900};
 test("private books are exact allowlisted objects and never arbitrary user keys",()=>{
  assert.deepEqual(Object.keys(DIGITAL_BOOK_OBJECTS).sort(),[
-  "a1-writing-model-exams-digital","a2-four-skills-exam-guide-digital","b1-four-skills-exam-guide-digital"
+  "a1-writing-model-exams-digital","a2-four-skills-exam-guide-digital","b1-four-skills-exam-guide-digital",
+  "a2-course-workbook-digital"
  ].sort());
  for (const {bucket,key} of Object.values(DIGITAL_BOOK_OBJECTS)) {
    assert.equal(bucket,"falowen-books-private");
-   assert.match(key,/^book\/Falowen_[A-Za-z0-9_]+\.pdf$/);
+   assert.match(key,/^book\/Falowen[-_][A-Za-z0-9_-]+\.pdf$/);
  }
  assert.equal(URL_EXPIRES_SECONDS,90);
  assert.throws(()=>signPrivateBookDownload({bookId:"a1-printed",env}),/No delivery mapping/);
@@ -134,4 +135,16 @@ test("public R2 account ID needs no Secret Manager binding and can sign with jus
  const result=signPrivateBookDownload({bookId:"b1-four-skills-exam-guide-digital",env});
  assert.equal(new URL(result.url).host,
    "falowen-books-private.886b2264d12c796d29879a8e919a2f46.r2.cloudflarestorage.com");
+});
+
+test("published A2 course PDF maps only to the clean 328-page private R2 object", () => {
+ const obj=DIGITAL_BOOK_OBJECTS["a2-course-workbook-digital"];
+ assert.deepEqual(obj,{
+   bucket:"falowen-books-private",
+   key:"book/Falowen-A2-Course-Materials-Clean.pdf",
+   filename:"Falowen-A2-Course-Materials-Clean.pdf",
+ });
+ const url=signPrivateBookDownload({bookId:"a2-course-workbook-digital",env}).url;
+ assert.equal(new URL(url).pathname,"/book/Falowen-A2-Course-Materials-Clean.pdf");
+ assert.match(url,/X-Amz-Expires=90/);
 });
