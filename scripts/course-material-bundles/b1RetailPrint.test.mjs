@@ -58,6 +58,14 @@ test("B1 printed-text coverage audit excludes web shell but detects missing actu
   assert.throws(() => assertB1PrintedContent(lesson, "Ein kleiner Abschnitt ohne Inhalt"));
 });
 
+test("B1 print replaces transient audio loaders with an authenticated lesson QR", () => {
+  const source = prepareB1PrintView.toString();
+  assert.ok(source.includes("Audio wird geladen"));
+  assert.ok(source.includes("Hören: Audio im Falowen Course Book"));
+  assert.ok(source.includes('section === "workbook-teil-4"'));
+  assert.ok(source.includes("panel.remove()"));
+});
+
 test("B1 retail PDF flags forbidden QR-only and live website messages",()=>{
   assert.ok(findB1PrintFaults("Diese Aufgabe ist nur online verfügbar").length);
   assert.ok(findB1PrintFaults("I prepared this part.").length);

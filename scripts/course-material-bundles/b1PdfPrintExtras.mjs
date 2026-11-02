@@ -27,7 +27,7 @@ export const isB1WorkbookGuideLabel = value =>
   /^Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook$/i
     .test(String(value || "").replace(/\s+/g, " ").trim());
 
-export const prepareB1PrintView = () => {
+export const prepareB1PrintView = ({ section = "", lessonUrl = "", audioQrDataUrl = "" } = {}) => {
   if (window.__b1PrintChanges) throw new Error("B1 print view already active");
   const undo = [];
   const normalize = value => String(value || "").replace(/\s+/g, " ").trim();
@@ -128,6 +128,45 @@ export const prepareB1PrintView = () => {
     }
     swap(field, blank);
   }
+  // Replace the dynamic audio player's loading state only in the PDF.
+  // The real recording stays protected and is played in the Falowen lesson.
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let textNode;
+  while ((textNode = walker.nextNode())) {
+    const before = textNode.textContent || "";
+    const after = before
+      .replace(/Audio wird geladen\s*(?:…|\.{2,3})?/gi, "Audio online in der Falowen-Lektion")
+      .replace(/Falowen bereitet die geschützte Aufnahme für die Wiedergabe vor\./gi, "");
+    if (after !== before) {
+      const originalNode = textNode;
+      originalNode.textContent = after;
+      undo.push(() => { originalNode.textContent = before; });
+    }
+  }
+
+  // The live listening tab needs the same authenticated audio QR as A2.
+  // Keep the QR with the exercise instead of relying on the web player UI.
+  if (section === "workbook-teil-4" && lessonUrl && audioQrDataUrl) {
+    const panel = document.createElement("aside");
+    panel.setAttribute("data-b1-pdf-audio-companion", "true");
+    panel.style.cssText = "display:flex;align-items:center;gap:12px;padding:10px;" +
+      "border:1px solid #bfd3eb;background:#eff6ff;break-inside:avoid;margin:6px 0 12px";
+    const qr = document.createElement("img");
+    qr.src = audioQrDataUrl; qr.width = 82; qr.height = 82;
+    qr.alt = "B1 Hören audio lesson QR";
+    const note = document.createElement("div");
+    const heading = document.createElement("strong");
+    heading.textContent = "Hören: Audio im Falowen Course Book";
+    const link = document.createElement("p");
+    link.style.cssText = "margin:4px 0;overflow-wrap:anywhere;font-size:10pt";
+    link.textContent = "QR-Code scannen, anmelden und Audio online anhören: " + lessonUrl;
+    note.append(heading, link);
+    panel.append(qr, note);
+    const container = document.querySelector("main") || root;
+    container.prepend(panel);
+    undo.push(() => panel.remove());
+  }
+
   window.__b1PrintChanges = undo;
   return { replacements: undo.length };
 };

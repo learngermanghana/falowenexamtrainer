@@ -322,7 +322,14 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
     if (level === "B1") {
-      await page.evaluate(prepareB1PrintView);
+      const b1NeedsLiveAudio = suffix === "workbook-teil-4" &&
+        ![19, 22].includes(Number(lesson.day));
+      const b1LessonUrl = b1NeedsLiveAudio ? getB1PdfLessonCompanionUrl(lesson.route, baseUrl) : "";
+      const b1AudioQrDataUrl = b1NeedsLiveAudio
+        ? await QRCode.toDataURL(b1LessonUrl, { width: 150, margin: 1, errorCorrectionLevel: "M" }) : "";
+      await page.evaluate(prepareB1PrintView, {
+        section: suffix, lessonUrl: b1LessonUrl, audioQrDataUrl: b1AudioQrDataUrl,
+      });
       await suppressPdfChromeText(page);
     }
     if (level === "A2") {
