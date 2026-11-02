@@ -154,9 +154,9 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
         url: "https://youtu.be/pCQVdJGsvtk",
       },
       {
-        key: "a1-day2-kapitel-1-1-pronouns-conjugation-ai-video",
-        chapter: "1.1",
-        title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
+        key: "a1-day2-pronouns-conjugation-ai-video",
+        chapter: "0.2",
+        title: "Day 2 · Pronouns & Verb Conjugation · AI video",
         description:
           "AI video lesson for German subject pronouns and basic verb conjugation.",
         url: "https://youtu.be/kqagu9qsOcc",
