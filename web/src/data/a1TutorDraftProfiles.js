@@ -38,7 +38,7 @@ const profiles = {
     },
   },
   // New storage identity; old Day 2 drafts and grades stay under their original IDs.
-  "A1-0.2-1.1": {
+  "A1-0.2_1.1": {
     sections: {
       "teil-1": section(choiceItems(5), { label: "Alphabet and spelling" }),
       "teil-2": section(shortItems(5, "Write the whole German word"), { label: "Hören and spelling" }),
