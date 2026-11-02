@@ -1,6 +1,7 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { WorkbookTabNav } from "./StandardWorkbookComponents";
 import BookPdfDownloadInjector, {
   getA2B1WorkbookExperienceContext,
   getA2B1WorkbookNavigationDestination,
@@ -151,6 +152,23 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(printSpy).toHaveBeenCalledTimes(1);
 
     printSpy.mockRestore();
+  });
+
+  it("hides A2 per-section Save PDF actions without hiding B1 section printing", () => {
+    const a2 = render(
+      <MemoryRouter initialEntries={["/campus/course/a2-day-14-beruf-und-karriere-workbook"]}>
+        <WorkbookTabNav activeTab="sprechen" onChange={() => {}} ariaLabel="A2 Day 14 workbook sections" />
+      </MemoryRouter>
+    );
+    expect(screen.getByRole("tablist", { name: "A2 Day 14 workbook sections" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Save .* as PDF/ })).not.toBeInTheDocument();
+    a2.unmount();
+    render(
+      <MemoryRouter initialEntries={["/campus/course/lesson/B1/8?view=workbook"]}>
+        <WorkbookTabNav activeTab="sprechen" onChange={() => {}} ariaLabel="B1 Day 8 workbook sections" />
+      </MemoryRouter>
+    );
+    expect(screen.getByRole("button", { name: /Save .* as PDF/ })).toBeInTheDocument();
   });
 
   it("exposes the school print stamp", () => {
