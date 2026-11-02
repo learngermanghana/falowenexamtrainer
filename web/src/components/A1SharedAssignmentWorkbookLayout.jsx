@@ -5,7 +5,7 @@ import { getA1CourseLessonNeighbors } from "../data/a1CanonicalLessonCatalog";
 import { styles } from "../styles";
 import { TimedAssignmentPanel } from "./SharedTimedAssignment";
 import { normalizeA1SectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
-import WorkbookSectionPdfAction from "./WorkbookSectionPdfAction";
+import A1CourseBookOffer from "./A1CourseBookOffer";
 import "./a1TutorMusicTabs.css";
 import { useA1TimedMockExam } from "./A1TimedMockExam";
 
@@ -274,6 +274,8 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
         <TimedAssignmentPanel studyMode={activeTab === "grammar" || activeTab === "music"} />
       </nav>
 
+      <A1CourseBookOffer />
+
       <div
         data-a1-workbook-section-progress="true"
         style={{ ...styles.card, padding: "10px 12px", display: "grid", gap: 7 }}
@@ -282,9 +284,7 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
           <span>{activeTab === "music" ? "♫ Optional listening · ungraded" : `Section ${activeIndex + 1} of ${requiredTabs.length}`}</span>
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <span>{activeTab === "music" ? "No submission required" : `${progressPercent}%`}</span>
-            {activeTabDefinition?.key !== "submit" && activeTabDefinition?.key !== "music" ? (
-              <WorkbookSectionPdfAction sectionLabel={activeTabDefinition?.label || "section"} />
-            ) : null}
+
           </div>
         </div>
         {activeTab !== "music" ? <div
