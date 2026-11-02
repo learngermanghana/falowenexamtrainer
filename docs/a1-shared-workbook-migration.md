@@ -1,12 +1,13 @@
 # A1 shared workbook migration matrix
 
-The section inventory was taken from each React workbook's visible headings, not inferred from its day. All records are submission-enabled. The canonical registry is the source of routes, identity, section tabs, and previous/next order.
+The section inventory was taken from each React workbook's visible headings, not inferred from its day. Current and legacy records retain their own submission identities. The canonical active assignment order is the source of current course navigation; archived IDs remain in the registry for historical submissions and saved drafts.
 
 | Assignment | Route | Component | Existing sections | Shared tabs |
 |---|---|---|---|---|
 | A1-0.1 | `/campus/course/a1-day-1-greetings-workbook` | A1Day1GreetingsWorkbookPage | Reading Text; Multiple-Choice Questions | Overview, Teil 1, Teil 2, Submit |
-| A1-0.2 | `/campus/course/a1-day-2-german-alphabet-reviewing-workbook` | A1Day3GermanAlphabetReviewingWorkbookPage | Reading and Writing; Questions; Hören | Overview, Teil 1, Teil 2, Teil 3, Submit |
-| A1-1.1 | `/campus/course/a1-day-2-kapitel-1-1-workbook` | A1Day2Kapitel11WorkbookPage | Personalpronomen; Verben konjugieren; Sätze ergänzen; Fehler korrigieren; Kurzer Text | Overview, Teil 1–5, Submit |
+| A1-0.2-1.1 **(current Day 2)** | `/campus/course/a1-day-2-foundations-workbook` | A1Day2UnifiedWorkbookPage | Alphabet; Hören; Personalpronomen; Verbkonjugation; Erste Sätze (20 marks each) | Overview, Teil 1–5, Submit |
+| A1-0.2 **(archived)** | `/campus/course/a1-day-2-german-alphabet-reviewing-workbook` | A1Day3GermanAlphabetReviewingWorkbookPage | Reading and Questions; Hören | Historical route; not in current course sequence |
+| A1-1.1 **(archived)** | `/campus/course/a1-day-2-kapitel-1-1-workbook` | A1Day2Kapitel11WorkbookPage | Hören; Schreiben | Historical route; not in current course sequence |
 | A1-1.2 | `/campus/course/a1-day-3-pronouns-introducing-yourself-workbook` | A1Day3PronounsIntroducingYourselfWorkbookPage | Lesen; Schreiben (Exercise); Hören | Overview, Teil 1–3, Submit |
 | A1-2 | `/campus/course/a1-day-4-numbers-for-beginners-workbook` | A1Day4NumbersForBeginnersWorkbookPage | Reading / Writing; Questions | Overview, Teil 1–2, Submit |
 | A1-3 | `/campus/course/a1-chapter-3-asking-about-prices-workbook` | A1Chapter3AskingAboutPricesWorkbookPage | Preise und Kosten; Familie; Hobbys | Overview, Teil 1–3, Submit |
@@ -26,8 +27,16 @@ The section inventory was taken from each React workbook's visible headings, not
 
 ## Architecture and legacy removal
 
-`A1SharedAssignmentWorkbookLayout` derives its tabs solely from the registry, keeps every section mounted while switching visibility, validates one non-empty `WorkbookSection` per declaration in development, locks submission identity, normalizes invalid URL tabs, and uses the explicit 19-item neighbor order. Registered routes opt out of the MutationObserver/click-driven legacy services, preventing duplicate injected navigation.
+`A1SharedAssignmentWorkbookLayout` derives its tabs solely from the registry, keeps every section mounted while switching visibility, validates one non-empty `WorkbookSection` per declaration in development, locks submission identity, normalizes invalid URL tabs, and uses the explicit 18-item active neighbor order. Registered routes opt out of the MutationObserver/click-driven legacy services, preventing duplicate injected navigation.
 
 ## Remaining risk
 
 The eight browser smoke cases should continue to run against an authenticated deployment because radio-first access and cloud submission require Firebase state that is unavailable in isolated unit tests.
+
+## A1 Day 2 (2026-11-02) unified release contract
+
+- The current Day 2 course card is chapter `0.2` titled *German Alphabet, Personal Pronouns and First Verbs*. The merged lesson has one grammar page and one five-part, 100-mark tutor workbook.
+- New assignment and draft identity: `A1-0.2-1.1`. This deliberately does **not** reuse historical `A1-0.2` or `A1-1.1` grades or local/cloud drafts. Keep historical records and direct workbook routes readable; default Day 2 lesson links redirect to the current chapter.
+- Parts: Alphabet and spelling (20); Hören/spelling (20); pronouns (20); verbs (20); short writing (20). The five-part workbook is the learner-facing question set. **Before production**, confirm a matching server/admin marking rubric, manual-review fallback for writing, and assessment-version handling. Displaying point values is not proof that the marking service applies these weights.
+- The two original teacher videos are both associated with Day 2 chapter 0.2 (teacher videos 1 and 2). Old grammar URLs remain accessible for archived links.
+- Run `npm run sync:curriculum`, `npm run check:curriculum-sync`, `node scripts/generateAssessmentTaskRegistry.mjs --check`, the scoped A1 Jest tests, and `node scripts/checkAiDocumentation.mjs`. Confirm the actual deployed revision, authenticated submission, and marking before declaring the merged lesson live.
