@@ -86,7 +86,7 @@ test("A2 print cleanup removes browser chrome, speaking timer and writing action
   assert.match(helpers, /interactive-writing-or-timer-control/);
   assert.match(helpers, /online-workbook-instructions/);
   assert.match(helpers, /input\[type=radio\],textarea,fieldset/);
-  assert.match(renderer, /scale: level === "A2" \? 0\.95 : 1/);
+  assert.ok(renderer.includes('scale: level === "A2" || level === "B1" ? 0.95 : 1'));
   assert.match(renderer, /data-course-writing-analysis-action/);
   assert.match(analyse, /data-course-writing-analysis-action="true"/);
   for (const item of [
