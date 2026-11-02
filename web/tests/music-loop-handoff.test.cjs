@@ -113,8 +113,9 @@ test("music player never disables the native loop and rebinds iOS media buttons 
   const app = fs.readFileSync(path.join(root, "public/music/app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "public/music/index.html"), "utf8");
   assert.match(app, /installLoopHandoff\(audio,/);
-  assert.match(app, /audio\.loop = true/);
-  assert.doesNotMatch(app, /audio\.loop = false|audio\.loop = byId\("repeat"\)\.checked/);
+  assert.match(app, /syncAudioLoop\(\)/);
+  assert.match(app, /iosLoopMode/);
+  assert.doesNotMatch(app, /audio\.loop = false/);
   assert.match(app, /audio\.addEventListener\("playing", \(\) => \{[\s\S]*?setupLockScreenControls\(\)/);
   assert.match(app, /audioSession\.type = "playback"/);
   assert.match(app, /onComplete: \(\) => audio\.dispatchEvent\(new Event\("falowen:music-complete"\)\)/);
