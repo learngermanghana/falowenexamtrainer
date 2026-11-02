@@ -174,7 +174,7 @@ export const prepareB1PrintView = ({ section = "", lessonUrl = "", audioQrDataUr
     note.append(heading, link);
     panel.append(qr, note);
     const lessonHeading = [...root.querySelectorAll("h2,h3")].find(el =>
-      /^Teil\\s*4\\b/i.test(normalize(el.textContent)) && el.isConnected);
+      /^Teil\s*4\b/i.test(normalize(el.textContent)) && el.isConnected);
     const target = lessonHeading?.closest("section") || document.querySelector("main") || root;
     target.insertBefore(panel, target.firstChild);
     undo.push(() => panel.remove());
