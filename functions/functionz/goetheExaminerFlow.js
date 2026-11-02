@@ -56,7 +56,7 @@ function createExaminerFlow(level, task, mode="guided") {
     flow.planningPoints=[
       {id:"time_place",text:"Wann und wo findet die Feier im Kursraum statt?"},
       {id:"guests",text:"Wen laden wir ein, Mitschüler und Lehrkräfte?"},
-      {id:"gift_budget",text:"Was schenken wir Frau Keller, und welches Budget haben wir?"},
+      {id:"catering",text:"Was bringen wir für das interkulturelle Buffet mit?"},
       {id:"food_decoration",text:"Wer besorgt Essen, Getränke und Dekoration?"},
     ];
   }
