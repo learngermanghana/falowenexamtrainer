@@ -79,28 +79,47 @@ test("wrong reference or customer cannot complete an order", async () => {
   }
 });
 
-test("independent A1 A2 B1 exam guides use approved benchmark-derived prices and catalogues", () => {
-  const expectations = [
-    ["a1-writing-model-exams",30,"A1",29,100],
-    ["a2-four-skills-exam-guide",50,"A2",39,200],
-    ["b1-four-skills-exam-guide",50,"B1",39,200],
+test("new A2 course book is the only A2 shop product and old guides cannot be sold", () => {
+  const a2 = BOOK_CATALOG_TITLES.find(item => item.id === "a2-course-workbook");
+  assert.ok(a2);
+  assert.equal(a2.pages, 328);
+  assert.equal(a2.status, "available");
+  assert.deepEqual(a2.bookIds, ["a2-course-workbook-digital"]);
+  assert.deepEqual(a2.formats, ["digital"]);
+  assert.equal(BOOKS["a2-course-workbook-digital"].priceGhs, 99);
+  const hiddenIds = [
+    "a1-writing-model-exams",
+    "a2-four-skills-exam-guide",
+    "b1-four-skills-exam-guide",
   ];
-  for (const [id,pages,level,digital,printed] of expectations) {
-    const item = BOOK_CATALOG_TITLES.find(book => book.id === id);
-    assert.ok(item, id);
-    assert.equal(item.status, "available");
-    assert.equal(item.pages, pages);
-    assert.deepEqual(item.levelTags, [level]);
-    assert.deepEqual(item.bookIds,[id+"-digital",id+"-printed"]);
-    assert.equal(BOOKS[id+"-digital"].priceGhs,digital);
-    assert.equal(BOOKS[id+"-printed"].priceGhs,printed);
-    assert.equal(BOOKS[id+"-digital"].format,"digital");
-    assert.equal(BOOKS[id+"-printed"].format,"printed");
-    assert.match(item.description, /Not an official Goethe-Institut publication/i);
+  for (const id of hiddenIds) {
+    assert.equal(BOOK_CATALOG_TITLES.some(item => item.id === id), false, id);
+    // Preserve old orders and their paid receipt records in the back end.
+    assert.ok(BOOKS[id + "-digital"]);
+    assert.ok(BOOKS[id + "-printed"]);
   }
-  // Existing retail prices and their checkout IDs must remain unchanged.
   assert.equal(BOOKS["a1-digital"].priceGhs, 99);
   assert.equal(BOOKS["a1-printed"].priceGhs, 800);
   assert.equal(BOOKS["writing-skills-a1-c2-digital"].priceGhs, 39);
-  assert.equal(Object.keys(BOOKS).length,9);
+  assert.equal(Object.keys(BOOKS).length, 10);
+});
+
+test("public books catalog does not expose the historical unlisted exam-guide SKUs", () => {
+  const { registerBookCommerceRoutes } = require("../functionz/bookCommerce");
+  const handlers = {};
+  registerBookCommerceRoutes({
+    get: (route, fn) => { handlers[route] = fn; },
+    post: () => {},
+  }, { admin: { firestore: () => { throw new Error("Catalog should not access Firestore"); } } });
+  let payload;
+  handlers["/books/catalog"]({}, {
+    set: () => {},
+    json: value => { payload = value; },
+  });
+  assert.deepEqual(payload.catalogTitles.map(book => book.id), [
+    "a1-course-workbook", "writing-skills-a1-c2", "a2-course-workbook"
+  ]);
+  assert.deepEqual(payload.books.map(book => book.id).sort(), [
+    "a1-digital", "a1-printed", "writing-skills-a1-c2-digital", "a2-course-workbook-digital"
+  ].sort());
 });
