@@ -426,7 +426,7 @@ const mergeRenderedSections = async (items, outputFile) => {
 // application, unlocking timed attempts, or persisting student information.
 const renderReadOnlyA2Section = async (page, lesson, part, filename = part) => {
   const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
-  const audioQrDataUrl = part === "teil-4"
+  const audioQrDataUrl = ["teil-3", "teil-4"].includes(part)
     ? await QRCode.toDataURL(lessonUrl, { width: 160, margin: 1, errorCorrectionLevel: "M" }) : "";
   const content = await buildA2ReadOnlyPrintHtml({ day: lesson.day, part, lesson, lessonUrl, audioQrDataUrl });
   const file = path.join(renderDir, String(lesson.day).padStart(2, "0") + "-" + filename + ".pdf");
@@ -469,7 +469,7 @@ const renderReadOnlyB1Section = async (page, lesson, part, filename = part) => {
   } finally {
     await printPage.close();
   }
-  return { tab: filename, file, origin: "canonical-read-only" };
+  return { tab: filename, file, origin: html.includes('data-b1-pdf-online-only="true"') ? "online-only-companion" : "canonical-read-only" };
 };
 
 const getWorkbookTabAvailability = async (page, name) => {
@@ -557,7 +557,7 @@ const renderA2B1Lesson = async (page, lesson) => {
   await mergeRenderedSections(workbookParts, workbookFile);
   workbookParts.forEach(({ file }) => fs.rmSync(file, { force: true }));
 
-  return [grammar, { tab: "workbook", file: workbookFile, origin: workbookParts.some(item => item.origin === "canonical-read-only") ? "mixed-live-and-read-only" : "live-workbook" }];
+  return [grammar, { tab: "workbook", file: workbookFile, origin: workbookParts.some(item => item.origin === "online-only-companion") ? "mixed-live-and-online-links" : workbookParts.some(item => item.origin === "canonical-read-only") ? "mixed-live-and-read-only" : "live-workbook" }];
 };
 
 const renderLesson = async (page, lesson) => {
