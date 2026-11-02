@@ -53,6 +53,16 @@ test("B1 locked reading and listening companions both receive authenticated less
   assert.ok(renderer.includes("buildB1ReadOnlyPrintHtml({ day: lesson.day, part, lessonUrl, audioQrDataUrl })"));
 });
 
+test("B1 Day 23 uses source-only speaking mock pages, never opens a graded attempt", () => {
+  const start = source.indexOf("const renderA2B1Lesson = async");
+  const end = source.indexOf("await ensureAuthenticatedLesson(page, lesson);", start);
+  assert.ok(start >= 0 && end > start);
+  const preflight = source.slice(start, end);
+  assert.match(preflight, /level === "B1" && Number\(lesson\.day\) === 23/);
+  assert.match(preflight, /renderReadOnlyB1Section\(page, lesson, "grammar", "grammar"\)/);
+  assert.match(preflight, /renderReadOnlyB1Section\(page, lesson, "workbook", "workbook"\)/);
+});
+
 test("A1 render plan contains only grammar and workbook targets", () => {
   const plan = JSON.parse(
     fs.readFileSync(path.join(__dirname, "a1RenderPlan.json"), "utf8"),
