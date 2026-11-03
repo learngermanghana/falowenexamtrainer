@@ -169,7 +169,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(8);
+      expect(list.data.result.tools).toHaveLength(9);
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
       expect(list.data.result.tools[0].securitySchemes[0].type).toBe("oauth2");
       const unlinked = await postJson(origin + "/api/chatgpt/mcp", {
@@ -313,7 +313,16 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const c1Reading = (await call(c1.tokens.access_token, 1, "reading", "C2"))
         .data.result.structuredContent;
       expect(c1Reading.level).toBe("C1");
-      expect(c1Reading.material.passageIncluded).toBe(false);
+      expect(c1Reading.material.passageIncluded).toBe(true);
+      expect(c1Reading.material.paragraphs).toHaveLength(3);
+      expect(c1Reading.material.questions).toHaveLength(4);
+      expect(c1Reading.material.questions[0]).not.toHaveProperty("answerIndex");
+      const c1AdvancedReading = (await call(c1.tokens.access_token, 20, "reading", "C2"))
+        .data.result.structuredContent;
+      expect(c1AdvancedReading.level).toBe("C1");
+      expect(c1AdvancedReading.available).toBe(true);
+      expect(c1AdvancedReading.material.paragraphs).toHaveLength(3);
+      expect(c1AdvancedReading.material.questions).toHaveLength(4);
       const c1Day20 = (await call(c1.tokens.access_token, 20, "overview", "B2"))
         .data.result.structuredContent;
       expect(c1Day20.level).toBe("C1");
@@ -356,6 +365,26 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const c2Writing = (await call(c2.tokens.access_token, 20, "writing", "C1"))
         .data.result.structuredContent;
       expect(c2Writing.material.targetWords).toBe(350);
+
+      const exam = await postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 85, method: "tools/call",
+        params: { name: "get_my_falowen_practice_guide",
+          arguments: { day: 5, skill: "reading", mode: "exam", language: "en", level: "B1" } },
+      }, c2.tokens.access_token);
+      const guide = exam.data.result.structuredContent;
+      expect(guide.level).toBe("C2");
+      expect(guide.available).toBe(true);
+      expect(guide.explanationLanguage).toBe("en");
+      expect(guide.interaction.method).toBe("one_question_at_a_time");
+      expect(guide.interaction.estimatedScoreIsPracticeOnly).toBe(true);
+      expect(guide.material.questions).toHaveLength(10);
+      expect(guide.material.questions[0]).not.toHaveProperty("answerIndex");
+      expect(guide.material.questions[0]).not.toHaveProperty("explanation");
+      const missingAudio = await postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 86, method: "tools/call",
+        params: { name: "get_my_falowen_practice_guide", arguments: { day: 5, skill: "listening" } },
+      }, c2.tokens.access_token);
+      expect(missingAudio.data.result.structuredContent.available).toBe(false);
     });
   });
 
