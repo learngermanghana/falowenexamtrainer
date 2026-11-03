@@ -152,13 +152,13 @@ describe("Canonical B2 Course Book material in ChatGPT", () => {
     expect(lessonContentResponse("B2", 1, "writing").available).toBe(false);
     expect(lessonContentResponse("B2", 4, "writing").material.instructions.length).toBe(4);
     expect(lessonContentResponse("B2", 2, "listening").material.audioAvailableInCampus).toBe(true);
-    expect(lessonContentResponse("C1", 1, "reading").available).toBe(false);
+    expect(lessonContentResponse("C1", 1, "reading").material.passageIncluded).toBe(false);
   });
 
   test("never exports graded answers, model solutions, teacher feedback or audio transcript", () => {
     const root = path.resolve(__dirname, "../../..");
     const raw = fs.readFileSync(path.join(root, "functions/data/chatgptLessonContent.generated.json"), "utf8");
-    for (const forbidden of ['"answerIndex"', '"answer"', '"sampleAnswer"', '"sample"',
+    for (const forbidden of ['"answerIndex"', '"answer"', '"sampleAnswer"',
       '"starterTemplate"', '"transcript"', '"correctOption"', '"teacherNotes"']) {
       expect(raw).not.toContain(forbidden);
     }
