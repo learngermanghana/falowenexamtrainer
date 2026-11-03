@@ -1,0 +1,72 @@
+{
+  "city": {
+    "path": "/music/covers/photos/city.jpg",
+    "source": "https://www.pexels.com/photo/photo-of-a-bridge-and-city-buildings-by-the-main-river-frankfurt-germany-13146203/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 13146203
+  },
+  "forest": {
+    "path": "/music/covers/photos/forest.jpg",
+    "source": "https://www.pexels.com/photo/green-trees-and-plants-in-forest-27028635/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 27028635
+  },
+  "journey": {
+    "path": "/music/covers/photos/journey.jpg",
+    "source": "https://www.pexels.com/photo/mountain-landscape-with-train-on-viaduct-10609938/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 10609938
+  },
+  "coffee": {
+    "path": "/music/covers/photos/coffee.jpg",
+    "source": "https://www.pexels.com/photo/a-person-reading-a-book-with-coffee-4427704/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 4427704
+  },
+  "dream": {
+    "path": "/music/covers/photos/dream.jpg",
+    "source": "https://www.pexels.com/photo/dirt-path-on-green-mountains-12742297/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 12742297
+  },
+  "steps": {
+    "path": "/music/covers/photos/steps.jpg",
+    "source": "https://www.pexels.com/photo/stone-steps-in-mountains-9606482/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 9606482
+  },
+  "bicycle": {
+    "path": "/music/covers/photos/bicycle.jpg",
+    "source": "https://www.pexels.com/photo/a-black-bicycle-parked-on-the-street-8811560/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 8811560
+  },
+  "food": {
+    "path": "/music/covers/photos/food.jpg",
+    "source": "https://www.pexels.com/photo/assorted-variety-of-vegetables-on-basket-2255924/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 2255924
+  },
+  "music": {
+    "path": "/music/covers/photos/music.jpg",
+    "source": "https://www.pexels.com/photo/black-vinyl-record-on-white-table-3944104/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 3944104
+  },
+  "friendship": {
+    "path": "/music/covers/photos/friendship.jpg",
+    "source": "https://www.pexels.com/photo/traveling-diverse-friends-walking-in-forest-5064934/",
+    "license": "https://www.pexels.com/license/",
+    "provider": "Pexels",
+    "photoId": 5064934
+  }
+}

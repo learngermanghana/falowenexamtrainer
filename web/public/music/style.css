@@ -247,3 +247,15 @@ html,body { background:#0e1921; }
 .behind-song .behind-song-translation{margin-top:9px;padding-top:9px;border-top:1px solid #d8e9df;color:#567066;font-size:13px}
 .behind-song-learning{border-left:1px solid #cbded3;padding-left:20px}
 @media(max-width:700px){.behind-song{grid-template-columns:minmax(0,1fr);gap:17px;padding:18px 16px;margin:19px 0}.behind-song-learning{border-left:none;border-top:1px solid #cbded3;padding:15px 0 0}.behind-song h3{font-size:1.1rem}}
+
+/* Share choices stay available on desktop, mobile and embedded players. */
+.song-share-dialog{border:1px solid #d6e1e2;border-radius:22px;padding:26px;width:min(520px,calc(100vw - 36px));max-height:85dvh;overflow:auto;color:#152c37;background:#fff;box-shadow:0 24px 100px #0e203055;box-sizing:border-box}
+.song-share-dialog::backdrop{background:#0e2030aa;backdrop-filter:blur(5px)}
+.song-share-dialog[open]{display:grid;gap:14px}
+.share-heading{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.share-heading h2,.share-song-name{margin:0}.share-song-name{color:#506773}
+.social-share-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.social-share-link{display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px;border:1px solid #cbdcdd;border-radius:12px;text-decoration:none;color:#133a3c;font-weight:700;background:#eff7f4}
+.social-share-link:hover{background:#d4eee3}.song-share-dialog :focus-visible{outline:3px solid #087d64;outline-offset:3px}
+.share-url{box-sizing:border-box;width:100%;padding:12px;border:1px solid #b9cacc;border-radius:10px;font:inherit;font-size:13px;background:#f6f9f9;color:#233e48}
+@media(max-width:420px){.social-share-links{grid-template-columns:repeat(2,minmax(0,1fr))}.song-share-dialog{padding:18px}}

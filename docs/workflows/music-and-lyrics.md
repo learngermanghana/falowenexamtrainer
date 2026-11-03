@@ -115,3 +115,7 @@ API. It streams only the validated public music track, with a 40 MB limit and
 30-second upstream timeout, so the browser need not read a signed R2 redirect.
 Normal audio playback still redirects. Uploaded local audio remains local.
 Export network failures now identify the MP3 download stage.
+
+## Public music sharing and art — 3 November 2026
+
+The public player offers platform choices and native device sharing, with a copyable song URL. `/song/<track-id>` serves recording-specific social preview metadata and the same listening room. The artwork manifest and credited local photography cover all 67 audited releases, with a default for new public recordings. These display changes do not approve lyrics, cues, translations or audio, and do not change assessment or music discovery. See [public music architecture](../public-falowen-music.md) for source ownership and checks.
