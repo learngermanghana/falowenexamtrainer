@@ -1127,11 +1127,6 @@ app.get("/course-media/a1/mock-audio-url", async (req, res) => {
     }
 
     const signed = await createA1MockAudioSignedUrl(validated);
-    if (isApprovedMock3Part && !released && !(await verifyB1Mock3Audio({
-      ...validated, signedUrl: signed.url,
-    }))) {
-      return res.status(404).json({ error: "This B1 Mock 3 recording has not been verified in R2 yet." });
-    }
     res.set("Cache-Control", "private, no-store");
     return res.json({
       url: signed.url,
@@ -1414,6 +1409,11 @@ app.get("/course-media/b1/mock-audio-url", async (req, res) => {
       ...validated, signedUrl: signed.url,
     }))) {
       return res.status(404).json({ error: "This B1 Mock 2 recording is not available yet." });
+    }
+    if (isApprovedMock3Part && !released && !(await verifyB1Mock3Audio({
+      ...validated, signedUrl: signed.url,
+    }))) {
+      return res.status(404).json({ error: "This B1 Mock 3 recording has not been verified in R2 yet." });
     }
     res.set("Cache-Control", "private, no-store");
     return res.json({
