@@ -1,4 +1,4 @@
-import { getC2TopicKnowledge, getC2TopicCollocations, getC2TopicChecks } from "./c2TopicKnowledge";
+import { getC2TopicKnowledge, getC2TopicCollocations, getC2TopicChecks } from "./c2TopicKnowledge.js";
 
 const rows = [
 [1,"Kreislaufwirtschaft und Wegwerfgesellschaft","Nuancierte Bewertung und Registersteuerung","Wie Kreislaufwirtschaft Produktion, Konsum, Reparatur und Wiederverwendung verändern kann.",[
