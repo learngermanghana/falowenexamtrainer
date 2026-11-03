@@ -34,13 +34,13 @@ describe("B1 Mock 3 Schreiben source + standardized practice contract", () => {
     expect(studentText).not.toContain("Marco Rossi");
   });
 
-  test("lists both practice modules but keeps the full mock gated", () => {
+  test("lists three practice modules but keeps the full mock gated", () => {
     const mock = MOCK_EXAM_CATALOG["b1-mock-03-pending"];
     expect(mock.status).toBe("preview");
     expect(mock.mode).toBe("section-preview");
     expect(mock.sections).toContain("Schreiben · 3 tasks");
     expect(mock.sections).toContain("Lesen · 30 questions");
     expect(mock.sections).toContain("Hören pending");
-    expect(mock.sections).toContain("Sprechen pending");
+    expect(mock.sections).toContain("Sprechen · 3 parts");
   });
 });
