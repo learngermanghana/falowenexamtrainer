@@ -1,6 +1,6 @@
 "use strict";
 // B1 Mock 3 Hören: teacher-supplied audio and the provided textual content for
-// Teile 1 and 2. Only these TEN items are content-verified. Never fabricate
+// Teile 1 and 2. Only these 15 items are content-verified. Never fabricate
 // scored answers for the untranscribed Teile 3 and 4.
 const tf=(number, question, answer)=>({
   part:1,number,kind:"richtig-falsch",question,
