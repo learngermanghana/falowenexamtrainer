@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const {
   oauthParameters, safeStudentAccess, scoreRowsForStudent,
-  summarizeStudentAssignments, lessonContentResponse, constants,
+  summarizeStudentAssignments, lessonContentResponse, practiceGuideResponse, constants,
 } = require("../chatgptCompanion");
 
 const validRequest = {
@@ -126,6 +126,31 @@ describe("ChatGPT OAuth static discovery", () => {
 });
 
 
+describe("C1 reading coverage and bilingual exam guidance", () => {
+  test("all 28 new Falowen-authored passages are present with four open-ended text questions", () => {
+    for (let day = 1; day <= 28; day += 1) {
+      const reading = lessonContentResponse("C1", day, "reading");
+      expect(reading.available).toBe(true);
+      expect(reading.material.passageIncluded).toBe(true);
+      expect(reading.material.paragraphs).toHaveLength(3);
+      expect(reading.material.questions).toHaveLength(4);
+      expect(reading.material.questions.every((q) => !("answerIndex" in q))).toBe(true);
+      expect(reading.material.source).toMatch(/Falowen-authored/);
+    }
+  });
+
+  test("practice examiner enforces source level and never invents a missing C2 skill day", () => {
+    const guide = practiceGuideResponse("C1", 20, "reading", "study", "en");
+    expect(guide.available).toBe(true);
+    expect(guide.level).toBe("C1");
+    expect(guide.interaction.method).toBe("one_question_at_a_time");
+    expect(guide.interaction.estimatedScoreIsPracticeOnly).toBe(true);
+    const miss = practiceGuideResponse("C2", 20, "reading", "exam", "de");
+    expect(miss.available).toBe(false);
+    expect(practiceGuideResponse("C2", 20, "writing", "exam", "de").available).toBe(true);
+  });
+});
+
 describe("Canonical B2 Course Book material in ChatGPT", () => {
   test("B2 day 1 contains the actual reading text, vocabulary, grammar exercise and review", () => {
     const overview = lessonContentResponse("B2", 1, "overview");
@@ -156,7 +181,7 @@ describe("Canonical B2 Course Book material in ChatGPT", () => {
     expect(lessonContentResponse("B2", 1, "writing").available).toBe(false);
     expect(lessonContentResponse("B2", 4, "writing").material.instructions.length).toBe(4);
     expect(lessonContentResponse("B2", 2, "listening").material.audioAvailableInCampus).toBe(true);
-    expect(lessonContentResponse("C1", 1, "reading").material.passageIncluded).toBe(false);
+    expect(lessonContentResponse("C1", 1, "reading").material.passageIncluded).toBe(true);
   });
 
   test("never exports graded answers, model solutions, teacher feedback or audio transcript", () => {
