@@ -48,7 +48,7 @@ describe("lean first-login onboarding", () => {
       "studentProfile?.balanceDue",
       "detectLevelKey(studentProfile)",
       "getTrialLifecycleState(studentProfile)",
-      "Start orientation",
+      "Start Day 1",
       "View class and account details",
       "Open billing",
       "Where can I get help?",

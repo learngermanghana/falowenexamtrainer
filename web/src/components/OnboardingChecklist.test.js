@@ -9,18 +9,18 @@ jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ logout: jest.fn()
 jest.mock("../context/ToastContext", () => ({ useToast: () => ({ showToast: mockToast }) }));
 const profile = { name: "Ama Learner", level: "A1", balanceDue: 3000, paymentStatus: "pending", trialStartedAt: new Date().toISOString(), trialEndsAt: new Date(Date.now() + 7 * 86400000).toISOString() };
 beforeEach(() => { jest.clearAllMocks(); mockSave.mockResolvedValue({}); });
-it("offers a single orientation action and a Course Book shortcut", async () => {
+it("offers a single Day 1 action and a Course Book shortcut", async () => {
   render(<OnboardingChecklist studentProfile={profile} onSaveOnboarding={mockSave} />);
-  expect(screen.getAllByRole("button", { name: /Start orientation/ })).toHaveLength(1);
-  expect(screen.queryByText(/Day 1 Workbook|getting started guide/i)).not.toBeInTheDocument();
+  expect(screen.getAllByRole("button", { name: /Start Day 1/ })).toHaveLength(1);
+  expect(screen.queryByText(/Day 0|orientation/i)).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Ask Study Buddy" }).closest("details")).not.toHaveAttribute("open");
-  fireEvent.click(screen.getByRole("button", { name: /Start orientation/ }));
-  await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("/campus/course/a1-day-0-orientation-and-knowledge-test-workbook", { replace: true }));
+  fireEvent.click(screen.getByRole("button", { name: /Start Day 1/ }));
+  await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("/campus/course/lesson/A1/1", { replace: true }));
   expect(mockSave).toHaveBeenCalledTimes(1);
 });
-it.each([["A2", "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook"], ["B2", "/campus/course/lesson/B2/0"], ["C1", "/campus/course/lesson/C1/0"]])("opens the existing %s orientation", async (level, path) => {
+it.each(["A2", "B1", "B2", "C1", "C2"].map(level => [level, `/campus/course/lesson/${level}/1`]))("opens the existing %s Day 1 lesson", async (level, path) => {
   render(<OnboardingChecklist studentProfile={{ ...profile, level }} onSaveOnboarding={mockSave} />);
-  fireEvent.click(screen.getByRole("button", { name: /Start orientation/ }));
+  fireEvent.click(screen.getByRole("button", { name: /Start Day 1/ }));
   await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith(path, { replace: true }));
 });
 it("opens Course Book directly instead of another guide", async () => {
@@ -36,7 +36,7 @@ it("does not navigate or claim setup succeeded if saving fails", async () => {
   mockSave.mockRejectedValueOnce(new Error("offline"));
   const spy = jest.spyOn(console, "error").mockImplementation(() => {});
   render(<OnboardingChecklist studentProfile={profile} onSaveOnboarding={mockSave} />);
-  fireEvent.click(screen.getByRole("button", { name: /Start orientation/ }));
+  fireEvent.click(screen.getByRole("button", { name: /Start Day 1/ }));
   await waitFor(() => expect(mockToast).toHaveBeenCalledWith(expect.stringContaining("could not finish"), "error"));
   expect(mockNavigate).not.toHaveBeenCalled();
   spy.mockRestore();

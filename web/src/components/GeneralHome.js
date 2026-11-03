@@ -17,14 +17,6 @@ import { formatCurrency } from "../lib/formatters";
 import LegalFooter from "./LegalFooter";
 import { detectLevelKey } from "../lib/day0Workbook";
 
-const day0WorkbookByLevel = {
-  A1: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
-  A2: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
-  B1: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
-  B2: "/campus/course/lesson/B2/0",
-  C1: "/campus/course/lesson/C1/0",
-};
-
 const classLevelFromName = (className = "") => {
   const match = String(className || "").toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/);
   return match?.[1] || "";
@@ -167,7 +159,7 @@ const GeneralHome = ({
   ).trim();
   const classCalendarId = "class-calendar-card";
   const levelKey = detectLevelKey(studentProfile);
-  const day0WorkbookLink = day0WorkbookByLevel[levelKey] || "/campus/account";
+  const firstLessonPath = levelKey ? `/campus/course/lesson/${levelKey}/1` : "/campus/course";
   const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted);
   const assignedClassLevel = classLevelFromName(preferredClass);
   const metricsStudentProfile = useMemo(
@@ -288,7 +280,7 @@ const GeneralHome = ({
   return (
     <div style={{ display: "grid", gap: 12 }}>
       {new URLSearchParams(location.search).get("welcome") === "1" ? (
-        <OnboardingStudyBuddyStart orientationPath={day0WorkbookLink} />
+        <OnboardingStudyBuddyStart firstLessonPath={firstLessonPath} />
       ) : null}
       <WelcomeHero
         studentProfile={studentProfile}

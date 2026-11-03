@@ -20,7 +20,7 @@ const profile = { level: "A1", paymentStatus: "paid", balanceDue: 0 };
 function Home() {
   const location = useLocation();
   return <>
-    {new URLSearchParams(location.search).get("welcome") === "1" && <OnboardingStudyBuddyStart orientationPath="/campus/course/lesson/A1/0" />}
+    {new URLSearchParams(location.search).get("welcome") === "1" && <OnboardingStudyBuddyStart firstLessonPath="/campus/course/lesson/A1/1" />}
     <StudyBuddyBar studentProfile={profile} />
   </>;
 }
@@ -39,7 +39,7 @@ test("hiding onboarding chat leaves starting actions and Course Book navigation"
   await waitFor(() => expect(document.body.querySelector(".study-buddy-bar")).toBeInTheDocument());
   await userEvent.click(screen.getByRole("button", { name: /hide bar/i }));
   expect(document.body.querySelector(".study-buddy-bar")).not.toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Start Orientation" })).toHaveAttribute("href", "/campus/course/lesson/A1/0");
+  expect(screen.getByRole("link", { name: "Start Day 1" })).toHaveAttribute("href", "/campus/course/lesson/A1/1");
   await userEvent.click(screen.getByRole("link", { name: "Open Course Book" }));
   expect(screen.getByRole("heading", { name: "Course Book lessons" })).toBeInTheDocument();
 });

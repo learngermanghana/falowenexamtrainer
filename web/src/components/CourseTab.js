@@ -747,7 +747,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     const sourceEntries = isFrenchProgram ? schedules[selectedCourseLevel] || [] : getCourseBookSchedule(selectedCourseLevel);
     const expandedEntries = dedupeCourseBookEntries(expandCourseBookEntries(sourceEntries, { level: selectedCourseLevel }));
     return sortByDay(
-      expandedEntries.map((entry) => {
+      // Hide orientation only in the Course Book; keep the canonical schedule intact.
+      expandedEntries.filter((entry) => isFrenchProgram || Number(entry.displayDay ?? entry.day) !== 0).map((entry) => {
         const dayKey = String(getCourseBookDisplayDay(entry) || "");
         seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
         return { ...entry, occurrence: seenByDay[dayKey] };

@@ -7,14 +7,6 @@ import { getTrialLifecycleState } from "../lib/trialAccess";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
 
-const day0WorkbookByLevel = {
-  A1: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
-  A2: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
-  B1: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
-  B2: "/campus/course/lesson/B2/0",
-  C1: "/campus/course/lesson/C1/0",
-};
-
 const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -27,7 +19,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const balanceDue = Math.max(Number(studentProfile?.balanceDue ?? studentProfile?.balance) || 0, 0);
   const paymentComplete = paymentStatus === "paid" || hasClearedBalance(balanceDue);
   const trialLifecycle = useMemo(() => getTrialLifecycleState(studentProfile), [studentProfile]);
-  const firstLessonPath = day0WorkbookByLevel[level] || "/campus/course";
+  const firstLessonPath = level ? `/campus/course/lesson/${level}/1` : "/campus/course";
   // Reuse the authenticated profile and existing routes. No extra database
   // reads, AI calls, Firestore listeners, or scheduled functions on login.
   const learnerFirstName = String(studentProfile?.firstName || studentProfile?.name || studentProfile?.fullName || "").trim().split(/\s+/)[0];
@@ -67,18 +59,18 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
         </div>
         <div style={{ display: "grid", gap: 10 }}>
           <h1 style={{ margin: 0, fontSize: "clamp(28px, 5vw, 38px)", lineHeight: 1.18 }}>Hallo{learnerFirstName ? `, ${learnerFirstName}` : ""}. Let’s get you started.</h1>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>Your account is ready. Begin with the teacher’s orientation so you know where to find lessons and submit your work.</p>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>Your account is ready. Begin with Day 1. Your teacher will explain how to use Falowen and submit your work.</p>
         </div>
         <div aria-label="Your course details" style={{ display: "flex", gap: 8, flexWrap: "wrap", color: "#475569", fontSize: 13 }}>
           <span style={{ background: "#f1f5f9", padding: "7px 10px", borderRadius: 8 }}>{level ? `${level} German` : "German course"}</span>
           <span style={{ background: "#f1f5f9", padding: "7px 10px", borderRadius: 8 }}>{accessLabel}</span>
         </div>
         <section aria-label="Start here" style={{ display: "grid", gap: 12, padding: 22, borderRadius: 14, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#1e40af" }}>START HERE · DAY 0</span>
-          <h2 style={{ margin: 0, fontSize: 22 }}>Get to know Falowen</h2>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>Meet your course, learn the navigation and get ready for your first lesson.</p>
-          <button type="button" style={{ ...styles.primaryButton, padding: 15 }} disabled={Boolean(savingAction)} onClick={() => finishAndGo(firstLessonPath, "orientation")}>
-            {savingAction === "orientation" ? "Opening…" : "Start orientation →"}
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#1e40af" }}>START HERE · DAY 1</span>
+          <h2 style={{ margin: 0, fontSize: 22 }}>Begin your first lesson</h2>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>Open Day 1 to begin your course and follow your teacher’s instructions.</p>
+          <button type="button" style={{ ...styles.primaryButton, padding: 15 }} disabled={Boolean(savingAction)} onClick={() => finishAndGo(firstLessonPath, "lesson")}>
+            {savingAction === "lesson" ? "Opening…" : "Start Day 1 →"}
           </button>
         </section>
         <button type="button" style={{ border: 0, background: "transparent", color: "#1d4ed8", textAlign: "left", padding: "8px 0", cursor: "pointer", justifySelf: "start", minHeight: 44 }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/campus/course", "course")}>
