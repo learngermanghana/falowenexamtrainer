@@ -210,6 +210,19 @@ function summarizeStudentAssignments(student, rows) {
         days.set(day, entry);
       }
     });
+    // Some advanced self-study days (notably C2) are stored in the canonical
+    // Course Book alignment rather than the legacy curriculum manifest.
+    // The generated source snapshot fills the missing catalogue days.
+    for (const [key, lesson] of Object.entries(GENERATED_COURSE_CONTENT?.levels?.[level] || {})) {
+      const day = Number(key);
+      if (!days.has(day) && Number.isInteger(day) && day >= 1 && day <= 50) {
+        days.set(day, {
+          day, lessonTitle: lesson.title, topic: lesson.topic, goal: lesson.goal,
+          grammarFocus: lesson.grammarFocus, displayChapter: lesson.chapter,
+          progressionEligible: true,
+        });
+      }
+    }
     const lessons = [...days.entries()].sort(([a], [b]) => a - b).map(([day, entry]) => ({
       day,
       title: normalize(entry.lessonTitle || entry.topic || entry.title || "Lesson").slice(0, 180),
@@ -378,22 +391,25 @@ async function callTool(name, args, student, admin) {
       return lessonContentResponse(view.level, args.day, section);
     }
     if (!view.level) return { error: "Course level is not available." };
-    const lessons = getCurriculumEntriesForLevel(view.level);
+    const lessons = getCurriculumEntriesForLevel(view.level) || [];
     const matching = lessons.filter((entry) =>
       Number(entry.day ?? entry.assignmentDay ?? entry.displayDay) === args.day);
     const entry = matching.find((x) => x.assignment === true) || matching[0];
-    if (!entry) return { error: "Lesson not found for this course and day.", level: view.level };
+    const exported = contentForLesson(view.level, args.day);
+    // Advanced courses may have authentic learner content even when the
+    // legacy curriculum manifest lacks that day. Never reject a real day.
+    if (!entry && !exported) return { error: "Lesson not found for this course and day.", level: view.level };
+    const featured = featuredLegacyCourseBookSection(view.level, args.day);
     return {
       level: view.level, day: args.day,
-      title: normalize(entry.topic || entry.title).slice(0, 180),
-      goal: normalize(entry.goal).slice(0, 600),
-      grammarFocus: normalize(entry.grammar_topic || entry.grammarFocus).slice(0, 200),
-      lessonUrl: lessonUrl(view.level, { dayNumber: args.day, displayChapter: entry.displayChapter || entry.chapter }),
+      title: normalize(entry?.topic || entry?.title || exported?.title).slice(0, 180),
+      goal: normalize(entry?.goal || exported?.goal).slice(0, 600),
+      grammarFocus: normalize(entry?.grammar_topic || entry?.grammarFocus || exported?.grammarFocus).slice(0, 200),
+      lessonUrl: lessonUrl(view.level, { dayNumber: args.day, displayChapter: entry?.displayChapter || entry?.chapter || exported?.chapter }),
       guidance: "Explain concepts and offer short original practice questions. Do not complete graded coursework for the learner.",
-      ...(contentForLesson(view.level, args.day)
+      ...(exported
         ? { courseBookContent: lessonContentResponse(view.level, args.day, "overview"),
-            ...(featuredLegacyCourseBookSection(view.level, args.day)
-              ? { featuredCourseBookSection: featuredLegacyCourseBookSection(view.level, args.day) } : {}),
+            ...(featured ? { featuredCourseBookSection: featured } : {}),
             contentTool: "get_my_falowen_lesson_content",
             exactContentAvailable: true }
         : { exactContentAvailable: false,
