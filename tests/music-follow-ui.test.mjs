@@ -15,6 +15,7 @@ const recordings=JSON.parse(read('web/public/music/timings.json')).recordings;
 async function room(track,pack,{studio=null,translations=null,classTimings=null,initiallySelected=true,requests=[]}={}){
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/'+(initiallySelected?'?track='+track.id:''),runScripts:'outside-only'});
  const w=dom.window;
+ w.HTMLElement.prototype.scrollIntoView=()=>{};
  Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,coverForTrack,songStoryForTrack,approximateScrollTop,matchingEnglishTranslation,matchingDraftEnglishTranslation,
   matchMedia:()=>({matches:true}),fetch:async url=>{
     requests.push(String(url));
