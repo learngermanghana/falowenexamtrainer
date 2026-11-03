@@ -4,6 +4,9 @@ import AppBackButton from "./navigation/AppBackButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import ReadingExamFrame, { ReadingExamDocument } from "./ReadingExamLayout";
+import C1ReadingPracticePanel from "./C1ReadingPracticePanel";
+import { C1_READING_PRACTICE } from "../data/c1ReadingPractice.js";
+import { getC1CanonicalTitle, getC1CanonicalGrammarTitle, getC1ContentProfile } from "../data/c1ContentRefresh.js";
 
 const SCORE_THRESHOLD = 80;
 
@@ -206,6 +209,25 @@ const C1_SELF_LEARNING_PLAN = [
   },
 ];
 
+// Legacy C1 page lists Days 1–16. Derive Days 17–28 from the same
+// canonical title/content registry used throughout the newer Course Book.
+const C1_ALL_DAYS = C1_SELF_LEARNING_PLAN.concat(
+  Array.from({ length: 12 }, (_, index) => {
+    const day = index + 17;
+    const profile = getC1ContentProfile(day);
+    const title = getC1CanonicalTitle(day);
+    return {
+      day, title, topic: profile.question,
+      grammar: getC1CanonicalGrammarTitle(day),
+      speakingTask: "Diskutiere differenziert: " + profile.question,
+      writingTask: "Schreibe eine C1-Stellungnahme: " + profile.question,
+      readingTask: "Lies den Falowen-Lesetext und beantworte die vier Fragen in eigenen Worten.",
+      listeningTask: "Wähle einen Hörbeitrag zu diesem Thema und notiere Position, Beleg und Einwand.",
+      keywords: profile.angles,
+    };
+  }),
+);
+
 const tabs = [
   { id: "lesson", label: "Lernen" },
   { id: "practice", label: "AI Practice" },
@@ -257,9 +279,9 @@ export default function C1SelfLearningCourse() {
   const selectedDay = Number(dayId || 1);
   const visiblePlan = useMemo(() => {
     if (Number.isInteger(selectedDay) && selectedDay > 0) {
-      return C1_SELF_LEARNING_PLAN.filter((entry) => entry.day === selectedDay);
+      return C1_ALL_DAYS.filter((entry) => entry.day === selectedDay);
     }
-    return C1_SELF_LEARNING_PLAN;
+    return C1_ALL_DAYS;
   }, [selectedDay]);
 
   const updateDay = (day, updates) => {
@@ -270,7 +292,7 @@ export default function C1SelfLearningCourse() {
     }));
   };
 
-  const completedCount = C1_SELF_LEARNING_PLAN.filter((entry) => progress[`day-${entry.day}`]?.completed).length;
+  const completedCount = C1_ALL_DAYS.filter((entry) => progress[`day-${entry.day}`]?.completed).length;
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -288,7 +310,7 @@ export default function C1SelfLearningCourse() {
           <div style={miniCard}><strong>4. Self-mark</strong><br />Score eintragen und ehrlich abschließen.</div>
         </div>
         <p style={{ margin: 0, color: "#4b5563" }}>
-          Fortschritt: {completedCount}/{C1_SELF_LEARNING_PLAN.length} Tage abgeschlossen. Empfohlene AI-Schwelle: {SCORE_THRESHOLD}/100.
+          Fortschritt: {completedCount}/{C1_ALL_DAYS.length} Tage abgeschlossen. Empfohlene AI-Schwelle: {SCORE_THRESHOLD}/100.
         </p>
       </div>
 
@@ -296,7 +318,7 @@ export default function C1SelfLearningCourse() {
         <strong>C1 Tagesseiten</strong>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course/c1-self-learning")}>Alle Tage</button>
-          {C1_SELF_LEARNING_PLAN.map((entry) => (
+          {C1_ALL_DAYS.map((entry) => (
             <button key={entry.day} type="button" style={styles.secondaryButton} onClick={() => navigate(`/campus/course/c1-self-learning/day-${entry.day}`)}>
               Tag {entry.day}{progress[`day-${entry.day}`]?.completed ? " ✓" : ""}
             </button>
@@ -378,6 +400,7 @@ export default function C1SelfLearningCourse() {
                     >
                       <ReadingExamDocument label="Leseauftrag" title={entry.title}>
                         <p style={{ margin: 0 }}>{task}</p>
+                        <C1ReadingPracticePanel day={entry.day} reading={C1_READING_PRACTICE[entry.day]} />
                         <button type="button" style={{ ...styles.linkButton, width: "fit-content" }} onClick={() => navigate(route)}>
                           Lesen AI öffnen
                         </button>
