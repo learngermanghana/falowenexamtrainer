@@ -368,13 +368,14 @@ describe("C1 and C2 canonical student Course Book in ChatGPT", () => {
     expect(lessonContentResponse("C1", 20, "overview").title).toBe("Digitale Gesundheit");
   });
 
-  test("returns authentic C1 reading assignments but never claims they contain a passage", () => {
+  test("returns new Falowen-authored C1 reading passages and preserves original reading tasks", () => {
     const reading = lessonContentResponse("C1", 1, "reading");
     expect(reading.available).toBe(true);
     expect(reading.material.task).toMatch(/Lies einen kurzen Text über Lernstrategien/);
-    expect(reading.material.passageIncluded).toBe(false);
-    expect(reading.material).not.toHaveProperty("paragraphs");
-    expect(lessonContentResponse("C1", 20, "reading").available).toBe(false);
+    expect(reading.material.passageIncluded).toBe(true);
+    expect(reading.material.paragraphs).toHaveLength(3);
+    expect(reading.material.questions).toHaveLength(4);
+    expect(lessonContentResponse("C1", 20, "reading").available).toBe(true);
     expect(lessonContentResponse("C1", 20, "writing").material.instructions.length).toBeGreaterThan(2);
     expect(lessonContentResponse("C1", 20, "grammar").material.fullExplanationIncluded).toBe(false);
   });
