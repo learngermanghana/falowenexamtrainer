@@ -67,11 +67,11 @@ export default function B1Mock3Hoeren() {
       .catch(()=>setAudioError("Der Browser konnte das Audio nicht starten. Bitte versuchen Sie es noch einmal."));
   };
   const submit=async()=>{
-    if(busy||target!==15||answered!==target)return;
+    if(busy||target!==30||answered!==target)return;
     setBusy(true);setError("");
     try{
       const scored=await scoreB1Mock3Hoeren({idToken,answers});
-      if(!scored.saved||!scored.practiceOnly||!scored.partial||Number(scored.total)!==15)
+      if(!scored.saved||!scored.practiceOnly||scored.partial||Number(scored.total)!==30)
         throw new Error("Der Server hat die Teilbewertung nicht bestätigt.");
       setResult(scored);
     }catch(e){setError(e?.response?.data?.error||e?.message||"Die Bewertung konnte nicht gespeichert werden.");}
@@ -86,17 +86,17 @@ export default function B1Mock3Hoeren() {
   return <main className="a2-mock2-shell" data-b1-mock3-hoeren lang="de">
     <div className="a2-mock2-top">
       <AppBackButton label="Zurück zu den Probeprüfungen" fallbackPath="/exams/mocks"/>
-      <span>B1 · Mock 3 · Hören</span>
+      <span>B1 · Mock 3 · Hören (30 Aufgaben)</span>
     </div>
     <header className="a2-mock2-progress">
       <div>
         <strong>B1 Mock 3 · Hören, Teile 1 bis 4</strong>
-        <span>{answered}/{target} geprüfte Aufgaben beantwortet · Ziel: 30 Aufgaben</span>
+        <span>{answered}/{target} Aufgaben beantwortet · 4 Teile · ca. 40 Minuten</span>
       </div>
       <strong>Teil {part?.part||1}</strong>
     </header>
     <p role="note" style={{padding:12,borderRadius:8,background:"#f8fafc",border:"1px solid #cbd5e1"}}>
-      <strong>Teilversion, noch keine vollständige Prüfung.</strong> Die vier Originalaufnahmen sind verlinkt. Für Teil 1 und Teil 2 sind 15 Aufgaben geprüft und werden bewertet. Für Teil 3 und Teil 4 müssen passende Aussagen und Lösungen noch anhand der Aufnahmen kontrolliert werden. Kein Ergebnis aus 30 Fragen oder aus vier Prüfungsmodulen wird vorgetäuscht.
+      <strong>Hören-Modul mit 30 Aufgaben.</strong> Alle vier Originalaufnahmen und die passenden Aufgaben sind vorhanden. Ihre Antworten werden anhand des serverseitigen Lösungsschlüssels bewertet. Das Ergebnis gilt für Hören, nicht automatisch als Gesamtbewertung der vier Prüfungsmodule.
     </p>
     {error?<p role="alert">{error}</p>:null}
     {!exam&&!error?<p role="status">Höraufgaben werden geladen …</p>:null}
@@ -105,7 +105,7 @@ export default function B1Mock3Hoeren() {
     {exam&&part?<><nav className="a2-mock2-nav" aria-label="Hören Teile">
       {parts.map((p,i)=><button key={p.part} type="button" className={i===active?"selected":""}
         onClick={()=>setActive(i)}>
-        Teil {p.part} <small>{p.verified ? `${p.questions.filter(q=>answers[q.number]).length}/${p.count}` : "Audio · Prüfung offen"}</small>
+        Teil {p.part} <small>{`${p.questions.filter(q=>answers[q.number]).length}/${p.count}`}</small>
       </button>)}
     </nav>
     <section className="a2-mock2-paper">
@@ -114,7 +114,7 @@ export default function B1Mock3Hoeren() {
       {part.part===1?<p role="note">Die Audio-Ansage nennt eine Richtig/Falsch-Aufgabe pro Text. Für die standardisierte Falowen-Übung kommt je Text eine ergänzende a/b/c-Aufgabe hinzu. Die Aufnahme wird nicht zusätzlich wiederholt.</p>:null}
       <div className="a2-mock2-audio">
         <strong>Original-Prüfungsaudio · Teil {part.part}</strong>
-        <p>Geschützte Aufnahme aus Falowen R2. Starten Sie das Audio erst, wenn Sie bereit sind. Einmal pro Versuch.</p>
+        <p>Geschützte Aufnahme aus Falowen R2. Starten Sie das Audio erst, wenn Sie bereit sind. Einmal pro Versuch; vorhandene Audio-Wiederholungen sind bereits enthalten.</p>
         {audioUrl?<><audio ref={audioRef} src={audioUrl} preload="metadata" controls={false}
           onError={()=>setAudioError("Die R2-Audiodatei konnte nicht abgespielt werden.")}
           onEnded={()=>setPlayed(prev=>({...prev,[part.part]:"ended"}))}/>
@@ -129,7 +129,7 @@ export default function B1Mock3Hoeren() {
         </p>:null}
       </div>
 
-      {part.verified ? part.questions.map(q=><fieldset className="a2-mock2-question" key={q.number} disabled={Boolean(result)}>
+      {part.questions.map(q=><fieldset className="a2-mock2-question" key={q.number} disabled={Boolean(result)}>
         <legend><strong>{q.number}.</strong> {q.question}</legend>
         {q.options.map(o=><label key={o.id} className={answers[q.number]===o.id?"selected":""}>
           <input type="radio" name={`b1mock3-${q.number}`} value={o.id}
@@ -137,17 +137,14 @@ export default function B1Mock3Hoeren() {
             onChange={()=>setAnswers(prev=>({...prev,[q.number]:o.id}))}/>
           <span>{q.kind==="multiple-choice"?`${o.id}) `:""}{o.label}</span>
         </label>)}
-      </fieldset>):<p role="status" style={{padding:12,border:"1px dashed #94a3b8"}}>
-        Die Fragen zu dieser Originalaufnahme werden vor der Benotung noch geprüft.
-        Sie können das Audio bereits zum eigenständigen Hörtraining verwenden.
-      </p>}
+      </fieldset>)}
 
-      {active===1 && !result ? <button type="button" disabled={busy || answered!==target} onClick={submit}>
-        {busy?"Bewertung wird gespeichert …":`Teil 1–2: ${target} Antworten zur Übung abgeben`}
+      {!result ? <button type="button" disabled={busy || answered!==target} onClick={submit}>
+        {busy?"Bewertung wird gespeichert …":`Alle ${target} Hören-Antworten einreichen`}
       </button>:null}
       {result?<section role="status" aria-live="polite">
-        <h2>Übungsergebnis für Teil 1–2: {result.correct}/{result.total} ({result.percentage} %)</h2>
-        <p>Dies ist eine Teilbewertung aus 15 bestätigten Aufgaben. Teil 3–4 und der vollständige B1-Mock-Gesamtwert sind nicht enthalten.</p>
+        <h2>Hören-Ergebnis: {result.correct}/{result.total} ({result.percentage} %)</h2>
+        <p>Dieses Ergebnis enthält alle 30 Hören-Aufgaben aus Teil 1–4. Die Gesamtbewertung von Lesen, Hören, Schreiben und Sprechen erfolgt separat.</p>
         <ul>{result.perPart.map(x=><li key={x.part}>Teil {x.part}: {x.correct}/{x.total}</li>)}</ul>
         <button type="button" onClick={reset}>Neue Übung starten</button>
       </section>:null}
