@@ -61,6 +61,36 @@ function createExaminerFlow(level, task, mode="guided") {
       {id:"responsibilities",text:"Wer übernimmt welche Vorbereitungen?"},
     ];
   }
+  // The teacher's Mock 3 task is a hospital visit after an accident, with
+  // four distinct decisions rather than the old Mock 1/2 party scenario.
+  if (key === "B1-1" && task?.id === "b1-mock-03-speaking-teil-1") {
+    flow.planningPoints = [
+      {id:"visit", text:"Wann besuchen wir den Kursteilnehmer im Krankenhaus (Tag und Uhrzeit)?"},
+      {id:"transport", text:"Wie kommen wir gemeinsam ins Krankenhaus?"},
+      {id:"gift", text:"Was nehmen wir als Geschenk von der Gruppe mit?"},
+      {id:"help", text:"Wie helfen wir ihm nächste Woche zu Hause (Abholen, Einkaufen, ...)?"},
+    ];
+  }
+  if (key === "B1-2" && task?.id === "b1-mock-03-speaking-teil-2") {
+    flow.contextTopic = clean(task?.keywords || task?.prompt, 180);
+  }
+  // B1 Mock 3 has a pair-format feedback exchange. The partner's example
+  // presentation is a Falowen simulation based on the alternate source topic;
+  // the original outline supplied no actual recording or partner transcript.
+  if (key === "B1-3" && task?.id === "b1-mock-03-speaking-teil-3") {
+    const chosePhone = /Brauchen Kinder Mobiltelefone/i.test(task?.keywords || "");
+    flow.contextTopic = chosePhone ? "Brauchen Kinder Mobiltelefone?" : "Sehen Kinder zu viel fern?";
+    flow.discussion = chosePhone
+      ? {
+        topic: "Sehen Kinder zu viel fern?",
+        presentation: "Mein Thema ist: Sehen Kinder zu viel fern? Zuerst erzähle ich von meiner Familie. Bei uns sehen die Kinder am Wochenende manchmal lange fern. In meinem Heimatland gibt es viele Fernsehsendungen für Kinder. Fernsehen kann unterhaltsam und lehrreich sein, aber zu viel Zeit am Bildschirm ist nicht gesund. Meiner Meinung nach sollten Eltern klare Zeiten vereinbaren. Vielen Dank für Ihre Aufmerksamkeit.",
+      }
+      : {
+        topic: "Brauchen Kinder Mobiltelefone?",
+        presentation: "Mein Thema ist: Brauchen Kinder Mobiltelefone? In meiner Familie haben Kinder erst ab einem bestimmten Alter ein eigenes Handy. In meinem Heimatland nutzen viele Kinder Mobiltelefone für Schule und Kontakt mit den Eltern. Ein Vorteil ist die schnelle Erreichbarkeit, ein Nachteil sind Ablenkungen. Ich finde, Eltern sollten klare Regeln vereinbaren. Vielen Dank für Ihre Aufmerksamkeit.",
+      };
+    flow.mockPresentationFeedback = true;
+  }
   if (key === "B1-2" && /^b1-mock-0[12]-speaking-teil-2$/.test(task?.id || "")) {
     flow.contextTopic=clean(task?.keywords || task?.prompt,180);
   }
