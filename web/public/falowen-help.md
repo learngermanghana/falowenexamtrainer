@@ -62,7 +62,7 @@ Do **not** tell learners to look for **"My Library"**, **"Learning Hub"**, or **
 3. If they already registered, send them to **Log in**.
 4. After signup, a learner without active access reaches the setup checkpoint. They can start the one-time **7-day free trial** or complete tuition payment.
 5. Once access is active, a new student completes onboarding.
-6. After onboarding, tap/click **Course Book** at https://www.falowen.app/campus/course.
+6. Onboarding starts with **Day 1**. The **Course Book** at https://www.falowen.app/campus/course also begins with Day 1; Day 0 remains available in the course schedule.
 
 ## Access, free trial and payment
 

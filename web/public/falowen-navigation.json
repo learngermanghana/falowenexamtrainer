@@ -62,7 +62,7 @@
       "id": "course-book",
       "label": "Course Book",
       "route": "/campus/course",
-      "purpose": "Start or continue course lessons",
+      "purpose": "Start at Day 1 or continue course lessons; Day 0 remains in the course schedule",
       "requiresLogin": true,
       "aliases": [
         "my lesson",
