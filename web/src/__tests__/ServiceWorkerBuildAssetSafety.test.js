@@ -85,7 +85,9 @@ describe("service worker build asset safety", () => {
 
   it("reloads an already-open Falowen tab when a later build revision appears", () => {
     expect(registration).toContain('const BUILD_REVISION_KEY = "falowen:loaded-build-revision"');
-    expect(registration).toContain("const BUILD_REVISION_CHECK_INTERVAL_MS = 5 * 60 * 1000");
+    expect(registration).toContain("const BUILD_REVISION_CHECK_INTERVAL_MS = 30 * 60 * 1000");
+    expect(registration).toContain("const MIN_BUILD_RECHECK_MS = 15 * 60 * 1000");
+    expect(registration).toContain('document.visibilityState !== "hidden"');
     expect(registration).toContain("checkForNewBuild");
     expect(registration).toContain("window.sessionStorage");
     expect(registration).toContain("window.location.reload()");
