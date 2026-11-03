@@ -3,6 +3,9 @@
   "functions": {
     "api/index.js": {
       "maxDuration": 60
+    },
+    "api/music-share.js": {
+      "includeFiles": "web/public/music/index.html"
     }
   },
   "installCommand": "npm install && npm --prefix functions install && npm --prefix web install",
@@ -508,6 +511,10 @@
       "continue": true
     },
     {
+      "src": "/song/([A-Za-z0-9_-]{1,245})",
+      "dest": "/api/music-share.js?track=$1"
+    },
+    {
       "handle": "filesystem"
     },
     {
@@ -545,6 +552,10 @@
     {
       "src": "/api/music",
       "dest": "/api/approved-music.js"
+    },
+    {
+      "src": "/api/music-share",
+      "dest": "/api/music-share.js"
     },
     {
       "src": "/api/(.*)",

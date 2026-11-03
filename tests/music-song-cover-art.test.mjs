@@ -17,9 +17,9 @@ test('20 original cover assets exist and do not rely on external hosts',()=>{
 test('all matching pinned tracks keep the same image on the same recording',()=>{
  assert.ok(catalog.tracks.filter(row=>coverForTrack(row)).length>=16);
  assert.equal(coverForTrack({objectKey:'private/a2/day-01/file.mp3'}),'');
- assert.equal(coverForTrack({level:'B1',day:1}),'/music/covers/b1-dream.svg');
- assert.equal(coverForTrack({level:'B1',day:5}),'');
- assert.equal(coverForTrack({id:'gemeinsam-schaffen-wir-das'}),'/music/covers/motivation-together.svg');
+ assert.equal(coverForTrack({level:'B1',day:1}),'/music/covers/photos/music.jpg');
+ assert.equal(coverForTrack({level:'B1',day:5}),'/music/covers/photos/music.jpg');
+ assert.equal(coverForTrack({id:'gemeinsam-schaffen-wir-das'}),'/music/covers/photos/friendship.jpg');
 });
 test('the cards, song detail and miniplayer use the artwork with a safe fallback',()=>{
  const app=readFileSync(new URL('../web/public/music/app.js',import.meta.url),'utf8');
@@ -29,4 +29,14 @@ test('the cards, song detail and miniplayer use the artwork with a safe fallback
  assert.match(app,/coverForTrack\(track\)/);
  assert.match(html,/id="detail-cover"/);
  assert.match(html,/id="player-cover"/);
+});
+
+test('all audited course recordings and new public songs have local photo artwork',()=>{
+ const coverage=JSON.parse(readFileSync(new URL('../web/public/music/timing-coverage.json',import.meta.url),'utf8'));
+ const sources=JSON.parse(readFileSync(new URL('../web/public/music/covers/photo-sources.json',import.meta.url),'utf8'));
+ for(const track of [...coverage.courseRecordings,...catalog.tracks,{id:'future-song',objectKey:'music/c1/day-01/new-song.mp3'}]){
+  const cover=coverForTrack(track);assert.match(cover,/^\/music\/covers\/photos\/[a-z]+\.jpg$/);
+  assert.ok(existsSync(new URL('../web/public'+cover,import.meta.url)),cover);
+ }
+ for(const photo of Object.values(sources)){assert.match(photo.source,/^https:\/\/www.pexels.com\/photo\//);assert.equal(photo.license,'https://www.pexels.com/license/');}
 });

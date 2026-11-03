@@ -1,5 +1,5 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
-import { coverForTrack } from "./cover-art.js?v=20261102-covers";
+import { coverForTrack } from "./cover-art.js?v=20261103-photo-covers";
 import { songStoryForTrack } from "./song-story.js?v=20261102-bilingual";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
@@ -165,7 +165,12 @@ function rememberPlayed(id) {
 
 let visibleTracks = [];
 const initialParams = new URLSearchParams(location.search);
-const initialId = (document.body.dataset.track || initialParams.get("track") || "").trim();
+function songIdFromLocation() {
+  return location.pathname.match(/^\/song\/([A-Za-z0-9_-]{1,245})\/?$/)?.[1]
+    || location.pathname.match(/\/music\/songs\/([a-z0-9-]+)\.html$/)?.[1]
+    || new URLSearchParams(location.search).get("track");
+}
+const initialId = (document.body.dataset.track || songIdFromLocation() || "").trim();
 
 function safeAudioUrl(value) {
   try {
@@ -214,10 +219,7 @@ function el(tag, className, content) {
 }
 function publicSongUrl(track) {
   // Share the public music website even when the player is inside the campus.
-  const path = track.autoDiscovered
-    ? "/?track=" + encodeURIComponent(track.id)
-    : "/music/songs/" + encodeURIComponent(track.id) + ".html";
-  return new URL(path, "https://music.falowen.app");
+  return new URL("/song/" + encodeURIComponent(track.id), "https://music.falowen.app");
 }
 function songUrl(track) {
   const publicPath = publicSongUrl(track);
@@ -230,20 +232,75 @@ function songUrl(track) {
   url.searchParams.set("embedded", "1");
   return url;
 }
-function setShareText(label) {
-  byId("share").textContent = label;
-  byId("detail-share").textContent = label === "Link copied!" ? "Link copied!" : "Copy song link";
-}
-async function shareCurrent() {
-  if (!current && !selected) return;
-  const url = publicSongUrl(selected || current).href;
-  try {
-    await navigator.clipboard.writeText(url);
-    setShareText("Link copied!");
-  } catch {
-    byId("player-error").textContent = "Copy this song URL: " + url;
-    setShareText("Copy page URL");
+function shareCurrent(track = selected || current) {
+  if (!track) return;
+  document.getElementById("song-share-dialog")?.remove();
+  const returnFocus = document.activeElement;
+  const url = publicSongUrl(track).href;
+  const title = track.title + " · Falowen Music";
+  const text = "Listen to " + track.title + " on Falowen Music";
+  const dialog = el("dialog", "song-share-dialog");
+  dialog.id = "song-share-dialog";
+  dialog.setAttribute("aria-labelledby", "song-share-title");
+  const heading = el("h2", "", "Share this song");
+  heading.id = "song-share-title";
+  const close = el("button", "outline-button", "Close");
+  close.type = "button";
+  close.setAttribute("aria-label", "Close sharing");
+  const dismiss = () => { if (dialog.open && dialog.close) dialog.close(); dialog.remove(); returnFocus?.focus(); };
+  close.addEventListener("click", dismiss);
+  dialog.addEventListener("cancel", event => { event.preventDefault(); dismiss(); });
+  dialog.addEventListener("click", event => { if (event.target === dialog) dismiss(); });
+  const header = el("div", "share-heading");
+  header.append(heading, close);
+  const links = el("div", "social-share-links");
+  const encodedUrl = encodeURIComponent(url);
+  const encodedText = encodeURIComponent(text);
+  const targets = [
+    ["WhatsApp", "https://wa.me/?text=" + encodeURIComponent(text + " " + url)],
+    ["Facebook", "https://www.facebook.com/sharer/sharer.php?u=" + encodedUrl],
+    ["X", "https://twitter.com/intent/tweet?text=" + encodedText + "&url=" + encodedUrl],
+    ["Telegram", "https://t.me/share/url?url=" + encodedUrl + "&text=" + encodedText],
+    ["Email", "mailto:?subject=" + encodeURIComponent(title) + "&body=" + encodeURIComponent(text + "\n" + url)],
+  ];
+  targets.forEach(([label, href]) => {
+    const link = el("a", "social-share-link", label);
+    link.href = href;
+    if (!href.startsWith("mailto:")) { link.target = "_blank"; link.rel = "noopener noreferrer"; }
+    links.append(link);
+  });
+  const input = el("input", "share-url");
+  input.value = url; input.readOnly = true; input.setAttribute("aria-label", "Song link");
+  const status = el("p", "detail-note"); status.setAttribute("role", "status");
+  const copy = el("button", "play-button", "Copy link"); copy.type = "button";
+  copy.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(url); status.textContent = "Link copied! Paste it into any app."; }
+    catch { input.focus(); input.select(); status.textContent = "Select and copy this link, then paste it into your app."; }
+  });
+  const note = el("p", "detail-note", "For Instagram or TikTok, copy the link into a message, bio or story link. On supported phones, More apps opens your sharing menu.");
+  dialog.append(header, el("p", "share-song-name", track.title), links, input, copy);
+  if (typeof navigator.share === "function") {
+    const native = el("button", "outline-button", "More apps…"); native.type = "button";
+    native.addEventListener("click", async () => {
+      try { await navigator.share({title, text, url}); }
+      catch (error) { if (error.name !== "AbortError") status.textContent = "Sharing is unavailable. Choose a platform or copy the link."; }
+    });
+    dialog.append(native);
   }
+  dialog.append(status, note);
+  document.body.append(dialog);
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else { dialog.setAttribute("open", ""); dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true"); }
+  // Native dialog traps focus; this also supports older embedded browsers.
+  dialog.addEventListener("keydown", event => {
+    if (event.key === "Escape") { event.preventDefault(); dismiss(); }
+    if (event.key !== "Tab") return;
+    const controls = [...dialog.querySelectorAll("button,a[href],input")];
+    const first = controls[0], last = controls.at(-1);
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  });
+  close.focus();
 }
 function playCurrentTrack() {
   if (!current) return;
@@ -792,8 +849,8 @@ document.querySelectorAll(".lesson-tabs button").forEach(button => button.addEve
 byId("listen-next").addEventListener("click", () => setTab("lyrics"));
 byId("lyrics-next").addEventListener("click", () => setTab("practice"));
 byId("check-answers").addEventListener("click", checkAnswers);
-byId("share").addEventListener("click", shareCurrent);
-byId("detail-share").addEventListener("click", shareCurrent);
+byId("share").addEventListener("click", () => shareCurrent(current || selected));
+byId("detail-share").addEventListener("click", () => shareCurrent(selected || current));
 byId("detail-favorite").addEventListener("click", () => { if (selected) toggleFavorite(selected.id); });
 byId("follow-lyrics").addEventListener("change", () => { followLyrics=byId("follow-lyrics").checked; highlightedLine = -2; updateLyricHighlight(); });
 byId("show-english").addEventListener("change", () => {
@@ -807,7 +864,7 @@ byId("repeat").addEventListener("change", () => {
 });
 audio.addEventListener("error", () => handlePlaybackFailure(audio.error));
 window.addEventListener("popstate", () => {
-  const id = location.pathname.match(/\/music\/songs\/([a-z0-9-]+)\.html$/)?.[1] || new URLSearchParams(location.search).get("track");
+  const id = songIdFromLocation();
   const track = catalog.find(song => song.id === id);
   if (track) showSong(track, false, false);
   else closeDetail(false);
@@ -839,7 +896,7 @@ async function refreshMusic() {
     if (current) rebuildPlaybackQueue(current);
     byId("discovery-status").textContent="";
     if(selected){lyricsRequests.delete(selected.id);loadPublishedLyrics(selected);}
-    const selectedId=initialId || new URLSearchParams(location.search).get("track");
+    const selectedId=selected?.id || songIdFromLocation() || initialId;
     if(selectedId && !selected) {
       const track=catalog.find(song=>song.id===selectedId);
       if(track) showSong(track,false,false);
