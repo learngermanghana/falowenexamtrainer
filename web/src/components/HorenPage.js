@@ -100,7 +100,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
               style={{ ...styles.secondaryButton, width:"100%", textAlign:"left", display:"grid", gap:4, padding:"14px 16px" }}>
               <strong>Hören Sample 3 · B1 Mock 3</strong>
               <span style={{fontSize:13,fontWeight:500,opacity:0.8}}>
-                Four R2 recordings · 15 checked questions (Teile 1–2) · Teile 3–4 questions pending
+                30 audio-verified questions · four Teile · R2 audio · server-graded
               </span>
             </button>
           ) : null}

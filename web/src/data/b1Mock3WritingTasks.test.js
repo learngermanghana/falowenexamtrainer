@@ -40,7 +40,7 @@ describe("B1 Mock 3 Schreiben source + standardized practice contract", () => {
     expect(mock.mode).toBe("section-preview");
     expect(mock.sections).toContain("Schreiben · 3 tasks");
     expect(mock.sections).toContain("Lesen · 30 questions");
-    expect(mock.sections).toContain("Hören · 15 verified + 15 pending");
+    expect(mock.sections).toContain("Hören · 30 questions");
     expect(mock.sections).toContain("Sprechen · 3 parts");
   });
 });
