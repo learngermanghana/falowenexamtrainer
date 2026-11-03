@@ -231,6 +231,23 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect(one.data.result.structuredContent.name).toBe("Student One");
       expect(two.data.result.structuredContent.name).toBe("Student Two");
       expect(one.data.result.structuredContent.id).not.toEqual(two.data.result.structuredContent.id);
+      // Existing ChatGPT installations expose the older lesson(day) tool.
+      // It must now deliver actual A2/B1 questions without revealing grading keys.
+      const legacy = (token) => postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 14, method: "tools/call",
+        params: { name: "get_my_falowen_lesson",
+          arguments: { day: 1, level: "C2", section: "reading" } },
+      }, token);
+      const a2 = (await legacy(first.tokens.access_token)).data.result.structuredContent;
+      const b1 = (await legacy(second.tokens.access_token)).data.result.structuredContent;
+      expect(a2.level).toBe("A2");
+      expect(b1.level).toBe("B1");
+      for (const exercise of [a2, b1]) {
+        expect(exercise.featuredCourseBookSection.section).toBe("reading");
+        expect(exercise.featuredCourseBookSection.material.questions.length).toBeGreaterThan(2);
+        expect(exercise.featuredCourseBookSection.material.questions[0]).not.toHaveProperty("answerIndex");
+        expect(JSON.stringify(exercise.featuredCourseBookSection)).not.toContain('"transcript"');
+      }
       const expired = await postJson(origin + "/api/chatgpt/approve", {
         ...requestParams("expired"), idToken: "inactive",
       });
@@ -405,6 +422,17 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect(prep.practiceQuestions[0].question).toMatch(/7:00 Uhr/);
       expect(prep.practiceQuestions[0]).not.toHaveProperty("answer");
       expect(JSON.stringify(prep)).not.toContain("Private Klasse");
+
+      const oldPluginLesson = await postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 92, method: "tools/call",
+        params: { name: "get_my_falowen_lesson",
+          arguments: { day: 1, level: "C2" } },
+      }, grant.tokens.access_token);
+      const a1 = oldPluginLesson.data.result.structuredContent;
+      expect(a1.level).toBe("A1");
+      expect(a1.featuredCourseBookSection.section).toBe("reading");
+      expect(a1.featuredCourseBookSection.material.questions).toHaveLength(10);
+      expect(a1.featuredCourseBookSection.material.questions[0]).not.toHaveProperty("answerIndex");
     });
   });
 
