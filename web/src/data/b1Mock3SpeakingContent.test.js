@@ -57,6 +57,6 @@ describe("B1 Mock 3 Sprechen source content", () => {
     expect(item.status).toBe("preview");
     expect(item.mode).toBe("section-preview");
     expect(item.sections).toContain("Sprechen · 3 parts");
-    expect(item.sections).toContain("Hören pending");
+    expect(item.sections).toContain("Hören · 15 verified + 15 pending");
   });
 });
