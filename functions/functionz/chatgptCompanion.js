@@ -71,6 +71,52 @@ function lessonContentResponse(level, day, section = "overview") {
   return { ...base, available: true, material: content[section] };
 }
 
+// One-on-one exam practice is instructed in the ChatGPT conversation itself.
+// No extra model request, score write, or transcript disclosure is made here.
+const PRACTICE_SKILLS = new Set(["reading", "listening", "speaking", "writing", "grammar"]);
+function practiceGuideResponse(level, day, skill = "reading", mode = "exam", language = "de") {
+  if (!PRACTICE_SKILLS.has(skill) || !["exam", "study"].includes(mode) ||
+      !["de", "en"].includes(language)) {
+    return { available: false, error: "Unsupported practice skill, mode or language." };
+  }
+  const original = lessonContentResponse(level, day, skill);
+  if (!original.available) return {
+    ...original, practiceMode: mode, language,
+    clarification: "The exact learner-facing material for this skill/day is unavailable. Do not invent an exercise, an audio link or an answer key.",
+  };
+  const rubric = {
+    reading: ["Locate the passage evidence", "Explain the author's argument", "Identify counterarguments and inferences", "Use the learner's own words"],
+    listening: ["Listen to the actual Campus audio first", "Identify the main point", "Distinguish evidence from opinion", "Confirm key details"],
+    speaking: ["Address the actual prompt", "Structure a clear argument", "Use precise level-appropriate German", "Respond to counterarguments"],
+    writing: ["Fulfil every prompt point", "Organise and connect arguments", "Use correct, precise German", "Revise grammar and register"],
+    grammar: ["Explain the grammatical meaning", "Show a source example", "Invite a learner-created sentence", "Correct form and explain why"],
+  };
+  const steps = {
+    reading: "First display the authentic passage. Ask only one original question at a time and wait for the student's answer. Give feedback with supporting paragraph evidence, then ask the next question. For open-response C1 questions, assess reasoning without inventing an official answer key.",
+    listening: "Link the learner to the lesson audio in Falowen Campus where available. Never claim to play an audio file that was not supplied. Ask one original question at a time after listening; do not disclose hidden transcripts.",
+    speaking: "Present the original discussion prompt, let the learner answer in German, and coach coherence, grammar, vocabulary, pronunciation only when audio is actually available, and counterarguments.",
+    writing: "Present the original writing task and expected length. Request the learner's own draft, then explain strengths and revisions using the provided rubric; do not claim to mark or submit in Campus.",
+    grammar: "Teach the exact course grammar in the requested language, provide short level-appropriate examples, then ask a learner to create one sentence at a time and explain corrections.",
+  };
+  return {
+    ...original, practiceMode: mode, explanationLanguage: language,
+    interaction: {
+      method: "one_question_at_a_time",
+      instructions: steps[skill],
+      rubric: rubric[skill],
+      studentAnswersRequired: true,
+      estimatedScoreIsPracticeOnly: true,
+      preserveStudentAnswersOnlyWithinConversation: true,
+      summaryInstruction: "At the end, summarise attempted questions, demonstrated strengths and areas to revise. Only report an exact score when the conversation contains sufficient graded evidence. Do not write grades, completion or scores to Falowen Campus.",
+      ...(skill === "listening" ? {
+        sourceAudioNote: original.material?.audioAvailableInCampus
+          ? "Open the authenticated Campus lesson link for audio; no direct audio URL is supplied by this tool."
+          : "No verified audio is supplied for this lesson; do not imply that it is playable.",
+      } : {}),
+    },
+  };
+}
+
 const SITE = "https://www.falowen.app";
 const ISSUER = SITE + "/api/chatgpt";
 const RESOURCE = ISSUER + "/mcp";
@@ -329,8 +375,23 @@ const toolDefinitions = [
     },
   },
   {
+    name: "get_my_falowen_practice_guide",
+    description: "Start a source-grounded one-question-at-a-time C1/C2 or A1–B2 German course practice. Use the exact enrolled lesson text for Lesen, audio availability for Hören, grammar, speaking or writing; English explanation is optional. No official grading, submission or answer keys.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        day: { type: "integer", minimum: 1, maximum: 50 },
+        skill: { type: "string", enum: ["reading", "listening", "speaking", "writing", "grammar"] },
+        mode: { type: "string", enum: ["exam", "study"] },
+        language: { type: "string", enum: ["de", "en"], description: "Language for explanations, not the original German source." },
+      },
+      required: ["day", "skill"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "get_my_falowen_lesson_content",
-    description: "Read learner-facing Falowen Course Book content for my enrolled level. A1–B1: original available workbook sections; B2: full 28-day rotating practice; C1: 28-day self-study guidance and original reading tasks where present (some lack passages); C2: 28-day rotating Lesen, Hören, Sprechen and Schreiben with passages only on real Lesen days. Choose the exact day and section. Never invent missing exercises or expose solutions, transcripts or private student work.",
+    description: "Read learner-facing Course Book content for my enrolled level. C1 now has Falowen-authored passages and questions on all 28 days (not Goethe originals). B2/C2 rotating skill days are preserved. Choose exact day and section; do not expose hidden solutions or invent audio.",
     inputSchema: {
       type: "object",
       properties: {
@@ -384,6 +445,14 @@ async function callTool(name, args, student, admin) {
   if (name === "get_my_falowen_next_class") {
     return getStudentTimetable({ db: admin.firestore(), student, now: new Date() });
   }
+  if (name === "get_my_falowen_practice_guide") {
+    if (!Number.isInteger(args?.day) || args.day < 1 || args.day > 50) {
+      throw new Error("day must be an integer between 1 and 50");
+    }
+    if (!view.level) return { available: false, error: "No linked student course level." };
+    return practiceGuideResponse(view.level, args.day, args?.skill,
+      args?.mode || "exam", args?.language || "de");
+  }
   if (name === "get_my_falowen_lesson" || name === "get_my_falowen_lesson_content") {
     if (!Number.isInteger(args?.day) || args.day < 1 || args.day > 50) throw new Error("day must be an integer between 1 and 50");
     if (name === "get_my_falowen_lesson_content") {
@@ -410,6 +479,7 @@ async function callTool(name, args, student, admin) {
       ...(exported
         ? { courseBookContent: lessonContentResponse(view.level, args.day, "overview"),
             ...(featured ? { featuredCourseBookSection: featured } : {}),
+            practiceSuggestion: "For exam-style practice, ask: Examine me on this day's Lesen. Show the text, then ask one question at a time, wait for my answer, and explain evidence. Writing, grammar and speaking coaching are also available from the actual lesson. All feedback is practice only.",
             contentTool: "get_my_falowen_lesson_content",
             exactContentAvailable: true }
         : { exactContentAvailable: false,
@@ -591,7 +661,7 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "Falowen Learning Companion", version: "1.0.0" },
-        instructions: "Read-only Falowen learning companion. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
+        instructions: "Tutoring protocol: prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
@@ -635,6 +705,6 @@ function makeRouter(admin) {
 
 module.exports = {
   makeRouter, oauthParameters, safeStudentAccess, scoreRowsForStudent, summarizeStudentAssignments,
-  lessonContentResponse,
+  lessonContentResponse, practiceGuideResponse,
   constants: { ISSUER, RESOURCE, SCOPE, CLIENT_ID, CALLBACK },
 };
