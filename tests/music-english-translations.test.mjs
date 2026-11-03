@@ -31,7 +31,7 @@ test('offline English translations exactly match published recording lyric lines
 test('every published course-draft translation matches its full source and exact recording identity',()=>{
  const studio=read('web/public/music/studio-drafts.json').tracks;
  const keys=new Set();
- assert.equal(translated.drafts.length,40);
+ assert.equal(translated.drafts.length,41);
  for(const row of translated.drafts){
   assert.ok(!keys.has(row.objectKey)); keys.add(row.objectKey);
   assert.ok(row.objectKey.startsWith(`music/${row.level.toLowerCase()}/day-${String(row.day).padStart(2,'0')}/`));
