@@ -167,7 +167,7 @@ let visibleTracks = [];
 const initialParams = new URLSearchParams(location.search);
 function songIdFromLocation() {
   return location.pathname.match(/^\/song\/([A-Za-z0-9_-]{1,245})\/?$/)?.[1]
-    || location.pathname.match(/\/music\/songs\/([a-z0-9-]+)\.html$/)?.[1]
+    || location.pathname.match(/\/music\/songs\/([A-Za-z0-9_-]{1,245})\.html$/)?.[1]
     || new URLSearchParams(location.search).get("track");
 }
 const initialId = (document.body.dataset.track || songIdFromLocation() || "").trim();
@@ -943,7 +943,7 @@ Promise.all([
   populateFeatured();
   populateFilters();
   renderCatalog();
-  const id = initialId || location.pathname.match(/\/music\/songs\/([a-z0-9-]+)\.html$/)?.[1];
+  const id = initialId || location.pathname.match(/\/music\/songs\/([A-Za-z0-9_-]{1,245})\.html$/)?.[1];
   const track = catalog.find(song => song.id === id);
   if (track) showSong(track, false, false);
   refreshMusic();

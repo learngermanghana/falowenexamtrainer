@@ -80,3 +80,30 @@ test('browser back and forward recognise the new song URL without autoplay',asyn
  assert.ok(w.document.getElementById('audio').paused);
  dom.window.close();
 });
+
+test('legacy .html links reach song metadata before filesystem or the learner SPA',()=>{
+ const config=JSON.parse(read('vercel.json'));
+ const routeIndex=config.routes.findIndex(row=>row.src && new RegExp('^'+row.src+'$').test('/music/songs/r2-a2-day-10-b64_RGllIFdlbHQgZW50ZGVja2VuLm1wMw.html'));
+ assert.ok(routeIndex>=0);assert.ok(routeIndex<config.routes.findIndex(row=>row.handle==='filesystem'));
+ const route=config.routes[routeIndex];
+ assert.equal(route.dest,'/api/music-share.js?track=$1');
+ const ids=[...coverage.courseRecordings.map(row=>row.trackId),...catalog.tracks.filter(row=>!row.retired).map(row=>row.id)];
+ for(const id of ids){
+  const match=('/music/songs/'+id+'.html').match(new RegExp('^'+route.src+'$'));
+  assert.equal(match?.[1],id);const response=request(match[1]);assert.equal(response.status,200);
+  assert.ok(response.body.includes('data-track="'+id+'"'));
+ }
+ const example=request('r2-a2-day-10-b64_RGllIFdlbHQgZW50ZGVja2VuLm1wMw');
+ assert.match(example.body,/<title>Die Welt entdecken – The Traveller · Falowen Music<\/title>/);
+ assert.ok(!new RegExp('^'+route.src+'$').test('/music/songs/private/hoeren.html'));
+});
+
+test('back/forward recognises base64 IDs in older HTML song links',async()=>{
+ const {dom,w}=await room({multiple:true});
+ const track=catalog.tracks.filter(row=>!row.retired)[1];
+ assert.match(track.id,/b64_/);
+ w.history.pushState({},'', '/music/songs/'+track.id+'.html');
+ w.dispatchEvent(new w.PopStateEvent('popstate'));
+ assert.equal(w.document.getElementById('detail-title').textContent,track.title);
+ assert.ok(w.document.getElementById('audio').paused);dom.window.close();
+});
