@@ -92,6 +92,7 @@ const CLASSROOM_RECORDINGS = Object.freeze({
   'A2-18': Object.freeze({ id: 'a2-day18-bank-telephone', key: 'a2/day-18/bank-telefonat.mp3' }),
   'A2-20': Object.freeze({ id: 'a2-day20-complaint', key: 'a2/day-20/reklamation-falsches-hemd.mp3' }),
   'A2-19': Object.freeze({ id: 'a2-day19-shopping', key: 'a2/day-19/einkaufen-wo-und-wie.mp3' }),
+  'A2-21': Object.freeze({ id: 'a2-day21-weekend-classroom', key: 'a2/day-21/ein-wochenende-planen.mp3' }),
   'B1-25': Object.freeze({ id: 'b1-day25-consumer-service', key: 'b1/day-25/online-shopping-verbraucherservice.mp3' }),
 });
 function createClassroomAudioHandler(options = {}) {
