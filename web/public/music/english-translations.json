@@ -6673,6 +6673,106 @@
           "en": "At Falowen, I learn to think about our future."
         }
       ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-16/So bestelle ich mein Essen.mp3",
+      "level": "A1",
+      "day": 16,
+      "assignmentKey": "A1-9",
+      "draftTitle": "Kein Fleisch, bitte",
+      "lines": [
+        {
+          "de": "Im Restaurant sehe ich die Karte.",
+          "en": "At the restaurant, I look at the menu."
+        },
+        {
+          "de": "Der Kellner fragt: Was möchten Sie?",
+          "en": "The waiter asks, “What would you like?”"
+        },
+        {
+          "de": "Ich sage: Eine Suppe, bitte.",
+          "en": "I say, “A soup, please.”"
+        },
+        {
+          "de": "Aber kein Fleisch für mich.",
+          "en": "But no meat for me."
+        },
+        {
+          "de": "Ich möchte Suppe, keinen Fisch.",
+          "en": "I'd like soup, not fish."
+        },
+        {
+          "de": "Ich trinke Wasser, keinen Saft.",
+          "en": "I'm having water, not juice."
+        },
+        {
+          "de": "So bestelle ich mein Essen.",
+          "en": "That's how I order my food."
+        },
+        {
+          "de": "Mia isst gern Reis und Gemüse.",
+          "en": "Mia likes eating rice and vegetables."
+        },
+        {
+          "de": "Sie mag heute keinen Kuchen.",
+          "en": "She doesn't feel like cake today."
+        },
+        {
+          "de": "Der Kellner bringt uns alles.",
+          "en": "The waiter brings us everything."
+        },
+        {
+          "de": "Wir sagen: Vielen Dank!",
+          "en": "We say, “Thank you very much!”"
+        },
+        {
+          "de": "Ich möchte Suppe, keinen Fisch.",
+          "en": "I'd like soup, not fish."
+        },
+        {
+          "de": "Ich trinke Wasser, keinen Saft.",
+          "en": "I'm having water, not juice."
+        },
+        {
+          "de": "So bestelle ich mein Essen.",
+          "en": "That's how I order my food."
+        },
+        {
+          "de": "Das Essen schmeckt uns sehr.",
+          "en": "We really enjoy the food."
+        },
+        {
+          "de": "Wir kommen morgen wieder.",
+          "en": "We'll come back tomorrow."
+        },
+        {
+          "de": "Mit Falowen kann ich Essen bestellen.",
+          "en": "With Falowen, I can order food."
+        }
+      ],
+      "vocabulary": [
+        {
+          "de": "die Speisekarte / die Karte",
+          "en": "menu"
+        },
+        {
+          "de": "bestellen",
+          "en": "to order"
+        },
+        {
+          "de": "der Kellner",
+          "en": "waiter"
+        },
+        {
+          "de": "kein Fleisch",
+          "en": "no meat"
+        },
+        {
+          "de": "Vielen Dank!",
+          "en": "Thank you very much!"
+        }
+      ]
     }
   ]
 }
