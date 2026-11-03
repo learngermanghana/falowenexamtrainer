@@ -1,15 +1,18 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import HealthIndicator from "../components/HealthIndicator";
+import { __resetHealthCacheForTests } from "../hooks/useHealthStatus";
 
 const originalEnv = process.env.REACT_APP_BACKEND_URL;
 
 describe("HealthIndicator", () => {
   beforeEach(() => {
+    __resetHealthCacheForTests();
     process.env.REACT_APP_BACKEND_URL = "https://api-awc2au65xa-ew.a.run.app";
     global.fetch = jest.fn();
   });
 
   afterEach(() => {
+    __resetHealthCacheForTests();
     process.env.REACT_APP_BACKEND_URL = originalEnv;
     delete global.fetch;
   });

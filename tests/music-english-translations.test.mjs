@@ -67,7 +67,7 @@ test('both public listening and workbook use matching published words, with leve
  assert.match(workbook,/courseLevel === "A1"/);
  assert.match(workbook,/data-english-line/);
  assert.match(workbook,/English translation is not available/);
- assert.match(publicApp,/fetch\("\/music\/english-translations.json"/);
+ assert.match(publicApp,/fetchSongPack\("\/music\/english-translations.json"/);
  assert.match(workbook,/getJson\("\/music\/english-translations.json"\)/);
 });
 

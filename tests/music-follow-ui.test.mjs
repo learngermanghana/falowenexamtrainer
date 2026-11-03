@@ -12,17 +12,40 @@ import {approximateScrollTop} from '../web/public/music/follow-lyrics.js';
 import {matchingEnglishTranslation,matchingDraftEnglishTranslation} from '../web/public/music/english-translations.js';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const recordings=JSON.parse(read('web/public/music/timings.json')).recordings;
-async function room(track,pack,{studio=null,translations=null,classTimings=null}={}){
- const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
+async function room(track,pack,{studio=null,translations=null,classTimings=null,initiallySelected=true,requests=[]}={}){
+ const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/'+(initiallySelected?'?track='+track.id:''),runScripts:'outside-only'});
  const w=dom.window;
+ w.HTMLElement.prototype.scrollIntoView=()=>{};
  Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,coverForTrack,songStoryForTrack,approximateScrollTop,matchingEnglishTranslation,matchingDraftEnglishTranslation,
-  matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('class-timings')?{recordings:classTimings||[]}:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:classTimings?[track]:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
+  matchMedia:()=>({matches:true}),fetch:async url=>{
+    requests.push(String(url));
+    return {ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('class-timings')?{recordings:classTimings||[]}:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:classTimings?[track]:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}};
+  }});
  const a=w.document.getElementById('audio');
  a.play=()=>Promise.resolve(); a.pause=()=>{};a.load=()=>{};Object.defineProperty(a,'readyState',{value:1});
  w.eval(read('web/public/music/app.js').replace(/^import .*;\n/gm,''));
  for(let i=0;i<8;i++)await new Promise(r=>setImmediate(r));
- return {w,a,dom,click:id=>w.document.getElementById(id).click()};
+ return {w,a,dom,requests,click:id=>w.document.getElementById(id).click()};
 }
+test('a library-only visit defers five lesson metadata requests until a song opens', async () => {
+ const track={id:'r2-test-a2',level:'A2',day:13,title:'Test song',
+   objectKey:'music/a2/day-13/test-song.mp3',autoDiscovered:true,
+   coursebook:true,audioUrl:'https://www.falowen.app/api/music?track=r2-test-a2'};
+ const requests=[];
+ const {w,dom}=await room(track,null,{initiallySelected:false,requests});
+ try {
+   assert.ok(requests.includes('/music/catalog.json'));
+   assert.ok(requests.includes('/api/music-library'));
+   const packs=['learning','studio-drafts','english-translations','song-stories','class-timings'];
+   for(const name of packs) assert.ok(!requests.includes('/music/'+name+'.json'),name+' loaded on library-only view');
+   const open=w.document.querySelector('.track-card .track-link');
+   assert.ok(open,'discovered song must still appear');
+   open.click();
+   for(let i=0;i<8;i++) await new Promise(r=>setImmediate(r));
+   for(const name of packs) assert.ok(requests.includes('/music/'+name+'.json'),name+' missing after song opened');
+ } finally {dom.window.close();}
+});
+
 test('all translated live course drafts expose matching English without enabling fake timed lines',async()=>{
  const translations=JSON.parse(read('web/public/music/english-translations.json'));
  const studio=JSON.parse(read('web/public/music/studio-drafts.json')).tracks;

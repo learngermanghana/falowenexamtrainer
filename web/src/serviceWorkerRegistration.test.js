@@ -8,7 +8,8 @@ describe('serviceWorkerRegistration update handling', () => {
   beforeEach(() => {
     originalServiceWorker = navigator.serviceWorker;
     controllerChangeHandler = null;
-    reloadSpy = jest.spyOn(window.location, 'reload').mockImplementation(() => {});
+    reloadSpy = jest.fn();
+    __private__.setReloadHandlerForTests(reloadSpy);
 
     Object.defineProperty(navigator, 'serviceWorker', {
       configurable: true,
@@ -28,7 +29,7 @@ describe('serviceWorkerRegistration update handling', () => {
       configurable: true,
       value: originalServiceWorker,
     });
-    reloadSpy.mockRestore();
+    __private__.setReloadHandlerForTests(null);
     jest.restoreAllMocks();
   });
 
@@ -60,7 +61,7 @@ describe('serviceWorkerRegistration update handling', () => {
     controllerChangeHandler();
     controllerChangeHandler();
 
-    expect(window.location.reload).toHaveBeenCalledTimes(1);
+    expect(reloadSpy).toHaveBeenCalledTimes(1);
   });
 
   it('does not reload on controllerchange without a controller', () => {
@@ -75,7 +76,7 @@ describe('serviceWorkerRegistration update handling', () => {
     navigator.serviceWorker.controller = null;
     controllerChangeHandler();
 
-    expect(window.location.reload).not.toHaveBeenCalled();
+    expect(reloadSpy).not.toHaveBeenCalled();
   });
 });
 
@@ -84,11 +85,12 @@ describe('forcePeriodicRefresh', () => {
 
   beforeEach(() => {
     window.localStorage.clear();
-    reloadSpy = jest.spyOn(window.location, 'reload').mockImplementation(() => {});
+    reloadSpy = jest.fn();
+    __private__.setReloadHandlerForTests(reloadSpy);
   });
 
   afterEach(() => {
-    reloadSpy.mockRestore();
+    __private__.setReloadHandlerForTests(null);
     jest.restoreAllMocks();
   });
 
@@ -102,11 +104,11 @@ describe('forcePeriodicRefresh', () => {
 
     await __private__.forcePeriodicRefresh(registration);
     expect(registration.update).toHaveBeenCalledTimes(1);
-    expect(window.location.reload).toHaveBeenCalledTimes(1);
+    expect(reloadSpy).toHaveBeenCalledTimes(1);
 
     await __private__.forcePeriodicRefresh(registration);
     expect(registration.update).toHaveBeenCalledTimes(1);
-    expect(window.location.reload).toHaveBeenCalledTimes(1);
+    expect(reloadSpy).toHaveBeenCalledTimes(1);
 
     expect(window.localStorage.getItem('app-last-force-refresh-at')).toBe(String(now));
   });
@@ -123,9 +125,52 @@ describe('forcePeriodicRefresh', () => {
     await __private__.forcePeriodicRefresh(registration);
 
     expect(registration.update).not.toHaveBeenCalled();
-    expect(window.location.reload).not.toHaveBeenCalled();
+    expect(reloadSpy).not.toHaveBeenCalled();
 
     setItemSpy.mockRestore();
   });
 
+});
+
+describe('build revision CDN request throttling', () => {
+  let originalVisibility;
+  let fetchBefore;
+
+  beforeEach(() => {
+    fetchBefore = global.fetch;
+    originalVisibility = Object.getOwnPropertyDescriptor(document, 'visibilityState');
+    window.sessionStorage.clear();
+    __private__.resetBuildCheckForTests();
+  });
+
+  afterEach(() => {
+    if (originalVisibility) Object.defineProperty(document, 'visibilityState', originalVisibility);
+    else delete document.visibilityState;
+    global.fetch = fetchBefore;
+    __private__.resetBuildCheckForTests();
+    jest.restoreAllMocks();
+  });
+
+  it('checks a visible tab once, then skips repeat and hidden-tab requests', async () => {
+    let now = 1_000_000;
+    jest.spyOn(Date, 'now').mockImplementation(() => now);
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ revision: '2026-11-03-cost-guard' }),
+    });
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+
+    await __private__.checkForNewBuild({ reloadOnChange: false });
+    await __private__.checkForNewBuild({ reloadOnChange: false });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    now += 16 * 60 * 1000;
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
+    await __private__.checkForNewBuild({ reloadOnChange: false });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+    await __private__.checkForNewBuild({ reloadOnChange: false });
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
 });

@@ -25,9 +25,9 @@ const isDay0CoursePath = (pathname = "") =>
   pathname.startsWith("/campus/course/") && pathname.includes("day-0");
 
 function HealthIndicator() {
-  // Check once on mount. If that first request hits a transient Cloud Run/CORS
-  // failure, useHealthStatus retries briefly and then stops instead of polling forever.
-  const { status } = useHealthStatus({ pollIntervalMs: 0 });
+  // Check on mount, reusing a recent successful probe across student routes.
+  // Transient failures still get brief retries but never continuous polling.
+  const { status } = useHealthStatus({ pollIntervalMs: 0, reuseSuccessMs: 15 * 60 * 1000 });
   const { isOffline } = useOfflineStatus();
   const location = useLocation();
   const navigate = useNavigate();

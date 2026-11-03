@@ -30,6 +30,9 @@ let learning = {};
 let studioDrafts = [];
 let englishTranslations = {recordings:[]};
 let editorialStories = {byObjectKey:{},byTrackId:{}};
+let songDetailsPromise = null;
+// Static lesson packs are needed only after a listener selects a song, not for
+// every visitor browsing the music catalogue.
 let showEnglish = false;
 let activeEnglishPack = null;
 const normalizedTitle = value => String(value || "").toLocaleLowerCase("de-DE")
@@ -687,7 +690,7 @@ async function loadPublishedLyrics(track) {
   if (lyricsRequests.has(track.id) || !track.objectKey) return;
   lyricsRequests.add(track.id);
   try {
-    const response = await fetch("/api/music-lyrics?track=" + encodeURIComponent(track.id), {cache:"no-cache"});
+    const response = await fetch("/api/music-lyrics?track=" + encodeURIComponent(track.id));
     if (!response.ok) {lyricsRequests.delete(track.id);return;}
     const data = await response.json();
     if (data.objectKey !== track.objectKey || typeof data.lyrics !== "string" || !data.lyrics.trim()) return;
@@ -804,6 +807,9 @@ function renderDetail(track) {
 }
 function showSong(track, autoplay = false, navigate = true) {
   if (selected?.id !== track.id) showEnglish = track.level === "A1";
+  // Load translations, draft notes, lesson exercises and stories once per page,
+  // in parallel with playback. The first visit needs only the small catalogue.
+  loadSongDetails();
   selected = track;
   rebuildPlaybackQueue(track);
   setPlayer(track, autoplay);
@@ -869,15 +875,31 @@ window.addEventListener("popstate", () => {
   if (track) showSong(track, false, false);
   else closeDetail(false);
 });
-async function refreshMusic() {
+const MUSIC_DISCOVERY_CACHE_KEY = "falowen:music-discovery:v1";
+const MUSIC_DISCOVERY_CACHE_MS = 10 * 60 * 1000;
+
+function recentDiscoveredTracks() {
+  try {
+    const entry = JSON.parse(sessionStorage.getItem(MUSIC_DISCOVERY_CACHE_KEY) || "null");
+    return entry && Date.now() - entry.time < MUSIC_DISCOVERY_CACHE_MS &&
+      Array.isArray(entry.tracks) ? entry.tracks : null;
+  } catch { return null; }
+}
+
+async function refreshMusic({ preferCache = false } = {}) {
   const button=byId("refresh-music");
   button.disabled=true;
   byId("discovery-status").textContent="Updating songs…";
   try {
-    const response=await fetch("/api/music-library",{cache:"no-cache"});
-    if(!response.ok) throw Error("R2 music discovery is unavailable.");
-    const data=await response.json();
+    const cached = preferCache ? recentDiscoveredTracks() : null;
+    const response = cached ? null : await fetch("/api/music-library");
+    if(response && !response.ok) throw Error("R2 music discovery is unavailable.");
+    const data = cached ? {ok:true,tracks:cached} : await response.json();
     if(!data?.ok || !Array.isArray(data.tracks)) throw Error("Music discovery returned no valid catalogue.");
+    if (!cached) {
+      try { sessionStorage.setItem(MUSIC_DISCOVERY_CACHE_KEY,
+        JSON.stringify({time:Date.now(),tracks:data.tracks})); } catch {}
+    }
     const dynamic=data.tracks.map(safeTrack).filter(Boolean);
     const pinnedKeys=new Set(pinnedTracks.map(track=>track.objectKey).filter(Boolean));
     const pinnedIds=new Set(pinnedTracks.map(track=>track.id));
@@ -907,46 +929,61 @@ async function refreshMusic() {
 }
 byId("refresh-music").addEventListener("click",refreshMusic);
 
-Promise.all([
-  fetch("/music/catalog.json", { cache: "no-cache" }).then(res => {
-    if (!res.ok) throw new Error("The music library is temporarily unavailable.");
-    return res.json();
-  }),
-  fetch("/music/learning.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : { lessons: {} })
-    .catch(() => ({ lessons: {} })),
-  fetch("/music/studio-drafts.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : { tracks: [] })
-    .catch(() => ({ tracks: [] })),
-  fetch("/music/english-translations.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : {recordings:[]})
-    .catch(() => ({recordings:[]})),
-  fetch("/music/song-stories.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : {byObjectKey:{},byTrackId:{}})
-    .catch(() => ({byObjectKey:{},byTrackId:{}})),
-  fetch("/music/class-timings.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : {recordings:[]})
-    .catch(() => ({recordings:[]})),
-]).then(([data, lessons, drafts, translations, stories, classTimings]) => {
-  englishTranslations = Array.isArray(translations?.recordings) ? translations : {recordings:[]};
-  editorialStories = stories && typeof stories==="object" ? stories : {byObjectKey:{},byTrackId:{}};
+// Music lessons and translations are static; browsers can reuse responses with
+// normal HTTP caching. Keep song data out of the initial library page request.
+function fetchSongPack(url, fallback) {
+  return fetch(url).then(res => res.ok ? res.json() : fallback).catch(() => fallback);
+}
+function loadSongDetails() {
+  if (songDetailsPromise) return songDetailsPromise;
+  songDetailsPromise = Promise.all([
+    fetchSongPack("/music/learning.json", {lessons:{}}),
+    fetchSongPack("/music/studio-drafts.json", {tracks:[]}),
+    fetchSongPack("/music/english-translations.json", {recordings:[]}),
+    fetchSongPack("/music/song-stories.json", {byObjectKey:{},byTrackId:{}}),
+    fetchSongPack("/music/class-timings.json", {recordings:[]}),
+  ]).then(([lessons, drafts, translations, stories, classTimings]) => {
+    englishTranslations = Array.isArray(translations?.recordings) ? translations : {recordings:[]};
+    editorialStories = stories && typeof stories === "object" ? stories : {byObjectKey:{},byTrackId:{}};
+    learning = lessons && typeof lessons.lessons === "object" && lessons.lessons ? lessons.lessons : {};
+    studioDrafts = Array.isArray(drafts?.tracks) ? drafts.tracks.filter(item =>
+      ["A1","A2","B1"].includes(item.level) && Number.isInteger(item.day)
+      && typeof item.lyrics === "string" && item.lyrics.length <= 6000
+    ) : [];
+    for (const pack of classTimings?.recordings || []) {
+      const track = pinnedTracks.find(row => row.level === "ALL" && row.id === pack.trackId && row.audioUrl === pack.audioUrl);
+      if (track && pack.referenceOnly && pack.transcriptionStatus === "automatic" &&
+        pack.timingStatus === "estimated" && /^[a-f0-9]{64}$/.test(pack.recordingSha256 || "") &&
+        validateCues(pack.cues, pack.lyrics).length) publishedLyrics.set(track.id, pack);
+    }
+    // A song may have started playing before its learning packs finish loading.
+    // Re-render that song without restarting its playback or changing its tab.
+    if (selected) {
+      const tab = document.querySelector('.lesson-tabs button[aria-pressed="true"]')?.dataset.tab || "listen";
+      renderDetail(selected);
+      setTab(tab);
+    }
+  });
+  return songDetailsPromise;
+}
+
+fetch("/music/catalog.json").then(res => {
+  if (!res.ok) throw new Error("The music library is temporarily unavailable.");
+  return res.json();
+}).then(data => {
   pinnedTracks = (Array.isArray(data.tracks) ? data.tracks : [])
     .filter(row => row.retired !== true)
     .map(safeTrack).filter(Boolean);
   catalog = [...pinnedTracks];
-  for (const pack of classTimings?.recordings || []) {
-    const track=pinnedTracks.find(row=>row.level==="ALL" && row.id===pack.trackId && row.audioUrl===pack.audioUrl);
-    if (track && pack.referenceOnly && pack.transcriptionStatus==="automatic" &&
-      pack.timingStatus==="estimated" && /^[a-f0-9]{64}$/.test(pack.recordingSha256 || "") &&
-      validateCues(pack.cues,pack.lyrics).length) publishedLyrics.set(track.id,pack);
-  }
-  learning = lessons && typeof lessons.lessons === "object" && lessons.lessons ? lessons.lessons : {};
-  studioDrafts = Array.isArray(drafts?.tracks) ? drafts.tracks.filter(item =>
-    ["A1","A2","B1"].includes(item.level) && Number.isInteger(item.day)
-    && typeof item.lyrics === "string" && item.lyrics.length <= 6000
-  ) : [];
   populateFeatured();
   populateFilters();
   renderCatalog();
   const id = initialId || location.pathname.match(/\/music\/songs\/([A-Za-z0-9_-]{1,245})\.html$/)?.[1];
   const track = catalog.find(song => song.id === id);
   if (track) showSong(track, false, false);
-  refreshMusic();
+  // Read-only R2 discovery is cached for repeat visits in the same tab.
+  // The manual Refresh songs button always bypasses this cache.
+  refreshMusic({ preferCache: true });
 }).catch(error => {
   byId("library-status").textContent = error.message;
   byId("song-count").textContent = "Unavailable";

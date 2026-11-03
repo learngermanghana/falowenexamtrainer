@@ -167,6 +167,12 @@ jobs:
           CI: true
         run: npx jest --runInBand --runTestsByPath src/__tests__/ServiceWorkerBuildAssetSafety.test.js src/__tests__/PublicAuthServiceWorker.test.js
 
+      - name: Test API health and CDN request throttling
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/__tests__/useHealthStatus.test.js src/serviceWorkerRegistration.test.js
+
       - name: Test Preposition Case Coach
         working-directory: web
         env:
