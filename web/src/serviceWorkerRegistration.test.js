@@ -129,3 +129,46 @@ describe('forcePeriodicRefresh', () => {
   });
 
 });
+
+describe('build revision CDN request throttling', () => {
+  let originalVisibility;
+  let fetchBefore;
+
+  beforeEach(() => {
+    fetchBefore = global.fetch;
+    originalVisibility = Object.getOwnPropertyDescriptor(document, 'visibilityState');
+    window.sessionStorage.clear();
+    __private__.resetBuildCheckForTests();
+  });
+
+  afterEach(() => {
+    if (originalVisibility) Object.defineProperty(document, 'visibilityState', originalVisibility);
+    else delete document.visibilityState;
+    global.fetch = fetchBefore;
+    __private__.resetBuildCheckForTests();
+    jest.restoreAllMocks();
+  });
+
+  it('checks a visible tab once, then skips repeat and hidden-tab requests', async () => {
+    let now = 1_000_000;
+    jest.spyOn(Date, 'now').mockImplementation(() => now);
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ revision: '2026-11-03-cost-guard' }),
+    });
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+
+    await __private__.checkForNewBuild({ reloadOnChange: false });
+    await __private__.checkForNewBuild({ reloadOnChange: false });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    now += 16 * 60 * 1000;
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
+    await __private__.checkForNewBuild({ reloadOnChange: false });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+    await __private__.checkForNewBuild({ reloadOnChange: false });
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+});
