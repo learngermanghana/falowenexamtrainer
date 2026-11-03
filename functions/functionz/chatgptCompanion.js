@@ -18,7 +18,7 @@ try {
 } catch (error) {
   if (error.code !== "MODULE_NOT_FOUND") throw error;
 }
-const VALID_LESSON_SECTIONS = new Set(["overview", "workbook", "vocabulary", "grammar", "reading", "listening", "writing", "review"]);
+const VALID_LESSON_SECTIONS = new Set(["overview", "workbook", "vocabulary", "grammar", "reading", "listening", "speaking", "writing", "review"]);
 function contentForLesson(level, day) {
   return GENERATED_COURSE_CONTENT?.levels?.[level]?.[String(day)] || null;
 }
@@ -317,13 +317,13 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_lesson_content",
-    description: "Read learner-facing Falowen Course Book content for my enrolled level. A1: original chapter/workbook section index plus verified exercises where extracted (Day 1 reading/questions); A2: original Lesen text/questions, Hören instructions/questions and linked grammar notes; B1: available original Lesen; B2: detailed vocabulary, grammar, reading and more. Do not invent missing exercises or expose answers, transcripts or private student work.",
+    description: "Read learner-facing Falowen Course Book content for my enrolled level. A1–B1: original available workbook sections; B2: full 28-day rotating practice; C1: 28-day self-study guidance and original reading tasks where present (some lack passages); C2: 28-day rotating Lesen, Hören, Sprechen and Schreiben with passages only on real Lesen days. Choose the exact day and section. Never invent missing exercises or expose solutions, transcripts or private student work.",
     inputSchema: {
       type: "object",
       properties: {
         day: { type: "integer", minimum: 1, maximum: 50, description: "Course Book day" },
         section: {
-          type: "string", enum: ["overview", "vocabulary", "grammar", "reading", "listening", "writing", "review"],
+          type: "string", enum: ["overview", "vocabulary", "grammar", "reading", "listening", "speaking", "writing", "review"],
           description: "Choose one section per call to keep results fast. Default overview.",
         },
       },
@@ -552,7 +552,7 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "Falowen Learning Companion", version: "1.0.0" },
-        instructions: "Read-only Falowen learning companion. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, say so rather than inventing a workbook passage. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
+        instructions: "Read-only Falowen learning companion. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
