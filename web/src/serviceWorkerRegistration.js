@@ -3,10 +3,14 @@ const FORCE_REFRESH_KEY = "app-last-force-refresh-at";
 const FORCE_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const BUILD_MANIFEST_PATH = `${process.env.PUBLIC_URL || ""}/offline-build-assets.json`;
 const BUILD_REVISION_KEY = "falowen:loaded-build-revision";
-const BUILD_REVISION_CHECK_INTERVAL_MS = 5 * 60 * 1000;
+// Keep an active tab up to date without repeatedly contacting the CDN while hidden.
+const BUILD_REVISION_CHECK_INTERVAL_MS = 30 * 60 * 1000;
+const MIN_BUILD_RECHECK_MS = 15 * 60 * 1000;
 
 let registrationStarted = false;
 let buildRevisionTimer = null;
+let lastBuildCheckAt = 0;
+let inFlightBuildCheck = null;
 
 const getLastForceRefreshAt = () => {
   try {
@@ -53,21 +57,39 @@ const fetchCurrentBuildRevision = async () => {
   return typeof payload?.revision === "string" ? payload.revision.trim() : "";
 };
 
+const shouldCheckForNewBuild = () =>
+  typeof window !== "undefined" &&
+  (typeof document === "undefined" || document.visibilityState !== "hidden") &&
+  (typeof navigator === "undefined" || navigator.onLine !== false) &&
+  (!lastBuildCheckAt || Date.now() - lastBuildCheckAt >= MIN_BUILD_RECHECK_MS);
+
 const checkForNewBuild = async ({ reloadOnChange = true } = {}) => {
-  if (typeof window === "undefined") return false;
-  const revision = await fetchCurrentBuildRevision();
-  if (!revision) return false;
+  if (inFlightBuildCheck) return inFlightBuildCheck;
+  if (!shouldCheckForNewBuild()) return false;
+  // Throttle attempts as well as successes to avoid repeated requests on
+  // rapid tab switching when a student's network is unreliable.
+  lastBuildCheckAt = Date.now();
+  const job = (async () => {
+    const revision = await fetchCurrentBuildRevision();
+    if (!revision) return false;
 
-  const loadedRevision = getLoadedBuildRevision();
-  if (!loadedRevision) {
+    const loadedRevision = getLoadedBuildRevision();
+    if (!loadedRevision) {
+      setLoadedBuildRevision(revision);
+      return false;
+    }
+    if (loadedRevision === revision) return false;
+
     setLoadedBuildRevision(revision);
-    return false;
+    if (reloadOnChange) window.location.reload();
+    return true;
+  })();
+  inFlightBuildCheck = job;
+  try {
+    return await job;
+  } finally {
+    if (inFlightBuildCheck === job) inFlightBuildCheck = null;
   }
-  if (loadedRevision === revision) return false;
-
-  setLoadedBuildRevision(revision);
-  if (reloadOnChange) window.location.reload();
-  return true;
 };
 
 const startBuildRevisionChecks = () => {
@@ -128,6 +150,8 @@ const setupUpdateHandlers = (registration) => {
 
 const setupUpdateChecks = (registration) => {
   const runUpdate = async () => {
+    // An update check itself sends a CDN request; avoid redundant checks.
+    if (!shouldCheckForNewBuild()) return;
     try {
       await registration.update();
       await checkForNewBuild();
@@ -200,4 +224,9 @@ export const __private__ = {
   getLoadedBuildRevision,
   setLoadedBuildRevision,
   startBuildRevisionChecks,
+  shouldCheckForNewBuild,
+  resetBuildCheckForTests: () => {
+    lastBuildCheckAt = 0;
+    inFlightBuildCheck = null;
+  },
 };
