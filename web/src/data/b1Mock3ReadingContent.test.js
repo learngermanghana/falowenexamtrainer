@@ -42,7 +42,8 @@ describe("B1 Mock 3 native Lesen source", () => {
   });
 
   test("is registered as a separate practice identity, without replacing existing B1 reading samples", () => {
-    expect(B1_READING_PRACTICE_SAMPLES.filter((item) => item.id === paper.id)).toHaveLength(1);
-    expect(B1_READING_PRACTICE_SAMPLES.find((item) => item.id === paper.id)).toBe(paper);
+    expect(B1_READING_PRACTICE_SAMPLES).toHaveLength(11);
+    expect(B1_READING_PRACTICE_SAMPLES.some((item) => item.id === paper.id)).toBe(false);
+    expect(getB1ReadingQuestions(paper).teil1).toHaveLength(6);
   });
 });
