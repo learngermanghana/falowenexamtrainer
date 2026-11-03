@@ -370,7 +370,7 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_lesson",
-    description: "Get my assigned course day's goal and Campus link. For B2–C2, also return the original learner-facing exercise for that day's skill when available (including C2 Lesen passages and questions), for compatibility with older ChatGPT connections. Do not browse the public web to guess Falowen exercises.",
+    description: "Get my assigned course day and a learner-safe, source-grounded exercise for A1–C2 when exported. Supports older published ChatGPT connections without the practice guide. Ask one question at a time and never fabricate missing exercises or expose answer keys.",
     inputSchema: {
       type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50, description: "Lesson day in the student's enrolled course." } },
       required: ["day"], additionalProperties: false,
@@ -417,19 +417,29 @@ const toolDefinitions = [
  // in the legacy result, still restricted to the OAuth student's own level.
  // Source fields come exclusively from the answer-safe generated snapshot.
 function featuredLegacyCourseBookSection(level, day) {
-  if (!SELF_STUDY_LEVELS.has(level)) return null;
   const lesson = contentForLesson(level, day);
   if (!lesson) return null;
   const bySkill = { lesen: "reading", hoeren: "listening", speak: "speaking", write: "writing" };
-  const section = bySkill[lesson.skillFocus] ||
+  let section = bySkill[lesson.skillFocus] ||
     (level === "C1" && lesson.reading ? "reading" : level === "C1" && lesson.writing ? "writing" : null);
+  // Older published connectors expose lesson(day), not lesson_content or the
+  // new exam guide. Give A1–B1 learners one *existing* source exercise, never
+  // fabricate a passage from a heading or send the full workbook/answer key.
+  // A2/B1 typically have a reading on each day; A1 only on exported days.
+  if (!section && !SELF_STUDY_LEVELS.has(level)) {
+    if (lesson.reading?.questions?.length &&
+        (lesson.reading.paragraphs?.length || lesson.reading.text)) section = "reading";
+    else if (lesson.grammar) section = "grammar";
+    else if (lesson.writing?.prompt) section = "writing";
+    else if (lesson.listening?.questions?.length) section = "listening";
+  }
   if (!section || !lesson[section]) return null;
   const result = lessonContentResponse(level, day, section);
   return result.available ? {
     section,
     material: result.material,
     source: result.source,
-    clarification: "Original learner-facing practice. Answer checking here does not record results in Falowen Campus.",
+    clarification: "Learner-facing Falowen material from the actual Course Book. Ask one question at a time and give feedback only after a student's attempt. Do not claim to record results in Falowen Campus.",
   } : null;
 }
 
@@ -482,7 +492,7 @@ async function callTool(name, args, student, admin) {
       ...(exported
         ? { courseBookContent: lessonContentResponse(view.level, args.day, "overview"),
             ...(featured ? { featuredCourseBookSection: featured } : {}),
-            practiceSuggestion: "For exam-style practice, ask: Examine me on this day's Lesen. Show the text, then ask one question at a time, wait for my answer, and explain evidence. Writing, grammar and speaking coaching are also available from the actual lesson. All feedback is practice only.",
+            practiceSuggestion: "For source-grounded practice, use featuredCourseBookSection if present. For Lesen, show the real text and ask only one original question at a time, wait for an attempt, then explain the passage evidence. For grammar, explain the supplied focus in German or English and invite one learner sentence. Do not invent missing workbook/audio, claim official scores or write progress to Campus.",
             contentTool: "get_my_falowen_lesson_content",
             exactContentAvailable: true }
         : { exactContentAvailable: false,
