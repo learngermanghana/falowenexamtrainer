@@ -91,8 +91,8 @@ describe("canonical A2/B1 lesson profiles", () => {
       assignmentKey: "A2-8.21",
       timer: {
         level: "A2",
-        durationMinutes: 20,
-        timedTabs: ["schreiben", "lesen"],
+        durationMinutes: 30,
+        timedTabs: ["schreiben", "lesen", "hoeren"],
       },
     });
     expect(getA2B1LessonProfile("A2", 25)).toMatchObject({
@@ -144,7 +144,8 @@ describe("canonical A2/B1 lesson profiles", () => {
   });
 
   test("critical late-course profiles no longer drift from lesson data", () => {
-    expect(getA2B1LessonProfile("A2", 21).sections.part4.mode).toBe("self-check");
+    expect(getA2B1LessonProfile("A2", 21).sections.part4).toMatchObject({ mode: "graded", submitRequired: true });
+    expect(getA2B1LessonProfile("A2", 21).requiredSubmissionParts.map((part) => part.partId)).toEqual(["teil2", "teil3", "teil4"]);
     expect(getA2B1LessonProfile("A2", 24).sections.part4.mode).toBe("graded");
     expect(getA2B1LessonProfile("A2", 25).sections.part4.visible).toBe(false);
     expect(getA2B1LessonProfile("A2", 26).sections.part4.mode).toBe("graded");
