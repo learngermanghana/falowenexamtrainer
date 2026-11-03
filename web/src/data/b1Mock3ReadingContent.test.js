@@ -33,7 +33,7 @@ describe("B1 Mock 3 native Lesen source", () => {
     expect(paper.teil3.situations.some((q) => q.answer === "0")).toBe(true);
     expect(paper.teil3.situations.every((q) => q.answer === "0" || q.answer !== "i")).toBe(true);
     expect(all.map((q) => q.answer)).toEqual([
-      "richtig", "falsch", "falsch", "falsch", "richtig", "falsch",
+      "richtig", "richtig", "falsch", "falsch", "richtig", "falsch",
       "b", "a", "b", "b", "b", "c",
       "d", "0", "f", "b", "a", "c", "h",
       "nein", "nein", "ja", "nein", "ja", "nein", "ja",
