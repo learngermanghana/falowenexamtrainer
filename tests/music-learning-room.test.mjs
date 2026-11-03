@@ -114,7 +114,7 @@ test('existing static share pages and dynamic songs retain common learning playe
  assert.match(template,/id="repeat"/);
  assert.match(template,/data-category="motivation"/);
  const js=file('web/public/music/app.js');
- assert.match(js,/fetch\("\/music\/learning.json"/);
+ assert.match(js,/fetchSongPack\("\/music\/learning.json"/);
  assert.match(js,/function renderQuestions/);
  assert.match(js,/function renderLyrics/);
  assert.match(js,/audio\.loop/);
