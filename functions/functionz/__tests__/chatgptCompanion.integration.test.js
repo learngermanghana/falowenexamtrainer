@@ -422,6 +422,17 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect(prep.practiceQuestions[0].question).toMatch(/7:00 Uhr/);
       expect(prep.practiceQuestions[0]).not.toHaveProperty("answer");
       expect(JSON.stringify(prep)).not.toContain("Private Klasse");
+
+      const oldPluginLesson = await postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 92, method: "tools/call",
+        params: { name: "get_my_falowen_lesson",
+          arguments: { day: 1, level: "C2" } },
+      }, grant.tokens.access_token);
+      const a1 = oldPluginLesson.data.result.structuredContent;
+      expect(a1.level).toBe("A1");
+      expect(a1.featuredCourseBookSection.section).toBe("reading");
+      expect(a1.featuredCourseBookSection.material.questions).toHaveLength(10);
+      expect(a1.featuredCourseBookSection.material.questions[0]).not.toHaveProperty("answerIndex");
     });
   });
 
