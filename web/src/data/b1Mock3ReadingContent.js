@@ -1,8 +1,8 @@
 // B1 Mock 3 Lesen source: teacher-uploaded Goethe-style Übungssatz (Teil 1–5).
 // Transcribed as native structured content: no PDF embed or learner-facing solutions.
-// IMPORTANT: source key gives Aufgabe 2 = falsch although the text says Susanne
-// believed she had left the purse at the supermarket checkout. Review before treating
-// this practice key as a verified official answer key.
+// Reading key validated against Goethe-Institut official Modellsatz Teil 1 solutions:
+// https://bfu.goethe.de/b1_mod/lesen_l1.php (Aufgabe 2 = Richtig).
+// The teacher source had erroneously marked Aufgabe 2 as Falsch.
 const statements = (start, rows) => rows.map(([question, answer], index) => ({
   number: start + index, question, answer,
 }));
@@ -30,7 +30,7 @@ export const B1_MOCK3_LESEN = {
     ],
     questions: statements(1, [
       ["Erst durch den Anruf bemerkte Susanne das Fehlen ihrer Brieftasche.", "richtig"],
-      ["Susanne glaubte, die Brieftasche beim Bezahlen vergessen zu haben.", "falsch"],
+      ["Susanne glaubte, die Brieftasche beim Bezahlen vergessen zu haben.", "richtig"],
       ["Der Finder hatte die Brieftasche ins Fundbüro gebracht.", "falsch"],
       ["Die Telefonnummer der Bank war in der Brieftasche.", "falsch"],
       ["In Susannes Brieftasche fehlte nichts.", "richtig"],
