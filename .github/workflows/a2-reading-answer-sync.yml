@@ -9,7 +9,7 @@ on:
       - "functions/data/answerKeyManifest.json"
       - "web/src/data/a2ListeningTasks.js"
       - "functions/functionz/r2CourseAudio.js"
-      - "functions/functionz/tests/a2Day21ListeningKey.test.js"
+      - "functions/functionz/tests/a2Day21ListeningKey.verify.cjs"
       - "scripts/auditA2ReadingAnswerSync.mjs"
       - "docs/a2-answer-sheet-sync.md"
       - ".github/workflows/a2-reading-answer-sync.yml"
@@ -34,7 +34,7 @@ jobs:
         run: node scripts/auditA2ReadingAnswerSync.mjs
 
       - name: Verify Day 21 graded Hören answer key and private R2 path
-        run: node --test functions/functionz/tests/a2Day21ListeningKey.test.js
+        run: node --test functions/functionz/tests/a2Day21ListeningKey.verify.cjs
 
       - name: Guard Day 17 pharmacy questions, keys and objective-only contract
         run: node --test tests/a2-day17-pharmacy-alignment.test.mjs
