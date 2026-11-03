@@ -158,10 +158,12 @@ export const C1_READING_PRACTICE = Object.freeze(Object.fromEntries(
       text: paragraphs,
       format: "C1 Lesen – Analyse und Textverständnis (Freitext)",
       source: "Falowen C1 self-study original practice",
-      questions: (profile.points || []).slice(0, 4).map((question) => ({
-        question,
-        options: [],
-      })),
+      questions: [
+        { question: "Welche Hauptthese vertritt der Text? Begründen Sie Ihre Antwort durch eine Textstelle.", options: [] },
+        { question: "Welchen Zielkonflikt oder welche Einschränkung erläutert der zweite Absatz?", options: [] },
+        { question: "Wie wird die Schlussfolgerung im letzten Absatz begründet?", options: [] },
+        { question: "Welche unterschiedliche Verantwortung weist der Text Einzelnen und Institutionen zu? Falls keine Unterscheidung vorliegt, erläutern Sie das am Text.", options: [] },
+      ],
     })];
   }),
 ));
