@@ -1502,10 +1502,9 @@ app.post("/b1-mock-02/hoeren/score", async (req, res) => {
 });
 
 /**
- * B1 Mock 3 Hören-only source-grounded practice. At present only 15 questions
- * in Teile 1 and 2 are teacher-script verified. Teile 3/4 recordings are
- * linked for listening, but not graded until their content is reviewed.
- * Never mark this partial section as a verified four-module mock.
+ * B1 Mock 3 Hören: all 30 questions now follow the four uploaded MP3 transcripts.
+ * Hören can be marked as an independent complete module (10/5/7/8).
+ * Never claim an unverified combined four-module score.
  */
 app.get("/b1-mock-03/hoeren/questions", async (req, res) => {
   try {
@@ -1525,25 +1524,25 @@ app.post("/b1-mock-03/hoeren/score", async (req, res) => {
     if (!access) return;
     let result;
     try {result = markB1Mock3Hoeren(req.body?.answers);}
-    catch {return res.status(400).json({error:"Complete the 15 verified Teil 1 and Teil 2 questions before submitting."});}
+    catch {return res.status(400).json({error:"Complete all 30 listening questions before submitting."});}
     const answers = Object.fromEntries(
       Object.entries(req.body.answers).sort(([a],[b])=>Number(a)-Number(b))
     );
     const attemptId = crypto.createHash("sha256")
-      .update(access.authedUser.uid + ":b1-mock-03:partial:" + JSON.stringify(answers))
+      .update(access.authedUser.uid + ":b1-mock-03:hoeren-full:" + JSON.stringify(answers))
       .digest("hex").slice(0,40);
     await access.db.collection("b1Mock3HoerenPracticeResults").doc(access.authedUser.uid)
       .collection("attempts").doc(attemptId).set({
         uid:access.authedUser.uid,
         email:access.authedUser.email ? String(access.authedUser.email).toLowerCase() : null,
         level:"B1",mockId:"b1-mock-03",section:"hoeren",
-        practiceOnly:true,partial:true,verifiedQuestionCount:15,expectedFullCount:30,
+        practiceOnly:true,partial:false,verifiedQuestionCount:30,expectedFullCount:30,
         answers,correct:result.correct,total:result.total,percentage:result.percentage,
-        perPart:result.perPart,status:"completed_partial",verifiedBy:"server-answer-key",
+        perPart:result.perPart,status:"completed",verifiedBy:"server-answer-key",
         submittedAt:admin.firestore.FieldValue.serverTimestamp(),
       },{merge:true});
     res.set("Cache-Control", "private, no-store");
-    return res.json({...result,attemptId,practiceOnly:true,partial:true,saved:true});
+    return res.json({...result,attemptId,practiceOnly:true,partial:false,saved:true});
   } catch (error) {
     console.error("B1 Mock 3 Hören score error", error);
     return res.status(503).json({ error:"Could not save the practice score. Your answers remain on this device; please retry." });
