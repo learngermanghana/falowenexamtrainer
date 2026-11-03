@@ -375,7 +375,10 @@ const c1Entries = curriculumManifest.getCurriculumEntriesForLevel("C1");
 const c1ReadingSource = fs.readFileSync(
   path.join(root, "web/src/components/C1SelfLearningCourse.js"), "utf8"
 );
-const c1ReadingTasks = [...c1ReadingSource.matchAll(/readingTask:\s*"([^"]+)"/g)]
+// The legacy plan has Days 1–16 only. Later days are generated below from
+// the canonical registry, and must not be included in this source-literal scan.
+const c1LegacyPlanSource = c1ReadingSource.split("const C1_ALL_DAYS =")[0];
+const c1ReadingTasks = [...c1LegacyPlanSource.matchAll(/readingTask:\s*"([^"]+)"/g)]
   .map((match) => match[1]);
 if (c1ReadingTasks.length !== 16) {
   throw new Error("C1 original reading-task list changed; review exporter");
