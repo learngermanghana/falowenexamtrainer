@@ -12,6 +12,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/b2LessonContentAlignment.js";
 import { getC1CanonicalTitle, getC1CanonicalGrammarTitle, getC1ContentProfile, alignC1LessonContent } from "../web/src/data/c1ContentRefresh.js";
+import { C1_READING_PRACTICE } from "../web/src/data/c1ReadingPractice.js";
 import { C2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/c2LessonContentAlignment.js";
 import { C2_READING_PRACTICE } from "../web/src/data/c2ReadingPractice.js";
 import { C2_LISTENING_PRACTICE } from "../web/src/data/c2ListeningPractice.js";
@@ -391,6 +392,11 @@ for (let day = 1; day <= 28; day += 1) {
     grammarLesson: { explanation: [], rules: [], examples: [] },
   });
   const readingTask = c1ReadingTasks[day - 1] || null;
+  const reading = C1_READING_PRACTICE[day];
+  if (!reading?.text?.length || reading.text.length < 3 ||
+      !reading.questions?.length) {
+    throw new Error("Missing authentic C1 learner practice for day " + day);
+  }
   C1[String(day)] = {
     level: "C1", day,
     chapter: text(entry.chapter || entry.displayChapter, 25),
@@ -399,7 +405,7 @@ for (let day = 1; day <= 28; day += 1) {
     goal: text(profile.aim, 700),
     grammarFocus: text(grammarFocus, 300),
     skillFocus: "self_study",
-    campusTabs: ["Learn", "Speak", "Write", "Finish", "Ref"],
+    campusTabs: ["Learn", "Lesen", "Speak", "Write", "Finish", "Ref"],
     grammar: {
       focus: text(grammarFocus, 300),
       explanation: strings(aligned.grammarLesson?.explanation, 6, 1100),
@@ -413,17 +419,29 @@ for (let day = 1; day <= 28; day += 1) {
       prompt: text(aligned.writingTopic, 1800),
       instructions: strings(aligned.writingPromptBullets, 6, 650),
     },
+    speaking: {
+      prompt: text(aligned.speakingTopic, 1600),
+      guidingQuestions: strings(aligned.topicQuestions, 5, 600),
+      plan: strings(aligned.speakingBuilder?.plan, 6, 800),
+      languageSupport: strings(aligned.speakingBuilder?.starters, 6, 200),
+      clarification: "Practise speaking in ChatGPT or Falowen Campus; no recorded speaking mark is created here.",
+    },
     vocabulary: {
       phrases: strings(aligned.phrases, 12, 180),
       clarification: "Selected C1 course expressions, not a complete lesson vocabulary inventory.",
     },
     review: strings(profile.points, 6, 600),
-    ...(readingTask ? { reading: {
-      task: text(readingTask, 900),
-      passageIncluded: false,
-      questionsIncluded: false,
-      clarification: "Original C1 reading assignment, not a reading passage. Choose the text as directed in Campus; no passage or questions are supplied by this source.",
-    } } : {}),
+    reading: {
+      title: text(reading.title, 260),
+      format: text(reading.format, 180),
+      task: text(readingTask || "Lesen Sie den Falowen-Text und bearbeiten Sie die Verständnisfragen.", 900),
+      source: "Falowen-authored C1 self-study Lesen passage (not an official Goethe exam text)",
+      passageIncluded: true,
+      questionsIncluded: true,
+      paragraphs: strings(reading.text, 6, 2500),
+      questions: publicQuestions(reading.questions),
+      clarification: "New Falowen C1 practice passage and open-response questions. ChatGPT may give feedback on attempted answers; official Campus marking is separate.",
+    },
   };
 }
 
@@ -523,4 +541,4 @@ if (serialized.includes('"answerIndex"') || serialized.includes('"sampleAnswer"'
 }
 fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, serialized, "utf8");
-process.stdout.write("Generated A1–B2 student lessons and original grammar teaching " + JSON.stringify(grammarCoverage) + " (" + Buffer.byteLength(serialized) + " bytes)\n");
+process.stdout.write("Generated A1–C2 student lessons, C1 Lesen and original grammar teaching " + JSON.stringify(grammarCoverage) + " (" + Buffer.byteLength(serialized) + " bytes)\n");
