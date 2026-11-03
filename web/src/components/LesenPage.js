@@ -20,8 +20,8 @@ const sampleMetaForLevel = (level) => {
 
   return samples.map((sample, index) => ({
     id: sample.id,
-    slug: `sample-${index + 1}`,
-    label: `Lesen Sample ${index + 1}`,
+    slug: sample.id === "b1-mock-03-lesen" ? "mock-3" : `sample-${index + 1}`,
+    label: sample.id === "b1-mock-03-lesen" ? sample.label : `Lesen Sample ${index + 1}`,
     detail: sample.availability === "needs_revision" ? "Under review · duplicate source content" : `${questionCount} questions · Teil 1–${partCount}`,
     unavailable: sample.availability === "needs_revision",
   }));
