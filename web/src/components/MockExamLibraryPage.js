@@ -114,6 +114,9 @@ export default function MockExamLibraryPage() {
                     <button type="button" style={styles.secondaryButton} onClick={() => { announceExamSuccess("B1 Mock 3 Schreiben opened."); navigate("/campus/course/b1-mock-3-schreiben"); }}>
                       Open Schreiben
                     </button>
+                    <button type="button" style={styles.secondaryButton} onClick={() => { announceExamSuccess("B1 Mock 3 Hören opened."); navigate("/campus/course/b1-mock-3-hoeren"); }}>
+                      Open Hören
+                    </button>
                     <button type="button" style={styles.secondaryButton} onClick={() => { announceExamSuccess("B1 Mock 3 Sprechen opened."); navigate("/campus/course/b1-mock-3-sprechen"); }}>
                       Open Sprechen
                     </button>
