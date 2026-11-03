@@ -309,7 +309,7 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_lesson",
-    description: "Get my assigned course day's goal and Campus link, plus real learner-facing teaching tasks where they are available. Do not browse the public web to guess Falowen exercises.",
+    description: "Get my assigned course day's goal and Campus link. For B2–C2, also return the original learner-facing exercise for that day's skill when available (including C2 Lesen passages and questions), for compatibility with older ChatGPT connections. Do not browse the public web to guess Falowen exercises.",
     inputSchema: {
       type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50, description: "Lesson day in the student's enrolled course." } },
       required: ["day"], additionalProperties: false,
@@ -335,6 +335,27 @@ const toolDefinitions = [
   securitySchemes: [{ type: "oauth2", scopes: [SCOPE] }],
   _meta: { ...(tool._meta || {}) },
 }));
+
+// Older installed ChatGPT connectors may only expose get_my_falowen_lesson,
+ // not the newer section-specific tool. Include that day's real skill exercise
+ // in the legacy result, still restricted to the OAuth student's own level.
+ // Source fields come exclusively from the answer-safe generated snapshot.
+function featuredLegacyCourseBookSection(level, day) {
+  if (!SELF_STUDY_LEVELS.has(level)) return null;
+  const lesson = contentForLesson(level, day);
+  if (!lesson) return null;
+  const bySkill = { lesen: "reading", hoeren: "listening", speak: "speaking", write: "writing" };
+  const section = bySkill[lesson.skillFocus] ||
+    (level === "C1" && lesson.reading ? "reading" : level === "C1" && lesson.writing ? "writing" : null);
+  if (!section || !lesson[section]) return null;
+  const result = lessonContentResponse(level, day, section);
+  return result.available ? {
+    section,
+    material: result.material,
+    source: result.source,
+    clarification: "Original learner-facing practice. Answer checking here does not record results in Falowen Campus.",
+  } : null;
+}
 
 async function callTool(name, args, student, admin) {
   const view = studentView(student);
@@ -371,6 +392,8 @@ async function callTool(name, args, student, admin) {
       guidance: "Explain concepts and offer short original practice questions. Do not complete graded coursework for the learner.",
       ...(contentForLesson(view.level, args.day)
         ? { courseBookContent: lessonContentResponse(view.level, args.day, "overview"),
+            ...(featuredLegacyCourseBookSection(view.level, args.day)
+              ? { featuredCourseBookSection: featuredLegacyCourseBookSection(view.level, args.day) } : {}),
             contentTool: "get_my_falowen_lesson_content",
             exactContentAvailable: true }
         : { exactContentAvailable: false,
