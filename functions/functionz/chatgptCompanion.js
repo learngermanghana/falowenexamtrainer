@@ -210,6 +210,19 @@ function summarizeStudentAssignments(student, rows) {
         days.set(day, entry);
       }
     });
+    // Some advanced self-study days (notably C2) are stored in the canonical
+    // Course Book alignment rather than the legacy curriculum manifest.
+    // The generated source snapshot fills the missing catalogue days.
+    for (const [key, lesson] of Object.entries(GENERATED_COURSE_CONTENT?.levels?.[level] || {})) {
+      const day = Number(key);
+      if (!days.has(day) && Number.isInteger(day) && day >= 1 && day <= 50) {
+        days.set(day, {
+          day, lessonTitle: lesson.title, topic: lesson.topic, goal: lesson.goal,
+          grammarFocus: lesson.grammarFocus, displayChapter: lesson.chapter,
+          progressionEligible: true,
+        });
+      }
+    }
     const lessons = [...days.entries()].sort(([a], [b]) => a - b).map(([day, entry]) => ({
       day,
       title: normalize(entry.lessonTitle || entry.topic || entry.title || "Lesson").slice(0, 180),
@@ -309,7 +322,7 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_lesson",
-    description: "Get my assigned course day's goal and Campus link, plus real learner-facing teaching tasks where they are available. Do not browse the public web to guess Falowen exercises.",
+    description: "Get my assigned course day's goal and Campus link. For B2–C2, also return the original learner-facing exercise for that day's skill when available (including C2 Lesen passages and questions), for compatibility with older ChatGPT connections. Do not browse the public web to guess Falowen exercises.",
     inputSchema: {
       type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50, description: "Lesson day in the student's enrolled course." } },
       required: ["day"], additionalProperties: false,
@@ -336,6 +349,27 @@ const toolDefinitions = [
   _meta: { ...(tool._meta || {}) },
 }));
 
+// Older installed ChatGPT connectors may only expose get_my_falowen_lesson,
+ // not the newer section-specific tool. Include that day's real skill exercise
+ // in the legacy result, still restricted to the OAuth student's own level.
+ // Source fields come exclusively from the answer-safe generated snapshot.
+function featuredLegacyCourseBookSection(level, day) {
+  if (!SELF_STUDY_LEVELS.has(level)) return null;
+  const lesson = contentForLesson(level, day);
+  if (!lesson) return null;
+  const bySkill = { lesen: "reading", hoeren: "listening", speak: "speaking", write: "writing" };
+  const section = bySkill[lesson.skillFocus] ||
+    (level === "C1" && lesson.reading ? "reading" : level === "C1" && lesson.writing ? "writing" : null);
+  if (!section || !lesson[section]) return null;
+  const result = lessonContentResponse(level, day, section);
+  return result.available ? {
+    section,
+    material: result.material,
+    source: result.source,
+    clarification: "Original learner-facing practice. Answer checking here does not record results in Falowen Campus.",
+  } : null;
+}
+
 async function callTool(name, args, student, admin) {
   const view = studentView(student);
   if (name === "get_my_falowen_profile") return {
@@ -357,20 +391,25 @@ async function callTool(name, args, student, admin) {
       return lessonContentResponse(view.level, args.day, section);
     }
     if (!view.level) return { error: "Course level is not available." };
-    const lessons = getCurriculumEntriesForLevel(view.level);
+    const lessons = getCurriculumEntriesForLevel(view.level) || [];
     const matching = lessons.filter((entry) =>
       Number(entry.day ?? entry.assignmentDay ?? entry.displayDay) === args.day);
     const entry = matching.find((x) => x.assignment === true) || matching[0];
-    if (!entry) return { error: "Lesson not found for this course and day.", level: view.level };
+    const exported = contentForLesson(view.level, args.day);
+    // Advanced courses may have authentic learner content even when the
+    // legacy curriculum manifest lacks that day. Never reject a real day.
+    if (!entry && !exported) return { error: "Lesson not found for this course and day.", level: view.level };
+    const featured = featuredLegacyCourseBookSection(view.level, args.day);
     return {
       level: view.level, day: args.day,
-      title: normalize(entry.topic || entry.title).slice(0, 180),
-      goal: normalize(entry.goal).slice(0, 600),
-      grammarFocus: normalize(entry.grammar_topic || entry.grammarFocus).slice(0, 200),
-      lessonUrl: lessonUrl(view.level, { dayNumber: args.day, displayChapter: entry.displayChapter || entry.chapter }),
+      title: normalize(entry?.topic || entry?.title || exported?.title).slice(0, 180),
+      goal: normalize(entry?.goal || exported?.goal).slice(0, 600),
+      grammarFocus: normalize(entry?.grammar_topic || entry?.grammarFocus || exported?.grammarFocus).slice(0, 200),
+      lessonUrl: lessonUrl(view.level, { dayNumber: args.day, displayChapter: entry?.displayChapter || entry?.chapter || exported?.chapter }),
       guidance: "Explain concepts and offer short original practice questions. Do not complete graded coursework for the learner.",
-      ...(contentForLesson(view.level, args.day)
+      ...(exported
         ? { courseBookContent: lessonContentResponse(view.level, args.day, "overview"),
+            ...(featured ? { featuredCourseBookSection: featured } : {}),
             contentTool: "get_my_falowen_lesson_content",
             exactContentAvailable: true }
         : { exactContentAvailable: false,

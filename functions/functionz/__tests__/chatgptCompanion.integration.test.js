@@ -325,6 +325,30 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect(c2Reading.available).toBe(true);
       expect(c2Reading.material.paragraphs.length).toBeGreaterThan(2);
       expect(c2Reading.material.questions[0]).not.toHaveProperty("answerIndex");
+
+      // Existing published connections expose the legacy lesson tool but not
+      // the new section tool. They must still receive the real Day 5 Lesen.
+      const legacy = (await postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 77, method: "tools/call",
+        params: { name: "get_my_falowen_lesson",
+          arguments: { day: 5, level: "B1", section: "reading" } },
+      }, c2.tokens.access_token)).data.result.structuredContent;
+      expect(legacy.level).toBe("C2");
+      expect(legacy.featuredCourseBookSection.section).toBe("reading");
+      expect(legacy.featuredCourseBookSection.material.title)
+        .toBe("Das Mandat des Zweifels: Über das fragile Fundament politischer Legitimität");
+      expect(legacy.featuredCourseBookSection.material.paragraphs).toHaveLength(4);
+      expect(legacy.featuredCourseBookSection.material.questions).toHaveLength(10);
+      expect(legacy.featuredCourseBookSection.material.questions[0]).not.toHaveProperty("answerIndex");
+      expect(JSON.stringify(legacy.featuredCourseBookSection)).not.toContain('"explanation"');
+      const legacyWriting = (await postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 78, method: "tools/call",
+        params: { name: "get_my_falowen_lesson", arguments: { day: 20 } },
+      }, c2.tokens.access_token)).data.result.structuredContent;
+      expect(legacyWriting.featuredCourseBookSection.section).toBe("writing");
+      expect(legacyWriting.featuredCourseBookSection.material.targetWords).toBe(350);
+      expect(legacyWriting).not.toHaveProperty("reading");
+
       const c2Day20 = (await call(c2.tokens.access_token, 20, "reading", "B2"))
         .data.result.structuredContent;
       expect(c2Day20.level).toBe("C2");

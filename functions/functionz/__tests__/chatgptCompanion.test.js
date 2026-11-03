@@ -91,7 +91,11 @@ describe("Falowen ChatGPT read-only records", () => {
     const c2 = summarizeStudentAssignments({ id: "C2", data: { level: "C2" } }, []);
     expect(c2.level).toBe("C2");
     expect(c2.totalTutorAssignments).toBe(0);
-    expect(c2.clarification).toMatch(/not yet available/);
+    expect(c2.totalSelfStudyLessons).toBe(28);
+    expect(c2.assignments).toHaveLength(28);
+    expect(c2.assignments[4].day).toBe(5);
+    expect(c2.assignments[4].title).toMatch(/Vertrauen|Politik|Legitimität/);
+    expect(c2.clarification).toMatch(/self-study/);
   });
 
   test("reports a score when a canonical tutor assignment has been marked", () => {
