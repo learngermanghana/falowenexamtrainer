@@ -8,6 +8,7 @@ import A2ReadingPracticeSamples, { A2_READING_PRACTICE_SAMPLES } from "./A2Readi
 import B1ReadingPracticeSamples from "./B1ReadingPracticeSamples";
 import B2ReadingPracticeSamples, { B2_READING_PRACTICE_SAMPLES } from "./B2ReadingPracticeSamples";
 import { B1_READING_PRACTICE_SAMPLES } from "../data/b1ReadingPracticeSamples";
+import { B1_MOCK3_LESEN } from "../data/b1Mock3ReadingContent";
 import C1ReadingPracticeSamples, { C1_READING_PRACTICE_SAMPLES } from "./C1ReadingPracticeSamples";
 
 const lesenLevels = [];
@@ -18,13 +19,21 @@ const sampleMetaForLevel = (level) => {
   const questionCount = ["B1", "B2", "C1"].includes(level) ? 30 : level === "A2" ? 20 : 15;
   const partCount = level === "C1" ? 4 : ["B1", "B2"].includes(level) ? 5 : level === "A2" ? 4 : 3;
 
-  return samples.map((sample, index) => ({
+  const entries = samples.map((sample, index) => ({
     id: sample.id,
     slug: `sample-${index + 1}`,
-    label: `Lesen Sample ${index + 1}`,
+    ...(sample.id === "b1-mock-03-lesen" ? { slug: "mock-3" } : {}),
+    label: sample.id === "b1-mock-03-lesen" ? sample.label : `Lesen Sample ${index + 1}`,
     detail: sample.availability === "needs_revision" ? "Under review · duplicate source content" : `${questionCount} questions · Teil 1–${partCount}`,
     unavailable: sample.availability === "needs_revision",
   }));
+  return level === "B1" ? [...entries, {
+    id: B1_MOCK3_LESEN.id,
+    slug: "mock-3",
+    label: B1_MOCK3_LESEN.label,
+    detail: "30 questions · 5 Teile · 65 minutes · Mock 3",
+    unavailable: false,
+  }] : entries;
 };
 
 const SampleList = ({ level, samples, onOpen }) => (

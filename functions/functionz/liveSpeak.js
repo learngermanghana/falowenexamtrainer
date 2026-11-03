@@ -347,6 +347,20 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const source = cleanPracticeSource(req.body?.source);
       const examTask = source === "exam-speaking-practice" ? cleanExamTask(req.body?.examTask) : null;
       if (examTask && !examTask.id) return error(res, 400, "exam_task_required", "Select a Goethe speaking task before starting the examiner.");
+      // B1 Mock 3 Sprechen is an isolated speaking-only practice: no verified
+      // 4-module attempt exists yet. Keep its tasks bound to the teacher outline.
+      if (/^b1-mock-03-speaking-teil-[123]$/.test(examTask?.id || "")) {
+        if (level !== "B1") return error(res, 400, "invalid_exam_level", "B1 Mock 3 requires the B1 live examiner.");
+        const part = examTask.id.match(/teil-([123])$/)?.[1];
+        const taskPrompt = examTask.prompt || "";
+        const topicValid = /^(Brauchen Kinder Mobiltelefone\?|Sehen Kinder zu viel fern\?)$/.test(examTask.keywords || "");
+        const correct = part === "1"
+          ? /Krankenhaus/.test(taskPrompt) && /Geschenk/.test(taskPrompt) && /nächste Woche/i.test(taskPrompt)
+          : part === "2"
+            ? topicValid && taskPrompt.includes("Folie 1") && taskPrompt.includes("Folie 5")
+            : topicValid && taskPrompt.includes("Feedback") && taskPrompt.includes("Präsentation");
+        if (!correct) return error(res, 400, "invalid_mock_task", "Use the teacher-provided B1 Mock 3 speaking task.");
+      }
       if (/^b1-mock-0[12]-speaking-teil-[123]$/.test(examTask?.id || "")) {
         if (level !== "B1") return error(res,400,"invalid_exam_level","B1 mocks require the B1 live examiner.");
         if (examTask.id.startsWith("b1-mock-02-")) {
@@ -403,7 +417,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
             (existing.examTask?.courseAssignmentKey !== examTask.courseAssignmentKey ||
               existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) ||
             (/^b1-mock-0[12]-speaking-teil-[123]$/.test(examTask?.id || "") &&
-              (existing.examTask?.id !== examTask.id || existing.examTask?.mockAttemptId !== examTask.mockAttemptId))) {
+              (existing.examTask?.id !== examTask.id || existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) ||
+            (/^b1-mock-03-speaking-teil-[123]$/.test(examTask?.id || "") &&
+              existing.examTask?.id !== examTask.id)) {
             throw Object.assign(new Error(
               "An earlier speaking session is still open. Reset or finish that session before opening this graded attempt."
             ), {status:409,code:"different_mock_attempt_active"});

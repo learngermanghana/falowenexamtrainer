@@ -8,6 +8,7 @@ import {
   getWeakestReadingSection,
   saveReadingPracticeAttempt,
 } from "../services/readingPracticeHistory";
+import { B1_MOCK3_LESEN } from "../data/b1Mock3ReadingContent";
 import {
   B1_READING_PART_KEYS,
   B1_READING_PRACTICE_SAMPLES,
@@ -69,7 +70,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
   const [timeBySample, setTimeBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
 
-  const sample = B1_READING_PRACTICE_SAMPLES.find((item) => item.id === selectedId) || B1_READING_PRACTICE_SAMPLES[0];
+  const sample = [...B1_READING_PRACTICE_SAMPLES, B1_MOCK3_LESEN].find((item) => item.id === selectedId) || B1_READING_PRACTICE_SAMPLES[0];
   const partQuestions = useMemo(() => getB1ReadingQuestions(sample), [sample]);
   const allQuestions = B1_READING_PART_KEYS.flatMap((key) => partQuestions[key]);
   const answers = answersBySample[sample.id] || {};
@@ -130,7 +131,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
       level: "B1",
       section: "lesen",
       setId: sample.id,
-      title: `B1 ${sample.label}`,
+      title: sample.id === "b1-mock-03-lesen" ? sample.label : `B1 ${sample.label}`,
       score,
       total: allQuestions.length,
       percent,
@@ -138,7 +139,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
       attemptId: attempt.id,
       attemptNumber: attempt.attemptNumber,
       resultType: "practice",
-      route: `/exams/lesen/b1/sample-${B1_READING_PRACTICE_SAMPLES.indexOf(sample) + 1}`,
+      route: sample.id === "b1-mock-03-lesen" ? "/exams/lesen/b1/mock-3" : `/exams/lesen/b1/sample-${B1_READING_PRACTICE_SAMPLES.indexOf(sample) + 1}`,
       sectionScores: Object.fromEntries(sectionScores.map(({ label, score: points }) => [
         label.toLowerCase().replace(/\s/g, ""), points,
       ])),
@@ -189,7 +190,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
         <nav aria-label="B1 reading sample selector" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {B1_READING_PRACTICE_SAMPLES.map((item, index) => (
             <button type="button" key={item.id} disabled={item.id === sample.id} onClick={() => selectSample(item.id)}>
-              Lesen Sample {index + 1}
+              {item.label || `Lesen Sample ${index + 1}`}
             </button>
           ))}
         </nav>
@@ -258,7 +259,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
             <div className="b1-final-ads">
               {sample.teil3.ads.map(([letter, title, description]) => (
                 <article key={letter}>
-                  <strong>Anzeige {letter}{letter === "C" ? " · Beispiel" : ""}</strong>
+                  <strong>Anzeige {letter}{letter === (sample.teil3.exampleAd || "C") ? " · Beispiel" : ""}</strong>
                   <h3>{title}</h3><p>{description}</p>
                 </article>
               ))}
@@ -275,7 +276,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
                   >
                     <option value="">Anzeige wählen</option>
                     <option value="0">0 · keine passende Anzeige</option>
-                    {"ABCDEFGHIJ".split("").filter((letter) => letter !== "C").map((letter) => (
+                    {"ABCDEFGHIJ".split("").filter((letter) => letter !== (sample.teil3.exampleAd || "C")).map((letter) => (
                       <option key={letter} value={letter.toLowerCase()}>{letter}</option>
                     ))}
                   </select>

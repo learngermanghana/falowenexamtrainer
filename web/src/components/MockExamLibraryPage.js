@@ -106,9 +106,26 @@ export default function MockExamLibraryPage() {
                     </p>
                   )}
                 </div>
+                {mock.id === "b1-mock-03-pending" ? (
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button type="button" style={styles.primaryButton} onClick={() => { announceExamSuccess("B1 Mock 3 Lesen opened."); navigate("/exams/lesen/b1/mock-3"); }}>
+                      Open Lesen
+                    </button>
+                    <button type="button" style={styles.secondaryButton} onClick={() => { announceExamSuccess("B1 Mock 3 Schreiben opened."); navigate("/campus/course/b1-mock-3-schreiben"); }}>
+                      Open Schreiben
+                    </button>
+                    <button type="button" style={styles.secondaryButton} onClick={() => { announceExamSuccess("B1 Mock 3 Hören opened."); navigate("/campus/course/b1-mock-3-hoeren"); }}>
+                      Open Hören
+                    </button>
+                    <button type="button" style={styles.secondaryButton} onClick={() => { announceExamSuccess("B1 Mock 3 Sprechen opened."); navigate("/campus/course/b1-mock-3-sprechen"); }}>
+                      Open Sprechen
+                    </button>
+                  </div>
+                ) : (
                 <button type="button" style={styles.primaryButton} onClick={() => { announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
                   {mock.mode === "full" || mock.mode === "kombi" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
+                )}
               </div>
             </article>
           ))}

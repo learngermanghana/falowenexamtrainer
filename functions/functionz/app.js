@@ -36,7 +36,9 @@ const { gradeA2HoerenOnly } = require("./a2HoerenOnlyScore");
 const { verifyA2Mock06Audio } = require("./a2Mock06PublishedAudio");
 const { verifyA2Mock07Audio } = require("./a2Mock07PublishedAudio");
 const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
+const { publicB1Mock3Hoeren, markB1Mock3Hoeren } = require("./b1Mock3Hoeren");
 const { PART_KEYS: B1_MOCK2_AUDIO, verifyB1Mock2Audio } = require("./b1Mock2PublishedAudio");
+const { PART_KEYS: B1_MOCK3_AUDIO, verifyB1Mock3Audio } = require("./b1Mock3PublishedAudio");
 const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
 const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
@@ -1395,8 +1397,10 @@ app.get("/course-media/b1/mock-audio-url", async (req, res) => {
     // verified against R2 before returning the student a signed URL.
     const isApprovedMock2Part = validated.mockId === "mock-02" &&
       B1_MOCK2_AUDIO[validated.part] === validated.key;
+    const isApprovedMock3Part = validated.mockId === "mock-03" &&
+      B1_MOCK3_AUDIO[validated.part] === validated.key;
     const released = await isReleasedMockHoerenAudio({ db, ...validated });
-    if (!released && !isApprovedMock2Part) {
+    if (!released && !isApprovedMock2Part && !isApprovedMock3Part) {
       return res.status(404).json({ error: "Mock Hören recording is not published." });
     }
 
@@ -1405,6 +1409,11 @@ app.get("/course-media/b1/mock-audio-url", async (req, res) => {
       ...validated, signedUrl: signed.url,
     }))) {
       return res.status(404).json({ error: "This B1 Mock 2 recording is not available yet." });
+    }
+    if (isApprovedMock3Part && !released && !(await verifyB1Mock3Audio({
+      ...validated, signedUrl: signed.url,
+    }))) {
+      return res.status(404).json({ error: "This B1 Mock 3 recording has not been verified in R2 yet." });
     }
     res.set("Cache-Control", "private, no-store");
     return res.json({
@@ -1489,6 +1498,55 @@ app.post("/b1-mock-02/hoeren/score", async (req, res) => {
   } catch (error) {
     console.error("B1 Mock 2 Hören score error", error);
     return res.status(503).json({ error: "Could not save the score. Your answers remain on this device; please retry." });
+  }
+});
+
+/**
+ * B1 Mock 3 Hören-only source-grounded practice. At present only 15 questions
+ * in Teile 1 and 2 are teacher-script verified. Teile 3/4 recordings are
+ * linked for listening, but not graded until their content is reviewed.
+ * Never mark this partial section as a verified four-module mock.
+ */
+app.get("/b1-mock-03/hoeren/questions", async (req, res) => {
+  try {
+    const access = await requireB1Mock2PracticeAccess(req, res);
+    if (!access) return;
+    res.set("Cache-Control", "private, no-store");
+    return res.json(publicB1Mock3Hoeren());
+  } catch (error) {
+    console.error("B1 Mock 3 Hören questions error", error);
+    return res.status(500).json({ error: "Could not load B1 Mock 3 listening questions." });
+  }
+});
+
+app.post("/b1-mock-03/hoeren/score", async (req, res) => {
+  try {
+    const access = await requireB1Mock2PracticeAccess(req, res);
+    if (!access) return;
+    let result;
+    try {result = markB1Mock3Hoeren(req.body?.answers);}
+    catch {return res.status(400).json({error:"Complete the 15 verified Teil 1 and Teil 2 questions before submitting."});}
+    const answers = Object.fromEntries(
+      Object.entries(req.body.answers).sort(([a],[b])=>Number(a)-Number(b))
+    );
+    const attemptId = crypto.createHash("sha256")
+      .update(access.authedUser.uid + ":b1-mock-03:partial:" + JSON.stringify(answers))
+      .digest("hex").slice(0,40);
+    await access.db.collection("b1Mock3HoerenPracticeResults").doc(access.authedUser.uid)
+      .collection("attempts").doc(attemptId).set({
+        uid:access.authedUser.uid,
+        email:access.authedUser.email ? String(access.authedUser.email).toLowerCase() : null,
+        level:"B1",mockId:"b1-mock-03",section:"hoeren",
+        practiceOnly:true,partial:true,verifiedQuestionCount:15,expectedFullCount:30,
+        answers,correct:result.correct,total:result.total,percentage:result.percentage,
+        perPart:result.perPart,status:"completed_partial",verifiedBy:"server-answer-key",
+        submittedAt:admin.firestore.FieldValue.serverTimestamp(),
+      },{merge:true});
+    res.set("Cache-Control", "private, no-store");
+    return res.json({...result,attemptId,practiceOnly:true,partial:true,saved:true});
+  } catch (error) {
+    console.error("B1 Mock 3 Hören score error", error);
+    return res.status(503).json({ error:"Could not save the practice score. Your answers remain on this device; please retry." });
   }
 });
 
@@ -2880,11 +2938,17 @@ const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "", mockId="
   "AUFGABE 3 — formal email, 5 points; use the canonical word target.",
   "Use formal address/register and an appropriate closing.",
   "For MOCK 02, report required_points_met as three booleans per part following the ordered points below. Do not penalise reasonable differences of opinion. In Teil 3, evaluate the four criterion weights 4/4/6/6 and scale their sum by 1/4 to the 5-point Falowen part score.",
+  "For MOCK 03 (writing-only practice), use the three teacher-provided tasks below. Award 10/10/5 points internally, displayed as 40/40/20 (100 total). Assess Aufgabenerfüllung, Kohärenz, Wortschatz and Strukturen. If a part has fewer than half the required words (under 40 words in Teil 1 or 2, under 20 in Teil 3), its task-fulfilment criterion is zero. Do not score against any model answer, and do not accept unrelated writing as task-complete.",
   "",
   mockId==="b1-mock-02" ? [
     "MOCK 02 TASK 1: Informal email to a friend who was too ill to attend the learner's birthday party a week ago. Exactly THREE required points, in this order: (1) describe how the birthday celebration went; (2) say which gift was especially great and why; (3) propose meeting the friend. Include an informal salutation and closing. Target circa 80 words. Do NOT judge against the old Julian invitation scenario.",
     "MOCK 02 TASK 2: Online guestbook entry responding to Tanja (15.01., 16:55) on Persönliche Kontakte und Internet. She believes online contact is useful for distant friends but cannot replace in-person meetings. Exactly THREE required points: (1) refer to her opinion and the subject; (2) state the learner's own view and justify it with an example or everyday experience; (3) end with a brief conclusion. The learner may agree OR disagree; neither viewpoint is automatically more correct. Target circa 80 words. Do NOT judge against the old cashless payment scenario.",
     "MOCK 02 TASK 3: Brief formal email to Kursleiterin Frau Müller. The learner was invited to a meeting about personal learning goals but cannot attend. Exactly THREE required points: (1) apologise politely for missing the meeting; (2) explain why they cannot attend; (3) use polite Sie-register with appropriate salutation and sign-off. A replacement meeting proposal is optional, not compulsory. Target circa 40 words. Assess diagnostic criteria on a 20-point scale: task fulfilment 0–4, cohesion 0–4, vocabulary 0–6, grammatical structures 0–6; report the four criterion marks as teil3.rubric_scores and report normalized teil3.score out of 5 for Falowen's /25 mock writing score. Do NOT judge against the old lost library card scenario."
+  ].join("\\n") : mockId==="b1-mock-03" ? [
+    "MOCK 03 TASK 1: Informal email to a friend who could not join a trip to another city last weekend because they had to study. Check three points (in order): (1) say which city the learner visited AND describe the excursion; (2) say what they liked best there AND why; (3) suggest meeting the friend to show photographs and tell them about the trip. Require suitable informal salutation and closing. Target circa 80 German words.",
+    "MOCK 03 TASK 2: An ONLINE GUESTBOOK opinion response (not a letter) to Laura (12.10., 18:30) on 'Brauchen wir noch gedruckte Bücher oder reichen E-Books?'. Laura says she reads on an E-reader, can take hundreds of books anywhere, saves shelf space, and considers print books outdated and bad for the environment. Check three indicators: (1) address the printed books versus E-books issue and/or Laura's argument; (2) state the learner's own opinion with coherent reason(s); (3) provide relevant discussion or conclusion. Both pro-print and pro-e-book positions are valid. NO salutation or sign-off. Target circa 80 German words.",
+    "MOCK 03 TASK 3: Short FORMAL email to Deutschkursleiter Herr Schneider. He invited the student to a Beratungsgespräch about exam preparation, but the student cannot attend because of a doctor appointment. Check (1) polite apology; (2) mention the Arzttermin reason; (3) ask for a new appointment. Require formal Sehr geehrter Herr Schneider and closing in Sie-register. Target circa 40 German words.",
+    "For MOCK 03, scoring is practice-only. Do not claim completion or verification of a full four-module B1 mock. Return numeric part scores out of 10, 10, and 5 (normalized from the source's 40, 40, 20).",
   ].join("\\n") : mockTaskPrompt("B1", "writing"),
   "Return JSON only, no markdown, using this shape:",
   JSON.stringify({
@@ -4824,7 +4888,8 @@ app.post("/writing/b1-mock-score", async (req, res) => {
     const teil3 = String(req.body?.teil3 || "").trim().slice(0, 6000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     const mockId=String(req.body?.mockId || "b1-mock-01");
-    if (!["b1-mock-01","b1-mock-02"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
+    if (!["b1-mock-01","b1-mock-02","b1-mock-03"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
+    if (mockId === "b1-mock-03" && attemptId) return res.status(400).json({ error: "B1 Mock 3 Schreiben is practice-only; no verified full mock attempt is available yet." });
 
     let result;
     if (!teil1 && !teil2 && !teil3) {
