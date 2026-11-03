@@ -11,6 +11,9 @@ let registrationStarted = false;
 let buildRevisionTimer = null;
 let lastBuildCheckAt = 0;
 let inFlightBuildCheck = null;
+// Indirection keeps navigation behavior testable in jsdom, where Location.reload
+// is read-only. Production still calls the browser's native reload method.
+let reloadApp = () => window.location.reload();
 
 const getLastForceRefreshAt = () => {
   try {
@@ -81,7 +84,7 @@ const checkForNewBuild = async ({ reloadOnChange = true } = {}) => {
     if (loadedRevision === revision) return false;
 
     setLoadedBuildRevision(revision);
-    if (reloadOnChange) window.location.reload();
+    if (reloadOnChange) reloadApp();
     return true;
   })();
   inFlightBuildCheck = job;
@@ -120,7 +123,7 @@ const forcePeriodicRefresh = async (registration) => {
     console.error("Failed to refresh service worker assets", error);
   }
 
-  window.location.reload();
+  reloadApp();
 };
 
 const setupUpdateHandlers = (registration) => {
@@ -129,7 +132,7 @@ const setupUpdateHandlers = (registration) => {
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (hasRefreshed || !navigator.serviceWorker.controller) return;
     hasRefreshed = true;
-    window.location.reload();
+    reloadApp();
   });
 
   if (registration.waiting) {
@@ -225,6 +228,7 @@ export const __private__ = {
   setLoadedBuildRevision,
   startBuildRevisionChecks,
   shouldCheckForNewBuild,
+  setReloadHandlerForTests: handler => { reloadApp = handler || (() => window.location.reload()); },
   resetBuildCheckForTests: () => {
     lastBuildCheckAt = 0;
     inFlightBuildCheck = null;
