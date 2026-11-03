@@ -1,14 +1,16 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { useHealthStatus } from "../hooks/useHealthStatus";
+import { useHealthStatus, __resetHealthCacheForTests } from "../hooks/useHealthStatus";
 
 describe("useHealthStatus", () => {
   beforeEach(() => {
     jest.useFakeTimers();
+    __resetHealthCacheForTests();
     global.fetch = jest.fn();
   });
 
   afterEach(() => {
     jest.useRealTimers();
+    __resetHealthCacheForTests();
     delete global.fetch;
   });
 
@@ -67,4 +69,21 @@ describe("useHealthStatus", () => {
     await waitFor(() => expect(result.current.status).toBe("offline"));
     expect(global.fetch).toHaveBeenCalledTimes(3);
   });
+  it("reuses a recent successful probe when the student header remounts", async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ timestamp: "2026-11-03T18:00:00.000Z" }),
+    });
+    const options = { pollIntervalMs: 0, reuseSuccessMs: 15 * 60 * 1000 };
+    const first = renderHook(() => useHealthStatus(options));
+    await waitFor(() => expect(first.result.current.status).toBe("ok"));
+    first.unmount();
+
+    const second = renderHook(() => useHealthStatus(options));
+    await waitFor(() => expect(second.result.current.status).toBe("ok"));
+    expect(second.result.current.lastChecked).toBe("2026-11-03T18:00:00.000Z");
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    second.unmount();
+  });
+
 });
