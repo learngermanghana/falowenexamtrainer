@@ -42,7 +42,7 @@ describe("B1 Mock 3 Hören — 30 original-audio-matched tasks", () => {
     expect(speakerOptions).toEqual(["Moderator Markus Baumann","Claudia Weber","Thomas Klein"]);
     expect(QUESTIONS.slice(22).map(q=>q.answer)).toEqual(["b","c","a","c","b","a","b","c"]);
     expect(QUESTIONS[24].question).toContain("Staus");
-    expect(QUESTIONS[27].question).toContain("Kosten")===false; // focus on moderator's financial question
+    expect(QUESTIONS[27].question).toContain("Geld");
     expect(QUESTIONS[29].question).toContain("Reisen");
   });
 
