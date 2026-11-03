@@ -515,6 +515,10 @@
       "dest": "/api/music-share.js?track=$1"
     },
     {
+      "src": "/music/songs/([A-Za-z0-9_-]{1,245})\\.html",
+      "dest": "/api/music-share.js?track=$1"
+    },
+    {
       "handle": "filesystem"
     },
     {
