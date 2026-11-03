@@ -1,5 +1,4 @@
 import uploadedB1Tests from "./b1ReadingPdfTests1to8.json";
-import { B1_MOCK3_LESEN } from "./b1Mock3ReadingContent";
 // Three original B1 Goethe-style Lesen practice sets inspired by the five-part
 // format of the B1 mock. The final mock question bank is never mutated.
 const trueFalse = (start, rows) => rows.map(([question, answer], index) => ({
@@ -377,7 +376,6 @@ export const B1_READING_PRACTICE_SAMPLES = Object.freeze([
     },
   }),
   ...uploadedB1Samples,
-  B1_MOCK3_LESEN,
 ]);
 
 export const B1_READING_PART_KEYS = Object.freeze(["teil1", "teil2", "teil3", "teil4", "teil5"]);
