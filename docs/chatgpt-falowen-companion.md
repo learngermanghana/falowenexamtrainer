@@ -1,8 +1,10 @@
 # Falowen Learning Companion — student pilot and public plugin release
 
-## Release status (1 November 2026)
+## Release status (3 November 2026)
 
-**Production MCP backend: deployed and tested.** Original A1, A2, B1 and B2 learning content is served from canonical Falowen course sources. The authenticated connection has been tested with an A1 account. **Public Plugin Directory publication is a separate, external OpenAI review and publish step.** Do not tell students the app is publicly installable before OpenAI approves and the publisher completes the publication action.
+**Production MCP backend: deployed and tested for A1–C2.** The nine-tool server includes a dedicated practice guide, exact learner-facing lesson sections, C1 Falowen-authored Lesen passages and C2 skill-day material. The older *installed* ChatGPT connection may expose only five previously reviewed tools. The existing `get_my_falowen_lesson` tool remains backward-compatible and can return a safe original exercise for A1–C2 where source material exists.
+
+**Publisher action remains required.** For a published Falowen plugin, OpenAI keeps a reviewed tool snapshot: build a new version of the **existing** Falowen Learning Companion submission, rescan the unchanged MCP endpoint, submit for review and publish the approved version. Do not create a different plugin identity or say that nine tools are installed until the updated version is visible in a fresh ChatGPT conversation.
 
 ### Production integration
 
@@ -26,7 +28,8 @@ The API is read-only. Each request uses the authenticated learner's account and 
 5. `get_my_falowen_next_class`: next recorded class date/time, topic and saved Zoom link when available.
 6. `get_my_falowen_class_preparation`: grounded study plan for the verified next class.
 7. `get_my_falowen_lesson`: canonical course-day metadata.
-8. `get_my_falowen_lesson_content`: actual learner-facing sections from the canonical course files. Some A1 and B1 exercises have not yet been exported; unavailable means unavailable, never a guessed workbook passage.
+8. `get_my_falowen_lesson_content`: exact learner-facing sections from source-verified A1–C2 Course Book files. Unavailable means unavailable, never an invented exercise.
+9. `get_my_falowen_practice_guide`: one-question-at-a-time exam or study coaching for reading, listening, speaking, writing and grammar, with optional English explanations. Coaching does not write official results.
 
 ### Student pilot checklist
 
@@ -54,13 +57,22 @@ Start with a few students who already have valid Falowen accounts and supported 
 - **Write action:** “Submit my assignment and give me a passing grade.” → explain that official submissions/marks are only in Falowen Campus; no write tool exposed.
 - **Invented data:** “Tell me tomorrow's class topic when no future class is assigned.” → report missing/unconfirmed timetable; do not manufacture session or lesson data.
 
+### Upgrade an existing published or installed Falowen plugin (v1.1.0 package)
+
+The release package must preserve the `falowen-learning-companion` identity, its original `mcpServers.falowen` endpoint, CIMD OAuth and Falowen logo. Version **1.1.0** adds an optional `guided-exam-practice` skill and updated reviewer test cases; the backend API itself advertises nine tools. The ZIP is prepared for the publisher; a GitHub merge or ZIP creation does **not** publish anything to OpenAI.
+
+- **Published plugin:** Go to [OpenAI plugin management](https://platform.openai.com/plugins/manage), open the **existing** Falowen Learning Companion submission, and create a **new version/draft**. Import the v1.1.0 ZIP when offered, or reconfigure using the same server. Scan the endpoint again and inspect nine tools. Submit the update for review and publish the approved replacement. Keep the existing published version available during review. Tool additions to a published plugin require a reviewed version; reinstalling alone does not refresh its tool snapshot.
+- **Custom ChatGPT MCP connection (not published):** Open [ChatGPT Plugins](https://chatgpt.com/), find the Falowen connection and choose **Refresh** to pull current tool metadata. Start a new conversation and check `get_my_falowen_practice_guide` is available.
+- Never paste demo-student credentials, OAuth secrets, Firestore keys or access tokens into the ZIP or reviewer text. Add the reviewer account privately in the submission portal.
+- **After publishing:** In a new ChatGPT conversation, verify profile, legacy lesson, exact content, one-question exam guide, language=en grammar, invalid skill/day refusal, and cross-level denial. The Portal approval state and actual tool availability, not the deployment status, determine whether the upgrade is live in ChatGPT.
+
 ### Required OpenAI publication steps (not performed by a production deploy)
 
 1. The publisher signs into https://platform.openai.com and verifies the business/developer identity and Apps Management Write permission.
 2. In the Plugin submission portal choose **Create plugin → With MCP**, entering the **Universal** HTTPS endpoint above (not a local URL).
 3. Upload the prepared Falowen plugin ZIP if the portal requests its package metadata. Do not upload student credentials, private tokens or secrets.
 4. Complete domain verification at the exact one-time challenge URL shown by the portal; the challenge token must never be guessed.
-5. Set OAuth via CIMD (`client.mode=cimd`), grant `falowen:read`, and scan all eight tools; inspect tool annotations and response data.
+5. Keep OAuth via CIMD (`client.mode=cimd`), scope `falowen:read`, and scan **all nine** server tools; inspect tool annotations and response data.
 6. Enter a dedicated reviewer demo account **privately** in the dashboard without MFA/email challenge, as required by review; do not publish the credentials in the ZIP or repository.
 7. Provide an accurate demo video, five positive and three negative tests, starter prompts, privacy/terms/support URLs and geographic availability.
 8. Submit for OpenAI review. After approval, the owner separately selects **Publish plugin**. Only then distribute the public directory link to students.
