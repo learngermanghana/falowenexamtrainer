@@ -19,6 +19,9 @@ on:
       - "web/src/components/*GrammarNotesPage.js"
       - "web/src/components/*WorkbookPage.js"
       - "web/src/data/b2*.js"
+      - "web/src/data/c1*.js"
+      - "web/src/data/c2*.js"
+      - "web/src/components/C1SelfLearningCourse.js"
       - "web/package.json"
       - "functions/functionz/__tests__/chatgptCompanion.test.js"
       - "functions/functionz/__tests__/chatgptCompanion.integration.test.js"
@@ -42,12 +45,13 @@ jobs:
           cache: npm
       - run: npm install --no-package-lock --ignore-scripts
       - run: npm --prefix functions install --no-package-lock --ignore-scripts
-      - name: Generate student-facing curriculum from canonical A1–B2 sources
+      - name: Generate student-facing curriculum from canonical A1–C2 sources
         run: node scripts/generateChatgptLessonContent.mjs
       - name: Verify OAuth constraints and student data scope
         run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js
       - name: Verify JavaScript syntax
         run: |
+          node --check scripts/generateChatgptLessonContent.mjs
           node --check scripts/extractFalowenGrammar.mjs
           node --check scripts/extractFalowenWorkbook.mjs
           node --check functions/functionz/chatgptCompanion.js
