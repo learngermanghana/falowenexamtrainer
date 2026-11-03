@@ -6,7 +6,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const file = path.join(root, "web/src/data/c2LessonContentAlignment.js");
 let source = fs.readFileSync(file, "utf8");
 
-const currentTopicDrivenAlignment = source.includes("const buildCurrentC2Mastery = (day) =>") && source.includes('from "./c2TopicKnowledge"');
+const currentTopicDrivenAlignment = source.includes("const buildCurrentC2Mastery = (day) =>") && (source.includes('from "./c2TopicKnowledge"') || source.includes('from "./c2TopicKnowledge.js"'));
 
 if (currentTopicDrivenAlignment) {
   console.log("Current topic-driven C2 alignment already derives Days 1-28 from c2TopicKnowledge; legacy redesign patch skipped.");

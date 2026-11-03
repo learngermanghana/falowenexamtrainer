@@ -1,5 +1,5 @@
 /**
- * Build a small, server-readable copy of the existing student-facing B2 Course Book.
+ * Build a server-readable, answer-safe copy of canonical A1–C2 learner-facing Course Books.
  *
  * Source of truth remains web/src/data; don't add a parallel teaching curriculum.
  * No grading answer indexes, model answers, hidden teacher notes, audio transcripts,
@@ -11,6 +11,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/b2LessonContentAlignment.js";
+import { getC1CanonicalTitle, getC1CanonicalGrammarTitle, getC1ContentProfile, alignC1LessonContent } from "../web/src/data/c1ContentRefresh.js";
+import { C2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/c2LessonContentAlignment.js";
+import { C2_READING_PRACTICE } from "../web/src/data/c2ReadingPractice.js";
+import { C2_LISTENING_PRACTICE } from "../web/src/data/c2ListeningPractice.js";
+import { getC2SkillFocus, getC2DayTabs } from "../web/src/data/c2SkillCycle.js";
+import { getC2WritingFormat } from "../web/src/data/c2WritingFormats.js";
+import { getC2ReviewKeyPoints } from "../web/src/data/c2ReviewKeyPoints.js";
 import { B2_GRAMMAR_EXPLANATIONS } from "../web/src/data/b2GrammarExplanations.js";
 import { B2_TOPIC_COLLOCATIONS } from "../web/src/data/b2TopicCollocations.js";
 import { B2_READING_PRACTICE } from "../web/src/data/b2ReadingPractice.js";
@@ -357,6 +364,148 @@ for (let day = 1; day <= 28; day += 1) {
   B2[String(day)] = item;
 }
 
+
+// C1 uses a self-study Course Book. Its canonical teaching, speaking and writing
+// instructions come from the same content-refresh alignment used by Campus.
+// The legacy reading plan supplies genuine tasks for Days 1–16, but does not
+// contain reading passages or question banks; do not fabricate either.
+const C1 = {};
+const c1Entries = curriculumManifest.getCurriculumEntriesForLevel("C1");
+const c1ReadingSource = fs.readFileSync(
+  path.join(root, "web/src/components/C1SelfLearningCourse.js"), "utf8"
+);
+const c1ReadingTasks = [...c1ReadingSource.matchAll(/readingTask:\s*"([^"]+)"/g)]
+  .map((match) => match[1]);
+if (c1ReadingTasks.length !== 16) {
+  throw new Error("C1 original reading-task list changed; review exporter");
+}
+for (let day = 1; day <= 28; day += 1) {
+  const entry = c1Entries.find((item) =>
+    Number(item.day ?? item.assignmentDay ?? item.displayDay) === day);
+  const profile = getC1ContentProfile(day);
+  if (!entry || !profile) throw new Error("Missing canonical C1 content for day " + day);
+  const title = getC1CanonicalTitle(day);
+  const grammarFocus = getC1CanonicalGrammarTitle(day);
+  const aligned = alignC1LessonContent({
+    level: "C1", day, title, grammarFocus,
+    grammarLesson: { explanation: [], rules: [], examples: [] },
+  });
+  const readingTask = c1ReadingTasks[day - 1] || null;
+  C1[String(day)] = {
+    level: "C1", day,
+    chapter: text(entry.chapter || entry.displayChapter, 25),
+    title: text(title, 240),
+    topic: text(profile.question, 600),
+    goal: text(profile.aim, 700),
+    grammarFocus: text(grammarFocus, 300),
+    skillFocus: "self_study",
+    campusTabs: ["Learn", "Speak", "Write", "Finish", "Ref"],
+    grammar: {
+      focus: text(grammarFocus, 300),
+      explanation: strings(aligned.grammarLesson?.explanation, 6, 1100),
+      rules: strings(aligned.grammarLesson?.rules, 8, 950),
+      task: text(aligned.grammarLesson?.miniExercise, 1200),
+      fullExplanationIncluded: false,
+      clarification: "Canonical C1 teaching focus and exercise; consult Campus for full original grammar notes.",
+    },
+    writing: {
+      type: text(aligned.writingTaskType, 180),
+      prompt: text(aligned.writingTopic, 1800),
+      instructions: strings(aligned.writingPromptBullets, 6, 650),
+    },
+    vocabulary: {
+      phrases: strings(aligned.phrases, 12, 180),
+      clarification: "Selected C1 course expressions, not a complete lesson vocabulary inventory.",
+    },
+    review: strings(profile.points, 6, 600),
+    ...(readingTask ? { reading: {
+      task: text(readingTask, 900),
+      passageIncluded: false,
+      questionsIncluded: false,
+      clarification: "Original C1 reading assignment, not a reading passage. Choose the text as directed in Campus; no passage or questions are supplied by this source.",
+    } } : {}),
+  };
+}
+
+// C2's Course Book has a rotating skill cycle, with genuine Lesen on seven
+// designated days. Export the original passages and questions only on those
+// days. Explicitly select permitted fields: source objects also contain
+// solutions, answer indices, model texts and audio transcripts.
+const C2 = {};
+for (let day = 1; day <= 28; day += 1) {
+  const plan = C2_LESSON_CONTENT_ALIGNMENT[day];
+  if (!plan || Number(plan.day) !== day) {
+    throw new Error("Missing canonical C2 alignment for day " + day);
+  }
+  const focus = getC2SkillFocus(day);
+  const reading = C2_READING_PRACTICE[day] || null;
+  const listening = C2_LISTENING_PRACTICE[day] || null;
+  if (focus === "lesen" && (!reading?.text?.length || !reading.questions?.length)) {
+    throw new Error("Missing actual C2 Lesen for day " + day);
+  }
+  const item = {
+    level: "C2", day,
+    chapter: text(plan.chapter, 25),
+    title: text(plan.title, 240),
+    topic: text(plan.topic, 600),
+    goal: strings(plan.objectives, 6, 450).join(" "),
+    grammarFocus: text(plan.grammarFocus, 350),
+    skillFocus: focus,
+    campusTabs: getC2DayTabs(day).map((tab) => text(tab.label, 70)),
+    vocabulary: {
+      terms: (Array.isArray(plan.vocabulary) ? plan.vocabulary : []).slice(0, 20).map((value) =>
+        Array.isArray(value)
+          ? { term: text(value[0], 160), meaning: text(value[1], 260) }
+          : typeof value === "string"
+            ? { term: text(value, 160) }
+            : { term: text(value?.de || value?.term || value?.word, 160),
+                meaning: text(value?.en || value?.meaning, 260) }
+      ).filter((value) => value.term),
+      collocations: (Array.isArray(plan.collocations) ? plan.collocations : []).slice(0, 16)
+        .filter(Array.isArray).map(([expression, meaning, example]) => ({
+          expression: text(expression, 180),
+          meaning: text(meaning, 250),
+          example: text(example, 380),
+        })),
+    },
+    grammar: {
+      focus: text(plan.grammarFocus, 350),
+      usage: text(plan.grammarNotes?.usage, 1100),
+      definitionDe: text(plan.grammarNotes?.definitionDe, 1400),
+      supportEn: text(plan.grammarNotes?.supportEn, 1000),
+      structure: text(plan.grammarNotes?.wordOrder, 1300),
+      examples: strings(plan.grammarNotes?.examples, 6, 700),
+      commonMistakes: strings(plan.grammarNotes?.commonMistakes, 6, 850),
+    },
+    review: strings(getC2ReviewKeyPoints(day), 8, 900),
+    ...(focus === "lesen" && reading ? { reading: {
+      title: text(reading.title, 260),
+      paragraphs: strings(reading.text, 10, 2400),
+      questions: publicQuestions(reading.questions),
+    } } : {}),
+    ...(focus === "hoeren" && listening ? { listening: {
+      title: text(listening.title, 260),
+      audioAvailableInCampus: Boolean(listening.audioKey),
+      questions: publicQuestions(listening.questions),
+    } } : {}),
+    ...(focus === "speak" ? { speaking: {
+      prompt: text(plan.challenge, 1400),
+      perspectives: strings(plan.perspectives, 5, 800),
+    } } : {}),
+    ...(focus === "write" ? { writing: (() => {
+      const format = getC2WritingFormat(day, plan.title);
+      return {
+        type: text(format.label, 160),
+        prompt: text(plan.writingExercise?.prompt, 1100),
+        instructions: [text(format.instruction, 1300)],
+        targetWords: Number(format.targetWords) || null,
+        perspectives: strings(plan.perspectives, 5, 800),
+      };
+    })() } : {}),
+  };
+  C2[String(day)] = item;
+}
+
 const grammarCoverage = Object.fromEntries(["A2", "B1"].map((level) => [level,
   Object.values(level === "A2" ? A2 : B1).filter((entry) => entry.grammar?.fullExplanationIncluded).length]));
 if (grammarCoverage.A2 < 20 || grammarCoverage.B1 < 20) {
@@ -365,7 +514,7 @@ if (grammarCoverage.A2 < 20 || grammarCoverage.B1 < 20) {
 const artifact = {
   schemaVersion: 1,
   provenance: "Learner-facing Falowen Course Book content compiled from canonical workbook and lesson sources",
-  levels: { A1, A2, B1, B2 },
+  levels: { A1, A2, B1, B2, C1, C2 },
 };
 const serialized = JSON.stringify(artifact, null, 2) + "\n";
 if (serialized.includes('"answerIndex"') || serialized.includes('"sampleAnswer"') ||

@@ -152,13 +152,13 @@ describe("Canonical B2 Course Book material in ChatGPT", () => {
     expect(lessonContentResponse("B2", 1, "writing").available).toBe(false);
     expect(lessonContentResponse("B2", 4, "writing").material.instructions.length).toBe(4);
     expect(lessonContentResponse("B2", 2, "listening").material.audioAvailableInCampus).toBe(true);
-    expect(lessonContentResponse("C1", 1, "reading").available).toBe(false);
+    expect(lessonContentResponse("C1", 1, "reading").material.passageIncluded).toBe(false);
   });
 
   test("never exports graded answers, model solutions, teacher feedback or audio transcript", () => {
     const root = path.resolve(__dirname, "../../..");
     const raw = fs.readFileSync(path.join(root, "functions/data/chatgptLessonContent.generated.json"), "utf8");
-    for (const forbidden of ['"answerIndex"', '"answer"', '"sampleAnswer"', '"sample"',
+    for (const forbidden of ['"answerIndex"', '"answer"', '"sampleAnswer"',
       '"starterTemplate"', '"transcript"', '"correctOption"', '"teacherNotes"']) {
       expect(raw).not.toContain(forbidden);
     }
@@ -321,5 +321,59 @@ describe("Original Falowen grammar teaching and remaining workbook gaps", () => 
     const listening = lessonContentResponse("A1", 3, "listening");
     expect(listening.material.questions).toHaveLength(5);
     expect(listening.material.chapter).toBe("1.2");
+  });
+});
+
+
+describe("C1 and C2 canonical student Course Book in ChatGPT", () => {
+  test("shows 28 real C1/C2 day overviews with their own levels", () => {
+    for (const level of ["C1", "C2"]) {
+      for (let day = 1; day <= 28; day += 1) {
+        const overview = lessonContentResponse(level, day, "overview");
+        expect(overview.available).toBe(true);
+        expect(overview.level).toBe(level);
+        expect(overview.title.length).toBeGreaterThan(3);
+        expect(overview.lessonUrl).toContain("/lesson/" + level + "/" + day);
+      }
+    }
+    expect(lessonContentResponse("C1", 20, "overview").title).toBe("Digitale Gesundheit");
+  });
+
+  test("returns authentic C1 reading assignments but never claims they contain a passage", () => {
+    const reading = lessonContentResponse("C1", 1, "reading");
+    expect(reading.available).toBe(true);
+    expect(reading.material.task).toMatch(/Lies einen kurzen Text über Lernstrategien/);
+    expect(reading.material.passageIncluded).toBe(false);
+    expect(reading.material).not.toHaveProperty("paragraphs");
+    expect(lessonContentResponse("C1", 20, "reading").available).toBe(false);
+    expect(lessonContentResponse("C1", 20, "writing").material.instructions.length).toBeGreaterThan(2);
+    expect(lessonContentResponse("C1", 20, "grammar").material.fullExplanationIncluded).toBe(false);
+  });
+
+  test("C2 returns original Lesen only on actual reading days, with no answer keys", () => {
+    for (const day of [1, 5, 9, 13, 17, 21, 25]) {
+      const reading = lessonContentResponse("C2", day, "reading");
+      expect(reading.available).toBe(true);
+      expect(reading.material.paragraphs.length).toBeGreaterThan(2);
+      expect(reading.material.questions.length).toBeGreaterThan(2);
+      expect(reading.material.questions[0].options.length).toBeGreaterThan(2);
+      expect(reading.material.questions[0]).not.toHaveProperty("answerIndex");
+      expect(reading.material.questions[0]).not.toHaveProperty("explanation");
+    }
+    const day20 = lessonContentResponse("C2", 20, "overview");
+    expect(day20.skillFocus).toBe("write");
+    expect(day20.availableSections).not.toContain("reading");
+    expect(lessonContentResponse("C2", 20, "reading").available).toBe(false);
+    expect(lessonContentResponse("C2", 20, "writing").material.targetWords).toBe(350);
+    expect(lessonContentResponse("C2", 3, "speaking").material.prompt.length).toBeGreaterThan(30);
+  });
+
+  test("keeps all advanced-course solutions, audio transcripts and models out of the snapshot", () => {
+    const raw = fs.readFileSync(path.resolve(__dirname, "../../data/chatgptLessonContent.generated.json"), "utf8");
+    for (const forbidden of ['"answerIndex"', '"answer"', '"modelAnswer"', '"sampleAnswer"',
+      '"transcript"', '"teacherNotes"', '"correctOption"']) {
+      expect(raw).not.toContain(forbidden);
+    }
+    expect(lessonContentResponse("C2", 2, "listening").material).not.toHaveProperty("transcript");
   });
 });

@@ -1,6 +1,6 @@
-import { getC2GrammarTeaching } from "./c2GrammarTeaching";
-import { getC2ExamStandard } from "./c2ExamStandardContent";
-import { getC2TopicKnowledge, getC2TopicCollocations, getC2TopicChecks } from "./c2TopicKnowledge";
+import { getC2GrammarTeaching } from "./c2GrammarTeaching.js";
+import { getC2ExamStandard } from "./c2ExamStandardContent.js";
+import { getC2TopicKnowledge, getC2TopicCollocations, getC2TopicChecks } from "./c2TopicKnowledge.js";
 
 const DAYS = Array.from({ length: 28 }, (_, index) => index + 1);
 
