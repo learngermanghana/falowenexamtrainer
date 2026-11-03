@@ -8,6 +8,7 @@ import {
   getWeakestReadingSection,
   saveReadingPracticeAttempt,
 } from "../services/readingPracticeHistory";
+import { B1_MOCK3_LESEN } from "../data/b1Mock3ReadingContent";
 import {
   B1_READING_PART_KEYS,
   B1_READING_PRACTICE_SAMPLES,
@@ -69,7 +70,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
   const [timeBySample, setTimeBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
 
-  const sample = B1_READING_PRACTICE_SAMPLES.find((item) => item.id === selectedId) || B1_READING_PRACTICE_SAMPLES[0];
+  const sample = [...B1_READING_PRACTICE_SAMPLES, B1_MOCK3_LESEN].find((item) => item.id === selectedId) || B1_READING_PRACTICE_SAMPLES[0];
   const partQuestions = useMemo(() => getB1ReadingQuestions(sample), [sample]);
   const allQuestions = B1_READING_PART_KEYS.flatMap((key) => partQuestions[key]);
   const answers = answersBySample[sample.id] || {};
