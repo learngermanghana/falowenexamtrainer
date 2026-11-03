@@ -59,5 +59,5 @@ test('the music page wires all-song shuffle and platform media controls', () => 
   assert.match(app, /audio\.addEventListener\("error", \(\) => handlePlaybackFailure/);
   assert.match(html, /id="queue-scope"/);
   assert.match(html, /id="play-all"/);
-  assert.match(html, /app\.js\?v=20261102-acoustic-cues/);
+  assert.match(html, /\/music\/app\.js\?v=[a-z0-9-]+/);
 });
