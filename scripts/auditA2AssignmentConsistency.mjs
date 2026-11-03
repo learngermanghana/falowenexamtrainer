@@ -100,11 +100,11 @@ for (const day of expectedDays) {
 if (Object.keys(A2_LISTENING_TASKS).length !== 28) {
   fail("Canonical Hören", `expected 28 day entries, found ${Object.keys(A2_LISTENING_TASKS).length}`);
 }
-if (A2_GRADED_LISTENING_DAYS.length !== 23) {
-  fail("Canonical Hören", `expected 23 graded days, found ${A2_GRADED_LISTENING_DAYS.length}`);
+if (A2_GRADED_LISTENING_DAYS.length !== 24) {
+  fail("Canonical Hören", `expected 24 graded days, found ${A2_GRADED_LISTENING_DAYS.length}`);
 }
-if (JSON.stringify(A2_SELF_CHECK_LISTENING_DAYS) !== JSON.stringify([21])) {
-  fail("Canonical Hören", `self-check days must be 21; found ${A2_SELF_CHECK_LISTENING_DAYS.join(",")}`);
+if (A2_SELF_CHECK_LISTENING_DAYS.length !== 0) {
+  fail("Canonical Hören", `all current A2 Hören lessons are now either graded or unavailable; found self-check days: ${A2_SELF_CHECK_LISTENING_DAYS.join(",")}`);
 }
 if (JSON.stringify(A2_NO_LISTENING_DAYS) !== JSON.stringify([14, 22, 23, 25])) {
   fail("Canonical Hören", `no-Hören days must be 14,22,23,25; found ${A2_NO_LISTENING_DAYS.join(",")}`);
