@@ -13,6 +13,7 @@ describe("A2 listening tasks", () => {
     [15, "6.15", "a2/day-15/day-15.mp3"],
     [16, "6.16", "a2/day-16/day-16.mp3"],
     [17, "6.17", "a2/day-17/day-17.mp3"],
+    [21, "8.21", "a2/day-21/day-21.mp3"],
     [24, "9.24", "a2/day-24/day-24.mp3"],
     [26, "10.26", "a2/day-26/day-26.mp3"],
     [27, "10.27", "a2/day-27/day-27.mp3"],
@@ -27,6 +28,21 @@ describe("A2 listening tasks", () => {
       audioUrl: "",
     });
     expect(task.questions).toHaveLength(5);
+  });
+
+  test("Day 21 uses the uploaded Claudia–Thomas Hören question order", () => {
+    const task = getA2ListeningTask(21);
+    expect(task.mode).toBe(A2_LISTENING_MODES.GRADED);
+    expect(task.audioUrl).toBe("");
+    expect(task.questions.map((item) => item.stem)).toEqual([
+      "Was hat Claudia am Samstag auf dem Markt gemacht?",
+      "Was hat Claudia am Sonntag gemacht?",
+      "Was hat Thomas am Samstagnachmittag gemacht?",
+      "Warum ruft Thomas an?",
+      "Um wie viel Uhr passt es Claudia für das Meeting?",
+    ]);
+    expect([0, 1, 2, 0, 1].map((correctIndex, i) => task.questions[i].options[correctIndex].slice(0, 1))).toEqual(["A", "B", "C", "A", "B"]);
+    expect(JSON.stringify(task)).not.toContain("Qg0tQFveI0M");
   });
 
   test("Day 16 five Lena–Max questions match the newly published listening answer choices", () => {

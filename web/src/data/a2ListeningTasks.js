@@ -270,10 +270,17 @@ export const A2_LISTENING_TASKS = {
   },
   21: {
     chapter: "8.21",
-    mode: A2_LISTENING_MODES.SELF_CHECK,
-    task: "Dies ist eine separate Goethe-Hören-Übung für Teil 4. Hören Sie den Test aufmerksam und kontrollieren Sie Ihre Antworten anschließend mit der Lösung im Video. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht Teil 4.",
-    audioUrl: "https://youtu.be/Qg0tQFveI0M",
-    questions: [],
+    mode: A2_LISTENING_MODES.GRADED,
+    task: "Hören Sie das Gespräch zwischen Claudia und Thomas über das Wochenende und ein Meeting. Beantworten Sie die fünf Fragen und tragen Sie die Buchstaben A, B oder C für Teil 4 im Submit-Bereich ein.",
+    audioKey: "a2/day-21/day-21.mp3",
+    audioUrl: "",
+    questions: [
+      { stem: "Was hat Claudia am Samstag auf dem Markt gemacht?", options: ["A) Sie hat frisches Obst gekauft.", "B) Sie hat Gemüse gekauft.", "C) Sie hat Blumen gekauft."] },
+      { stem: "Was hat Claudia am Sonntag gemacht?", options: ["A) Sie hat lange geschlafen.", "B) Sie war lange spazieren.", "C) Sie hat ein Buch gelesen."] },
+      { stem: "Was hat Thomas am Samstagnachmittag gemacht?", options: ["A) Er war auf dem Markt.", "B) Er ist spazieren gegangen.", "C) Er hat ein Buch gelesen."] },
+      { stem: "Warum ruft Thomas an?", options: ["A) Weil sie am Freitag das Meeting planen müssen.", "B) Weil sie am Wochenende spazieren gehen wollen.", "C) Weil er frisches Obst kaufen möchte."] },
+      { stem: "Um wie viel Uhr passt es Claudia für das Meeting?", options: ["A) Um neun Uhr.", "B) Um zehn Uhr.", "C) Um elf Uhr."] },
+    ],
   },
   22: {
     chapter: "8.22",

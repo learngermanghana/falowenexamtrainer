@@ -134,6 +134,25 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
     expect(validateA2AudioKey({ day: 28, key: "b2/day-28/day-28.mp3" })).toBeNull();
     expect(validateA2AudioKey({ day: 28, key: "../day-28.mp3" })).toBeNull();
   });
+  test("A2 Day 21 signs only the new private Hören audio object", async () => {
+    const key = "a2/day-21/day-21.mp3";
+    expect(validateA2AudioKey({ day: 21, key })).toEqual({ day: 21, key });
+    expect(validateA2AudioKey({ day: 21, key: "a2/day-21/other.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 21, key: "a2/day-20/day-20.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 20, key })).toBeNull();
+    const signed = await createA2AudioSignedUrl({
+      day: 21, key,
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+      },
+    });
+    expect(signed.url).toContain("/a2/day-21/day-21.mp3");
+    expect(signed.url).toContain("X-Amz-Signature=");
+  });
+
   test("accepts the protected B1 final mock listening and speaking objects", () => {
     expect(validateB1MockAudioKey({
       mockId: "mock-01",
