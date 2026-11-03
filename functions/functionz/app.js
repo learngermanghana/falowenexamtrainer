@@ -36,7 +36,9 @@ const { gradeA2HoerenOnly } = require("./a2HoerenOnlyScore");
 const { verifyA2Mock06Audio } = require("./a2Mock06PublishedAudio");
 const { verifyA2Mock07Audio } = require("./a2Mock07PublishedAudio");
 const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
+const { publicB1Mock3Hoeren, markB1Mock3Hoeren } = require("./b1Mock3Hoeren");
 const { PART_KEYS: B1_MOCK2_AUDIO, verifyB1Mock2Audio } = require("./b1Mock2PublishedAudio");
+const { PART_KEYS: B1_MOCK3_AUDIO, verifyB1Mock3Audio } = require("./b1Mock3PublishedAudio");
 const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
 const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
@@ -1125,6 +1127,11 @@ app.get("/course-media/a1/mock-audio-url", async (req, res) => {
     }
 
     const signed = await createA1MockAudioSignedUrl(validated);
+    if (isApprovedMock3Part && !released && !(await verifyB1Mock3Audio({
+      ...validated, signedUrl: signed.url,
+    }))) {
+      return res.status(404).json({ error: "This B1 Mock 3 recording has not been verified in R2 yet." });
+    }
     res.set("Cache-Control", "private, no-store");
     return res.json({
       url: signed.url,
@@ -1395,8 +1402,10 @@ app.get("/course-media/b1/mock-audio-url", async (req, res) => {
     // verified against R2 before returning the student a signed URL.
     const isApprovedMock2Part = validated.mockId === "mock-02" &&
       B1_MOCK2_AUDIO[validated.part] === validated.key;
+    const isApprovedMock3Part = validated.mockId === "mock-03" &&
+      B1_MOCK3_AUDIO[validated.part] === validated.key;
     const released = await isReleasedMockHoerenAudio({ db, ...validated });
-    if (!released && !isApprovedMock2Part) {
+    if (!released && !isApprovedMock2Part && !isApprovedMock3Part) {
       return res.status(404).json({ error: "Mock Hören recording is not published." });
     }
 
@@ -1489,6 +1498,55 @@ app.post("/b1-mock-02/hoeren/score", async (req, res) => {
   } catch (error) {
     console.error("B1 Mock 2 Hören score error", error);
     return res.status(503).json({ error: "Could not save the score. Your answers remain on this device; please retry." });
+  }
+});
+
+/**
+ * B1 Mock 3 Hören-only source-grounded practice. At present only 15 questions
+ * in Teile 1 and 2 are teacher-script verified. Teile 3/4 recordings are
+ * linked for listening, but not graded until their content is reviewed.
+ * Never mark this partial section as a verified four-module mock.
+ */
+app.get("/b1-mock-03/hoeren/questions", async (req, res) => {
+  try {
+    const access = await requireB1Mock2PracticeAccess(req, res);
+    if (!access) return;
+    res.set("Cache-Control", "private, no-store");
+    return res.json(publicB1Mock3Hoeren());
+  } catch (error) {
+    console.error("B1 Mock 3 Hören questions error", error);
+    return res.status(500).json({ error: "Could not load B1 Mock 3 listening questions." });
+  }
+});
+
+app.post("/b1-mock-03/hoeren/score", async (req, res) => {
+  try {
+    const access = await requireB1Mock2PracticeAccess(req, res);
+    if (!access) return;
+    let result;
+    try {result = markB1Mock3Hoeren(req.body?.answers);}
+    catch {return res.status(400).json({error:"Complete the 15 verified Teil 1 and Teil 2 questions before submitting."});}
+    const answers = Object.fromEntries(
+      Object.entries(req.body.answers).sort(([a],[b])=>Number(a)-Number(b))
+    );
+    const attemptId = crypto.createHash("sha256")
+      .update(access.authedUser.uid + ":b1-mock-03:partial:" + JSON.stringify(answers))
+      .digest("hex").slice(0,40);
+    await access.db.collection("b1Mock3HoerenPracticeResults").doc(access.authedUser.uid)
+      .collection("attempts").doc(attemptId).set({
+        uid:access.authedUser.uid,
+        email:access.authedUser.email ? String(access.authedUser.email).toLowerCase() : null,
+        level:"B1",mockId:"b1-mock-03",section:"hoeren",
+        practiceOnly:true,partial:true,verifiedQuestionCount:15,expectedFullCount:30,
+        answers,correct:result.correct,total:result.total,percentage:result.percentage,
+        perPart:result.perPart,status:"completed_partial",verifiedBy:"server-answer-key",
+        submittedAt:admin.firestore.FieldValue.serverTimestamp(),
+      },{merge:true});
+    res.set("Cache-Control", "private, no-store");
+    return res.json({...result,attemptId,practiceOnly:true,partial:true,saved:true});
+  } catch (error) {
+    console.error("B1 Mock 3 Hören score error", error);
+    return res.status(503).json({ error:"Could not save the practice score. Your answers remain on this device; please retry." });
   }
 });
 
