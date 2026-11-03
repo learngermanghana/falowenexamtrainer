@@ -60,13 +60,16 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
         <div style={{ padding: "12px 18px", background: "#f4f8fc", borderRadius: 12 }}>
           <strong>ChatGPT can read:</strong>
           <ul style={{ lineHeight: 1.85, marginBottom: 0 }}>
-            <li>Your course level and lesson topics</li>
+            <li>Your course level, actual lesson topics, and available learner-facing Course Book passages and exercises</li>
             <li>Your assignment list and links to Campus</li>
             <li>Your recorded marks and teacher feedback</li>
             <li>Your assigned class timetable, session topics and saved Zoom join link (when available)</li>
           </ul>
         </div>
         <p style={styles.subtle}>
+          ChatGPT can guide you through reading, listening, speaking, writing and grammar practice one question
+          at a time using available course material. English explanations are optional. Practice answers
+          and feedback in ChatGPT are not saved as official Falowen marks or completion records.
           ChatGPT cannot submit assignments, change grades, access payment records, or start timed exams.
           Official work stays on Falowen Campus.
         </p>
