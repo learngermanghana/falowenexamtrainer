@@ -46,7 +46,7 @@ describe("A2/B1 workbook section profiles", () => {
     expect(day21).toMatchObject({
       listening: true,
       part4: "listening",
-      part4Submission: "self-check",
+      part4Submission: "submit",
     });
     expect(day24).toMatchObject({
       listening: true,
