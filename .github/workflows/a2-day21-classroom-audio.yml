@@ -1,0 +1,25 @@
+name: A2 Day 21 private classroom Hören
+on:
+  pull_request:
+    paths:
+      - "server/courseMusic.cjs"
+      - "tests/course-music-access.test.cjs"
+      - ".github/workflows/a2-day21-classroom-audio.yml"
+  push:
+    branches: [main]
+    paths:
+      - "server/courseMusic.cjs"
+      - "tests/course-music-access.test.cjs"
+      - ".github/workflows/a2-day21-classroom-audio.yml"
+permissions:
+  contents: read
+jobs:
+  teacher-only-audio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check server/courseMusic.cjs
+      - run: node --test tests/course-music-access.test.cjs

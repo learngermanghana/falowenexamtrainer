@@ -157,3 +157,42 @@ test('A2 Day 20 complaint playback signs the exact private object only for verif
  }
  assert.throws(()=>signTrack('a2-day20-complaint',env),/Unknown/);
 });
+
+
+// The uploaded Day 21 Lisa–Tom dialogue is a teacher-only slide recording.
+// Its key differs from the graded workbook's Claudia–Thomas MP3; never
+// expose either through the public music map or the other's audio route.
+test('A2 Day 21 weekend classroom Hören signs only the supplied teacher recording', async () => {
+ const {createClassroomBankAudioHandler,createClassroomAudioHandler}=require('../server/courseMusic.cjs');
+ const key='a2/day-21/ein-wochenende-planen.mp3';
+ const staff={localId:'teacher',customAttributes:'{"role":"teacher"}'};
+ const cases=[
+  [null,key,21,401],
+  [{localId:'student',email:'student@example.com'},key,21,403],
+  [staff,key,21,200],
+  [{...staff,disabled:true},key,21,401],
+  [staff,key,20,400],
+  [staff,'a2/day-21/day-21.mp3',21,400],
+  [staff,'a2/day-21/another.mp3',21,400],
+  [staff,'a2/day-21/../private.mp3',21,400],
+ ];
+ for(const createHandler of [createClassroomBankAudioHandler,createClassroomAudioHandler]) {
+  for(const [account,requested,day,expected] of cases) {
+   const res=response();
+   await createHandler({env,fetchImpl:async()=>({ok:true,json:async()=>({users:account?[account]:[]})})})({
+    method:'GET',
+    headers:account?{authorization:'Bearer verified-token',origin:'https://admin.falowen.app'}:{},
+    url:'/?'+new URLSearchParams({level:'A2',day:String(day),key:requested})
+   },res);
+   assert.equal(res.code,expected,day+' '+requested);
+   assert.equal(Boolean(res.body.url),expected===200);
+   if(expected===200) {
+    const url=new URL(res.body.url);
+    assert.equal(url.pathname,'/'+key);
+    assert.match(url.searchParams.get('X-Amz-Signature'),/^[a-f0-9]{64}$/);
+    assert.equal(res.headers['Cache-Control'],'private, no-store');
+   }
+  }
+ }
+ assert.throws(()=>signTrack('a2-day21-weekend-classroom',env),/Unknown/);
+});
