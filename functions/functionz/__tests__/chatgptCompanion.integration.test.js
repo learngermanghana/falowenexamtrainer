@@ -14,6 +14,8 @@ function mockFirebase() {
     ["student-1", { uid: "student-1", role: "student", level: "A2", name: "Student One", studentCode: "TEST001" }],
     ["student-2", { uid: "student-2", role: "student", level: "B1", name: "Student Two", studentCode: "TEST002" }],
     ["b2-learner", { uid: "b2-learner", role: "student", level: "B2", name: "B2 Test Learner", studentCode: "TESTB2" }],
+    ["c1-learner", { uid: "c1-learner", role: "student", level: "C1", name: "C1 Learner" }],
+    ["c2-learner", { uid: "c2-learner", role: "student", level: "C2", name: "C2 Learner" }],
     ["inactive", { uid: "inactive", role: "student", level: "A1", trialStatus: "expired", paymentStatus: "pending" }],
     ["student-class", { uid: "student-class", role: "student", level: "A1", classId: "class-genuine", name: "Class Learner" }],
   ]);
@@ -102,7 +104,7 @@ function mockFirebase() {
     firestore: () => db,
     auth: () => ({
       async verifyIdToken(idToken) {
-        if (!["student-1", "student-2", "b2-learner", "student-class", "inactive"].includes(idToken)) throw Error("invalid token");
+        if (!["student-1", "student-2", "b2-learner", "c1-learner", "c2-learner", "student-class", "inactive"].includes(idToken)) throw Error("invalid token");
         return { uid: idToken, email: idToken + "@example.org", email_verified: true };
       },
     }),
@@ -291,6 +293,45 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const spoofed = await call({ day: 1, section: "reading", level: "B2" });
       expect(spoofed.data.result.structuredContent.level).toBe("B1");
       expect(spoofed.data.result.structuredContent.material.title).toBe("Traumdeutung und ihre Bedeutung");
+    });
+  });
+
+  test("C1 and C2 course materials remain OAuth-bound and match original skill days", async () => {
+    await withServer(async (origin) => {
+      const [c1, c2] = await Promise.all([
+        connectStudent(origin, "c1-learner", "real-c1"),
+        connectStudent(origin, "c2-learner", "real-c2"),
+      ]);
+      expect(c1.response.status).toBe(200);
+      expect(c2.response.status).toBe(200);
+      const call = (token, day, section, requestedLevel) => postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 76, method: "tools/call",
+        params: { name: "get_my_falowen_lesson_content",
+          arguments: { day, section, level: requestedLevel } },
+      }, token);
+
+      const c1Reading = (await call(c1.tokens.access_token, 1, "reading", "C2"))
+        .data.result.structuredContent;
+      expect(c1Reading.level).toBe("C1");
+      expect(c1Reading.material.passageIncluded).toBe(false);
+      const c1Day20 = (await call(c1.tokens.access_token, 20, "overview", "B2"))
+        .data.result.structuredContent;
+      expect(c1Day20.level).toBe("C1");
+      expect(c1Day20.title).toBe("Digitale Gesundheit");
+
+      const c2Reading = (await call(c2.tokens.access_token, 1, "reading", "B2"))
+        .data.result.structuredContent;
+      expect(c2Reading.level).toBe("C2");
+      expect(c2Reading.available).toBe(true);
+      expect(c2Reading.material.paragraphs.length).toBeGreaterThan(2);
+      expect(c2Reading.material.questions[0]).not.toHaveProperty("answerIndex");
+      const c2Day20 = (await call(c2.tokens.access_token, 20, "reading", "B2"))
+        .data.result.structuredContent;
+      expect(c2Day20.level).toBe("C2");
+      expect(c2Day20.available).toBe(false);
+      const c2Writing = (await call(c2.tokens.access_token, 20, "writing", "C1"))
+        .data.result.structuredContent;
+      expect(c2Writing.material.targetWords).toBe(350);
     });
   });
 
