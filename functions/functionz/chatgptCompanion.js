@@ -34,6 +34,7 @@ function lessonContentResponse(level, day, section = "overview") {
     level, day, chapter: content.chapter, title: content.title, section,
     source: "Falowen Course Book (learner-facing source data)",
     lessonUrl: lessonUrl(level, { dayNumber: day, displayChapter: content.chapter }),
+    ...(level === "C1" ? { readingPracticeUrl: SITE + "/campus/course/c1-self-learning/day-" + day } : {}),
     guidance: "Use only the supplied learner-facing text for claims about Falowen's exact exercises. Do not claim to know answers or completion state.",
   };
   if (section === "overview") return {
@@ -277,6 +278,7 @@ function summarizeStudentAssignments(student, rows) {
       status: "self_study",
       completionVerified: false,
       lessonUrl: lessonUrl(level, { dayNumber: day, displayChapter: entry.displayChapter || entry.chapter }),
+      ...(level === "C1" ? { readingPracticeUrl: SITE + "/campus/course/c1-self-learning/day-" + day } : {}),
     }));
     return {
       level,
@@ -475,6 +477,7 @@ async function callTool(name, args, student, admin) {
       goal: normalize(entry?.goal || exported?.goal).slice(0, 600),
       grammarFocus: normalize(entry?.grammar_topic || entry?.grammarFocus || exported?.grammarFocus).slice(0, 200),
       lessonUrl: lessonUrl(view.level, { dayNumber: args.day, displayChapter: entry?.displayChapter || entry?.chapter || exported?.chapter }),
+      ...(view.level === "C1" ? { readingPracticeUrl: SITE + "/campus/course/c1-self-learning/day-" + args.day } : {}),
       guidance: "Explain concepts and offer short original practice questions. Do not complete graded coursework for the learner.",
       ...(exported
         ? { courseBookContent: lessonContentResponse(view.level, args.day, "overview"),
