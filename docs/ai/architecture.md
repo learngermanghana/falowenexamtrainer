@@ -69,3 +69,13 @@ access; the GHS 1,000 balance after one month unlocks the full six-month period.
 GHS 3,000 upfront gives full six-month access. Amounts reuse level fee settings.
 Course tuition has no refunds, with a seven-day trial offered before payment;
 book, subscription and third-party exam refund terms are referred to the team.
+
+The public `/help` page also renders the approved visitor FAQs.
+`publicAdmissionsFaqs.js` derives its entries from the same question dictionary;
+`generatePublicHelp.mjs` produces no-JavaScript Help HTML, matching FAQPage JSON-LD
+and a generated admissions section in the existing `falowen-help.md`. Indexing
+metadata, the Help sitemap entry and llms discovery point to that canonical page.
+Confirmed support answers include teacher questions outside class, 24-hour Study
+Buddy AI, timetable transfers/pauses within six months, enrolment from abroad and
+Exams Room readiness practice with timers and an AI examiner. They do not promise
+a passing score or an official qualification.

@@ -363,3 +363,127 @@ Example:
 ## Maintenance
 
 When Falowen changes a route, tab, trial/payment rule, level structure or submission rule, update this file and the public Help page together. The public Help page is https://www.falowen.app/help.
+
+<!-- BEGIN GENERATED ADMISSIONS FAQ -->
+## Admissions, classes, fees and learner support
+
+### Is the class hybrid?
+
+Yes, our classes are hybrid: you can attend online or in person. Recorded lectures are also available if you miss a class.
+
+View classes and schedules: https://www.falowen.app/classes
+
+### What are the fees?
+
+Tuition is paid separately for each 10-week level. Current tuition per level: A1: GHS 3,000 · A2: GHS 3,000 · B1: GHS 3,000 · B2: GHS 3,000 · C1: GHS 3,000. Confirm your selected course details before paying.
+
+View course details: https://www.falowen.app/classes
+
+### What is the exam registration fee?
+
+A1 exam registration is currently GHS 3,000, separate from the class tuition fee. For A2–C2, check the Goethe-Institut Ghana website for the current fee. Please confirm the latest official charge and registration availability before paying.
+
+Check Goethe exam fees and registration: https://www.goethe.de/ins/gh/en/spr/prf/anm.html
+
+### How long is the course?
+
+Each level can be completed in 10 weeks, and you pay tuition separately for each level. Your contract lasts six months in total, allowing three months of free catch-up time within that period if travel or illness interrupts your studies.
+
+View course details: https://www.falowen.app/classes
+
+### Can I learn up to B1 or B2?
+
+Each German level takes 10 weeks, and tuition is paid separately for each level. You can study up to your preferred level, such as B1 or B2. Falowen provides mock exam samples to practise and check your progress, so you do not need to take an official exam after every level as part of our learning pathway. You can take the official exam at your chosen target level. Official exam registration is paid separately.
+
+Explore mock exam samples: https://www.falowen.app/exam-practice
+
+### Can I join late?
+
+You can join a class only while it has completed fewer than four sessions (0–3 sessions). You will need to use the recorded lectures to catch up. Contact our team to confirm the current session count before enrolling.
+
+View classes: https://www.falowen.app/classes
+
+### What does tuition include?
+
+Tuition includes your classes, recorded lectures and access to the Falowen app, including your digital books and learning materials. Physical books can be requested separately through the book page if preferred. Official exam registration is not included in tuition.
+
+View physical books: https://www.falowen.app/books
+
+### Can I pay in instalments?
+
+You can pay an initial deposit of GHS 2,000 for one month of access, then pay the remaining GHS 1,000 after one month to unlock the full six-month access period. Alternatively, pay GHS 3,000 in full for six months of access. Tuition is paid separately for each level.
+
+View courses and registration: https://www.falowen.app/classes
+
+### How do I register?
+
+Create a free Falowen account to get started. You can also view available classes before registering.
+
+View classes and registration: https://www.falowen.app/classes
+
+### Where are you located?
+
+Learn Language Education Academy is in Awoshie, Accra, Ghana.
+
+Open location: https://maps.app.goo.gl/CPYX7uCj9YSELc1Q9
+
+### What is the minimum age?
+
+The minimum age is 16. Applicants should have at least vocational training or secondary school education. If you have only junior high school education, our team must assess your eligibility, including whether you can use your phone to access the Falowen app.
+
+### Can a complete beginner join?
+
+Yes, you can join A1 as a complete beginner. You do not need any prior German knowledge.
+
+Find an A1 class: https://www.falowen.app/classes
+
+### Do you help with exam registration?
+
+Yes, we help students with exam registration. Falowen has a platform that guides students through the registration process. Contact our team if you need assistance. Official exam registration fees are separate from tuition.
+
+View official exam registration: https://www.goethe.de/ins/gh/en/spr/prf/anm.html
+
+### What certificates will I receive?
+
+You receive a Falowen certificate, transcript, attendance certificate and class participation certificate. These do not replace a Goethe certificate. For visa purposes, confirm the required certificate with the relevant authority before relying on a Falowen document.
+
+### What do I need for online classes?
+
+You need a good smartphone or computer and a reliable internet connection to use Falowen and attend online classes.
+
+View classes: https://www.falowen.app/classes
+
+### Can I switch attendance each day?
+
+Yes. Each day you can choose to attend online or in person, or use the recorded lectures if you cannot attend live.
+
+View class schedules: https://www.falowen.app/classes
+
+### What is the refund policy?
+
+Course tuition fees are non-refundable. We offer a 7-day free trial so you can try Falowen before paying.
+
+Explore the 7-day trial: https://www.falowen.app/
+
+### Can I ask teachers questions outside class?
+
+Yes, you can ask teachers questions outside class. You also have Study Buddy AI support available 24 hours a day in Falowen.
+
+Read about learning support: https://www.falowen.app/help#student-support
+
+### Can I transfer or pause my course?
+
+Yes, you can transfer to another timetable or pause your course within your six-month contract. Contact our team to arrange the change. The change must remain within that contract period.
+
+### Can I join from abroad?
+
+Yes, we accept students living abroad. You can join online from another country. Check the published class timetable and its time zone before enrolling.
+
+Check class times: https://www.falowen.app/classes
+
+### How do I know I am ready for the official exam?
+
+Use the tools in Falowen’s Exams Room to check your readiness. You can practise with Goethe-style sample tests, timers and AI as an examiner. Review your results and feedback to see what still needs practice before taking the official exam.
+
+Open Exams Room (login required): https://www.falowen.app/exams/overview
+<!-- END GENERATED ADMISSIONS FAQ -->

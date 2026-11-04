@@ -20,7 +20,7 @@ export default function publicVisitorHelper() {
           const relative = prefix + entry.name;
           if (entry.isDirectory()) { if (!['assets','campus'].includes(entry.name)) await visit(join(directory,entry.name),relative+'/'); continue; }
           if (!entry.name.endsWith('.html') || relative === 'index.html' || relative.endsWith('/embed.html')) continue;
-          const path = relative === 'exams-landing.html' ? '/' : '/'+relative.replace(/\/index\.html$/,'');
+          const path = relative === 'exams-landing.html' ? '/' : relative === 'help.html' ? '/help' : '/'+relative.replace(/\/index\.html$/,'');
           if (!isPublicVisitorPath(path)) continue;
           const filename = join(directory,entry.name);
           const html = await readFile(filename,'utf8');
