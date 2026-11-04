@@ -1320,7 +1320,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 {isB2CourseBook ? <span data-b2-main-skill={getB2SkillLabel(entry.day)?.label || ""} style={{ ...courseBookStyles.chip, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>Main: {getB2SkillLabel(entry.day)?.label}</span> : null}
                                 {entry.chapter ? <span style={courseBookStyles.chip}>Chapter {entry.chapter}</span> : null}
                                 {shouldShowGrammarChip(entry) ? <span style={courseBookStyles.chip}>{entry.grammar_topic}</span> : null}
-                                {entry.isTutorMarked ? <span style={courseBookStyles.chip}>Tutor-marked</span> : <span style={courseBookStyles.chip}>Self-learning</span>}
+                                {entry.sessionType === "app_assessment" ? <span style={courseBookStyles.chip}>App Assessment · No live class</span> : entry.isTutorMarked ? <span style={courseBookStyles.chip}>Tutor-marked</span> : <span style={courseBookStyles.chip}>Self-learning</span>}
                                 {entry.timedConfig ? (
                                   <span
                                     data-timed-coursebook-chip={entry.assignmentKey}

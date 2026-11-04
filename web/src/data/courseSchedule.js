@@ -2542,10 +2542,17 @@ const normalizeCourseSchedules = (schedules) =>
 
           return {
             ...canonicalEntry,
+            ...(((level === "A2" && Number(canonicalEntry.day) === 22) || (level === "B1" && Number(canonicalEntry.day) === 23)) ? {
+              topic: `Goethe ${level} Speaking Mock`, grammar_topic: null,
+              sessionType: "app_assessment", attendanceRequired: false,
+              goal: "Complete all three speaking parts with the Falowen AI examiner in the app.",
+            } : {}),
             assignment: isA1PracticalTopic(canonicalEntry, level) ? false : canonicalEntry.assignment,
             topic: resolvedTopic,
             instruction:
-              needsSelfPracticeNote && levelSpecificInstruction && !hasNote
+              ((level === "A2" && Number(canonicalEntry.day) === 22) || (level === "B1" && Number(canonicalEntry.day) === 23))
+                ? "App Assessment · No live class. Open the speaking mock and complete all three parts with the Falowen AI examiner. Confirm your spoken answers; your result is saved after all three parts."
+                : needsSelfPracticeNote && levelSpecificInstruction && !hasNote
                 ? `${levelSpecificInstruction} ${SELF_PRACTICE_NOTE}`
                 : levelSpecificInstruction,
             lesen_hören: canonicalLesenHoeren,
