@@ -130,6 +130,7 @@ describe("Exams Room writing tasks", () => {
     fireEvent.click(screen.getByRole("button", { name: "Send to tutor" }));
     await waitFor(() => expect(mockSaveForTutor).toHaveBeenCalledTimes(1));
     expect(mockSaveForTutor.mock.calls[0][0].source).toBe("exam-room-simple-writing");
+    expect(mockSaveForTutor.mock.calls[0][0].aiAssessment).toEqual(await mockMark.mock.results[0].value);
   });
   test("C1 Part 2 offers the optional formal-email template with English controls and German content", () => {
     mockSelectedLevel = "C1";
