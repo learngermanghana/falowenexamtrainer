@@ -116,8 +116,12 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
     const approved = approvedLyrics.recordings?.find(pack => pack.objectKey === objectKey);
     const ownerFallback = approved ? validateLyrics(approved, objectKey) : null;
     const estimate=validateEstimate(estimates.recordings?.find(pack=>pack.objectKey===objectKey),objectKey,approved);
+    // A fresh word-aligned estimate can replace a coarse estimate for the same
+    // fingerprint. Reviewed bundled timing and owner R2 sidecars still win.
+    const refinedEstimate = estimate && approved?.timingStatus === 'estimated'
+      && approved.recordingSha256 === estimate.recordingSha256 ? estimate : null;
     const fallback = checkedRecording?.cues.length ? checkedRecording
-      : ownerFallback?.cues.length ? ownerFallback : estimate || checkedRecording || ownerFallback;
+      : refinedEstimate || (ownerFallback?.cues.length ? ownerFallback : estimate || checkedRecording || ownerFallback);
     const sendFallback = () => res.status(200).json(withEnglishTranslation({...fallback,
       source:fallback===estimate ? 'acoustic-estimate' : checkedRecording ? 'bundled' : 'owner-supplied',
       timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? 'published' : approved?.timingStatus || 'missing'}));

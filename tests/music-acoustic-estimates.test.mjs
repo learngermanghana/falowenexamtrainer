@@ -37,9 +37,9 @@ test('API serves an explicit estimate without pretending the draft words were ap
  assert.equal(r.body.cues.length,17);
 });
 
-test('all 48 new course timing drafts validate without promoting automatic transcripts to approved lyrics',()=>{
+test('all course timing drafts validate without promoting automatic transcripts to approved lyrics',()=>{
  const approved=require('../web/public/music/approved-recording-lyrics.json');
- assert.equal(estimates.recordings.length,48);
+ assert.equal(estimates.recordings.length,49);
  assert.equal(estimates.recordings.filter(p=>p.transcriptionStatus==='automatic').length,25);
  const keys=new Set();
  for(const row of estimates.recordings){

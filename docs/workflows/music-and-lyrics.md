@@ -143,6 +143,19 @@ recording-matched cues, respects instrumental gaps, and labels estimates and
 automatic transcripts. Without valid cues it offers a manual lyric sheet. No
 playback-time AI, generated audio or new persistence is introduced.
 
+## A2 Day 1 audio-derived refinement — 4 November 2026
+
+The teacher-supplied 158.4-second `Ein nettes Gespräch.mp3` matches the approved
+recording SHA-256. Offline Whisper small German word alignment matched 97.7%
+of expected words (weakest line 81.8%). All 28 approved lines and repeated
+choruses remain unchanged. The new pack lives in `estimated-timings.json`,
+with recognized word evidence, and remains estimated pending listening review.
+For example, the first chorus starts at 30.22 seconds in the word-aligned
+estimate, replacing the coarse 38.18-second window.
+The API prefers this refinement only over an estimated approved pack with the
+same fingerprint. Reviewed bundled cues and owner-reviewed R2 sidecars retain
+precedence. No audio upload, paid transcription or runtime AI work is added.
+
 ## A2 Day 21 transcript English — 4 November 2026
 
 The current Endlich Wochenende player uses an automatic transcript whose words
