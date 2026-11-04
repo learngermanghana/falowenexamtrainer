@@ -28,9 +28,9 @@ describe("Student Music and Books navigation", () => {
     expect(app).toContain('resolvedSection === "music" && allowedSections.music ? <CampusMusicPage />');
     expect(app).toContain('path="/campus/:section/*"');
     expect(app).toContain('resolvedSection === "books" && allowedSections.books ? <CampusBooksPage />');
-    expect(app).toContain('<Route path="/campus/vocab" element={<Navigate to="/campus/music" replace />} />');
-    expect(app).not.toContain('key: "vocab"');
-    expect(app).not.toContain('resolvedSection === "vocab" && allowedSections.vocab');
+    expect(app).toContain('{ key: "vocab", label: t("appNav.sections.vocab"), section: "vocab" }');
+    expect(app).toContain('resolvedSection === "vocab" && allowedSections.vocab ? <VocabExamPage context="campus" />');
+    expect(app).not.toContain('<Route path="/campus/vocab" element={<Navigate to="/campus/music" replace />} />');
     expect(app).toContain('{examSection === "vocab" ? <VocabExamPage /> : null}');
     expect((app.match(/if \(tab\.route\)/g) || []).length).toBe(2); // Campus + deep lesson nav
     expect(app).toContain('if (location.pathname === "/books" || location.pathname === "/books/")');
@@ -55,7 +55,8 @@ describe("Student Music and Books navigation", () => {
     expect(product).toContain('basePath + href.slice("/books".length)');
     expect(product).toContain('window.location.assign(url.toString());');
     expect(patch).toContain('label: "Books", route: "/campus/books"');
-    expect(patch).toContain('["books", "examFile", "classMembers", "home"]');
+    expect(patch).toContain('["vocab", "books", "classMembers", "home"]');
+    expect(patch).toContain('{ key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" }');
   });
 
   test("reuses music backend and keeps sharing and song navigation correct inside iframe", () => {
@@ -82,7 +83,8 @@ describe("Student Music and Books navigation", () => {
     const nav = JSON.parse(file("../web/public/falowen-navigation.json"));
     expect(nav.navigation.find(item => item.id === "music").route).toBe("/campus/music");
     expect(nav.navigation.find(item => item.id === "books").route).toBe("/campus/books");
-    expect(nav.navigation.some(item => item.route === "/campus/vocab")).toBe(false);
+    expect(nav.navigation.find(item => item.id === "vocabulary").route).toBe("/campus/vocab");
+    expect(nav.navigation.find(item => item.id === "exam-file").route).toBe("/exams/file");
     expect(nav.navigation.filter(item => item.id === "music")).toHaveLength(1);
   });
 });
