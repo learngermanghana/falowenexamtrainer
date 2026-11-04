@@ -575,6 +575,7 @@ const renderA2B1Lesson = async (page, lesson) => {
   ];
   const workbookParts = [];
   const readOnlyParts = level === "A2" ? await getA2ReadOnlyParts(lesson.day) : [];
+  const b1ReadOnlyParts = level === "B1" ? await getB1ReadOnlyParts(lesson.day) : [];
   for (const tabSpec of workbookTabSpecs) {
     // Graded A2 questions always come from the public source fields. Never
     // click a graded tab or print the account's answer/marking state, even
@@ -593,6 +594,17 @@ const renderA2B1Lesson = async (page, lesson) => {
     }
     if (availability === "hidden")
       throw new Error(`${level} Day ${lesson.day}: ${tabSpec.names[0]} unexpectedly hidden.`);
+    // For B1 graded/reading/listening tabs, print source-owned questions
+    // regardless of whether the export account can open the live tab.
+    // A live Hören page may include player loading states or overflow sheets,
+    // while the canonical companion prints every question and the audio QR.
+    // Teil 1 Sprechen remains the live lesson; missing canonical data for a
+    // locked tab still fails closed in the branch below.
+    if (level === "B1" && tabSpec.key !== "teil-1" && b1ReadOnlyParts.includes(tabSpec.key)) {
+      workbookParts.push(await renderReadOnlyB1Section(page, lesson, tabSpec.key, `workbook-${tabSpec.key}`));
+      console.log(`B1 Day ${lesson.day}: printed ${tabSpec.names[0]} from canonical questions, not live account state.`);
+      continue;
+    }
     if (availability === "locked") {
       if (level === "B1") {
         const availableCompanions = await getB1ReadOnlyParts(lesson.day);

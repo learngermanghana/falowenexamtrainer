@@ -106,3 +106,18 @@ test("B1 later-course canonical reading and listening material remains accessibl
     }
   }
 });
+
+
+test("B1 Day 1 Hören is printable from canonical questions without a live audio player", async () => {
+  const lessonUrl = getB1PdfLessonCompanionUrl("/campus/course/lesson/B1/1");
+  const parts = await getB1ReadOnlyParts(1);
+  assert.ok(parts.includes("teil-4"));
+  const html = await buildB1ReadOnlyPrintHtml({
+    day: 1, part: "teil-4", lessonUrl,
+    audioQrDataUrl: "data:image/png;base64,AA",
+  });
+  assert.match(html, /Audio in der Falowen-Lektion/);
+  assert.match(html, /Fragen/);
+  assert.match(html, /FALOWEN · B1 · Tag 1/);
+  assert.doesNotMatch(html, /Audio wird geladen|X-Amz-Signature|studentUid/);
+});
