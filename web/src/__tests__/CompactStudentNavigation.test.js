@@ -42,8 +42,9 @@ describe("compact student navigation", () => {
       expect(app).toContain(label);
     });
     expect(app).toContain('label: "Vocab", route: "/campus/vocab"');
+    expect(app).toContain('label: "Music", route: "/campus/music"');
     expect(app).not.toContain('label: "Practice", route: "/campus/vocab"');
-    expect(app).toContain('label: "Exam File"');
+    expect(app).not.toContain('label: "Exam File"');
     expect(app).toContain('label: "Class Members"');
     expect(app).toContain('label: "Falowen Home"');
     expect(appCss).toContain(".campus-primary-nav");
