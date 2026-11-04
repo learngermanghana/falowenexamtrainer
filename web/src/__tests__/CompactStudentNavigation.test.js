@@ -38,11 +38,14 @@ describe("compact student navigation", () => {
     expect(app).toContain("const CampusPrimaryNavigation =");
     expect(app).toContain("const CampusMobileBottomNav =");
     expect(app).toContain('aria-label="Mobile campus navigation"');
-    ["Course Book", "Vocab", "Attendance", "Results", "More"].forEach((label) => {
+    ["Course Book", "Music", "Attendance", "Results", "More"].forEach((label) => {
       expect(app).toContain(label);
     });
     expect(app).toContain('label: "Vocab", route: "/campus/vocab"');
     expect(app).toContain('label: "Music", route: "/campus/music"');
+    expect(app).toContain('{ key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" }');
+    expect(app).toContain('["vocab", "books", "classMembers", "home"].includes(item.key)');
+    expect(app).not.toContain('["music", "books", "classMembers", "home"].includes(item.key)');
     expect(app).not.toContain('label: "Practice", route: "/campus/vocab"');
     expect(app).not.toContain('label: "Exam File"');
     expect(app).toContain('label: "Class Members"');
@@ -59,10 +62,10 @@ describe("compact student navigation", () => {
       '{ key: "vocab", label: "Vocab", route: "/campus/vocab", enabled: Boolean(allowedSections.vocab) }',
     );
     expect(compactNavigationPatch).toContain(
-      '{ key: "vocab", label: "Vocab", icon: "✦", route: "/campus/vocab", permission: "vocab" }',
+      '{ key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" }',
     );
     expect(compactNavigationPatch).toContain(
-      '["music", "books", "classMembers", "home"].includes(item.key)',
+      '["vocab", "books", "classMembers", "home"].includes(item.key)',
     );
   });
 
