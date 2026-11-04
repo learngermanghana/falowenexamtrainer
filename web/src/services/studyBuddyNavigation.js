@@ -3,11 +3,11 @@
 export const STUDY_BUDDY_DESTINATIONS = Object.freeze({
   results: { label: "Results", path: "/campus/results" },
   exams: { label: "Exams Room", path: "/exams/overview" },
-  examFile: { label: "Exam File", path: "/campus/examFile" },
+  examFile: { label: "Exam File and Date", path: "/exams/file" },
   courseBook: { label: "Course Book", path: "/campus/course" },
   attendance: { label: "Attendance", path: "/campus/attendance" },
   music: { label: "Music", path: "/campus/music" },
-  vocab: { label: "Vocab", path: "/exams/vocab" },
+  vocab: { label: "Vocab", path: "/campus/vocab" },
   calendar: { label: "Study Calendar", path: "/exams/study" },
   billing: { label: "Billing", path: "/campus/account?tab=billing" },
   placement: { label: "Placement Test", path: "/placement-test" },
@@ -77,7 +77,7 @@ export const resolveStudyBuddyNavigationReply = (rawMessage, conversationHistory
     return { destination: "courseBook", reply: makeReply("courseBook", "Open Course Book, select the relevant lesson and use its Submit tab to hand in the assignment:") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:exam file|prüfungsakte)\b/)) {
-    return { destination: "examFile", reply: makeReply("examFile", "Open Exam File from your Falowen campus:") };
+    return { destination: "examFile", reply: makeReply("examFile", "Open Exam File and Date in the Exams Room:") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:mock(?: exam| test| attempt| review| feedback| details)?|exams room|exam practice|goethe practice|prüfungsübungen)\b/) ||
       /\b(?:start|resume|continue|take|practise|practice|sit)\b.*\b(?:mock|goethe exam)\b/.test(resolvedMessage)) {
@@ -93,7 +93,7 @@ export const resolveStudyBuddyNavigationReply = (rawMessage, conversationHistory
     return { destination: "music", reply: makeReply("music", "Open Music in your Falowen campus to listen and practise:") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:vocab|vocabulary|word practice|wortschatz)\b/)) {
-    return { destination: "vocab", reply: makeReply("vocab", "Open Exams Room → Vocab to practise words:") };
+    return { destination: "vocab", reply: makeReply("vocab", "Open Campus → Vocab to practise words (on mobile: More → Vocab):") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:study calendar|study plan|learning calendar|lernkalender)\b/)) {
     return { destination: "calendar", reply: makeReply("calendar", "Open Study Calendar to plan your preparation:") };
