@@ -57,7 +57,7 @@ const renderPageToGrayscale = (file, pageNumber, cropInterior = false) => {
   }
 };
 
-export const trimPrintedPdfTail = async (file, { description = "" } = {}) => {
+export const trimPrintedPdfTail = async (file, { description = "", removeBlankInterior = false } = {}) => {
   const pdf = await PDFDocument.load(fs.readFileSync(file));
   const pageCount = pdf.getPageCount();
   const textPages = extractPdfPages(execFileSync("pdftotext", ["-layout", file, "-"], {
@@ -108,6 +108,25 @@ export const trimPrintedPdfTail = async (file, { description = "" } = {}) => {
     }
   }
   removed += removedChrome;
+  // Chromium can create completely white overflow sheets between real B1
+  // exercise pages. Never discard a textless page merely because pdftotext
+  // cannot see an illustration. Require both no extractable text and a
+  // visually white full-page raster. This is opt-in for B1 only; the default
+  // A1/A2 policy preserves interior pages for manual review.
+  if (removeBlankInterior) {
+    let removedInterior = 0;
+    for (let index = pageCount - removed - 1; index >= 0; index--) {
+      if (textPages[index].trim()) continue;
+      if (!isVisuallyEmptyPgm(renderPageToGrayscale(file, index + 1))) continue;
+      if (pdf.getPageCount() <= 1) break; // An empty section must fail validation.
+      if (removedInterior >= 3) {
+        throw new Error("Too many visually blank interior pages in " + description);
+      }
+      pdf.removePage(index);
+      removedInterior++;
+    }
+    removed += removedInterior;
+  }
   if (removed) {
     fs.writeFileSync(file, await pdf.save());
     console.log("A1 PDF: removed " + removed + " empty overflow / chrome-only page(s) from " + description);
