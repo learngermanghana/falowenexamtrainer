@@ -120,3 +120,13 @@ Export network failures now identify the MP3 download stage.
 ## Public music sharing and art — 3 November 2026
 
 The public player offers platform choices and native device sharing, with a copyable song URL. `/song/<track-id>` serves recording-specific social preview metadata and the same listening room. The artwork manifest and credited local photography cover all 67 audited releases, with a default for new public recordings. These display changes do not approve lyrics, cues, translations or audio, and do not change assessment or music discovery. See [public music architecture](../public-falowen-music.md) for source ownership and checks.
+
+## Private B1 Day 26 classroom audio — 4 November 2026
+
+The Admin travel-problems listening activity uses the teacher-uploaded
+`a2/day-26/reiseprobleme-und-losungen.mp3` object. Despite the storage prefix,
+the exact allowlist triple is B1, day 26 and that key. The existing staff-only
+classroom signer serves it on demand; anonymous/student requests, other levels,
+days and objects remain rejected. It is not a public music recording and does
+not change the graded workbook Hören. Admin owns the five supplied classroom
+questions (B, A, C, A, B) in `b1Day26Listening.js`.
