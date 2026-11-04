@@ -259,3 +259,6 @@ html,body { background:#0e1921; }
 .social-share-link:hover{background:#d4eee3}.song-share-dialog :focus-visible{outline:3px solid #087d64;outline-offset:3px}
 .share-url{box-sizing:border-box;width:100%;padding:12px;border:1px solid #b9cacc;border-radius:10px;font:inherit;font-size:13px;background:#f6f9f9;color:#233e48}
 @media(max-width:420px){.social-share-links{grid-template-columns:repeat(2,minmax(0,1fr))}.song-share-dialog{padding:18px}}
+
+/* Song pages open directly into the listening room, without homepage promotion. */
+body.song-detail-open .hero { display: none; }
