@@ -67,7 +67,7 @@ describe("Student Music and Books navigation", () => {
     expect(music).toContain('link.target = "_top"');
     expect(music).toContain('new URL("/music/index.html?track="');
     expect(music).toContain('url.searchParams.set("embedded", "1")');
-    expect(music).toContain('const url = publicSongUrl(selected || current).href;');
+    expect(music).toContain('const url = publicSongUrl(track).href;');
     expect(music).toContain('embedded ? "/music/index.html?embedded=1" : "/"');
     expect(css).toContain(".music-embedded .site-header");
     expect(css).toContain(".music-embedded .library-section");
