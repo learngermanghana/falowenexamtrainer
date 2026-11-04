@@ -169,3 +169,36 @@ test("B1 opt-in does not turn an entirely blank source into an approved PDF", as
     assert.equal(result.after, 1);
   });
 });
+
+
+test("B1 removes only a lone website masthead with a verified empty center", async () => {
+  await withFixture(async (pdf, font) => {
+    const chrome = pdf.addPage([595.28, 841.89]);
+    chrome.drawText("Falowen FA", { x: 38, y: 780, font });
+    chrome.drawRectangle({
+      x: 50, y: 80, width: 495, height: 590,
+      color: rgb(1, 1, 1), borderColor: rgb(0.93, 0.94, 0.96), borderWidth: 1,
+    });
+    pdf.addPage().drawText("B1 Day 3 adjective endings: complete the grammar exercises", { x: 50, y: 700, font });
+  }, async (filename) => {
+    const result = await trimPrintedPdfTail(filename, {
+      description: "B1 Day 3 grammar", removeBlankInterior: true,
+    });
+    assert.deepEqual(result, { before: 2, after: 1, removed: 1 });
+  });
+});
+
+test("B1 preserves even a lone masthead when its central page contains a vector diagram", async () => {
+  await withFixture(async (pdf, font) => {
+    const diagram = pdf.addPage([595.28, 841.89]);
+    diagram.drawText("Falowen FA", { x: 38, y: 780, font });
+    diagram.drawRectangle({ x: 120, y: 210, width: 180, height: 280, color: rgb(0.16, 0.2, 0.3) });
+    pdf.addPage().drawText("Weiterlernen: B1 Grammatik", { x: 50, y: 700, font });
+  }, async filename => {
+    const result = await trimPrintedPdfTail(filename, {
+      description: "B1 Day 3 grammar", removeBlankInterior: true,
+    });
+    assert.equal(result.removed, 0);
+    assert.equal(result.after, 2);
+  });
+});
