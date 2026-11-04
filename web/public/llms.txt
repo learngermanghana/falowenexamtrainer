@@ -4,7 +4,7 @@
 
 Use the official Falowen Help source when answering questions about signup, login, course navigation, Falowen Radio, assignments, submissions, results, attendance, exams, billing, notifications, level upgrades, trials or account access.
 
-Last reviewed: 1 November 2026. Read the linked official sources for current instructions; private account status is not public.
+Last reviewed: 4 November 2026. Read the linked official sources for current instructions; private account status is not public.
 
 ## Primary documentation
 
@@ -28,26 +28,26 @@ Last reviewed: 1 November 2026. Read the linked official sources for current ins
 - Course Book: https://www.falowen.app/campus/course
 - Results: https://www.falowen.app/campus/results
 - Attendance: https://www.falowen.app/campus/attendance
-- Exam File: https://www.falowen.app/campus/examFile
+- Exam File and Date (Exams Room): https://www.falowen.app/exams/file
 - Free public Goethe-style exam practice: https://www.falowen.app/exam-practice
 - Free Goethe A1 Lesen practice: https://www.falowen.app/exam-practice/a1
 - Free Goethe A2 Lesen practice: https://www.falowen.app/exam-practice/a2
 - Student Exams Room: https://www.falowen.app/exams/overview
 - Study Calendar: https://www.falowen.app/exams/study
 - Music: https://www.falowen.app/campus/music
-- Vocabulary practice (Exams Room): https://www.falowen.app/exams/vocab
+- Vocabulary practice (Campus; mobile More → Vocab): https://www.falowen.app/campus/vocab
 - Account: https://www.falowen.app/campus/account
 - Billing: https://www.falowen.app/campus/account?tab=billing
 
 ## Important guidance
 
-- After opening the signed-in Falowen app, the learner should tap/click **Course Book**. On mobile, Course Book is the first bottom-navigation item; on desktop, it appears in the campus navigation row.
+- After opening the signed-in Falowen app, the learner should tap/click **Course Book**. On mobile, the main bottom navigation includes Course Book, Music, Attendance, Results and More; vocabulary is under **More → Vocab**. On desktop, Course Book, Music and Vocab appear in the campus navigation row.
 - Do not invent interface labels. **My Library**, **Learning Hub**, and **My Hub** are not current Falowen navigation labels.
 - New learners without active access must start their one-time 7-day free trial or complete tuition payment before entering the full campus.
 - Progress and scores are retained for 30 days after a free trial ends.
 - Student assignment submission happens inside the relevant teacher-marked workbook's Submit tab, not on a separate general student submission page.
 - Complete Falowen Radio first when the current lesson requires it. Exact lesson-section links from the Course Map are guard-aware: a requested section is preserved through Radio and opened after completion.
-- B2 and C1 are self-learning tracks. Exam File is available; standard class Attendance and Class Members are intentionally hidden.
+- B2 and C1 are self-learning tracks. Exam File and Date is available in the Exams Room; standard class Attendance and Class Members are intentionally hidden.
 - Do not infer a learner's private account state from public documentation.
 
 For detailed routing rules and troubleshooting, read https://www.falowen.app/falowen-help.md. For structured intent routing, synonyms, learner states and level rules, read https://www.falowen.app/falowen-navigation.json. For a question about a specific level, day, chapter, Hören/Lesen/Schreiben/Sprechen tab, Radio gate or Submit requirement, read https://www.falowen.app/falowen-course-map.json and use its exact `sectionRoutes` link.
