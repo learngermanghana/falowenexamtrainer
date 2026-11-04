@@ -805,6 +805,8 @@ function renderDetail(track) {
 function showSong(track, autoplay = false, navigate = true) {
   if (selected?.id !== track.id) showEnglish = track.level === "A1";
   selected = track;
+  // The marketing hero belongs to the discovery page, not the listening view.
+  document.body.classList.add("song-detail-open");
   rebuildPlaybackQueue(track);
   setPlayer(track, autoplay);
   renderDetail(track);
@@ -813,6 +815,7 @@ function showSong(track, autoplay = false, navigate = true) {
 }
 function closeDetail(navigate = true) {
   selected = null;
+  document.body.classList.remove("song-detail-open");
   byId("song-detail").hidden = true;
   document.title = "Falowen Music · Learn German through songs";
   if (navigate) history.pushState(null, "", embedded ? "/music/index.html?embedded=1" : "/");
