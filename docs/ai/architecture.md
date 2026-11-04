@@ -56,3 +56,16 @@ their preferred target level (for example B1/B2), use mock samples along the
 way, and sit the official exam for that target level rather than every level.
 This describes the academy's learning pathway, not a waiver of a receiving
 organisation's certificate requirements. Official exam registration remains separate.
+
+Further admissions policies confirmed on 2026-11-04: minimum age 16 with
+vocational/secondary education; JHS applicants need team assessment of eligibility
+and ability to use the app. A1 needs no prior German. Students need a suitable
+phone/computer and internet, and may choose online, in-person or recorded
+attendance each day. Exam registration assistance is guided through Falowen.
+Academy documents include a Falowen certificate, transcript, attendance certificate
+and class participation certificate, which do not replace Goethe certification;
+visa acceptance is not guaranteed. A GHS 2,000 course deposit gives one month's
+access; the GHS 1,000 balance after one month unlocks the full six-month period.
+GHS 3,000 upfront gives full six-month access. Amounts reuse level fee settings.
+Course tuition has no refunds, with a seven-day trial offered before payment;
+book, subscription and third-party exam refund terms are referred to the team.

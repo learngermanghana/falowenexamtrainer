@@ -3,13 +3,29 @@ import academy from './publicAcademyProfile.json';
 
 export const VISITOR_WHATSAPP = 'https://wa.me/233205706589';
 export const GOETHE_EXAM_REGISTRATION = 'https://www.goethe.de/ins/gh/en/spr/prf/anm.html';
-export const QUICK_QUESTIONS = ['Is the class hybrid?', 'When is the next A1 class?', 'What are the fees?', 'What is the exam registration fee?', 'How long is the course?', 'Can I learn up to B1 or B2?', 'Can I join late?', 'What does tuition include?', 'Can I pay in instalments?', 'How do I register?', 'Where are you located?'];
+export const QUICK_QUESTIONS = ['Is the class hybrid?', 'When is the next A1 class?', 'What are the fees?', 'What is the exam registration fee?', 'How long is the course?', 'Can I learn up to B1 or B2?', 'Can I join late?', 'What does tuition include?', 'Can I pay in instalments?', 'How do I register?', 'Where are you located?', 'What is the minimum age?', 'Can a complete beginner join?', 'Do you help with exam registration?', 'What certificates will I receive?', 'What do I need for online classes?', 'Can I switch attendance each day?', 'What is the refund policy?'];
 // Admissions policies and A1 exam guidance confirmed by the academy on 2026-11-04.
 // Official exam charges are separate from tuition and Falowen practice access.
 const EXAM_REGISTRATION_ANSWER = 'A1 exam registration is currently GHS 3,000, separate from the class tuition fee. For A2–C2, check the Goethe-Institut Ghana website for the current fee. Please confirm the latest official charge and registration availability before paying.';
 // Edit the approved answers and matching phrases here. Dates come from the
 // public class catalog, and fees come from the same settings as registration.
 export const VISITOR_QUESTIONS = [
+  { id: 'eligibility', pattern: /\b(minimum age|how old|age limit|(?:16|sixteen|15|fifteen|under.{0,5}16).{0,20}(?:years?|join|enrol|register)|vocational|secondary school|junior high|jhs|education(?:al)? (?:requirements?|qualifications?)|who can (?:join|enrol|register))\b/i,
+    text: 'The minimum age is 16. Applicants should have at least vocational training or secondary school education. If you have only junior high school education, our team must assess your eligibility, including whether you can use your phone to access the Falowen app.', handoff: true },
+  { id: 'beginner', pattern: /\b(beginner|no (?:prior |previous )?(?:german|knowledge|experience)|(?:need|require).{0,25}(?:prior|previous).{0,15}(?:knowledge|german|experience)|(?:never|cannot|can.t|don.t).{0,20}(?:studied|speak|know).{0,15}german|start from (?:zero|scratch))\b/i,
+    text: 'Yes, you can join A1 as a complete beginner. You do not need any prior German knowledge.', href: '/classes', label: 'Find an A1 class' },
+  { id: 'equipment', pattern: /\b(phone|computer|laptop|internet|equipment|device|online requirements|requirements for online|what do i need|what (?:is|are) required)\b/i,
+    text: 'You need a good smartphone or computer and a reliable internet connection to use Falowen and attend online classes.', href: '/classes', label: 'View classes' },
+  { id: 'switchAttendance', pattern: /\b(switch.{0,30}(?:online|in.person|attendance|format)|switch between|alternate|change.{0,20}(?:online|in.person|attendance)|(?:choose|decide).{0,20}(?:each|every) day|(?:online|in.person).{0,20}(?:today|tomorrow)|(?:each|every) day.{0,20}(?:online|in.person|choose|decide))\b/i,
+    text: 'Yes. Each day you can choose to attend online or in person, or use the recorded lectures if you cannot attend live.', href: '/classes', label: 'View class schedules' },
+  { id: 'examHelp', pattern: /\b(?:help|assist|support|guid(?:e|ance))\b.{0,60}\b(?:exam|exams|goethe|regist(?:er|ration))\b|\b(?:exam|exams|goethe)\b.{0,40}\b(?:help|assist|guid(?:e|ance))\b/i,
+    text: 'Yes, we help students with exam registration. Falowen has a platform that guides students through the registration process. Contact our team if you need assistance. Official exam registration fees are separate from tuition.', href: GOETHE_EXAM_REGISTRATION, label: 'View official exam registration', handoff: true },
+  { id: 'certificates', pattern: /\b(certificates?|transcript|attendance cert|participation cert|certification|completion document)\b/i,
+    text: 'You receive a Falowen certificate, transcript, attendance certificate and class participation certificate. These do not replace a Goethe certificate. For visa purposes, confirm the required certificate with the relevant authority before relying on a Falowen document.', handoff: true },
+  { id: 'refund', pattern: /\b(refunds?|refundable|non.refundable|money back|cancel(?:lation|ling)?|cannot start|can.t start)\b/i,
+    text: 'Course tuition fees are non-refundable. We offer a 7-day free trial so you can try Falowen before paying.', href: 'https://www.falowen.app/', label: 'Explore the 7-day trial', handoff: true },
+  { id: 'payment', pattern: /\b(instalments?|installments?|pay in parts|part payment|deposits?|payment plan|remaining|balance|full payment|pay (?:upfront|in full)|pay.{0,15}full|(?:pay|payment).{0,15}(?:3000|3,000)|(?:one|1) month.{0,15}access|after (?:one|1) month|(?:2000|2,000))\b/i },
+
   { id: 'levelPath', pattern: /\b(up to|until|through to|from a[12].{0,20}(?:b[12]|c[12])|each level|every level|per level|preferred level|b1 or b2|b1 and b2|all levels|exam.{0,20}(?:each|every) level|(?:each|every) level.{0,20}exam)\b/i,
     text: 'Each German level takes 10 weeks, and tuition is paid separately for each level. You can study up to your preferred level, such as B1 or B2. Falowen provides mock exam samples to practise and check your progress, so you do not need to take an official exam after every level as part of our learning pathway. You can take the official exam at your chosen target level. Official exam registration is paid separately.', href: '/exam-practice', label: 'Explore mock exam samples' },
   { id: 'lateJoin', pattern: /\b(join(?:ing)? late|late (?:registration|enrolment|enrollment|joining)|already (?:started|begun)|after.{0,25}(?:start(?:s|ed|ing)?|begun)|(?:four|4) sessions?|catch up.{0,20}(?:join|new))\b/i,
@@ -28,7 +44,6 @@ export const VISITOR_QUESTIONS = [
     text: 'Yes, recorded lectures are available in Falowen if you miss a class. You can watch them to follow up and catch up on the lessons.', href: '/classes', label: 'Explore classes' },
 
   { id: 'fees', pattern: /\b(fees?|tuition|cost|price|how much)\b/i },
-  { id: 'payment', pattern: /\b(instalments?|installments?|pay in parts|part payment|deposit|payment plan)\b/i },
   { id: 'classes', pattern: /\b(next|upcoming|start|starting|schedule|timetable|intake|when|class times?)\b/i },
   { id: 'register', pattern: /\b(register|registration|sign up|signup|enrol|enroll|join)\b/i,
     text: 'Create a free Falowen account to get started. You can also view available classes before registering.', href: '/classes', label: 'View classes and registration' },
@@ -51,7 +66,16 @@ export function questionTopic(question) {
     .replace(/\bclas\b/gi, 'class').replace(/\bclases\b/gi, 'classes')
     .replace(/\bregistraton\b/gi, 'registration');
   // Prefer a human handoff to guessing sensitive exceptions or special offers.
-  if (/\b(refund|discount|scholarship|visa|guarantee)\b/i.test(text)) return null;
+  if (/\b(discount|scholarship|guarantee)\b/i.test(text)) return null;
+  // Certificate recognition is never inferred from a visa keyword.
+  if (/\bvisa\b/i.test(text)) return VISITOR_QUESTIONS.find(row => row.id === 'certificates');
+  // These confirmed policies take precedence over generic words such as
+  // 'registration', 'fees', 'when' and 'class'. Official fee questions still
+  // resolve separately below from Falowen documents and registration help.
+  for (const id of ['refund','eligibility','beginner','switchAttendance','examHelp']) {
+    const row = VISITOR_QUESTIONS.find(item => item.id === id);
+    if (row.pattern.test(text)) return row;
+  }
   const officialExam = /\b(goethe|official|certificate|exams?|examinations?)\b/i.test(text)
     && /\b(regist(?:er|ration)|book(?:ing)?|fees?|cost|price|pay|how much)\b/i.test(text)
     && !/\b(mock|practice|subscription)\b/i.test(text);
@@ -63,6 +87,8 @@ export function visitorAnswer(question, { classes = [], now = new Date(), contex
   const topic = questionTopic(question);
   const level = String(question).match(/\b(a1|a2|b1|b2|c1|c2)\b/i)?.[1].toUpperCase();
   if (!topic) return { text: "I don't have a saved answer for that yet. Please ask our team on WhatsApp so you get the right information.", handoff: true };
+  if (topic.id === 'refund' && (/\b(exams?|goethe|mock|subscription|books?|shipping)\b/i.test(question) || context === 'books' || context === 'exams'))
+    return {text:'Our course tuition is non-refundable, and the course offers a 7-day free trial before payment. For a book order, exam-practice subscription or official exam payment, please contact our team or the exam provider to confirm the applicable refund terms.', handoff:true};
   if (topic.id === 'examRegistration') return {
     text: level && level !== 'A1'
       ? `${level} official exam registration is separate from class tuition. Check the Goethe-Institut Ghana website for the current fee and available registration dates.`
@@ -79,7 +105,13 @@ export function visitorAnswer(question, { classes = [], now = new Date(), contex
     if (entries.some(([,fee]) => !fee)) return {text: `Please contact our team to confirm the current ${level} fee.`, handoff: true};
     return {text: 'Tuition is paid separately for each 10-week level. Current tuition per level: ' + entries.map(([name,fee]) => `${name}: GHS ${fee.toLocaleString('en-GH')}`).join(' · ') + '. Confirm your selected course details before paying.', href:'/classes', label:'View course details'};
   }
-  if (topic.id === 'payment') return {text:`The current minimum instalment is GHS ${MIN_INSTALLMENT_GHS.toLocaleString('en-GH')}. Our team can confirm the payment arrangement for your course.`, handoff:true};
+  if (topic.id === 'payment') {
+    const listedFees = [...new Set(Object.values(LEVEL_FEES))];
+    const fullFee = level ? LEVEL_FEES[level] : listedFees.length === 1 ? listedFees[0] : 0;
+    if (!fullFee || fullFee <= MIN_INSTALLMENT_GHS) return {text:'Please contact our team to confirm the deposit and balance for your chosen level.', handoff:true};
+    const money = amount => 'GHS ' + amount.toLocaleString('en-GH');
+    return {text:`You can pay an initial deposit of ${money(MIN_INSTALLMENT_GHS)} for one month of access, then pay the remaining ${money(fullFee - MIN_INSTALLMENT_GHS)} after one month to unlock the full six-month access period. Alternatively, pay ${money(fullFee)} in full for six months of access. Tuition is paid separately for each level.`, href:'/classes', label:'View courses and registration'};
+  }
   if (topic.id === 'classes') {
     const today = now.toLocaleDateString('en-CA', {timeZone:'Africa/Accra',year:'numeric',month:'2-digit',day:'2-digit'});
     const upcoming = classes.filter(row => row.publicVisible !== false && row.registrationOpen !== false && row.availability !== 'always' && !row.isSelfLearning && /^\d{4}-\d{2}-\d{2}$/.test(row.startDate) && row.startDate >= today && (!level || row.level === level))
