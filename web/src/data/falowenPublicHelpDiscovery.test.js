@@ -37,11 +37,11 @@ describe("Falowen public help and AI discovery", () => {
       "/campus/course",
       "/campus/results",
       "/campus/attendance",
-      "/campus/examFile",
+      "/exams/file",
       "/exams/overview",
       "/exams/study",
       "/campus/music",
-      "/exams/vocab",
+      "/campus/vocab",
       "/campus/account?tab=billing",
     ].forEach((route) => expect(help).toContain(route));
   });
@@ -66,8 +66,9 @@ describe("Falowen public help and AI discovery", () => {
     });
     expect(navigation.navigation.find((item) => item.id === "vocabulary")).toMatchObject({
       label: "Vocab",
-      route: "/exams/vocab",
+      route: "/campus/vocab",
     });
+    expect(navigation.navigation.find((item) => item.id === "exam-file").route).toBe("/exams/file");
     expect(navigation.intentRoutes.some((item) => item.intent === "submit teacher-marked work")).toBe(true);
     expect(navigation.accessStates.some((item) => item.state === "radio-gated")).toBe(true);
     expect(navigation.sourceOfTruth.courseSchedulesMarkdown).toBe(
@@ -113,14 +114,15 @@ describe("Falowen public help and AI discovery", () => {
     expect(courseMap.assistantRules.join(" ")).toContain("A1 through C2");
   });
 
-  test("documents the current Course Book, Music and Exams Room Vocab destinations", () => {
+  test("documents the current Course Book, Music, Campus Vocab and Exams Room Exam File destinations", () => {
     [help, llms, guide].forEach((source) => {
       expect(source).toContain("Course Book");
       expect(source).toContain("Music");
       expect(source).toContain("Vocab");
       expect(source).toContain("/campus/course");
       expect(source).toContain("/campus/music");
-      expect(source).toContain("/exams/vocab");
+      expect(source).toContain("/campus/vocab");
+      expect(source).toContain("/exams/file");
       expect(source).toContain("My Library");
       expect(source).toContain("Learning Hub");
       expect(source).toContain("My Hub");
@@ -142,14 +144,15 @@ describe("Falowen public help and AI discovery", () => {
     });
     expect(studyBuddy).toContain("Falowen navigation/support questions are not unrelated");
     expect(backendApp).toContain("Falowen navigation/support questions are NEVER off-topic");
-    // The deterministic Study Buddy answer bypasses the AI prompts. Both prompt
-    // layers must nevertheless agree with its current Exam Room vocabulary route.
+    // Study Buddy's browser and backend prompts must match the canonical
+    // Campus vocabulary route and keep Music as a distinct mobile destination.
     [studyBuddy, backendApp].forEach((source) => {
-      expect(source).toContain("https://www.falowen.app/exams/vocab");
+      expect(source).toContain("https://www.falowen.app/campus/vocab");
       expect(source).toContain("https://www.falowen.app/campus/music");
-      expect(source).not.toContain("https://www.falowen.app/campus/vocab");
+      expect(source).toContain("https://www.falowen.app/exams/file");
+      expect(source).not.toContain("https://www.falowen.app/exams/vocab");
     });
-    expect(guide).toContain('"Vocabulary practice", "Exams Room → Vocab", "/exams/vocab"');
+    expect(guide).toContain('"Vocabulary practice", "Campus → Vocab", "/campus/vocab"');
   });
 
   test("does not block OpenAI search or Google Extended from public help", () => {
