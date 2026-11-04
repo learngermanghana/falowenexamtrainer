@@ -228,12 +228,13 @@ test("PDF text cleanup passes course level across Playwright's browser isolation
 });
 
 
-test("B1 graded tabs use canonical questions even when unlocked in the live workbook", () => {
+test("B1 writing/listening tabs use canonical questions but Lesen stays live when unlocked", () => {
   assert.match(source, /const b1ReadOnlyParts = level === "B1" \? await getB1ReadOnlyParts\(lesson\.day\)/);
   const start = source.indexOf('if (availability === "hidden")');
   const end = source.indexOf('if (availability === "locked")', start);
   const section = source.slice(start, end);
-  assert.match(section, /tabSpec\.key !== "teil-1" && b1ReadOnlyParts\.includes\(tabSpec\.key\)/);
+  assert.match(section, /\["teil-2", "teil-4"\]\.includes\(tabSpec\.key\) && b1ReadOnlyParts\.includes\(tabSpec\.key\)/);
   assert.match(section, /renderReadOnlyB1Section\(page, lesson, tabSpec\.key/);
   assert.match(section, /continue;/);
+  assert.doesNotMatch(section, /\["teil-2", "teil-3", "teil-4"\]/);
 });
