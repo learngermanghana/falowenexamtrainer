@@ -139,3 +139,15 @@ conversation. Only the exact `a2/day-01/small-talk.mp3` object is added to the
 existing staff-only classroom signer. It is not a public music track and does
 not change graded workbook Hören, keys or course submission requirements.
 Admin presentation and this signing registry deploy independently.
+
+## Workbook player and Music-first navigation — 4 November 2026
+
+A2/B1 workbook Music appears first and is the standard workbook opening tab;
+explicit section links remain authoritative. A1 keeps Overview first and Music
+next. Legacy references/ref keys remain valid and Submit stays last. Music is
+optional and does not start the timed assignment or change required sections.
+The player reuses published artwork and song stories, a single on-demand audio
+element, and an in-page lyric-video view. The video advances only with complete
+recording-matched cues, respects instrumental gaps, and labels estimates and
+automatic transcripts. Without valid cues it offers a manual lyric sheet. No
+playback-time AI, generated audio or new persistence is introduced.

@@ -263,7 +263,7 @@ export const resolveB1WorkbookTabs = (listening = {}) =>
     : A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
 export default function B1StandardWorkbookPage({ config, renderSections = null }) {
-  const [activeTab, setActiveTab] = useState("grammar");
+  const [activeTab, setActiveTab] = useState("references");
   const handleTimedExpiry = useCallback(() => setActiveTab("submit"), []);
   const [prepared, setPrepared] = useState({
     sprechen: false,

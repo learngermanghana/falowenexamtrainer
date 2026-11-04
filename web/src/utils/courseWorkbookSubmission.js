@@ -48,11 +48,11 @@ export const getWorkbookNavigationTabs = (level) => {
 
   if (["A2", "B1"].includes(normalizedLevel)) {
     return [
+      { key: "ref", label: "Music" },
       { key: "teil1", label: "Teil 1" },
       { key: "teil2", label: "Teil 2" },
       { key: "teil3", label: "Teil 3" },
       { key: "teil4", label: "Teil 4" },
-      { key: "ref", label: "Ref" },
       { key: "submit", label: "Submit" },
     ];
   }
@@ -70,6 +70,6 @@ export const getWorkbookNativeTabKey = (label) => {
   if (/teil\s*2\b/.test(normalized)) return "teil2";
   if (/teil\s*3\b/.test(normalized)) return "teil3";
   if (/teil\s*4\b/.test(normalized)) return "teil4";
-  if (/\bref\b/.test(normalized) || /reference/.test(normalized)) return "ref";
+  if (/\bmusic\b/.test(normalized) || /\bref\b/.test(normalized) || /reference/.test(normalized)) return "ref";
   return "";
 };

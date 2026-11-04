@@ -13,17 +13,18 @@ import {
 } from "./a2B1WorkbookSectionProfile";
 
 export const A2_B1_WORKBOOK_TABS = [
+  { key: "references", label: "Music", description: "Optional" },
   { key: "sprechen", label: "Teil 1", description: "Sprechen" },
   { key: "schreiben", label: "Teil 2", description: "Schreiben" },
   { key: "lesen", label: "Teil 3", description: "Lesen" },
   { key: "hoeren", label: "Teil 4", description: "Hören" },
-  { key: "references", label: "Music", description: "Optional" },
   { key: "submit", label: "Submit", description: "Send work" },
 ];
 
 export const A2_B1_WORKBOOK_TABS_WITH_GRAMMAR = [
+  A2_B1_WORKBOOK_TABS[0],
   { key: "grammar", label: "Grammar", description: "Notes" },
-  ...A2_B1_WORKBOOK_TABS,
+  ...A2_B1_WORKBOOK_TABS.slice(1),
 ];
 
 export const B2_C1_WORKBOOK_TABS = [
@@ -64,7 +65,11 @@ export const getWorkbookTabsWithLegacyGrammar = ({ tabs = STANDARD_WORKBOOK_TABS
     context,
     sectionProfile,
     integratesLegacyGrammar,
-    tabs: availableTabs,
+    tabs: context ? [
+      ...availableTabs.filter(tab => tab.key === "references").map(tab => ({ ...tab, label: "Music", description: "Optional" })),
+      ...availableTabs.filter(tab => tab.key === "grammar"),
+      ...availableTabs.filter(tab => !["references", "grammar"].includes(tab.key)),
+    ] : availableTabs,
   };
 };
 

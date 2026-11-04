@@ -167,7 +167,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
   );
   const assignmentKey = selectedAssignment?.assignmentKey || "";
   const requestedWorkbookTab = useMemo(() => new URLSearchParams(location.search || "").get("workbookTab"), [location.search]);
-  const defaultTab = requestedWorkbookTab === "submit" ? "submit" : level === "A1" ? "assignment" : "teil1";
+  const defaultTab = requestedWorkbookTab === "submit" ? "submit" : level === "A1" ? "assignment" : "ref";
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [lockReady, setLockReady] = useState(false);
   const [nativeTabRowDetected, setNativeTabRowDetected] = useState(false);
