@@ -47,3 +47,16 @@ test("A1 health coursebook can show an optional published song without exposing 
   assert.match(component, /song\.coursebook !== false/);
   assert.match(component, /fetch\("\/music\/catalog.json"/);
 });
+
+test("selected songs hide the landing hero, and Browse all songs restores it", () => {
+  const page = read("web/public/music/index.html");
+  const app = read("web/public/music/app.js");
+  const styles = read("web/public/music/style.css");
+  // The promotional area remains available to visitors browsing the homepage.
+  assert.match(page, /class="hero" aria-labelledby="hero-title"/);
+  // Opening a song, including a direct shared link or history navigation, hides it.
+  assert.match(app, /function showSong\([\s\S]*?document\.body\.classList\.add\("song-detail-open"\)/);
+  // Going back to the library puts the promotional homepage back.
+  assert.match(app, /function closeDetail\([\s\S]*?document\.body\.classList\.remove\("song-detail-open"\)/);
+  assert.match(styles, /body\.song-detail-open \.hero \{ display: none; \}/);
+});
