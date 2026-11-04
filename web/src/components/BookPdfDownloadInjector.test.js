@@ -96,7 +96,7 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(screen.getByLabelText("AI explanation")).toBeInTheDocument();
     expect(screen.getByTitle("Kapitel 5.14 · Teacher lecture video")).toHaveAttribute(
       "src",
-      expect.stringContaining("hGK64aXtARk")
+      expect.stringContaining("peuEAMRsFKI")
     );
     expect(screen.getByTitle("AI grammar video")).toHaveAttribute(
       "src",
@@ -171,3 +171,14 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(SCHOOL_PRINT_STAMP).toBe("learn Language Education Academy");
   });
 });
+
+  it.each([
+    "/campus/course/a2-day-1-small-talk-workbook",
+    "/campus/course/a2-day-2-small-talk-workbook",
+  ])("uses Day 1 Small Talk metadata and AI video on %s", pathname => {
+    const search = "?radio=done&view=submit&level=A2&assignmentKey=A2-1.1&assignmentId=A2-1.1";
+    expect(getA2B1WorkbookExperienceContext(pathname, search)).toMatchObject({ level: "A2", day: 1 });
+    render(<MemoryRouter initialEntries={[pathname + search]}><BookPdfDownloadInjector /></MemoryRouter>);
+    expect(document.querySelector('iframe[src*="HMEs3mEKdrk"]')).not.toBeNull();
+    expect(document.querySelector('iframe[src*="AxSh8t71Jlo"]')).toBeNull();
+  });
