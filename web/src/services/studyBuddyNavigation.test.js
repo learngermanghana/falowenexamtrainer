@@ -55,11 +55,11 @@ describe("Study Buddy authoritative navigation routing", () => {
     ["Where can I start a mock test?", "exams", "/exams/overview"],
     ["How do I resume my Goethe mock?", "exams", "/exams/overview"],
     ["Where can I review my mock attempt?", "exams", "/exams/overview"],
-    ["How do I access my exam file?", "examFile", "/campus/examFile"],
+    ["How do I access my exam file?", "examFile", "/exams/file"],
     ["Where do I open my course book?", "courseBook", "/campus/course"],
     ["Where can I submit my assignment?", "courseBook", "/campus/course"],
     ["How do I check attendance?", "attendance", "/campus/attendance"],
-    ["Where do I open vocabulary practice?", "vocab", "/exams/vocab"],
+    ["Where do I open vocabulary practice?", "vocab", "/campus/vocab"],
     ["Where can I listen to Falowen music?", "music", "/campus/music"],
     ["How do I find my study calendar?", "calendar", "/exams/study"],
     ["Where is my payment history?", "billing", "/campus/account?tab=billing"],
@@ -68,6 +68,13 @@ describe("Study Buddy authoritative navigation routing", () => {
     const answer = resolveStudyBuddyNavigationReply(message);
     expect(answer?.destination).toBe(expected);
     expect(answer.reply).toContain(`https://www.falowen.app${path}`);
+  });
+
+  test("mobile Vocab guidance stays under More and Exam File stays in Exams Room", () => {
+    const vocab = resolveStudyBuddyNavigationReply("Where do I open vocabulary practice?");
+    const examFile = resolveStudyBuddyNavigationReply("How do I access my exam file?");
+    expect(vocab.reply).toContain("More → Vocab");
+    expect(examFile.reply).toContain("Exams Room");
   });
 
   test("a natural follow-up about results can use the last student's question", () => {
