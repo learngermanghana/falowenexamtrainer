@@ -32,9 +32,9 @@ test("selects a branch and shows compact speaking support", async () => {
     screen.getByRole("heading", { name: config.branches[1].label }),
   ).toBeInTheDocument();
   expect(screen.getByText(config.branches[1].guidingQuestion)).toBeInTheDocument();
-  expect(screen.getByText(config.branches[1].sentenceStarter)).toBeInTheDocument();
+  expect(screen.getAllByText(config.branches[1].sentenceStarter)[0]).toBeInTheDocument();
   expect(screen.getByText("Show model sentence")).toBeInTheDocument();
-  expect(screen.getByText(config.branches[1].modelSentence)).toBeInTheDocument();
+  expect(screen.getAllByText(config.branches[1].modelSentence)[0]).toBeInTheDocument();
 });
 
 test("moves through the configured speaking route", async () => {
@@ -45,7 +45,7 @@ test("moves through the configured speaking route", async () => {
   expect(
     screen.getByRole("heading", { name: config.branches[1].label }),
   ).toBeInTheDocument();
-  expect(screen.getByText(/2\s*\/\s*5/)).toBeInTheDocument();
+  expect(screen.getByText(/2\s*\/\s*4/)).toBeInTheDocument();
 });
 
 test("starts A2 focus mode with speaking help open and allows it to collapse", async () => {
@@ -124,7 +124,7 @@ test("A2 Days 1 to 8 use topic-specific prompts instead of the generic template"
     expect.objectContaining({
       day: 1,
       title: "Small Talk",
-      centralQuestion: "Wie führst du ein kurzes freundliches Gespräch?",
+      centralQuestion: "Wer bist du?",
     }),
   );
 

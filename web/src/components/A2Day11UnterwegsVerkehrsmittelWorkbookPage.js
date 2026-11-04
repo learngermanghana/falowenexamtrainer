@@ -8,7 +8,7 @@ const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const sprechenContent = (
   <>
-    <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
+    <WorkbookTaskCard eyebrow="Präsentationsübung" title="Teil 1 · Sprechen" practiceOnly>
       <p style={{ margin: 0, lineHeight: 1.7 }}>
         Open each mind-map branch, practise the sentence, and connect the parts into one clear answer.
       </p>

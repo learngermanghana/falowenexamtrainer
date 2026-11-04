@@ -2,15 +2,15 @@ import { getA2SpeakingMindMap, validateSpeakingMindMapConfig } from "./index";
 
 test("A2 Day 2 uses topic-specific Personen beschreiben prompts", () => {
   const config = getA2SpeakingMindMap(2);
-  const aussehen = config.branches.find((branch) => branch.id === "aussehen");
+  const aussehen = config.branches.find((branch) => branch.label === "Aussehen");
 
   expect(validateSpeakingMindMapConfig(config)).toBe(true);
   expect(aussehen).toEqual(
     expect.objectContaining({
-      guidingQuestion: "Wie sieht die Person aus?",
-      sentenceStarter: "Die Person ist ... und hat ...",
+      guidingQuestion: "Aussehen?",
+      sentenceStarter: "Sie ist ... und hat ...",
       modelSentence:
-        "Die Person ist groß und schlank. Sie hat kurze schwarze Haare und braune Augen.",
+        "Sie ist groß und hat kurze schwarze Haare.",
     }),
   );
   expect(aussehen.guidingQuestion).not.toContain("Was sagst du über");

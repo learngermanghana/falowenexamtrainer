@@ -1,9 +1,12 @@
 import React from "react";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
 import { WorkbookTaskCard } from "./StandardWorkbookComponents";
 
 const sprechenContent = (
   <>
+    <SpeakingMindMap config={getA2SpeakingMindMap(8)} />
     <WorkbookTaskCard eyebrow="Teil 1 · Sprechen" title="Restaurant-Rollenspiel" practiceOnly>
       <p style={{ margin: 0, lineHeight: 1.7 }}>
         Situation: Du bist mit einer Freundin oder einem Freund in einem Restaurant. Eine Person ist Gast, die andere Person ist Kellnerin oder Kellner.
