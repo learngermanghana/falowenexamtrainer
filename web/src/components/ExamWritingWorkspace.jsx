@@ -219,10 +219,11 @@ export default function ExamWritingWorkspace() {
         promptTitle: part.label + " · " + examWritingTitle(task),
         draft: record.checkedText || draft,
         aiFeedback: feedback.data.feedback || feedback.data.structuredFeedback?.summary || "",
+        aiAssessment: feedback.data,
         revisedDraft: "", reflection: "", source: "exam-room-simple-writing",
       });
       changeRecord(task.id, { tutorSaved: true });
-      showToast("Your writing was sent to the tutor.", "success");
+      showToast("Your full letter and AI feedback were sent to the tutor by email.", "success");
     } catch (err) {
       showToast(err?.message || "Could not save for tutor review.", "error");
     } finally {
@@ -390,7 +391,7 @@ export default function ExamWritingWorkspace() {
             <button type="button" className="few-secondary few-tutor-button" disabled={
               savingTutor || record.tutorSaved || !isTutorReviewCloudEnabled()
             } onClick={sendToTutor}>
-              {record.tutorSaved ? "Sent to tutor" : savingTutor ? "Saving ..." : "Send to tutor"}
+              {record.tutorSaved ? "Sent to tutor" : savingTutor ? "Sending email ..." : "Send to tutor"}
             </button>
             {!isTutorReviewCloudEnabled() && <p className="few-muted">Tutor submission is currently unavailable.</p>}
           </>}

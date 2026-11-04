@@ -119,10 +119,22 @@ export const saveExamLetterForTutorReview = async ({
   promptId,
   draft,
   aiFeedback,
+  aiAssessment,
   revisedDraft,
   reflection,
   source = "exam-room",
 }) => {
+  if (source === "exam-room-simple-writing") {
+    if (!user?.uid) throw new Error("Sign in to send writing to your tutor.");
+    const response = await fetch("/api/exam-writing/send-tutor", {
+      method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await user.getIdToken() },
+      body: JSON.stringify({ level, promptId, promptTitle, draft, aiAssessment }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result.ok !== true || result.saved !== true || result.emailed !== true)
+      throw new Error(result.error || "Could not confirm the tutor email. Your writing remains saved; please retry.");
+    return result;
+  }
   const createdAt = new Date().toISOString();
   const ownerKey = String(studentProfile?.studentCode || studentProfile?.studentcode || user?.uid || "")
     .trim()
