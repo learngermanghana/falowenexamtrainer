@@ -5,7 +5,7 @@ import { styles } from "../styles";
 
 const lesson = {
   title: "Verkehrsmittel und Ziele: mit, zu und nach",
-  english: "Use mit + dative for transport, zu + dative for many destinations, nach for cities/countries without an article, and the fixed phrase zu Fuß.",
+  english: "Use mit + dative for transport, zu + dative for many destinations, nach for cities/countries without an article, and the fixed phrase zu Fuß. Mit answers how you travel: Ich fahre mit dem Bus zur Arbeit. = I go to work by bus. Dative articles are dem (masculine/neuter), der (feminine) and den (plural); compare mit dem Zug and mit der Bahn. Zu names a destination: zu dem becomes zum and zu der becomes zur. Ich gehe zu Fuß zur Universität. = I walk to university. Nach goes with cities and countries without an article: Wir fahren nach Accra. = We are going to Accra. Countries with an article use in + accusative, for example in die Schweiz. Do not confuse transport (mit dem Bus) with destination (zur Schule).",
   rule: "Verkehrsmittel: mit + Dativ. Person/Ort als Ziel: zu + Dativ. Stadt/Land ohne Artikel: nach. Zu Fuß is fixed.",
   examples: [
     "Ich fahre mit dem Bus zur Arbeit.",

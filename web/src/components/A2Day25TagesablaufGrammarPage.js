@@ -19,6 +19,8 @@ export default function A2Day25TagesablaufGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>1. Separable verbs split in the main clause</h2>
+<p lang="en" style={paragraph}>A separable verb has a prefix that moves to the end in a normal main clause. Conjugate only the verb stem: Ich stehe um 6:30 Uhr auf. = I get up at 6:30. Abends sehe ich eine Stunde fern. = In the evening I watch television for an hour. With a modal, keep the infinitive together at the end: Ich muss früh aufstehen. = I must get up early.</p>
+
         <ul style={list}>
           <li><strong>aufstehen:</strong> Ich stehe um 6:30 Uhr <strong>auf</strong>.</li>
           <li><strong>einkaufen:</strong> Nach der Arbeit kaufe ich <strong>ein</strong>.</li>
@@ -30,6 +32,8 @@ export default function A2Day25TagesablaufGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>2. Put time first, but keep the verb second</h2>
+<p lang="en" style={paragraph}>If a time phrase comes first, the conjugated verb remains in position 2 and the subject follows it. Morgens stehe ich früh auf. = In the mornings I get up early. Position means a sentence unit, not a single word: Am Nachmittag is one time phrase. Zuerst means first, danach means afterwards and zum Schluss means finally.</p>
+
         <ul style={list}>
           <li><strong>Morgens stehe ich</strong> früh auf.</li>
           <li><strong>Danach dusche ich</strong>.</li>
@@ -41,6 +45,8 @@ export default function A2Day25TagesablaufGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>3. Reflexive routine verbs</h2>
+<p lang="en" style={paragraph}>Reflexive routine verbs also need a pronoun that matches the subject: ich → mich, du → dich, wir → uns. Ich ziehe mich an. = I get dressed. Ich ruhe mich nach der Arbeit aus. = I rest after work. Keep both parts: the pronoun near the subject and the separable prefix at the end.</p>
+
         <ul style={list}>
           <li>Ich <strong>ziehe mich</strong> an.</li>
           <li>Ich <strong>ruhe mich</strong> nach der Arbeit aus.</li>

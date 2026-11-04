@@ -5,7 +5,7 @@ import { styles } from "../styles";
 
 const lesson = {
   title: "Über Zukunftspläne sprechen",
-  english: "German often uses the present tense with a future time phrase. You can also use möchte for intentions and werden + infinitive for a clear future statement.",
+  english: "German often uses the present tense with a future time phrase. You can also use möchte for intentions and werden + infinitive for a clear future statement. Nächstes Jahr mache ich eine Weiterbildung. = Next year I am taking further training. The whole phrase Nächstes Jahr fills position 1, so mache comes before ich. Ich möchte später im Ausland arbeiten. = I would like to work abroad later; möchte expresses a wish rather than a confirmed arrangement. To form Futur I, conjugate werden: ich werde, du wirst, er/sie/es wird, wir werden, ihr werdet, sie/Sie werden. Wir werden nächstes Jahr umziehen. = We will move next year. Keep umziehen as an infinitive at the end. Do not use geworden for this future pattern.",
   rule: "Future time + Präsens: Nächstes Jahr mache ich .... Intention: ich möchte + infinitive. Futur I: werden (position 2) + infinitive at the end.",
   examples: [
     "Nächstes Jahr mache ich eine Weiterbildung.",
