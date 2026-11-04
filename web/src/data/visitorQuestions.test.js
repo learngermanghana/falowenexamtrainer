@@ -44,3 +44,49 @@ test.each(['Can I learn up to B1?', 'I want to learn up to B2', 'Do I pay for ea
   expect(answer.text).toContain('do not need to take an official exam after every level');
   expect(answer.href).toBe('/exam-practice');
 });
+
+test.each(['What is the minimum age?', 'Can my 15 year old join?', 'I have only JHS education', 'What educational qualifications do I need?'])('eligibility: %s',question=>{
+  const answer=visitorAnswer(question);
+  expect(answer.text).toContain('minimum age is 16');
+  expect(answer.text).toContain('team must assess');
+  expect(answer.handoff).toBe(true);
+});
+test.each(['Can a complete beginner join?', 'I have no German knowledge', 'Do I need prior German knowledge?', 'I cannot speak German'])('A1 beginner: %s',question=>{
+  expect(visitorAnswer(question).text).toContain('do not need any prior German knowledge');
+});
+test.each(['Can I pay in instalments?', 'When do I pay the balance?', 'How much is the deposit?', 'Can I pay full tuition?', 'Can I pay 3000?', 'Do I get one month access?'])('payment and access: %s',question=>{
+  const answer=visitorAnswer(question);
+  expect(answer.text).toContain('GHS 2,000 for one month');
+  expect(answer.text).toContain('remaining GHS 1,000 after one month');
+  expect(answer.text).toContain('GHS 3,000 in full for six months');
+  expect(answer.text).not.toContain('GHS 300 in full');
+});
+test.each(['Do you help students register for the exams?', 'Do you assist with Goethe registration?', 'Is there exam registration guidance?'])('registration assistance: %s',question=>{
+  expect(visitorAnswer(question).text).toContain('platform that guides students');
+});
+test.each(['What certificates will I receive?', 'Will I receive a transcript?', 'Is your certificate valid for a visa?'])('Falowen documents: %s',question=>{
+  const answer=visitorAnswer(question);
+  for(const name of ['Falowen certificate','transcript','attendance certificate','class participation certificate']) expect(answer.text).toContain(name);
+  expect(answer.text).toContain('do not replace a Goethe certificate');
+  expect(answer.text).toContain('confirm the required certificate');
+});
+test.each(['What do I need for online classes?', 'Do I need a computer?', 'Can I use my phone?'])('devices: %s',question=>{
+  expect(visitorAnswer(question).text).toContain('smartphone or computer');
+  expect(visitorAnswer(question).text).toContain('internet connection');
+});
+test.each(['Can I switch attendance each day?', 'Can I switch between online and in person?', 'Can I attend online today and in person tomorrow?'])('flexible attendance: %s',question=>{
+  expect(visitorAnswer(question).text).toContain('Each day you can choose');
+  expect(visitorAnswer(question).text).toContain('recorded lectures');
+});
+test.each(['What is your refund policy?', 'Can I get my money back?', 'What if I pay but cannot start?'])('course refunds and trial: %s',question=>{
+  const answer=visitorAnswer(question);
+  expect(answer.text).toContain('non-refundable');expect(answer.text).toContain('7-day free trial');
+});
+test('refund answers do not extend the course policy to books and exam providers',()=>{
+  expect(visitorAnswer('Can Goethe refund my exam payment?').text).toContain('confirm the applicable refund terms');
+  expect(visitorAnswer('Can I get a refund?',{context:'books'}).text).toContain('confirm the applicable refund terms');
+});
+test('advanced fees and unrelated switches do not invent course payment policies',()=>{
+  expect(visitorAnswer('C2 deposit').handoff).toBe(true);
+  expect(visitorAnswer('Can I switch levels?').text).not.toContain('Each day you can choose');
+});
