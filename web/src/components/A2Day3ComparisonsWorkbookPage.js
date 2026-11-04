@@ -8,11 +8,9 @@ const paragraph = { margin: 0, lineHeight: 1.7 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const speakingContent = <>
-  <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
-    <p style={paragraph}>
-      Open each mind-map branch, practise the sentence, and connect the parts into one clear answer.
-    </p>
-  </WorkbookTaskCard>
+  <WorkbookTaskCard eyebrow="Präsentationsübung" title="Teil 1 · Sprechen" practiceOnly>
+      <p style={paragraph}>Halte eine kurze Präsentation über dich und dein Leben. Die Frage und die vier Stichpunkte in der Mindmap helfen dir.</p>
+    </WorkbookTaskCard>
   <SpeakingMindMap config={getA2Days2To6SpeakingConfig(3)} />
 </>;
 

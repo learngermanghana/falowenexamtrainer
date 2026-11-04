@@ -26,7 +26,7 @@ const positionSets = {
 const withA2EnhancedHelp = (config) => {
   const level = String(config?.level || "").toUpperCase();
   const day = Number(config?.day || 0);
-  if (level !== "A2") return config;
+  if (level !== "A2" || config?.presentation) return config;
 
   if (day >= 7 && day <= 11) {
     const enriched = getA2Days7To11SpeakingConfig(day);
@@ -147,6 +147,15 @@ const SpeakingMindMap = ({ config }) => {
   return (
     <section aria-label={`${safeConfig.title} interactive brain map`} className="speaking-mind-map" data-speaking-mind-map data-level={safeConfig.level} data-focus-mode={focusModeEnabled ? "true" : "false"} data-help-open={helpOpen ? "true" : "false"}>
       <header className="speaking-mind-map__header"><div><span className="speaking-mind-map__eyebrow">{safeConfig.level} · Sprechvorbereitung</span><h3>Baue deine Antwort als Mindmap auf</h3><p>Frage lesen, einen Ast öffnen und die Ideen laut verbinden.</p></div></header>
+      {safeConfig.presentation ? (
+        <section aria-label="A2 presentation task" style={{ padding: 16, border: "1px solid #bfdbfe", borderRadius: 12, lineHeight: 1.7 }}>
+          <strong>Präsentation · Von sich erzählen · Übung zu Goethe A2 Teil 2</strong>
+          <h4 style={{ margin: "8px 0" }}>{safeConfig.presentation.prompt}</h4>
+          <p>{safeConfig.presentation.instruction}</p>
+          <p lang="en">{safeConfig.presentation.instructionEn}</p>
+          <p><strong>Stichpunkte:</strong> {safeConfig.presentation.keywords.join(" · ")}</p>
+        </section>
+      ) : null}
       <div className="speaking-mind-map__viewport">
         <div className="speaking-mind-map__canvas" data-testid="mind-map-canvas" data-mobile-layout="vertical-connected">
           <svg className="speaking-mind-map__connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">

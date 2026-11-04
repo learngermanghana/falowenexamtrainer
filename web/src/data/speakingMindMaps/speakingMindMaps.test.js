@@ -2,7 +2,7 @@ import { validateSpeakingMindMapConfig, branchTypesByLevel } from ".";
 import { a2SpeakingMindMaps } from "./a2";
 import { b1SpeakingMindMapExample, b2SpeakingMindMapExample, c1SpeakingMindMapExample } from "./examples";
 
-const requiredA2Days = Array.from({ length: 27 }, (_, index) => index + 2);
+const requiredA2Days = Array.from({ length: 28 }, (_, index) => index + 1);
 
 test("A2 registry contains every required speaking lesson exactly once", () => {
   const days = a2SpeakingMindMaps.map((entry) => entry.day);

@@ -16,3 +16,21 @@ Use the shared `SpeakingMindMap` component for workbook speaking preparation ins
 7. Add or update tests so `validateSpeakingMindMapConfig` covers the new lesson.
 
 A2 remains backward compatible: existing A2 pages can continue importing `getA2SpeakingMindMap(day)` from `speakingMindMaps/a2`.
+
+## A2 individual presentations
+
+`src/data/a2PresentationCards.js` owns the original classroom practice prompts,
+four keywords, sentence starters and model sentences for Days 1–28. The A2
+mind-map registry derives its displayed task and help from these cards; do not
+add local conversation overrides. Small Talk uses curriculum Day 1, even though
+its public route contains `a2-day-2-small-talk-workbook`.
+
+These cards practise Goethe A2 Sprechen Teil 2 (talking about yourself with four
+keywords), not a B1 formal presentation. The restaurant role-play on Day 8 is
+an additional dialogue activity. Day 22 keeps its existing speaking mock and
+selected questions from `speakingDictionary.js`; the unused Day 22 mind map is
+not a replacement for that assessed assignment.
+
+After changes, run the learner assessment registry check and sync the static
+Admin snapshot with `scripts/syncA2WorkbookPresentations.mjs` in falowenadmin.
+No runtime request is needed. Reference: https://bfu.goethe.de/a2_mod_2MX5/sprechen.php

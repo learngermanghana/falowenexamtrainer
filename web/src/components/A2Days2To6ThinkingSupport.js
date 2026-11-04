@@ -173,5 +173,5 @@ export const A2ThinkingFirstGrammarGuide = ({ day }) => {
 export const getA2Days2To6SpeakingConfig = (day) => {
   const base = getA2SpeakingMindMap(day);
   if (!base) return base;
-  return { ...base, extraHelp: speakingHelp[Number(day)] || base.extraHelp };
+  return base;
 };
