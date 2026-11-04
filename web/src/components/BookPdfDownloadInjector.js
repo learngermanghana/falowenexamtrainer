@@ -94,7 +94,12 @@ export const getA2B1WorkbookNavigationDestination = (level, day) => {
 };
 
 export const getA2B1WorkbookExperienceContext = (pathname = "", search = "") => {
-  const normalizedPath = normalizePathname(pathname);
+  // App routes retain this old Day 2 bookmark for the Day 1 Small Talk lesson.
+  // Resolve its canonical identity before selecting schedule metadata or videos.
+  const originalPath = normalizePathname(pathname);
+  const normalizedPath = originalPath === "/campus/course/a2-day-2-small-talk-workbook"
+    ? "/campus/course/a2-day-1-small-talk-workbook"
+    : originalPath;
   const lessonMatch = normalizedPath.match(COURSE_LESSON_PATTERN);
   if (lessonMatch) {
     const level = String(lessonMatch[1] || "").toUpperCase();
