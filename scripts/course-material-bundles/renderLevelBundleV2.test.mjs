@@ -209,7 +209,7 @@ test("A2 retail PDF suppresses the two labels caught in build 40490474437", () =
 
 
 test("B1 live PDF scrubs transient audio status and checks every page before merging", () => {
-  assert.ok(source.includes('/Audio\\s+wird\\s+geladen\\s*') || source.includes('/Audio\s+wird\s+geladen\s*'));
+  assert.ok(source.includes('/Audio\\s+wird\\s+geladen\\s*'));
   assert.ok(source.includes('removeBlankInterior: true'));
   assert.ok(source.includes('scanPdfPageContent(cleaned, cleanPdf.getPageCount())'));
   assert.ok(source.includes('scanPdfPageContent(cleanText, cleanPdf.getPageCount())'));
