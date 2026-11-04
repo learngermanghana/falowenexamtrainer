@@ -24,3 +24,13 @@
 ## Changes across repos
 
 A contract change involving both learner assignment submission and Admin marking needs separate PRs plus shared payload/version tests. The two repos deploy independently; confirm each side's release status. See [source-of-truth map](content-source-of-truth.md).
+
+## Public landing-page questions
+
+`VisitorQuestionHelper` adds a floating, browser-local enquiry panel to the homepage.
+`web/src/data/visitorQuestions.js` owns its question patterns and approved answers;
+fees reuse `levelFees.js`, location reuses `publicAcademyProfile.json`, and class
+questions load the existing public class catalog on demand. No AI request,
+background polling, database write or persistent chat history is introduced.
+Unknown questions and unconfirmed class/fee details offer the existing admissions
+WhatsApp contact with the visitor's question prefilled; the visitor chooses to send.

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { persistInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
 import academyProfile from "../data/publicAcademyProfile.json";
+import VisitorQuestionHelper from "./VisitorQuestionHelper";
 import FalowenHomepageCarousel from "./FalowenHomepageCarousel";
 import "./LandingPageMarketing.css";
 
@@ -228,6 +229,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
           <a className="falowen-home-contact-link" href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer">{copy.contact} ↗</a>
         </footer>
       </div>
+      <VisitorQuestionHelper />
     </main>
   );
 }
