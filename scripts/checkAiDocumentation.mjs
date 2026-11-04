@@ -58,6 +58,21 @@ if (!llmsDate||!helpDate||Number.isNaN(Date.parse(llmsDate))||Number.isNaN(Date.
 }
 if (!/music\.falowen\.app/.test(llms)||!/falowen-course-map\.json/.test(llms)) errors.push("Public AI discovery missing Music or generated course map");
 if (!nav?.currentGuidance?.music?.publicSite || !nav?.sourceOfTruth?.courseMap) errors.push("Navigation missing Music or course-map references");
+// Campus vocabulary and Exams Room exam file are canonical destinations.
+// Keep AI-readable navigation and public Help aligned whenever a Campus tab moves.
+const vocab = nav?.navigation?.find(item => item.id === "vocabulary");
+const examFile = nav?.navigation?.find(item => item.id === "exam-file");
+if (vocab?.route !== "/campus/vocab") errors.push("Vocabulary must point to /campus/vocab");
+if (examFile?.route !== "/exams/file") errors.push("Exam File must point to /exams/file");
+if (!help.includes("https://www.falowen.app/campus/vocab") || !help.includes("More → Vocab")) {
+  errors.push("Public Help missing Campus Vocab destination or mobile More navigation");
+}
+if (!help.includes("https://www.falowen.app/exams/file") || /vocab.*redirect.*music/i.test(help)) {
+  errors.push("Public Help has outdated Exams Room or Campus Vocab guidance");
+}
+if (!llms.includes("https://www.falowen.app/campus/vocab") || !llms.includes("https://www.falowen.app/exams/file")) {
+  errors.push("LLM discovery index missing current Campus Vocab or Exams Room Exam File");
+}
 if (!/get_my_falowen_lesson_content/.test(file("docs/ai/mcp-plugin-reference.md"))) errors.push("Missing documented Companion lesson-content tool");
 if (!/estimated/i.test(file("docs/workflows/music-and-lyrics.md"))) errors.push("Music guide must distinguish estimated cue timing");
 if (errors.length) {
