@@ -58,6 +58,8 @@ export default function A2Day16WohlbefindenReflexiveVerbenGrammarPage() {
         </header>
 
         <SectionCard title="1) Was ist ein reflexives Verb?">
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>A reflexive verb uses a pronoun that refers back to the subject. German needs this pronoun even when English does not: Ich entspanne mich am Abend. = I relax in the evening. Learn the verb together with sich.</p>
+
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Bei einem reflexiven Verb bezieht sich die Handlung auf dieselbe Person wie das Subjekt. Deshalb gehört ein
             <strong> Reflexivpronomen</strong> zum Verb.
@@ -72,6 +74,8 @@ export default function A2Day16WohlbefindenReflexiveVerbenGrammarPage() {
         </SectionCard>
 
         <SectionCard title="2) Reflexivpronomen">
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>Choose the pronoun to match the subject: ich → mich, du → dich, er/sie/es → sich, wir → uns, ihr → euch, sie/Sie → sich. These are the accusative forms used in this lesson. Ich entspanne mich. = I relax; Wir entspannen uns. = We relax.</p>
+
           <div style={{ overflowX: "auto" }}>
             <table style={tableStyle}>
               <thead>
@@ -102,6 +106,8 @@ export default function A2Day16WohlbefindenReflexiveVerbenGrammarPage() {
         </SectionCard>
 
         <SectionCard title="3) Wichtige reflexive Verben für Day 16">
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>Use sich fühlen to describe your state, sich entspannen to relax and sich erholen to recover. Some verbs have a fixed preposition: Ich freue mich auf das Wochenende. = I am looking forward to the weekend. Ich ärgere mich über den Stress. = I am annoyed about the stress.</p>
+
           <div style={{ overflowX: "auto" }}>
             <table style={tableStyle}>
               <thead>
@@ -125,6 +131,8 @@ export default function A2Day16WohlbefindenReflexiveVerbenGrammarPage() {
         </SectionCard>
 
         <SectionCard title="4) Position im Satz">
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>In a statement, keep the conjugated verb second. With a subject pronoun, the reflexive pronoun follows it: Heute fühle ich mich besser. = Today I feel better. The time phrase Heute occupies the first position; do not write Heute ich fühle mich.</p>
+
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Im Hauptsatz steht das konjugierte Verb normalerweise auf Position 2. Das Reflexivpronomen steht meistens direkt danach.
           </p>
@@ -136,6 +144,8 @@ export default function A2Day16WohlbefindenReflexiveVerbenGrammarPage() {
         </SectionCard>
 
         <SectionCard title="5) Modalverben, trennbare Verben und Perfekt">
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>With a modal, use the infinitive at the end: Ich möchte mich entspannen. = I would like to relax. A separable verb splits in a main clause: Du ruhst dich aus. = You rest. In the Perfekt use haben: Ich habe mich entspannt. = I relaxed.</p>
+
           <div style={patternStyle}>
             <strong>Mit Modalverb:</strong> Das Reflexivpronomen steht beim Subjekt; der Infinitiv kommt ans Satzende.
             <br />Ich möchte <strong>mich</strong> entspannen.
@@ -150,6 +160,8 @@ export default function A2Day16WohlbefindenReflexiveVerbenGrammarPage() {
         </SectionCard>
 
         <SectionCard title="6) Häufige Fehler">
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>Do not use sich for every person or omit the pronoun because English omits it. Du fühlst dich müde. = You feel tired. With ausruhen, only the prefix goes at the end: Ich ruhe mich aus. = I am resting.</p>
+
           <ul style={listStyle}>
             <li>❌ Du fühlst <strong>sich</strong> müde. → ✅ Du fühlst <strong>dich</strong> müde.</li>
             <li>❌ Wir treffen <strong>sich</strong> am Samstag. → ✅ Wir treffen <strong>uns</strong> am Samstag.</li>
@@ -159,6 +171,8 @@ export default function A2Day16WohlbefindenReflexiveVerbenGrammarPage() {
         </SectionCard>
 
         <SectionCard title="7) Mini-Übung">
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>Fill each gap with the pronoun that matches the subject. For the final item, conjugate möchten as möchte and put entspannen at the end. Check the sample answers after trying the exercise.</p>
+
           <ol style={listStyle}>
             <li>Ich entspanne ___ nach der Arbeit.</li>
             <li>Du fühlst ___ heute besser.</li>
@@ -178,6 +192,8 @@ export default function A2Day16WohlbefindenReflexiveVerbenGrammarPage() {
         </SectionCard>
 
         <SectionCard title="Sprechziel">
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>Say how you feel and how you relax in four or five sentences. Include at least two reflexive verbs. Ich fühle mich müde. Nach der Arbeit entspanne ich mich. = I feel tired. After work I relax.</p>
+
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Sprich 4–5 Sätze über dein Wohlbefinden. Benutze mindestens zwei reflexive Verben.
           </p>

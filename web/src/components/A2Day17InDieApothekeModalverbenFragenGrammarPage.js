@@ -11,6 +11,12 @@ export default function A2Day17InDieApothekeModalverbenFragenGrammarPage() {
         <h1 style={{ ...styles.title, margin: 0 }}>A2 Day 17 · In die Apotheke gehen</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Grammatik: Modalverben für Fragen, Beschwerden und Empfehlungen.</p>
       </header>
+      <section lang="en" style={{ ...styles.card, display: "grid", gap: 12, lineHeight: 1.75 }}>
+        <h2 style={{ margin: 0 }}>Meaning and word order · English explanation</h2>
+        <p style={{ margin: 0 }}>Use können for ability or possibility, müssen for necessity and sollen for advice or an instruction from someone else. Ich muss die Tabletten nehmen. = I must take the tablets. Sie sollen viel Wasser trinken. = You are supposed to drink plenty of water.</p>
+        <p style={{ margin: 0 }}>In a statement, conjugate the modal in position 2 and put the other verb in the infinitive at the end: Ich muss dieses Medikament zweimal täglich nehmen. = I must take this medicine twice a day. Learn ich kann/muss/soll and du kannst/musst/sollst; formal Sie uses können/müssen/sollen.</p>
+        <p style={{ margin: 0 }}>For a yes/no question, start with the modal: Soll ich die Tabletten nach dem Essen nehmen? = Should I take the tablets after eating? Können Sie mir etwas empfehlen? = Can you recommend something? Könnten Sie ...? means Could you ...? and sounds more polite. Do not conjugate the final infinitive as well.</p>
+      </section>
       <A2MiniLearningBlock
         essential
         title="können, müssen und sollen in der Apotheke"

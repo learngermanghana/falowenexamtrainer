@@ -17,6 +17,8 @@ export default function A2Day19EinkaufenOderDennGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>1. Was bedeutet „oder“?</h2>
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>Oder means or and offers a choice between products, colours, places or payment methods. Möchtest du Tee oder Kaffee? = Would you like tea or coffee? Und means and: it combines things rather than offering alternatives.</p>
+
         <p style={{ margin: 0, lineHeight: 1.75 }}>
           <strong>oder</strong> verbindet zwei oder mehrere Möglichkeiten. Beim Einkaufen benutzt du es ständig, wenn du zwischen Produkten, Farben, Größen, Orten oder Zahlungsarten wählst. Es bedeutet: Es gibt eine Alternative.
         </p>
@@ -31,6 +33,8 @@ export default function A2Day19EinkaufenOderDennGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>2. „oder“ verändert die Wortstellung nicht</h2>
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>Oder does not send a verb to the end. When it joins statements, each statement keeps its normal verb-second order: Ich kaufe die Hose oder ich nehme die Jacke. = I will buy the trousers or take the jacket. Questions keep question order: Kaufst du heute ein oder wartest du bis morgen? = Are you shopping today or waiting until tomorrow?</p>
+
         <p style={{ margin: 0, lineHeight: 1.75 }}>
           <strong>oder</strong> ist eine nebenordnende Konjunktion. Wenn du zwei Hauptsätze verbindest, bleibt die normale Hauptsatz-Wortstellung erhalten. Das konjugierte Verb steht weiterhin an Position 2.
         </p>
@@ -44,6 +48,8 @@ export default function A2Day19EinkaufenOderDennGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>3. Wiederholungen können wegfallen</h2>
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>You can leave out repeated words when the meaning stays clear. Möchtest du die kleine oder die große Packung? = Would you like the small or the large packet? The second Packung is understood. With a shared modal, keep both infinitives: Wir können bestellen oder abholen. = We can order or collect.</p>
+
         <p style={{ margin: 0, lineHeight: 1.75 }}>
           Wenn beide Möglichkeiten denselben Satzanfang haben, musst du ihn nicht zweimal sagen. Dadurch klingt dein Deutsch natürlicher.
         </p>
@@ -57,6 +63,8 @@ export default function A2Day19EinkaufenOderDennGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>4. „entweder … oder“</h2>
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>Entweder … oder means either … or and emphasises a choice. Ich kaufe entweder die Schuhe oder die Jacke. = I will buy either the shoes or the jacket. Put either before the first option and or before the second.</p>
+
         <p style={{ margin: 0, lineHeight: 1.75 }}>
           Mit <strong>entweder … oder</strong> betonst du, dass du zwischen zwei Möglichkeiten wählen musst. Das ist besonders nützlich, wenn du eine Entscheidung erklärst.
         </p>
@@ -69,6 +77,8 @@ export default function A2Day19EinkaufenOderDennGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>5. „oder?“ als kurze Bestätigung</h2>
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>At the end of a statement, oder? asks for confirmation, like right? in English: Die Jacke kostet 40 Euro, oder? = The jacket costs 40 euros, right? Here it does not introduce a second alternative.</p>
+
         <p style={{ margin: 0, lineHeight: 1.75 }}>
           In Gesprächen kann <strong>oder?</strong> am Satzende bedeuten: „Stimmt das?“ oder „Richtig?“. Beispiel: <em>Die Jacke kostet 40 Euro, oder?</em> – Du glaubst, dass sie 40 Euro kostet, und möchtest eine Bestätigung.
         </p>
@@ -76,6 +86,8 @@ export default function A2Day19EinkaufenOderDennGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>6. „oder“ und „denn“ nicht verwechseln</h2>
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>Denn means because and gives a reason. Like oder, it keeps normal main-clause order: Ich kaufe im Geschäft, denn ich möchte die Kleidung anprobieren. = I shop in the store because I want to try on the clothes. Compare weil ich die Kleidung anprobieren möchte: weil moves the conjugated verb to the end.</p>
+
         <p style={{ margin: 0, lineHeight: 1.75 }}>
           <strong>oder</strong> gibt eine Alternative. <strong>denn</strong> gibt einen Grund. Auch nach <strong>denn</strong> bleibt die normale Hauptsatz-Wortstellung.
         </p>
@@ -88,6 +100,8 @@ export default function A2Day19EinkaufenOderDennGrammarPage() {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>7. Einkaufsdialog</h2>
+<p lang="en" style={{ margin: 0, lineHeight: 1.75 }}>The assistant offers choices of item, colour, size and payment. The customer then gives a reason: Ich nehme die schwarze Jacke, denn sie passt sehr gut. = I will take the black jacket because it fits very well. Möchten Sie bar oder mit Karte bezahlen? = Would you like to pay cash or by card?</p>
+
         <p style={{ margin: 0, lineHeight: 1.8 }}>
           <strong>Verkäuferin:</strong> Guten Tag. Suchen Sie eine Hose oder eine Jacke?<br />
           <strong>Kunde:</strong> Eine Jacke, bitte. Haben Sie sie in Schwarz oder Blau?<br />
