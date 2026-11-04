@@ -152,7 +152,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const part4Profile = lessonProfile?.sections?.part4;
   const showHoeren = Boolean(part4Profile?.visible);
   const writingRequired = Boolean(lessonProfile?.sections?.writing?.visible);
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const [activeTab, setActiveTab] = useState("references");
   const requestedView = normalizeA2B1SectionView(
     new URLSearchParams(location.search || "").get("view") || "",
   );

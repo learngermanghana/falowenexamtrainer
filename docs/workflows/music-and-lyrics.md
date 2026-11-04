@@ -130,3 +130,15 @@ classroom signer serves it on demand; anonymous/student requests, other levels,
 days and objects remain rejected. It is not a public music recording and does
 not change the graded workbook Hören. Admin owns the five supplied classroom
 questions (B, A, C, A, B) in `b1Day26Listening.js`.
+
+## Workbook player and Music-first navigation — 4 November 2026
+
+A2/B1 workbook Music appears first and is the standard workbook opening tab;
+explicit section links remain authoritative. A1 keeps Overview first and Music
+next. Legacy references/ref keys remain valid and Submit stays last. Music is
+optional and does not start the timed assignment or change required sections.
+The player reuses published artwork and song stories, a single on-demand audio
+element, and an in-page lyric-video view. The video advances only with complete
+recording-matched cues, respects instrumental gaps, and labels estimates and
+automatic transcripts. Without valid cues it offers a manual lyric sheet. No
+playback-time AI, generated audio or new persistence is introduced.
