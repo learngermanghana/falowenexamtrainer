@@ -82,7 +82,9 @@ function validateEstimate(pack, objectKey, approved, studio=studioDrafts) {
 function withEnglishTranslation(pack, translations=englishTranslations) {
   const lines=String(pack.lyrics||'').replace(/\\n/g,'\n').split(/\r?\n/)
     .map(line=>line.trim()).filter(line=>line&&!/^\[.*\]$/.test(line));
-  const candidates=[...(translations.recordings||[]),
+  const transcriptRows = pack.transcriptionStatus === 'automatic' && /^[a-f0-9]{64}$/.test(pack.recordingSha256||'')
+    ? (translations.transcripts||[]).filter(row=>row.source==='automatic-transcript' && row.recordingSha256===pack.recordingSha256) : [];
+  const candidates=[...transcriptRows,...(translations.recordings||[]),
     ...(pack.referenceOnly && pack.transcriptionStatus!=='automatic' ? translations.drafts||[] : [])];
   const match=candidates.find(row=>row.objectKey===pack.objectKey &&
     Array.isArray(row.lines) && lines.length>0 && row.lines.length===lines.length &&

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import WorkbookMusicPlayer from "./WorkbookMusicPlayer";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { styles } from "../styles";
-import { matchingEnglishTranslation } from "../utils/musicEnglishTranslations";
+import { matchingEnglishTranslation, matchingTranscriptEnglishTranslation } from "../utils/musicEnglishTranslations";
 
 // Only approved public music playback IDs; private Hören assets are never read.
 // Uploads to music/<level>/day-XX/ are discovered through the existing
@@ -110,7 +110,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
     }).then(response => response.ok ? response.json() : null).then(data => {
       if (controller.signal.aborted) return;
       if (data?.objectKey === chosen.objectKey && typeof data.lyrics === "string" && data.lyrics.trim()) {
-        setRecordingLyrics({ id: chosen.id, objectKey: chosen.objectKey, lyrics: data.lyrics.trim(), cues: data.cues, timingStatus: data.timingStatus, transcriptionStatus: data.transcriptionStatus, referenceOnly: data.referenceOnly });
+        setRecordingLyrics({ id: chosen.id, objectKey: chosen.objectKey, lyrics: data.lyrics.trim(), cues: data.cues, timingStatus: data.timingStatus, transcriptionStatus: data.transcriptionStatus, referenceOnly: data.referenceOnly, recordingSha256: data.recordingSha256 });
       }
     }).catch(() => {
       // Missing lyric sidecars are normal for newly uploaded MP3s.
@@ -128,7 +128,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const approvedLyrics = recordingLyrics && chosen &&
     recordingLyrics.id === chosen.id && recordingLyrics.objectKey === chosen.objectKey
     ? recordingLyrics.lyrics : legacyLyrics;
-  const englishPack = chosen && approvedLyrics ? matchingEnglishTranslation(
+  const englishPack = chosen && approvedLyrics ? matchingTranscriptEnglishTranslation(translations, chosen, recordingLyrics) || matchingEnglishTranslation(
     translations, chosen.objectKey, approvedLyrics) : null;
 
   if (!valid) return null;

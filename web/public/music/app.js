@@ -3,7 +3,7 @@ import { coverForTrack } from "./cover-art.js?v=20261103-photo-covers";
 import { songStoryForTrack } from "./song-story.js?v=20261102-bilingual";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
-import { matchingEnglishTranslation, matchingDraftEnglishTranslation } from "./english-translations.js?v=20261101-draft";
+import { matchingEnglishTranslation, matchingDraftEnglishTranslation, matchingTranscriptEnglishTranslation } from "./english-translations.js?v=20261104-transcript";
 // Never autoplay on initial load; continue only after a listener starts a song.
 // Falowen Music's static listening room. No authentication, AI calls,
 // Firestore writes or generated media. Optional consented GA4 usage tracking is
@@ -592,14 +592,14 @@ function renderLyrics(lesson) {
   const root = byId("lyrics-text");
   root.replaceChildren();
   renderedCues = validateCues(lesson.cues, lesson.lyrics);
-  activeEnglishPack = lesson.transcriptionStatus === "automatic" ? null : lesson.referenceOnly
+  activeEnglishPack = lesson.transcriptionStatus === "automatic" ? matchingTranscriptEnglishTranslation(englishTranslations, selected, lesson) : lesson.referenceOnly
     ? matchingDraftEnglishTranslation(englishTranslations, selected, lesson)
     : matchingEnglishTranslation(englishTranslations, selected?.objectKey, lesson.lyrics);
   const translateControl = byId("show-english");
   translateControl.disabled = !activeEnglishPack;
   translateControl.checked = Boolean(activeEnglishPack && showEnglish);
   byId("english-status").textContent = lesson.transcriptionStatus === "automatic"
-    ? "English for this automatic transcript has not been reviewed yet."
+    ? (activeEnglishPack ? "AUTOMATIC TRANSCRIPT TRANSLATION — English follows the displayed draft; unclear recognition is marked. Teacher review is still needed." : "English for this automatic transcript has not been reviewed yet.")
     : activeEnglishPack?.source === "course-draft"
     ? "COURSE DRAFT TRANSLATION — English explains the displayed German draft, not a verified transcription of this recording."
     : activeEnglishPack

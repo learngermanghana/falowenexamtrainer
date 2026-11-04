@@ -6774,5 +6774,180 @@
         }
       ]
     }
+  ],
+  "transcripts": [
+    {
+      "source": "automatic-transcript",
+      "objectKey": "music/a2/day-21/Endlich Wochenende.mp3",
+      "recordingSha256": "55440940e8e8961aae3edaa9e5d6720c1bde12572c1c6e492852478713c69df9",
+      "level": "A2",
+      "day": 21,
+      "lines": [
+        {
+          "de": "Es ist Freitag, die Woche ist vorbei, ich",
+          "en": "It's Friday, the week is over; I"
+        },
+        {
+          "de": "rufe meine Freunde an, habt ihr am Wochenende",
+          "en": "call my friends: have you got any plans"
+        },
+        {
+          "de": "schon etwas vor?",
+          "en": "for the weekend?"
+        },
+        {
+          "de": "Wir könnten doch zusammen etwas machen,",
+          "en": "We could do something together,"
+        },
+        {
+          "de": "dann möchte gerne in die Berge fahren,",
+          "en": "[speaker unclear] would like to go to the mountains,"
+        },
+        {
+          "de": "mir bleibt lieber in der Stadt.",
+          "en": "[speaker unclear] would rather stay in the city."
+        },
+        {
+          "de": "Ich schlage einen Ausflug zum See vor, vielleicht",
+          "en": "I suggest a trip to the lake; perhaps"
+        },
+        {
+          "de": "haben alle da Raufluss Wir haben viele Ideen,",
+          "en": "everyone feels like it [wording unclear]. We have lots of ideas,"
+        },
+        {
+          "de": "doch nur zwei Tage Zeit Wir suchen einen",
+          "en": "but only two days. We are looking for a"
+        },
+        {
+          "de": "guten Plan, dann sind wir endlich so weit",
+          "en": "good plan; then we are finally ready."
+        },
+        {
+          "de": "Endlich Wochenende,",
+          "en": "At last, the weekend,"
+        },
+        {
+          "de": "endlich frei",
+          "en": "finally free!"
+        },
+        {
+          "de": "Komm wir machen etwas zusammen Ob in der",
+          "en": "Come on, let's do something together, whether in the"
+        },
+        {
+          "de": "Stadt oder draußen am See Hauptsache wir haben",
+          "en": "city or outside by the lake. What matters is that we have"
+        },
+        {
+          "de": "eine schöne Zeit",
+          "en": "a lovely time."
+        },
+        {
+          "de": "Was hältst du davon?",
+          "en": "What do you think?"
+        },
+        {
+          "de": "Bist du dabei?",
+          "en": "Are you joining us?"
+        },
+        {
+          "de": "Wir können fahren, wohin wir wollen",
+          "en": "We can go wherever we want."
+        },
+        {
+          "de": "Ein guter Plan, ein bisschen Zeit",
+          "en": "A good plan, a little time,"
+        },
+        {
+          "de": "Und das Wochenende kann beginnen Am Samstag treffen",
+          "en": "and the weekend can begin. On Saturday,"
+        },
+        {
+          "de": "wir uns um neun Der Bus bringt uns",
+          "en": "we meet at nine. The bus takes us"
+        },
+        {
+          "de": "direkt zum See Wir wandern durch den grünen",
+          "en": "straight to the lake. We walk through the green"
+        },
+        {
+          "de": "Wald und machen eine Pause am Weh Am",
+          "en": "forest and take a break [wording unclear]. On"
+        },
+        {
+          "de": "Sonntag gehen wir ins Café, wir trinken Café",
+          "en": "Sunday we go to the café, drink coffee"
+        },
+        {
+          "de": "und erzählen viel Ben zeigt uns die Fotos",
+          "en": "and chat a lot. Ben shows us the photos"
+        },
+        {
+          "de": "vom See und mir lacht über ein altes",
+          "en": "from the lake, and [speaker unclear] laughs at an old"
+        },
+        {
+          "de": "Bild Manchmal ist es gar nicht leicht, wenn",
+          "en": "picture. Sometimes it isn't easy when"
+        },
+        {
+          "de": "jeder etwas anderes möchte Doch wenn wir miteinander",
+          "en": "everyone wants something different. But when we"
+        },
+        {
+          "de": "sprechen, finden wir eine gute Lösung Endlich warnende,",
+          "en": "talk, we find a good solution. Finally [wording unclear],"
+        },
+        {
+          "de": "endlich frei,",
+          "en": "finally free!"
+        },
+        {
+          "de": "kommen wir machen etwas zusammen Ob in der",
+          "en": "Come on, let's do something together, whether in the"
+        },
+        {
+          "de": "Stadt oder draußen am See, Hauptsache wir haben",
+          "en": "city or outside by the lake. What matters is that we have"
+        },
+        {
+          "de": "eine schöne Zeit Was hältst du davon,",
+          "en": "a lovely time. What do you think,"
+        },
+        {
+          "de": "bist du dabei?",
+          "en": "are you joining us?"
+        },
+        {
+          "de": "Wir können fahren wohin wir wollen, ein guter",
+          "en": "We can go wherever we want; a good"
+        },
+        {
+          "de": "Plan, ein bisschen Zeit",
+          "en": "plan, a little time,"
+        },
+        {
+          "de": "Und das Wochenende kann beginnen",
+          "en": "and the weekend can begin."
+        },
+        {
+          "de": "Am Abend schreibe ich in die Gruppe Danke",
+          "en": "In the evening I write in the group: thank"
+        },
+        {
+          "de": "euch, das war wirklich schön Die nächste Woche",
+          "en": "you, that was really lovely. Next week"
+        },
+        {
+          "de": "kommt bestimmt Doch wir werden uns bald wiedersehen",
+          "en": "will come, but we will see each other again soon."
+        },
+        {
+          "de": "Copyright",
+          "en": "Copyright"
+        }
+      ]
+    }
   ]
 }

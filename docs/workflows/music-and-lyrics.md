@@ -142,3 +142,12 @@ element, and an in-page lyric-video view. The video advances only with complete
 recording-matched cues, respects instrumental gaps, and labels estimates and
 automatic transcripts. Without valid cues it offers a manual lyric sheet. No
 playback-time AI, generated audio or new persistence is introduced.
+
+## A2 Day 21 transcript English — 4 November 2026
+
+The current Endlich Wochenende player uses an automatic transcript whose words
+differ from the saved songwriting draft. A separate `transcripts` translation
+entry now binds English to its exact MP3 key, SHA-256 and all 41 displayed
+German lines. Unclear recognition is marked rather than silently corrected.
+The public player, workbook and lyrics API expose it as automatic-transcript
+English; existing German words, cues and approval states are unchanged.
