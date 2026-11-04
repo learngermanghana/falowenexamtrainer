@@ -32,3 +32,11 @@ export function matchingDraftEnglishTranslation(data, track, draft) {
       typeof line.en !== "string" || !line.en.trim())) return null;
   return pack;
 }
+
+// Automatic words need their own translation, bound to fingerprint and text.
+export function matchingTranscriptEnglishTranslation(data, track, pack) {
+  if (!track?.objectKey || pack?.objectKey !== track.objectKey || pack.transcriptionStatus !== 'automatic' || !/^[a-f0-9]{64}$/.test(pack.recordingSha256 || '')) return null;
+  const row = data?.transcripts?.find(item => item.source === 'automatic-transcript' && item.objectKey === track.objectKey && item.recordingSha256 === pack.recordingSha256);
+  const lines = sungGermanLines(pack.lyrics);
+  return row && lines.length && row.lines?.length === lines.length && row.lines.every((item,i) => item.de === lines[i] && typeof item.en === 'string' && item.en.trim()) ? row : null;
+}

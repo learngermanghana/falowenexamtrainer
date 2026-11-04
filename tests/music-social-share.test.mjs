@@ -10,7 +10,7 @@ import {resolveRecordingLesson} from '../web/public/music/lesson-content.js';
 import {songStoryForTrack} from '../web/public/music/song-story.js';
 import {buildPlaybackQueue,advancePlaybackQueue} from '../web/public/music/playback-queue.js';
 import {lyricLines,validateCues,activeLyricIndex} from '../web/public/music/lyrics-timing.js';
-import {matchingEnglishTranslation,matchingDraftEnglishTranslation} from '../web/public/music/english-translations.js';
+import {matchingEnglishTranslation,matchingDraftEnglishTranslation,matchingTranscriptEnglishTranslation} from '../web/public/music/english-translations.js';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const catalog=JSON.parse(read('web/public/music/catalog.json'));
 const coverage=JSON.parse(read('web/public/music/timing-coverage.json'));
@@ -43,7 +43,7 @@ async function room({nativeShare,clipboardFails=false,multiple=false}={}){
  const track=catalog.tracks[0];
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
  const w=dom.window;
- Object.assign(w,{coverForTrack,resolveRecordingLesson,songStoryForTrack,buildPlaybackQueue,advancePlaybackQueue,lyricLines,validateCues,activeLyricIndex,matchingEnglishTranslation,matchingDraftEnglishTranslation,matchMedia:()=>({matches:true}),fetch:async url=>({ok:true,json:async()=>String(url).includes('catalog.json')?{tracks:multiple?catalog.tracks.filter(row=>!row.retired):[track]}:String(url).includes('music-library')?{ok:true,tracks:[]}:String(url).includes('english-translations')?{recordings:[],drafts:[]}:String(url).includes('song-stories')?{byObjectKey:{},byTrackId:{}}:{lessons:{},recordings:[],tracks:[]}})});
+ Object.assign(w,{coverForTrack,resolveRecordingLesson,songStoryForTrack,buildPlaybackQueue,advancePlaybackQueue,lyricLines,validateCues,activeLyricIndex,matchingEnglishTranslation,matchingDraftEnglishTranslation,matchingTranscriptEnglishTranslation,matchMedia:()=>({matches:true}),fetch:async url=>({ok:true,json:async()=>String(url).includes('catalog.json')?{tracks:multiple?catalog.tracks.filter(row=>!row.retired):[track]}:String(url).includes('music-library')?{ok:true,tracks:[]}:String(url).includes('english-translations')?{recordings:[],drafts:[]}:String(url).includes('song-stories')?{byObjectKey:{},byTrackId:{}}:{lessons:{},recordings:[],tracks:[]}})});
  const copied=[];Object.defineProperty(w.navigator,'clipboard',{value:{writeText:async value=>{if(clipboardFails)throw Error('denied');copied.push(value);}}});
  if(nativeShare)w.navigator.share=nativeShare;
  const audio=w.document.getElementById('audio');audio.play=()=>Promise.resolve();audio.pause=()=>{};audio.load=()=>{};

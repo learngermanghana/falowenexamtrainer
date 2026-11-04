@@ -9,13 +9,13 @@ import {resolveRecordingLesson} from '../web/public/music/lesson-content.js';
 import {songStoryForTrack} from '../web/public/music/song-story.js';
 import {coverForTrack} from '../web/public/music/cover-art.js';
 import {approximateScrollTop} from '../web/public/music/follow-lyrics.js';
-import {matchingEnglishTranslation,matchingDraftEnglishTranslation} from '../web/public/music/english-translations.js';
+import {matchingEnglishTranslation,matchingDraftEnglishTranslation,matchingTranscriptEnglishTranslation} from '../web/public/music/english-translations.js';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const recordings=JSON.parse(read('web/public/music/timings.json')).recordings;
 async function room(track,pack,{studio=null,translations=null,classTimings=null}={}){
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
  const w=dom.window;
- Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,coverForTrack,songStoryForTrack,approximateScrollTop,matchingEnglishTranslation,matchingDraftEnglishTranslation,
+ Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,coverForTrack,songStoryForTrack,approximateScrollTop,matchingEnglishTranslation,matchingDraftEnglishTranslation,matchingTranscriptEnglishTranslation,
   matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('class-timings')?{recordings:classTimings||[]}:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:classTimings?[track]:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
  const a=w.document.getElementById('audio');
  a.play=()=>Promise.resolve(); a.pause=()=>{};a.load=()=>{};Object.defineProperty(a,'readyState',{value:1});
@@ -152,4 +152,20 @@ test('both catalogued class songs have native line timing tied to the exact audi
    assert.equal(d.querySelector('[aria-current="true"]')?.dataset.line,'2');
   }finally{dom.window.close();}
  }
+});
+
+test('A2 Day 21 enables English for its exact fingerprint-bound automatic transcript',async()=>{
+ const translations=JSON.parse(read('web/public/music/english-translations.json'));
+ const entry=translations.transcripts[0];
+ const estimates=JSON.parse(read('web/public/music/estimated-timings.json'));
+ const find=value=>{if(value&&typeof value==='object'){if(value.objectKey===entry.objectKey&&value.lyrics)return value;for(const child of Object.values(value)){const found=find(child);if(found)return found;}}};
+ const pack={...find(estimates),referenceOnly:true,transcriptionStatus:'automatic'};
+ const id='r2-a2-day-21-b64_RW5kbGljaCBXb2NoZW5lbmRlLm1wMw';
+ const track={id,objectKey:entry.objectKey,title:'Endlich Wochenende',level:'A2',day:21,coursebook:true,autoDiscovered:true,audioUrl:'https://www.falowen.app/api/music?track='+id};
+ const {w,dom}=await room(track,pack,{translations});
+ const toggle=w.document.getElementById('show-english');assert.equal(toggle.disabled,false);
+ toggle.checked=true;toggle.dispatchEvent(new w.Event('change',{bubbles:true}));
+ assert.ok(w.document.getElementById('lyrics-text').textContent.includes("It's Friday"));
+ assert.match(w.document.getElementById('english-status').textContent,/AUTOMATIC TRANSCRIPT TRANSLATION/);
+ dom.window.close();
 });
