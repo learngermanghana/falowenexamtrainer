@@ -32,7 +32,7 @@ describe("Campus vocabulary replaces Exam File without removing exam access", ()
     expect(nav.navigation.find(item => item.id === "vocabulary").route).toBe("/campus/vocab");
     expect(nav.navigation.find(item => item.id === "exam-file").route).toBe("/exams/file");
     expect(help).toContain("More → Vocab");
-    expect(help).not.toContain("vocab\` bookmarks redirect there");
+    expect(help).not.toContain("Existing `/campus/vocab` bookmarks redirect there");
     expect(guide).toContain('href="/campus/vocab"');
     expect(llms).toContain("Vocabulary practice (Campus; mobile More → Vocab)");
   });
