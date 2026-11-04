@@ -117,7 +117,7 @@ export const trimPrintedPdfTail = async (file, { description = "", removeBlankIn
     let removedInterior = 0;
     for (let index = pageCount - removed - 1; index >= 0; index--) {
       if (textPages[index].trim()) continue;
-      if (!isVisuallyEmptyPgm(renderPageToGrayscale(file, index + 1))) continue;
+      if (!isVisuallyEmptyPgm(renderPageToGrayscale(file, index + 1), 250)) continue;
       if (pdf.getPageCount() <= 1) break; // An empty section must fail validation.
       if (removedInterior >= 3) {
         throw new Error("Too many visually blank interior pages in " + description);
