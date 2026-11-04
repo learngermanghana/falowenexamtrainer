@@ -71,3 +71,23 @@ test('an owner-reviewed R2 sidecar replaces bundled timing for the same exact MP
  assert.equal(r.code,200);
  assert.deepEqual(r.body.cues,revised.cues);
 });
+
+test('A2 Day 1 uses word-aligned estimates but preserves reviewed timing precedence',async()=>{
+ const approved=require('../web/public/music/approved-recording-lyrics.json').recordings.find(p=>p.assignmentKey==='A2-1.1');
+ const aligned=require('../web/public/music/estimated-timings.json').recordings.find(p=>p.objectKey===approved.objectKey);
+ assert.equal(aligned.recordingSha256,approved.recordingSha256);
+ assert.equal(aligned.cues.length,28);
+ assert.equal(aligned.matchCoverage,.977);
+ assert.equal(aligned.weakestLineCoverage,.818);
+ assert.equal(aligned.cues[4].start,30.22);
+ const r=res();await createLyricsHandler({env,fetchImpl:async()=>new Response('',{status:404})})({method:'GET',query:{key:approved.objectKey}},r);
+ assert.equal(r.code,200);assert.equal(r.body.timingStatus,'estimated');
+ assert.equal(r.body.source,'acoustic-estimate');assert.deepEqual(r.body.cues,aligned.cues);
+ const reviewed={objectKey:approved.objectKey,lyrics:approved.lyrics,cues:approved.cues};
+ const owner=res();await createLyricsHandler({env,fetchImpl:async()=>new Response(JSON.stringify(reviewed))})({method:'GET',query:{key:approved.objectKey}},owner);
+ assert.deepEqual(owner.body.cues,reviewed.cues);
+ const bundled=res();await createLyricsHandler({env,timings:{recordings:[reviewed]},fetchImpl:async()=>new Response('',{status:404})})({method:'GET',query:{key:approved.objectKey}},bundled);
+ assert.deepEqual(bundled.body.cues,reviewed.cues);
+ const mismatched=res();await createLyricsHandler({env,approvedLyrics:{recordings:[{...approved,recordingSha256:'b'.repeat(64)}]},fetchImpl:async()=>new Response('',{status:404})})({method:'GET',query:{key:approved.objectKey}},mismatched);
+ assert.deepEqual(mismatched.body.cues,approved.cues);
+});

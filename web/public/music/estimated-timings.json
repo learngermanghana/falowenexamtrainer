@@ -31816,6 +31816,1275 @@
       ],
       "referenceOnly": true,
       "transcriptionStatus": "automatic"
+    },
+    {
+      "trackId": "r2-a2-day-01-b64_RWluIG5ldHRlcyBHZXNwcsOkY2gubXAz",
+      "objectKey": "music/a2/day-01/Ein nettes Gespräch.mp3",
+      "assignmentKey": "A2-1.1",
+      "title": "Ein nettes Gespräch",
+      "lyrics": "[Verse 1]\nAm Freitagabend gehe ich ins Restaurant,\ndort treffe ich jemanden, den ich noch nicht gut kannte.\nWir begrüßen uns freundlich und setzen uns hin,\nich frage: Wie geht's dir? Wie war dein Tag bisher?\n\n[Chorus]\nEin nettes Gespräch, wir lernen uns kennen,\nwir haben viel zu erzählen und lachen zusammen.\nWir sprechen über das Leben und unsere Freizeit,\ndie Stunden vergehen, wir vergessen die Zeit.\n\n[Verse 2]\nSie fragt mich: Was machst du in deiner Freizeit?\nIch sage: Ich höre Musik und treibe gern Sport.\nDann frage ich: Wie lange wohnst du schon hier?\nSie sagt: Seit zwei Jahren, die Stadt gefällt mir.\nWir bestellen Pizza und etwas zu trinken\nund sprechen über Reisen und unsere Familien.\nSie erzählt von ihrem Studium und ihrem Beruf,\nich höre ihr zu und erzähle auch von mir.\n\n[Chorus]\nEin nettes Gespräch, wir lernen uns kennen,\nwir haben viel zu erzählen und lachen zusammen.\nWir sprechen über das Leben und unsere Freizeit,\ndie Stunden vergehen, wir vergessen die Zeit.\nEin schönes Gespräch, wir lernen uns besser kennen,\nwir haben so viel Spaß und lachen zusammen.\nWir reden über das Leben und unsere Freizeit,\ndie Stunden vergehen, wir genießen die Zeit.\n\n[Outro]\nWir zahlen und gehen, der Abend ist vorbei.\nSie sagt: Es war schön, ich komme gern wieder.\nWir tauschen Nummern und lächeln dabei,\nbis nächste Woche, sagen wir zwei.",
+      "cues": [
+        {
+          "start": 15.32,
+          "end": 18.7,
+          "text": "Am Freitagabend gehe ich ins Restaurant,"
+        },
+        {
+          "start": 19.64,
+          "end": 22.56,
+          "text": "dort treffe ich jemanden, den ich noch nicht gut kannte."
+        },
+        {
+          "start": 22.56,
+          "end": 26.6,
+          "text": "Wir begrüßen uns freundlich und setzen uns hin,"
+        },
+        {
+          "start": 26.77,
+          "end": 30.02,
+          "text": "ich frage: Wie geht's dir? Wie war dein Tag bisher?"
+        },
+        {
+          "start": 30.22,
+          "end": 33.6,
+          "text": "Ein nettes Gespräch, wir lernen uns kennen,"
+        },
+        {
+          "start": 33.6,
+          "end": 37.22,
+          "text": "wir haben viel zu erzählen und lachen zusammen."
+        },
+        {
+          "start": 37.22,
+          "end": 41.86,
+          "text": "Wir sprechen über das Leben und unsere Freizeit,"
+        },
+        {
+          "start": 41.86,
+          "end": 45.22,
+          "text": "die Stunden vergehen, wir vergessen die Zeit."
+        },
+        {
+          "start": 52.82,
+          "end": 56.56,
+          "text": "Sie fragt mich: Was machst du in deiner Freizeit?"
+        },
+        {
+          "start": 56.56,
+          "end": 59.48,
+          "text": "Ich sage: Ich höre Musik und treibe gern Sport."
+        },
+        {
+          "start": 59.48,
+          "end": 63.56,
+          "text": "Dann frage ich: Wie lange wohnst du schon hier?"
+        },
+        {
+          "start": 63.58,
+          "end": 66.9,
+          "text": "Sie sagt: Seit zwei Jahren, die Stadt gefällt mir."
+        },
+        {
+          "start": 66.9,
+          "end": 70.7,
+          "text": "Wir bestellen Pizza und etwas zu trinken"
+        },
+        {
+          "start": 70.7,
+          "end": 74.36,
+          "text": "und sprechen über Reisen und unsere Familien."
+        },
+        {
+          "start": 74.36,
+          "end": 78.04,
+          "text": "Sie erzählt von ihrem Studium und ihrem Beruf,"
+        },
+        {
+          "start": 78.04,
+          "end": 82.18,
+          "text": "ich höre ihr zu und erzähle auch von mir."
+        },
+        {
+          "start": 82.98,
+          "end": 86.1,
+          "text": "Ein nettes Gespräch, wir lernen uns kennen,"
+        },
+        {
+          "start": 86.1,
+          "end": 89.74,
+          "text": "wir haben viel zu erzählen und lachen zusammen."
+        },
+        {
+          "start": 89.74,
+          "end": 94.36,
+          "text": "Wir sprechen über das Leben und unsere Freizeit,"
+        },
+        {
+          "start": 94.36,
+          "end": 97.52,
+          "text": "die Stunden vergehen, wir vergessen die Zeit."
+        },
+        {
+          "start": 97.52,
+          "end": 101.16,
+          "text": "Ein schönes Gespräch, wir lernen uns besser kennen,"
+        },
+        {
+          "start": 101.16,
+          "end": 104.74,
+          "text": "wir haben so viel Spaß und lachen zusammen."
+        },
+        {
+          "start": 104.74,
+          "end": 109.3,
+          "text": "Wir reden über das Leben und unsere Freizeit,"
+        },
+        {
+          "start": 109.3,
+          "end": 112.6,
+          "text": "die Stunden vergehen, wir genießen die Zeit."
+        },
+        {
+          "start": 127.7,
+          "end": 131.1,
+          "text": "Wir zahlen und gehen, der Abend ist vorbei."
+        },
+        {
+          "start": 131.1,
+          "end": 134.88,
+          "text": "Sie sagt: Es war schön, ich komme gern wieder."
+        },
+        {
+          "start": 135.64,
+          "end": 138.46,
+          "text": "Wir tauschen Nummern und lächeln dabei,"
+        },
+        {
+          "start": 138.46,
+          "end": 142.6,
+          "text": "bis nächste Woche, sagen wir zwei."
+        }
+      ],
+      "matchCoverage": 0.977,
+      "weakestLineCoverage": 0.818,
+      "totalLines": 28,
+      "recordingSha256": "edb408a57611d459cad14f2e13dd57d67ae5e726a665573cf8cfb47618daf928",
+      "duration": 158.4,
+      "timingStatus": "estimated",
+      "timingMethod": "Offline Whisper small German word alignment against teacher-supplied exact MP3, 2026-11-04; listening review still required.",
+      "source": "Teacher-supplied A2 Day 1 MP3; 97.7% word match, no lyric replacement.",
+      "wordTimestamps": [
+        {
+          "text": " Am",
+          "start": 15.439999999999998,
+          "end": 16.22
+        },
+        {
+          "text": " Freitagabend",
+          "start": 16.22,
+          "end": 17.0
+        },
+        {
+          "text": " geh",
+          "start": 17.0,
+          "end": 17.22
+        },
+        {
+          "text": " ich",
+          "start": 17.22,
+          "end": 17.68
+        },
+        {
+          "text": " ins",
+          "start": 17.68,
+          "end": 17.9
+        },
+        {
+          "text": " Restaurant",
+          "start": 17.9,
+          "end": 18.54
+        },
+        {
+          "text": " Da",
+          "start": 18.54,
+          "end": 19.76
+        },
+        {
+          "text": " treffe",
+          "start": 19.76,
+          "end": 20.04
+        },
+        {
+          "text": " ich",
+          "start": 20.04,
+          "end": 20.28
+        },
+        {
+          "text": " jemanden,",
+          "start": 20.28,
+          "end": 20.72
+        },
+        {
+          "text": " den",
+          "start": 20.72,
+          "end": 20.88
+        },
+        {
+          "text": " ich",
+          "start": 20.88,
+          "end": 21.06
+        },
+        {
+          "text": " noch",
+          "start": 21.06,
+          "end": 21.28
+        },
+        {
+          "text": " nicht",
+          "start": 21.28,
+          "end": 21.52
+        },
+        {
+          "text": " gut",
+          "start": 21.52,
+          "end": 22.04
+        },
+        {
+          "text": " kannte",
+          "start": 22.04,
+          "end": 22.68
+        },
+        {
+          "text": " Wir",
+          "start": 22.68,
+          "end": 23.38
+        },
+        {
+          "text": " begrüßen",
+          "start": 23.38,
+          "end": 23.94
+        },
+        {
+          "text": " uns",
+          "start": 23.94,
+          "end": 24.2
+        },
+        {
+          "text": " freundlich",
+          "start": 24.2,
+          "end": 25.02
+        },
+        {
+          "text": " und",
+          "start": 25.02,
+          "end": 25.38
+        },
+        {
+          "text": " setzen",
+          "start": 25.38,
+          "end": 25.68
+        },
+        {
+          "text": " uns",
+          "start": 25.68,
+          "end": 26.02
+        },
+        {
+          "text": " hin",
+          "start": 26.02,
+          "end": 26.44
+        },
+        {
+          "text": " Ich",
+          "start": 26.89,
+          "end": 27.24
+        },
+        {
+          "text": " frage",
+          "start": 27.24,
+          "end": 27.56
+        },
+        {
+          "text": " wie",
+          "start": 27.56,
+          "end": 27.74
+        },
+        {
+          "text": " gehts",
+          "start": 27.74,
+          "end": 28.14
+        },
+        {
+          "text": " dir,",
+          "start": 28.14,
+          "end": 28.26
+        },
+        {
+          "text": " wie",
+          "start": 28.56,
+          "end": 28.68
+        },
+        {
+          "text": " war",
+          "start": 28.68,
+          "end": 28.88
+        },
+        {
+          "text": " dein",
+          "start": 28.88,
+          "end": 29.04
+        },
+        {
+          "text": " Tag",
+          "start": 29.04,
+          "end": 29.4
+        },
+        {
+          "text": " bisher?",
+          "start": 29.4,
+          "end": 29.86
+        },
+        {
+          "text": " Ein",
+          "start": 30.34,
+          "end": 31.04
+        },
+        {
+          "text": " nettes",
+          "start": 31.04,
+          "end": 31.3
+        },
+        {
+          "text": " Gespräch,",
+          "start": 31.3,
+          "end": 32.02
+        },
+        {
+          "text": " wir",
+          "start": 32.52,
+          "end": 32.88
+        },
+        {
+          "text": " lernen",
+          "start": 32.88,
+          "end": 33.14
+        },
+        {
+          "text": " uns",
+          "start": 33.14,
+          "end": 33.38
+        },
+        {
+          "text": " kennen",
+          "start": 33.38,
+          "end": 33.72
+        },
+        {
+          "text": " Wir",
+          "start": 33.72,
+          "end": 34.62
+        },
+        {
+          "text": " haben",
+          "start": 34.62,
+          "end": 34.74
+        },
+        {
+          "text": " viel",
+          "start": 34.74,
+          "end": 34.92
+        },
+        {
+          "text": " zu",
+          "start": 34.92,
+          "end": 35.1
+        },
+        {
+          "text": " erzählen",
+          "start": 35.1,
+          "end": 35.84
+        },
+        {
+          "text": " und",
+          "start": 35.84,
+          "end": 36.64
+        },
+        {
+          "text": " lachen",
+          "start": 36.64,
+          "end": 36.88
+        },
+        {
+          "text": " zusammen",
+          "start": 36.88,
+          "end": 37.34
+        },
+        {
+          "text": " Wir",
+          "start": 37.34,
+          "end": 38.02
+        },
+        {
+          "text": " sprechen",
+          "start": 38.02,
+          "end": 38.36
+        },
+        {
+          "text": " über",
+          "start": 38.36,
+          "end": 38.78
+        },
+        {
+          "text": " das",
+          "start": 38.78,
+          "end": 39.02
+        },
+        {
+          "text": " Leben",
+          "start": 39.02,
+          "end": 39.56
+        },
+        {
+          "text": " und",
+          "start": 39.56,
+          "end": 40.4
+        },
+        {
+          "text": " unsere",
+          "start": 40.4,
+          "end": 40.76
+        },
+        {
+          "text": " Freizeit",
+          "start": 40.76,
+          "end": 41.98
+        },
+        {
+          "text": " Die",
+          "start": 41.98,
+          "end": 42.24
+        },
+        {
+          "text": " Stunden",
+          "start": 42.24,
+          "end": 42.46
+        },
+        {
+          "text": " vergehen,",
+          "start": 42.46,
+          "end": 43.16
+        },
+        {
+          "text": " wir",
+          "start": 43.64,
+          "end": 43.98
+        },
+        {
+          "text": " vergessen",
+          "start": 43.98,
+          "end": 44.36
+        },
+        {
+          "text": " die",
+          "start": 44.36,
+          "end": 44.6
+        },
+        {
+          "text": " Zeit",
+          "start": 44.6,
+          "end": 45.06
+        },
+        {
+          "text": " Sie",
+          "start": 52.94,
+          "end": 53.5
+        },
+        {
+          "text": " fragt",
+          "start": 53.5,
+          "end": 53.9
+        },
+        {
+          "text": " mich,",
+          "start": 53.9,
+          "end": 54.06
+        },
+        {
+          "text": " was",
+          "start": 54.32,
+          "end": 54.48
+        },
+        {
+          "text": " machst",
+          "start": 54.48,
+          "end": 54.76
+        },
+        {
+          "text": " du",
+          "start": 54.76,
+          "end": 54.96
+        },
+        {
+          "text": " in",
+          "start": 54.96,
+          "end": 55.14
+        },
+        {
+          "text": " deiner",
+          "start": 55.14,
+          "end": 55.4
+        },
+        {
+          "text": " Freizeit?",
+          "start": 55.4,
+          "end": 56.58
+        },
+        {
+          "text": " Ich",
+          "start": 56.68,
+          "end": 56.82
+        },
+        {
+          "text": " sage",
+          "start": 56.82,
+          "end": 57.02
+        },
+        {
+          "text": " ich",
+          "start": 57.02,
+          "end": 57.34
+        },
+        {
+          "text": " höre",
+          "start": 57.34,
+          "end": 57.5
+        },
+        {
+          "text": " Musik",
+          "start": 57.5,
+          "end": 57.96
+        },
+        {
+          "text": " und",
+          "start": 57.96,
+          "end": 58.68
+        },
+        {
+          "text": " treibe",
+          "start": 58.68,
+          "end": 58.94
+        },
+        {
+          "text": " gern",
+          "start": 58.94,
+          "end": 59.16
+        },
+        {
+          "text": " Sport",
+          "start": 59.16,
+          "end": 59.6
+        },
+        {
+          "text": " Dann",
+          "start": 59.6,
+          "end": 61.0
+        },
+        {
+          "text": " frage",
+          "start": 61.0,
+          "end": 61.44
+        },
+        {
+          "text": " ich,",
+          "start": 61.44,
+          "end": 61.78
+        },
+        {
+          "text": " wie",
+          "start": 61.98,
+          "end": 62.12
+        },
+        {
+          "text": " lange",
+          "start": 62.12,
+          "end": 62.32
+        },
+        {
+          "text": " wohnst",
+          "start": 62.32,
+          "end": 62.68
+        },
+        {
+          "text": " du",
+          "start": 62.68,
+          "end": 62.74
+        },
+        {
+          "text": " schon",
+          "start": 62.74,
+          "end": 62.98
+        },
+        {
+          "text": " hier?",
+          "start": 62.98,
+          "end": 63.4
+        },
+        {
+          "text": " Sie",
+          "start": 63.7,
+          "end": 63.8
+        },
+        {
+          "text": " sagt,",
+          "start": 63.8,
+          "end": 64.14
+        },
+        {
+          "text": " seit",
+          "start": 64.8,
+          "end": 64.98
+        },
+        {
+          "text": " zwei",
+          "start": 64.98,
+          "end": 65.3
+        },
+        {
+          "text": " Jahren",
+          "start": 65.3,
+          "end": 65.82
+        },
+        {
+          "text": " die",
+          "start": 65.82,
+          "end": 66.14
+        },
+        {
+          "text": " Stadt",
+          "start": 66.14,
+          "end": 66.3
+        },
+        {
+          "text": " gefällt",
+          "start": 66.3,
+          "end": 66.74
+        },
+        {
+          "text": " mir,",
+          "start": 66.74,
+          "end": 67.02
+        },
+        {
+          "text": " wir",
+          "start": 67.02,
+          "end": 67.28
+        },
+        {
+          "text": " bergst",
+          "start": 67.28,
+          "end": 67.56
+        },
+        {
+          "text": " Sterne,",
+          "start": 67.56,
+          "end": 68.4
+        },
+        {
+          "text": " Pizza",
+          "start": 68.64,
+          "end": 68.9
+        },
+        {
+          "text": " und",
+          "start": 68.9,
+          "end": 69.36
+        },
+        {
+          "text": " etwas",
+          "start": 69.36,
+          "end": 69.92
+        },
+        {
+          "text": " zu",
+          "start": 69.92,
+          "end": 70.3
+        },
+        {
+          "text": " trinken",
+          "start": 70.3,
+          "end": 70.82
+        },
+        {
+          "text": " und",
+          "start": 70.82,
+          "end": 71.06
+        },
+        {
+          "text": " sprechen",
+          "start": 71.06,
+          "end": 71.5
+        },
+        {
+          "text": " über",
+          "start": 71.5,
+          "end": 72.06
+        },
+        {
+          "text": " Reisen",
+          "start": 72.06,
+          "end": 72.76
+        },
+        {
+          "text": " Und",
+          "start": 72.76,
+          "end": 73.24
+        },
+        {
+          "text": " unsere",
+          "start": 73.24,
+          "end": 73.68
+        },
+        {
+          "text": " Familien,",
+          "start": 73.68,
+          "end": 74.48
+        },
+        {
+          "text": " sie",
+          "start": 74.48,
+          "end": 74.8
+        },
+        {
+          "text": " erzählt",
+          "start": 74.8,
+          "end": 75.28
+        },
+        {
+          "text": " von",
+          "start": 75.28,
+          "end": 75.58
+        },
+        {
+          "text": " ihrem",
+          "start": 75.58,
+          "end": 75.82
+        },
+        {
+          "text": " Studium",
+          "start": 75.82,
+          "end": 76.7
+        },
+        {
+          "text": " und",
+          "start": 76.7,
+          "end": 76.92
+        },
+        {
+          "text": " ihrem",
+          "start": 76.92,
+          "end": 77.52
+        },
+        {
+          "text": " Beruf",
+          "start": 77.52,
+          "end": 78.16
+        },
+        {
+          "text": " Ich",
+          "start": 78.16,
+          "end": 78.46
+        },
+        {
+          "text": " höre",
+          "start": 78.46,
+          "end": 78.6
+        },
+        {
+          "text": " ihr",
+          "start": 78.6,
+          "end": 78.82
+        },
+        {
+          "text": " zu",
+          "start": 78.82,
+          "end": 79.12
+        },
+        {
+          "text": " und",
+          "start": 79.12,
+          "end": 80.44
+        },
+        {
+          "text": " erzähle",
+          "start": 80.44,
+          "end": 81.08
+        },
+        {
+          "text": " auch",
+          "start": 81.08,
+          "end": 81.3
+        },
+        {
+          "text": " von",
+          "start": 81.3,
+          "end": 81.6
+        },
+        {
+          "text": " mir",
+          "start": 81.6,
+          "end": 82.02
+        },
+        {
+          "text": " Ein",
+          "start": 83.1,
+          "end": 83.52
+        },
+        {
+          "text": " nettes",
+          "start": 83.52,
+          "end": 83.8
+        },
+        {
+          "text": " Gespräch,",
+          "start": 83.8,
+          "end": 84.44
+        },
+        {
+          "text": " wir",
+          "start": 85.16,
+          "end": 85.38
+        },
+        {
+          "text": " lernen",
+          "start": 85.38,
+          "end": 85.62
+        },
+        {
+          "text": " uns",
+          "start": 85.62,
+          "end": 85.86
+        },
+        {
+          "text": " kennen",
+          "start": 85.86,
+          "end": 86.22
+        },
+        {
+          "text": " Wir",
+          "start": 86.22,
+          "end": 87.12
+        },
+        {
+          "text": " haben",
+          "start": 87.12,
+          "end": 87.26
+        },
+        {
+          "text": " viel",
+          "start": 87.26,
+          "end": 87.42
+        },
+        {
+          "text": " zu",
+          "start": 87.42,
+          "end": 87.6
+        },
+        {
+          "text": " erzählen",
+          "start": 87.6,
+          "end": 88.38
+        },
+        {
+          "text": " und",
+          "start": 88.38,
+          "end": 89.14
+        },
+        {
+          "text": " lachen",
+          "start": 89.14,
+          "end": 89.38
+        },
+        {
+          "text": " zusammen",
+          "start": 89.38,
+          "end": 89.86
+        },
+        {
+          "text": " Wir",
+          "start": 89.86,
+          "end": 90.52
+        },
+        {
+          "text": " sprechen",
+          "start": 90.52,
+          "end": 90.92
+        },
+        {
+          "text": " über",
+          "start": 90.92,
+          "end": 91.28
+        },
+        {
+          "text": " das",
+          "start": 91.28,
+          "end": 91.52
+        },
+        {
+          "text": " Leben",
+          "start": 91.52,
+          "end": 92.06
+        },
+        {
+          "text": " und",
+          "start": 92.06,
+          "end": 92.92
+        },
+        {
+          "text": " unsere",
+          "start": 92.92,
+          "end": 93.24
+        },
+        {
+          "text": " Freizeit",
+          "start": 93.24,
+          "end": 94.48
+        },
+        {
+          "text": " Die",
+          "start": 94.48,
+          "end": 94.74
+        },
+        {
+          "text": " Stunden",
+          "start": 94.74,
+          "end": 94.98
+        },
+        {
+          "text": " vergehen,",
+          "start": 94.98,
+          "end": 95.62
+        },
+        {
+          "text": " wir",
+          "start": 96.06,
+          "end": 96.48
+        },
+        {
+          "text": " vergessen",
+          "start": 96.48,
+          "end": 96.9
+        },
+        {
+          "text": " die",
+          "start": 96.9,
+          "end": 97.12
+        },
+        {
+          "text": " Zeit",
+          "start": 97.12,
+          "end": 97.64
+        },
+        {
+          "text": " Ein",
+          "start": 97.64,
+          "end": 98.14
+        },
+        {
+          "text": " schönes",
+          "start": 98.14,
+          "end": 98.86
+        },
+        {
+          "text": " Gespräch,",
+          "start": 98.86,
+          "end": 99.52
+        },
+        {
+          "text": " wir",
+          "start": 99.78,
+          "end": 99.94
+        },
+        {
+          "text": " lernen",
+          "start": 99.94,
+          "end": 100.26
+        },
+        {
+          "text": " uns",
+          "start": 100.26,
+          "end": 100.56
+        },
+        {
+          "text": " besser",
+          "start": 100.56,
+          "end": 100.78
+        },
+        {
+          "text": " kennen",
+          "start": 100.78,
+          "end": 101.28
+        },
+        {
+          "text": " Wir",
+          "start": 101.28,
+          "end": 102.14
+        },
+        {
+          "text": " haben",
+          "start": 102.14,
+          "end": 102.36
+        },
+        {
+          "text": " so",
+          "start": 102.36,
+          "end": 102.64
+        },
+        {
+          "text": " viel",
+          "start": 102.64,
+          "end": 102.9
+        },
+        {
+          "text": " Spaß",
+          "start": 102.9,
+          "end": 103.28
+        },
+        {
+          "text": " und",
+          "start": 103.28,
+          "end": 104.16
+        },
+        {
+          "text": " lachen",
+          "start": 104.16,
+          "end": 104.4
+        },
+        {
+          "text": " zusammen",
+          "start": 104.4,
+          "end": 104.86
+        },
+        {
+          "text": " Wir",
+          "start": 104.86,
+          "end": 105.58
+        },
+        {
+          "text": " reden",
+          "start": 105.58,
+          "end": 105.96
+        },
+        {
+          "text": " über",
+          "start": 105.96,
+          "end": 106.32
+        },
+        {
+          "text": " das",
+          "start": 106.32,
+          "end": 106.52
+        },
+        {
+          "text": " Leben",
+          "start": 106.52,
+          "end": 107.06
+        },
+        {
+          "text": " und",
+          "start": 107.06,
+          "end": 107.92
+        },
+        {
+          "text": " unsere",
+          "start": 107.92,
+          "end": 108.24
+        },
+        {
+          "text": " Freizeit",
+          "start": 108.24,
+          "end": 109.42
+        },
+        {
+          "text": " Die",
+          "start": 109.42,
+          "end": 109.74
+        },
+        {
+          "text": " Stunden",
+          "start": 109.74,
+          "end": 109.96
+        },
+        {
+          "text": " vergehen,",
+          "start": 109.96,
+          "end": 110.62
+        },
+        {
+          "text": " wir",
+          "start": 111.12,
+          "end": 111.48
+        },
+        {
+          "text": " genießen",
+          "start": 111.48,
+          "end": 111.9
+        },
+        {
+          "text": " die",
+          "start": 111.9,
+          "end": 112.12
+        },
+        {
+          "text": " Zeit",
+          "start": 112.12,
+          "end": 112.44
+        },
+        {
+          "text": " Wir",
+          "start": 127.82000000000001,
+          "end": 128.52
+        },
+        {
+          "text": " zahlen",
+          "start": 128.52,
+          "end": 128.9
+        },
+        {
+          "text": " und",
+          "start": 128.9,
+          "end": 129.22
+        },
+        {
+          "text": " gehen,",
+          "start": 129.22,
+          "end": 129.56
+        },
+        {
+          "text": " der",
+          "start": 129.88,
+          "end": 129.94
+        },
+        {
+          "text": " Abend",
+          "start": 129.94,
+          "end": 130.32
+        },
+        {
+          "text": " ist",
+          "start": 130.32,
+          "end": 130.64
+        },
+        {
+          "text": " vorbei",
+          "start": 130.64,
+          "end": 131.22
+        },
+        {
+          "text": " Sie",
+          "start": 131.22,
+          "end": 132.22
+        },
+        {
+          "text": " sagt,",
+          "start": 132.22,
+          "end": 132.48
+        },
+        {
+          "text": " es",
+          "start": 132.54,
+          "end": 132.64
+        },
+        {
+          "text": " war",
+          "start": 132.64,
+          "end": 132.78
+        },
+        {
+          "text": " schön,",
+          "start": 132.78,
+          "end": 133.28
+        },
+        {
+          "text": " ich",
+          "start": 133.62,
+          "end": 133.7
+        },
+        {
+          "text": " komme",
+          "start": 133.7,
+          "end": 133.84
+        },
+        {
+          "text": " gern",
+          "start": 133.84,
+          "end": 134.16
+        },
+        {
+          "text": " wieder",
+          "start": 134.16,
+          "end": 134.72
+        },
+        {
+          "text": " Wir",
+          "start": 135.76000000000002,
+          "end": 136.46
+        },
+        {
+          "text": " tauschen",
+          "start": 136.46,
+          "end": 136.88
+        },
+        {
+          "text": " Nummern",
+          "start": 136.88,
+          "end": 137.32
+        },
+        {
+          "text": " und",
+          "start": 137.32,
+          "end": 137.54
+        },
+        {
+          "text": " lächeln",
+          "start": 137.54,
+          "end": 138.14
+        },
+        {
+          "text": " dabei",
+          "start": 138.14,
+          "end": 138.58
+        },
+        {
+          "text": " Bis",
+          "start": 138.58,
+          "end": 140.18
+        },
+        {
+          "text": " nächste",
+          "start": 140.18,
+          "end": 140.54
+        },
+        {
+          "text": " Woche",
+          "start": 140.54,
+          "end": 140.98
+        },
+        {
+          "text": " sagen",
+          "start": 140.98,
+          "end": 141.84
+        },
+        {
+          "text": " wir",
+          "start": 141.84,
+          "end": 142.12
+        },
+        {
+          "text": " zwei",
+          "start": 142.12,
+          "end": 142.44
+        }
+      ]
     }
   ]
 }
