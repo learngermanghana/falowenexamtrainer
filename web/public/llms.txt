@@ -12,7 +12,7 @@ Last reviewed: 4 November 2026. Read the linked official sources for current ins
 - [Falowen Learning Companion](https://www.falowen.app/help): Account-specific lesson, assignment, progress and class information requires an authenticated read-only connection; public plugin availability is separate from backend readiness.
 
 
-- [Falowen Help / How Falowen Works](https://www.falowen.app/help): Human-readable official guide.
+- [Falowen Help / How Falowen Works](https://www.falowen.app/help): Public, search-readable official guide with admissions FAQs, hybrid classes, fees, payment plans, course duration, certificates and learner support.
 - [Falowen Help & Navigation Knowledge Base](https://www.falowen.app/falowen-help.md): AI-readable Markdown source of truth.
 - [Falowen Structured Navigation](https://www.falowen.app/falowen-navigation.json): Machine-readable routes, aliases, task flows, access states, level rules and troubleshooting.
 - [Falowen Course Map](https://www.falowen.app/falowen-course-map.json): Generated A1–C2 lesson map with day/chapter identity, visible sections, Radio gates, submission mode, skill focus, media availability and supported deep links.

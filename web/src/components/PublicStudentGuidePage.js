@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { admissionsFaqs, admissionsFaqSchema, PUBLIC_HELP_TITLE, PUBLIC_HELP_DESCRIPTION } from "../data/publicAdmissionsFaqs";
+import { visitorWhatsAppLink } from "../data/visitorQuestions";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
 
@@ -36,10 +38,10 @@ const routeRows = [
 const PublicStudentGuidePage = () => {
   useEffect(() => {
     const description =
-      "Official Falowen help: signup, free trial, Course Book, Falowen Radio, assignments, Results, Attendance, exams, billing and account navigation.";
+      PUBLIC_HELP_DESCRIPTION;
 
     updatePageMeta({
-      title: "Falowen Help | How Falowen Works",
+      title: PUBLIC_HELP_TITLE,
       description,
       canonicalPath: "/help",
       structuredData: [
@@ -48,7 +50,7 @@ const PublicStudentGuidePage = () => {
           "@type": "Article",
           headline: "Falowen Help & Navigation Guide",
           description,
-          dateModified: "2026-10-11",
+          dateModified: "2026-11-04",
           author: { "@type": "Organization", name: "Falowen" },
           publisher: { "@type": "Organization", name: "Falowen" },
         },
@@ -56,6 +58,7 @@ const PublicStudentGuidePage = () => {
           "@context": "https://schema.org",
           "@type": "FAQPage",
           mainEntity: [
+            ...admissionsFaqSchema.mainEntity,
             {
               "@type": "Question",
               name: "Where can I access my Course Book in Falowen?",
@@ -107,7 +110,7 @@ const PublicStudentGuidePage = () => {
       <section style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
         <p style={{ ...styles.badge, width: "fit-content", margin: 0 }}>Official Falowen guide</p>
         <h1 style={{ margin: 0 }}>Falowen Help & Navigation</h1>
-        <p style={{ margin: 0 }}>Updated 11 October 2026</p>
+        <p style={{ margin: 0 }}>Updated 4 November 2026</p>
         <p style={{ margin: 0, color: "#1f2937", lineHeight: 1.7 }}>
           Use this guide if you are new, lost, blocked, looking for a feature, or trying to understand where to go next in Falowen.
         </p>
@@ -116,6 +119,22 @@ const PublicStudentGuidePage = () => {
         </p>
       </section>
 
+      <section id="admissions-faq" style={cardStyle} aria-labelledby="admissions-faq-title">
+        <h2 id="admissions-faq-title" style={{ margin: 0 }}>German classes, fees and admissions: common questions</h2>
+        <p>Find the answers below, or <RouteLink href="/classes">view upcoming classes and current timetables</RouteLink>. All times follow the time zone published for the class.</p>
+        <nav aria-label="Help topics"><a href="#student-support" style={linkStyle}>Learning support and exam readiness ↓</a></nav>
+        {admissionsFaqs.map(faq => <article key={faq.question} style={{ borderTop: "1px solid #e2e8f0", paddingTop: 14 }}>
+          <h3 style={{ margin: "0 0 8px", fontSize: 18 }}>{faq.question}</h3>
+          <p style={{ margin: "0 0 8px", lineHeight: 1.7 }}>{faq.text}</p>
+          {faq.href && <p style={{ margin: "6px 0" }}><RouteLink href={faq.href}>{faq.label}</RouteLink></p>}
+          {faq.handoff && <p style={{ margin: "6px 0" }}><RouteLink href={visitorWhatsAppLink(faq.question)}>Ask our team on WhatsApp</RouteLink></p>}
+        </article>)}
+      </section>
+      <section id="student-support" style={cardStyle}>
+        <h2 style={{ margin: 0 }}>Learning support and your next step</h2>
+        <p>Ask your teacher outside class, or use Study Buddy AI 24 hours a day. For a timetable change or pause within your six-month contract, contact our team. Students abroad can attend online.</p>
+        <p>Use <RouteLink href="/exams/overview">Exams Room (login required)</RouteLink> for timed Goethe-style sample tests, AI examiner practice and feedback. Visitors can <RouteLink href="/exam-practice">explore public exam practice</RouteLink> before signing in.</p>
+      </section>
       <section style={cardStyle}>
         <h2 style={{ margin: 0 }}>Start here</h2>
         <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>

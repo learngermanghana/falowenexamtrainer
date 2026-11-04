@@ -3,13 +3,22 @@ import academy from './publicAcademyProfile.json';
 
 export const VISITOR_WHATSAPP = 'https://wa.me/233205706589';
 export const GOETHE_EXAM_REGISTRATION = 'https://www.goethe.de/ins/gh/en/spr/prf/anm.html';
-export const QUICK_QUESTIONS = ['Is the class hybrid?', 'When is the next A1 class?', 'What are the fees?', 'What is the exam registration fee?', 'How long is the course?', 'Can I learn up to B1 or B2?', 'Can I join late?', 'What does tuition include?', 'Can I pay in instalments?', 'How do I register?', 'Where are you located?', 'What is the minimum age?', 'Can a complete beginner join?', 'Do you help with exam registration?', 'What certificates will I receive?', 'What do I need for online classes?', 'Can I switch attendance each day?', 'What is the refund policy?'];
+export const QUICK_QUESTIONS = ['Is the class hybrid?', 'When is the next A1 class?', 'What are the fees?', 'What is the exam registration fee?', 'How long is the course?', 'Can I learn up to B1 or B2?', 'Can I join late?', 'What does tuition include?', 'Can I pay in instalments?', 'How do I register?', 'Where are you located?', 'What is the minimum age?', 'Can a complete beginner join?', 'Do you help with exam registration?', 'What certificates will I receive?', 'What do I need for online classes?', 'Can I switch attendance each day?', 'What is the refund policy?', 'Can I ask teachers questions outside class?', 'Can I transfer or pause my course?', 'Can I join from abroad?', 'How do I know I am ready for the official exam?'];
 // Admissions policies and A1 exam guidance confirmed by the academy on 2026-11-04.
 // Official exam charges are separate from tuition and Falowen practice access.
 const EXAM_REGISTRATION_ANSWER = 'A1 exam registration is currently GHS 3,000, separate from the class tuition fee. For A2–C2, check the Goethe-Institut Ghana website for the current fee. Please confirm the latest official charge and registration availability before paying.';
 // Edit the approved answers and matching phrases here. Dates come from the
 // public class catalog, and fees come from the same settings as registration.
 export const VISITOR_QUESTIONS = [
+  { id: 'learningSupport', pattern: /\b(study buddy|studybuddy|24[ -]?(?:hours?|7)|outside (?:of )?class|after class|ask (?:my |the )?teachers?|teacher support|learning support|help with homework|questions?.{0,20}teachers?)\b/i,
+    text: 'Yes, you can ask teachers questions outside class. You also have Study Buddy AI support available 24 hours a day in Falowen.', href: '/help#student-support', label: 'Read about learning support' },
+  { id: 'changeClass', pattern: /\b(transfer|pause|change.{0,20}(?:class|timetable|schedule)|switch.{0,20}(?:class|timetable|schedule)|another timetable)\b/i,
+    text: 'Yes, you can transfer to another timetable or pause your course within your six-month contract. Contact our team to arrange the change. The change must remain within that contract period.', handoff: true },
+  { id: 'international', pattern: /\b(abroad|overseas|another country|outside ghana|international students?|from (?:nigeria|germany|uk|usa|canada|europe|america))\b/i,
+    text: 'Yes, we accept students living abroad. You can join online from another country. Check the published class timetable and its time zone before enrolling.', href: '/classes', label: 'Check class times' },
+  { id: 'examReadiness', pattern: /\b(exam readiness|ready.{0,25}(?:exam|goethe)|(?:exam|goethe).{0,25}ready|readiness|check my progress|test my readiness|know.{0,30}prepared)\b/i,
+    text: 'Use the tools in Falowen’s Exams Room to check your readiness. You can practise with Goethe-style sample tests, timers and AI as an examiner. Review your results and feedback to see what still needs practice before taking the official exam.', href: '/exams/overview', label: 'Open Exams Room (login required)' },
+
   { id: 'eligibility', pattern: /\b(minimum age|how old|age limit|(?:16|sixteen|15|fifteen|under.{0,5}16).{0,20}(?:years?|join|enrol|register)|vocational|secondary school|junior high|jhs|education(?:al)? (?:requirements?|qualifications?)|who can (?:join|enrol|register))\b/i,
     text: 'The minimum age is 16. Applicants should have at least vocational training or secondary school education. If you have only junior high school education, our team must assess your eligibility, including whether you can use your phone to access the Falowen app.', handoff: true },
   { id: 'beginner', pattern: /\b(beginner|no (?:prior |previous )?(?:german|knowledge|experience)|(?:need|require).{0,25}(?:prior|previous).{0,15}(?:knowledge|german|experience)|(?:never|cannot|can.t|don.t).{0,20}(?:studied|speak|know).{0,15}german|start from (?:zero|scratch))\b/i,
@@ -72,7 +81,7 @@ export function questionTopic(question) {
   // These confirmed policies take precedence over generic words such as
   // 'registration', 'fees', 'when' and 'class'. Official fee questions still
   // resolve separately below from Falowen documents and registration help.
-  for (const id of ['refund','eligibility','beginner','switchAttendance','examHelp']) {
+  for (const id of ['refund','eligibility','beginner','learningSupport','changeClass','international','examReadiness','switchAttendance','examHelp']) {
     const row = VISITOR_QUESTIONS.find(item => item.id === id);
     if (row.pattern.test(text)) return row;
   }

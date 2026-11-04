@@ -90,3 +90,24 @@ test('advanced fees and unrelated switches do not invent course payment policies
   expect(visitorAnswer('C2 deposit').handoff).toBe(true);
   expect(visitorAnswer('Can I switch levels?').text).not.toContain('Each day you can choose');
 });
+
+
+test.each(['Can I ask teachers questions outside class?', 'Do I have study buddy support?', 'Can I ask a teacher after class?'])('learning support: %s',question=>{
+  const answer=visitorAnswer(question);
+  expect(answer.text).toContain('teachers questions outside class');
+  expect(answer.text).toContain('24 hours a day');
+});
+test.each(['Can I transfer to another timetable?', 'Can I pause my course?', 'Can I change class schedule?'])('timetable changes: %s',question=>{
+  expect(visitorAnswer(question).text).toContain('within your six-month contract');
+  expect(visitorAnswer(question).handoff).toBe(true);
+});
+test.each(['Can I join from abroad?', 'Do you accept students from Nigeria?', 'Can I enrol from another country?'])('international students: %s',question=>{
+  expect(visitorAnswer(question).text).toContain('accept students living abroad');
+  expect(visitorAnswer(question).text).toContain('time zone');
+});
+test.each(['How do I know I am ready for the official exam?', 'How can I check my exam readiness?'])('exam readiness: %s',question=>{
+  const answer=visitorAnswer(question);
+  expect(answer.text).toContain('timers and AI as an examiner');
+  expect(answer.href).toBe('/exams/overview');
+  expect(answer.text).not.toMatch(/guarantee|will pass/);
+});

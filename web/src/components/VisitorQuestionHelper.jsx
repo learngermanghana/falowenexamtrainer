@@ -50,7 +50,7 @@ export default function VisitorQuestionHelper() {
       </div>
       <div className="visitor-helper-suggestions" aria-label="Common questions">{QUICK_QUESTIONS.map(text=><button key={text} type="button" disabled={busy} onClick={()=>ask(text)}>{text}</button>)}</div>
       <form onSubmit={event=>{event.preventDefault();ask(question);}}><label className="visitor-helper-input-label" htmlFor="visitor-question">Your question</label><div><input ref={input} id="visitor-question" value={question} onChange={event=>setQuestion(event.target.value)} maxLength={500} placeholder="Ask about classes or fees…" autoComplete="off"/><button type="submit" disabled={busy || !question.trim()}>Ask</button></div></form>
-      <footer><a href={visitorWhatsAppLink(question)} target="_blank" rel="noopener noreferrer">Prefer a person? WhatsApp us ↗</a><small>Keep personal and payment details out of chat.</small></footer>
+      <footer><a href="/help#admissions-faq">Read all FAQs →</a><br /><a href={visitorWhatsAppLink(question)} target="_blank" rel="noopener noreferrer">Prefer a person? WhatsApp us ↗</a><small>Keep personal and payment details out of chat.</small></footer>
     </section>}
     <button ref={trigger} className="visitor-helper-trigger" type="button" aria-expanded={open} aria-controls="visitor-question-panel" onClick={()=>open ? close() : setOpen(true)}>💬 {open ? 'Close' : 'Questions? Ask us'}</button>
   </aside>;
