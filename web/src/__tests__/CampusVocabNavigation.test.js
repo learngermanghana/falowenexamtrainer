@@ -18,17 +18,17 @@ describe("Campus vocabulary replaces Exam File without removing exam access", ()
   });
 
   it("keeps Music in the mobile bottom bar and Vocab under More", () => {
-    const patch = read("../scripts/patchCompactStudentNavigation.mjs");
+    const patch = read("../../scripts/patchCompactStudentNavigation.mjs");
     expect(patch).toContain('{ key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" }');
     expect(patch).toContain('["vocab", "books", "classMembers", "home"].includes(item.key)');
     expect(patch).not.toContain('    ["music", "books", "classMembers", "home"].includes(item.key)');
   });
 
   it("keeps documentation consistent with restored Campus vocabulary", () => {
-    const help = read("../web/public/falowen-help.md");
+    const help = read("../public/falowen-help.md");
     const guide = read("components/PublicStudentGuidePage.js");
-    const nav = JSON.parse(read("../web/public/falowen-navigation.json"));
-    const llms = read("../web/public/llms.txt");
+    const nav = JSON.parse(read("../public/falowen-navigation.json"));
+    const llms = read("../public/llms.txt");
     expect(nav.navigation.find(item => item.id === "vocabulary").route).toBe("/campus/vocab");
     expect(nav.navigation.find(item => item.id === "exam-file").route).toBe("/exams/file");
     expect(help).toContain("More → Vocab");
