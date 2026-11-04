@@ -262,3 +262,16 @@ html,body { background:#0e1921; }
 
 /* Song pages open directly into the listening room, without homepage promotion. */
 body.song-detail-open .hero { display: none; }
+
+/* Give existing song photography more room without crowding controls. */
+.track-art{aspect-ratio:1.25}
+.day-group .track-art{height:140px}
+.detail-cover{width:220px;height:165px}
+.player-cover{width:64px;height:64px}
+@media(max-width:700px){
+ .track-art{aspect-ratio:1.1}
+ .day-group .track-art{height:125px}
+ .detail-cover{width:140px;height:105px}
+ .player-cover{display:grid;width:48px;height:48px}
+ .player-details{min-width:0;flex:1 1 120px}
+}

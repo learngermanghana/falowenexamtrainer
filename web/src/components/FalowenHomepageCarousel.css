@@ -249,3 +249,8 @@
   .falowen-carousel-content,
   .falowen-carousel-courses .falowen-carousel-content { height: 535px; min-height: 0; }
 }
+
+/* Compact existing song artwork in the music preview. */
+.falowen-slide-music-art{width:118px;height:118px;border:0;border-radius:16px;overflow:hidden;background:#29254e;flex-shrink:0}
+.falowen-slide-music-art img{width:100%;height:100%;object-fit:cover;display:block}
+@media(max-width:700px){.falowen-slide-music-art{width:64px;height:64px;border:0;border-radius:12px}.falowen-slide-music-player{grid-template-columns:64px minmax(0,1fr)}}
