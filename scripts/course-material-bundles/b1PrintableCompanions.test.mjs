@@ -118,6 +118,6 @@ test("B1 Day 1 Hören is printable from canonical questions without a live audio
   });
   assert.match(html, /Audio in der Falowen-Lektion/);
   assert.match(html, /Fragen/);
-  assert.match(html, /B1 Day 1/);
+  assert.match(html, /FALOWEN · B1 · Tag 1/);
   assert.doesNotMatch(html, /Audio wird geladen|X-Amz-Signature|studentUid/);
 });
