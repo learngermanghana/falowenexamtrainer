@@ -85,7 +85,7 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
   it("keeps Personen beschreiben speaking practice separate from the Teil 2 boss letter", () => {
     const source = read("A2Day2PersonenBeschreibenWorkbookPage.js");
 
-    expect(source).toContain('eyebrow="Group practice"');
+    expect(source).toContain('eyebrow="Präsentationsübung"');
     expect(source).toContain('title="Teil 1 · Sprechen"');
     expect(source).toContain('title="Brief an Felix: Mein Chef / Meine Chefin"');
     expect(source).toContain("Beschreibe das Aussehen deines Chefs / deiner Chefin.");
@@ -133,7 +133,7 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
     const grammar = read("A2Day10PraeteritumGrammarPage.js");
 
-    expect(day10).toContain('eyebrow="Group practice"');
+    expect(day10).toContain('eyebrow="Präsentationsübung"');
     expect(day10).toContain('title="Teil 1 · Sprechen"');
     expect(grammar).toContain("Präteritum und Perfekt: Was ist der Unterschied?");
     expect(grammar).toContain("Regelmäßige Verben: Stamm + -te");
