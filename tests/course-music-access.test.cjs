@@ -196,3 +196,38 @@ test('A2 Day 21 weekend classroom Hören signs only the supplied teacher recordi
  }
  assert.throws(()=>signTrack('a2-day21-weekend-classroom',env),/Unknown/);
 });
+
+test('B1 Day 26 signs the supplied a2-prefix upload only for the exact lesson and staff', async () => {
+ const {createClassroomAudioHandler,createClassroomBankAudioHandler}=require('../server/courseMusic.cjs');
+ const key='a2/day-26/reiseprobleme-und-losungen.mp3';
+ const staff={localId:'teacher',customAttributes:'{"role":"teacher"}'};
+ const cases=[
+  [null,'B1',26,key,401],
+  [{localId:'student',email:'student@example.com'},'B1',26,key,403],
+  [staff,'B1',26,key,200],
+  [{...staff,disabled:true},'B1',26,key,401],
+  [staff,'A2',26,key,400],
+  [staff,'B1',25,key,400],
+  [staff,'B1',26,'b1/day-26/reiseprobleme-und-losungen.mp3',400],
+  [staff,'B1',26,'a2/day-26/day-26.mp3',400],
+  [staff,'B1',26,'a2/day-26/../secret.mp3',400],
+  [staff,'B1',26,'a2/day-26/reiseprobleme-und-losungen.wav',400],
+ ];
+ for(const [account,level,day,requested,expected] of cases){
+  const handler=createClassroomAudioHandler({env,fetchImpl:async()=>({ok:true,json:async()=>({users:account?[account]:[]})})});
+  const res=response();
+  await handler({method:'GET',headers:account?{authorization:'Bearer test-teacher-token',origin:'https://admin.falowen.app'}:{},url:'/course-media/classroom/audio-url?'+new URLSearchParams({level,day:String(day),key:requested})},res);
+  assert.equal(res.code,expected,level+' '+day+' '+requested);
+  assert.equal(Boolean(res.body.url),expected===200);
+  if(expected===200){
+   assert.equal(new URL(res.body.url).pathname,'/'+key);
+   assert.equal(res.headers['Cache-Control'],'private, no-store');
+   assert.equal(res.headers['Access-Control-Allow-Origin'],'https://admin.falowen.app');
+  }
+ }
+ const legacy=createClassroomBankAudioHandler({env,fetchImpl:async()=>({ok:true,json:async()=>({users:[staff]})})});
+ const res=response();
+ await legacy({method:'GET',headers:{authorization:'Bearer test-teacher-token'},url:'/course-media/a2/classroom-audio-url?'+new URLSearchParams({day:'26',key})},res);
+ assert.equal(res.code,400,'the legacy A2 signer must not gain this B1 permission');
+ assert.throws(()=>signTrack('b1-day26-travel-problems',env),/Unknown/,'never expose private classroom Hören as public music');
+});
