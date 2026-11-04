@@ -65,7 +65,7 @@ function SlideIllustration({kind,language}) {
     <div className="falowen-slide-illustration falowen-slide-music" aria-hidden="true">
       <div className="falowen-slide-music-player">
         <div className="falowen-slide-music-top"><span className="falowen-slide-music-mark">♫</span> FALOWEN MUSIC</div>
-        <div className="falowen-slide-music-art">♪</div>
+        <div className="falowen-slide-music-art"><img src="/music/covers/photos/friendship.jpg" alt="" loading="lazy" decoding="async" /></div>
         <strong>Deutsch mit Musik</strong>
         <small>A1 · A2 · B1</small>
         <div className="falowen-slide-music-wave">

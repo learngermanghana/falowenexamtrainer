@@ -74,3 +74,11 @@ This preview does not collect listening analytics or load the standalone music
 app. The full song link opens the existing lyrics/listening page. Featured IDs
 are curated in `web/src/lib/homepageMusic.js`; audio titles, URLs and pictures
 remain owned by the canonical public Music manifests.
+
+### Artwork sizing — 4 November 2026
+
+The homepage Music carousel reuses the existing credited friendship photograph
+as a compact 118px preview (64px on mobile). Public Music shows moderately
+larger covers in song cards, the detail heading and the persistent player;
+mobile player artwork remains visible while text and controls can wrap. These
+are display-only changes with no new media, audio requests or lyric changes.
