@@ -1,7 +1,7 @@
 # Falowen Help & Navigation Knowledge Base
 
 **Official Falowen source for learners, support staff, search engines and AI assistants.**  
-Last reviewed: **1 November 2026**.
+Last reviewed: **4 November 2026**.
 
 Falowen is a language-learning campus that combines structured lessons, Falowen Radio, workbooks, teacher-marked assignments, results, attendance, exam support, vocabulary practice, account management and an in-app Study Buddy.
 
@@ -22,11 +22,11 @@ Generated A1–C2 lesson/course map: https://www.falowen.app/falowen-course-map.
 | Browse books without leaving Campus | Books | https://www.falowen.app/campus/books |
 | Scores and tutor feedback | Results | https://www.falowen.app/campus/results |
 | Class attendance | Attendance | https://www.falowen.app/campus/attendance |
-| Goethe/exam information | Exam File | https://www.falowen.app/campus/examFile |
+| Goethe/exam information | Exams Room → Exam File and Date | https://www.falowen.app/exams/file |
 | Exam-style practice | Exams Room | https://www.falowen.app/exams/overview |
 | Study/exam planning | Study Calendar | https://www.falowen.app/exams/study |
 | German learning songs | Music | https://www.falowen.app/campus/music |
-| Vocabulary practice | Exams Room → Vocab | https://www.falowen.app/exams/vocab |
+| Vocabulary practice | Campus → Vocab (mobile: More → Vocab) | https://www.falowen.app/campus/vocab |
 | Profile and student data | Account → Student Data | https://www.falowen.app/campus/account?tab=studentData |
 | Notification settings | Account → Notifications | https://www.falowen.app/campus/account?tab=notifications |
 | Tuition, balance, history, receipts | Account → Billing | https://www.falowen.app/campus/account?tab=billing |
@@ -38,11 +38,11 @@ Campus routes require a Falowen account and may redirect a learner who has not y
 
 For a signed-in learner, use the **current visible navigation labels** when giving directions.
 
-- **Mobile:** the campus navigation includes **Course Book**, **Music**, **Books**, **Attendance**, **Results**, and other available destinations.
-- **Desktop:** the campus navigation row includes **Course Book**, **Music**, **Books**, **Attendance**, **Results**, and other available destinations.
+- **Mobile:** the main bottom navigation shows **Course Book**, **Music**, **Attendance**, **Results** and **More**. Open **More → Vocab** for vocabulary practice, alongside Books and other available destinations.
+- **Desktop:** the campus navigation row includes **Course Book**, **Music**, **Books**, **Vocab**, **Attendance**, **Results**, and other available destinations.
 - **Course Book:** tap or click **Course Book** to open https://www.falowen.app/campus/course.
 - Inside the Course Book, the learner sees the **Course Book** heading, progress, next lesson and the **Continue learning** action.
-- **Music** opens the Falowen Music listening room at https://www.falowen.app/campus/music. Existing `/campus/vocab` bookmarks redirect there. Vocabulary practice remains available under Exams Room → Vocab.
+- **Music** opens the Falowen Music listening room at https://www.falowen.app/campus/music. **Vocab** opens level-based vocabulary browse, flashcards and quizzes at https://www.falowen.app/campus/vocab. On mobile, choose **More → Vocab**. Older `/campus/vocab` bookmarks now open vocabulary again.
 - **Music lyrics:** the public site is https://music.falowen.app/. On supported songs, open **Lyrics & words** and select **Show English** (A1 defaults on where translations match; A2/B1 default off). Only approved, exact-recording lyric packs have verified status. Approximate or Whisper-estimated highlighting and unverified studio drafts are labeled as such. Music in tutor workbooks is optional and ungraded.
 - **ChatGPT Learning Companion:** the authenticated connection can read a student's own course/profile, lessons, assignments, feedback and available next class. It cannot officially submit assignments or change marks. A deployed MCP backend is not proof of public Plugin Directory publication.
 - **Books** opens the bookstore inside Campus at https://www.falowen.app/campus/books, with book details and checkout under the Campus navigation. The public storefront remains at https://www.falowen.app/books. Secure Paystack payment opens on Paystack.
@@ -101,7 +101,7 @@ A2 and B1 use a consistent lesson flow with grammar/learning material, workbook 
 
 B2 and C1 are self-learning tracks with AI support. Published teacher-marked lessons can still show a locked teacher-submission panel. Planned assignments should not be presented as available before they are published.
 
-For B2/C1 self-learning students, **Exam File is available**. Standard class **Attendance and Class Members** remain hidden. They should primarily use Course Book, Music, Results, Exam File and Account.
+For B2/C1 self-learning students, **Exam File and Date is available in the Exams Room**. Standard class **Attendance and Class Members** remain hidden. Their Campus destinations include Course Book, Music, Vocab, Results and Account.
 
 ### C2
 
@@ -171,7 +171,7 @@ Translate informal student wording to the exact current Falowen label:
 | homework, assignment, course material, my lesson | Course Book |
 | marks, grades, correction, feedback | Results |
 | songs, music, listening room | Music |
-| words, vocabulary practice | Exams Room → Vocab |
+| words, vocabulary practice | Campus → Vocab (mobile: More → Vocab) |
 | fees, tuition, balance, receipt, payment | Account → Billing |
 | exam practice, mock exam, Goethe practice | Exams Room |
 | study plan, exam plan | Study Calendar |
@@ -198,7 +198,7 @@ B2/C1 self-learning tracks intentionally do not show the standard class Attendan
 
 ## Exam support
 
-- **Exam File:** https://www.falowen.app/campus/examFile — exam details and Goethe-related information for enrolled A1–C2 learners.
+- **Exam File and Date:** https://www.falowen.app/exams/file — exam details and Goethe-related information inside the Exams Room.
 - **Exams Room:** https://www.falowen.app/exams/overview — separate exam-style practice. This is not the normal Course Book assignment flow.
 - **Study Calendar:** https://www.falowen.app/exams/study — study and exam-preparation planning.
 
@@ -294,7 +294,7 @@ Send applicable class-based learners to https://www.falowen.app/campus/attendanc
 Send them to Attendance and tell them to generate/download the Attendance Record / Attendance Transcript.
 
 ### “Where do I see exam information?”
-Send enrolled A1–C2 learners to Exam File: https://www.falowen.app/campus/examFile.
+Send enrolled A1–C2 learners to Exams Room → Exam File and Date: https://www.falowen.app/exams/file. Old `/campus/examFile` bookmarks redirect there.
 
 ### “I want exam practice.”
 Send them to Exams Room: https://www.falowen.app/exams/overview.
@@ -303,7 +303,7 @@ Send them to Exams Room: https://www.falowen.app/exams/overview.
 Send them to https://www.falowen.app/exams/study.
 
 ### “Where do I practise vocabulary?”
-Send them to https://www.falowen.app/exams/vocab in Exams Room. The former campus Vocab page now opens Music.
+Send them to Campus → Vocab at https://www.falowen.app/campus/vocab. On mobile, tap **More → Vocab**; Music remains a main bottom-navigation item.
 
 ### “Where do I pay or check my balance?”
 Send them to Account → Billing: https://www.falowen.app/campus/account?tab=billing.
@@ -331,8 +331,8 @@ The activity may be self-practice or not currently teacher-marked. Do not tell t
 ### No result yet
 Check Results. Marking or synchronization may still be pending.
 
-### Cannot see Attendance, Exam File or Class Members
-For B2/C1 self-learning, Attendance and Class Members are intentionally hidden; Exam File is available.
+### Cannot see Attendance or Class Members
+For B2/C1 self-learning, Attendance and Class Members are intentionally hidden; Exam File and Date is available in the Exams Room.
 
 ### Payment made but access has not updated
 Use the setup/account status refresh flow. The payment-complete flow also refreshes the learner's account status.

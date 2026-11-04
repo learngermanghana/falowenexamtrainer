@@ -180,7 +180,7 @@ const CampusPrimaryNavigation = ({ allowedSections }) => {
 
 const MOBILE_NAV_ITEMS = [
   { key: "learn", label: "Learn", icon: "▤", route: "/campus/course", permission: "course" },
-  { key: "vocab", label: "Vocab", icon: "✦", route: "/campus/vocab", permission: "vocab" },
+  { key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" },
   { key: "attendance", label: "Attendance", icon: "✓", route: "/campus/attendance", permission: "attendance" },
   { key: "results", label: "Results", icon: "◎", route: "/campus/results", permission: "results" },
 ];
@@ -189,7 +189,7 @@ const CampusMobileBottomNav = ({ allowedSections }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const moreItems = getCampusNavigationItems(allowedSections).filter((item) =>
-    ["music", "books", "classMembers", "home"].includes(item.key)
+    ["vocab", "books", "classMembers", "home"].includes(item.key)
   );
   const moreActive = moreItems.some((item) => isCampusNavigationItemActive(item, location));
 
@@ -258,12 +258,16 @@ app = app
     'if (item.key === "vocab") return location.pathname.startsWith("/campus/vocab");',
   )
   .replaceAll(
-    '{ key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" }',
     '{ key: "vocab", label: "Vocab", icon: "✦", route: "/campus/vocab", permission: "vocab" }',
+    '{ key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" }',
   )
   .replaceAll(
     '["books", "examFile", "classMembers", "home"].includes(item.key)',
+    '["vocab", "books", "classMembers", "home"].includes(item.key)',
+  )
+  .replaceAll(
     '["music", "books", "classMembers", "home"].includes(item.key)',
+    '["vocab", "books", "classMembers", "home"].includes(item.key)',
   );
 
 // Keep the generated Music destination correct on already-patched worktrees.

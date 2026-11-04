@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastReviewed": "2026-11-01",
+  "lastReviewed": "2026-11-04",
   "canonicalBaseUrl": "https://www.falowen.app",
   "sourceOfTruth": {
     "humanHelp": "https://www.falowen.app/help",
@@ -100,8 +100,8 @@
     {
       "id": "vocabulary",
       "label": "Vocab",
-      "route": "/exams/vocab",
-      "purpose": "Practice vocabulary inside Exams Room; the former Campus Vocab destination now opens Music",
+      "route": "/campus/vocab",
+      "purpose": "Practise level-based vocabulary in Campus through browsing, flashcards and quizzes; on mobile, use More → Vocab (Music stays in the main bottom navigation)",
       "requiresLogin": true,
       "aliases": [
         "vocabulary",
@@ -137,9 +137,9 @@
     },
     {
       "id": "exam-file",
-      "label": "Exam File",
-      "route": "/campus/examFile",
-      "purpose": "View Goethe/exam information for applicable enrolled tracks",
+      "label": "Exam File and Date",
+      "route": "/exams/file",
+      "purpose": "View Exam File and Date and Goethe/exam information inside the Exams Room; older /campus/examFile bookmarks redirect here",
       "requiresLogin": true,
       "aliases": [
         "exam information",
@@ -369,8 +369,8 @@
     "A1": "Mixes foundation lessons, self-practice and teacher-marked assignments. Do not describe every workbook as a submission.",
     "A2": "Uses lesson material, workbooks and teacher-marked submissions. Falowen Radio may gate the workbook.",
     "B1": "Uses lesson material, workbooks and teacher-marked submissions. Falowen Radio may gate the workbook.",
-    "B2": "Self-learning track with AI support. Exam File is available; standard class Attendance and Class Members remain hidden.",
-    "C1": "Self-learning track with AI support. Exam File is available; standard class Attendance and Class Members remain hidden.",
+    "B2": "Self-learning track with AI support. Exam File and Date is available in the Exams Room; standard class Attendance and Class Members remain hidden.",
+    "C1": "Self-learning track with AI support. Exam File and Date is available in the Exams Room; standard class Attendance and Class Members remain hidden.",
     "C2": "Advanced self-learning and AI-supported practice. Do not invent a teacher-marked assignment requirement unless the current page explicitly provides one."
   },
   "deprecatedLabels": [
@@ -396,7 +396,7 @@
     },
     {
       "problem": "B2/C1 cannot see Attendance or Class Members",
-      "action": "These class-based tabs are intentionally hidden for B2/C1 self-learning. Exam File is available."
+      "action": "These class-based tabs are intentionally hidden for B2/C1 self-learning. Exam File and Date is available in the Exams Room."
     },
     {
       "problem": "Payment was made but access has not updated",
