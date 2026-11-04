@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, within, cleanup } from "@testing-library/react";
 import SpeakingMindMap from "./SpeakingMindMap";
 import SmallTalkWorkbook from "./A2Day2SmallTalkWorkbookEnhancedPage";
+import CityWorkbook from "./A2Day10TourismusTraditionelleFesteWorkbookPage";
 import RestaurantWorkbook from "./A2Day8RezepteUndEssenWorkbookPage";
 
 jest.mock("./A2StandardTabbedWorkbookPage", () => ({ sprechenContent }) => <div>{sprechenContent}</div>);
@@ -51,4 +52,9 @@ test("restaurant practice includes a presentation followed by a separate dialogu
   expect(screen.getByRole("region", { name: "A2 presentation task" })).toHaveTextContent("Was machst du, wenn du ins Restaurant gehst?");
   expect(screen.getByText("Restaurant-Rollenspiel")).toBeInTheDocument();
   expect(screen.getByText(/Eine Person ist Gast/)).toBeInTheDocument();
+});
+
+test("Day 10 presentation page imports and renders without undefined style references", () => {
+  render(<CityWorkbook />);
+  expect(screen.getByRole("region", { name: "A2 presentation task" })).toHaveTextContent("Welche Stadt möchtest du kennenlernen?");
 });

@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { A2_PRESENTATION_CARDS } from "../web/src/data/a2PresentationCards.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -43,13 +44,9 @@ const requiredMarkers = {
     '<SpeakingMindMap config={getA2SpeakingMindMap(day)} />',
   ],
   "web/src/data/speakingMindMaps/a2/index.js": [
-    '[2, "a2-day-2-personen-beschreiben", "Deine Beschreibung", "Kannst du eine Person beschreiben? Wie sieht sie aus und was für ein Mensch ist sie?"',
-  ],
-  "web/src/data/speakingMindMaps/a2/personenBeschreiben.js": [
-    'id: "aussehen"',
-    'id: "charakter"',
-    'id: "kleidung"',
-    'id: "besondere-merkmale"',
+    'import { A2_PRESENTATION_CARDS } from "../../a2PresentationCards"',
+    "const card = A2_PRESENTATION_CARDS[day]",
+    "presentation: card",
   ],
 };
 
@@ -132,6 +129,22 @@ for (const [file, markers] of Object.entries(forbiddenMarkers)) {
       throw new Error(`Obsolete source marker returned in ${file}: ${marker}`);
     }
   }
+}
+
+// Audit the canonical task data, rather than the retired inline question syntax.
+if (Object.keys(A2_PRESENTATION_CARDS).length !== 28) {
+  throw new Error("A2 presentation cards must cover all 28 curriculum days.");
+}
+for (let day = 1; day <= 28; day += 1) {
+  const card = A2_PRESENTATION_CARDS[day];
+  if (!card?.prompt || card.keywords?.length !== 4 || card.branches?.length !== 4 ||
+      !card.instruction || !card.instructionEn ||
+      card.branches.some((point, index) => point.label !== card.keywords[index] || !point.starter || !point.modelSentence)) {
+    throw new Error(`Incomplete A2 presentation card for Day ${day}.`);
+  }
+}
+if (A2_PRESENTATION_CARDS[1].prompt !== "Wer bist du?") {
+  throw new Error("Small Talk must use the personal introduction presentation task.");
 }
 
 console.log("Course media and A2 speaking source audit passed without modifying files.");
