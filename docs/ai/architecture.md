@@ -41,3 +41,18 @@ questions load the existing public class catalog on demand. No AI request,
 background polling, database write or persistent chat history is introduced.
 Unknown questions and unconfirmed class/fee details offer the existing admissions
 WhatsApp contact with the visitor's question prefilled; the visitor chooses to send.
+
+Admissions answers confirmed on 2026-11-04 cover hybrid attendance, recorded
+lectures, a 10-week course, and a six-month total contract. Three months of free
+catch-up for travel/illness are within that contract, not an extension after it.
+Late entry requires fewer than four completed sessions and recorded catch-up;
+the team confirms the session count. Tuition includes app access and digital
+books; physical books are requested through `/books`. Official exam registration
+is separate: academy-provided A1 guidance is GHS 3,000, while A2–C2 link to
+Goethe Ghana for current fees without an unverified price ceiling.
+
+Each level takes 10 weeks and is paid for separately. Learners may continue to
+their preferred target level (for example B1/B2), use mock samples along the
+way, and sit the official exam for that target level rather than every level.
+This describes the academy's learning pathway, not a waiver of a receiving
+organisation's certificate requirements. Official exam registration remains separate.
