@@ -4,6 +4,7 @@ import { WorkbookTaskCard } from "./StandardWorkbookComponents";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
+const paragraph = { margin: 0, lineHeight: 1.7 };
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const sprechenContent = (
