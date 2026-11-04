@@ -29,7 +29,8 @@ export default function VisitorQuestionHelper() {
         classes = await catalog.current;
         if (!classes.length) catalog.current = null;
       }
-      const answer = visitorAnswer(text, {classes});
+      const context = /^(www\.)?exams\.falowen\.app$/.test(window.location.hostname) ? 'exams' : window.location.pathname.startsWith('/books') ? 'books' : '';
+      const answer = visitorAnswer(text, {classes, context});
       if (mounted.current) setMessages(previous => [...previous, {answer, questionText:text}]);
     } catch {
       catalog.current = null;
