@@ -4,6 +4,7 @@ import { persistInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
 import academyProfile from "../data/publicAcademyProfile.json";
 import FalowenHomepageCarousel from "./FalowenHomepageCarousel";
+import HomepageMusicPlayer from "./HomepageMusicPlayer";
 import "./LandingPageMarketing.css";
 
 const COPY = {
@@ -190,6 +191,8 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
         </nav>
 
         <FalowenHomepageCarousel language={language} classroomImage={academyProfile.classroomImage} onSignUp={signup} />
+
+        <HomepageMusicPlayer language={language} />
 
         <section className="falowen-home-support" aria-labelledby="falowen-support-heading">
           <div className="falowen-home-support-copy">

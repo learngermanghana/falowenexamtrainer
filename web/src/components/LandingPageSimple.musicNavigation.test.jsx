@@ -7,7 +7,8 @@ import LandingPageSimple from "./LandingPageSimple";
 
 jest.mock("../i18n", () => ({ persistInterfaceLanguage: jest.fn() }));
 jest.mock("../lib/pageMeta", () => ({ updatePageMeta: jest.fn() }));
-jest.mock("./FalowenHomepageCarousel", () => () => null);
+jest.mock("./FalowenHomepageCarousel", () => () => <div data-testid="homepage-carousel" />);
+jest.mock("./HomepageMusicPlayer", () => () => <section data-testid="homepage-music" />);
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({
     i18n: {
@@ -47,4 +48,13 @@ test("keeps the navigation visible and horizontally reachable on small screens",
   expect(mobileNavStyles).toContain("display: flex");
   expect(mobileNavStyles).toContain("overflow-x: auto");
   expect(mobileNavStyles).not.toContain(".falowen-home-nav-links { display: none; }");
+});
+
+test("places music after the carousel and before the support section", () => {
+  const { container } = render(<LandingPageSimple />);
+  const carousel = screen.getByTestId("homepage-carousel");
+  const music = screen.getByTestId("homepage-music");
+  const support = container.querySelector(".falowen-home-support");
+  expect(carousel.nextElementSibling).toBe(music);
+  expect(music.nextElementSibling).toBe(support);
 });
