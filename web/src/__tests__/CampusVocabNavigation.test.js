@@ -17,6 +17,26 @@ describe("Campus vocabulary replaces Exam File without removing exam access", ()
     expect(app).not.toContain('<Route path="/campus/vocab" element={<Navigate to="/campus/music"');
   });
 
+  it("keeps Music in the mobile bottom bar and Vocab under More", () => {
+    const patch = read("../scripts/patchCompactStudentNavigation.mjs");
+    expect(patch).toContain('{ key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" }');
+    expect(patch).toContain('["vocab", "books", "classMembers", "home"].includes(item.key)');
+    expect(patch).not.toContain('    ["music", "books", "classMembers", "home"].includes(item.key)');
+  });
+
+  it("keeps documentation consistent with restored Campus vocabulary", () => {
+    const help = read("../web/public/falowen-help.md");
+    const guide = read("components/PublicStudentGuidePage.js");
+    const nav = JSON.parse(read("../web/public/falowen-navigation.json"));
+    const llms = read("../web/public/llms.txt");
+    expect(nav.navigation.find(item => item.id === "vocabulary").route).toBe("/campus/vocab");
+    expect(nav.navigation.find(item => item.id === "exam-file").route).toBe("/exams/file");
+    expect(help).toContain("More → Vocab");
+    expect(help).not.toContain("vocab\` bookmarks redirect there");
+    expect(guide).toContain('href="/campus/vocab"');
+    expect(llms).toContain("Vocabulary practice (Campus; mobile More → Vocab)");
+  });
+
   it("keeps Exam File and Date in the Exams Room and redirects old Campus links there", () => {
     expect(app).toContain('<Route path="/campus/examFile" element={<Navigate to="/exams/file" replace />} />');
     expect(app).toContain('{ key: "file", label: t("appNav.examTabs.file") }');
