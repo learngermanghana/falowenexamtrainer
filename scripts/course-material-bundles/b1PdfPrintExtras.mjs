@@ -178,6 +178,7 @@ export const findB1PrintFaults = text => {
     ["workbook tab instructions", /Select Grammar,\s*Teil\s*1/i],
     ["saved learner state", /Draft saved|Your saved answers|Recognised speech|Recognized speech|Your corrected sentences/i],
     ["unhydrated lesson", /Loading grammar notes|Loading the app|Unexpected Application Error/i],
+    ["unresolved audio-loading placeholder", /Audio wird geladen\s*(?:…|\.{2,3})?/i],
     ["private media token", /X-Amz-(?:Signature|Credential)|[?&](?:token|signature|access_token)=|r2\.cloudflarestorage\.com/i],
   ];
   return forbidden.filter(([,regex])=>regex.test(String(text))).map(([name])=>name);

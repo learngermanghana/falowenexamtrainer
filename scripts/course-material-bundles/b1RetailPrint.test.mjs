@@ -75,6 +75,7 @@ test("B1 retail PDF flags forbidden QR-only and live website messages",()=>{
   assert.ok(findB1PrintFaults("Draft saved").length);
   assert.ok(findB1PrintFaults("Back to Course Book").length);
   assert.deepEqual(findB1PrintFaults("Teil 3 · Lesen – Lies den Text und beantworte die Fragen"),[]);
+  assert.deepEqual(findB1PrintFaults("Audio wird geladen…"), ["unresolved audio-loading placeholder"]);
   assert.match(B1_PRINT_CSS,/overflow: visible !important/);
   assert.match(B1_PRINT_CSS,/header\.app-header--compact/);
 });

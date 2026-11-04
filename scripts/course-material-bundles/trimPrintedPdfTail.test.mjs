@@ -133,3 +133,39 @@ test("A2 print tail cleanup keeps generic notice pages outside a read-only Teil 
     assert.equal((await PDFDocument.load(fs.readFileSync(filename))).getPageCount(), 2);
   });
 });
+
+
+test("B1 opt-in removes white interior overflow without deleting printed exercises", async () => {
+  await withFixture(async (pdf, font) => {
+    pdf.addPage().drawText("B1 Day 1 Grammar: Satzbau und Konjugation", { x: 50, y: 700, font });
+    pdf.addPage(); // Chromium's empty interior overflow sheet
+    pdf.addPage().drawText("B1 Workbook: Lesen Sie den Text und beantworten Sie die Fragen", { x: 50, y: 700, font });
+  }, async (filename) => {
+    const result = await trimPrintedPdfTail(filename, { description: "B1 Day 1 workbook", removeBlankInterior: true });
+    assert.deepEqual(result, { before: 3, after: 2, removed: 1 });
+    const printed = await PDFDocument.load(fs.readFileSync(filename));
+    assert.equal(printed.getPageCount(), 2);
+  });
+});
+
+test("B1 opt-in preserves textless illustrated pages", async () => {
+  await withFixture(async (pdf, font) => {
+    pdf.addPage().drawText("B1 Wortschatz", { x: 50, y: 700, font });
+    pdf.addPage().drawRectangle({ x: 80, y: 210, width: 320, height: 260, color: rgb(0.94, 0.94, 0.94) });
+    pdf.addPage().drawText("B1 Aufgaben", { x: 50, y: 700, font });
+  }, async (filename) => {
+    const result = await trimPrintedPdfTail(filename, { description: "B1 Day 2 grammar", removeBlankInterior: true });
+    assert.equal(result.removed, 0);
+    assert.equal(result.after, 3);
+  });
+});
+
+test("B1 opt-in does not turn an entirely blank source into an approved PDF", async () => {
+  await withFixture(async (pdf) => {
+    pdf.addPage();
+    pdf.addPage();
+  }, async (filename) => {
+    const result = await trimPrintedPdfTail(filename, { description: "B1 empty source", removeBlankInterior: true });
+    assert.equal(result.after, 1);
+  });
+});

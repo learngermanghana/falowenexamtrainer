@@ -12,6 +12,7 @@ import { buildB1ReadOnlyPrintHtml, getB1ReadOnlyParts, getB1PdfLessonCompanionUr
 import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
 import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2PrintSafety, assertA2PrintedContent } from "./a2PdfSafety.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
+import { scanPdfPageContent } from "./pdfPageAudit.mjs";
 import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent } from "./b1PdfPrintExtras.mjs";
 import { addB1RetailCover } from "./b1RetailCover.mjs";
 
@@ -287,6 +288,9 @@ const suppressPdfChromeText = async (page) => page.evaluate(() => {
     [/Download\s+this\s+workbook\s+as\s+PDF/gi, ""],
     [/Day\s+\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook/gi, ""],
     [/\b\d+\s+of\s+\d+\s+answered\b/gi, ""],
+    // Transient audio player status is not a lesson exercise. Scrub its
+    // exact text nodes even when nested inside an otherwise useful card.
+    ...(level === "B1" ? [[/Audio\s+wird\s+geladen\s*(?:…|\.{2,3})?/gi, ""]] : []),
   ];
   const changes = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -356,7 +360,17 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       if (faults.length) throw new Error("B1 Day " + lesson.day + " " + suffix +
         " printed website/private content: " + faults.join(", "));
       assertB1PrintedContent(b1ExpectedText, printed);
-      await trimPrintedPdfTail(file, { description: `B1 Day ${lesson.day} ${suffix}` });
+      await trimPrintedPdfTail(file, {
+        description: "B1 Day " + lesson.day + " " + suffix,
+        removeBlankInterior: true,
+      });
+      const cleaned = execFileSync("pdftotext", ["-layout", file, "-"],
+        { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+      const cleanPdf = await PDFDocument.load(fs.readFileSync(file));
+      const audit = scanPdfPageContent(cleaned, cleanPdf.getPageCount());
+      if (audit.faults.length) throw new Error(
+        "B1 Day " + lesson.day + " " + suffix + " failed print-page audit:\n" + audit.faults.join("\n")
+      );
     }
   } finally {
     if (level === "B1") await page.evaluate(restoreB1PrintView).catch(() => {});
@@ -500,7 +514,18 @@ const renderReadOnlyB1Section = async (page, lesson, part, filename = part) => {
     if (faults.length) throw new Error("B1 Day " + lesson.day + " " + part +
       " companion contains excluded content: " + faults.join(", "));
     assertA2PrintedContent(expectedText, printedText);
-    await trimPrintedPdfTail(file, { description: "B1 Day " + lesson.day + " " + part + " companion" });
+    await trimPrintedPdfTail(file, {
+      description: "B1 Day " + lesson.day + " " + part + " companion",
+      removeBlankInterior: true,
+    });
+    const cleanText = execFileSync("pdftotext", ["-layout", file, "-"],
+      { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+    const cleanPdf = await PDFDocument.load(fs.readFileSync(file));
+    const audit = scanPdfPageContent(cleanText, cleanPdf.getPageCount());
+    if (audit.faults.length) throw new Error(
+      "B1 Day " + lesson.day + " " + part + " companion failed print-page audit:\n" +
+      audit.faults.join("\n")
+    );
   } finally {
     await printPage.close();
   }
