@@ -27,7 +27,14 @@ A contract change involving both learner assignment submission and Admin marking
 
 ## Public landing-page questions
 
-`VisitorQuestionHelper` adds a floating, browser-local enquiry panel to the homepage.
+`VisitorQuestionHelper` adds a floating, browser-local enquiry panel to public marketing,
+placement, books, class, review, music and exam-practice pages. The route
+allowlist in `publicVisitorPaths.js` excludes learner campus and protected exams.
+Static public HTML (including the Exams subdomain and class brochures) receives
+the same helper from the Vite `publicVisitorHelper` build plugin; React routes
+use `PublicVisitorQuestionHelper`, while the homepage retains its existing mount.
+Exam/book price questions link to their respective pricing pages instead of
+returning course tuition.
 `web/src/data/visitorQuestions.js` owns its question patterns and approved answers;
 fees reuse `levelFees.js`, location reuses `publicAcademyProfile.json`, and class
 questions load the existing public class catalog on demand. No AI request,

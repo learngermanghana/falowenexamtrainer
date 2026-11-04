@@ -5,6 +5,7 @@ import './index.css';
 import './goetheFreeChatMobile.css';
 import './i18n';
 import App from './App';
+import PublicVisitorQuestionHelper from './components/PublicVisitorQuestionHelper';
 import AppStartupBoundary from './components/AppStartupBoundary';
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
 import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
@@ -123,6 +124,7 @@ root.render(
     <AppStartupBoundary>
       <BrowserRouter>
         <AppMountedSignal />
+        <PublicVisitorQuestionHelper />
         <RouteScopedBackgroundServices />
         {isFalowenRadioSeoPage ? (
           <FalowenRadioSeoPage />

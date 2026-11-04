@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import publicVisitorHelper from './build-plugins/publicVisitorHelper.mjs';
 
 const getClientEnv = (mode) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -127,6 +128,7 @@ const splitVendorChunk = (id) => {
 
 export default defineConfig(({ mode }) => ({
   plugins: [
+    publicVisitorHelper(),
     offlinePrecacheManifest(),
     lazyLevelPages(),
     react({

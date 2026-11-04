@@ -31,10 +31,14 @@ export function questionTopic(question) {
   if (/\b(refund|discount|scholarship|visa|guarantee)\b/i.test(text)) return null;
   return VISITOR_QUESTIONS.find(row => row.pattern.test(text)) || null;
 }
-export function visitorAnswer(question, { classes = [], now = new Date() } = {}) {
+export function visitorAnswer(question, { classes = [], now = new Date(), context = "" } = {}) {
   const topic = questionTopic(question);
   const level = String(question).match(/\b(a1|a2|b1|b2|c1|c2)\b/i)?.[1].toUpperCase();
   if (!topic) return { text: "I don't have a saved answer for that yet. Please ask our team on WhatsApp so you get the right information.", handoff: true };
+  if (topic.id === 'fees' && (/\b(exam|mock|subscription)\b/i.test(question) || context === 'exams'))
+    return {text:'Exam-practice access is separate from course tuition. Please check the current plan and price on Falowen Exams before paying.',href:'https://exams.falowen.app/#pricing',label:'View exam plans',handoff:true};
+  if (topic.id === 'fees' && (/\b(book|books|workbook|delivery|shipping)\b/i.test(question) || context === 'books'))
+    return {text:'Book prices depend on the title and available format. Open the book catalog for current prices and checkout details.',href:'https://www.falowen.app/books',label:'View book prices',handoff:true};
   if (topic.id === 'fees') {
     const entries = level ? [[level, LEVEL_FEES[level]]] : Object.entries(LEVEL_FEES);
     if (entries.some(([,fee]) => !fee)) return {text: `Please contact our team to confirm the current ${level} fee.`, handoff: true};
