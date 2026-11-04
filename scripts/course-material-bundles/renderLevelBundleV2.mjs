@@ -594,13 +594,15 @@ const renderA2B1Lesson = async (page, lesson) => {
     }
     if (availability === "hidden")
       throw new Error(`${level} Day ${lesson.day}: ${tabSpec.names[0]} unexpectedly hidden.`);
-    // For B1 graded/reading/listening tabs, print source-owned questions
+    // For B1 writing and listening tabs, print source-owned questions
     // regardless of whether the export account can open the live tab.
     // A live Hören page may include player loading states or overflow sheets,
     // while the canonical companion prints every question and the audio QR.
-    // Teil 1 Sprechen remains the live lesson; missing canonical data for a
+    // Teil 1 Sprechen and Teil 3 Lesen remain live unless locked, since some
+    // reading metadata lack a complete canonical print transcription.
+    // Missing canonical data for a
     // locked tab still fails closed in the branch below.
-    if (level === "B1" && tabSpec.key !== "teil-1" && b1ReadOnlyParts.includes(tabSpec.key)) {
+    if (level === "B1" && ["teil-2", "teil-4"].includes(tabSpec.key) && b1ReadOnlyParts.includes(tabSpec.key)) {
       workbookParts.push(await renderReadOnlyB1Section(page, lesson, tabSpec.key, `workbook-${tabSpec.key}`));
       console.log(`B1 Day ${lesson.day}: printed ${tabSpec.names[0]} from canonical questions, not live account state.`);
       continue;
