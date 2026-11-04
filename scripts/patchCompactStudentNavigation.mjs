@@ -141,7 +141,7 @@ if (!app.includes("const CampusPrimaryNavigation =")) {
   { key: "books", label: "Books", route: "/campus/books", enabled: Boolean(allowedSections.books) },
   { key: "attendance", label: "Attendance", route: "/campus/attendance", enabled: Boolean(allowedSections.attendance) },
   { key: "results", label: "Results", route: "/campus/results", enabled: Boolean(allowedSections.results) },
-  { key: "examFile", label: "Exam File", route: "/campus/examFile", enabled: Boolean(allowedSections.examFile) },
+  { key: "vocab", label: "Vocab", route: "/campus/vocab", enabled: Boolean(allowedSections.vocab) },
   { key: "classMembers", label: "Class Members", route: "/campus/classMembers", enabled: Boolean(allowedSections.classMembers) },
   { key: "home", label: "Falowen Home", route: "/", enabled: true },
 ].filter((item) => item.enabled);
@@ -152,7 +152,7 @@ const isCampusNavigationItemActive = (item, location) => {
   if (item.key === "books") return location.pathname.startsWith("/campus/books");
   if (item.key === "attendance") return location.pathname.startsWith("/campus/attendance");
   if (item.key === "results") return location.pathname.startsWith("/campus/results");
-  if (item.key === "examFile") return location.pathname.startsWith("/campus/examFile");
+  if (item.key === "vocab") return location.pathname.startsWith("/campus/vocab");
   if (item.key === "classMembers") return location.pathname.startsWith("/campus/classMembers") || new URLSearchParams(location.search || "").get("classMembers") === "1";
   return location.pathname === "/";
 };
@@ -180,7 +180,7 @@ const CampusPrimaryNavigation = ({ allowedSections }) => {
 
 const MOBILE_NAV_ITEMS = [
   { key: "learn", label: "Learn", icon: "▤", route: "/campus/course", permission: "course" },
-  { key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" },
+  { key: "vocab", label: "Vocab", icon: "✦", route: "/campus/vocab", permission: "vocab" },
   { key: "attendance", label: "Attendance", icon: "✓", route: "/campus/attendance", permission: "attendance" },
   { key: "results", label: "Results", icon: "◎", route: "/campus/results", permission: "results" },
 ];
@@ -189,7 +189,7 @@ const CampusMobileBottomNav = ({ allowedSections }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const moreItems = getCampusNavigationItems(allowedSections).filter((item) =>
-    ["books", "examFile", "classMembers", "home"].includes(item.key)
+    ["music", "books", "classMembers", "home"].includes(item.key)
   );
   const moreActive = moreItems.some((item) => isCampusNavigationItemActive(item, location));
 
@@ -245,6 +245,26 @@ const CampusQuickNavigation = ({ allowedSections }) => <CampusPrimaryNavigation 
 `;
   app = `${app.slice(0, start)}${navigationHelpers}${app.slice(end)}`;
 }
+
+// Migrate the old Exam File Campus nav to vocabulary on already-patched worktrees.
+// The complete Exam File remains available under /exams/file.
+app = app
+  .replaceAll(
+    '{ key: "examFile", label: "Exam File", route: "/campus/examFile", enabled: Boolean(allowedSections.examFile) }',
+    '{ key: "vocab", label: "Vocab", route: "/campus/vocab", enabled: Boolean(allowedSections.vocab) }',
+  )
+  .replaceAll(
+    'if (item.key === "examFile") return location.pathname.startsWith("/campus/examFile");',
+    'if (item.key === "vocab") return location.pathname.startsWith("/campus/vocab");',
+  )
+  .replaceAll(
+    '{ key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" }',
+    '{ key: "vocab", label: "Vocab", icon: "✦", route: "/campus/vocab", permission: "vocab" }',
+  )
+  .replaceAll(
+    '["books", "examFile", "classMembers", "home"].includes(item.key)',
+    '["music", "books", "classMembers", "home"].includes(item.key)',
+  );
 
 // Keep the generated Music destination correct on already-patched worktrees.
 // prestart/prebuild rerun this patch after CampusPrimaryNavigation already exists,

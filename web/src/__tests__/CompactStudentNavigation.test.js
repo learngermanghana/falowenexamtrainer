@@ -42,8 +42,9 @@ describe("compact student navigation", () => {
       expect(app).toContain(label);
     });
     expect(app).toContain('label: "Vocab", route: "/campus/vocab"');
+    expect(app).toContain('label: "Music", route: "/campus/music"');
     expect(app).not.toContain('label: "Practice", route: "/campus/vocab"');
-    expect(app).toContain('label: "Exam File"');
+    expect(app).not.toContain('label: "Exam File"');
     expect(app).toContain('label: "Class Members"');
     expect(app).toContain('label: "Falowen Home"');
     expect(appCss).toContain(".campus-primary-nav");
@@ -52,13 +53,16 @@ describe("compact student navigation", () => {
     expect(appCss).toContain("min-width: 44px");
   });
 
-  it("repairs Vocab labels even when campus navigation was already patched", () => {
+  it("keeps vocabulary in Campus on both initial and already-patched builds", () => {
     expect(compactNavigationPatch).toContain("already-patched worktrees");
     expect(compactNavigationPatch).toContain(
-      '.replaceAll(\n    \'{ key: "practice", label: "Practice", route: "/campus/vocab"\'',
+      '{ key: "vocab", label: "Vocab", route: "/campus/vocab", enabled: Boolean(allowedSections.vocab) }',
     );
     expect(compactNavigationPatch).toContain(
-      '.replaceAll(\n    \'{ key: "practice", label: "Practice", icon: "✦", route: "/campus/vocab"\'',
+      '{ key: "vocab", label: "Vocab", icon: "✦", route: "/campus/vocab", permission: "vocab" }',
+    );
+    expect(compactNavigationPatch).toContain(
+      '["music", "books", "classMembers", "home"].includes(item.key)',
     );
   });
 

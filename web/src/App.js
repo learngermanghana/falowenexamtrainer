@@ -236,7 +236,7 @@ const getTabStructure = (t) => {
     { key: "course", label: t("appNav.sections.courseBook"), section: "course" },
     { key: "music", label: "Music", section: "music" },
     { key: "books", label: "Books", section: "books" },
-    { key: "examFile", label: t("appNav.sections.examFile"), section: "examFile" },
+    { key: "vocab", label: t("appNav.sections.vocab"), section: "vocab" },
     { key: "attendance", label: t("appNav.sections.attendance"), section: "attendance" },
     { key: "classMembers", label: t("appNav.sections.classMembers"), section: "classMembers" },
     { key: "results", label: t("appNav.tabs.results"), section: "results" },
@@ -334,7 +334,7 @@ function App() {
       course: true,
       music: true,
       books: true,
-      examFile: isEnrolled || isStaff,
+      vocab: true,
       attendance: (isEnrolled || isStaff) && !isSelfLearningTrack,
       results: isEnrolled || isStaff,
       discussion: (isEnrolled || isStaff) && !isSelfLearningTrack,
@@ -860,7 +860,7 @@ const AppShell = ({
               />
             }
           />
-          <Route path="/campus/vocab" element={<Navigate to="/campus/music" replace />} />
+          <Route path="/campus/examFile" element={<Navigate to="/exams/file" replace />} />
           <Route path="/campus/live-speak" element={<LiveSpeakPage />} />
           <Route
             path="/campus/:section"
@@ -1562,7 +1562,7 @@ const CampusArea = ({
           program={campusStudentProfile?.program}
         />
       ) : null}
-      {resolvedSection === "examFile" && allowedSections.examFile ? <MyExamFilePage /> : null}
+      {resolvedSection === "vocab" && allowedSections.vocab ? <VocabExamPage context="campus" /> : null}
       {resolvedSection === "attendance" && allowedSections.attendance ? <AttendanceTab /> : null}
       {resolvedSection === "classMembers" && allowedSections.classMembers ? <ClassMembersTab /> : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
