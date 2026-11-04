@@ -151,7 +151,7 @@ test("B1 opt-in removes white interior overflow without deleting printed exercis
 test("B1 opt-in preserves textless illustrated pages", async () => {
   await withFixture(async (pdf, font) => {
     pdf.addPage().drawText("B1 Wortschatz", { x: 50, y: 700, font });
-    pdf.addPage().drawRectangle({ x: 80, y: 210, width: 320, height: 260, color: rgb(0.1, 0.2, 0.7) });
+    pdf.addPage().drawRectangle({ x: 80, y: 210, width: 320, height: 260, color: rgb(0.94, 0.94, 0.94) });
     pdf.addPage().drawText("B1 Aufgaben", { x: 50, y: 700, font });
   }, async (filename) => {
     const result = await trimPrintedPdfTail(filename, { description: "B1 Day 2 grammar", removeBlankInterior: true });
