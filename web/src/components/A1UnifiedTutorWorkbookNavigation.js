@@ -512,9 +512,8 @@ export default function A1UnifiedTutorWorkbookNavigation() {
   const hasSections = sectionTabs.length > 0;
   const navItems = [
     ...(hasSections
-      ? [{ key: "overview", label: "Overview" }, ...sectionTabs.map((tab) => ({ key: tab.key, label: `Teil ${tab.number}` }))]
-      : [{ key: "assignment", label: "Assignment" }]),
-    { key: "music", label: "♫ Music" },
+      ? [{ key: "overview", label: "Overview" }, { key: "music", label: "♫ Music" }, ...sectionTabs.map((tab) => ({ key: tab.key, label: `Teil ${tab.number}` }))]
+      : [{ key: "assignment", label: "Assignment" }, { key: "music", label: "♫ Music" }]),
     { key: "submit", label: "Submit", submit: true },
   ];
 

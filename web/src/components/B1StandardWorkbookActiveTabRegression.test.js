@@ -8,7 +8,7 @@ const source = fs.readFileSync(
 
 describe("B1StandardWorkbookPage active-tab runtime safety", () => {
   test("does not shadow the active-tab state inside the timed-assignment render callback", () => {
-    expect(source).toContain('const [activeTab, setActiveTab] = useState("grammar")');
+    expect(source).toContain('const [activeTab, setActiveTab] = useState("references")');
     expect(source).toContain(
       'const resolvedActiveTab = isTabLocked(activeTab) ? "grammar" : activeTab;',
     );

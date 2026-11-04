@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import WorkbookMusicPlayer from "./WorkbookMusicPlayer";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { styles } from "../styles";
 import { matchingEnglishTranslation } from "../utils/musicEnglishTranslations";
@@ -43,6 +44,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const [selectedId, setSelectedId] = useState("");
   const [state, setState] = useState("loading");
   const [recordingLyrics, setRecordingLyrics] = useState(null);
+  const [artwork, setArtwork] = useState(null);
+  const [stories, setStories] = useState(null);
   const [translations, setTranslations] = useState({recordings:[]});
   const [showEnglish, setShowEnglish] = useState(courseLevel === "A1");
   useEffect(() => { setShowEnglish(courseLevel === "A1"); }, [courseLevel]);
@@ -61,7 +64,9 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
       getJson("/api/music-library"),
       getJson("/music/learning.json"),
       getJson("/music/english-translations.json"),
-    ]).then(([curated, discovered, lessons, english]) => {
+      getJson("/music/covers/artwork-map.json"),
+      getJson("/music/song-stories.json"),
+    ]).then(([curated, discovered, lessons, english, covers, descriptions]) => {
       if (controller.signal.aborted) return;
       const pinned = curated.status === "fulfilled"
         ? (Array.isArray(curated.value?.tracks) ? curated.value.tracks : []) : [];
@@ -77,6 +82,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
         if (song.objectKey) paths.add(song.objectKey);
       }
       const sorted = [...combined.values()];
+      setArtwork(covers.status === "fulfilled" ? covers.value : null);
+      setStories(descriptions.status === "fulfilled" ? descriptions.value : null);
       setSongs(sorted);
       setSelectedId(previous => sorted.some(song => song.id === previous) ? previous : sorted[0]?.id || "");
       setPacks(lessons.status === "fulfilled" && typeof lessons.value?.lessons === "object"
@@ -103,7 +110,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
     }).then(response => response.ok ? response.json() : null).then(data => {
       if (controller.signal.aborted) return;
       if (data?.objectKey === chosen.objectKey && typeof data.lyrics === "string" && data.lyrics.trim()) {
-        setRecordingLyrics({ id: chosen.id, objectKey: chosen.objectKey, lyrics: data.lyrics.trim() });
+        setRecordingLyrics({ id: chosen.id, objectKey: chosen.objectKey, lyrics: data.lyrics.trim(), cues: data.cues, timingStatus: data.timingStatus, transcriptionStatus: data.transcriptionStatus, referenceOnly: data.referenceOnly });
       }
     }).catch(() => {
       // Missing lyric sidecars are normal for newly uploaded MP3s.
@@ -177,22 +184,10 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
               </select>
             </label>
           ) : null}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-            <span aria-hidden="true" style={{ display: "grid", placeItems: "center", flex: "0 0 48px",
-              width: 48, height: 48, fontSize: 23, borderRadius: 12, color: "#f1fff3",
-              background: "linear-gradient(145deg,#235d4c,#173a52)" }}>♫</span>
-            <div style={{ minWidth: 0 }}>
-              <span style={{ color: "#567768", fontWeight: 800, fontSize: 11, letterSpacing: ".05em" }}>
-                {courseLevel} · DAY {lessonDay} · LISTEN
-              </span>
-              <h3 style={{ margin: "3px 0 0", fontSize: "1.14rem", lineHeight: 1.4, color: "#163f35" }}>{chosen.title}</h3>
-            </div>
-          </div>
-          <audio key={chosen.id} data-music-audio="true" controls preload="none"
-            src={chosen.audioUrl} style={{ display: "block", width: "100%", maxWidth: "100%",
-              height: 50, minHeight: 50, maxHeight: 50, alignSelf: "stretch", flex: "0 0 50px" }}>
-            Your browser does not support this audio player.
-          </audio>
+          <WorkbookMusicPlayer song={chosen} lyrics={approvedLyrics} recording={recordingLyrics}
+            artwork={'/music/covers/photos/' + (/^[a-z-]+$/.test(artwork?.byObjectKey?.[chosen.objectKey] || '') ? artwork.byObjectKey[chosen.objectKey] : 'music') + '.jpg'}
+            story={stories?.byObjectKey?.[chosen.objectKey] || stories?.byTrackId?.[chosen.id]}
+            english={englishPack} showEnglish={showEnglish} />
           <a href={listenLinkFor(chosen)} target="_blank" rel="noopener noreferrer"
             style={{ color: "#166534", fontWeight: 700, fontSize: 13 }}>
             Open this song on Falowen Music ↗

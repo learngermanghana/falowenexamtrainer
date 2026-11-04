@@ -43,8 +43,8 @@ describe("course workbook tabs", () => {
     expect(getWorkbookNavigationTabs("A1")).toEqual([]);
   });
 
-  test("uses Teil 1 to 4, Ref and Submit for A2 and B1", () => {
-    const expected = ["Teil 1", "Teil 2", "Teil 3", "Teil 4", "Ref", "Submit"];
+  test("uses optional Music first and Submit last for A2 and B1", () => {
+    const expected = ["Music", "Teil 1", "Teil 2", "Teil 3", "Teil 4", "Submit"];
     expect(getWorkbookNavigationTabs("A2").map((tab) => tab.label)).toEqual(expected);
     expect(getWorkbookNavigationTabs("B1").map((tab) => tab.label)).toEqual(expected);
   });

@@ -273,7 +273,7 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
       `${window.location.pathname || ""}${window.location.search || ""}`,
     );
   }, [workbookLevel]);
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const [activeTab, setActiveTab] = useState("references");
   const [showFallbackTabs, setShowFallbackTabs] = useState(false);
   const [showSubmit, setShowSubmit] = useState(false);
   const submitRef = useRef(null);

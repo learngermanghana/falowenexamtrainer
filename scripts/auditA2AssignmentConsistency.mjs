@@ -111,8 +111,8 @@ if (JSON.stringify(A2_NO_LISTENING_DAYS) !== JSON.stringify([14, 22, 23, 25])) {
 }
 
 const sharedSource = read(SHARED_WORKBOOK_PATH);
-if (!sharedSource.includes('useState("sprechen")')) {
-  fail("Shared workbook", "must open on Teil 1 / Sprechen by default");
+if (!sharedSource.includes('useState("references")')) {
+  fail("Shared workbook", "must open on optional Music by default");
 }
 for (const forbidden of ['get("radio") === "done"', "radioCompleted", "openGrammarAfterRadio"]) {
   if (sharedSource.includes(forbidden)) {

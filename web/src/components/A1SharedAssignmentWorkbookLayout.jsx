@@ -59,9 +59,9 @@ export const validateWorkbookSections = (assignment, sectionElements) => {
 
 export const getAllowedWorkbookTabs = (sections, hasGrammar = false, hasMusic = false) => [
   sections.length ? "overview" : "assignment",
+  ...(hasMusic ? ["music"] : []),
   ...(hasGrammar ? ["grammar"] : []),
   ...sections.map(({ key }) => key),
-  ...(hasMusic ? ["music"] : []),
   "submit",
 ];
 
@@ -167,15 +167,15 @@ export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false,
   sections.length
     ? [
       { key: "overview", label: "Overview" },
+      ...(hasMusic ? [{ key: "music", label: "♫ Music", optional: true }] : []),
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       ...sections,
-      ...(hasMusic ? [{ key: "music", label: "♫ Music", optional: true }] : []),
       { key: "submit", label: "Review & Submit", submit: true },
     ]
     : [
       { key: "assignment", label: "Assignment" },
-      ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       ...(hasMusic ? [{ key: "music", label: "♫ Music", optional: true }] : []),
+      ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       { key: "submit", label: "Review & Submit", submit: true },
     ];
 
