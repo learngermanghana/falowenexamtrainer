@@ -214,3 +214,15 @@ test("B1 live PDF scrubs transient audio status and checks every page before mer
   assert.ok(source.includes('scanPdfPageContent(cleaned, cleanPdf.getPageCount())'));
   assert.ok(source.includes('scanPdfPageContent(cleanText, cleanPdf.getPageCount())'));
 });
+
+
+test("PDF text cleanup passes course level across Playwright's browser isolation boundary", () => {
+  const start = source.indexOf("const suppressPdfChromeText = async");
+  const end = source.indexOf("const restorePdfChromeText = async", start);
+  const callback = source.slice(start, end);
+  assert.ok(start >= 0 && end > start);
+  assert.match(callback, /page\.evaluate\(\(pdfLevel\) =>/);
+  assert.match(callback, /pdfLevel === "B1"/);
+  assert.match(callback, /\}, level\);/);
+  assert.doesNotMatch(callback, /\(level === "B1"/);
+});
