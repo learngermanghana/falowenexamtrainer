@@ -25,7 +25,7 @@ const shuffle = (arr) => {
 
 const pickRandom = (arr, count) => shuffle(arr).slice(0, count);
 
-const VocabExamPage = () => {
+const VocabExamPage = ({ context = "exam" }) => {
   const { level, setLevel, setError } = useExam();
   const { studentProfile } = useAuth();
 
@@ -136,7 +136,7 @@ const VocabExamPage = () => {
       <section style={styles.card}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <div>
-            <p style={{ ...styles.helperText, margin: 0 }}>Exam Room</p>
+            <p style={{ ...styles.helperText, margin: 0 }}>{context === "campus" ? "Falowen Campus" : "Exam Room"}</p>
             <h2 style={{ ...styles.sectionTitle, margin: "4px 0 2px" }}>Vocabulary Practice</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
               Mode: <strong>{playModeLabel}</strong> • Filtered by your level.
