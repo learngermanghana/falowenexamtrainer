@@ -25,11 +25,11 @@ const routeRows = [
   ["Start or continue lessons", "Course Book", "/campus/course"],
   ["Scores and tutor feedback", "Results", "/campus/results"],
   ["Class attendance", "Attendance", "/campus/attendance"],
-  ["Goethe/exam information", "Exam File", "/campus/examFile"],
+  ["Goethe/exam information", "Exams Room → Exam File and Date", "/exams/file"],
   ["Exam-style practice", "Exams Room", "/exams/overview"],
   ["Study/exam planning", "Study Calendar", "/exams/study"],
   ["German learning songs", "Music", "/campus/music"],
-  ["Vocabulary practice", "Exams Room → Vocab", "/exams/vocab"],
+  ["Vocabulary practice", "Campus → Vocab", "/campus/vocab"],
   ["Tuition, balance, receipts", "Account → Billing", "/campus/account?tab=billing"],
 ];
 
@@ -133,7 +133,7 @@ const PublicStudentGuidePage = () => {
           To continue lessons, tap or click <strong>Course Book</strong>. On mobile, Course Book is the first item in the bottom navigation. On desktop, Course Book appears in the campus navigation row.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Course Book</strong> opens <RouteLink href="/campus/course">your lessons</RouteLink>. <strong>Music</strong> opens <RouteLink href="/campus/music">German learning songs</RouteLink>. Vocabulary practice remains in Exams Room → Vocab, while <strong>Results</strong> opens your scores and feedback.
+          <strong>Course Book</strong> opens <RouteLink href="/campus/course">your lessons</RouteLink>. <strong>Music</strong> opens <RouteLink href="/campus/music">German learning songs</RouteLink> as a main mobile destination. <strong>Vocab</strong> opens <RouteLink href="/campus/vocab">vocabulary browse, flashcards and quizzes</RouteLink>; on mobile, open <strong>More → Vocab</strong>. <strong>Results</strong> opens your scores and feedback.
         </p>
         <div style={{ margin: 0, padding: 12, borderRadius: 12, border: "1px solid #fed7aa", background: "#fff7ed", color: "#9a3412", lineHeight: 1.6 }}>
           Do not look for <strong>My Library</strong>, <strong>Learning Hub</strong>, or <strong>My Hub</strong>. These are not current Falowen navigation labels.
@@ -209,7 +209,7 @@ const PublicStudentGuidePage = () => {
         <h2 style={{ margin: 0 }}>Levels</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}><strong>A1:</strong> mixes foundation lessons, self-practice and teacher-marked assignments.</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}><strong>A2 and B1:</strong> use grammar/learning material, workbook tasks and teacher-marked submissions.</p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}><strong>B2 and C1:</strong> are self-learning tracks with AI support. Exam File is available; standard class Attendance and Class Members remain hidden.</p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}><strong>B2 and C1:</strong> are self-learning tracks with AI support. Exam File and Date is available in the Exams Room; standard class Attendance and Class Members remain hidden.</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}><strong>C2:</strong> uses advanced self-learning and AI-supported practice. Do not assume a teacher-marked Submit requirement unless the current page explicitly provides one.</p>
       </section>
 
@@ -235,7 +235,7 @@ const PublicStudentGuidePage = () => {
           <strong>Attendance:</strong> <RouteLink href="/campus/attendance" /> — attendance rate plus present, absent and pending sessions. The page can generate an Attendance Record / Attendance Transcript PDF.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Exam File:</strong> <RouteLink href="/campus/examFile" /> — Goethe/exam information for enrolled A1–C2 learners.
+          <strong>Exam File and Date:</strong> <RouteLink href="/exams/file" /> — Goethe/exam information inside the Exams Room.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Exams Room:</strong> <RouteLink href="/exams/overview" /> — separate exam-style practice.
@@ -280,7 +280,7 @@ const PublicStudentGuidePage = () => {
           <li><strong>Workbook returns to Falowen Radio:</strong> finish the required Radio step, then use Continue.</li>
           <li><strong>No Submit tab:</strong> the activity may be self-practice or not currently teacher-marked.</li>
           <li><strong>No result yet:</strong> marking or synchronization may still be pending.</li>
-          <li><strong>B2/C1 learner cannot see Attendance or Class Members:</strong> those class-based tabs are intentionally hidden for self-learning tracks. Exam File is available.</li>
+          <li><strong>B2/C1 learner cannot see Attendance or Class Members:</strong> those class-based tabs are intentionally hidden for self-learning tracks. Exam File and Date is available in the Exams Room.</li>
           <li><strong>Payment made but access has not updated:</strong> use the setup/account status refresh flow.</li>
         </ul>
       </section>
