@@ -1,3 +1,4 @@
+import { isAppAssessment } from "./appAssessment";
 export const GHANA_TIMEZONE = "Africa/Accra";
 
 const CACHE_PREFIX = "falowen:live-class-summary:v6:";
@@ -108,6 +109,7 @@ export const liveClassLessonLink = (summary = {}, session = {}) => {
 };
 
 export const liveClassSessionStatus = (session = {}, now = new Date()) => {
+  if (isAppAssessment(session)) return "App Assessment · No live class";
   const stored = String(session.status || session.sessionStatus || "scheduled").trim().toLowerCase();
   if (stored === "cancelled") return "Cancelled";
   const start = asLiveClassDate(session.startsAt)?.getTime() || 0;
@@ -132,6 +134,7 @@ export const liveClassSessionStatus = (session = {}, now = new Date()) => {
 };
 
 export const canJoinLiveClass = (session = {}, now = new Date()) => {
+  if (isAppAssessment(session)) return false;
   const start = asLiveClassDate(session.startsAt)?.getTime();
   const end = asLiveClassDate(session.endsAt)?.getTime();
   if (!start) return false;
@@ -141,6 +144,7 @@ export const canJoinLiveClass = (session = {}, now = new Date()) => {
 
 export const liveClassJoinOpensAt = (session = {}, locale = "en") => {
   const start = asLiveClassDate(session.startsAt);
+  if (isAppAssessment(session)) return "Complete the speaking assessment in the app";
   if (!start) return "Join unavailable";
   const openAt = new Date(start.getTime() - 15 * 60 * 1000);
   const time = new Intl.DateTimeFormat(locale, {
@@ -163,7 +167,7 @@ export const upcomingLiveClassSessions = (summary = {}, selectedSession = null, 
   return [...(summary.sessions || [])]
     .filter((session) => {
       const status = String(session.status || session.sessionStatus || "scheduled").trim().toLowerCase();
-      if (INACTIVE_STATUSES.has(status) || session.superseded === true) return false;
+      if (isAppAssessment(session) || INACTIVE_STATUSES.has(status) || session.superseded === true) return false;
       const start = asLiveClassDate(session.startsAt)?.getTime() || 0;
       return start > selectedStart;
     })

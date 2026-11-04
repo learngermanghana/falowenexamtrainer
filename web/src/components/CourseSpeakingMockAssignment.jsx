@@ -323,6 +323,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       <Link to="/campus/course" className="speaking-course-mock__back">← Course Book</Link>
       <span className="speaking-course-mock__eyebrow">{config.level} · DAY {config.day} · SPEAKING ASSESSMENT</span>
       <h1>{config.title}</h1>
+      {config.level !== "A1" ? <p>App Assessment · No live class. Complete all three parts here with the Falowen AI examiner. Confirm your spoken answers; your result is saved after all three parts.</p> : null}
       {stage === "intro" ? <p>Learn the format, then complete all three parts with the Falowen AI examiner.</p>
         : stage === "exam" ? <p>Teil {activePart + 1} of 3 · {sectionNames[config.level][activePart]}</p> : null}
     </header>

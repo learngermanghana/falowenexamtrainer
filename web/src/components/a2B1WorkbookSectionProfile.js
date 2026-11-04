@@ -54,6 +54,8 @@ export const getA2B1WorkbookIncludedSectionLabels = (level, day) => {
     return [];
   }
 
+  if ((normalizedLevel === "A2" && normalizedDay === 22) || (normalizedLevel === "B1" && normalizedDay === 23)) return ["Sprechen"];
+
   const profile = getA2B1WorkbookSectionProfile(normalizedLevel, normalizedDay);
   const labels = [];
   if (profile.grammar) labels.push("Grammar");

@@ -96,12 +96,8 @@ describe("A2/B1 workbook section profiles", () => {
       "Lesen",
     ]);
 
-    expect(getA2B1WorkbookIncludedSectionLabels("B1", 23)).toEqual([
-      "Grammar",
-      "Sprechen",
-      "Schreiben",
-      "Lesen",
-    ]);
+    expect(getA2B1WorkbookIncludedSectionLabels("B1", 23)).toEqual(["Sprechen"]);
+    expect(getA2B1WorkbookIncludedSectionLabels("A2", 22)).toEqual(["Sprechen"]);
   });
 
   test("unknown tabs are preserved so page-specific extensions remain safe", () => {
