@@ -131,6 +131,15 @@ days and objects remain rejected. It is not a public music recording and does
 not change the graded workbook Hören. Admin owns the five supplied classroom
 questions (B, A, C, A, B) in `b1Day26Listening.js`.
 
+## A2 Day 1 teaching media — 4 November 2026
+
+The Admin presenter uses the published A2 Day 1 song `Ein nettes Gespräch`
+from the public music library and a separate teacher-supplied Small Talk
+conversation. Only the exact `a2/day-01/small-talk.mp3` object is added to the
+existing staff-only classroom signer. It is not a public music track and does
+not change graded workbook Hören, keys or course submission requirements.
+Admin presentation and this signing registry deploy independently.
+
 ## Workbook player and Music-first navigation — 4 November 2026
 
 A2/B1 workbook Music appears first and is the standard workbook opening tab;
