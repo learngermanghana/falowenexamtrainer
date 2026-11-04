@@ -126,10 +126,31 @@ export const trimPrintedPdfTail = async (file, { description = "", removeBlankIn
       removedInterior++;
     }
     removed += removedInterior;
+
+    // Some B1 pages retain only the tiny Falowen account masthead and a
+    // faint, empty website card. These are not lesson text. Drop them ONLY
+    // when the page's entire extractable text matches that masthead and
+    // an actual raster check confirms a white central content area.
+    // Never infer that a short question, table or textless illustration is
+    // disposable; the final page audit must still fail on unknown pages.
+    const isB1Section = /^B1 Day (?:[1-9]|1\d|2[0-8]) (?:grammar|workbook(?:-teil-[1-4])?)$/.test(description);
+    if (isB1Section) {
+      let removedShell = 0;
+      for (let index = pageCount - removed - 1; index >= 0; index--) {
+        const text = textPages[index].replace(/\s+/g, " ").trim();
+        if (!/^Falowen\s*(?:🔔\s*)?(?:FA)?$/i.test(text)) continue;
+        if (pdf.getPageCount() <= 1) break;
+        if (!isVisuallyEmptyPgm(renderPageToGrayscale(file, index + 1, true))) continue;
+        if (removedShell >= 3) throw new Error("Too many empty B1 website-shell pages in " + description);
+        pdf.removePage(index);
+        removedShell++;
+      }
+      removed += removedShell;
+    }
   }
   if (removed) {
     fs.writeFileSync(file, await pdf.save());
-    console.log("A1 PDF: removed " + removed + " empty overflow / chrome-only page(s) from " + description);
+    console.log("PDF print cleanup: removed " + removed + " empty overflow / chrome-only page(s) from " + description);
   }
   return { before: pageCount, after: pageCount - removed, removed };
 };
