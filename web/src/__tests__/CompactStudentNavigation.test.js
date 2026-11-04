@@ -53,13 +53,16 @@ describe("compact student navigation", () => {
     expect(appCss).toContain("min-width: 44px");
   });
 
-  it("repairs Vocab labels even when campus navigation was already patched", () => {
+  it("keeps vocabulary in Campus on both initial and already-patched builds", () => {
     expect(compactNavigationPatch).toContain("already-patched worktrees");
     expect(compactNavigationPatch).toContain(
-      '.replaceAll(\n    \'{ key: "practice", label: "Practice", route: "/campus/vocab"\'',
+      '{ key: "vocab", label: "Vocab", route: "/campus/vocab", enabled: Boolean(allowedSections.vocab) }',
     );
     expect(compactNavigationPatch).toContain(
-      '.replaceAll(\n    \'{ key: "practice", label: "Practice", icon: "✦", route: "/campus/vocab"\'',
+      '{ key: "vocab", label: "Vocab", icon: "✦", route: "/campus/vocab", permission: "vocab" }',
+    );
+    expect(compactNavigationPatch).toContain(
+      '["music", "books", "classMembers", "home"].includes(item.key)',
     );
   });
 
