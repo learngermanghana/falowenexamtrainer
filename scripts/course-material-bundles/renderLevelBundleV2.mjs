@@ -275,7 +275,7 @@ const injectPrintMode = async (page) => {
 
 // Remove web-only navigation copy before printing and restore every original
 // text node immediately afterwards so the live student page is unchanged.
-const suppressPdfChromeText = async (page) => page.evaluate(() => {
+const suppressPdfChromeText = async (page) => page.evaluate((pdfLevel) => {
   const replacements = [
     [/Falowen\s+Radio/gi, "pre-lesson audio"],
     [/Back\s+to\s+Course\s+Book/gi, ""],
@@ -290,7 +290,7 @@ const suppressPdfChromeText = async (page) => page.evaluate(() => {
     [/\b\d+\s+of\s+\d+\s+answered\b/gi, ""],
     // Transient audio player status is not a lesson exercise. Scrub its
     // exact text nodes even when nested inside an otherwise useful card.
-    ...(level === "B1" ? [[/Audio\s+wird\s+geladen\s*(?:…|\.{2,3})?/gi, ""]] : []),
+    ...(pdfLevel === "B1" ? [[/Audio\s+wird\s+geladen\s*(?:…|\.{2,3})?/gi, ""]] : []),
   ];
   const changes = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -302,7 +302,7 @@ const suppressPdfChromeText = async (page) => page.evaluate(() => {
     if (clean !== previous) { changes.push([node, previous]); node.textContent = clean; }
   }
   window.__falowenPdfChromeChanges = changes;
-});
+}, level);
 
 const restorePdfChromeText = async (page) => page.evaluate(() => {
   for (const [node, original] of window.__falowenPdfChromeChanges || []) {
