@@ -12,8 +12,10 @@ test.each(["organisation-enrolments", "referrals/apply", "referrals/claim"])("pu
 });
 const catalog = { classes: [{ id: "a1-test", title: "A1 Example Class", level: "A1", startDate: "2027-01-04", registrationOpen: true }, { id: "b1-test", title: "B1 Example Class", level: "B1", startDate: "2027-01-05" }] };
 async function chooseClass() {
+  // The catalogue is fetched on mount. Wait for that request to finish rather
+  // than racing the temporary "Loading classes…" state or forcing a refresh.
+  await screen.findByRole("button", { name: "Load / refresh available classes" });
   fireEvent.change(screen.getByLabelText("Student 1 Level"), { target: { value: "A1" } });
-  fireEvent.click(screen.getByRole("button", { name: "Load / refresh available classes" }));
   await screen.findByRole("option", { name: "A1 Example Class — 2027-01-04" });
   expect(screen.queryByRole("option", { name: "B1 Example Class — 2027-01-05" })).not.toBeInTheDocument();
   fireEvent.change(screen.getByLabelText("Student 1 Requested class"), { target: { value: "a1-test" } });
@@ -101,12 +103,19 @@ test("the student-list form prefills the signed organisation and sends its agree
 });
 
 test("a class request is required and changing level clears the previous class", async () => {
-  global.fetch = jest.fn(async () => ({ ok: true, json: async () => catalog }));
+  global.fetch = jest.fn(async path => {
+    if (path !== "/api/public/classes") throw new Error("Unexpected submission during class validation");
+    return { ok: true, json: async () => catalog };
+  });
   show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
+  // Let the automatic GET complete before validating an unselected class.
+  await screen.findByRole("button", { name: "Load / refresh available classes" });
   fireEvent.change(screen.getByLabelText("Student 1 Full name"), { target: { value: "Learner" } });
   fireEvent.submit(screen.getByRole("button", { name: "Submit for Falowen review" }).closest("form"));
   expect(await screen.findByRole("alert")).toHaveTextContent("select an available class");
-  expect(global.fetch).not.toHaveBeenCalled();
+  // A catalogue GET is expected; validation must still block enrolment POSTs.
+  expect(global.fetch).toHaveBeenCalledWith("/api/public/classes", expect.any(Object));
+  expect(global.fetch.mock.calls.filter(([path]) => path === "/api/organisation-enrolments")).toHaveLength(0);
   await chooseClass();
   fireEvent.change(screen.getByLabelText("Student 1 Level"), { target: { value: "B1" } });
   expect(screen.getByLabelText("Student 1 Requested class")).toHaveValue("");
