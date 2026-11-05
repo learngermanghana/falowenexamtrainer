@@ -92,3 +92,8 @@ live reminder emails, attendance confirmations and automatic check-in opening.
 The attendance page links to the learner task instead of present/absent controls.
 Existing session metadata is identified by assignment IDs even before repair.
 No new background requests or assessment scoring changes are introduced.
+
+
+## Organisation class selection and price links — 5 November 2026
+
+The public organisation enrolment form loads the public class catalogue when opened and keeps a manual refresh button for retries. Class choices are filtered by each student's selected level. The dropdown explains loading, missing level and no matching classes rather than showing an empty selectable list. The duration/access clause in the agreement UI and the enrolment introduction link to https://www.falowen.app/classes for upcoming classes and current prices. Existing signed agreement snapshots and PDFs are unchanged. Class selection remains a request subject to Falowen confirmation.
