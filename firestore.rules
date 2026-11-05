@@ -9,7 +9,11 @@ service cloud.firestore {
     }
 
     function courseUser() {
-      return signedIn() && request.auth.token.get('examOnly', false) != true;
+      return signedIn() && request.auth.token.get('examOnly', false) != true && (
+        isStaff() ||
+        !exists(/databases/$(database)/documents/organisationPartnerMembers/$(request.auth.uid)) ||
+        get(/databases/$(database)/documents/organisationPartnerMembers/$(request.auth.uid)).data.get('courseAccessAllowed', false) == true
+      );
     }
 
     function isOwner(uid) {
