@@ -210,7 +210,7 @@ function collectMatchingRows({ studentCodes = [], uids = [], emails = [], target
 }
 
 function resolvePaidValue(student = {}) {
-  return student.initialPaymentAmount ?? student.paidAmount ?? student.paid ?? "";
+  return student.paid ?? student.paidAmount ?? student.amountPaid ?? student.totalPaid ?? student.initialPaymentAmount ?? "";
 }
 
 function resolveBalanceValue(student = {}) {
