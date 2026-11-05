@@ -16,6 +16,10 @@
 | Student identity, private data, payment | Server rules, consent and permissions | [Privacy](student-data-and-privacy.md); never make public documentation reveal private records |
 | Admin marking, attendance, AI Music Studio | **falowenadmin** repo | Admin `AGENTS.md`, Admin `docs/ai/` and owner-scoped tests |
 
+## Students sheet payment synchronization
+
+The canonical learner Firebase `students/{documentId}` record is the source for the Students Google Sheet upsert. `functions/functionz/studentsSheet.js` must write confirmed `paid` tuition before considering legacy `paidAmount` fields or the Admin `initialPaymentAmount` intent. A previously approved organisation student's `studentCode` may differ from the stable Firestore document ID; the upsert matches an existing sheet row by student code, UID **or email** and must update the row rather than append a second one. Organisation payment credits and human-readable student-code repairs are made in the separate Admin repository; this learner repository owns sheet synchronization.
+
 ## Public documentation precedence
 1. **Authenticated account facts:** verified learner-scoped server/MCP responses.
 2. **Published lesson behavior / page navigation:** current app routes plus official Help and generated course map.
