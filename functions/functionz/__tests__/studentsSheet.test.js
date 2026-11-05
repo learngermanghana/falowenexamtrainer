@@ -101,6 +101,40 @@ describe('upsertStudentToSheet paid field sync', () => {
     );
   });
 
+  it('uses the verified paid total instead of a zero initial-payment intent', async () => {
+    mockValuesGet
+      .mockResolvedValueOnce({ data: { values: [[
+        'Name', 'Phone', 'Location', 'Level', 'Paid', 'Balance',
+        'ContractStart', 'ContractEnd', 'StudentCode', 'Email',
+      ]] } })
+      .mockResolvedValueOnce({ data: { values: [['ORG-example-internal-key']] } })
+      .mockResolvedValueOnce({ data: { values: [['learner@example.test']] } });
+
+    const { upsertStudentToSheet, __testables } = require('../studentsSheet');
+    const student = {
+      name: 'Example Learner', studentCode: 'ExampleLearner235',
+      email: 'learner@example.test',
+      tuitionFee: 3000,
+      initialPaymentAmount: 0,
+      paid: 2000,
+      balanceDue: 1000,
+    };
+
+    expect(__testables.resolvePaidValue(student)).toBe(2000);
+    expect(__testables.resolveBalanceValue(student)).toBe(1000);
+    expect(__testables.resolvePaidValue({
+      initialPaymentAmount: 3000, paid: 0,
+    })).toBe(0);
+
+    expect(await upsertStudentToSheet(student)).toEqual({ action: 'updated', row: 2 });
+    const updates = mockBatchUpdate.mock.calls[0][0].requestBody.data;
+    expect(updates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ range: 'students!E2', values: [[2000]] }),
+      expect.objectContaining({ range: 'students!F2', values: [[1000]] }),
+      expect.objectContaining({ range: 'students!I2', values: [['ExampleLearner235']] }),
+    ]));
+  });
+
   it('adds and writes trial retention columns when trial metadata is present', async () => {
     const baseHeaders = [
       'Name',
