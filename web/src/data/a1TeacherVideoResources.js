@@ -14,7 +14,7 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [13, "3.5", "Revision: Numbers, Time and Prices", "https://youtu.be/0aprj_rMWw8"],
   [14, "3.6", "Modal Verbs", "https://youtu.be/0zps4OYwShg"],
   [15, "4.7", "Introduction to Speaking Exams", "https://youtu.be/o9nn_hSDzw8"],
-  [16, "9", "Negation", "https://youtu.be/yYIjI6P-qmw"],
+  [16, "9", "Negation", "https://youtu.be/1oOO1aJ8lV0"],
   [17, "11", "Instructions and Directions", "https://youtu.be/9wvr4iwGsIc"],
   [18, "12.1", "Two-Case Prepositions", "https://youtu.be/WzmgAmmmTJs"],
   [19, "5.9", "Goethe A1 Speaking Confidence Lab", "https://youtu.be/uAAlpkhZ2qs"],
