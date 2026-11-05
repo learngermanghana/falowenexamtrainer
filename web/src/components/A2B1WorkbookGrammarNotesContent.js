@@ -55,7 +55,6 @@ import B1Day25OnlineShoppingRightsRisksGrammarNotesPage from "./B1Day25OnlineSho
 import B1Day26ReiseproblemeGrammarNotesPage from "./B1Day26ReiseproblemeGrammarNotesPage";
 import B1Day27UmweltfreundlichAlltagGrammarNotesPage from "./B1Day27UmweltfreundlichAlltagGrammarNotesPage";
 import B1Day28KlimafreundlichLebenGrammarNotesPage from "./B1Day28KlimafreundlichLebenGrammarNotesPage";
-import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
 import B1TopicIntroduction from "./B1TopicIntroduction";
 import B1Days18To23LearningUpgrade from "./B1Days18To23LearningUpgrade";
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
@@ -120,7 +119,6 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
         data-a2-focused-grammar={numericDay}
         style={{ display: "grid", gap: 16 }}
       >
-        <A2B1GrammarVideoCard level={level} day={day} />
         <GrammarNotes embedded />
       </div>
     );
@@ -131,7 +129,6 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
-      <A2B1GrammarVideoCard level={level} day={day} />
       {showB1TopicIntro ? <B1TopicIntroduction day={numericDay} /> : null}
       {showB1Days18To23Upgrade ? <B1Days18To23LearningUpgrade day={numericDay} /> : null}
       <GrammarNotes />
