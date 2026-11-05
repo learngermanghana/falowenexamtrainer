@@ -57,13 +57,16 @@ describe("teacher lecture media regressions", () => {
       expect.objectContaining({
         chapter: "1.1",
         title: "Kapitel 1.1 · Teacher lecture video",
-        url: "https://youtu.be/gsSdn-IlWWY",
+        url: "https://youtu.be/rjtQISl_N-4",
       }),
     );
     expect(lesson.resources.videos).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ url: "https://youtu.be/gsSdn-IlWWY" }),
+        expect.objectContaining({ url: "https://youtu.be/rjtQISl_N-4" }),
       ]),
+    );
+    expect(lesson.resources.videos.map((video) => video.url)).not.toContain(
+      "https://youtu.be/gsSdn-IlWWY",
     );
   });
 
