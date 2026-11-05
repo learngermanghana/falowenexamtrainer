@@ -35,40 +35,42 @@ test("the public group form keeps its request ID and students through a failed s
   expect(requests[0].students).toHaveLength(1);
 });
 test("one organisation programme offers signing without referral or bank fields", async () => {
-  global.fetch = jest.fn(async () => ({ ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", terms: ["Organisation terms"] }) }));
+  global.fetch = jest.fn(async () => ({ ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", partnerShareRate: 0.1, shareSettlement: "invoice_deduction", terms: ["Organisation terms"] }) }));
   show(<PartnershipPage />, "/partnerships");
-  expect(screen.getByRole("heading", { name: "Falowen Organisation Partnerships" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: /Grow your offering/ })).toBeInTheDocument();
   expect(screen.queryByRole("heading", { name: "Referral partnerships" })).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: "Read agreement and register organisation" }));
+  fireEvent.click(screen.getByRole("tab", { name: "Agreement" }));
   expect(await screen.findByText("Organisation terms")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("tab", { name: "Register" }));
   expect(screen.queryByLabelText("Account holder name")).not.toBeInTheDocument();
   expect(screen.queryByLabelText("Payment arrangement")).not.toBeInTheDocument();
 });
-test("old referral links send clients to normal signup without attribution or commission", () => {
-  global.fetch = jest.fn();
-  show(<PartnershipPage />, "/partnerships?ref=" + "a".repeat(32));
-  expect(screen.getByRole("link", { name: /Continue to normal student signup/ })).toHaveAttribute("href", "https://www.falowen.app/signup?program=german");
-  expect(screen.getByText(/No referral commission applies/)).toBeInTheDocument();
+test("the page is organisation-only even with an old referral query", () => {
+  global.fetch = jest.fn(); show(<PartnershipPage />, "/partnerships?ref=" + "a".repeat(32));
+  expect(screen.getAllByRole("tab")).toHaveLength(3);
+  expect(document.querySelector('a[href*="signup"]')).toBeNull();
+  expect(screen.queryByText("Clients paying for themselves")).not.toBeInTheDocument();
   expect(global.fetch).not.toHaveBeenCalled();
 });
 test("signing saves the organisation context and continues to the student-list form", async () => {
   const sent = []; global.URL.createObjectURL = jest.fn(() => "blob:receipt"); global.URL.revokeObjectURL = jest.fn();
   const anchorClick = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
   global.fetch = jest.fn(async (path, options) => {
-    if (path.includes("agreement-terms")) return { ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", terms: ["Organisation terms"] }) };
+    if (path.includes("agreement-terms")) return { ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", partnerShareRate: 0.1, shareSettlement: "invoice_deduction", terms: ["Organisation terms"] }) };
     sent.push({ path, body: JSON.parse(options.body) });
     if (path.includes("agreement-copy")) return { ok: true, headers: { get: () => "application/pdf" }, blob: async () => new Blob(["PDF"]) };
     return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "a".repeat(64) }) };
   });
   show(<PartnershipPage />, "/partnerships");
-  fireEvent.click(screen.getByRole("button", { name: "Read agreement and register organisation" }));
+  fireEvent.click(screen.getByRole("tab", { name: "Agreement" }));
   expect(await screen.findByText("Organisation terms")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("tab", { name: "Register" }));
   for (const [label, value] of [["Organisation name", "Example agency"], ["Contact email", "agency@example.test"], ["Phone", "0200000000"], ["Address", "Accra"], ["Full name of person signing", "Director"], ["Role / capacity", "Director"]]) fireEvent.change(screen.getByLabelText(label), { target: { value } });
   for (const checkbox of screen.getAllByRole("checkbox")) fireEvent.click(checkbox);
   fireEvent.submit(screen.getByRole("button", { name: "Sign, save and download receipt" }).closest("form"));
-  expect(await screen.findByText("Signed application saved.")).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Your organisation is registered for review." })).toBeInTheDocument();
   expect(sent[0].body).toMatchObject({ kind: "institutional", billingResponsibility: "organisation", termsVersion: "org-v3" });
-  expect(screen.getByRole("link", { name: "Continue to add your students →" })).toHaveAttribute("href", "/organisation-enrolment");
+  expect(screen.getByRole("link", { name: /Continue to add your students/ })).toHaveAttribute("href", "/organisation-enrolment");
   const context = JSON.parse(sessionStorage.getItem("falowen:organisation-partner-context"));
   expect(context.organisation.email).toBe("agency@example.test"); expect(context.agreementReference).toBe("a".repeat(64));
   anchorClick.mockRestore();
