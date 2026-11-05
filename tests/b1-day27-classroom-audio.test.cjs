@@ -59,18 +59,19 @@ test("Day 27 teacher Hören signs only the exact private R2 object for authorize
   assert.throws(() => signTrack("b1-day27-environmental-habits", env), /Unknown/);
 });
 
-test("Day 28 teacher Hören uses the teacher-confirmed Day 27-named MP3 without expanding R2 access", async () => {
+test("Day 28 teacher Hören signs only the correctly uploaded Day 28 MP3", async () => {
+  const day28Key = "b1/day-28/klimafreundlich-leben.mp3";
   const cases = [
-    [null, "B1", 28, key, 401],
-    [{ localId: "student", email: "student@example.com" }, "B1", 28, key, 403],
-    [staff, "B1", 28, key, 200],
-    [{ ...staff, disabled: true }, "B1", 28, key, 401],
-    [staff, "A2", 28, key, 400],
-    [staff, "B1", 29, key, 400],
-    [staff, "B1", 28, "b1/day-28/umweltfreundlich-im-alltag.mp3", 400],
-    [staff, "B1", 28, "b1/day-27/another.mp3", 400],
-    [staff, "B1", 28, "b1/day-27/../private.mp3", 400],
-    [staff, "B1", 28, "b1/day-27/umweltfreundlich-im-alltag.wav", 400],
+    [null, "B1", 28, day28Key, 401],
+    [{ localId: "student", email: "student@example.com" }, "B1", 28, day28Key, 403],
+    [staff, "B1", 28, day28Key, 200],
+    [{ ...staff, disabled: true }, "B1", 28, day28Key, 401],
+    [staff, "A2", 28, day28Key, 400],
+    [staff, "B1", 29, day28Key, 400],
+    [staff, "B1", 28, "b1/day-27/umweltfreundlich-im-alltag.mp3", 400],
+    [staff, "B1", 28, "b1/day-28/another.mp3", 400],
+    [staff, "B1", 28, "b1/day-28/../private.mp3", 400],
+    [staff, "B1", 28, "b1/day-28/klimafreundlich-leben.wav", 400],
   ];
   for (const [account, level, day, requested, expected] of cases) {
     const handler = createClassroomAudioHandler({
@@ -90,7 +91,7 @@ test("Day 28 teacher Hören uses the teacher-confirmed Day 27-named MP3 without 
     assert.equal(Boolean(res.body.url), expected === 200);
     if (expected === 200) {
       const signed = new URL(res.body.url);
-      assert.equal(signed.pathname, "/" + key);
+      assert.equal(signed.pathname, "/" + day28Key);
       assert.match(signed.searchParams.get("X-Amz-Signature"), /^[a-f0-9]{64}$/);
       assert.equal(res.headers["Cache-Control"], "private, no-store");
       assert.equal(res.headers["Access-Control-Allow-Origin"], "https://admin.falowen.app");
