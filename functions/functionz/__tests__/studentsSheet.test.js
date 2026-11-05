@@ -135,6 +135,57 @@ describe('upsertStudentToSheet paid field sync', () => {
     ]));
   });
 
+  it('syncs organisation payer metadata for a legacy GH₵2,000 partial payment without duplicating the student row', async () => {
+    const headers = [
+      'Name', 'Phone', 'Location', 'Level', 'Paid', 'Balance',
+      'ContractStart', 'ContractEnd', 'StudentCode', 'Email',
+      'BillingResponsibility', 'OrganisationName', 'OrganisationPaymentReference',
+      'OrganisationRetainedShare', 'OrganisationNetTuition', 'OrganisationPaymentGross',
+      'OrganisationSubmissionId', 'OrganisationId', 'OrganisationBillingEmail',
+    ];
+    mockValuesGet
+      .mockResolvedValueOnce({ data: { values: [headers] } })
+      .mockResolvedValueOnce({ data: { values: [['ORG-prior-internal-document-id']] } })
+      .mockResolvedValueOnce({ data: { values: [['learner@example.test']] } });
+
+    const { upsertStudentToSheet } = require('../studentsSheet');
+    const result = await upsertStudentToSheet({
+      name: 'Example Learner', studentCode: 'ExampleLearner357', email: 'learner@example.test',
+      paid: 2000, balanceDue: 1000, tuitionFee: 3000,
+      billingResponsibility: 'organisation', organisationName: 'Example Organisation',
+      organisationPaymentReference: 'FAL-ORG-MAN-TEST', organisationRetainedShare: 0,
+      organisationNetTuition: 2000, organisationPaymentGross: 2000,
+      organisationSubmissionId: 'batch-demo', organisationId: 'example-org',
+      organisationBillingEmail: 'billing@example.test',
+    });
+    expect(result).toEqual({ action: 'updated', row: 2 });
+    const writes = mockBatchUpdate.mock.calls[0][0].requestBody.data;
+    const valueAt = col => writes.find(x => x.range === 'students!' + col + '2')?.values?.[0]?.[0];
+    expect(valueAt('E')).toBe(2000);
+    expect(valueAt('F')).toBe(1000);
+    expect(valueAt('I')).toBe('ExampleLearner357');
+    expect(valueAt('K')).toBe('organisation');
+    expect(valueAt('L')).toBe('Example Organisation');
+    expect(valueAt('M')).toBe('FAL-ORG-MAN-TEST');
+    expect(valueAt('Q')).toBe('batch-demo');
+    expect(valueAt('S')).toBe('billing@example.test');
+    expect(mockAppend).not.toHaveBeenCalled();
+  });
+
+  it('does not clear organisation metadata when legacy student source omits those fields', async () => {
+    const headers = ['Name','StudentCode','Email','BillingResponsibility','OrganisationPaymentReference'];
+    mockValuesGet
+      .mockResolvedValueOnce({ data: { values: [headers] } })
+      .mockResolvedValueOnce({ data: { values: [['Legacy123']] } })
+      .mockResolvedValueOnce({ data: { values: [['legacy@example.test']] } });
+    const { upsertStudentToSheet } = require('../studentsSheet');
+    expect(await upsertStudentToSheet({
+      name: 'Legacy Student', studentCode: 'Legacy123', email: 'legacy@example.test',
+    })).toEqual({ action: 'updated', row: 2 });
+    const writes = mockBatchUpdate.mock.calls[0][0].requestBody.data;
+    expect(writes.some(x => /students![DE]2/.test(x.range))).toBe(false);
+  });
+
   it('adds and writes trial retention columns when trial metadata is present', async () => {
     const baseHeaders = [
       'Name',
