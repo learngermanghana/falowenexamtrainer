@@ -118,19 +118,32 @@ const AuthenticatedAppRoutes = () => (
   </>
 );
 
+const OrganisationEnrolmentPage = React.lazy(() => import('./components/OrganisationEnrolmentPage'));
+const PartnershipPage = React.lazy(() => import('./components/PartnershipPage'));
+
+function PublicFormPage({ component: Page }) {
+  return <React.Suspense fallback={<p role="status">Loading form…</p>}><Page /></React.Suspense>;
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AppStartupBoundary>
       <BrowserRouter>
         <AppMountedSignal />
-        <PublicVisitorQuestionHelper />
-        <RouteScopedBackgroundServices />
-        {isFalowenRadioSeoPage ? (
-          <FalowenRadioSeoPage />
-        ) : (
-          <AuthenticatedAppRoutes />
-        )}
+        <Routes>
+          <Route path="/organisation-enrolment" element={<PublicFormPage component={OrganisationEnrolmentPage} />} />
+          <Route path="/partnerships" element={<PublicFormPage component={PartnershipPage} />} />
+          <Route path="*" element={<>
+            <PublicVisitorQuestionHelper />
+            <RouteScopedBackgroundServices />
+            {isFalowenRadioSeoPage ? (
+              <FalowenRadioSeoPage />
+            ) : (
+              <AuthenticatedAppRoutes />
+            )}
+          </>} />
+        </Routes>
       </BrowserRouter>
     </AppStartupBoundary>
   </React.StrictMode>

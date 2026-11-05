@@ -11,7 +11,7 @@ import "./LandingPageMarketing.css";
 const COPY = {
   en: {
     language: "Language", login: "Log in", signup: "Sign up", returning: "Already signed up?",
-    navClasses: "Live classes", navMusic: "German Music", navExams: "Exam practice", navBooks: "Books", navHelp: "How Falowen works",
+    navPartnerships: "Partnerships", navClasses: "Live classes", navMusic: "German Music", navExams: "Exam practice", navBooks: "Books", navHelp: "How Falowen works",
     classScheduleAction: "View full class schedule",
     eyebrow: "GERMAN LEARNING THAT FITS YOUR LIFE",
     title: "Learn German your way.",
@@ -41,7 +41,7 @@ const COPY = {
   },
   de: {
     language: "Sprache", login: "Anmelden", signup: "Registrieren", returning: "Schon registriert?",
-    navClasses: "Live-Kurse", navMusic: "Deutsch mit Musik", navExams: "Prüfungsvorbereitung", navBooks: "Bücher", navHelp: "So funktioniert Falowen",
+    navPartnerships: "Partnerschaften", navClasses: "Live-Kurse", navMusic: "Deutsch mit Musik", navExams: "Prüfungsvorbereitung", navBooks: "Bücher", navHelp: "So funktioniert Falowen",
     classScheduleAction: "Vollständigen Kursplan ansehen",
     eyebrow: "DEUTSCH LERNEN, WIE ES ZU DIR PASST",
     title: "Lerne Deutsch auf deine Weise.",
@@ -76,7 +76,7 @@ const COPY = {
   },
   fr: {
     language: "Langue", login: "Se connecter", signup: "S'inscrire", returning: "Déjà inscrit ?",
-    navClasses: "Cours en direct", navMusic: "Musique allemande", navExams: "Examens blancs", navBooks: "Livres", navHelp: "Comment fonctionne Falowen",
+    navPartnerships: "Partenariats", navClasses: "Cours en direct", navMusic: "Musique allemande", navExams: "Examens blancs", navBooks: "Livres", navHelp: "Comment fonctionne Falowen",
     classScheduleAction: "Voir le calendrier complet des cours",
     eyebrow: "APPRENDRE L'ALLEMAND À VOTRE RYTHME",
     title: "Apprenez l'allemand à votre façon.",
@@ -117,6 +117,7 @@ const FOOTER_LINKS = [
   { href: "https://music.falowen.app/", labelKey: "footerMusic" },
   { href: "/exam-practice", labelKey: "footerExam" },
   { href: "/reviews/", labelKey: "footerReviews" },
+  { href: "/partnerships", labelKey: "navPartnerships" },
   { href: "/visitor-guide", labelKey: "footerHelp" },
 ];
 
@@ -177,6 +178,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
             <a href="https://music.falowen.app/">{copy.navMusic}</a>
             <a href="https://exams.falowen.app/">{copy.navExams}</a>
             <a href="/books">{copy.navBooks}</a>
+            <a href="/partnerships">{copy.navPartnerships}</a>
             <a href="/visitor-guide">{copy.navHelp}</a>
           </div>
           <div className="falowen-home-nav-actions">

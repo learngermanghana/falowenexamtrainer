@@ -562,6 +562,21 @@
       "dest": "/api/music-share.js"
     },
     {
+      "src": "/api/organisation-enrolments",
+      "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/organisation-enrolments",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/api/referrals/apply",
+      "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/referrals/apply",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/api/referrals/claim",
+      "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/referrals/claim",
+      "methods": ["POST"]
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },

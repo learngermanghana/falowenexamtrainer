@@ -25,6 +25,20 @@
   ],
   "navigation": [
     {
+      "id": "partnerships",
+      "label": "Partnership & Referral Programme",
+      "route": "/partnerships",
+      "purpose": "Read the referral terms and apply to introduce learners",
+      "requiresLogin": false
+    },
+    {
+      "id": "organisation-enrolment",
+      "label": "Organisation enrolment",
+      "route": "/organisation-enrolment",
+      "purpose": "Submit a student group for Falowen review",
+      "requiresLogin": false
+    },
+    {
       "id": "placement-test",
       "label": "Placement Test",
       "route": "/placement-test",
