@@ -487,3 +487,7 @@ Use the tools in Falowen’s Exams Room to check your readiness. You can practis
 
 Open Exams Room (login required): https://www.falowen.app/exams/overview
 <!-- END GENERATED ADMISSIONS FAQ -->
+
+## Partnerships
+
+Visit [Partnerships](https://www.falowen.app/partnerships) to apply as a referral partner. Schools and sponsors can use [Organisation enrolment](https://www.falowen.app/organisation-enrolment) to submit a student group for review. Both forms are public.
