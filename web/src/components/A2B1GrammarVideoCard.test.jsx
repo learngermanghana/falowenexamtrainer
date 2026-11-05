@@ -8,8 +8,8 @@ const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe("A2/B1 grammar notes without duplicate AI video cards", () => {
   test.each([
-    ["A2", 1, /A2 Day 1 · Small Talk 1\\.1/i],
-    ["B1", 13, /5\\. Struktur für einen Meinungsaufsatz/i],
+    ["A2", 1, /A2 Day 1 · Small Talk 1[.]1/i],
+    ["B1", 13, /5[.] Struktur für einen Meinungsaufsatz/i],
     ["B1", 24, /Konsum und Nachhaltigkeit – Mittel, Folgen und Vergleiche/i],
   ])("%s Day %i keeps its grammar content without another AI video", async (level, day, heading) => {
     const { container } = renderWithRouter(<A2B1GrammarNotesTab level={level} day={day} />);
@@ -27,14 +27,14 @@ describe("A2/B1 grammar notes without duplicate AI video cards", () => {
     const lesson = normalizeA2B1Lesson({ day, chapter }, level);
     const urls = lesson.resources.videos.map((video) => video.url);
 
-    expect(lesson.resources.teacherVideo?.url).toMatch(/^https:\\/\\//);
+    expect(lesson.resources.teacherVideo?.url).toMatch(/^https:/);
     expect(urls).toContain(lesson.resources.teacherVideo.url);
     expect(urls).toContain(aiUrl);
   });
 
   test("B1 Day 13 keeps its reviewed grammar teaching content", async () => {
     renderWithRouter(<A2B1GrammarNotesTab level="B1" day={13} />);
-    expect(await screen.findByText(/5\\. Struktur für einen Meinungsaufsatz/i)).toBeVisible();
+    expect(await screen.findByText(/5[.] Struktur für einen Meinungsaufsatz/i)).toBeVisible();
     expect(screen.queryByText(/Empfehlung mit Konjunktiv II/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Ich würde den Film weiterempfehlen/i)).not.toBeInTheDocument();
   });
