@@ -276,6 +276,23 @@ async function upsertStudentToSheet(student) {
   const colTrialPurgeAt = findCol(headerMap, "TrialPurgeAt", "Trial Purge At");
   const colTrialUsedAt = findCol(headerMap, "TrialUsedAt", "Trial Used At");
   const colTrialConvertedAt = findCol(headerMap, "TrialConvertedAt", "Trial Converted At");
+  const organisationFields = [
+    ["BillingResponsibility", "billingResponsibility"],
+    ["OrganisationName", "organisationName"],
+    ["OrganisationPaymentReference", "organisationPaymentReference"],
+    ["OrganisationRetainedShare", "organisationRetainedShare"],
+    ["OrganisationNetTuition", "organisationNetTuition"],
+    ["OrganisationPaymentGross", "organisationPaymentGross"],
+    ["OrganisationSubmissionId", "organisationSubmissionId"],
+    ["OrganisationId", "organisationId"],
+    ["OrganisationBillingEmail", "organisationBillingEmail"],
+  ].map(([header, key]) => ({
+    col: findCol(headerMap, header), key,
+  }));
+  // These columns may already exist even for a student's pre-organisation history.
+  // Copy server-owned billing identity only when it is explicitly present in
+  // the source record. Missing metadata must never erase a prior sheet value.
+
   const colEmergencyPhone = findCol(
     headerMap,
     "Emergency Contact (Phone Number)",
@@ -407,6 +424,9 @@ async function upsertStudentToSheet(student) {
     pushCell(colTrialPurgeAt, student.trialPurgeAt || "");
     pushCell(colTrialUsedAt, student.trialUsedAt || "");
     pushCell(colTrialConvertedAt, student.trialConvertedAt || "");
+    organisationFields.forEach(({ col, key }) => {
+      if (col !== null && student[key] !== undefined && student[key] !== null) pushCell(col, student[key]);
+    });
     pushCell(colLearningMode, student.learningMode || "");
     pushCell(colAddress, student.address || "");
     pushCell(colContractMergeMode, student.contractMergeMode || "");
@@ -463,6 +483,9 @@ async function upsertStudentToSheet(student) {
   if (colTrialPurgeAt !== null) row[colTrialPurgeAt] = student.trialPurgeAt || "";
   if (colTrialUsedAt !== null) row[colTrialUsedAt] = student.trialUsedAt || "";
   if (colTrialConvertedAt !== null) row[colTrialConvertedAt] = student.trialConvertedAt || "";
+  organisationFields.forEach(({ col, key }) => {
+    if (col !== null && student[key] !== undefined && student[key] !== null) row[col] = student[key];
+  });
   if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
   if (colAddress !== null) row[colAddress] = student.address || "";
   if (colContractMergeMode !== null)
