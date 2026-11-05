@@ -564,17 +564,58 @@
     {
       "src": "/api/organisation-enrolments",
       "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/organisation-enrolments",
-      "methods": ["POST"]
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "src": "/api/referrals/agreement-terms",
+      "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/referrals/agreement-terms",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "src": "/api/referrals/agreement-sample",
+      "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/referrals/agreement-sample",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "src": "/api/referrals/payout-banks",
+      "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/referrals/payout-banks",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "src": "/api/referrals/apply-signed",
+      "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/referrals/apply-signed",
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "src": "/api/referrals/agreement-copy",
+      "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/referrals/agreement-copy",
+      "methods": [
+        "POST"
+      ]
     },
     {
       "src": "/api/referrals/apply",
       "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/referrals/apply",
-      "methods": ["POST"]
+      "methods": [
+        "POST"
+      ]
     },
     {
       "src": "/api/referrals/claim",
       "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/referrals/claim",
-      "methods": ["POST"]
+      "methods": [
+        "POST"
+      ]
     },
     {
       "src": "/api/(.*)",

@@ -50,3 +50,30 @@ test("a referral link preserves the code and continues to Campus signup", async 
   expect(path).toBe("/api/referrals/claim");
   expect(JSON.parse(options.body)).toMatchObject({ code: ref, consent: true, email: "learner@example.org" });
 });
+
+test("partner signs existing terms and receives a downloadable PDF without exposing banking details in its URL", async () => {
+  const sent = [];
+  global.URL.createObjectURL = jest.fn(() => "blob:receipt");
+  global.URL.revokeObjectURL = jest.fn();
+  const anchorClick = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+  global.fetch = jest.fn(async (path, options) => {
+    if (path.includes("agreement-terms")) return { ok: true, text: async () => JSON.stringify({ ok: true, version: "existing-v1", terms: ["Existing referral terms"] }) };
+    if (path.includes("payout-banks")) return { ok: true, text: async () => JSON.stringify({ ok: true, banks: [{ code: "123", name: "Example Bank" }] }) };
+    sent.push({ path, body: JSON.parse(options.body) });
+    if (path.includes("agreement-copy")) return { ok: true, headers: { get: () => "application/pdf" }, blob: async () => new Blob(["PDF"]) };
+    return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "a".repeat(64) }) };
+  });
+  show(<PartnershipPage />, "/partnerships");
+  fireEvent.click(screen.getByRole("button", { name: "Read agreement and apply" }));
+  expect(await screen.findByText("Existing referral terms", { selector: "p" })).toBeInTheDocument();
+  for (const [label, value] of [["Your name or organisation", "Example partner"], ["Contact email", "partner@example.test"], ["Phone", "0200000000"], ["Address", "Accra"], ["Full name of person signing", "Example Director"], ["Role / capacity", "Director"], ["Account holder name", "Example partner"], ["Account number / mobile money number", "0123456789"]]) fireEvent.change(screen.getByLabelText(label), { target: { value } });
+  fireEvent.change(screen.getByLabelText("Bank / mobile money network"), { target: { value: "123" } });
+  for (const checkbox of screen.getAllByRole("checkbox")) fireEvent.click(checkbox);
+  fireEvent.submit(screen.getByRole("button", { name: "Sign, save and download receipt" }).closest("form"));
+  expect(await screen.findByText("Signed application saved.")).toBeInTheDocument();
+  expect(sent[0].path).toBe("/api/referrals/apply-signed");
+  expect(sent[0].body).toMatchObject({ signatureConsent: true, payoutConsent: true, termsVersion: "existing-v1", accountNumber: "0123456789" });
+  expect(sent[1].path).toBe("/api/referrals/agreement-copy");
+  expect(sent[1].path).not.toContain(sent[0].body.receiptToken);
+  anchorClick.mockRestore();
+});
