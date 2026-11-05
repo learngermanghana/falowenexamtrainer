@@ -10,6 +10,14 @@ test.each(["organisation-enrolments", "referrals/apply", "referrals/claim"])("pu
   expect(match.dest).toBe("https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/" + path);
   expect(match.methods).toEqual(["POST"]);
 });
+const catalog = { classes: [{ id: "a1-test", title: "A1 Example Class", level: "A1", startDate: "2027-01-04", registrationOpen: true }, { id: "b1-test", title: "B1 Example Class", level: "B1", startDate: "2027-01-05" }] };
+async function chooseClass() {
+  fireEvent.change(screen.getByLabelText("Student 1 Level"), { target: { value: "A1" } });
+  fireEvent.click(screen.getByRole("button", { name: "Load / refresh available classes" }));
+  await screen.findByRole("option", { name: "A1 Example Class — 2027-01-04" });
+  expect(screen.queryByRole("option", { name: "B1 Example Class — 2027-01-05" })).not.toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Student 1 Requested class"), { target: { value: "a1-test" } });
+}
 const originalFetch = global.fetch;
 afterEach(() => { global.fetch = originalFetch; sessionStorage.clear(); });
 const show = (page, path) => render(<MemoryRouter initialEntries={[path]}>{page}</MemoryRouter>);
@@ -17,6 +25,7 @@ const show = (page, path) => render(<MemoryRouter initialEntries={[path]}>{page}
 test("the public group form keeps its request ID and students through a failed submission", async () => {
   const requests = [];
   global.fetch = jest.fn(async (path, options) => {
+    if (path === "/api/public/classes") return { ok: true, json: async () => catalog };
     requests.push(JSON.parse(options.body));
     expect(path).toBe("/api/organisation-enrolments");
     if (requests.length === 1) throw new Error("offline");
@@ -25,6 +34,7 @@ test("the public group form keeps its request ID and students through a failed s
   show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
   fireEvent.change(screen.getByLabelText("Organisation name"), { target: { value: "Test school" } });
   fireEvent.change(screen.getByLabelText("Student 1 Full name"), { target: { value: "Example learner" } });
+  await chooseClass();
   const button = screen.getByText("Submit for Falowen review");
   fireEvent.submit(button.closest("form"));
   expect(await screen.findByRole("alert")).toHaveTextContent("retry");
@@ -35,7 +45,7 @@ test("the public group form keeps its request ID and students through a failed s
   expect(requests[0].students).toHaveLength(1);
 });
 test("one organisation programme offers signing without referral or bank fields", async () => {
-  global.fetch = jest.fn(async () => ({ ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", partnerShareRate: 0.1, shareSettlement: "invoice_deduction", terms: ["Organisation terms"] }) }));
+  global.fetch = jest.fn(async () => ({ ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", partnerShareRate: 0.1, shareSettlement: "invoice_deduction", tuitionRefundable: false, classDurationWeeks: 10, accessMonths: 6, accessStartsAt: "account_activation", terms: ["Organisation terms"] }) }));
   show(<PartnershipPage />, "/partnerships");
   expect(screen.getByRole("heading", { name: /Grow your offering/ })).toBeInTheDocument();
   expect(screen.queryByRole("heading", { name: "Referral partnerships" })).not.toBeInTheDocument();
@@ -56,7 +66,7 @@ test("signing saves the organisation context and continues to the student-list f
   const sent = []; global.URL.createObjectURL = jest.fn(() => "blob:receipt"); global.URL.revokeObjectURL = jest.fn();
   const anchorClick = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
   global.fetch = jest.fn(async (path, options) => {
-    if (path.includes("agreement-terms")) return { ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", partnerShareRate: 0.1, shareSettlement: "invoice_deduction", terms: ["Organisation terms"] }) };
+    if (path.includes("agreement-terms")) return { ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", partnerShareRate: 0.1, shareSettlement: "invoice_deduction", tuitionRefundable: false, classDurationWeeks: 10, accessMonths: 6, accessStartsAt: "account_activation", terms: ["Organisation terms"] }) };
     sent.push({ path, body: JSON.parse(options.body) });
     if (path.includes("agreement-copy")) return { ok: true, headers: { get: () => "application/pdf" }, blob: async () => new Blob(["PDF"]) };
     return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "a".repeat(64) }) };
@@ -78,11 +88,26 @@ test("signing saves the organisation context and continues to the student-list f
 test("the student-list form prefills the signed organisation and sends its agreement reference", async () => {
   sessionStorage.setItem("falowen:organisation-partner-context", JSON.stringify({ agreementReference: "a".repeat(64), organisation: { name: "Signed agency", contactName: "Director", email: "agency@example.test", phone: "0200000000" } }));
   let payload;
-  global.fetch = jest.fn(async (path, options) => { payload = JSON.parse(options.body); return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "batch" }) }; });
+  global.fetch = jest.fn(async (path, options) => { if (path === "/api/public/classes") return { ok: true, json: async () => catalog }; payload = JSON.parse(options.body); return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "batch" }) }; });
   show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
   expect(screen.getByLabelText("Organisation name")).toHaveValue("Signed agency");
   fireEvent.change(screen.getByLabelText("Student 1 Full name"), { target: { value: "Learner" } });
+  await chooseClass();
   fireEvent.submit(screen.getByRole("button", { name: "Submit for Falowen review" }).closest("form"));
   expect(await screen.findByText("batch")).toBeInTheDocument();
   expect(payload.agreementReference).toBe("a".repeat(64));
+  expect(payload.schemaVersion).toBe(2);
+  expect(payload.students[0]).toMatchObject({ level: "A1", requestedClassId: "a1-test", requestedClassName: "A1 Example Class", requestedClassStartDate: "2027-01-04" });
+});
+
+test("a class request is required and changing level clears the previous class", async () => {
+  global.fetch = jest.fn(async () => ({ ok: true, json: async () => catalog }));
+  show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
+  fireEvent.change(screen.getByLabelText("Student 1 Full name"), { target: { value: "Learner" } });
+  fireEvent.submit(screen.getByRole("button", { name: "Submit for Falowen review" }).closest("form"));
+  expect(await screen.findByRole("alert")).toHaveTextContent("select an available class");
+  expect(global.fetch).not.toHaveBeenCalled();
+  await chooseClass();
+  fireEvent.change(screen.getByLabelText("Student 1 Level"), { target: { value: "B1" } });
+  expect(screen.getByLabelText("Student 1 Requested class")).toHaveValue("");
 });
