@@ -11,7 +11,7 @@ test.each(["organisation-enrolments", "referrals/apply", "referrals/claim"])("pu
   expect(match.methods).toEqual(["POST"]);
 });
 const originalFetch = global.fetch;
-afterEach(() => { global.fetch = originalFetch; });
+afterEach(() => { global.fetch = originalFetch; sessionStorage.clear(); });
 const show = (page, path) => render(<MemoryRouter initialEntries={[path]}>{page}</MemoryRouter>);
 
 test("the public group form keeps its request ID and students through a failed submission", async () => {
@@ -34,46 +34,53 @@ test("the public group form keeps its request ID and students through a failed s
   expect(requests[1]).toEqual(requests[0]);
   expect(requests[0].students).toHaveLength(1);
 });
-test("institutional enrolment stays on the main domain", () => {
+test("one organisation programme offers signing without referral or bank fields", async () => {
+  global.fetch = jest.fn(async () => ({ ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", terms: ["Organisation terms"] }) }));
   show(<PartnershipPage />, "/partnerships");
-  expect(screen.getByRole("link", { name: /organisation enrolment form/ })).toHaveAttribute("href", "/organisation-enrolment");
+  expect(screen.getByRole("heading", { name: "Falowen Organisation Partnerships" })).toBeInTheDocument();
+  expect(screen.queryByRole("heading", { name: "Referral partnerships" })).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Read agreement and register organisation" }));
+  expect(await screen.findByText("Organisation terms")).toBeInTheDocument();
+  expect(screen.queryByLabelText("Account holder name")).not.toBeInTheDocument();
+  expect(screen.queryByLabelText("Payment arrangement")).not.toBeInTheDocument();
 });
-test("a referral link preserves the code and continues to Campus signup", async () => {
-  const ref = "a".repeat(32);
-  global.fetch = jest.fn(async () => ({ ok: true, text: async () => '{"ok":true}' }));
-  show(<PartnershipPage />, "/partnerships?ref=" + ref);
-  fireEvent.change(screen.getByLabelText("Learner email"), { target: { value: "learner@example.org" } });
-  fireEvent.click(screen.getByRole("checkbox"));
-  fireEvent.submit(screen.getByRole("button", { name: "Register referral" }).closest("form"));
-  expect(await screen.findByText("Invitation received.")).toBeInTheDocument();
-  const [path, options] = global.fetch.mock.calls[0];
-  expect(path).toBe("/api/referrals/claim");
-  expect(JSON.parse(options.body)).toMatchObject({ code: ref, consent: true, email: "learner@example.org" });
+test("old referral links send clients to normal signup without attribution or commission", () => {
+  global.fetch = jest.fn();
+  show(<PartnershipPage />, "/partnerships?ref=" + "a".repeat(32));
+  expect(screen.getByRole("link", { name: /Continue to normal student signup/ })).toHaveAttribute("href", "https://www.falowen.app/signup?program=german");
+  expect(screen.getByText(/No referral commission applies/)).toBeInTheDocument();
+  expect(global.fetch).not.toHaveBeenCalled();
 });
-
-test("partner signs existing terms and receives a downloadable PDF without exposing banking details in its URL", async () => {
-  const sent = [];
-  global.URL.createObjectURL = jest.fn(() => "blob:receipt");
-  global.URL.revokeObjectURL = jest.fn();
+test("signing saves the organisation context and continues to the student-list form", async () => {
+  const sent = []; global.URL.createObjectURL = jest.fn(() => "blob:receipt"); global.URL.revokeObjectURL = jest.fn();
   const anchorClick = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
   global.fetch = jest.fn(async (path, options) => {
-    if (path.includes("agreement-terms")) return { ok: true, text: async () => JSON.stringify({ ok: true, version: "existing-v1", terms: ["Existing referral terms"] }) };
-    if (path.includes("payout-banks")) return { ok: true, text: async () => JSON.stringify({ ok: true, banks: [{ code: "123", name: "Example Bank" }] }) };
+    if (path.includes("agreement-terms")) return { ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", terms: ["Organisation terms"] }) };
     sent.push({ path, body: JSON.parse(options.body) });
     if (path.includes("agreement-copy")) return { ok: true, headers: { get: () => "application/pdf" }, blob: async () => new Blob(["PDF"]) };
     return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "a".repeat(64) }) };
   });
   show(<PartnershipPage />, "/partnerships");
-  fireEvent.click(screen.getByRole("button", { name: "Read agreement and apply" }));
-  expect(await screen.findByText("Existing referral terms", { selector: "p" })).toBeInTheDocument();
-  for (const [label, value] of [["Your name or organisation", "Example partner"], ["Contact email", "partner@example.test"], ["Phone", "0200000000"], ["Address", "Accra"], ["Full name of person signing", "Example Director"], ["Role / capacity", "Director"], ["Account holder name", "Example partner"], ["Account number / mobile money number", "0123456789"]]) fireEvent.change(screen.getByLabelText(label), { target: { value } });
-  fireEvent.change(screen.getByLabelText("Bank / mobile money network"), { target: { value: "123" } });
+  fireEvent.click(screen.getByRole("button", { name: "Read agreement and register organisation" }));
+  expect(await screen.findByText("Organisation terms")).toBeInTheDocument();
+  for (const [label, value] of [["Organisation name", "Example agency"], ["Contact email", "agency@example.test"], ["Phone", "0200000000"], ["Address", "Accra"], ["Full name of person signing", "Director"], ["Role / capacity", "Director"]]) fireEvent.change(screen.getByLabelText(label), { target: { value } });
   for (const checkbox of screen.getAllByRole("checkbox")) fireEvent.click(checkbox);
   fireEvent.submit(screen.getByRole("button", { name: "Sign, save and download receipt" }).closest("form"));
   expect(await screen.findByText("Signed application saved.")).toBeInTheDocument();
-  expect(sent[0].path).toBe("/api/referrals/apply-signed");
-  expect(sent[0].body).toMatchObject({ signatureConsent: true, payoutConsent: true, termsVersion: "existing-v1", accountNumber: "0123456789" });
-  expect(sent[1].path).toBe("/api/referrals/agreement-copy");
-  expect(sent[1].path).not.toContain(sent[0].body.receiptToken);
+  expect(sent[0].body).toMatchObject({ kind: "institutional", billingResponsibility: "organisation", termsVersion: "org-v3" });
+  expect(screen.getByRole("link", { name: "Continue to add your students →" })).toHaveAttribute("href", "/organisation-enrolment");
+  const context = JSON.parse(sessionStorage.getItem("falowen:organisation-partner-context"));
+  expect(context.organisation.email).toBe("agency@example.test"); expect(context.agreementReference).toBe("a".repeat(64));
   anchorClick.mockRestore();
+});
+test("the student-list form prefills the signed organisation and sends its agreement reference", async () => {
+  sessionStorage.setItem("falowen:organisation-partner-context", JSON.stringify({ agreementReference: "a".repeat(64), organisation: { name: "Signed agency", contactName: "Director", email: "agency@example.test", phone: "0200000000" } }));
+  let payload;
+  global.fetch = jest.fn(async (path, options) => { payload = JSON.parse(options.body); return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "batch" }) }; });
+  show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
+  expect(screen.getByLabelText("Organisation name")).toHaveValue("Signed agency");
+  fireEvent.change(screen.getByLabelText("Student 1 Full name"), { target: { value: "Learner" } });
+  fireEvent.submit(screen.getByRole("button", { name: "Submit for Falowen review" }).closest("form"));
+  expect(await screen.findByText("batch")).toBeInTheDocument();
+  expect(payload.agreementReference).toBe("a".repeat(64));
 });
