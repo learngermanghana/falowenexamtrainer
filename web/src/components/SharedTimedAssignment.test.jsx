@@ -24,7 +24,7 @@ beforeEach(() => {
   setDoc.mockResolvedValue(undefined);
 });
 afterEach(() => jest.useRealTimers());
-test.each([["B1", "B1-6.18", 18], ["B1", "B1-10.27", 27], ["A2", "A2-10.27", 27], ["A1", "A1-12.3", null]])(
+test.each([["A2", "A2-8.21", 21], ["B1", "B1-6.18", 18], ["B1", "B1-10.27", 27], ["A2", "A2-10.27", 27], ["A1", "A1-12.3", null]])(
   "%s agreement, start, countdown, navigation, resume and expiry", async (level, assignmentKey, day) => {
     const onTimeExpired = jest.fn();
     const props = { level, assignmentKey, day, onTimeExpired };
@@ -248,4 +248,24 @@ test("Grammar study mode retains the visible countdown while a timed attempt is 
   fireEvent.click(screen.getByRole("checkbox"));
   await act(async () => fireEvent.click(screen.getByRole("button", { name: /^Start/ })));
   expect(screen.getByLabelText(/seconds remaining/)).toBeInTheDocument();
+});
+
+
+test("A2 Day 21 teacher timer reset clears the closed attempt and allows a new timed attempt", async () => {
+  const closed = { exists: () => true, data: () => ({
+    status: "submitted", clientStartedAt: Date.now() - 1800000, durationSeconds: 1800,
+  }) };
+  onSnapshot.mockImplementation((_ref, next) => { snapshot = next; next(closed); return unsubscribe; });
+  render(<Harness level="A2" assignmentKey="A2-8.21" day={21} />);
+  expect(screen.queryByRole("button", { name: /^Start/ })).not.toBeInTheDocument();
+  expect(screen.getByTestId("lock")).toHaveTextContent("true");
+  act(() => snapshot({ exists: () => false }));
+  expect(screen.getByRole("button", { name: /^Start/ })).toBeDisabled();
+  fireEvent.click(screen.getByRole("checkbox"));
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: /^Start/ })));
+  expect(screen.getByTestId("lock")).toHaveTextContent("false");
+  expect(screen.getByLabelText("1800 seconds remaining")).toBeInTheDocument();
+  expect(setDoc).toHaveBeenCalledWith("ref", expect.objectContaining({
+    assignmentKey: "A2-8.21", studentId: "student", timerRecord: true, status: "active",
+  }));
 });

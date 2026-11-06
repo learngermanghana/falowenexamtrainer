@@ -45,6 +45,8 @@ Replace these mutators with permanent shared navigation and submission component
 
 Target: one A2 workbook shell for Days 1–30 with route-locked submission context and native Grammar → Teil 1–4 → Ref → Submit navigation.
 
+Submission recovery (6 November 2026): `AssignmentSubmissionPage` reloads the signed-in student's submissions, locks and drafts when the visible page regains focus or visibility. Overlapping return events share one request; there is no polling. This reflects teacher unlocks and newly published marks without requiring a page reload. A score of 0 remains a reviewed failure eligible for the existing corrected-work flow, subject to server attempt and review rules. Timer reset and submitted-work locks remain separate controls. `A2Day21Submission.test.jsx` covers initial save, zero-score correction and submission-lock removal; `SharedTimedAssignment.test.jsx` covers the A2-8.21 timer lifecycle and teacher timer reset. These mocked tests do not verify a particular student's live records or deployed Firebase functions.
+
 ### Phase 3: A1 workbook shell
 
 Move all A1 tutor-marked days to `A1TutorMarkedWorkbookShell`, then retire A1 navigation and Day 19/20 patch scripts.
