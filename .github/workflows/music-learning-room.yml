@@ -54,6 +54,8 @@ jobs:
           node --check web/public/music/playback-queue.js
           node --check api/approved-music.js
           node --check scripts/publishApprovedMusic.mjs
+      - name: Check A2 Day 23 exact-recording English
+        run: node --test tests/a2-day23-lyrics-english.test.mjs
       - name: Check mobile continuous-playback queue and lock-screen contracts
         run: node --test web/tests/music-playback-queue.test.cjs
       - name: Install isolated DOM test dependencies

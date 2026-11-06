@@ -164,3 +164,14 @@ entry now binds English to its exact MP3 key, SHA-256 and all 41 displayed
 German lines. Unclear recognition is marked rather than silently corrected.
 The public player, workbook and lyrics API expose it as automatic-transcript
 English; existing German words, cues and approval states are unchanged.
+
+## A2 Day 23 English (6 November 2026)
+
+`Fahrrad zur Schule.mp3` now has English for all 36 displayed automatic
+transcript lines. The translation is stored separately from owner-reviewed
+recording lyrics and bound to the exact object key, German lines and recording
+SHA-256. The API, public player and Admin presenter can therefore use the same
+translation without substituting the differently segmented course draft.
+Automatic transcript and estimated timing labels remain in place. This change
+does not correct or approve recognition errors, alter audio, or invent cues.
+Regression: `node --test tests/a2-day23-lyrics-english.test.mjs`.

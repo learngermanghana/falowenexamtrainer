@@ -6948,6 +6948,159 @@
           "en": "Copyright"
         }
       ]
+    },
+    {
+      "objectKey": "music/a2/day-23/Fahrrad zur Schule.mp3",
+      "source": "automatic-transcript",
+      "lines": [
+        {
+          "de": "Jeden Morgen fahre ich zur Schule Früher bin",
+          "en": "Every morning I go to school. I used to"
+        },
+        {
+          "de": "ich immer Bus gefahren Doch heute nehme ich",
+          "en": "always take the bus. But today I take"
+        },
+        {
+          "de": "mein Fahrer Weil ich die Umwelt schützen will",
+          "en": "my bicycle because I want to protect the environment."
+        },
+        {
+          "de": "Die Sonne scheint,",
+          "en": "The sun is shining,"
+        },
+        {
+          "de": "die Luft ist frisch",
+          "en": "the air is fresh."
+        },
+        {
+          "de": "Ich fahre langsam durch den Park Ich brauche",
+          "en": "I ride slowly through the park. I do not need"
+        },
+        {
+          "de": "heute kein Auto",
+          "en": "a car today"
+        },
+        {
+          "de": "Und komme pünktlich in der Schule",
+          "en": "and arrive at school on time."
+        },
+        {
+          "de": "Hey, ja, hey, ja, der Morgen ist da",
+          "en": "Hey, yeah, hey, yeah, the morning is here."
+        },
+        {
+          "de": "Ich fahre mit dem Fahrrad ist auch klar",
+          "en": "I ride my bicycle, of course."
+        },
+        {
+          "de": "Wenige Autos, die Luft wird rein",
+          "en": "Fewer cars, the air becomes clean."
+        },
+        {
+          "de": "So soll mein Weg zur Schule sein Ich",
+          "en": "That is how my journey to school should be. I"
+        },
+        {
+          "de": "spare Geld,",
+          "en": "save money,"
+        },
+        {
+          "de": "ich bleibe fit Die frische Luft, die tut",
+          "en": "I stay fit. The fresh air does"
+        },
+        {
+          "de": "mir gut Ein schöner Tag, ein gutes Gefühl",
+          "en": "me good. A lovely day, a good feeling."
+        },
+        {
+          "de": "Ich mache etwas für die umwelt",
+          "en": "I do something for the environment."
+        },
+        {
+          "de": "Wenn es regnet, nehme ich den Bus Bei",
+          "en": "When it rains, I take the bus. In the"
+        },
+        {
+          "de": "Sonne fahre ich lieberer",
+          "en": "sunshine I prefer cycling."
+        },
+        {
+          "de": "Manchmal gehe ich auf zu Fuß Weil ich",
+          "en": "Sometimes I walk, because"
+        },
+        {
+          "de": "es nicht so weit habe Ich sehe Bäume",
+          "en": "it is not far. I see trees,"
+        },
+        {
+          "de": "blumen und den Park Und freue mich über",
+          "en": "flowers and the park, and enjoy"
+        },
+        {
+          "de": "die Natur",
+          "en": "nature."
+        },
+        {
+          "de": "Am Nachmittag fahre ich nach Hause Ganz entspannt",
+          "en": "In the afternoon I cycle home, completely relaxed"
+        },
+        {
+          "de": "und ohne Stress Heya heya, ja morgen ist",
+          "en": "and without stress. Hey, yeah, hey, yeah, the morning is"
+        },
+        {
+          "de": "da Ich fahre mit dem Fahrrad ist doch",
+          "en": "here. I ride my bicycle, of"
+        },
+        {
+          "de": "klar",
+          "en": "course."
+        },
+        {
+          "de": "Weniger Autos, die Luft wird rein So soll",
+          "en": "Fewer cars, the air becomes clean. That is how"
+        },
+        {
+          "de": "mein Weg zur Schule sein Ich spare Geld,",
+          "en": "my journey to school should be. I save money,"
+        },
+        {
+          "de": "ich bleibe fit Die frische Luft, die tut",
+          "en": "I stay fit. The fresh air does"
+        },
+        {
+          "de": "mir gut Ein schöner Tag,",
+          "en": "me good. A lovely day,"
+        },
+        {
+          "de": "ein gutes Gefühl Ich mache etwas für die",
+          "en": "a good feeling. I do something for the"
+        },
+        {
+          "de": "Umwelt Der Wind ist warm,",
+          "en": "environment. The wind is warm,"
+        },
+        {
+          "de": "die Sonne scheint Ich fahre langsam nach Haus",
+          "en": "the sun is shining. I cycle slowly home."
+        },
+        {
+          "de": "Heute war ein schöner Tag Morgen fahre ich",
+          "en": "Today was a lovely day. Tomorrow I will ride"
+        },
+        {
+          "de": "wieder rauf",
+          "en": "again."
+        },
+        {
+          "de": "Copyright",
+          "en": "Copyright"
+        }
+      ],
+      "recordingSha256": "b0883057d1559d7a004b29a7b044db872b1c46b4f6eea7b64f2350c9d5a9b195",
+      "level": "A2",
+      "day": 23
     }
   ]
 }
