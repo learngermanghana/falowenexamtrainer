@@ -38,7 +38,7 @@ const renderCanonicalRoute = ({
   );
 
 describe("A1CanonicalChapterLessonRoute", () => {
-  test("routes Kapitel 1.1 to its chapter resource hub even when stale state says 0.2", async () => {
+  test("routes retired Kapitel 1.1 to the unified Kapitel 0.2 resource hub even with stale state", async () => {
     renderCanonicalRoute({
       pathname: "/campus/course/lesson/A1/chapter/1.1",
       state: {
@@ -48,7 +48,7 @@ describe("A1CanonicalChapterLessonRoute", () => {
     });
 
     expect(
-      await screen.findByText("/campus/course/lesson/A1/2?chapter=1.1&hub=1"),
+      await screen.findByText("/campus/course/lesson/A1/2?chapter=0.2&hub=1"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("state")).toHaveTextContent("state-cleared");
   });
@@ -70,7 +70,7 @@ describe("A1CanonicalChapterLessonRoute", () => {
     });
 
     expect(
-      await screen.findByText("/campus/course/lesson/A1/2?chapter=1.1&hub=1"),
+      await screen.findByText("/campus/course/lesson/A1/2?chapter=0.2&hub=1"),
     ).toBeInTheDocument();
   });
 
@@ -103,7 +103,7 @@ describe("A1CanonicalChapterLessonRoute", () => {
 
   test("destination resolution is chapter-owned and opens each assignment resource hub", () => {
     expect(getA1CanonicalChapterDestination({ chapter: "1.1" })).toBe(
-      "/campus/course/lesson/A1/2?chapter=1.1&hub=1",
+      "/campus/course/lesson/A1/2?chapter=0.2&hub=1",
     );
     expect(getA1CanonicalChapterDestination({ chapter: "0.2" })).toBe(
       "/campus/course/lesson/A1/2?chapter=0.2&hub=1",

@@ -36,7 +36,7 @@ const renderBoundary = ({ pathname = "/campus/course/lesson/A1/2", search, state
   );
 
 describe("A1ChapterSpecificLessonRouteBoundary", () => {
-  test("keeps the requested Kapitel 1.1 URL even when stale state belongs to 0.2", async () => {
+  test("redirects retired Kapitel 1.1 to the unified Kapitel 0.2 route even with stale state", async () => {
     const onRender = jest.fn();
 
     renderBoundary({
@@ -53,7 +53,7 @@ describe("A1ChapterSpecificLessonRouteBoundary", () => {
     });
 
     expect(
-      await screen.findByText("/campus/course/lesson/A1/chapter/1.1"),
+      await screen.findByText("/campus/course/lesson/A1/chapter/0.2"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("lesson-state")).toHaveTextContent("state-cleared");
     expect(onRender).toHaveBeenCalledTimes(1);
@@ -105,7 +105,7 @@ describe("A1ChapterSpecificLessonRouteBoundary", () => {
 
     expect(
       await screen.findByText(
-        "/campus/course/lesson/A1/chapter/1.1?source=coursebook&radio=done",
+        "/campus/course/lesson/A1/chapter/0.2?source=coursebook&radio=done",
       ),
     ).toBeInTheDocument();
   });
@@ -125,7 +125,7 @@ describe("A1ChapterSpecificLessonRouteBoundary", () => {
         search: "?chapter=1.1",
       }),
     ).toEqual({
-      pathname: "/campus/course/lesson/A1/chapter/1.1",
+      pathname: "/campus/course/lesson/A1/chapter/0.2",
       search: "",
     });
     expect(
