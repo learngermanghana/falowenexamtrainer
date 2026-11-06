@@ -231,3 +231,25 @@ test('B1 Day 26 signs the supplied a2-prefix upload only for the exact lesson an
  assert.equal(res.code,400,'the legacy A2 signer must not gain this B1 permission');
  assert.throws(()=>signTrack('b1-day26-travel-problems',env),/Unknown/,'never expose private classroom Hören as public music');
 });
+
+
+test('A2 Day 23 commute conversation requires staff and the exact private object key', async () => {
+ const {createClassroomBankAudioHandler,createClassroomAudioHandler}=require('../server/courseMusic.cjs');
+ const key='a2/day-23/wie-kommst-du-zur-schule-oder-zur-arbeit.mp3';
+ const teacher={localId:'teacher',customAttributes:'{"role":"teacher"}'};
+ for(const createHandler of [createClassroomBankAudioHandler,createClassroomAudioHandler]) {
+  for(const [account,requested,day,level,expected] of [
+   [null,key,23,'A2',401], [{localId:'student',email:'student@example.test'},key,23,'A2',403],
+   [teacher,key,23,'A2',200], [{...teacher,disabled:true},key,23,'A2',401],
+   [teacher,key,21,'A2',400], [teacher,'a2/day-23/day-23.mp3',23,'A2',400],
+   [teacher,'music/a2/day-23/Fahrrad zur Schule.mp3',23,'A2',400],
+   [teacher,'a2/day-23/../private.mp3',23,'A2',400],
+  ]) {
+   const res=response();
+   await createHandler({env,fetchImpl:async()=>({ok:true,json:async()=>({users:account?[account]:[]})})})({method:'GET',headers:account?{authorization:'Bearer test',origin:'https://admin.falowen.app'}:{},url:'/?'+new URLSearchParams({level,day:String(day),key:requested})},res);
+   assert.equal(res.code,expected,requested);
+   if(expected===200) { assert.equal(new URL(res.body.url).pathname,'/'+key); assert.equal(res.headers['Cache-Control'],'private, no-store'); }
+  }
+ }
+ assert.throws(()=>signTrack('a2-day23-commute-classroom',env),/Unknown/);
+});
