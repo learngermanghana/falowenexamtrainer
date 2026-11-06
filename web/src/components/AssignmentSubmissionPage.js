@@ -1317,7 +1317,9 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   }, [assignmentOptions, form.assignmentTitle, requestedAssignmentMatch]);
 
   useEffect(() => {
+    let refreshInFlight = false;
     const loadDraftsAndSubmissions = async () => {
+      if (refreshInFlight) return;
       if (!db || !user?.uid) {
         setRecentSubmissions([]);
         setLockedChapters(new Set());
@@ -1327,6 +1329,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         return;
       }
 
+      refreshInFlight = true;
       setSubmissionDataLoaded(false);
       setSubmissionsLoading(true);
       try {
@@ -1431,12 +1434,24 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         console.error("Failed to load submissions", error);
         setStatus((prev) => ({ ...prev, error: "Could not load your previous submissions." }));
       } finally {
+        refreshInFlight = false;
         setSubmissionsLoading(false);
         setSubmissionDataLoaded(true);
       }
     };
 
+    // Recheck teacher unlocks and new marks when returning to the workbook.
+    // Avoid polling; focus and visibility events share one in-flight request.
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") loadDraftsAndSubmissions();
+    };
     loadDraftsAndSubmissions();
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
   }, [accessibleSubmitLevels, assignmentOptions, buildChapterKey, selectedSubmitLevel, user?.uid]);
 
   // When assignment changes, pull draft text (if any) into editor.
