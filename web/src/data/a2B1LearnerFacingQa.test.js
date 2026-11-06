@@ -60,6 +60,13 @@ describe("A2 + B1 learner-facing QA · Days 1–28", () => {
       const listening = getA2ListeningTask(day);
       expect(entry?.instruction).toBeTruthy();
 
+      if (day === 22) {
+        // Day 22 is an app-based speaking assessment without normal workbook parts.
+        expect(entry.instruction).toContain("App Assessment · No live class");
+        expect(entry.instruction).toContain("all three parts");
+        return;
+      }
+
       if (listening?.mode === A2_LISTENING_MODES.NONE) {
         expect(entry.instruction).toContain("no Teil 4 · Hören");
         expect(entry.instruction).toContain("Teil 1–3");
@@ -78,6 +85,13 @@ describe("A2 + B1 learner-facing QA · Days 1–28", () => {
       const entry = scheduleEntry("B1", day);
       const listening = getB1ListeningTask(day);
       expect(entry?.instruction).toBeTruthy();
+
+      if (day === 23) {
+        // Day 23 is an app-based speaking assessment without normal workbook parts.
+        expect(entry.instruction).toContain("App Assessment · No live class");
+        expect(entry.instruction).toContain("all three parts");
+        return;
+      }
 
       if (listening?.status === "unavailable") {
         expect(entry.instruction).toContain("kein Teil 4 · Hören");
