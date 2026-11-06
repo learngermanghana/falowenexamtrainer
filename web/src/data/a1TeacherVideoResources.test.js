@@ -179,7 +179,7 @@ describe("standardized A1 teacher videos", () => {
     );
 
     expect(teacherVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/yYIjI6P-qmw",
+      "https://youtu.be/1oOO1aJ8lV0",
     ]);
     expect(teacherVideos.map((video) => video.url)).not.toContain(
       "https://youtu.be/custom-teacher-video"
