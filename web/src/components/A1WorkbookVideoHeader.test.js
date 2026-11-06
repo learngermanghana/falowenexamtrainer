@@ -142,7 +142,7 @@ describe("A1 workbook AI video header", () => {
         pathname: "/campus/course/lesson/A1/2",
         search: "?view=workbook&chapter=1.1&assignmentKey=A1-1.1",
       })?.id,
-    ).toBe("A1-1.1");
+    ).toBe("A1-0.2_1.1");
 
     expect(
       resolveA1WorkbookVideoLesson({
