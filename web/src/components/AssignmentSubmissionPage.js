@@ -1318,6 +1318,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
   useEffect(() => {
     let refreshInFlight = false;
+    let active = true;
     const loadDraftsAndSubmissions = async () => {
       if (refreshInFlight) return;
       if (!db || !user?.uid) {
@@ -1335,11 +1336,24 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       try {
         // Recent submissions
         const submissionsRef = collection(db, SUBMISSION_COLLECTION);
-        const submissionSnapshot = await getDocs(
-          query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))
-        );
+        // Fetch both windows before replacing state so an older selected
+        // assignment never temporarily loses its reviewed score on return.
+        const [submissionSnapshot, selectedSnapshot] = await Promise.all([
+          getDocs(query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))),
+          selectedCanonicalAssignmentKey
+            ? getDocs(query(
+                submissionsRef,
+                where("studentId", "==", user.uid),
+                where("canonicalAssignmentKey", "==", selectedCanonicalAssignmentKey),
+                limit(50)
+              ))
+            : Promise.resolve({ docs: [] }),
+        ]);
+        if (!active) return;
+        const submissionsById = new Map(submissionSnapshot.docs.map(entry => [entry.id, entry]));
+        selectedSnapshot.docs.forEach(entry => submissionsById.set(entry.id, entry));
 
-        const entries = submissionSnapshot.docs
+        const entries = Array.from(submissionsById.values())
           .map((entry) => {
             const data = entry.data() || {};
             const computedAssignmentKey =
@@ -1371,6 +1385,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         // Locks
         const lockRef = collection(db, LOCK_COLLECTION);
         const lockSnapshot = await getDocs(query(lockRef, where("studentId", "==", user.uid)));
+        if (!active) return;
 
         const locked = new Set();
         const lockMeta = {};
@@ -1402,6 +1417,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
           query(draftsRef, where("studentId", "==", user.uid), orderBy("updatedAt", "desc"), limit(30))
         );
 
+        if (!active) return;
         const latestDrafts = {};
         draftSnapshot.docs.forEach((docSnap) => {
           const data = docSnap.data();
@@ -1431,12 +1447,15 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         });
         setDraftsByAssignment(latestDrafts);
       } catch (error) {
+        if (!active) return;
         console.error("Failed to load submissions", error);
         setStatus((prev) => ({ ...prev, error: "Could not load your previous submissions." }));
       } finally {
         refreshInFlight = false;
-        setSubmissionsLoading(false);
-        setSubmissionDataLoaded(true);
+        if (active) {
+          setSubmissionsLoading(false);
+          setSubmissionDataLoaded(true);
+        }
       }
     };
 
@@ -1449,10 +1468,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     window.addEventListener("focus", refreshWhenVisible);
     document.addEventListener("visibilitychange", refreshWhenVisible);
     return () => {
+      active = false;
       window.removeEventListener("focus", refreshWhenVisible);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
-  }, [accessibleSubmitLevels, assignmentOptions, buildChapterKey, selectedSubmitLevel, user?.uid]);
+  }, [accessibleSubmitLevels, assignmentOptions, buildChapterKey, selectedCanonicalAssignmentKey, selectedSubmitLevel, user?.uid]);
 
   // When assignment changes, pull draft text (if any) into editor.
   useEffect(() => {
@@ -1515,35 +1535,6 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       }),
     [buildChapterKey, form.assignmentTitle, selectedAssignmentId, selectedAssignmentLevel, selectedCanonicalAssignmentKey, selectedChapterKey]
   );
-
-  useEffect(() => {
-    const loadSelectedAssignmentAttempts = async () => {
-      if (!db || !user?.uid || !selectedCanonicalAssignmentKey) return;
-
-      try {
-        const snapshot = await getDocs(
-          query(
-            collection(db, SUBMISSION_COLLECTION),
-            where("studentId", "==", user.uid),
-            where("canonicalAssignmentKey", "==", selectedCanonicalAssignmentKey),
-            limit(50)
-          )
-        );
-        const selectedEntries = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
-        if (!selectedEntries.length) return;
-
-        setRecentSubmissions((current) => {
-          const byId = new Map(current.map((entry) => [entry.id, entry]));
-          selectedEntries.forEach((entry) => byId.set(entry.id, entry));
-          return Array.from(byId.values());
-        });
-      } catch (error) {
-        console.error("Failed to load selected assignment attempts", error);
-      }
-    };
-
-    loadSelectedAssignmentAttempts();
-  }, [selectedCanonicalAssignmentKey, user?.uid]);
 
   const selectedResubmissionCount = useMemo(() => {
     return recentSubmissions.reduce((count, entry) => {

@@ -71,8 +71,8 @@ jest.mock("../firebase", () => ({
   httpsCallable: jest.fn(() => jest.fn(() => Promise.resolve({ data: { attempt: 2 } }))),
   serverTimestamp: jest.fn(() => ({ seconds: 1 })),
   collection: jest.fn((_db, name) => ({ name })),
-  query: jest.fn((ref) => ref),
-  where: jest.fn(() => ({})),
+  query: jest.fn((ref, ...constraints) => ({ ...ref, constraints })),
+  where: jest.fn((field, _op, value) => ({ field, value })),
   orderBy: jest.fn(() => ({})),
   limit: jest.fn(() => ({})),
   doc: jest.fn(() => ({})),
@@ -114,7 +114,13 @@ const open = () => renderPage(["/campus/submit?level=A2&assignmentKey=A2-8.21"])
 beforeEach(() => {
   jest.clearAllMocks();
   rows = { submissions: [], submissionLocks: [], submissionDrafts: [] };
-  getDocs.mockImplementation(async (ref) => ({ docs: rows[ref.name] || [], empty: !(rows[ref.name] || []).length }));
+  getDocs.mockImplementation(async (ref) => {
+    const selected = ref.constraints?.find(item => item.field === "canonicalAssignmentKey");
+    const docs = selected && rows.selectedAttempts
+      ? rows.selectedAttempts.filter(item => item.data().canonicalAssignmentKey === selected.value)
+      : rows[ref.name] || [];
+    return { docs, empty: !docs.length };
+  });
 });
 test("A2 Day 21 saves the first confirmed submission atomically with its lock", async () => {
   open();
@@ -174,4 +180,59 @@ test("return events share a refresh and listeners stop when the page closes", as
   fireEvent(window, new Event("focus"));
   fireEvent(document, new Event("visibilitychange"));
   expect(getDocs).not.toHaveBeenCalled();
+});
+
+
+test.each(["focus", "visibilitychange"])("%s retains and refreshes reviewed attempts outside the latest 25 submissions", async (eventName) => {
+  rows.submissionLocks = [lock()];
+  rows.submissions = Array.from({ length: 25 }, (_, index) => entry(`newer-${index}`, {
+    studentId: "u1", level: "A2", canonicalAssignmentKey: "A2-10.28",
+    assignmentKey: "A2-10.28", assignmentTitle: "Another assignment", status: "submitted",
+    score: 90, createdAt: new Date("2026-02-01"),
+  }));
+  rows.selectedAttempts = [failed()];
+  open();
+  await screen.findByRole("textbox", { name: /Corrected (work|answers)/ });
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+  // A subsequent review must replace the cached score, not merely retain it.
+  rows.selectedAttempts = [entry("first", { ...failed().data(), score: 35 })];
+  getDocs.mockClear();
+  fireEvent(eventName === "focus" ? window : document, new Event(eventName));
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+  expect(getDocs.mock.calls.some(([ref]) => ref.constraints?.some(item =>
+    item.field === "canonicalAssignmentKey" && item.value === "A2-8.21"
+  ))).toBe(true);
+  const editor = screen.getByRole("textbox", { name: /Corrected (work|answers)/ });
+  expect(screen.queryByText("Awaiting review")).not.toBeInTheDocument();
+  fireEvent.change(editor, { target: { value: corrected } });
+  fireEvent.change(screen.getByRole("textbox", { name: /What did you improve/ }), {
+    target: { value: "I completed the invitation and corrected the weekend plans and missing answers." },
+  });
+  fireEvent.click(screen.getByRole("button", { name: /Submit resubmission/i }));
+  await waitFor(() => expect(httpsCallable).toHaveBeenCalled());
+  expect(httpsCallable.mock.results[0].value).toHaveBeenCalledWith(expect.objectContaining({
+    assignmentKey: "A2-8.21", previousScore: 35, attempt: 2,
+  }));
+});
+
+test("a slower assignment-specific refresh keeps the existing correction form until both windows finish", async () => {
+  rows.submissionLocks = [lock()];
+  rows.selectedAttempts = [failed()];
+  open();
+  await screen.findByRole("textbox", { name: /Corrected (work|answers)/ });
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+  const normalGetDocs = getDocs.getMockImplementation();
+  let finishSelected;
+  getDocs.mockImplementation(ref => {
+    if (ref.constraints?.some(item => item.field === "canonicalAssignmentKey")) {
+      return new Promise(resolve => { finishSelected = resolve; });
+    }
+    return normalGetDocs(ref);
+  });
+  fireEvent(window, new Event("focus"));
+  await waitFor(() => expect(finishSelected).toEqual(expect.any(Function)));
+  expect(screen.getByRole("textbox", { name: /Corrected (work|answers)/ })).toBeEnabled();
+  expect(screen.queryByText("Awaiting review")).not.toBeInTheDocument();
+  await act(async () => finishSelected({ docs: [failed()], empty: false }));
+  expect(screen.getByRole("textbox", { name: /Corrected (work|answers)/ })).toBeEnabled();
 });
