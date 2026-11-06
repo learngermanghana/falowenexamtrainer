@@ -288,6 +288,13 @@
       }
     },
     {
+      "src": "/book-appointment/?",
+      "dest": "/book-appointment/index.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/robots\\.txt",
       "has": [
         {
@@ -528,6 +535,13 @@
     {
       "src": "/classes/([^/]+)/?",
       "dest": "/classes/index.html"
+    },
+    {
+      "src": "/api/public/appointments",
+      "dest": "https://admin.falowen.app/api/appointments",
+      "headers": {
+        "Cache-Control": "no-store, max-age=0"
+      }
     },
     {
       "src": "/api/public/classes",

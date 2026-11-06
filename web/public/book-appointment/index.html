@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d503f" />
+  <meta name="description" content="Choose an available time to speak with Falowen. Book a free consultation online, with confirmation and meeting details by email." />
+  <link rel="canonical" href="https://falowen.app/book-appointment" />
+  <title>Book an appointment | Falowen</title>
+  <link rel="stylesheet" href="/book-appointment/style.css" />
+  <script src="/book-appointment/app.js" defer></script>
+</head>
+<body>
+  <header class="booking-topbar">
+    <a class="booking-brand" href="https://falowen.app/" aria-label="Falowen home">
+      <span class="booking-mark" aria-hidden="true">F</span>
+      <span>FALOWEN</span>
+    </a>
+    <span class="booking-top-title">SCHEDULE A MEETING</span>
+    <span class="booking-secure">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      Secure booking
+    </span>
+  </header>
+
+  <main class="booking-layout">
+    <section class="booking-content" aria-labelledby="booking-title">
+      <div class="booking-content-inner">
+        <div class="booking-intro">
+          <p class="booking-eyebrow">FALOWEN <span aria-hidden="true">·</span> SCHEDULE A MEETING</p>
+          <h1 id="booking-title">Book an appointment</h1>
+          <p class="booking-lead">Choose a convenient time to meet with our team. No account or payment is needed.</p>
+          <div class="booking-timezone">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-3 3-3 15 0 18M12 3c3 3 3 15 0 18"/></svg>
+            <span>All appointment times are shown in <strong>Accra, Ghana</strong> (GMT / UTC+00:00).</span>
+          </div>
+        </div>
+
+        <div id="booking-error" class="booking-alert" role="alert" hidden></div>
+
+        <section id="choose-step" class="booking-step" aria-labelledby="step-heading">
+          <div class="booking-step-heading">
+            <span class="booking-step-number">1</span>
+            <h2 id="step-heading">Choose your appointment time</h2>
+          </div>
+          <p class="booking-step-description">Pick a date, then choose one of the available times.</p>
+
+          <div class="booking-availability-bar">
+            <span id="availability-count" aria-live="polite">Checking availability…</span>
+            <button id="refresh-times" class="booking-text-button" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2 6M20 4v7h-7"/></svg>
+              Refresh times
+            </button>
+          </div>
+
+          <div id="loading-slots" class="booking-loading" role="status">
+            <span class="booking-spinner" aria-hidden="true"></span> Finding available dates…
+          </div>
+
+          <div id="availability-content" hidden>
+            <h3 class="booking-section-label">Choose a date</h3>
+            <div id="booking-dates" class="booking-dates" role="group" aria-label="Available appointment dates"></div>
+            <button id="more-dates" type="button" class="booking-more-dates" hidden>Show more dates
+              <svg width="15" height="15" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="booking-times-header">
+              <h3 id="times-heading" class="booking-section-label">Available times</h3>
+              <span>GMT</span>
+            </div>
+            <div id="booking-times" class="booking-times" role="group" aria-labelledby="times-heading"></div>
+          </div>
+          <p id="no-availability" class="booking-empty" hidden>No appointment times are available at the moment. Please check back soon.</p>
+        </section>
+
+        <section id="details-step" class="booking-step" aria-labelledby="details-heading" hidden>
+          <button id="back-to-times" type="button" class="booking-back">← Change appointment time</button>
+          <div class="booking-step-heading">
+            <span class="booking-step-number">2</span>
+            <h2 id="details-heading">Tell us a little about yourself</h2>
+          </div>
+          <p class="booking-step-description">We'll send your confirmation and Zoom meeting details to your email.</p>
+          <form id="booking-contact-form" class="booking-form" novalidate>
+            <div class="booking-form-row">
+              <label for="booking-name">Full name <span aria-hidden="true">*</span>
+                <input id="booking-name" name="name" type="text" autocomplete="name" maxlength="120" minlength="2" placeholder="Your full name" required />
+              </label>
+              <label for="booking-email">Email address <span aria-hidden="true">*</span>
+                <input id="booking-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com" required />
+              </label>
+            </div>
+            <label for="booking-phone">Phone number <span class="booking-optional">(optional)</span>
+              <input id="booking-phone" name="phone" type="tel" autocomplete="tel" maxlength="40" placeholder="+233 ..." />
+            </label>
+            <label for="booking-notes">Anything you'd like us to know? <span class="booking-optional">(optional)</span>
+              <textarea id="booking-notes" name="notes" maxlength="500" rows="3" placeholder="Tell us what you'd like to discuss"></textarea>
+            </label>
+            <div class="booking-honeypot" aria-hidden="true"><label>Website <input name="website" type="text" tabindex="-1" autocomplete="off" /></label></div>
+            <p class="booking-form-notice">No payment required. Your details are used only to arrange this meeting.</p>
+            <button id="booking-confirm" class="booking-form-submit" type="submit">Confirm appointment <span aria-hidden="true">→</span></button>
+          </form>
+        </section>
+
+        <section id="success-step" class="booking-step booking-success" role="status" aria-live="polite" hidden>
+          <span class="booking-success-icon" aria-hidden="true">✓</span>
+          <h2>Your appointment is confirmed!</h2>
+          <p id="success-description">Your meeting is saved.</p>
+          <div id="success-details" class="booking-success-details"></div>
+          <p id="success-email" class="booking-success-email"></p>
+          <button id="booking-again" class="booking-more-dates" type="button">Book another appointment →</button>
+        </section>
+      </div>
+    </section>
+
+    <aside class="booking-summary" aria-label="Your appointment summary">
+      <div class="booking-summary-inner">
+        <p class="booking-summary-eyebrow">YOUR APPOINTMENT</p>
+        <h2 id="summary-title">Let's find a time that works.</h2>
+        <p id="summary-description">Select any available time and we'll take care of the rest.</p>
+        <div id="summary-card" class="booking-summary-card" aria-live="polite">
+          <div class="booking-placeholder">
+            <span class="booking-calendar-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>
+            </span>
+            <span>Your selected appointment will<br />appear here.</span>
+          </div>
+        </div>
+        <button id="summary-next" class="booking-summary-next" type="button" disabled>
+          <span>Continue</span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <p class="booking-summary-footnote">You will receive a confirmation email with your meeting information.</p>
+      </div>
+    </aside>
+  </main>
+
+  <div id="mobile-action" class="booking-mobile-action" hidden>
+    <span id="mobile-selection"></span>
+    <button id="mobile-next" type="button">Continue <span aria-hidden="true">→</span></button>
+  </div>
+</body>
+</html>
