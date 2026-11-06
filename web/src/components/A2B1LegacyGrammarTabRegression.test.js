@@ -12,17 +12,17 @@ import {
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
 const expectedTabOrder = [
+  "references", // Music appears before Grammar on current A2/B1 workbooks.
   "grammar",
   "sprechen",
   "schreiben",
   "lesen",
   "hoeren",
-  "references",
   "submit",
 ];
 
 describe("A2/B1 legacy workbook grammar-tab regression", () => {
-  it("keeps Grammar first for legacy A2 and B1 workbook navigation", () => {
+  it("keeps optional Music before Grammar in legacy A2 and B1 workbook navigation", () => {
     ["A2 Day 22 workbook sections", "B1 Day 3 workbook sections"].forEach((ariaLabel) => {
       const resolved = getWorkbookTabsWithLegacyGrammar({
         tabs: STANDARD_WORKBOOK_TABS,

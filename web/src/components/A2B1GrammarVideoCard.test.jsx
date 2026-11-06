@@ -22,7 +22,7 @@ describe("A2/B1 grammar notes without duplicate AI video cards", () => {
   test.each([
     ["A2", 1, "1.1", "https://youtu.be/HMEs3mEKdrk?si=VYK4VjV9Da2_AzU0"],
     ["B1", 2, "1.2", "https://youtu.be/Skl0FjF5JBg"],
-    ["B1", 13, "4.13", "https://youtu.be/mH1nb8qJWhU"],
+    ["B1", 13, "4.13", "https://youtu.be/NwieoHEBZVs"],
   ])("%s Day %i still offers the teacher lecture and AI video in lesson resources", (level, day, chapter, aiUrl) => {
     const lesson = normalizeA2B1Lesson({ day, chapter }, level);
     const urls = lesson.resources.videos.map((video) => video.url);

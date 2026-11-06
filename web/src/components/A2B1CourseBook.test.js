@@ -127,13 +127,13 @@ describe("A2 and B1 course books", () => {
     expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
   });
 
-  test.each(["A2", "B1"])("adds a standardized Submit tab after Teil 1-4 and Ref for %s", (level) => {
+  test.each(["A2", "B1"])("shows Music first and Submit after Teil 1–4 for %s", (level) => {
     expect(getWorkbookNavigationTabs(level).map((tab) => tab.label)).toEqual([
+      "Music",
       "Teil 1",
       "Teil 2",
       "Teil 3",
       "Teil 4",
-      "Ref",
       "Submit",
     ]);
   });

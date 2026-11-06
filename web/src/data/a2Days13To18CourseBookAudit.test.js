@@ -72,7 +72,7 @@ describe("A2 Course Book continuation audit · Days 13–18", () => {
     expect(source).toContain("day={17}");
     expect(source).toContain('chapter="6.17"');
     expect(source).not.toContain("openGrammarAfterRadio");
-    expect(shared).toContain('useState("sprechen")');
+    expect(shared).toContain('useState("references")');
     expect(shared).not.toContain("radioCompleted");
   });
 
