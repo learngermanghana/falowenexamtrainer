@@ -27,6 +27,10 @@ on:
       - "web/src/data/mockFactoryContract.js"
       - "web/src/components/A1Kombi*"
       - "web/src/components/A1FinalMockExamPage.jsx"
+      - "web/src/components/A1GoetheSpeakingMockPreview.jsx"
+      - "web/src/components/A1AllMocksSubmission.test.jsx"
+      - "web/src/services/coachService.js"
+      - "web/src/services/a1FinalMockService.js"
       - "web/src/components/MockExamLibraryPage.js"
       - "web/src/utils/mockReviewAccess.js"
       - "web/src/services/mockAssessmentRequest.js"
@@ -43,6 +47,10 @@ on:
       - "web/src/data/a1Kombi*"
       - "web/src/components/A1Kombi*"
       - "web/src/components/A1FinalMockExamPage.jsx"
+      - "web/src/components/A1GoetheSpeakingMockPreview.jsx"
+      - "web/src/components/A1AllMocksSubmission.test.jsx"
+      - "web/src/services/coachService.js"
+      - "web/src/services/a1FinalMockService.js"
       - ".github/workflows/a1-kombi-mocks-tests.yml"
 
 permissions:
@@ -96,4 +104,5 @@ jobs:
             src/components/A1KombiMockIntegration.test.jsx \
             src/components/A1KombiFlowContract.test.jsx \
             src/components/A1KombiMockDesignParity.test.jsx \
-            src/components/A1Mock4HoerenUpgrade.test.jsx
+            src/components/A1Mock4HoerenUpgrade.test.jsx \
+            src/components/A1AllMocksSubmission.test.jsx

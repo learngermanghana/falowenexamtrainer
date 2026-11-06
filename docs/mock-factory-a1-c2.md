@@ -32,3 +32,15 @@ Draft authoring is available, but a complete verified four-module engine and res
 - Staff can create/edit `draft` or `review` records only. No browser API grants `published` status.
 - Published correct answers and score calculations are server-owned.
 - Admin's local rules file is not the complete production Firestore ruleset; the exam trainer's `firestore.rules` is the canonical source. Do not deploy Admin's reduced rules file over it.
+
+### A1 submission regression coverage
+
+`web/src/components/A1AllMocksSubmission.test.jsx` exercises the shared full-mock
+page and real HTTP service wrappers for Mocks 01–08, with network responses
+stubbed. It covers advancing through all four modules with saved speaking
+transcripts, resuming an expired speaking section with incomplete answers,
+and retrying failed final marking without losing the saved answers. The A1
+speaking endpoint receives three `attempts`, the original `attemptId`, `mockId`
+and the mock-specific task version; it does not use examiner session IDs.
+These tests verify the completion save request and final result UI, not live
+microphone capture, AI grading, Firestore persistence or Admin synchronization.
