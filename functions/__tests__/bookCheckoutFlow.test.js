@@ -49,6 +49,18 @@ test("checkout validates quantities and delivery, charges server total and verif
   const a2PrintedReceipt=await processBookWebhook({admin,data:{domain:"live",status:"success",reference:saved.reference,currency:"GHS",amount:210000,customer:{email:saved.email},metadata:initialization.metadata}});
   assert.equal(a2PrintedReceipt.body.status,"synced");
   assert.equal(receipt.amountGhs,2100);
+  const writingPrinted=await invoke({bookId:"writing-skills-a1-c2-printed",quantity:2,deliveryMethod:"delivery",deliveryAddress:"Accra, Example Street"});
+  assert.equal(writingPrinted.code,200);
+  assert.equal(initialization.amount,50000); // 2 copies × GH₵250
+  assert.equal(initialization.metadata.bookId,"writing-skills-a1-c2-printed");
+  assert.equal(saved.format,"printed");
+  assert.equal(saved.priceGhs,500);
+  assert.equal(saved.quantity,2);
+  const writingDigital=await invoke({bookId:"writing-skills-a1-c2-digital"});
+  assert.equal(writingDigital.code,200);
+  assert.equal(initialization.amount,3900);
+  assert.equal(saved.format,"digital");
+  assert.equal(saved.priceGhs,39);
   const legacy=await invoke({bookId:"a1-digital"});assert.equal(legacy.code,200);assert.equal(initialization.amount,10000);assert.equal(saved.quantity,1);
  } finally {
   global.fetch=oldFetch;

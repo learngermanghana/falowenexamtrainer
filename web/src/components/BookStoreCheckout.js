@@ -73,7 +73,7 @@ function ReceiptConfirmation({ basePath = "/books" }) {
           <dt>Amount</dt><dd><strong>{money(order.priceGhs)}</strong></dd>
         </dl>
         <p>{order.status === "paid"
-          ? order.format === "printed" ? "Falowen will arrange printing manually. Delivery costs are separate." : order.downloadableBookIds?.length ? "Your private PDF download is available below for this verified purchase." : "Falowen will arrange the PDF manually. No automatic download is issued."
+          ? order.format === "printed" ? "Falowen will arrange printing manually. Delivery costs are separate." : order.downloadableBookIds?.length ? "Your private PDF download is available below for this verified purchase." : "Your digital PDF is delivered manually by Falowen after payment verification; no instant download is issued for this title."
           : "If you have been charged, do not pay a second time. Retain your Paystack receipt and check again."}</p>
         {order.status === "paid" && Array.isArray(order.downloadableBookIds)
           ? order.downloadableBookIds.map(id =>
@@ -82,6 +82,10 @@ function ReceiptConfirmation({ basePath = "/books" }) {
               {downloadBusy ? "Preparing your private PDF…" : "Download purchased PDF"}
             </button>)
           : null}
+        {order.status === "paid" && order.format === "digital" && !order.downloadableBookIds?.length &&
+          <p><a href={`mailto:learngermanghana@gmail.com?subject=${encodeURIComponent("Falowen PDF delivery — " + order.orderId)}`}>
+            Contact Falowen about PDF delivery
+          </a></p>}
         <button type="button" className="fb-btn fb-btn-ghost" onClick={copyReceipt}>Copy receipt details</button>
       </div> : null}
       {error ? <p className="fb-error" role="alert">{error}</p> : null}
