@@ -399,17 +399,20 @@ Herr Weber: Auf Wiedersehen!`,
     submitRequired: false,
   }),
   24: task({
-    // New owner-provided private R2 recording. Do not reuse the old smartphone
-    // questions or grade an unreviewed recording against the legacy answer key.
-    title: "Konsum und Nachhaltigkeit · Hören · Neue Aufnahme",
-    instructions: "Hören Sie die neue Aufnahme zweimal. Konzentrieren Sie sich auf das Hauptthema, die Meinungen und wichtige Details. Die bisherigen Fragen wurden entfernt, da sie nicht für diese neue Aufnahme überprüft sind.",
+    title: "Konsum und Nachhaltigkeit · Hören · 5 Fragen",
+    instructions: "Lesen Sie zuerst die fünf Fragen. Hören Sie das Gespräch zweimal und wählen Sie jeweils A, B oder C.",
     audioKey: "b1/day-24/day_24.mp3",
     videoTitle: "B1 Day 24 · Konsum und Nachhaltigkeit",
-    submitRequired: false,
+    submitRequired: true,
     showPublishedPractice: false,
-    selfCheckText: "Neue Aufnahme · Hörtraining ohne benotete Fragen. Teil 4 ist bis zur Prüfung passender Fragen eine freiwillige Hörübung. Reichen Sie nur Schreiben und Lesen ein.",
-    submissionNote: "Hörtraining ohne Benotung. Keine alten Teil-4-Antworten einreichen.",
-    questions: [],
+    submissionNote: "Reichen Sie die fünf Antwortbuchstaben im Submit-Tab als TEIL 4 ein.",
+    questions: [
+      q("Woher kommt Lisa gerade?", ["A) Vom Wochenmarkt und aus dem Unverpackt-Laden", "B) Aus dem normalen Supermarkt", "C) Direkt von zu Hause"]),
+      q("Was möchte Lisa im Alltag stark reduzieren?", ["A) Ihren Stromverbrauch", "B) Ihren Plastikmüll", "C) Ihre Ausgaben für Kleidung"]),
+      q("Was hat Lisa früher oft gemacht?", ["A) Zu viel gekauft und die Hälfte weggeworfen", "B) Immer nur im Supermarkt eingekauft", "C) Sehr viel Geld gespart"]),
+      q("Wie kauft Lisa heute ein?", ["A) Ganz spontan ohne Plan", "B) Nur noch Bioprodukte", "C) Sie plant ihre Mahlzeiten genau"]),
+      q("Was findet Lisa am Gemüse vom Markt besonders gut?", ["A) Es ist viel frischer", "B) Es ist sehr günstig", "C) Es hat keine Verpackung"]),
+    ],
   }),
   25: task({
     title: "Online einkaufen – Rechte und Risiken · Hören · Richtig oder Falsch (5 Aufgaben)",

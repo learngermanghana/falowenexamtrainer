@@ -1,0 +1,59 @@
+{
+  "mode": "course",
+  "level": "B1",
+  "examPart": "",
+  "title": "Konsum und Nachhaltigkeit",
+  "kind": "multiple-choice",
+  "questions": [
+    {
+      "question": "Woher kommt Lisa gerade?",
+      "evidence": "Ich komme gerade vom Wochenmarkt und aus dem Unverpackt-Laden.",
+      "options": [
+        "Vom Wochenmarkt und aus dem Unverpackt-Laden",
+        "Aus dem normalen Supermarkt",
+        "Direkt von zu Hause"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Was möchte Lisa im Alltag stark reduzieren?",
+      "evidence": "Ich versuche, meinen Plastikmüll im Alltag stark zu reduzieren.",
+      "options": [
+        "Ihren Stromverbrauch",
+        "Ihren Plastikmüll",
+        "Ihre Ausgaben für Kleidung"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Was hat Lisa früher oft gemacht?",
+      "evidence": "Früher habe ich oft zu viel gekauft und am Ende die Hälfte weggeworfen.",
+      "options": [
+        "Zu viel gekauft und die Hälfte weggeworfen",
+        "Immer nur im Supermarkt eingekauft",
+        "Sehr viel Geld gespart"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Wie kauft Lisa heute ein?",
+      "evidence": "Heute plane ich meine Mahlzeiten genau und kaufe nur das, was ich wirklich brauche.",
+      "options": [
+        "Ganz spontan ohne Plan",
+        "Nur noch Bioprodukte",
+        "Sie plant ihre Mahlzeiten genau"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Was findet Lisa am Gemüse vom Markt besonders gut?",
+      "evidence": "Außerdem schmeckt das Gemüse vom Markt viel frischer.",
+      "options": [
+        "Es ist viel frischer",
+        "Es ist sehr günstig",
+        "Es hat keine Verpackung"
+      ],
+      "correctIndex": 0
+    }
+  ]
+}
