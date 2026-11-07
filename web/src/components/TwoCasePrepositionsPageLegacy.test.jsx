@@ -29,7 +29,7 @@ test("A1-12.1 workbook Grammar tab and the standalone route use the rewritten le
 test("A1 Day 18 teaching distinguishes object cases from cases required by prepositions", () => {
   renderLesson();
   expect(screen.getByText(/A single German sentence can contain both Akkusativ and Dativ/i)).toBeInTheDocument();
-  expect(screen.getByText(/sehen requires den Mann/i)).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: /Verbs and prepositions can control different parts/i }).closest("section")).toHaveTextContent("sehen requires den Mann");
   expect(screen.getByText(/Do not apply the Wo\/Wohin\? case choice/i)).toBeInTheDocument();
   expect(screen.getByText(/Subject \+ Verb \+ \(Object, if needed\) \+ Preposition \+ German case phrase/i)).toBeInTheDocument();
 });
