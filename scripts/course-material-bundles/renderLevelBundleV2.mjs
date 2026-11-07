@@ -15,6 +15,7 @@ import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
 import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent } from "./b1PdfPrintExtras.mjs";
 import { addB1RetailCover } from "./b1RetailCover.mjs";
+import { classifyPdfLoginFailure } from "./pdfLoginFailures.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -102,62 +103,40 @@ const credentials = () => {
   const email = String(process.env.FALOWEN_PDF_EMAIL || "").trim();
   const password = String(process.env.FALOWEN_PDF_PASSWORD || "");
   if (!email || !password) throw new Error("Falowen PDF login requires FALOWEN_PDF_EMAIL and FALOWEN_PDF_PASSWORD repository secrets.");
+  if (password.length < 8) throw new Error("Falowen PDF password secret is shorter than the login form minimum of 8 characters; update FALOWEN_PDF_PASSWORD.");
   return { email, password };
 };
 
 const getLoginForm = (page) =>
   page.locator("form").filter({ hasText: /Email or student code/i }).first();
 
-const LOGIN_FAILURE_PATTERN =
-  /Password mismatch|could not find an account|cannot log in right now|permission denied|too many login attempts|could not connect to the internet|student account cannot log in/i;
-
+// Do not treat a brief React form unmount as evidence of a successful login.
+const LOGIN_SETTLE_MS = 1600;
+const LOGIN_WAIT_TIMEOUT_MS = 45000;
 const waitForLoginCompletion = async (page) => {
-  await page.waitForFunction(
-    () => {
-      const bodyText = document.body?.innerText || "";
-      const forms = Array.from(document.querySelectorAll("form"));
-      const loginFormVisible = forms.some((form) => {
-        const text = form.innerText || "";
-        const style = window.getComputedStyle(form);
-        const rect = form.getBoundingClientRect();
-        return (
-          /Email or student code/i.test(text) &&
-          style.display !== "none" &&
-          style.visibility !== "hidden" &&
-          rect.width > 0 &&
-          rect.height > 0
-        );
-      });
-      const failed =
-        /Password mismatch|could not find an account|cannot log in right now|permission denied|too many login attempts|could not connect to the internet|student account cannot log in/i.test(
-          bodyText,
-        );
-      return failed || !loginFormVisible;
-    },
-    undefined,
-    { timeout: 30000 },
-  );
-
-  await waitForPage(page);
-
-  const authText = await getBodyText(page);
-  if (LOGIN_FAILURE_PATTERN.test(authText)) {
-    if (level === "A2") throw new Error("A2 PDF login failed; page text omitted to protect account data.");
-    throw new Error(`Falowen PDF login failed: ${authText.slice(0, 500)}`);
+  const deadline = Date.now() + LOGIN_WAIT_TIMEOUT_MS;
+  let hiddenSince = 0;
+  while (Date.now() < deadline) {
+    const loginFormVisible = await getLoginForm(page).isVisible().catch(() => false);
+    if (loginFormVisible) {
+      hiddenSince = 0;
+      const reason = classifyPdfLoginFailure(await getBodyText(page));
+      if (reason) throw new Error(`Falowen PDF login rejected (${reason}). Check the export account and FALOWEN_PDF_EMAIL/FALOWEN_PDF_PASSWORD secrets.`);
+    } else {
+      if (!hiddenSince) hiddenSince = Date.now();
+      if (Date.now() - hiddenSince >= LOGIN_SETTLE_MS) {
+        // The form must stay gone after Firebase/React finishes hydrating.
+        await page.waitForTimeout(1200);
+        if (!(await getLoginForm(page).isVisible().catch(() => false))) return;
+        hiddenSince = 0;
+      }
+    }
+    await page.waitForTimeout(400);
   }
-
-  const loginForm = getLoginForm(page);
-  if (await loginForm.isVisible().catch(() => false)) {
-    throw new Error(
-      "Falowen PDF login did not complete: the login form is still visible after submitting credentials.",
-    );
-  }
-
-  // Do not interrupt Firebase while it is persisting the newly authenticated
-  // user to browser storage. The previous renderer navigated immediately after
-  // clicking Log in, which could reload the app before the auth session was
-  // durable and send the lesson back to the public landing page.
-  await page.waitForTimeout(1200);
+  const reason = classifyPdfLoginFailure(await getBodyText(page));
+  throw new Error(reason
+    ? `Falowen PDF login rejected (${reason}). Verify the export account; no account details were logged.`
+    : "Falowen PDF login timed out: the login form stayed visible or authentication did not settle. Verify the export account is active, can access this course, and has valid repository secrets.");
 };
 
 const openLessonWithAuthHydration = async (page, lesson, targetUrl) => {
@@ -233,11 +212,8 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
 
   if (await openLessonWithAuthHydration(page, lesson, targetUrl)) return;
 
-  const preview = (await getBodyText(page)).slice(0, 700);
-  if (level === "A2") throw new Error(`Authentication completed but Day ${lesson.day} still did not show the real lesson after auth hydration retries. Page text omitted to protect account data.`);
-  throw new Error(
-    `Authentication completed but Day ${lesson.day} still did not show the real lesson after auth hydration retries. Current URL: ${page.url()}. Preview: ${preview}`,
-  );
+  // Never include student page text or credential-adjacent data in CI output.
+  throw new Error(`Authentication completed but Day ${lesson.day} still did not show the real lesson after auth hydration retries. Verify that the export account can open this course. No page text was logged.`);
 };
 
 const injectPrintMode = async (page) => {
