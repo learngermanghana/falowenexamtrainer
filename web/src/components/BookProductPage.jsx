@@ -154,6 +154,8 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
                 <strong>{money(book.priceGhs)}<small>{indicativeUsd(book.priceGhs,fx)}</small></strong>
               </label>)}
             </fieldset>
+            {selected.format === "digital" && selected.deliveryMode === "manual_email" &&
+              <p className="fb-muted" role="note">Manual PDF delivery: after payment is verified, Falowen sends this PDF to the email you provide at checkout. This is not an instant download.</p>}
             {!checkout && (canPay ? <a className="fb-btn fb-btn-primary fb-pay" href={`${bookHref(page.href)}/checkout?edition=${encodeURIComponent(selected.id)}`}>Buy Now</a>
               : <button className="fb-btn fb-btn-primary" disabled>Checkout temporarily unavailable</button>)}
           </> : <p role="status">Coming Soon · Unavailable for purchase</p>}
@@ -165,7 +167,9 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
             </label>)}
             <label>Quantity<input type="number" min="1" max="20" step="1" required value={selected.format==="digital"?1:quantity}
               disabled={selected.format==="digital"} onChange={e=>setQuantity(e.target.value)} /></label>
-            {selected.format==="digital" ? <p>One PDF per purchase. After verified payment, a secure download is provided when available, or Falowen arranges delivery manually.</p> : <>
+            {selected.format==="digital" ? <p>{selected.deliveryMode === "secure_download"
+                ? "One PDF per purchase. After payment verification, use the secure download on your confirmation page."
+                : "One PDF per purchase. This edition is sent manually to your email after payment verification; it is not an instant download. If it has not arrived, contact learngermanghana@gmail.com with your Paystack reference."}</p> : <>
               <label>Collection or delivery<select value={delivery} onChange={e=>setDelivery(e.target.value)}><option value="collection">Collection</option><option value="delivery">Delivery</option></select></label>
               {delivery==="delivery" && <label>Delivery address<textarea required maxLength={500} autoComplete="street-address" value={address} onChange={e=>setAddress(e.target.value)} /></label>}
               <p>Printed on demand. Delivery is arranged and charged separately by Falowen.</p>
