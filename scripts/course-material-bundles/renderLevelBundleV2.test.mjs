@@ -16,6 +16,10 @@ test("course bundle renderer waits for the current login form to disappear", () 
   assert.match(source, /loginFormVisible/);
   assert.match(source, /await waitForLoginCompletion\(page\)/);
   assert.doesNotMatch(source, /Returning Falowen student/);
+  assert.match(source, /LOGIN_SETTLE_MS = 1600/);
+  assert.match(source, /classifyPdfLoginFailure/);
+  assert.ok(!source.includes("authText.slice(0, 500)"));
+  assert.ok(!source.includes("Preview: ${preview}"));
 });
 
 test("course bundle renderer allows Firebase auth hydration after hard lesson navigation", () => {
