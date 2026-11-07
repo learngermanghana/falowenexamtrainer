@@ -40,7 +40,8 @@ jobs:
   validate-a2-print-safety:
     name: Validate A2 private-data redaction and printed QR codes
     if: github.event_name == 'pull_request' || inputs.level == 'A2'
-    runs-on: ubuntu-latest
+    # Playwright 1.54.2 has no Chromium support for the Ubuntu 26.04 image used by ubuntu-latest.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -190,7 +191,8 @@ jobs:
     name: Build ${{ inputs.level }} course material bundle
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: validate-manifests
-    runs-on: ubuntu-latest
+    # Keep the PDF renderer on a Chromium-supported runner until Playwright is upgraded.
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
 
     steps:
