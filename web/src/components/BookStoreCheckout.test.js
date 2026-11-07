@@ -82,11 +82,11 @@ test("A1 digital checkout shows flat GH₵100, restricts quantity and hides deli
 
 test("writing guide provides both paid editions and clearly discloses manual PDF delivery", async () => {
   const writingCatalog = {paymentsEnabled:true,catalogTitles:[
-    {id:"writing-skills-a1-c2",title:"Writing guide",status:"available",pages:32,
+    {id:"writing-skills-a1-c2",title:"Writing guide",status:"available",pages:68,
       bookIds:["writing-skills-a1-c2-digital","writing-skills-a1-c2-printed"],levelTags:["A1","C2"]}
   ],books:[
     {id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:39,deliveryMode:"manual_email"},
-    {id:"writing-skills-a1-c2-printed",format:"printed",priceGhs:150,deliveryMode:"print_on_demand"}
+    {id:"writing-skills-a1-c2-printed",format:"printed",priceGhs:250,deliveryMode:"print_on_demand"}
   ]};
   global.fetch=jest.fn(async url=>({ok:true,json:async()=>String(url).includes("/books/catalog")?writingCatalog:{usdToGhs:10}}));
   window.history.replaceState({},"","/books/how-to-unlock-your-german-writing-skills-a1-c2");
