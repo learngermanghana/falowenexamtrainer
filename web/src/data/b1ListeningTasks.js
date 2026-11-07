@@ -399,51 +399,18 @@ Herr Weber: Auf Wiedersehen!`,
     submitRequired: false,
   }),
   24: task({
-    "title": "Konsum und Nachhaltigkeit · Hören · Richtig oder Falsch (5 Aufgaben)",
-    "instructions": "Lesen Sie zuerst die fünf Aussagen. Hören Sie das Gespräch zweimal und entscheiden Sie jeweils: A) Richtig oder B) Falsch.",
-    "audioKey": "b1/day_24/day-24.mp3",
-    "videoTitle": "B1 Day 24 · Konsum und Nachhaltigkeit",
-    "submitRequired": true,
-    "selfCheckText": "",
-    "submissionNote": "Reichen Sie alle fünf Antworten über Submit als TEIL 4 ein: A = Richtig, B = Falsch.",
-    "questions": [
-        {
-            "stem": "Jonas möchte sich sofort ein neues Smartphone kaufen, weil sein altes komplett kaputt ist.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Lisa weist darauf hin, dass man auf den Konsum achten und Elektroschrott vermeiden sollte.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Jonas plant nun, den Akku seines Smartphones reparieren zu lassen.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Laut Lisa ist eine Reparatur teurer als ein komplett neues Smartphone.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Jonas möchte das Gerät nach der Reparatur noch mindestens zwei Jahre lang nutzen.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        }
-    ]
-}),
+    // New owner-provided private R2 recording. Do not reuse the old smartphone
+    // questions or grade an unreviewed recording against the legacy answer key.
+    title: "Konsum und Nachhaltigkeit · Hören · Neue Aufnahme",
+    instructions: "Hören Sie die neue Aufnahme zweimal. Konzentrieren Sie sich auf das Hauptthema, die Meinungen und wichtige Details. Die bisherigen Fragen wurden entfernt, da sie nicht für diese neue Aufnahme überprüft sind.",
+    audioKey: "b1/day-24/day_24.mp3",
+    videoTitle: "B1 Day 24 · Konsum und Nachhaltigkeit",
+    submitRequired: false,
+    showPublishedPractice: false,
+    selfCheckText: "Neue Aufnahme · Hörtraining ohne benotete Fragen. Teil 4 ist bis zur Prüfung passender Fragen eine freiwillige Hörübung. Reichen Sie nur Schreiben und Lesen ein.",
+    submissionNote: "Hörtraining ohne Benotung. Keine alten Teil-4-Antworten einreichen.",
+    questions: [],
+  }),
   25: task({
     title: "Online einkaufen – Rechte und Risiken · Hören · Richtig oder Falsch (5 Aufgaben)",
     instructions: "Lesen Sie zuerst die fünf Aussagen. Hören Sie das Gespräch zweimal und entscheiden Sie jeweils: A) Richtig oder B) Falsch.",

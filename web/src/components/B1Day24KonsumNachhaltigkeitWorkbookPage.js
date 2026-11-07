@@ -128,6 +128,8 @@ export const B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG = {
   listening: getB1ListeningTask(24),
   submitWritingDescription: "Paste your final blog/forum post of about 80 words covering all four points.",
   submitReadingDescription: "Paste your seven answer letters (A, B or C).",
+  submitListening: false,
+  submitNote: "Teil 2 · Schreiben und Teil 3 · Lesen einreichen. Teil 4 ist mit der neuen Aufnahme nur freiwillige Hörpraxis ohne Fragen oder Benotung.",
 };
 
 export default function B1Day24KonsumNachhaltigkeitWorkbookPage() {
