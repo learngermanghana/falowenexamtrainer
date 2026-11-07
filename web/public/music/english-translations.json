@@ -7101,6 +7101,3122 @@
       "recordingSha256": "b0883057d1559d7a004b29a7b044db872b1c46b4f6eea7b64f2350c9d5a9b195",
       "level": "A2",
       "day": 23
+    },
+    {
+      "objectKey": "music/a1/day-01/Guten Morgen, guten Tag.mp3",
+      "recordingSha256": "0b537675c837321da3490f314d6298a96af3fb2f99ab3678edf3377a2d104dc6",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Am Morgen gehe ich aus dem Haus,",
+          "en": "In the morning I leave the house,"
+        },
+        {
+          "de": "ich sehe mir vor der Tür",
+          "en": "I see myself in front of the door [unclear transcript]"
+        },
+        {
+          "de": "Sie sagt hallo, guten Morgen und frag mich",
+          "en": "She says hello, good morning, and asks me"
+        },
+        {
+          "de": "wie geht es dir Ich sage Danke, mir",
+          "en": "how are you? I say thanks, I"
+        },
+        {
+          "de": "geht's gut.",
+          "en": "am fine."
+        },
+        {
+          "de": "Und wie geht es dir heute?",
+          "en": "And how are you today?"
+        },
+        {
+          "de": "Sie sagt mir geht es auch sehr gut.",
+          "en": "She says she is very well too."
+        },
+        {
+          "de": "Wir lachen und gehen weiter.",
+          "en": "We laugh and carry on walking."
+        },
+        {
+          "de": "Guten Morgen,",
+          "en": "Good morning,"
+        },
+        {
+          "de": "guten Tag.",
+          "en": "good afternoon."
+        },
+        {
+          "de": "Wie geht es dir?",
+          "en": "How are you?"
+        },
+        {
+          "de": "Wie war dein Tag?",
+          "en": "How was your day?"
+        },
+        {
+          "de": "Mir geht es gut.",
+          "en": "I am fine."
+        },
+        {
+          "de": "Und wie geht's dir?",
+          "en": "And how are you?"
+        },
+        {
+          "de": "Schön dich heute hier zu sehen.",
+          "en": "Lovely to see you here today."
+        },
+        {
+          "de": "Hallo, tschüss und bis bald auf Wiedersehen Mach",
+          "en": "Hello, goodbye, and see you soon. Goodbye. Take"
+        },
+        {
+          "de": "es gut,",
+          "en": "care,"
+        },
+        {
+          "de": "gute Nacht und schlaf gut Bis morgen",
+          "en": "good night and sleep well. See you tomorrow."
+        },
+        {
+          "de": "Ich freue mich",
+          "en": "I am looking forward to it."
+        },
+        {
+          "de": "Am Nachmittag sehe ich Ben Er sagt hallo",
+          "en": "In the afternoon I see Ben. He says hello."
+        },
+        {
+          "de": "Wie geht's?",
+          "en": "How are you?"
+        },
+        {
+          "de": "Ich sage,",
+          "en": "I say,"
+        },
+        {
+          "de": "heute bin ich müde, doch sonst geht es",
+          "en": "today I am tired, but otherwise I"
+        },
+        {
+          "de": "mir gut.",
+          "en": "am fine."
+        },
+        {
+          "de": "Am Abend gehe ich nach Haus, sage allen,",
+          "en": "In the evening I go home and say to everyone,"
+        },
+        {
+          "de": "Tschüss bis morgen.",
+          "en": "Bye, see you tomorrow."
+        },
+        {
+          "de": "Meine Mutter sagt, gute Nacht.",
+          "en": "My mother says good night."
+        },
+        {
+          "de": "Schlaf gut und träum was Schönes.",
+          "en": "Sleep well and have lovely dreams."
+        },
+        {
+          "de": "Guten Morgen,",
+          "en": "Good morning,"
+        },
+        {
+          "de": "guten Tag.",
+          "en": "good afternoon."
+        },
+        {
+          "de": "Wie geht es dir?",
+          "en": "How are you?"
+        },
+        {
+          "de": "Wie war dein Tag?",
+          "en": "How was your day?"
+        },
+        {
+          "de": "Mir geht es gut.",
+          "en": "I am fine."
+        },
+        {
+          "de": "Und wie geht's dir,",
+          "en": "And how are you,"
+        },
+        {
+          "de": "schön dich heute hier zu sehen Hallo,",
+          "en": "lovely to see you here today. Hello,"
+        },
+        {
+          "de": "tschüss und bis bald auf Wiedersehen Mach es",
+          "en": "goodbye and see you soon. Goodbye. Take"
+        },
+        {
+          "de": "gut,",
+          "en": "care,"
+        },
+        {
+          "de": "gute Nacht und schlaf gut Bis morgen,",
+          "en": "good night and sleep well. See you tomorrow,"
+        },
+        {
+          "de": "ich freue mich",
+          "en": "I am looking forward to it."
+        },
+        {
+          "de": "Gute Nacht.",
+          "en": "Good night."
+        },
+        {
+          "de": "Schlaf gut.",
+          "en": "Sleep well."
+        },
+        {
+          "de": "Bis morgen.",
+          "en": "See you tomorrow."
+        },
+        {
+          "de": "Mach es gut.",
+          "en": "Take care."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-02/Ich heiße Bina.mp3",
+      "recordingSha256": "bff8440f79a18941381e371c2cfdacac4ce0fbbde7aad84c52d0ca8df40740ff",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Heute rufe ich die Schule an, ich möchte",
+          "en": "Today I call the school. I would like"
+        },
+        {
+          "de": "einen Deutschkurs machen.",
+          "en": "to take a German course."
+        },
+        {
+          "de": "Die Frau sagt freundlich guten Tag Wie heißen",
+          "en": "The woman kindly says good afternoon. What is"
+        },
+        {
+          "de": "Sie,",
+          "en": "your name,"
+        },
+        {
+          "de": "sagen Sie es mir Ich sage Hallo, ich",
+          "en": "tell me. I say hello, my"
+        },
+        {
+          "de": "heiße Bina Ich komme aus Ghana, das ist",
+          "en": "name is Bina. I come from Ghana, that is"
+        },
+        {
+          "de": "mein Land Sie fragt wie schreibt man Ihren",
+          "en": "my country. She asks how do you spell your"
+        },
+        {
+          "de": "Namen Ich buche tabiere langsam, dann ich heiße",
+          "en": "name? I slowly spell it [unclear transcript], then my name is"
+        },
+        {
+          "de": "Bina,",
+          "en": "Bina,"
+        },
+        {
+          "de": "B -I -N -A Oh, oh, das ist",
+          "en": "B-I-N-A. Oh, oh, that is"
+        },
+        {
+          "de": "mein Name, ja",
+          "en": "my name, yes."
+        },
+        {
+          "de": "B -I -N -A Mhm,",
+          "en": "B-I-N-A. Mhm,"
+        },
+        {
+          "de": "so schreibt man mein Name Wie heißt du?",
+          "en": "that is how you spell my name. What is your name?"
+        },
+        {
+          "de": "Sag es mir Ich heiße Bina Und wie",
+          "en": "Tell me. My name is Bina. And what is"
+        },
+        {
+          "de": "heißt du?",
+          "en": "your name?"
+        },
+        {
+          "de": "mhm Jetzt kennst du mein Name",
+          "en": "Mhm, now you know my name."
+        },
+        {
+          "de": "Die Frau fragt, wo wohnen sie,",
+          "en": "The woman asks where do you live,"
+        },
+        {
+          "de": "ich sage in der Kra, hier bin ich",
+          "en": "I say in Accra [unclear transcript], here I am."
+        },
+        {
+          "de": "Sie sagt bitte noch einmal Ihren Namen, ich",
+          "en": "She says your name once again please, I"
+        },
+        {
+          "de": "sage langsam B -I -N -A, sie schreit",
+          "en": "slowly say B-I-N-A. She shouts [unclear transcript]"
+        },
+        {
+          "de": "meinen Namen ab und sagt Danke, alles klar",
+          "en": "my name and says thank you, all clear."
+        },
+        {
+          "de": "Ihr Deutschgruß beginnt am Montag, ich freue mich,",
+          "en": "Your German greeting [unclear transcript] begins on Monday. I am happy,"
+        },
+        {
+          "de": "ich bin bald da, ich heiße Bina",
+          "en": "I will be there soon. My name is Bina."
+        },
+        {
+          "de": "O,",
+          "en": "Oh,"
+        },
+        {
+          "de": "dass ist mein Name, ja W I N",
+          "en": "that is my name, yes. W I N"
+        },
+        {
+          "de": "R So schreibt man mein Name Wie heist",
+          "en": "R. That is how you spell my name. What is"
+        },
+        {
+          "de": "du sagst es mir Ich heiße Bina Und",
+          "en": "your name? You tell me. My name is Bina. And"
+        },
+        {
+          "de": "wie heißt du O, o, um",
+          "en": "what is your name? Oh, oh, um,"
+        },
+        {
+          "de": "Jetzt kennst du mein Name",
+          "en": "now you know my name."
+        },
+        {
+          "de": "Ich heiße Bina,",
+          "en": "My name is Bina,"
+        },
+        {
+          "de": "B -I -N -A, oh und wie heißt",
+          "en": "B-I-N-A, oh, and what is"
+        },
+        {
+          "de": "du?",
+          "en": "your name?"
+        },
+        {
+          "de": "Copyright",
+          "en": "Copyright"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-03/Wer bist du_ Sag es mir!.mp3",
+      "recordingSha256": "b76ead1ee8fd9ec0d1530f935c796e22daa27b7878560288b81e38d486366a4d",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Heute kommt ein neuer Schüler, er hat dein",
+          "en": "Today a new student arrives. He has your"
+        },
+        {
+          "de": "Buch und einen Stift.",
+          "en": "book and a pen."
+        },
+        {
+          "de": "Ich frage freundlich wie heißt du, er sagt",
+          "en": "I kindly ask what is your name? He says"
+        },
+        {
+          "de": "hallo,",
+          "en": "hello,"
+        },
+        {
+          "de": "ich heiße Ben.",
+          "en": "my name is Ben."
+        },
+        {
+          "de": "Woher kommst du, frage ich?",
+          "en": "Where do you come from, I ask?"
+        },
+        {
+          "de": "Er sagt ich komme aus Berlin.",
+          "en": "He says I come from Berlin."
+        },
+        {
+          "de": "Ich sage schön dich hier zu sehen,",
+          "en": "I say lovely to see you here,"
+        },
+        {
+          "de": "jetzt lernen wir zusammen Deutsch.",
+          "en": "now we are learning German together."
+        },
+        {
+          "de": "Wer bist du,",
+          "en": "Who are you,"
+        },
+        {
+          "de": "wie heißt du?",
+          "en": "what is your name?"
+        },
+        {
+          "de": "Woher kommst du, sag es mir.",
+          "en": "Where do you come from? Tell me."
+        },
+        {
+          "de": "Wo wohnst du, was machst du gern?",
+          "en": "Where do you live? What do you enjoy doing?"
+        },
+        {
+          "de": "Ich möchte dich gern kennenlernen.",
+          "en": "I'd like to get to know you."
+        },
+        {
+          "de": "Ich frage dich, mmh, du antwortest mir So",
+          "en": "I ask you, mmh, you answer me. That is how"
+        },
+        {
+          "de": "lernen wir uns besser kennen Und sprechen jeden",
+          "en": "we get to know each other better and speak a little"
+        },
+        {
+          "de": "Tag ein bisschen mehr",
+          "en": "more every day."
+        },
+        {
+          "de": "Ich frage Ben, wo wohnst du jetzt?",
+          "en": "I ask Ben where do you live now?"
+        },
+        {
+          "de": "Er sagt, ich wohne hier in Bonn Was",
+          "en": "He says I live here in Bonn. What"
+        },
+        {
+          "de": "machst du gerne am Wochenende?",
+          "en": "do you enjoy doing at the weekend?"
+        },
+        {
+          "de": "Ich höre Musik und spiele gern Man beginnt",
+          "en": "I listen to music and enjoy playing. When does [unclear transcript]"
+        },
+        {
+          "de": "der Deutschkuss morgen Er sagt um Neu nur",
+          "en": "the German course start tomorrow? He says at nine [unclear transcript],"
+        },
+        {
+          "de": "wie heute Ich sage Danke bis morgen Er",
+          "en": "like today. I say thank you, see you tomorrow. He"
+        },
+        {
+          "de": "lächelt und sagt bis dann Wer bist du?",
+          "en": "smiles and says see you then. Who are you?"
+        },
+        {
+          "de": "Wie heißt du?",
+          "en": "What's your name?"
+        },
+        {
+          "de": "Woher kommst du?",
+          "en": "Where do you come from?"
+        },
+        {
+          "de": "Sag es mir, wo wohnst du?",
+          "en": "Tell me, where do you live?"
+        },
+        {
+          "de": "Was machst du gern?",
+          "en": "What do you enjoy doing?"
+        },
+        {
+          "de": "Ich möchte dich gern kennenlernen Oh oh oh,",
+          "en": "I would like to get to know you. Oh, oh, oh,"
+        },
+        {
+          "de": "ich frage dich Du antwortest mir, so lernen",
+          "en": "I ask you. You answer me, so"
+        },
+        {
+          "de": "wir uns besser kennen Und sprechen jeden Tag",
+          "en": "we get to know each other better and speak every day"
+        },
+        {
+          "de": "ein bisschen mehr",
+          "en": "a little more."
+        },
+        {
+          "de": "Jetzt kenne ich Ben, oh, wir sehen uns",
+          "en": "Now I know Ben, oh, we will see each other"
+        },
+        {
+          "de": "morgen Ich frage gern, ich höre zu und",
+          "en": "tomorrow. I like asking questions, I listen and"
+        },
+        {
+          "de": "lerne jeden Tag deutsch",
+          "en": "learn German every day."
+        },
+        {
+          "de": "Bissmorg 'n",
+          "en": "See you tomorrow [unclear transcript]."
+        },
+        {
+          "de": "Bissmorg 'n",
+          "en": "See you tomorrow [unclear transcript]."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-04/Meine Nummer, meine Adresse.mp3",
+      "recordingSha256": "626a491a74d71bb408828bac95abdfb161908594cb3a56437ca2ffe810fdf50a",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Hallo ich heiße Ben, ich komme aus Ghana",
+          "en": "Hello, my name is Ben. I come from Ghana,"
+        },
+        {
+          "de": "aus Akra,",
+          "en": "from Accra,"
+        },
+        {
+          "de": "ich bin 24 Jahre alt und heute stelle",
+          "en": "I am 24 years old and today I introduce"
+        },
+        {
+          "de": "Ich wohne in der Blumenstraße, meine Hausnummer ist",
+          "en": "I live on Blumenstraße. My house number is"
+        },
+        {
+          "de": "1, 2, 3 Die Postleitzahl ist 1, 2,",
+          "en": "1, 2, 3. The postcode is 1, 2,"
+        },
+        {
+          "de": "3, 4, 5 Hier bin ich zu Hause,",
+          "en": "3, 4, 5. This is my home,"
+        },
+        {
+          "de": "hier bin ich gern 1, 2, 3, 4,",
+          "en": "I like being here. 1, 2, 3, 4,"
+        },
+        {
+          "de": "5, 6, 7, 8, und 10, 11, 12,",
+          "en": "5, 6, 7, 8, and 10, 11, 12,"
+        },
+        {
+          "de": "13, 14, 15, 16, 17, 18, 19,",
+          "en": "13, 14, 15, 16, 17, 18, 19,"
+        },
+        {
+          "de": "20 Oh oh oh wie alt bist du?",
+          "en": "20. Oh, oh, oh, how old are you?"
+        },
+        {
+          "de": "Ich bin 24 und du",
+          "en": "I am 24, and you?"
+        },
+        {
+          "de": "Sag es mir,",
+          "en": "Tell me,"
+        },
+        {
+          "de": "wie ist deine Hausnummer hier?",
+          "en": "what is your house number here?"
+        },
+        {
+          "de": "Wie ist deine Hausnummer hier?",
+          "en": "what is your house number here?"
+        },
+        {
+          "de": "Meine Telefonnummer ist ganz einfach 0, 2, 4,",
+          "en": "My telephone number is very simple: 0, 2, 4,"
+        },
+        {
+          "de": "5, 6, 7, 8, 9, 0, 1, 2,",
+          "en": "5, 6, 7, 8, 9, 0, 1, 2,"
+        },
+        {
+          "de": "3 Ich sage sie noch einmal langsam 0,",
+          "en": "3. I say it slowly once again: 0,"
+        },
+        {
+          "de": "2, 4, 4, 5, 6, 7, 8, 9,",
+          "en": "2, 4, 4, 5, 6, 7, 8, 9,"
+        },
+        {
+          "de": "0, 1, 2, 3 Wie ist deine Telefonnummer?",
+          "en": "0, 1, 2, 3. What is your telephone number?"
+        },
+        {
+          "de": "Jetzt kannst du sie auch sagen 1, 2,",
+          "en": "Now you can say it too: 1, 2,"
+        },
+        {
+          "de": "3, 4, 5, 6, 7, 8, 9 und",
+          "en": "3, 4, 5, 6, 7, 8, 9 and"
+        },
+        {
+          "de": "10, 11, 12, 13, 14, 15, 16, 17,",
+          "en": "10, 11, 12, 13, 14, 15, 16, 17,"
+        },
+        {
+          "de": "18, 19,",
+          "en": "18, 19,"
+        },
+        {
+          "de": "20 Oh, oh, oh, oh, wie alt bist",
+          "en": "20. Oh, oh, oh, oh, how old are"
+        },
+        {
+          "de": "du?",
+          "en": "your name?"
+        },
+        {
+          "de": "Ich bin 24 und du",
+          "en": "I am 24, and you?"
+        },
+        {
+          "de": "Sag es mir,",
+          "en": "Tell me,"
+        },
+        {
+          "de": "wie ist deine Hausnummer hier?",
+          "en": "what is your house number here?"
+        },
+        {
+          "de": "Mein Name ist Ben,",
+          "en": "My name is Ben,"
+        },
+        {
+          "de": "24 Jahre, das bin ich",
+          "en": "24 years old, that is me."
+        },
+        {
+          "de": "Lumenstraße 1, 2, 3 Oh,",
+          "en": "Lumenstraße 1, 2, 3. Oh,"
+        },
+        {
+          "de": "jetzt kennst du mich",
+          "en": "now you know me."
+        },
+        {
+          "de": "1,",
+          "en": "1,"
+        },
+        {
+          "de": "2, 3",
+          "en": "2, 3."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-05/Schön, dich kennenzulernen.mp3",
+      "recordingSha256": "bfe8d48468fc6a2802b916ee97f9c42ff44795226e2300f6d9714a686881d3d8",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Ich heiße Sarah,",
+          "en": "My name is Sarah,"
+        },
+        {
+          "de": "ich bin neu hier,",
+          "en": "I am new here,"
+        },
+        {
+          "de": "ich komme aus Akra,",
+          "en": "I come from Accra,"
+        },
+        {
+          "de": "jetzt bin ich hier, in Berlin beginnt mein",
+          "en": "now I am here. In Berlin my"
+        },
+        {
+          "de": "neuer tag ich lerne deutsch weil ich es",
+          "en": "new day begins. I am learning German because I"
+        },
+        {
+          "de": "mag du lächelst mich an und sagst hallo",
+          "en": "like it. You smile at me and say hello."
+        },
+        {
+          "de": "ich lächle zurück und frage dich wie heißt",
+          "en": "I smile back and ask you what is"
+        },
+        {
+          "de": "du erzähl mir von dir woher kommst du",
+          "en": "your name? Tell me about yourself. Where are you from?"
+        },
+        {
+          "de": "bleib",
+          "en": "Stay."
+        },
+        {
+          "de": "Wo wohnst du?",
+          "en": "Where do you live?"
+        },
+        {
+          "de": "Ich wohne in Berlin, schön,",
+          "en": "I live in Berlin. Lovely"
+        },
+        {
+          "de": "dich kennenzulernen",
+          "en": "to meet you."
+        },
+        {
+          "de": "Das ist Karim,",
+          "en": "This is Karim,"
+        },
+        {
+          "de": "er kommt aus Bonn, er wohnt jetzt hier",
+          "en": "he comes from Bonn. He lives here now,"
+        },
+        {
+          "de": "nicht Er spricht Arabisch und etwas Deutsch Wir",
+          "en": "not [unclear transcript]. He speaks Arabic and some German. We"
+        },
+        {
+          "de": "trinken Kaffee und reden viel Wie heißt du?",
+          "en": "drink coffee and talk a lot. What is your name?"
+        },
+        {
+          "de": "Erzähl mir von dir",
+          "en": "Tell me about yourself."
+        },
+        {
+          "de": "Woher kommst du?",
+          "en": "Where do you come from?"
+        },
+        {
+          "de": "Bleib noch hier",
+          "en": "Stay here a while."
+        },
+        {
+          "de": "Wo wohnst du?",
+          "en": "Where do you live?"
+        },
+        {
+          "de": "Ich wohne in Berlin",
+          "en": "I live in Berlin."
+        },
+        {
+          "de": "Schö,",
+          "en": "Lovely [unclear transcript],"
+        },
+        {
+          "de": "dich kennen zu lang Ein neuer Tag,",
+          "en": "to meet you [unclear transcript]. A new day,"
+        },
+        {
+          "de": "ein neues Gesicht Du kennst mich jetzt und",
+          "en": "a new face. You know me now and"
+        },
+        {
+          "de": "ich kenne dich Schö, dich kennen zu lang",
+          "en": "I know you. Lovely to meet you [unclear transcript]."
+        },
+        {
+          "de": "Copyright",
+          "en": "Copyright"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-06/Ein Sonntag mit meiner Familie.mp3",
+      "recordingSha256": "e4fc317a466a89d405cef01ff0f0dccbb1749fe9af74dc14c1c3983a6ce025ef",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Am Sonntag scheint die Sonne, der Morgen fängt",
+          "en": "On Sunday the sun is shining. The morning starts"
+        },
+        {
+          "de": "ganz langsam an",
+          "en": "very slowly."
+        },
+        {
+          "de": "Meine Mutter kocht den Kaffee,",
+          "en": "My mother makes the coffee"
+        },
+        {
+          "de": "mein Bruder spielt Gitarre dann",
+          "en": "My brother then plays the guitar."
+        },
+        {
+          "de": "Ich sitze draußen und sing,",
+          "en": "I sit outside and sing,"
+        },
+        {
+          "de": "die Musik klingt durch das Haus Wir haben",
+          "en": "the music rings through the house. We"
+        },
+        {
+          "de": "heute alle frei und niemand muss früh raus",
+          "en": "all have today off and no one has to leave early."
+        },
+        {
+          "de": "Ein bisschen Zeit, ein bisschen Ruhe, wir machen",
+          "en": "A little time, a little peace. We do"
+        },
+        {
+          "de": "was uns Freude macht",
+          "en": "what makes us happy."
+        },
+        {
+          "de": "Die kleinen Dinge sind so schön, wir reden",
+          "en": "The little things are so lovely. We talk"
+        },
+        {
+          "de": "viel und lachen",
+          "en": "a lot and laugh."
+        },
+        {
+          "de": "Was machst du gerne in deiner Zeit?",
+          "en": "What do you enjoy doing in your free time?"
+        },
+        {
+          "de": "Ich singe gern, spielst für mich,",
+          "en": "I like singing. You play for me,"
+        },
+        {
+          "de": "wir hören Musik, wir lachen viel Und jeder",
+          "en": "we listen to music, we laugh a lot. And every"
+        },
+        {
+          "de": "Tag hat seinen Kern",
+          "en": "day has its heart."
+        },
+        {
+          "de": "Oh, wie schön ist dieser Tag, wenn die",
+          "en": "Oh, how lovely this day is when the"
+        },
+        {
+          "de": "Familie zusammen ist",
+          "en": "family is together."
+        },
+        {
+          "de": "Wir brauchen heute gar nicht viel, nur Zeit",
+          "en": "We do not need much today, just time"
+        },
+        {
+          "de": "für dich und mich",
+          "en": "for you and me."
+        },
+        {
+          "de": "Mein Vater liest auf dem Sofa,",
+          "en": "My father is reading on the sofa,"
+        },
+        {
+          "de": "meine Schwester mal dein Bild Wir essen später",
+          "en": "My sister paints your picture [unclear transcript]. Later we eat"
+        },
+        {
+          "de": "alle zusammen,",
+          "en": "all together,"
+        },
+        {
+          "de": "draußen ist es wahr und still",
+          "en": "outside it is true and quiet [unclear transcript]."
+        },
+        {
+          "de": "Am Nachmittag gehen wir spazieren durch den Park",
+          "en": "In the afternoon we walk through the park,"
+        },
+        {
+          "de": "am See vorbei",
+          "en": "past the lake."
+        },
+        {
+          "de": "Wir sprechen über unsere Woche und fühlen uns",
+          "en": "We talk about our week and feel"
+        },
+        {
+          "de": "ganz frei",
+          "en": "completely free."
+        },
+        {
+          "de": "Was machst du gerne in deiner Zeit?",
+          "en": "What do you enjoy doing in your free time?"
+        },
+        {
+          "de": "Ich singe gern, du spielst für mich",
+          "en": "I like singing, you play for me."
+        },
+        {
+          "de": "Wir hören Musik gelachen viel Und jeder Tag",
+          "en": "We listen to music and laugh a lot [unclear transcript]. And every day"
+        },
+        {
+          "de": "hat sein Unkrank",
+          "en": "has its own [unclear transcript]."
+        },
+        {
+          "de": "Oh, wie schön ist dieser Tag Wenn die",
+          "en": "Oh, how lovely this day is when the"
+        },
+        {
+          "de": "Familie zusammen ist",
+          "en": "family is together."
+        },
+        {
+          "de": "Wir brauchen heute gar nicht viel Nur Zeit",
+          "en": "We do not need much today, just time"
+        },
+        {
+          "de": "für dich und mich Die Sonne geht langsam",
+          "en": "for you and me. The sun slowly goes"
+        },
+        {
+          "de": "runter Wir gehen wieder nach Haus",
+          "en": "down. We go back home."
+        },
+        {
+          "de": "Ein schöner Tag mit meiner Familie",
+          "en": "A lovely day with my family."
+        },
+        {
+          "de": "Und morgen sieht die Welt anders aus",
+          "en": "And tomorrow the world looks different."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-07/Was kostet das_.mp3",
+      "recordingSha256": "d48555c85dfd6e4397bc3c6031901ccab1b0c910e10fa891ef66884825336221",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Heute gehe ich auf den Markt, ich sehe",
+          "en": "Today I go to the market. I see"
+        },
+        {
+          "de": "Äpfel, Rot und Grün",
+          "en": "apples, red and green."
+        },
+        {
+          "de": "Ich frage freundlich, was kostet das?",
+          "en": "I kindly ask how much is that?"
+        },
+        {
+          "de": "Der Verkäufer sagt zwei Euro Ich nenne mir",
+          "en": "The seller says two euros. I take [unclear transcript]"
+        },
+        {
+          "de": "zwei, sie sehen gut aus Ich kaufe noch",
+          "en": "two; they look good. I also buy"
+        },
+        {
+          "de": "ein Stück Bro Ich sage danke schön Tag",
+          "en": "a piece of bread [unclear transcript]. I say thank you, have a nice day,"
+        },
+        {
+          "de": "Und gehe weiter durch den Markt Hier gibt",
+          "en": "and walk on through the market. Here there"
+        },
+        {
+          "de": "es Obst, hier gibt es Bro Die Gumm",
+          "en": "is fruit, here there is bread [unclear transcript]. The [unclear transcript]"
+        },
+        {
+          "de": "sind Geld, die Äpfel rot, ich sehe viel,",
+          "en": "are yellow, the apples red [unclear transcript]. I see a lot,"
+        },
+        {
+          "de": "ich frage nach Und kaufe ein, was ich",
+          "en": "I ask questions and buy what I"
+        },
+        {
+          "de": "gern mag Wie viel kostet das, sag's mir",
+          "en": "like. How much does that cost? Tell me."
+        },
+        {
+          "de": "Ich möchte zwei,",
+          "en": "I would like two,"
+        },
+        {
+          "de": "was kosten die?",
+          "en": "how much are they?"
+        },
+        {
+          "de": "Ein Maro, zwei Euro, das ist okay Ich",
+          "en": "One euro [unclear transcript], two euros, that is okay. I"
+        },
+        {
+          "de": "kaufe ein und geh dann Haben sie das?",
+          "en": "shop and then leave. Do you have that?"
+        },
+        {
+          "de": "Na natürlich,",
+          "en": "Of course,"
+        },
+        {
+          "de": "ich nehme es Vielen Dank, bitte schön und",
+          "en": "I will take it. Thank you very much, you are welcome, and"
+        },
+        {
+          "de": "auf Wiedersehen Bis zum nächsten Mal",
+          "en": "goodbye. Until next time."
+        },
+        {
+          "de": "Er möchte Blumen kaufen, sie sieht die Rosen",
+          "en": "He would like to buy flowers. She sees the roses"
+        },
+        {
+          "de": "nebenan Sie fragt die Frau, haben sie rot?",
+          "en": "next door. She asks the woman do you have red ones?"
+        },
+        {
+          "de": "Die Frau sagt ja,",
+          "en": "The woman says yes,"
+        },
+        {
+          "de": "sehen sie mal Wie viel kosten diese Rosen?",
+          "en": "have a look. How much do these roses cost?"
+        },
+        {
+          "de": "3 Euro für ein Stück",
+          "en": "3 euros each."
+        },
+        {
+          "de": "Mir kauft zwei rote Rosen",
+          "en": "Mir [unclear name] buys two red roses"
+        },
+        {
+          "de": "Und lächelt voller Glück",
+          "en": "and smiles with happiness."
+        },
+        {
+          "de": "Wie viel kostet das?",
+          "en": "How much does that cost?"
+        },
+        {
+          "de": "Sag's mir,",
+          "en": "Tell me,"
+        },
+        {
+          "de": "ich möchte zwei Was kosten die?",
+          "en": "I would like two. How much are they?"
+        },
+        {
+          "de": "1 Euro, 2 Euro, das ist okay Ich",
+          "en": "1 euro, 2 euros, that is okay. I"
+        },
+        {
+          "de": "kaufe ein und geh dann Haben sie das?",
+          "en": "shop and then leave. Do you have that?"
+        },
+        {
+          "de": "Na natürlich Ich nehme es,",
+          "en": "Of course, I will take it,"
+        },
+        {
+          "de": "vielen Dank, bitte schön und auf Wiedersehen",
+          "en": "thank you very much, you are welcome, and goodbye."
+        },
+        {
+          "de": "Bis zum nächsten Mal",
+          "en": "Until next time."
+        },
+        {
+          "de": "Wir gehen langsam wieder heim, die Taschen sind",
+          "en": "We slowly walk home again. The bags are"
+        },
+        {
+          "de": "nicht schwer",
+          "en": "not heavy."
+        },
+        {
+          "de": "Zuhause trinken wir noch teel, morgen kommen wir",
+          "en": "At home we drink some tea [unclear transcript]. Tomorrow we will"
+        },
+        {
+          "de": "wieder her",
+          "en": "come back here."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-08/Viele Länder, viele Sprachen.mp3",
+      "recordingSha256": "61951bfa150e472ac2f291859f13a2e4c41feb3cc1f58a231ce5a936fc075c80",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Ich komme aus Ghana,",
+          "en": "I come from Ghana,"
+        },
+        {
+          "de": "ich wohne jetzt in Berlin In Ghana spricht",
+          "en": "I live in Berlin now. In Ghana people speak"
+        },
+        {
+          "de": "man Englisch und viele sprechen auch Tfi",
+          "en": "English and many also speak Twi [unclear transcript]."
+        },
+        {
+          "de": "In Deutschland spricht man Deutsch, in Frankreich spricht",
+          "en": "In Germany people speak German; in France people speak"
+        },
+        {
+          "de": "man Französisch In Spanien spricht man Spanisch, so",
+          "en": "French. In Spain people speak Spanish. So"
+        },
+        {
+          "de": "viele Sprachen auf der Welt Ich lerne jeden",
+          "en": "many languages in the world. Every"
+        },
+        {
+          "de": "Tag ein Wort, mal hier, mal dort, an",
+          "en": "day I learn a word, here and there, at"
+        },
+        {
+          "de": "jedem Mont Ich frage gern, ich höre zu",
+          "en": "every [unclear transcript]. I like asking questions, I listen"
+        },
+        {
+          "de": "und lerne jeden Tag dazu Woher kommst du,",
+          "en": "and learn more every day. Where are you from,"
+        },
+        {
+          "de": "wo wohnst du jetzt Welche Sprache sprichst du",
+          "en": "where do you live now? Which language do you enjoy"
+        },
+        {
+          "de": "gern?",
+          "en": "speaking?"
+        },
+        {
+          "de": "Ich spreche Englisch und ein bisschen Deutsch Und",
+          "en": "I speak English and a little German and"
+        },
+        {
+          "de": "lerne jeden Tag noch mehr Viele Länder, viele",
+          "en": "learn more every day. Many countries, many"
+        },
+        {
+          "de": "Sprachen Viele Menschen, groß und klein Wir sprechen",
+          "en": "languages. Many people, big and small. We"
+        },
+        {
+          "de": "alle anders Doch wir können Freunde sein",
+          "en": "all speak differently, but we can be friends."
+        },
+        {
+          "de": "In Italien spricht man Italienisch In Österreich spricht",
+          "en": "In Italy people speak Italian. In Austria people speak"
+        },
+        {
+          "de": "man Deutsch In Brasilien spricht man Portugiesisch Und",
+          "en": "German. In Brazil people speak Portuguese. And"
+        },
+        {
+          "de": "in Japan spricht man Japanisch Mein Freund kommt",
+          "en": "in Japan people speak Japanese. My friend comes"
+        },
+        {
+          "de": "aus der Schweiz Er spricht Deutsch und Französisch",
+          "en": "from Switzerland. He speaks German and French."
+        },
+        {
+          "de": "Meine Freundin kommt aus Spanien, sie spricht Spanisch",
+          "en": "My friend comes from Spain. She speaks Spanish"
+        },
+        {
+          "de": "und Englisch Woher kommst du, wo wohnst du",
+          "en": "and English. Where are you from? Where do you live"
+        },
+        {
+          "de": "jetzt?",
+          "en": "now?"
+        },
+        {
+          "de": "Welche Sprache sprichst du gern?",
+          "en": "Which language do you like to speak?"
+        },
+        {
+          "de": "Ich spreche Englisch und ein bisschen Deutsch Und",
+          "en": "I speak English and a little German and"
+        },
+        {
+          "de": "lerne jeden Tag noch mehr Viele Länder, viele",
+          "en": "learn more every day. Many countries, many"
+        },
+        {
+          "de": "Sprachen, viele Menschen groß und klein",
+          "en": "Languages, many people, big and small."
+        },
+        {
+          "de": "Wir sprechen alle anders, doch wir können Freunde",
+          "en": "We all speak differently, but we can"
+        },
+        {
+          "de": "sein",
+          "en": "be friends."
+        },
+        {
+          "de": "Ich komme aus Ghana und du woher kommst",
+          "en": "I come from Ghana, and you, where are"
+        },
+        {
+          "de": "du?",
+          "en": "your name?"
+        },
+        {
+          "de": "Ich spreche ein bisschen Deutsch,",
+          "en": "I speak a little German,"
+        },
+        {
+          "de": "vielleicht sprichst du es auch.",
+          "en": "you might speak it too."
+        },
+        {
+          "de": "Copyright",
+          "en": "Copyright"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-10/Das gehört mir.mp3",
+      "recordingSha256": "91c236dc372b81e93b4a99c860ed9065d78dad84d5997ee7cc7fc5f11f422788",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Ich habe eine kleine Tasche, meine Tasche ist",
+          "en": "I have a little bag. My bag is"
+        },
+        {
+          "de": "dunkelblau Mit darin habe ich meine Bücher und",
+          "en": "dark blue. Inside I have my books and"
+        },
+        {
+          "de": "einen Heft, das brauche ich auch Mein Handy",
+          "en": "a notebook; I need that too. My phone"
+        },
+        {
+          "de": "liegt auf dem Tisch,",
+          "en": "is on the table,"
+        },
+        {
+          "de": "meine Brille liegt daneben Ich habe einen neuen",
+          "en": "my glasses are beside it. I have a new"
+        },
+        {
+          "de": "Stift,",
+          "en": "pen,"
+        },
+        {
+          "de": "den hat mir mein Freund gegeben Das ist",
+          "en": "my friend gave it to me. This is"
+        },
+        {
+          "de": "mein Buch,",
+          "en": "my book,"
+        },
+        {
+          "de": "das ist mein Heft und hier liegt auch",
+          "en": "this is my notebook, and here is also"
+        },
+        {
+          "de": "mein Schlüssel Ich habe alles, was ich brauche",
+          "en": "my key. I have everything I need"
+        },
+        {
+          "de": "und packe meine Tasche ein Das ist mein",
+          "en": "and pack my bag. This is my"
+        },
+        {
+          "de": "Buch,",
+          "en": "book,"
+        },
+        {
+          "de": "das ist mein Stift, das ist meine Tasche",
+          "en": "this is my pen, this is my bag"
+        },
+        {
+          "de": "hier Das ist dein Handy, das ist dein",
+          "en": "here. That is your phone, that is your"
+        },
+        {
+          "de": "Heft und diese Jacke gehört dir Mein und",
+          "en": "notebook, and this jacket belongs to you. Mine and"
+        },
+        {
+          "de": "dein, das ist ganz heiß, jeder hat die",
+          "en": "yours, that is very hot [unclear transcript]. Everyone has the"
+        },
+        {
+          "de": "Sachen, die er braucht Was gehört dir?",
+          "en": "things they need. What belongs to you?"
+        },
+        {
+          "de": "Zeig mir deine Sachen hier",
+          "en": "Show me your things here."
+        },
+        {
+          "de": "Zeig mir deine Sachen hier, zeig mir deine",
+          "en": "Show me your things here, show me your"
+        },
+        {
+          "de": "Sachen hier",
+          "en": "things here."
+        },
+        {
+          "de": "Zuhause habe ich ein Fahrer, mein Fahrrad ist",
+          "en": "At home I have a driver [unclear transcript]. My bicycle is"
+        },
+        {
+          "de": "rot und klein In meinem Zimmer steht ein",
+          "en": "red and small. In my room there is a"
+        },
+        {
+          "de": "Schreibtisch,",
+          "en": "desk,"
+        },
+        {
+          "de": "dort lerne ich auf der Lein",
+          "en": "there I study [unclear transcript]."
+        },
+        {
+          "de": "Meine Schuhe sind ganz neu,",
+          "en": "My shoes are brand new,"
+        },
+        {
+          "de": "meine Jacke ist schon halb Ich schaue auch",
+          "en": "My jacket is already half [unclear transcript]. I also look at"
+        },
+        {
+          "de": "eine schöne Ruhe und deinen Rucksack für den",
+          "en": "a lovely rest and your backpack for"
+        },
+        {
+          "de": "Alltag",
+          "en": "everyday life [unclear transcript]."
+        },
+        {
+          "de": "Das ist mein Buch,",
+          "en": "This is my book,"
+        },
+        {
+          "de": "das ist mein Stift, das ist meine Tasche",
+          "en": "this is my pen, this is my bag"
+        },
+        {
+          "de": "hier Das ist dein Handy, das ist dein",
+          "en": "here. That is your phone, that is your"
+        },
+        {
+          "de": "Heft und diese Jacke gehört dir Mein und",
+          "en": "notebook, and this jacket belongs to you. Mine and"
+        },
+        {
+          "de": "dein, das ist ganz leicht, jeder hat die",
+          "en": "yours, that is very easy. Everyone has the"
+        },
+        {
+          "de": "Sachen, die er braucht Was gehört dir?",
+          "en": "things they need. What belongs to you?"
+        },
+        {
+          "de": "Zeig mir deine Sachen hier",
+          "en": "Show me your things here."
+        },
+        {
+          "de": "Zeig mir deine Sachen",
+          "en": "Show me your things."
+        },
+        {
+          "de": "Mein Buch, mein Stift, mein Handy, meine Tasche",
+          "en": "My book, my pen, my phone, my bag"
+        },
+        {
+          "de": "und mein Show Ich kenne jetzt meine Sachen",
+          "en": "and my show [unclear transcript]. Now I know my things,"
+        },
+        {
+          "de": "und was gehört denn dir dazu?",
+          "en": "and what belongs to you?"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-11/Mein Tag – Von morgens bis.mp3",
+      "recordingSha256": "69a3ed6ae9d8984758056f7c1076c2f2b23d199ffea78081859f3b0e3ce49930",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Musik",
+          "en": "Music."
+        },
+        {
+          "de": "Um sieben Uhr stehe ich auf, ich mache",
+          "en": "At seven I get up. I"
+        },
+        {
+          "de": "das Fenster auf Um halb acht Frühstücke ich,",
+          "en": "open the window. At half past seven I have breakfast,"
+        },
+        {
+          "de": "dann ziehe ich meine Jacke an Um acht",
+          "en": "then I put on my jacket. At eight"
+        },
+        {
+          "de": "Uhr gehe ich aus dem Haus, mein Deutschkurs",
+          "en": "o'clock I leave the house. My German course"
+        },
+        {
+          "de": "fängt um neun Uhr an Von neun bis",
+          "en": "starts at nine. From nine until"
+        },
+        {
+          "de": "zwölf lerne ich Deutsch, danach fahre ich wieder",
+          "en": "twelve I learn German; afterwards I go back"
+        },
+        {
+          "de": "nach Haus Am Morgen habe ich viel zu",
+          "en": "home. In the morning I have a lot to"
+        },
+        {
+          "de": "tun, am Mittag mache ich eine Pause Ich",
+          "en": "do; at midday I take a break. I"
+        },
+        {
+          "de": "schaue kurz auf meine Uhr, schon ist es",
+          "en": "briefly look at my watch. It is already"
+        },
+        {
+          "de": "wieder eine Uhr",
+          "en": "one o'clock again."
+        },
+        {
+          "de": "Von morgens bis abends zu geht mein Tag.",
+          "en": "From morning to evening, that is my day."
+        },
+        {
+          "de": "Ich mache viele Dinge, die ich mach.",
+          "en": "I do many things that I do."
+        },
+        {
+          "de": "Um 7 stehe ich auf und 10 schlafe",
+          "en": "At seven I get up, and at ten"
+        },
+        {
+          "de": "ich ein.",
+          "en": "I fall asleep."
+        },
+        {
+          "de": "Da zwischen bleibt auch Zeit für mich.",
+          "en": "In between there is also time for me."
+        },
+        {
+          "de": "Am Morgen, am Mittag, am Abend.",
+          "en": "In the morning, at midday, in the evening."
+        },
+        {
+          "de": "Ich weiß, wann ich was mache.",
+          "en": "I know when I'm doing something."
+        },
+        {
+          "de": "Wie spät ist es?",
+          "en": "What time is it?"
+        },
+        {
+          "de": "Wie viel Uhr haben wir?",
+          "en": "What time do we have?"
+        },
+        {
+          "de": "Mein Tag geht weiter Schritt für Schritt.",
+          "en": "My day goes on, step by step."
+        },
+        {
+          "de": "Mein Tag geht weiter Schritt für Schritt.",
+          "en": "My day goes on, step by step."
+        },
+        {
+          "de": "Mein Tag geht weiter Schritt für Schritt",
+          "en": "My day goes on, step by step."
+        },
+        {
+          "de": "Und mein Uhr esse ich zum Mittag Und",
+          "en": "At [unclear transcript] I have lunch. At"
+        },
+        {
+          "de": "zwei kaufe ich im Supermarkt ein Und vier",
+          "en": "two I shop at the supermarket. At four"
+        },
+        {
+          "de": "Uhr räume ich mein Zimmer auf Dann rufe",
+          "en": "o'clock I tidy my room. Then"
+        },
+        {
+          "de": "ich meine Mutter an",
+          "en": "I call my mother."
+        },
+        {
+          "de": "Am Abend koche ich um sechs, um sieben",
+          "en": "In the evening I cook at six; at seven"
+        },
+        {
+          "de": "sehe ich etwas fern, um halb neun lese",
+          "en": "I watch some television; at half past eight"
+        },
+        {
+          "de": "ich ein Buch, um zehn Uhr schlafe ich",
+          "en": "I read a book; at ten I fall"
+        },
+        {
+          "de": "ein",
+          "en": "asleep."
+        },
+        {
+          "de": "Vor dem Kurs trinke ich Kaffee, nach dem",
+          "en": "Before the course I drink coffee; after the"
+        },
+        {
+          "de": "Kurs gehe ich nach Haus",
+          "en": "course I go home."
+        },
+        {
+          "de": "Am Montag lerne ich neue Wörter,",
+          "en": "On Monday I learn new words,"
+        },
+        {
+          "de": "am Freitag gehe ich mit Freunden aus Von",
+          "en": "On Friday I go out with friends. From"
+        },
+        {
+          "de": "morgens bis abends so geht mein Tag Ich",
+          "en": "morning to evening, that is my day. I"
+        },
+        {
+          "de": "mache viele Dinge, die ich mag Um 7",
+          "en": "do many things I like. At seven"
+        },
+        {
+          "de": "stehe ich auf und 10 schlafe ich ein",
+          "en": "I get up, and at ten I fall asleep."
+        },
+        {
+          "de": "Da zwischen bleibt auch Zeit für mich Am",
+          "en": "In between there is also time for me. In the"
+        },
+        {
+          "de": "Morgen, am Mittag, am Abend Ich weiß, wann",
+          "en": "morning, at midday, in the evening. I know when"
+        },
+        {
+          "de": "ich was mache Wie spät ist es, wie",
+          "en": "I do what. What time is it, what"
+        },
+        {
+          "de": "viel Uhr haben wir?",
+          "en": "time do we have?"
+        },
+        {
+          "de": "Mein Tag geht weiter Schritt für Schritt Mein",
+          "en": "My day goes on, step by step. My"
+        },
+        {
+          "de": "Tag geht weiter Schritt für Schritt",
+          "en": "day goes on, step by step."
+        },
+        {
+          "de": "Ja,",
+          "en": "Yes,"
+        },
+        {
+          "de": "jetzt ist es spät, ich bin schon müde",
+          "en": "now it is late, I am already tired."
+        },
+        {
+          "de": "Ich mache das Licht aus und sage gute",
+          "en": "I turn off the light and say good"
+        },
+        {
+          "de": "Nacht Morgen stehe ich wieder um sieben auf",
+          "en": "night. Tomorrow I will get up at seven again,"
+        },
+        {
+          "de": "und ein neuer Tag",
+          "en": "and a new day."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-12/Zeit und Datum.mp3",
+      "recordingSha256": "444c0f306de7b261124e3446c5a30c32ca6effc3a67334691623aa8727ff3e73",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Mein Handy zeigt 14 Uhr Ich schau in",
+          "en": "My phone shows 14:00. I look at"
+        },
+        {
+          "de": "den Kalender",
+          "en": "the calendar."
+        },
+        {
+          "de": "Heute habe ich einen Termin Um 16 Uhr",
+          "en": "Today I have an appointment. At 16:00"
+        },
+        {
+          "de": "treffe ich Freunde Um 8 Uhr beginnt mein",
+          "en": "I meet friends. At eight my"
+        },
+        {
+          "de": "Deutschkurs.",
+          "en": "German course starts."
+        },
+        {
+          "de": "Um 12 Uhr machen wir Pause.",
+          "en": "At twelve we take a break."
+        },
+        {
+          "de": "Um 18 Uhr bin ich wieder frei.",
+          "en": "At 18:00 I am free again."
+        },
+        {
+          "de": "Um 22 Uhr gehe ich schlafen.",
+          "en": "At 22:00 I go to sleep."
+        },
+        {
+          "de": "Ich schreibe Datum und Uhrzeit auf.",
+          "en": "I write down the date and time."
+        },
+        {
+          "de": "Dann vergesse ich keinen Termin.",
+          "en": "Then I won't forget an appointment."
+        },
+        {
+          "de": "Welcher Tag um wie viel Uhr ich schaue",
+          "en": "Which day, at what time? I look"
+        },
+        {
+          "de": "in den Kalender",
+          "en": "at the calendar."
+        },
+        {
+          "de": "Januar,",
+          "en": "January,"
+        },
+        {
+          "de": "Februar, März und April,",
+          "en": "February, March and April,"
+        },
+        {
+          "de": "Mai und Juli die Zeit geht schnell Juli,",
+          "en": "May and July; time goes quickly. July,"
+        },
+        {
+          "de": "August,",
+          "en": "August,"
+        },
+        {
+          "de": "September,",
+          "en": "September,"
+        },
+        {
+          "de": "Oktober, November,",
+          "en": "October, November,"
+        },
+        {
+          "de": "Dezember, das Jahr ist vorbei Um 8 Uhr",
+          "en": "December; the year is over. At eight,"
+        },
+        {
+          "de": "um 16 Uhr um 18 Uhr bin ich",
+          "en": "at 16:00, at 18:00 I am"
+        },
+        {
+          "de": "dabei Ich gähne die Zeit, ich gähne den",
+          "en": "there. I [unclear transcript] the time, I [unclear transcript] the"
+        },
+        {
+          "de": "Tag und komme immer pünktlich an",
+          "en": "day and always arrive on time."
+        },
+        {
+          "de": "Im Januar beginnt das neue Jahr Im Februar",
+          "en": "In January the new year begins. In February"
+        },
+        {
+          "de": "ist es oft kalt",
+          "en": "it is often cold."
+        },
+        {
+          "de": "Im Erz kommt langsam der Frühling Im April",
+          "en": "In [unclear transcript] spring slowly arrives. In April"
+        },
+        {
+          "de": "wird es wieder warm",
+          "en": "it gets warm again."
+        },
+        {
+          "de": "Im Mai habe ich Geburtstag Im Juni besuch",
+          "en": "In May it is my birthday. In June I visit"
+        },
+        {
+          "de": "ich meine Freunde Im Juli fahren wir an",
+          "en": "my friends. In July we go to"
+        },
+        {
+          "de": "den See",
+          "en": "the lake."
+        },
+        {
+          "de": "Im August habe ich Urlaub Im September beginnt",
+          "en": "In August I am on holiday. In September"
+        },
+        {
+          "de": "mein neuer Kurs Im Oktober lerne ich jeden",
+          "en": "my new course begins. In October I learn every"
+        },
+        {
+          "de": "Tag Im November habe ich einen Termin Im",
+          "en": "day. In November I have an appointment. In"
+        },
+        {
+          "de": "Dezember feiern wir zusammen",
+          "en": "December we celebrate together."
+        },
+        {
+          "de": "Januar,",
+          "en": "January,"
+        },
+        {
+          "de": "Februar, März und April Mai und Juni, die",
+          "en": "February, March and April. May and June,"
+        },
+        {
+          "de": "Zeit geht schnell Juli, August,",
+          "en": "time goes quickly. July, August,"
+        },
+        {
+          "de": "September,",
+          "en": "September,"
+        },
+        {
+          "de": "Oktober November,",
+          "en": "October, November,"
+        },
+        {
+          "de": "Dezember, das Jahr ist vorbei Um 8 Uhr,",
+          "en": "December; the year is over. At eight,"
+        },
+        {
+          "de": "um 16 Uhr, um 18 Uhr bin ich",
+          "en": "at 16:00, at 18:00 I am"
+        },
+        {
+          "de": "dabei Ich gänne die Zeit, ich gänne den",
+          "en": "there. I [unclear transcript] the time, I [unclear transcript] the"
+        },
+        {
+          "de": "Tag Und komme immer fünftig an",
+          "en": "day and always arrive [unclear transcript]."
+        },
+        {
+          "de": "Heute ist der dritte Mai, mein Termin ist",
+          "en": "Today is the third of May. My appointment is"
+        },
+        {
+          "de": "Du mach 10 Uhr,",
+          "en": "at ten [unclear transcript],"
+        },
+        {
+          "de": "ich schreibe alles in mein Handy",
+          "en": "I write everything in my phone"
+        },
+        {
+          "de": "Und bin pünktlich da",
+          "en": "and arrive on time."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-17/Wo ist der Bahnhof_.mp3",
+      "recordingSha256": "e71ab6989d1d075b5d70e7c0da7c62ea2f004f429b327fefc019728d259b505a",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Ich bin heute in einer neuen Stadt, ich",
+          "en": "Today I am in a new city. I"
+        },
+        {
+          "de": "möchte mit dem Zug nach Haus.",
+          "en": "would like to go home by train."
+        },
+        {
+          "de": "Doch ich weiß nicht wo der Bahnhof ist,",
+          "en": "But I do not know where the station is,"
+        },
+        {
+          "de": "ich kenne mich hier noch nicht aus.",
+          "en": "I do not know my way around here yet."
+        },
+        {
+          "de": "Ich stehe vor dem Rathaus und sehe eine",
+          "en": "I am standing in front of the town hall and see a"
+        },
+        {
+          "de": "Frau vor mir.",
+          "en": "woman in front of me."
+        },
+        {
+          "de": "Ich frage Entschuldigung, ist der Bahnhof von hier?",
+          "en": "I ask excuse me, where is the station from here [unclear transcript]?"
+        },
+        {
+          "de": "Die Frau lächelt und sagt zu mir,",
+          "en": "The woman smiles and says to me,"
+        },
+        {
+          "de": "der Bahnhof ist nicht weit von hier Gehen",
+          "en": "the station is not far from here. Go"
+        },
+        {
+          "de": "Sie einfach geradeaus, dann kommen Sie zur Ampel",
+          "en": "straight ahead and you will reach the traffic lights."
+        },
+        {
+          "de": "Geradeaus und danach rechts, an der Ampel bleibe",
+          "en": "Straight ahead and then right. At the lights"
+        },
+        {
+          "de": "ich kurz stehen Dann gehe ich bis zur",
+          "en": "I stop briefly. Then I go to the"
+        },
+        {
+          "de": "Bäckerei,",
+          "en": "bakery,"
+        },
+        {
+          "de": "dort kann ich den Bahnhof sehen Links ist",
+          "en": "from there I can see the station. On the left is"
+        },
+        {
+          "de": "der Acht, rechts ist die Bahn Der Bahnhof",
+          "en": "the eight [unclear transcript], on the right is the railway. The station"
+        },
+        {
+          "de": "liegt gleich nebenan Jetzt weiß ich wo ich",
+          "en": "is right next door. Now I know where I"
+        },
+        {
+          "de": "hingehen muss Und komme endlich dort an Ich",
+          "en": "need to go and finally arrive there. I"
+        },
+        {
+          "de": "gehe langsam gerade aus An der Ampel biege",
+          "en": "slowly walk straight ahead. At the lights"
+        },
+        {
+          "de": "ich rechts ab Ich gehe weiter bis zur",
+          "en": "I turn right. I continue to the"
+        },
+        {
+          "de": "Bäckerei Und sehe den Bahnhof schon von dort",
+          "en": "bakery and can already see the station from there."
+        },
+        {
+          "de": "Ich schaue auf die große Uhr Mein Zug",
+          "en": "I look at the big clock. My train"
+        },
+        {
+          "de": "kommt erst um drei Ich habe noch ein",
+          "en": "does not come until three. I still have a"
+        },
+        {
+          "de": "bisschen Zeit und kaufe mir ein Wasser ein",
+          "en": "little time and buy myself some water."
+        },
+        {
+          "de": "Ich denke an die nette Frau, sie hat",
+          "en": "I think of the kind woman. She"
+        },
+        {
+          "de": "mir den Weg gezeigt Ich sage noch einmal",
+          "en": "showed me the way. I say once more"
+        },
+        {
+          "de": "vielen Dank,",
+          "en": "thank you very much,"
+        },
+        {
+          "de": "jetzt kenne ich den Weg",
+          "en": "now I know the way."
+        },
+        {
+          "de": "Geradeaus und dann nach rechts, an der Ampel",
+          "en": "Straight ahead and then right. At the lights"
+        },
+        {
+          "de": "bleibe ich kurz stehen Dann gehe ich bis",
+          "en": "I stop briefly. Then I go"
+        },
+        {
+          "de": "zur Bäckerei,",
+          "en": "to the bakery,"
+        },
+        {
+          "de": "dort kann ich den Bahnhof sehen Links ist",
+          "en": "from there I can see the station. On the left is"
+        },
+        {
+          "de": "der Pass, rechts ist die Bank Der Bahnhof",
+          "en": "the pass [unclear transcript], on the right is the bank. The station"
+        },
+        {
+          "de": "liegt gleich nebenan Jetzt weiß ich, wo ich",
+          "en": "is right next door. Now I know where I"
+        },
+        {
+          "de": "hingehen muss Und komm' endlich dort ab Ich",
+          "en": "need to go and finally arrive there [unclear transcript]. I"
+        },
+        {
+          "de": "steh' ich am Bahnhof, mein Zug kommt pünktlicher",
+          "en": "am at the station. My train arrives on time [unclear transcript]."
+        },
+        {
+          "de": "Ich steige ein' und fahre nach Haus Wie",
+          "en": "I get on and go home. How"
+        },
+        {
+          "de": "schön, dass ich den Weg jetzt kann",
+          "en": "lovely that I know the way now [unclear transcript]."
+        },
+        {
+          "de": "Copyright",
+          "en": "Copyright"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-18/Wo ist mein Schlüssel_.mp3",
+      "recordingSha256": "78f01a9df35bb0ea09b8218a730ab190ede2f4c91ed7d7cf163611ffa516b54e",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Ich möchte heute einkaufen gehen, doch wo ist",
+          "en": "I would like to go shopping today, but where"
+        },
+        {
+          "de": "nur mein Schlüssel?",
+          "en": "is my key?"
+        },
+        {
+          "de": "Ich suche ihn im ganzen Haus, ich kann",
+          "en": "I search the whole house for it, but unfortunately"
+        },
+        {
+          "de": "ihn leider nicht sehen.",
+          "en": "I cannot see it."
+        },
+        {
+          "de": "Ich schaue auf den Tisch,",
+          "en": "I look at the table,"
+        },
+        {
+          "de": "dort liegt nun mein Handy.",
+          "en": "Only my phone is lying there now."
+        },
+        {
+          "de": "Ich suche in meiner Tasche, doch mein Schlüssel",
+          "en": "I look in my bag, but my key"
+        },
+        {
+          "de": "ist nicht da.",
+          "en": "is not there."
+        },
+        {
+          "de": "Vielleicht liegt er auf dem Sofa,",
+          "en": "Maybe he's lying on the sofa,"
+        },
+        {
+          "de": "vielleicht liegt er unter dem Bett Ich schaue",
+          "en": "Perhaps it is under the bed. I look"
+        },
+        {
+          "de": "neben die Lampe, doch dort finde ich ihn",
+          "en": "beside the lamp, but there I cannot find"
+        },
+        {
+          "de": "nicht Wo ist mein Schlösser?",
+          "en": "it. Where are my locks [unclear transcript]?"
+        },
+        {
+          "de": "Wo kann er sein?",
+          "en": "Where could it be?"
+        },
+        {
+          "de": "Auf dem Tisch?",
+          "en": "On the table?"
+        },
+        {
+          "de": "Nein, nein, nein Unter dem Stuhl oder hinter",
+          "en": "No, no, no. Under the chair or behind"
+        },
+        {
+          "de": "der Tür Ich suche überall nach Ihnen In",
+          "en": "the door? I look everywhere for it [unclear transcript]. In"
+        },
+        {
+          "de": "der Tasche, in dem Bett, zwischen den Büchern",
+          "en": "the bag, in the bed, between the books"
+        },
+        {
+          "de": "im Regal Ich schaue hier,",
+          "en": "on the shelf. I look here,"
+        },
+        {
+          "de": "ich schaue dort Wo ist mein Schlüssel?",
+          "en": "I look there. Where is my key?"
+        },
+        {
+          "de": "Mir kommt und fragt mich, warum bist du",
+          "en": "Mir [unclear name] comes and asks me why are you"
+        },
+        {
+          "de": "noch zu Hause?",
+          "en": "still at home?"
+        },
+        {
+          "de": "Ich sage, suche meinen Schlüssel Ich möchte endlich",
+          "en": "I say I am looking for my key. I would finally like to"
+        },
+        {
+          "de": "raus Sie schaut auf den kleinen Tisch, dort",
+          "en": "leave. She looks at the small table. There"
+        },
+        {
+          "de": "liegt ein großes Buch Unter dem Buch liegt",
+          "en": "is a big book. Under the book is"
+        },
+        {
+          "de": "mein Schlüssel, jetzt ist meine Suche vorbei Ich",
+          "en": "my key. Now my search is over. I"
+        },
+        {
+          "de": "nehme meine Schlüssel und stecke ihn in die",
+          "en": "take my key and put it in my"
+        },
+        {
+          "de": "Tasche",
+          "en": "bag."
+        },
+        {
+          "de": "Ich ziehe meine Jacke an, jetzt können wir",
+          "en": "I put on my jacket. Now we can"
+        },
+        {
+          "de": "endlich gehen Wo ist mein Schlüssel?",
+          "en": "finally go. Where is my key?"
+        },
+        {
+          "de": "Jetzt weiß ich es Er liegt unter meinem",
+          "en": "Now I know. It is under my"
+        },
+        {
+          "de": "Buch, nicht auf dem Sofa, mich hinter der",
+          "en": "book, not on the sofa, [unclear transcript] behind the"
+        },
+        {
+          "de": "Tür Ich habe ihn endlich gefunden Auf dem",
+          "en": "door. I have finally found it. On the"
+        },
+        {
+          "de": "Tisch und da den Buch Neben der Lampe",
+          "en": "table and under the book [unclear transcript], beside the lamp,"
+        },
+        {
+          "de": "hinter der Tür Jetzt habe ich meinen Schlüssel",
+          "en": "behind the door. Now I have my key"
+        },
+        {
+          "de": "Und geh' mit mir aus dem Haus Wir",
+          "en": "and leave the house with me [unclear transcript]. We"
+        },
+        {
+          "de": "gehen zusammen zum Bäcker Wer ist gleich um",
+          "en": "walk to the bakery together. Who is just around"
+        },
+        {
+          "de": "die Ecke?",
+          "en": "the corner [unclear transcript]?"
+        },
+        {
+          "de": "Mein Schlüssel ist in meiner Tasche So jetzt",
+          "en": "My key is in my bag. Now"
+        },
+        {
+          "de": "komm' der Tag beginn'",
+          "en": "come on, let the day begin [unclear transcript]."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a1/day-21/Heute kann ich leider nicht.mp3",
+      "recordingSha256": "975dccc63635bb209a98da254a20447b0336d15fc548b82ea61694d2ab8cfdd8",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Heute ist das Wetter schlecht Der Himmel ist",
+          "en": "Today the weather is bad. The sky is"
+        },
+        {
+          "de": "grau, es regnet stark Ich möchte mir im",
+          "en": "grey, it is raining hard. I would like to meet [unclear transcript] in the"
+        },
+        {
+          "de": "Park treffen Doch draußen ist es nass und",
+          "en": "park. But outside it is wet and"
+        },
+        {
+          "de": "kalt Ich schau auf mein Handy und rufe",
+          "en": "cold. I look at my phone and call"
+        },
+        {
+          "de": "meine Freundin an Ich sage mir, es tut",
+          "en": "my friend. I say [unclear transcript] I am"
+        },
+        {
+          "de": "mir leid, heute kann ich, leider nicht Es",
+          "en": "sorry, unfortunately I cannot today. It"
+        },
+        {
+          "de": "regnet, es regnet, der Wind ist kalt Ich",
+          "en": "is raining, it is raining, the wind is cold. I"
+        },
+        {
+          "de": "bleibe heute lieber zuhause",
+          "en": "would rather stay at home today."
+        },
+        {
+          "de": "Die Sonne scheint nicht der Himmel ist kau",
+          "en": "The sun is not shining, the sky is [unclear transcript]."
+        },
+        {
+          "de": "Ich gehe heute nicht mehr raus Können wir",
+          "en": "I am not going out again today. Can we"
+        },
+        {
+          "de": "uns morgen treffen?",
+          "en": "meet tomorrow?"
+        },
+        {
+          "de": "Vielleicht scheint dann die Sonne",
+          "en": "Perhaps the sun will shine then."
+        },
+        {
+          "de": "Heute muss ich leider absagen",
+          "en": "Unfortunately I have to cancel today,"
+        },
+        {
+          "de": "Doch morgen habe ich Zeit",
+          "en": "but tomorrow I have time."
+        },
+        {
+          "de": "Am Nachmittag kommt ein Gewitter Ist Platz und",
+          "en": "In the afternoon there is a thunderstorm. There is [unclear transcript] and"
+        },
+        {
+          "de": "Wander draußen, ich mache meine Fenster zu Und",
+          "en": "[unclear transcript] outside. I close my windows and"
+        },
+        {
+          "de": "trinke einen warmen Tee Am Abend wird der",
+          "en": "drink a warm tea. In the evening the"
+        },
+        {
+          "de": "Regen weniger",
+          "en": "rain eases."
+        },
+        {
+          "de": "Ich schaue noch einmal hinaus Mir schreibt morgen",
+          "en": "I look outside once more. Mir [unclear name] writes tomorrow"
+        },
+        {
+          "de": "um drei Ich antworte ja, das passt mir",
+          "en": "at three. I reply yes, that suits me"
+        },
+        {
+          "de": "gut",
+          "en": "well."
+        },
+        {
+          "de": "Es regnet, es regnet, der Wind ist kalt",
+          "en": "It is raining, it is raining, the wind is cold."
+        },
+        {
+          "de": "Ich bleibe heute lieber zu Haus Die Sonne",
+          "en": "I would rather stay at home today. The sun"
+        },
+        {
+          "de": "scheint nicht der Himmel ist kauf Ich gehe",
+          "en": "is not shining, the sky is [unclear transcript]. I am"
+        },
+        {
+          "de": "heute nicht mehr raus Können wir uns morgen",
+          "en": "not going out again today. Can we meet tomorrow?"
+        },
+        {
+          "de": "treffen?",
+          "en": "Meet?"
+        },
+        {
+          "de": "Vielleicht scheint an die Sonne Heute muss ich",
+          "en": "Perhaps the sun will shine [unclear transcript]. Today I"
+        },
+        {
+          "de": "leider absagen",
+          "en": "unfortunately have to cancel,"
+        },
+        {
+          "de": "Doch morgen hab ich Zeit Am nächsten Tag",
+          "en": "but tomorrow I have time. The next day"
+        },
+        {
+          "de": "scheint die Sonne Der Himmel ist wieder blau,",
+          "en": "the sun is shining. The sky is blue again,"
+        },
+        {
+          "de": "ich zertreffe mich um Dreiempark",
+          "en": "I meet [unclear transcript] at three in the park."
+        },
+        {
+          "de": "Und freue mich auf den Tag",
+          "en": "And I look forward to the day."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-08/Ein Abend zu zweit.mp3",
+      "recordingSha256": "f13735d3d4954c4925db0c045fe27a9cd6c6c30e8cb5a4ca392eae63a18b0829",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Ein Abend im Restaurant und Freitagabend gehe ich",
+          "en": "An evening in the restaurant. On Friday evening I go"
+        },
+        {
+          "de": "mit mir aus Für mich bitte Gemüse mit",
+          "en": "out with Mir [unclear name]. For me, vegetables with"
+        },
+        {
+          "de": "Reis, für mir die Suppe schön heiß Zwei",
+          "en": "rice please; for Mir [unclear name], the soup nice and hot. Two"
+        },
+        {
+          "de": "Gläser Wasser, Danke sehr,",
+          "en": "glasses of water, thank you very much,"
+        },
+        {
+          "de": "ein Abend zu zweit Was wollen wir mehr?",
+          "en": "an evening for two. What more could we want?"
+        },
+        {
+          "de": "Doch plötzlich steht ein Fisch vor mir Ich",
+          "en": "But suddenly there is a fish in front of me. I"
+        },
+        {
+          "de": "schaue auf den Teller und sage zu ihr",
+          "en": "look at the plate and say to her"
+        },
+        {
+          "de": "Das habe ich doch gar nicht bestellt Der",
+          "en": "I did not order that. The"
+        },
+        {
+          "de": "Kilner kommt und fragt, was fehlt Ich sage",
+          "en": "waiter [unclear transcript] comes and asks what is missing. I say"
+        },
+        {
+          "de": "freundlich Das ist nicht mein Essen Er sagt",
+          "en": "kindly that is not my meal. He says"
+        },
+        {
+          "de": "entschuldigung Ich hab's verwechselt Kurz darauf bringt er",
+          "en": "sorry, I mixed it up. Shortly afterwards he brings"
+        },
+        {
+          "de": "mein richtiges Gericht Mir lacht und sagt Jetzt",
+          "en": "my correct dish. Mir [unclear name] laughs and says now"
+        },
+        {
+          "de": "fehlt uns nichts",
+          "en": "we have everything we need."
+        },
+        {
+          "de": "Für mich bitte Gemüse mit Reis Für mir",
+          "en": "For me, vegetables with rice please; for Mir [unclear name],"
+        },
+        {
+          "de": "die Suppe schön heiß Zwei Gläser Wasser, danke",
+          "en": "the soup nice and hot. Two glasses of water, thank you"
+        },
+        {
+          "de": "sehr Ein Abend zu zweit Was wollen wir",
+          "en": "very much. An evening for two. What more could we"
+        },
+        {
+          "de": "mehr?",
+          "en": "want?"
+        },
+        {
+          "de": "Für mich bitte Gemüse mit Reis Für mir",
+          "en": "For me, vegetables with rice please; for Mir [unclear name],"
+        },
+        {
+          "de": "die Suppe schön heiß Zwei Gläser Wasser, danke",
+          "en": "the soup nice and hot. Two glasses of water, thank you"
+        },
+        {
+          "de": "sehr Mein Abend zu zweit",
+          "en": "very much. My evening for two."
+        },
+        {
+          "de": "Was wollen wir mehr?",
+          "en": "What more could we want?"
+        },
+        {
+          "de": "Copyright",
+          "en": "Copyright"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-09/Ein kleiner Urlaub.mp3",
+      "recordingSha256": "05c8fe7c2994af24056ace2ffd3eb840755ae0783ec5047c035ca11a63adba54",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Letzten Sommer war ich am Meer Meine Freundin",
+          "en": "Last summer I was by the sea. My friend"
+        },
+        {
+          "de": "war auch dabei",
+          "en": "was there too."
+        },
+        {
+          "de": "Wir sind früh mit dem Zug gefahren Am",
+          "en": "We took an early train. In the"
+        },
+        {
+          "de": "Abend haben wir den Strand gesehen Ein kleiner",
+          "en": "evening we saw the beach. A short"
+        },
+        {
+          "de": "Urlaub weit vom Alltag Die Luft ist warm,",
+          "en": "holiday far from everyday life. The air is warm,"
+        },
+        {
+          "de": "das Wasser blau Diese Tage bleiben in Erinnerung",
+          "en": "the water blue. These days will stay in our memory."
+        },
+        {
+          "de": "Wir sind deshalb ins Museum gegangen, dort haben",
+          "en": "So we went to the museum, where"
+        },
+        {
+          "de": "wir viel Neues entdeckt, am letzten Tag kaum",
+          "en": "we discovered many new things. On the last day"
+        },
+        {
+          "de": "die Sonne zurück,",
+          "en": "the sun came back [unclear transcript],"
+        },
+        {
+          "de": "ein kleiner Urlaub weit vom Alltag,",
+          "en": "a short holiday far from everyday life,"
+        },
+        {
+          "de": "die Luft ist warm, es fasse Das ist",
+          "en": "the air is warm, [unclear transcript]. It is"
+        },
+        {
+          "de": "ja blau, diese Tage bleiben",
+          "en": "blue, yes. These days will stay."
+        },
+        {
+          "de": "Wir haben viele Fotos gemacht",
+          "en": "We took lots of photos."
+        },
+        {
+          "de": "Nächstes Jahr fahren wir wieder hin Mit Verloven",
+          "en": "Next year we will go there again. With Falowen [unclear transcript]"
+        },
+        {
+          "de": "kann ich von Reisen erzählen",
+          "en": "I can talk about travels."
+        },
+        {
+          "de": "Copyright",
+          "en": "Copyright"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-22/Zeit für mich.mp3",
+      "recordingSha256": "ea30d8df12c1bd6455fd88abec7eafe2bf25e4451fcb170ce87ca4f2660357e3",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Am Montag habe ich Deutschkurs, am Dienstag arbeite",
+          "en": "On Monday I have my German course; on Tuesday I work"
+        },
+        {
+          "de": "ich besagt, am Mittwoch ruft mich mir an,",
+          "en": "[unclear transcript]. On Wednesday Mir [unclear name] calls me,"
+        },
+        {
+          "de": "sie fragt ob ich am Abendzeit tag,",
+          "en": "she asks if I have time in the evening [unclear transcript],"
+        },
+        {
+          "de": "ich schaue kurz in mein Kalender,",
+          "en": "I briefly look at my calendar,"
+        },
+        {
+          "de": "die ganze Diese Woche ist schon voll, doch",
+          "en": "the whole week is already full, but"
+        },
+        {
+          "de": "ich möchte sie gern wieder singen, überlegen wann",
+          "en": "I would like to sing to her again [unclear transcript], consider when"
+        },
+        {
+          "de": "es passen soll.",
+          "en": "it might work."
+        },
+        {
+          "de": "So viele Termine, so wenig Zeit,",
+          "en": "So many appointments, so little time,"
+        },
+        {
+          "de": "doch ein freier Abend ist nicht bei.",
+          "en": "But there is no free evening."
+        },
+        {
+          "de": "Ich nehme mein Handy und schreibe ihr,",
+          "en": "I take my phone and write to her,"
+        },
+        {
+          "de": "am Donnerstag passt es bei mir.",
+          "en": "Thursday works for me."
+        },
+        {
+          "de": "Zwischen Arbeit und all den Terminen bleibt auch",
+          "en": "Between work and all the appointments, there is also"
+        },
+        {
+          "de": "ein bisschen Zeit für mich.",
+          "en": "a little time left for me."
+        },
+        {
+          "de": "Ein Abend mit Freunden ein gutes Gespräch, das",
+          "en": "An evening with friends, a good conversation, that"
+        },
+        {
+          "de": "brauche ich manchmal wirklich.",
+          "en": "is something I really need sometimes."
+        },
+        {
+          "de": "Wir machen Pläne, ändern die Zeit Und finden",
+          "en": "We make plans, change the time and find"
+        },
+        {
+          "de": "einen Tag, der passt Denn auch wenn meine",
+          "en": "a day that suits us. Because even when my"
+        },
+        {
+          "de": "Woche voll ist, freue ich mich",
+          "en": "week is full, I look forward"
+        },
+        {
+          "de": "Auf eine kleine Pause",
+          "en": "to a little break."
+        },
+        {
+          "de": "Am Donnerstag kochen wir zusammen Wir essen Pasta",
+          "en": "On Thursday we cook together. We eat pasta"
+        },
+        {
+          "de": "und reden viel Am Freitag gehe ich zum",
+          "en": "and talk a lot. On Friday I go to"
+        },
+        {
+          "de": "Sport Das ist nach der Arbeit mein Ziel",
+          "en": "exercise. That is my goal after work."
+        },
+        {
+          "de": "Am Samstag besuche ich meine Familie Am Sonntag",
+          "en": "On Saturday I visit my family. On Sunday"
+        },
+        {
+          "de": "schlafe ich länger aus Danach plane ich die",
+          "en": "I sleep in longer. Afterwards I plan the"
+        },
+        {
+          "de": "nächste Woche Ganz in Ruhe bei mir zu",
+          "en": "next week, in peace and quiet at"
+        },
+        {
+          "de": "Haus Manchmal muss ich Termine verschieben",
+          "en": "home. Sometimes I have to reschedule appointments."
+        },
+        {
+          "de": "Manchmal sage ich auch mal nein",
+          "en": "Sometimes I say no too."
+        },
+        {
+          "de": "Ich muss nicht jeden Tag etwas machen Ein",
+          "en": "I do not have to do something every day. A"
+        },
+        {
+          "de": "freier Abend darf auch sein",
+          "en": "free evening is allowed too."
+        },
+        {
+          "de": "Zwischen Arbeit und all den Terminen bleibt auch",
+          "en": "Between work and all the appointments, there is also"
+        },
+        {
+          "de": "ein bisschen Zeit für mich Seine Abend mit",
+          "en": "a little time for me. An evening [unclear transcript] with"
+        },
+        {
+          "de": "Freunden ein gutes Gespräch Das brauche ich manchmal",
+          "en": "friends, a good conversation. Sometimes I"
+        },
+        {
+          "de": "wirklich Wir machen Pläne, ändern die Zeit Und",
+          "en": "really need that. We make plans, change the time and"
+        },
+        {
+          "de": "finden einen Tag, der passt Denn auch wenn",
+          "en": "find a day that suits us. Because even when"
+        },
+        {
+          "de": "meine Woche voll ist Freue ich mich Auf",
+          "en": "my week is full, I look forward to"
+        },
+        {
+          "de": "eine kleine Pause",
+          "en": "a little break."
+        },
+        {
+          "de": "Auf eine kleine Pause",
+          "en": "to a little break."
+        },
+        {
+          "de": "Jetzt steht alles in meinem Kalender Und ich",
+          "en": "Now everything is in my calendar and I"
+        },
+        {
+          "de": "weiß, wann ich Zeit hab Eine Woche mit",
+          "en": "know when I have time. A week with"
+        },
+        {
+          "de": "Arbeit und Freunden und ein bisschen Zeit für",
+          "en": "work and friends and a little time for"
+        },
+        {
+          "de": "mich",
+          "en": "me."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-24/Endlich Urlaub.mp3",
+      "recordingSha256": "087650874c42ae2b28dc150eebaa27a2845c4d51f9f760fa92f1cfc20c237fc6",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Ich möchte in den Ferien verreisen.",
+          "en": "I would like to travel during the holidays."
+        },
+        {
+          "de": "Schon lange träume ich von Hamburg.",
+          "en": "I've dreamed of Hamburg for a long time."
+        },
+        {
+          "de": "Ich habe jeden Monat Geld gespart.",
+          "en": "I have saved money every month."
+        },
+        {
+          "de": "Jetzt kann ich endlich Urlaub machen.",
+          "en": "now I can finally take a holiday."
+        },
+        {
+          "de": "Ich suche ein Hotel im Internet und finde",
+          "en": "I search for a hotel online and find"
+        },
+        {
+          "de": "ein Zimmer in der Stadt.",
+          "en": "a room in the city."
+        },
+        {
+          "de": "Dann buche ich mein Ticket für Samstag, jetzt",
+          "en": "Then I book my ticket for Saturday. Now"
+        },
+        {
+          "de": "fehlt nur noch mein Koffer Endlich Urlaub, endlich",
+          "en": "all I need is my suitcase. Finally a holiday, finally"
+        },
+        {
+          "de": "frei, ich packe meine Sachen ein Ein neues",
+          "en": "free. I pack my things. A new"
+        },
+        {
+          "de": "Ziel,",
+          "en": "destination,"
+        },
+        {
+          "de": "ein neuer Ort, am Samstag fahre ich endlich",
+          "en": "a new place. On Saturday I finally travel"
+        },
+        {
+          "de": "vor",
+          "en": "[unclear transcript]."
+        },
+        {
+          "de": "Hamburg,",
+          "en": "Hamburg,"
+        },
+        {
+          "de": "ich freue mich auf dich",
+          "en": "I am looking forward to seeing you."
+        },
+        {
+          "de": "Hamburg, ich freue mich auf dich",
+          "en": "Hamburg, I am looking forward to seeing you."
+        },
+        {
+          "de": "Freitag packe ich mein Koffer, ich nehme Kleidung",
+          "en": "On Friday I pack my suitcase. I take clothes"
+        },
+        {
+          "de": "um mein Handy mit Am Samstag stehe ich",
+          "en": "and my phone [unclear transcript]. On Saturday I get"
+        },
+        {
+          "de": "früh auf, mein Zug fährt schon um 8",
+          "en": "up early; my train leaves at eight"
+        },
+        {
+          "de": "Uhr ab Am Bahnhof kaufe ich ein Café,",
+          "en": "o'clock. At the station I buy a coffee [unclear transcript],"
+        },
+        {
+          "de": "da steige ich in mein Zug ein Ich",
+          "en": "then I get on my train. I"
+        },
+        {
+          "de": "schaue aus den Fenster und lächle, mein Urlaub",
+          "en": "look out of the window and smile. My holiday"
+        },
+        {
+          "de": "beginnt wie schön Endlich Urlaub, endlich frei, ich",
+          "en": "begins, how lovely. Finally a holiday, finally free, I"
+        },
+        {
+          "de": "dacke meine Sachen ein Ein neues Ziel,",
+          "en": "pack my things [unclear transcript]. A new destination,"
+        },
+        {
+          "de": "ein neuer Ort, am Samstag fahre ich endlich",
+          "en": "a new place. On Saturday I finally travel"
+        },
+        {
+          "de": "vor",
+          "en": "[unclear transcript]."
+        },
+        {
+          "de": "Dodu, Dodu, Hamburg,",
+          "en": "Doo-doo, doo-doo, Hamburg,"
+        },
+        {
+          "de": "ich freue mich auf dich Dodu,",
+          "en": "I am looking forward to seeing you. Doo-doo,"
+        },
+        {
+          "de": "Dodu,",
+          "en": "doo-doo,"
+        },
+        {
+          "de": "Hamburg, ich freue mich auf dich",
+          "en": "Hamburg, I am looking forward to seeing you."
+        },
+        {
+          "de": "Am Mittag komme ich in Hamburg an, ich",
+          "en": "At midday I arrive in Hamburg. I"
+        },
+        {
+          "de": "gehe zum Hotel und checke einen, dann mache",
+          "en": "go to the hotel and check in [unclear transcript], then"
+        },
+        {
+          "de": "ich ein Spaziergang Mein Urlaub kann jetzt beginnen",
+          "en": "I go for a walk. My holiday can begin now."
+        },
+        {
+          "de": "Am Mittag komme ich in Hamburg an, ich",
+          "en": "At midday I arrive in Hamburg. I"
+        },
+        {
+          "de": "gehe zum Hotel und checke einen, dann mache",
+          "en": "go to the hotel and check in [unclear transcript], then"
+        },
+        {
+          "de": "ich ein Spaziergang Mein Urlaub kann jetzt beginnen",
+          "en": "I go for a walk. My holiday can begin now."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/a2/day-27/Handys weg.mp3",
+      "recordingSha256": "db7209d0c3092a6a9b94ede867a05344faeb5305f71c9683d7564de6e35d2746",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Heute Morgen schreibt mir mir,",
+          "en": "This morning Mir [unclear name] writes to me,"
+        },
+        {
+          "de": "sie fragt hast du heute Zeit",
+          "en": "she asks do you have time today?"
+        },
+        {
+          "de": "Doch ich bin schon auf dem Weg zur",
+          "en": "But I am already on my way to"
+        },
+        {
+          "de": "Arbeit und mein Handy liegt ganz weit Erst",
+          "en": "work and my phone is far away. Only"
+        },
+        {
+          "de": "am Abend sehe ich ihre Nachricht, ich denke",
+          "en": "in the evening do I see her message. I think"
+        },
+        {
+          "de": "oh das tut mir leid Ich wollte ihr",
+          "en": "oh, I am sorry. I wanted to"
+        },
+        {
+          "de": "schon früher schreiben,",
+          "en": "write to her earlier,"
+        },
+        {
+          "de": "doch der Tag empfehlt so schnell vorbei Eine",
+          "en": "but the day went by so quickly [unclear transcript]. A"
+        },
+        {
+          "de": "Nachricht, ein kleiner Groß Wir bleiben in Kontakt",
+          "en": "message, a little greeting [unclear transcript]. We stay in touch."
+        },
+        {
+          "de": "Doch manchmal leg ich mein Handy weg Weil",
+          "en": "But sometimes I put my phone away because"
+        },
+        {
+          "de": "das echte Leben Freude macht Ich schreibe mir,",
+          "en": "real life brings joy. I write to Mir [unclear name],"
+        },
+        {
+          "de": "tut mir leid Ich hatte heute leider keine",
+          "en": "sorry, unfortunately I did not have any"
+        },
+        {
+          "de": "Zeit Sie antwortet,",
+          "en": "time today. She replies,"
+        },
+        {
+          "de": "mach dir keine Sorgen Wir wär's mit einem",
+          "en": "do not worry. How about [unclear transcript]"
+        },
+        {
+          "de": "Treffen morgen, wir verabreden uns im kleinen Kaffee",
+          "en": "meeting tomorrow? We arrange to meet in the little café,"
+        },
+        {
+          "de": "Um 4 Uhr nachmittags, ganz in der Nähe,",
+          "en": "at four in the afternoon, very nearby,"
+        },
+        {
+          "de": "dann legen wir die Handys weg Und freuen",
+          "en": "then we put our phones away and look"
+        },
+        {
+          "de": "uns auf unser Treffen Eine Nachricht, ein kleiner",
+          "en": "forward to meeting. A message, a little"
+        },
+        {
+          "de": "Gruß Wir bleiben im Kontakt",
+          "en": "greeting. We stay in touch."
+        },
+        {
+          "de": "Doch manchmal leg ich mein Handy weg Weil",
+          "en": "But sometimes I put my phone away because"
+        },
+        {
+          "de": "das echte Leben Freude macht Am nächsten Tag",
+          "en": "real life brings joy. The next day"
+        },
+        {
+          "de": "sitze ich mit mir,",
+          "en": "I sit with Mir [unclear name],"
+        },
+        {
+          "de": "wir erzählen uns so viel Die Handys bleiben",
+          "en": "we have so much to tell each other. The phones stay"
+        },
+        {
+          "de": "in den Taschen, dann heute zählt nur unser",
+          "en": "in our bags, because [unclear transcript] today only our"
+        },
+        {
+          "de": "Gespräch",
+          "en": "conversation matters."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/b1/day-03/Ein kleiner Erfolg.mp3",
+      "recordingSha256": "5ea00a32422c74d91b4b6c30ff7d1d6a5d2d11b3ba04cd3713f1d23867a82f52",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Als Sauer ihren ersten Kurs begann,",
+          "en": "When Sauer [unclear name] began her first course,"
+        },
+        {
+          "de": "konnte sie kaum meinen Satz sagen,",
+          "en": "she could barely say my sentence [unclear transcript],"
+        },
+        {
+          "de": "sie machte Fehler und schämte sich obwohl sie",
+          "en": "she made mistakes and felt ashamed, although she"
+        },
+        {
+          "de": "jeden Abend fleißig übte Ein kleiner Erfolg verändert",
+          "en": "practised diligently every evening. A small success changes"
+        },
+        {
+          "de": "viel, auch wenn noch nicht alles geliebt Ich",
+          "en": "a lot, even if not everything is loved yet [unclear transcript]. I"
+        },
+        {
+          "de": "bleibe dran und glaube an mich",
+          "en": "keep going and believe in myself."
+        },
+        {
+          "de": "Eines Tages hielt sie einen kurzen Vortrag, sie",
+          "en": "One day she gave a short presentation. She"
+        },
+        {
+          "de": "zitterte doch sich brach bis zum Schluss Die",
+          "en": "trembled but spoke [unclear transcript] until the end. The"
+        },
+        {
+          "de": "Gruppe hörte aufmerksam zu, danach sagte jemand, das",
+          "en": "group listened attentively. Afterwards someone said"
+        },
+        {
+          "de": "hast du gut gemacht Ein kleiner Erfolg verändert",
+          "en": "you did that well. A small success changes"
+        },
+        {
+          "de": "viel Auch wenn noch nicht alles gelingt Ich",
+          "en": "a lot. Even if not everything works yet, I"
+        },
+        {
+          "de": "bleibe dran",
+          "en": "keep going"
+        },
+        {
+          "de": "Und glaube an mich",
+          "en": "and believe in myself."
+        },
+        {
+          "de": "Sarah ging löschen nach Hause Sie wusste das",
+          "en": "Sarah went [unclear transcript] home. She knew that"
+        },
+        {
+          "de": "Übung geglichen Mit verloren Wachsern Mine is it's",
+          "en": "[unclear transcript: practice …]"
+        },
+        {
+          "de": "all my mood",
+          "en": "[unclear transcript: all my mood]"
+        }
+      ]
+    },
+    {
+      "objectKey": "music/b1/day-15/Echte Gespräche.mp3",
+      "recordingSha256": "b1d0bd41e6555947488a4b0627312bc963e7a1591092f8687a2e4c7cd4ca813c",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Heute arbeite ich wieder von zu Hause",
+          "en": "Today I am working from home again."
+        },
+        {
+          "de": "Der Computer steht am Küchentisch Um ein Beginn",
+          "en": "The computer is on the kitchen table. At one [unclear transcript] begins"
+        },
+        {
+          "de": "unserer Videokonferenz",
+          "en": "our video conference."
+        },
+        {
+          "de": "Doch plötzlich fällt meine Verbindung raus",
+          "en": "But suddenly my connection drops."
+        },
+        {
+          "de": "Auch wenn der Bild schon uns verbindet Brauchen",
+          "en": "Even if the screen [unclear transcript] connects us, we need"
+        },
+        {
+          "de": "wir Zeit für echte Gespräche",
+          "en": "time for real conversations."
+        },
+        {
+          "de": "Ich finde meinen Rhythmus jeden Tag",
+          "en": "I find my rhythm every day."
+        },
+        {
+          "de": "Ich rufe meine Kollegin schnell an",
+          "en": "I quickly call my colleague."
+        },
+        {
+          "de": "Sie erklärt mir die richtigsten Aufgaben",
+          "en": "She explains the most correct tasks to me [unclear transcript]."
+        },
+        {
+          "de": "In der Pause gehe ich kurz nach draußen",
+          "en": "During the break I go outside briefly"
+        },
+        {
+          "de": "Damit ich mich wieder besser konzentrieren kann",
+          "en": "so that I can concentrate better again."
+        },
+        {
+          "de": "Auch wenn der Bild schon uns verbindet",
+          "en": "Even if the screen [unclear transcript] connects us,"
+        },
+        {
+          "de": "Brauchen wir Zeit für echte Gespräche",
+          "en": "we need time for real conversations."
+        },
+        {
+          "de": "Ich finde meinen Rhythmus jeden Tag",
+          "en": "I find my rhythm every day."
+        },
+        {
+          "de": "Am Abend schließe ich mein Laptop, die Arbeit",
+          "en": "In the evening I close my laptop. Today the work"
+        },
+        {
+          "de": "bleibt heute wirklich im Büro Mit Falluren kann",
+          "en": "really stays in the office. With Falowen [unclear transcript] I can"
+        },
+        {
+          "de": "ich auch Digitale Probleme erklären.",
+          "en": "also explain digital problems."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/b1/day-16/Atme Ein und Atme Aus.mp3",
+      "recordingSha256": "73f77432e88b7c9482d81c9fea4db6ee944a2d39dbb662ac81d74d582d0bc89e",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Morgen schreibe ich meine Deutschprüfung Die Wörter kenne",
+          "en": "Tomorrow I take my German exam. I actually know"
+        },
+        {
+          "de": "ich eigentlich gut Trotzdem kann ich kaum schlafen,",
+          "en": "the words well, yet I can barely sleep"
+        },
+        {
+          "de": "weil ich ständig am wirkliche Fehler denke",
+          "en": "because I keep thinking about real mistakes [unclear transcript]."
+        },
+        {
+          "de": "Ich abmeh' ein und abmeh' aus, mein Fehler",
+          "en": "I breathe in and breathe out [unclear transcript]. My mistake"
+        },
+        {
+          "de": "macht mich nicht klein Ich habe gelernt,",
+          "en": "does not make me small. I have studied,"
+        },
+        {
+          "de": "geht um mein Bestes",
+          "en": "[unclear transcript: do my best]"
+        },
+        {
+          "de": "Meine Lehrerin erinnert mich an meine Fortschritte Ich",
+          "en": "My teacher reminds me of my progress. I"
+        },
+        {
+          "de": "mach eine Pause und wir spazieren",
+          "en": "take a break and we go for a walk."
+        },
+        {
+          "de": "Danach wiederhole ich nur die wichtigsten Themen Anstatt",
+          "en": "Afterwards I revise only the most important topics, instead of"
+        },
+        {
+          "de": "bis Tiefen die Nacht zu lernen",
+          "en": "studying until late into the night [unclear transcript]."
+        },
+        {
+          "de": "Ich abmein und atme aus Ein Fehler mach",
+          "en": "I breathe in [unclear transcript] and breathe out. A mistake does not"
+        },
+        {
+          "de": "mich nicht klein Ich habe gelernt, don't give",
+          "en": "make me small. I have studied, [unclear transcript: don't give]"
+        },
+        {
+          "de": "me my bestest",
+          "en": "[unclear transcript: me my bestest]"
+        },
+        {
+          "de": "Am Morgen geh ich ruhig zur Prüfung Ich",
+          "en": "In the morning I go calmly to the exam. I"
+        },
+        {
+          "de": "bin bereit für diesen Schritt Bei Verloven wächst",
+          "en": "am ready for this step. With Falowen [unclear transcript] grows"
+        },
+        {
+          "de": "mein Mut vor jeder Prüfung",
+          "en": "my courage before every exam."
+        }
+      ]
+    },
+    {
+      "objectKey": "music/b1/day-28/Ein kleiner Weg.mp3",
+      "recordingSha256": "42dc95108ab49013140089e3de0de8944cfb2edd65011363b08bb5272c26222d",
+      "source": "automatic-transcript",
+      "translationMethod": "Assistant-authored English of the displayed automatic German transcript; unclear source fragments are marked, not audio-verified.",
+      "lines": [
+        {
+          "de": "Mein Vater fährt für jeden Weg mit dem",
+          "en": "My father takes every journey by"
+        },
+        {
+          "de": "Auto",
+          "en": "car."
+        },
+        {
+          "de": "Ich habe ihn von meiner Idee erzählt",
+          "en": "I told him about my idea."
+        },
+        {
+          "de": "Vielleicht können wir öfter den Bus nehmen, wenn",
+          "en": "Perhaps we can take the bus more often, if"
+        },
+        {
+          "de": "das Wetter und die Zeit ist erlauben.",
+          "en": "the weather and time allow it."
+        },
+        {
+          "de": "Wir müssen nicht alles heute ändern,",
+          "en": "We don't have to change everything today,"
+        },
+        {
+          "de": "doch morgen können wir anfangen.",
+          "en": "but tomorrow, we can start."
+        },
+        {
+          "de": "Ein kleiner Weg,",
+          "en": "A small journey"
+        },
+        {
+          "de": "führt uns weiter Hm,",
+          "en": "leads us further. Hmm,"
+        },
+        {
+          "de": "können wir anfangen",
+          "en": "we can begin."
+        },
+        {
+          "de": "Im Sonntag fahren wir mit dem Fahrrad zum",
+          "en": "On Sunday [unclear transcript] we cycle to the"
+        },
+        {
+          "de": "Markt Wir kaufen Gemüse aus der Region.",
+          "en": "market. We buy vegetables from the region."
+        },
+        {
+          "de": "Später sprechen wir über unseren Stromverbrauch, ohne dass",
+          "en": "Later we talk about our electricity consumption without"
+        },
+        {
+          "de": "jemand alles perfekt machen muss.",
+          "en": "anyone having to do everything perfectly."
+        },
+        {
+          "de": "Wir müssen nicht alles heute ändern.",
+          "en": "We do not have to change everything today,"
+        },
+        {
+          "de": "Doch morgen können wir anfangen.",
+          "en": "but tomorrow we can begin."
+        },
+        {
+          "de": "Ein kleiner Weg führt uns weiter.",
+          "en": "A little path takes us further."
+        },
+        {
+          "de": "Wir müssen doch morgen Führt uns weiter",
+          "en": "We have to, but tomorrow leads us further [unclear transcript]."
+        },
+        {
+          "de": "Unser Alltag sieht noch fast gleich aus",
+          "en": "Our everyday life still looks almost the same."
+        },
+        {
+          "de": "Lern' ich über unsere Zukunft nachzudenken",
+          "en": "I learn to think about our future [unclear transcript]."
+        },
+        {
+          "de": "Copyright WDR 2021",
+          "en": "Copyright WDR 2021 [transcript artefact]."
+        }
+      ]
     }
   ]
 }

@@ -175,3 +175,25 @@ translation without substituting the differently segmented course draft.
 Automatic transcript and estimated timing labels remain in place. This change
 does not correct or approve recognition errors, alter audio, or invent cues.
 Regression: `node --test tests/a2-day23-lyrics-english.test.mjs`.
+
+## Recording transcript English coverage — 7 November 2026
+
+A fresh read-only audit of the 65 discoverable course songs found 23 automatic
+German transcript packs with no matching English. Older English was attached to
+studio drafts or differently segmented German lyrics, so it correctly did not
+appear beside the current transcript. The other 41 lyric API responses already
+included English; B1 Day 4 remained an unpublished-transcript response with its
+separate translated course-draft fallback.
+
+Added 23 assistant-authored English packs (733 lines) under `transcripts`, bound
+to the exact MP3 key, recording SHA-256 and every displayed German line. Unclear
+recognition and obvious transcript artefacts are explicitly marked in English.
+These translate the existing automatic text; they do not correct or approve the
+German, change the audio, or verify the timing. Existing English, German, cues,
+fingerprints and review labels stay intact. No runtime model calls are added.
+
+`tests/music-full-library-english.test.mjs` checks complete English on every
+valid estimated recording, plus rejection after a text/fingerprint change. It
+runs in the existing music-learning-room workflow. Admin slides consume the same
+`music-lyrics` English response; no duplicate Admin translation pack is needed.
+The 23 additions require learner deployment before they can appear live.
