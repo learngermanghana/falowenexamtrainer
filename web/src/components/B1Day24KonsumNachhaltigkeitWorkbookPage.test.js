@@ -18,43 +18,38 @@ describe("B1 Day 24 sustainability workbook", () => {
     );
   });
 
-  test("uses Paul's complete writing prompt", () => {
+  test("keeps the current four-point sustainability writing prompt", () => {
     const { writing } = B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG;
-
-    expect(writing.title).toBe(
-      "Ist es wichtig, beim Konsum auf Nachhaltigkeit zu achten? Schreiben Sie Ihre Meinung.",
-    );
-    expect(writing.sourceText).toContain(
-      "weniger Plastik zu verwenden oder Secondhand zu kaufen",
-    );
+    expect(writing.title).toContain("Konsum und Nachhaltigkeit");
+    expect(writing.sourceTitle).toContain("Laura");
+    expect(writing.taskPoints).toHaveLength(4);
   });
 
-  test("keeps Eleni's full reading and seven true-or-false statements", () => {
+  test("keeps the current reading about secondhand shopping and Repair-Cafés", () => {
     const { text } = B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG.reading;
-
-    expect(text.paragraphs.join(" ")).toContain("Wertstoffhof und ein Schadstoffmobil");
-    expect(text.paragraphs.join(" ")).toContain("Man gibt Sachen eine zweite Chance!");
+    expect(text.paragraphs.join(" ")).toContain("Repair-Cafés");
+    expect(text.paragraphs.join(" ")).toContain("Greenwashing");
     expect(text.questions).toHaveLength(7);
-    expect(text.questions.every((question) => question.options.length === 2)).toBe(true);
+    expect(text.questions.every((question) => question.options.length === 3)).toBe(true);
   });
 
-  test("uses the exact new Day 24 R2 object and no longer shows the old Hören questions", () => {
+  test("uses the approved Day 24 questions with the exact R2 object", () => {
     const { listening } = B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG;
     expect(listening.audioKey).toBe("b1/day-24/day_24.mp3");
-    expect(listening.questions).toEqual([]);
-    expect(listening.submitRequired).toBe(false);
+    expect(listening.questions).toHaveLength(5);
+    expect(listening.submitRequired).toBe(true);
     expect(listening.showPublishedPractice).toBe(false);
     expect(listening.videoId || listening.embedUrl || listening.externalUrl).toBeFalsy();
-    expect(B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG.submitListening).toBe(false);
+    expect(B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG.submitListening).toBe(true);
   });
 
-  test("keeps the Hören audio tab while graded submission requires only Schreiben and Lesen", () => {
+  test("includes Hören questions in timed submission", () => {
     const profile = getA2B1LessonProfile("B1", 24);
     expect(profile.assignmentKey).toBe("B1-8.24");
     expect(profile.sections.part4).toMatchObject({
-      visible: true, mode: "self-check", submitRequired: false, contentType: "listening",
+      visible: true, mode: "graded", submitRequired: true, contentType: "listening",
     });
-    expect(profile.requiredSubmissionParts.map((part) => part.partId)).toEqual(["teil2", "teil3"]);
-    expect(profile.timer?.timedTabs).toEqual(["schreiben", "lesen"]);
+    expect(profile.requiredSubmissionParts.map((part) => part.partId)).toEqual(["teil2", "teil3", "teil4"]);
+    expect(profile.timer?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
   });
 });
