@@ -120,7 +120,7 @@ test("new A2 course book is the only A2 shop product and old guides cannot be so
   assert.equal(BOOKS["a1-digital"].priceGhs, 100);
   assert.equal(BOOKS["a1-printed"].priceGhs, 800);
   assert.equal(BOOKS["writing-skills-a1-c2-digital"].priceGhs, 39);
-  assert.equal(BOOKS["writing-skills-a1-c2-printed"].priceGhs, 150);
+  assert.equal(BOOKS["writing-skills-a1-c2-printed"].priceGhs, 250);
   assert.equal(Object.keys(BOOKS).length, 12);
 });
 
@@ -143,6 +143,7 @@ test("public books catalog does not expose the historical unlisted exam-guide SK
     "a1-digital", "a1-printed", "writing-skills-a1-c2-digital", "writing-skills-a1-c2-printed", "a2-course-workbook-digital", "a2-course-workbook-printed"
   ].sort());
   const writing = payload.catalogTitles.find(title => title.id === "writing-skills-a1-c2");
+  assert.equal(writing.pages, 68);
   assert.deepEqual(writing.formats, ["digital", "printed"]);
   assert.deepEqual(writing.bookIds, ["writing-skills-a1-c2-digital", "writing-skills-a1-c2-printed"]);
   assert.equal(payload.books.find(book => book.id === "writing-skills-a1-c2-digital").deliveryMode, "manual_email");
