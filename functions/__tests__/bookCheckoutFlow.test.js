@@ -51,10 +51,10 @@ test("checkout validates quantities and delivery, charges server total and verif
   assert.equal(receipt.amountGhs,2100);
   const writingPrinted=await invoke({bookId:"writing-skills-a1-c2-printed",quantity:2,deliveryMethod:"delivery",deliveryAddress:"Accra, Example Street"});
   assert.equal(writingPrinted.code,200);
-  assert.equal(initialization.amount,30000); // 2 copies × GH₵150
+  assert.equal(initialization.amount,50000); // 2 copies × GH₵250
   assert.equal(initialization.metadata.bookId,"writing-skills-a1-c2-printed");
   assert.equal(saved.format,"printed");
-  assert.equal(saved.priceGhs,300);
+  assert.equal(saved.priceGhs,500);
   assert.equal(saved.quantity,2);
   const writingDigital=await invoke({bookId:"writing-skills-a1-c2-digital"});
   assert.equal(writingDigital.code,200);
