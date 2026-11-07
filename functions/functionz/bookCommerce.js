@@ -7,7 +7,7 @@ const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 100 }),
   "a1-printed": Object.freeze({ id: "a1-printed", title: "Falowen Deutsch A1 – Printed Course & Workbook", format: "printed", priceGhs: 800 }),
   "writing-skills-a1-c2-digital": Object.freeze({ id: "writing-skills-a1-c2-digital", title: "How to Unlock Your German Writing Skills (A1–C2)", format: "digital", priceGhs: 39 }),
-  "writing-skills-a1-c2-printed": Object.freeze({ id: "writing-skills-a1-c2-printed", title: "How to Unlock Your German Writing Skills (A1–C2) — Printed", format: "printed", priceGhs: pricePrintedGuide(32) }),
+  "writing-skills-a1-c2-printed": Object.freeze({ id: "writing-skills-a1-c2-printed", title: "How to Unlock Your German Writing Skills (A1–C2) — Printed", format: "printed", priceGhs: pricePrintedGuide(68) }),
   // The digital price matches A1; printed A2 uses the existing 250-page A1 retail benchmark.
   "a2-course-workbook-digital": Object.freeze({ id: "a2-course-workbook-digital", title: "Falowen Deutsch A2 – Digital Course & Workbook", format: "digital", priceGhs: 100 }),
   "a2-course-workbook-printed": Object.freeze({ id: "a2-course-workbook-printed", title: "Falowen Deutsch A2 – Printed Course & Workbook", format: "printed", priceGhs: pricePrintedGuide(328) }),
@@ -40,7 +40,7 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     levelTags: ["A1", "A2", "B1", "B2", "C1", "C2"],
     topics: ["writing", "schreiben", "letters", "emails", "grammar", "connectors", "essays", "cefr", "exam preparation", "practice"],
     formats: ["digital", "printed"],
-    pages: 32,
+    pages: 68,
     status: "available",
     bookIds: ["writing-skills-a1-c2-digital", "writing-skills-a1-c2-printed"],
   }),
