@@ -1,4 +1,5 @@
 import { B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG } from "./B1Day24KonsumNachhaltigkeitWorkbookPage";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 
 describe("B1 Day 24 sustainability workbook", () => {
   test("keeps all seven speaking branches", () => {
@@ -37,13 +38,23 @@ describe("B1 Day 24 sustainability workbook", () => {
     expect(text.questions.every((question) => question.options.length === 2)).toBe(true);
   });
 
-  test("embeds the requested Goethe listening video as self-check practice", () => {
+  test("uses the exact new Day 24 R2 object and no longer shows the old Hören questions", () => {
     const { listening } = B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG;
+    expect(listening.audioKey).toBe("b1/day-24/day_24.mp3");
+    expect(listening.questions).toEqual([]);
+    expect(listening.submitRequired).toBe(false);
+    expect(listening.showPublishedPractice).toBe(false);
+    expect(listening.videoId || listening.embedUrl || listening.externalUrl).toBeFalsy();
+    expect(B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG.submitListening).toBe(false);
+  });
 
-    expect(listening.videoId).toBe("zzPpGxzvJCY");
-    expect(listening.externalUrl).toBe("https://youtu.be/zzPpGxzvJCY");
-    expect(listening.selfCheckText).toContain(
-      "The only parts that will be officially evaluated by the school are Lesen (reading) and Schreiben (writing).",
-    );
+  test("keeps the Hören audio tab while graded submission requires only Schreiben and Lesen", () => {
+    const profile = getA2B1LessonProfile("B1", 24);
+    expect(profile.assignmentKey).toBe("B1-8.24");
+    expect(profile.sections.part4).toMatchObject({
+      visible: true, mode: "self-check", submitRequired: false, contentType: "listening",
+    });
+    expect(profile.requiredSubmissionParts.map((part) => part.partId)).toEqual(["teil2", "teil3"]);
+    expect(profile.timer?.timedTabs).toEqual(["schreiben", "lesen"]);
   });
 });
