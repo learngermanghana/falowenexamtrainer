@@ -1,7 +1,18 @@
 import React, { useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+
+// A1-12.1 grammar notes. Also used inside the tutor workbook Grammar tab.
+// This is an ungraded practice lesson; the workbook's canonical questions,
+ // answer keys, draft state and Review & Submit flow live elsewhere.
+const palette = {
+  subject: { color: "#166534", background: "#dcfce7", label: "Subject · Nominativ" },
+  verb: { color: "#334155", background: "#e2e8f0", label: "Verb" },
+  object: { color: "#9f1239", background: "#ffe4e6", label: "Akkusativ object" },
+  preposition: { color: "#6d28d9", background: "#ede9fe", label: "Preposition" },
+  accusative: { color: "#9f1239", background: "#ffe4e6", label: "Akkusativ phrase" },
+  dative: { color: "#1d4ed8", background: "#dbeafe", label: "Dativ phrase" },
+};
 
 const card = {
   ...styles.card,
@@ -9,288 +20,400 @@ const card = {
   gap: 12,
   border: "1px solid #e2e8f0",
   borderRadius: 18,
+  padding: "clamp(16px, 3vw, 24px)",
 };
 
-const Section = ({ title, eyebrow, children }) => (
+const Section = ({ number, title, eyebrow, children }) => (
   <section style={card}>
-    <div style={{ display: "grid", gap: 4 }}>
-      {eyebrow ? (
-        <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#475569" }}>
-          {eyebrow}
-        </span>
-      ) : null}
-      <h2 style={{ margin: 0 }}>{title}</h2>
+    <div style={{ display: "grid", gap: 5 }}>
+      <span style={{ color: "#475569", fontSize: 12, fontWeight: 800, letterSpacing: ".04em", textTransform: "uppercase" }}>
+        {number ? "Step " + number + " · " : ""}{eyebrow}
+      </span>
+      <h2 style={{ margin: 0, fontSize: "clamp(20px, 3vw, 24px)" }}>{title}</h2>
     </div>
     {children}
   </section>
 );
 
-const pairRows = [
-  { preposition: "in", wohin: "Ich gehe in die Schule.", wohinEn: "I am going to school.", wo: "Ich bin in der Schule.", woEn: "I am at school.", note: "die Schule → Akkusativ: die / Dativ: der" },
-  { preposition: "auf", wohin: "Ich lege das Buch auf den Tisch.", wohinEn: "I put the book on the table.", wo: "Das Buch liegt auf dem Tisch.", woEn: "The book is lying on the table.", note: "der Tisch → Akkusativ: den / Dativ: dem · legen (put) / liegen (lie)" },
-  { preposition: "an", wohin: "Ich hänge das Bild an die Wand.", wohinEn: "I hang the picture on the wall.", wo: "Das Bild hängt an der Wand.", woEn: "The picture is hanging on the wall.", note: "die Wand → Akkusativ: die / Dativ: der" },
-  { preposition: "unter", wohin: "Der Hund läuft unter den Tisch.", wohinEn: "The dog runs under the table.", wo: "Der Hund liegt unter dem Tisch.", woEn: "The dog is lying under the table.", note: "der Tisch → Akkusativ: den / Dativ: dem" },
-  { preposition: "zwischen", wohin: "Ich stelle den Stuhl zwischen die Tische.", wohinEn: "I place the chair between the tables.", wo: "Der Stuhl steht zwischen den Tischen.", woEn: "The chair stands between the tables.", note: "Plural: Akkusativ die / Dativ den (+n when needed) · stellen (place) / stehen (stand)" },
+const Role = ({ kind, children }) => (
+  <span
+    style={{
+      color: palette[kind].color,
+      background: palette[kind].background,
+      padding: "4px 7px",
+      borderRadius: 7,
+      display: "inline-block",
+      fontWeight: 800,
+      lineHeight: 1.65,
+    }}
+  >
+    {children}
+  </span>
+);
+
+const Sentence = ({ parts, english }) => (
+  <div style={{ display: "grid", gap: 5 }}>
+    <div lang="de" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 5, lineHeight: 1.8, fontSize: 17 }}>
+      {parts.map(([kind, word], i) => (
+        <Role key={i} kind={kind}>{word}</Role>
+      ))}
+    </div>
+    <span style={{ color: "#475569", fontSize: 14 }}>{english}</span>
+  </div>
+);
+
+const Table = ({ headings, rows, label }) => (
+  <div style={{ overflowX: "auto" }}>
+    <table aria-label={label} style={{ borderCollapse: "collapse", minWidth: 510, width: "100%" }}>
+      <thead>
+        <tr style={{ background: "#f1f5f9" }}>
+          {headings.map((heading) => (
+            <th key={heading} scope="col" style={{ border: "1px solid #cbd5e1", padding: 10, textAlign: "left" }}>{heading}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i}>
+            {row.map((value, j) => (
+              <td key={j} style={{ border: "1px solid #e2e8f0", padding: 10, fontWeight: j === 0 ? 750 : 500 }}>
+                {value}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+const twoWayPrepositions = [
+  ["an", "at / on (a vertical surface or edge)"],
+  ["auf", "on / onto (a surface)"],
+  ["hinter", "behind"],
+  ["in", "in / into"],
+  ["neben", "next to"],
+  ["über", "over / above"],
+  ["unter", "under / below"],
+  ["vor", "in front of / before"],
+  ["zwischen", "between"],
+];
+
+const definiteArticles = [
+  ["Masculine (der)", "der", "den", "dem"],
+  ["Feminine (die)", "die", "die", "der"],
+  ["Neuter (das)", "das", "das", "dem"],
+  ["Plural (die)", "die", "die", "den"],
+];
+
+const indefiniteArticles = [
+  ["Masculine", "ein", "einen", "einem"],
+  ["Feminine", "eine", "eine", "einer"],
+  ["Neuter", "ein", "ein", "einem"],
 ];
 
 const quiz = [
-  { prompt: "Which case? Ich lege das Buch auf den Tisch.", options: ["Akkusativ", "Dativ", "Nominativ"], answer: "Akkusativ", explanation: "Wohin? legen describes placing the book at a destination; auf den Tisch is accusative." },
-  { prompt: "Which case? Das Buch liegt auf dem Tisch.", options: ["Akkusativ", "Dativ", "Nominativ"], answer: "Dativ", explanation: "Wo? liegen describes position; auf dem Tisch is dative." },
-  { prompt: "Choose the verb: Ich ___ das Buch auf den Tisch.", options: ["lege", "liege", "liegt"], answer: "lege", explanation: "legen = to put or lay something somewhere (Wohin?)." },
-  { prompt: "Choose the verb: Das Buch ___ auf dem Tisch.", options: ["lege", "liegt", "stelle"], answer: "liegt", explanation: "liegen = to be lying in a position (Wo?)." },
-  { prompt: "Choose the verb: Ich ___ den Stuhl neben die Tür.", options: ["stehe", "steht", "stelle"], answer: "stelle", explanation: "stellen = to put something in an upright position (Wohin?)." },
-  { prompt: "Choose the verb: Der Stuhl ___ neben der Tür.", options: ["steht", "stellt", "stelle"], answer: "steht", explanation: "stehen = to stand in a location (Wo?)." },
-  { prompt: "What is the masculine definite article in Dativ?", options: ["den", "dem", "der"], answer: "dem", explanation: "der Tisch → auf dem Tisch (Dativ). Masculine accusative is den." },
-  { prompt: "What is the masculine definite article in Akkusativ?", options: ["den", "dem", "der"], answer: "den", explanation: "der Tisch → auf den Tisch (Akkusativ). Masculine dative is dem." },
-  { prompt: "Correct the destination sentence: Ich gehe in der Schule.", options: ["Ich gehe in die Schule.", "Ich gehe in dem Schule.", "Ich gehe in den Schule."], answer: "Ich gehe in die Schule.", explanation: "For going into/to school, Wohin? → Akkusativ: die Schule. 'Ich gehe in der Schule' can be grammatical if walking inside the school is intended." },
-  { prompt: "Correct the location sentence: Ich bin in die Schule.", options: ["Ich bin in der Schule.", "Ich bin in den Schule.", "Ich bin in das Schule."], answer: "Ich bin in der Schule.", explanation: "Wo? → Dativ: die Schule becomes der Schule." },
-  { prompt: "Ich hänge das Bild an ___ Wand.", options: ["die", "der", "dem"], answer: "die", explanation: "Wohin? → Akkusativ: feminine die remains die." },
-  { prompt: "Das Bild hängt an ___ Wand.", options: ["die", "der", "dem"], answer: "der", explanation: "Wo? → Dativ: die Wand becomes der Wand." },
-  { prompt: "Ich stelle den Stuhl zwischen ___ Tische.", options: ["die", "den", "dem"], answer: "die", explanation: "Wohin? → plural Akkusativ die Tische." },
-  { prompt: "Der Stuhl steht zwischen ___ Tischen.", options: ["die", "den", "dem"], answer: "den", explanation: "Wo? → plural Dativ den Tischen, including -n on the noun." },
-  { prompt: "Ich fahre mit ___ Bus.", options: ["den", "dem", "der"], answer: "dem", explanation: "mit always takes Dativ, even with movement: mit dem Bus." },
+  {
+    prompt: "Ich lege das Handy auf ___ Tisch.",
+    options: ["den", "dem", "der"],
+    answer: "den",
+    explanation: "Wohin? The phone is being placed onto the table. Auf takes Akkusativ for a destination: auf den Tisch.",
+  },
+  {
+    prompt: "Das Handy liegt auf ___ Tisch.",
+    options: ["den", "dem", "das"],
+    answer: "dem",
+    explanation: "Wo? The phone is already on the table. Auf takes Dativ for a location: auf dem Tisch.",
+  },
+  {
+    prompt: "Ich fahre mit ___ Bus.",
+    options: ["den", "der", "dem"],
+    answer: "dem",
+    explanation: "Mit always requires Dativ, even when travelling involves movement: mit dem Bus.",
+  },
+  {
+    prompt: "Ich gehe in ___ Küche.",
+    options: ["die", "der", "dem"],
+    answer: "die",
+    explanation: "Wohin? The kitchen is the destination. In takes Akkusativ, and feminine die stays die.",
+  },
+  {
+    prompt: "Ich bin in ___ Küche.",
+    options: ["die", "der", "den"],
+    answer: "der",
+    explanation: "Wo? The kitchen is a location. In takes Dativ; die Küche becomes in der Küche.",
+  },
+  {
+    prompt: "Ich sehe ___ Hund neben ___ Auto.",
+    options: ["der / dem", "den / dem", "dem / das"],
+    answer: "den / dem",
+    explanation: "Sehen takes an Akkusativ object (den Hund). Neben describes the dog's location and takes Dativ (dem Auto).",
+  },
+  {
+    prompt: "Ich laufe ___ Park. (I run inside the park.)",
+    options: ["in den", "im", "ins"],
+    answer: "im",
+    explanation: "The action happens inside the park (Wo?), even though laufen means to run. In dem = im: Dativ.",
+  },
+  {
+    prompt: "Ich gehe zu ___ Arzt.",
+    options: ["den", "dem", "der"],
+    answer: "dem",
+    explanation: "Zu always requires Dativ, even for a destination. Zu dem is commonly shortened to zum.",
+  },
+  {
+    prompt: "Ich stelle den Stuhl zwischen ___ Tische.",
+    options: ["die", "den", "dem"],
+    answer: "die",
+    explanation: "The chair is placed in a destination (Wohin?). Zwischen takes plural Akkusativ: die Tische.",
+  },
+  {
+    prompt: "Der Stuhl steht zwischen ___ Tischen.",
+    options: ["die", "den", "dem"],
+    answer: "den",
+    explanation: "Wo? Zwischen takes Dativ for the chair's position: den Tischen. Dative plural usually adds -n to the noun.",
+  },
 ];
 
-const articles = [
-  ["Akkusativ", "den", "die", "das", "die"],
-  ["Dativ", "dem", "der", "dem", "den (+n)"],
+const prepositionTypes = [
+  {
+    title: "Always Akkusativ",
+    description: "These prepositions always require an Akkusativ noun phrase.",
+    words: "durch (through) · für (for) · gegen (against) · ohne (without) · um (around)",
+    color: "#9f1239",
+    background: "#fff1f2",
+  },
+  {
+    title: "Always Dativ",
+    description: "These prepositions always require a Dativ noun phrase.",
+    words: "mit (with) · bei (at/with) · zu (to) · aus (from/out of) · von (from/of) · nach (to/after) · seit (since/for)",
+    color: "#1d4ed8",
+    background: "#eff6ff",
+  },
+  {
+    title: "Two-way (Wechselpräpositionen)",
+    description: "These can require Akkusativ for a destination or Dativ for a location.",
+    words: "an · auf · hinter · in · neben · über · unter · vor · zwischen",
+    color: "#6d28d9",
+    background: "#f5f3ff",
+  },
 ];
 
-const TwoCasePrepositionsPageLegacy = () => {
-  const location = useLocation();
+export default function TwoCasePrepositionsPageLegacy() {
   const [answers, setAnswers] = useState({});
-  const [showScore, setShowScore] = useState(false);
-  const workbookHref = "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook";
-
-  const score = useMemo(
-    () => quiz.reduce((total, question, index) => total + (answers[index] === question.answer ? 1 : 0), 0),
-    [answers],
-  );
-  const allAnswered = Object.keys(answers).length === quiz.length;
+  const [checked, setChecked] = useState(false);
+  const score = useMemo(() => quiz.reduce((total, question, index) =>
+    total + (answers[index] === question.answer ? 1 : 0), 0), [answers]);
+  const allAnswered = quiz.every((_, index) => answers[index] !== undefined);
+  const workbookHref = "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook&assignmentKey=A1-12.1&assignmentId=A1-12.1&level=A1";
 
   return (
-    <main style={{ ...styles.container, display: "grid", gap: 16, maxWidth: 1080 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+    <main data-a1-day18-preposition-lesson="true" style={{ ...styles.container, display: "grid", gap: 16, maxWidth: 1080 }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <a href={workbookHref} style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>
           Open Chapter 12.1 workbook
         </a>
       </div>
 
-      <header style={{ ...card, padding: "clamp(20px, 4vw, 34px)", background: "linear-gradient(135deg, #f8fafc, #eef2ff)" }}>
-        <span style={{ width: "fit-content", borderRadius: 999, padding: "6px 10px", background: "#e0e7ff", color: "#3730a3", fontWeight: 800, fontSize: 12 }}>
-          A1.2 · Day 18 · Chapter 12.1
-        </span>
-        <h1 style={{ ...styles.title, margin: 0 }}>Wechselpräpositionen</h1>
-        <p style={{ margin: 0, lineHeight: 1.7, color: "#334155", maxWidth: 820 }}>
-          The same preposition can use either Akkusativ or Dativ. The key is not memorising two random forms: first decide whether the sentence describes a destination or a position.
+      <header style={{ ...card, background: "linear-gradient(135deg, #f8fafc, #eef2ff)" }}>
+        <span style={{ color: "#3730a3", fontSize: 13, fontWeight: 900 }}>A1 · Day 18 · Kapitel 12.1 · Grammar Notes</span>
+        <h1 style={{ ...styles.title, margin: 0 }}>Wechselpräpositionen – Two-Way Prepositions</h1>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          You already know how verbs such as <strong>sein, werden, haben</strong> and <strong>sehen</strong>
+          {" "}help you identify Nominativ and Akkusativ. Today you will learn that <strong>prepositions can also determine a German case.</strong>
         </p>
+        <p style={{ margin: 0, fontWeight: 700 }}>Your goal: find the preposition, choose the correct case, and then choose the correct article.</p>
       </header>
 
-      <Section eyebrow="Connect to what you know" title="Before you start">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          You already know places, articles and direction language from earlier A1 lessons. Today you combine those skills. Ask one question first:
+      <Section number="1" eyebrow="Connect to your earlier lesson" title="What you already know">
+        <p style={{ margin: 0 }}>You know that the subject normally uses Nominativ. Some verbs take an Akkusativ object; after <em>sein</em> and <em>werden</em>, a noun describing the subject is Nominativ.</p>
+        <Sentence parts={[["subject", "Das"], ["verb", "ist"], ["subject", "der Mann."]]} english="That is the man. Sein connects the subject to its identity (Nominativ)." />
+        <Sentence parts={[["subject", "Ich"], ["verb", "sehe"], ["object", "den Mann."]]} english="I see the man. Sehen takes an Akkusativ object." />
+        <Sentence parts={[["subject", "Er"], ["verb", "wird"], ["subject", "ein Lehrer."]]} english="He becomes a teacher. Werden links the subject to its new identity." />
+        <Sentence parts={[["subject", "Ich"], ["verb", "habe"], ["object", "einen Hund."]]} english="I have a dog. Haben takes an Akkusativ object." />
+        <p style={{ margin: 0, fontWeight: 750 }}>New today: a preposition can choose the case of the noun phrase after it, even when the verb takes a different case elsewhere in the sentence.</p>
+      </Section>
+
+      <Section number="2" eyebrow="The new idea" title="What is a preposition?">
+        <p style={{ margin: 0, lineHeight: 1.65 }}>
+          A preposition is a small word such as <strong>in, on, under, with</strong> or <strong>to</strong>.
+          In German, prepositions help describe places, directions and relationships. Learn these three groups:
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
-          <div style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 14, padding: 14 }}>
-            <strong>Wohin? → Akkusativ</strong>
-            <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>A person or object moves to a destination or changes position.</p>
-          </div>
-          <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14 }}>
-            <strong>Wo? → Dativ</strong>
-            <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>The sentence describes where something is or where an activity happens.</p>
-          </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10 }}>
+          {prepositionTypes.map((group) => (
+            <div key={group.title} style={{ border: "1px solid #e2e8f0", borderRadius: 13, padding: 14, background: group.background, display: "grid", gap: 6 }}>
+              <strong style={{ color: group.color }}>{group.title}</strong>
+              <span>{group.description}</span>
+              <span style={{ lineHeight: 1.6, fontSize: 14 }}>{group.words}</span>
+            </div>
+          ))}
         </div>
+        <p style={{ margin: 0, color: "#475569" }}>Today we focus on the third group: the nine <strong>Wechselpräpositionen</strong> (two-way prepositions). These are prepositions, not verbs.</p>
       </Section>
 
-      <Section eyebrow="Two-way prepositions" title="Movement or destination?">
-        <p><strong>Two-way prepositions:</strong> in, an, auf, über, unter, vor, hinter, neben, zwischen. A destination (Wohin?) takes Akkusativ; a location (Wo?) takes Dativ.</p>
-        <p><strong>Movement alone does not mean Akkusativ:</strong> Ich laufe im Park. (I run in the park: where?) Ich laufe in den Park. (I run into the park: where to?)</p>
-      </Section>
-      <Section eyebrow="Today's targets" title="By the end of this lesson, you should be able to">
-        <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
-          <li>recognise the nine common two-case prepositions;</li>
-          <li>choose Akkusativ after <strong>Wohin?</strong> and Dativ after <strong>Wo?</strong>;</li>
-          <li>use common movement/position verb pairs such as <strong>legen/liegen</strong>, <strong>stellen/stehen</strong> and <strong>setzen/sitzen</strong>.</li>
-        </ol>
-      </Section>
-
-      <Section eyebrow="Core vocabulary" title="The nine Wechselpräpositionen">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 10 }}>
-          {[
-            ["an", "at / on a side or edge"],
-            ["auf", "on top of"],
-            ["hinter", "behind"],
-            ["in", "in / into"],
-            ["neben", "next to"],
-            ["über", "above / over"],
-            ["unter", "under"],
-            ["vor", "in front of"],
-            ["zwischen", "between"],
-          ].map(([word, meaning]) => (
-            <div key={word} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, background: "#fff" }}>
-              <strong style={{ fontSize: 19 }}>{word}</strong>
-              <div style={{ marginTop: 4, color: "#64748b" }}>{meaning}</div>
+      <Section number="3" eyebrow="Core vocabulary" title="The nine two-way prepositions and their English meanings">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10 }}>
+          {twoWayPrepositions.map(([word, meaning]) => (
+            <div key={word} style={{ border: "1px solid #ddd6fe", background: "#faf5ff", borderRadius: 12, padding: 12 }}>
+              <strong style={{ color: "#6d28d9", fontSize: 19 }}>{word}</strong>
+              <div style={{ color: "#475569", marginTop: 4 }}>{meaning}</div>
             </div>
           ))}
         </div>
       </Section>
 
-      <Section eyebrow="Main rule" title="Movement is not enough — think destination vs position">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          A sentence can contain a verb of movement and still answer <strong>Wo?</strong>. What matters is whether the prepositional phrase gives a destination. For A1, the clearest shortcut is to compare these common verb pairs:
-        </p>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
-            <thead>
-              <tr style={{ background: "#f8fafc" }}>
-                {["Wohin? + Akkusativ", "Meaning", "Wo? + Dativ", "Meaning"].map((heading) => (
-                  <th key={heading} style={{ border: "1px solid #e2e8f0", textAlign: "left", padding: 10 }}>{heading}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["legen", "put something down", "liegen", "be lying"],
-                ["stellen", "put/place upright", "stehen", "be standing"],
-                ["setzen", "put/seat", "sitzen", "be sitting"],
-                ["hängen", "hang something up", "hängen", "be hanging"],
-              ].map((row) => (
-                <tr key={row.join("-")}>
-                  {row.map((cell) => <td key={cell} style={{ border: "1px solid #e2e8f0", padding: 10 }}>{cell}</td>)}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <Section number="4" eyebrow="Before choosing a case" title="Learn the Akkusativ and Dativ articles">
+        <p style={{ margin: 0 }}>First identify the noun's gender (der, die, das) or plural form. Then choose the article for the case.</p>
+        <h3 style={{ margin: 0 }}>Definite articles – “the”</h3>
+        <Table label="Definite articles by grammatical case" headings={["Gender / number", "Nominativ", "Akkusativ", "Dativ"]} rows={definiteArticles} />
+        <h3 style={{ margin: 0 }}>Indefinite articles – “a / an”</h3>
+        <Table label="Indefinite articles by grammatical case" headings={["Gender", "Nominativ", "Akkusativ", "Dativ"]} rows={indefiniteArticles} />
+        <div style={{ borderLeft: "4px solid #2563eb", borderRadius: 10, background: "#eff6ff", padding: 12, display: "grid", gap: 5 }}>
+          <strong>Remember: der Tisch → den Tisch (Akkusativ) / dem Tisch (Dativ)</strong>
+          <span>Dativ plural usually uses <strong>den</strong> and adds <strong>-n</strong> to the noun when possible: mit den Kindern. There is no normal plural form of <em>ein</em>.</span>
+          <span>Useful short forms: <strong>im = in dem</strong>, <strong>ins = in das</strong>, <strong>am = an dem</strong>, <strong>ans = an das</strong>.</span>
         </div>
       </Section>
 
-      <Section eyebrow="Article check" title="The article forms you need today">
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
-            <thead>
-              <tr style={{ background: "#f8fafc" }}>
-                {["Case", "der", "die", "das", "Plural"].map((heading) => (
-                  <th key={heading} style={{ border: "1px solid #e2e8f0", padding: 10, textAlign: "left" }}>{heading}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {articles.map((row) => (
-                <tr key={row[0]}>
-                  {row.map((cell) => <td key={cell} style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>{cell}</strong></td>)}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <Section number="5" eyebrow="The decision rule" title="First find the preposition. Then ask: Wo or Wohin?">
+        <p style={{ margin: 0 }}>This question applies when the preposition is one of the <strong>nine two-way prepositions</strong>.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(245px, 1fr))", gap: 12 }}>
+          <div style={{ background: "#fff1f2", border: "1px solid #fda4af", borderRadius: 14, padding: 15, display: "grid", gap: 8 }}>
+            <strong style={{ color: "#9f1239" }}>Wohin? (Where to?) → Akkusativ</strong>
+            <span>There is a destination or change of location.</span>
+            <span role="img" aria-label="Book moving onto a table">📖 ➜ 🪑</span>
+            <Sentence parts={[["subject", "Ich"], ["verb", "lege"], ["object", "das Buch"], ["preposition", "auf"], ["accusative", "den Tisch."]]} english="I put the book onto the table." />
+            <span><strong>auf den Tisch</strong> tells us the destination of the book.</span>
+          </div>
+          <div style={{ background: "#eff6ff", border: "1px solid #93c5fd", borderRadius: 14, padding: 15, display: "grid", gap: 8 }}>
+            <strong style={{ color: "#1d4ed8" }}>Wo? (Where?) → Dativ</strong>
+            <span>There is a location or position, not a destination.</span>
+            <span role="img" aria-label="Book resting on a table">📖 🪑</span>
+            <Sentence parts={[["subject", "Das Buch"], ["verb", "liegt"], ["preposition", "auf"], ["dative", "dem Tisch."]]} english="The book is lying on the table." />
+            <span><strong>auf dem Tisch</strong> tells us where the book is.</span>
+          </div>
         </div>
-        <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-          Useful short forms: <strong>im = in dem</strong>, <strong>ins = in das</strong>, <strong>am = an dem</strong>, <strong>ans = an das</strong>.
-        </p>
+        <div style={{ borderLeft: "4px solid #d97706", background: "#fffbeb", borderRadius: 10, padding: 12, display: "grid", gap: 7 }}>
+          <strong>Important: movement alone does not always mean Akkusativ!</strong>
+          <p style={{ margin: 0 }}><strong>Ich laufe im Park.</strong> = I run in the park (Wo? → Dativ).</p>
+          <p style={{ margin: 0 }}><strong>Ich laufe in den Park.</strong> = I run into the park (Wohin? → Akkusativ).</p>
+          <span>Ask whether the prepositional phrase describes <strong>where an action happens</strong> or <strong>where someone/something is going</strong>.</span>
+        </div>
       </Section>
 
-      <Section eyebrow="Model sentences" title="See the same preposition in both cases">
-        <div style={{ display: "grid", gap: 12 }}>
-          {pairRows.map((pair) => (
-            <article key={pair.preposition} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, display: "grid", gap: 6 }}>
-              <strong style={{ fontSize: 18 }}>{pair.preposition}</strong>
-              <div><strong>Wohin? · Akkusativ</strong> {pair.wohin}<div style={{ color: "#475569", fontSize: 14 }}>{pair.wohinEn}</div></div>
-              <div><strong>Wo? · Dativ</strong> {pair.wo}<div style={{ color: "#475569", fontSize: 14 }}>{pair.woEn}</div></div>
-              <span style={{ color: "#64748b", fontSize: 14 }}>{pair.note}</span>
-            </article>
+      <Section number="6" eyebrow="Colour-coded examples" title="Verbs and prepositions can control different parts of the same sentence">
+        <p style={{ margin: 0 }}>Use the colours and the labels. The noun after the verb and the noun after the preposition may have different cases.</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+          {["subject", "verb", "object", "preposition", "dative"].map((kind) => (
+            <span key={kind} style={{ color: palette[kind].color, background: palette[kind].background, padding: "5px 9px", borderRadius: 8, fontWeight: 750, fontSize: 13 }}>{palette[kind].label}</span>
           ))}
         </div>
-      </Section>
-
-      <Section eyebrow="Common confusion" title="an or auf?">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          English often uses “on” for both. In German, <strong>an</strong> is common for contact with a side, wall, door, window or edge, while <strong>auf</strong> is common for something resting on top of a surface.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
-            <strong>an</strong>
-            <p style={{ margin: "5px 0 0" }}>Das Bild hängt <strong>an der Wand</strong>. (The picture is hanging on the wall.)</p>
-          </div>
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
-            <strong>auf</strong>
-            <p style={{ margin: "5px 0 0" }}>Das Buch liegt <strong>auf dem Tisch</strong>. (The book is lying on the table.)</p>
-          </div>
+        <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 14, display: "grid", gap: 9 }}>
+          <strong>Example A · Verb + Akkusativ object + destination</strong>
+          <Sentence parts={[["subject", "Ich"], ["verb", "lege"], ["object", "das Buch"], ["preposition", "auf"], ["accusative", "den Tisch."]]} english="I put the book onto the table." />
+          <span><em>legen</em> takes a direct object (<strong>das Buch</strong>). <em>auf</em> introduces the destination (<strong>den Tisch</strong>).</span>
         </div>
+        <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 14, display: "grid", gap: 9 }}>
+          <strong>Example B · Akkusativ object + Dativ location</strong>
+          <Sentence parts={[["subject", "Ich"], ["verb", "sehe"], ["object", "den Mann"], ["preposition", "in"], ["dative", "dem Park."]]} english="I see the man in the park." />
+          <span><em>sehen</em> requires <strong>den Mann</strong> (Akkusativ). <em>in</em> describes where the man is, so we say <strong>dem Park</strong> (Dativ).</span>
+          <strong>A single German sentence can contain both Akkusativ and Dativ.</strong>
+        </div>
+        <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 14, display: "grid", gap: 9 }}>
+          <strong>Example C · No direct object needed</strong>
+          <Sentence parts={[["subject", "Ich"], ["verb", "gehe"], ["preposition", "in"], ["accusative", "die Schule."]]} english="I go into the school / I go to school." />
+          <span>Here <em>in die Schule</em> identifies the destination. There is no separate direct object between the verb and the preposition.</span>
+        </div>
+        <p style={{ margin: 0, fontWeight: 750 }}>Useful starter pattern: Subject + Verb + (Object, if needed) + Preposition + German case phrase.</p>
+        <p style={{ margin: 0, color: "#475569" }}>This is a learning pattern, not a fixed word order for every German sentence. First inspect the verb and the preposition separately.</p>
       </Section>
 
-      <Section eyebrow="Guided practice" title="Test cases, articles, verb pairs and error correction">
+      <Section number="7" eyebrow="Compare locations and destinations" title="More examples with the same preposition">
+        <Table
+          label="Two-way preposition example pairs"
+          headings={["Preposition", "Wohin? · Akkusativ", "Wo? · Dativ"]}
+          rows={[
+            ["in", "Ich gehe in die Schule. (I go to school.)", "Ich bin in der Schule. (I am at school.)"],
+            ["an", "Ich hänge das Bild an die Wand. (I hang the picture on the wall.)", "Das Bild hängt an der Wand. (The picture hangs on the wall.)"],
+            ["unter", "Der Hund läuft unter den Tisch. (The dog runs under the table.)", "Der Hund liegt unter dem Tisch. (The dog lies under the table.)"],
+            ["zwischen", "Ich stelle den Stuhl zwischen die Tische. (I put the chair between the tables.)", "Der Stuhl steht zwischen den Tischen. (The chair stands between the tables.)"],
+          ]}
+        />
+        <p style={{ margin: 0 }}>Verb pairs to recognise: <strong>legen / liegen</strong> (put down / lie), <strong>stellen / stehen</strong> (put upright / stand), <strong>setzen / sitzen</strong> (seat / sit).</p>
+      </Section>
+
+      <Section number="8" eyebrow="Brief introduction" title="Mit, bei and zu: always Dativ">
+        <p style={{ margin: 0 }}>These are <strong>not</strong> two-way prepositions. With <strong>mit (with), bei (at/with), zu (to)</strong>, the article after the preposition must be Dativ — even when someone is travelling.</p>
+        <Sentence parts={[["subject", "Ich"], ["verb", "spiele"], ["preposition", "mit"], ["dative", "dem Kind."]]} english="I play with the child." />
+        <Sentence parts={[["subject", "Ich"], ["verb", "bin"], ["preposition", "bei"], ["dative", "meiner Mutter."]]} english="I am at my mother's place." />
+        <Sentence parts={[["subject", "Ich"], ["verb", "gehe"], ["preposition", "zu"], ["dative", "dem Arzt."]]} english="I am going to the doctor." />
+        <p style={{ margin: 0 }}><strong>zu dem = zum</strong> and <strong>zu der = zur</strong>. Remember: <strong>mit, bei, zu → Dativ</strong>. Do not apply the Wo?/Wohin? case choice to these fixed-Dativ prepositions.</p>
+      </Section>
+
+      <Section number="9" eyebrow="Self-check · Ungraded practice" title="Test yourself: choose the correct article">
+        <p style={{ margin: 0 }}>Read each sentence. First identify its preposition, then its case, and finally its article. Your answers here do not affect your tutor-marked assignment.</p>
+        <div role="status" aria-live="polite" style={{ color: "#475569", fontWeight: 750 }}>
+          {Object.keys(answers).length} of {quiz.length} answered
+        </div>
         <div style={{ display: "grid", gap: 12 }}>
-          {quiz.map((question, index) => {
-            const selected = answers[index];
-            const correct = selected === question.answer;
-            return (
-              <article key={question.prompt} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, display: "grid", gap: 9 }}>
-                <strong>{index + 1}. {question.prompt}</strong>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {question.options.map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => {
-                        setAnswers((old) => ({ ...old, [index]: option }));
-                        setShowScore(false);
-                      }}
-                      style={selected === option ? styles.primaryButton : styles.secondaryButton}
-                    >
-                      {option}
-                    </button>
-                  ))}
+          {quiz.map((question, index) => (
+            <fieldset key={question.prompt} style={{ border: "1px solid #e2e8f0", borderRadius: 12, margin: 0, padding: 13, minWidth: 0, display: "grid", gap: 8 }}>
+              <legend style={{ padding: "0 4px", fontWeight: 800 }}>{index + 1}. {question.prompt}</legend>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {question.options.map((option) => (
+                  <label key={option} style={{ display: "inline-flex", gap: 6, alignItems: "center", border: answers[index] === option ? "2px solid #2563eb" : "1px solid #cbd5e1", borderRadius: 9, padding: "8px 11px", cursor: "pointer", background: answers[index] === option ? "#eff6ff" : "#fff" }}>
+                    <input
+                      type="radio"
+                      name={"a1-day18-q-" + index}
+                      value={option}
+                      checked={answers[index] === option}
+                      onChange={() => { setAnswers((old) => ({ ...old, [index]: option })); setChecked(false); }}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+              {checked ? (
+                <div role="status" style={{ background: answers[index] === question.answer ? "#f0fdf4" : "#fff1f2", color: answers[index] === question.answer ? "#166534" : "#9f1239", borderRadius: 9, padding: 10, lineHeight: 1.6 }}>
+                  <strong>{answers[index] === question.answer ? "Correct." : "Correct answer: " + question.answer + "."}</strong> {question.explanation}
                 </div>
-                {selected ? (
-                  <div style={{ color: correct ? "#166534" : "#9f1239", lineHeight: 1.55 }}>
-                    <strong>{correct ? "Correct." : `Correct answer: ${question.answer}.`}</strong> {question.explanation}
-                  </div>
-                ) : null}
-              </article>
-            );
-          })}
+              ) : null}
+            </fieldset>
+          ))}
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-          <button type="button" disabled={!allAnswered} onClick={() => setShowScore(true)} style={{ ...styles.primaryButton, opacity: allAnswered ? 1 : 0.55 }}>
-            Show my score
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
+          <button type="button" disabled={!allAnswered} onClick={() => setChecked(true)} style={{ ...styles.primaryButton, opacity: allAnswered ? 1 : 0.55 }}>
+            Check my answers
           </button>
-          <button type="button" onClick={() => { setAnswers({}); setShowScore(false); }} style={styles.secondaryButton}>
-            Restart practice
+          <button type="button" onClick={() => { setAnswers({}); setChecked(false); }} style={styles.secondaryButton}>
+            Try again
           </button>
         </div>
-        {showScore ? (
-          <div style={{ border: "1px solid #cbd5e1", background: "#f8fafc", borderRadius: 12, padding: 12 }}>
-            <strong>{score}/{quiz.length} correct.</strong> {score >= Math.ceil(quiz.length * 0.8) ? "You are ready for the workbook." : "Review Wo/Wohin and repeat the practice before continuing."}
+        {checked ? (
+          <div role="status" aria-live="polite" style={{ border: "1px solid #bfdbfe", borderRadius: 12, background: "#eff6ff", padding: 12 }}>
+            <strong>{score}/{quiz.length} correct.</strong> {score === quiz.length ? "Excellent! You are ready for the workbook." : "Review the explanations and try again."}
           </div>
         ) : null}
       </Section>
 
-      <Section eyebrow="Workbook preparation" title="Use the grammar across different tasks">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The workbook combines this grammar with reading, listening and familiar A1 language. When you see a place phrase, first ask <strong>Wo?</strong> or <strong>Wohin?</strong>, then choose the case and article.
-        </p>
-        <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", padding: 12, borderRadius: 10, lineHeight: 1.65 }}>
-          <strong>Tip:</strong> Focus on meaning first. Then check whether the sentence describes a location or a destination before choosing Dativ or Akkusativ.
-        </div>
+      <Section number="10" eyebrow="Lesson summary" title="Four questions to ask before choosing an article">
+        <ol style={{ margin: 0, paddingLeft: 22, lineHeight: 1.85 }}>
+          <li><strong>Who is the subject?</strong> The subject is normally Nominativ.</li>
+          <li><strong>What verb is used?</strong> Does it require a particular object case, such as Akkusativ after sehen?</li>
+          <li><strong>Is there a preposition?</strong> Is it always Akkusativ, always Dativ, or one of the nine two-way prepositions?</li>
+          <li><strong>If it is two-way, is the phrase Wo or Wohin?</strong> Choose Dativ for a location, Akkusativ for a destination. Then check the noun's article.</li>
+        </ol>
       </Section>
-
-      <Section eyebrow="A small note for now" title="mit, bei und zu">
-        <p><strong>mit, bei and zu are dative prepositions, not two-way prepositions.</strong> After them, put the noun phrase (including its article) into the dative. There is no Wo?/Wohin? case choice.</p>
-        <p>mit <strong>dem Bus</strong> (by bus) · bei <strong>der Arbeit</strong> (at work) · zu <strong>dem Arzt</strong> (to the doctor)</p>
-        <p>You will study dative prepositions in more detail in A2. For now, just remember: mit, bei, zu → Dativ.</p>
-      </Section>
-
       <section style={{ ...card, background: "#172554", color: "#fff" }}>
-        <h2 style={{ margin: 0 }}>Ready for Chapter 12.1?</h2>
-        <p style={{ margin: 0, color: "#dbeafe", lineHeight: 1.65 }}>
-          Before opening the workbook, make sure you can explain the difference between <strong>Wo?</strong> and <strong>Wohin?</strong> in one sentence and form at least two example pairs yourself.
+        <h2 style={{ margin: 0 }}>Ready for Kapitel 12.1?</h2>
+        <p style={{ margin: 0, lineHeight: 1.7, color: "#dbeafe" }}>
+          Review the coloured examples, then complete your separate tutor-marked Lesen and Hören activities. This practice quiz is not your graded submission.
         </p>
-        <a href={workbookHref} style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none", background: "#fff", color: "#172554", borderColor: "#fff" }}>
+        <a href={workbookHref} style={{ ...styles.primaryButton, width: "fit-content", background: "#fff", color: "#172554", borderColor: "#fff", textDecoration: "none" }}>
           Continue to the tutor-marked workbook
         </a>
       </section>
     </main>
   );
-};
-
-export default TwoCasePrepositionsPageLegacy;
+}
