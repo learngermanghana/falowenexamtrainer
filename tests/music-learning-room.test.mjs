@@ -15,7 +15,7 @@ const template = file('web/public/music/index.html');
 function api() {
   const signedCalls = [];
   const fakeRequire = id => {
-    if (id === 'node:stream') return require(id);
+    if (id === 'node:stream' || id === 'node:stream/promises') return require(id);
     if (id.endsWith('catalog.json')) return catalog;
     if (id.includes('courseHoerenPublishing')) return { signedStudioUrl: options => {
       signedCalls.push(options);
