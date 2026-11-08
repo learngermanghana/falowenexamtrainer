@@ -113,7 +113,7 @@ test("B1 prepublication audit excludes website submission overlays and blank blu
 test("B1 print uses stable block flow for reading questions and removes empty web buttons", () => {
   assert.match(B1_PRINT_CSS, /data-reading-exam-question-grid/);
   assert.match(B1_PRINT_CSS, /page-break-inside: avoid !important/);
-  assert.match(suppressB1EmptyChromeControls.toString(), /document\\.querySelectorAll/);
+  assert.ok(suppressB1EmptyChromeControls.toString().includes("document.querySelectorAll"));
   assert.match(suppressB1EmptyChromeControls.toString(), /vividBlueFrame/);
   assert.match(B1_PRINT_CSS, /\\.app-back-button/);
   assert.match(suppressB1EmptyChromeControls.toString(), /rect\.width < 180/);
