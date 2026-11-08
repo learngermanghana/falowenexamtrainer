@@ -224,8 +224,16 @@ function extractB1Day1Reading(source) {
     /<h3 style=\{sectionTitle\}>(Traumdeutung und ihre Bedeutung)<\/h3>([\s\S]*?)<h3 style=\{sectionTitle\}>Questions<\/h3>/
   );
   if (!section) throw new Error("B1 Day 1 original Lesen section not found; review workbook markup");
-  const paragraphs = [...section[2].matchAll(/<p style=\{\{ margin: 0, lineHeight: 1\.7 \}\}>\s*([^<]+?)\s*<\/p>/g)]
-    .map((x) => text(x[1], 2400));
+  // Accept both legacy literal paragraphs and the lesson's inline glossary.
+  // The glossary stores the original source as a JSON string in a JSX text prop;
+  // parse that literal only. Do not evaluate JSX or derive reading content from it.
+  const glossaryParagraphs = [...section[2].matchAll(
+    /<p style=\{\{ margin: 0, lineHeight: 1\.7 \}\}>\s*<InlineReadingTranslations text=\{("(?:\\.|[^"\\])*")\} level="B1" day=\{1\} \/>\s*<\/p>/g
+  )].map((x) => text(JSON.parse(x[1]), 2400));
+  const legacyParagraphs = [...section[2].matchAll(
+    /<p style=\{\{ margin: 0, lineHeight: 1\.7 \}\}>\s*([^<]+?)\s*<\/p>/g
+  )].map((x) => text(x[1], 2400));
+  const paragraphs = glossaryParagraphs.length ? glossaryParagraphs : legacyParagraphs;
   const literal = source.match(/const lesenQuestions = (\[[\s\S]*?\n\]);/);
   if (!literal) throw new Error("B1 Day 1 source reading questions not found");
   // Only literal arrays containing stem and options are permitted.
