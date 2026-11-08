@@ -96,3 +96,14 @@ test("B1 canonical exercise printing rejects significant missing text despite wo
     /lost source-controlled exercise text/);
   assert.doesNotThrow(() => assertB1CanonicalPrintedContent(expected, words.slice().reverse().join(" ")));
 });
+
+test("B1 prepublication audit excludes website submission overlays and blank blue input fields", () => {
+  assert.ok(findB1PrintFaults("Answer directly in the workbook. Your required choices and writing are saved to Review & Submit automatically. You can edit the final answer there before submitting.").length);
+  assert.ok(findB1PrintFaults("Click an answer option. Your choice is saved automatically to Submit, and you can change it at any time.").length);
+  assert.ok(findB1PrintFaults("Lösungen anzeigen").length);
+  assert.match(B1_PRINT_CSS, /break-inside: avoid !important/);
+  assert.match(B1_PRINT_CSS, /input:not\(\[type="radio"\]\)/);
+  assert.match(prepareB1PrintView.toString(), /paperOnlyNotices/);
+  assert.match(prepareB1PrintView.toString(), /B1 Grammar Notes/);
+  assert.equal(findB1PrintFaults("Was macht eine Freundschaft wichtig? a) Ehrlichkeit b) Respekt").length, 0);
+});
