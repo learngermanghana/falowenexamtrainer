@@ -20,6 +20,7 @@ import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import A2B1ReadingQualityChallenge from "./A2B1ReadingQualityChallenge";
 import B1ProtectedAudioPlayer from "./B1ProtectedAudioPlayer";
 import B1Day26MatchingReading from "./B1Day26MatchingReading";
+import ReadingTranslationText, { ReadingTranslationHint } from "./ReadingTranslationText";
 import PublishedHoerenPractice from "./PublishedHoerenPractice";
 
 const card = {
@@ -191,14 +192,15 @@ const QuestionList = ({ questions, startAt = 1, examGrid = false }) => {
   );
 };
 
-const TextBlock = ({ block, examReading = false, sourceLabel = "" }) => {
+const TextBlock = ({ block, examReading = false, sourceLabel = "", day }) => {
   if (!block) return null;
 
+  const readingContext = (block.paragraphs || []).join(" ");
   const body = (
     <>
       {block.paragraphs?.map((paragraph, index) => (
         <p key={`${block.title || "text"}-${index}`} style={{ margin: 0, lineHeight: 1.75 }}>
-          {paragraph}
+          <ReadingTranslationText text={paragraph} level="B1" day={day} contextText={readingContext} />
         </p>
       ))}
     </>
@@ -482,6 +484,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
           
                     <SectionImage image={reading.image} alt={reading.imageAlt} />
           
+                    <ReadingTranslationHint />
                     {reading.status === "planned" ? (
                       <PlaceholderCard
                         title="Reading content skeleton"
@@ -498,18 +501,19 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                           <B1Day26MatchingReading task={reading} />
                         ) : reading.additionalTexts?.length ? (
                           <ReadingSourceGrid>
-                            <TextBlock block={reading.text} examReading sourceLabel={readingSourceLabel(0)} />
+                            <TextBlock block={reading.text} examReading sourceLabel={readingSourceLabel(0)} day={config.day} />
                             {reading.additionalTexts.map((block, index) => (
                               <TextBlock
                                 key={`${block.title || "additional"}-${index}`}
                                 block={block}
                                 examReading
                                 sourceLabel={readingSourceLabel(index + 1)}
+                                day={config.day}
                               />
                             ))}
                           </ReadingSourceGrid>
                         ) : (
-                          <TextBlock block={reading.text} examReading />
+                          <TextBlock block={reading.text} examReading day={config.day} />
                         )}
                       </ReadingExamFrame>
                     )}

@@ -1,5 +1,6 @@
 import React from "react";
 import "./B1Day26MatchingReading.css";
+import ReadingTranslationText from "./ReadingTranslationText";
 
 /**
  * Presenter-friendly and mobile-safe Anzeigen layout. The answer key is
@@ -9,6 +10,10 @@ export default function B1Day26MatchingReading({ task = {} }) {
   const situations = Array.isArray(task.text?.situations) ? task.text.situations : [];
   const advertisements = Array.isArray(task.text?.advertisements) ? task.text.advertisements : [];
   if (!situations.length || !advertisements.length) return null;
+  const readingContext = [
+    ...situations.map(({ description }) => description),
+    ...advertisements.map(({ description }) => description),
+  ].join(" ");
 
   return (
     <section className="b1-day26-matching" data-b1-day26-matching="true" aria-label="B1 Lesen Teil 3 Anzeigen zuordnen">
@@ -25,7 +30,7 @@ export default function B1Day26MatchingReading({ task = {} }) {
             {situations.map(({ number, person, description }) => (
               <li key={number}>
                 <span className="b1-day26-number" aria-hidden="true">{number}</span>
-                <div><strong>{person}</strong><p>{description}</p></div>
+                <div><strong>{person}</strong><p><ReadingTranslationText text={description} level="B1" day={26} contextText={readingContext} /></p></div>
               </li>
             ))}
           </ol>
@@ -39,7 +44,7 @@ export default function B1Day26MatchingReading({ task = {} }) {
                   <span className="b1-day26-ad-letter">{letter})</span>
                   <strong>{title}</strong>
                 </div>
-                <p>{description}</p>
+                <p><ReadingTranslationText text={description} level="B1" day={26} contextText={readingContext} /></p>
                 {contact && <small>{contact}</small>}
               </article>
             ))}

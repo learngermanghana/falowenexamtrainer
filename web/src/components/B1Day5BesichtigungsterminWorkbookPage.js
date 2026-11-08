@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReadingTranslationText, { ReadingTranslationHint } from "./ReadingTranslationText";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
@@ -181,6 +182,7 @@ const B1Day5PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
       {activeTab === "lesen" ? (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
+          <ReadingTranslationHint />
           <WorkbookTaskCard
             eyebrow="Your assignment · Reading"
             title={reading.title}
@@ -192,10 +194,10 @@ const B1Day5PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <h3 style={{ margin: 0 }}>Lesen Teil 1 · Der Besichtigungstermin</h3>
           <p style={{ margin: 0, lineHeight: 1.75 }}><strong>Betreff: Mein Besichtigungstermin heute Nachmittag – endlich eine Traumwohnung?</strong></p>
           <p style={{ margin: 0, lineHeight: 1.75 }}><strong>Lieber Simon,</strong></p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>wie du weißt, suche ich schon seit drei Monaten nach einer bezahlbaren Zwei-Zimmer-Wohnung in der Innenstadt. Heute um 16:30 Uhr hatte ich endlich einen Besichtigungstermin für eine Wohnung, die genau meinen Vorstellungen entspricht.</p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>Als ich ankam, war ich überrascht: Es warteten bereits mindestens fünfzehn andere Interessenten vor der Tür. Der Vermieter, Herr Krüger, ließ uns aber glücklicherweise einzeln durch die Räume gehen, sodass man sich alles in Ruhe ansehen konnte. Die Wohnung liegt im dritten Stock eines alten, aber sehr gut gepflegten Hauses. Sie hat hohe Decken, einen Parkettboden und einen kleinen Balkon nach hinten raus, wo es sehr ruhig ist.</p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>Die Kaltmiete beträgt 650 Euro, dazu kommen noch 150 Euro Nebenkosten. Das ist zwar etwas mehr, als ich ursprünglich ausgeben wollte, aber die Lage ist einfach perfekt, da ich in nur fünf Minuten zur U-Bahn-Station laufen kann. Außerdem ist die Einbauküche bereits im Preis enthalten und in sehr gutem Zustand.</p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>Herr Krüger hat gesagt, dass er bis Freitag entscheiden wird, wer die Wohnung bekommt. Ich habe ihm direkt alle meine Unterlagen übergeben, inklusive Gehaltsnachweis und Schufa-Auskunft. Jetzt kann ich nur hoffen und abwarten! Drück mir die Daumen!</p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText level="B1" day={5}>wie du weißt, suche ich schon seit drei Monaten nach einer bezahlbaren Zwei-Zimmer-Wohnung in der Innenstadt. Heute um 16:30 Uhr hatte ich endlich einen Besichtigungstermin für eine Wohnung, die genau meinen Vorstellungen entspricht.</ReadingTranslationText></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText level="B1" day={5}>Als ich ankam, war ich überrascht: Es warteten bereits mindestens fünfzehn andere Interessenten vor der Tür. Der Vermieter, Herr Krüger, ließ uns aber glücklicherweise einzeln durch die Räume gehen, sodass man sich alles in Ruhe ansehen konnte. Die Wohnung liegt im dritten Stock eines alten, aber sehr gut gepflegten Hauses. Sie hat hohe Decken, einen Parkettboden und einen kleinen Balkon nach hinten raus, wo es sehr ruhig ist.</ReadingTranslationText></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText level="B1" day={5}>Die Kaltmiete beträgt 650 Euro, dazu kommen noch 150 Euro Nebenkosten. Das ist zwar etwas mehr, als ich ursprünglich ausgeben wollte, aber die Lage ist einfach perfekt, da ich in nur fünf Minuten zur U-Bahn-Station laufen kann. Außerdem ist die Einbauküche bereits im Preis enthalten und in sehr gutem Zustand.</ReadingTranslationText></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText level="B1" day={5}>Herr Krüger hat gesagt, dass er bis Freitag entscheiden wird, wer die Wohnung bekommt. Ich habe ihm direkt alle meine Unterlagen übergeben, inklusive Gehaltsnachweis und Schufa-Auskunft. Jetzt kann ich nur hoffen und abwarten! Drück mir die Daumen!</ReadingTranslationText></p>
           <p style={{ margin: 0, lineHeight: 1.75 }}><strong>Liebe Grüße<br />Laura</strong></p>
 
           <h3 style={sectionTitle}>Questions</h3>

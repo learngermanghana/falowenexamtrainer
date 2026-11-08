@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReadingTranslationText, { ReadingTranslationHint } from "./ReadingTranslationText";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
@@ -53,9 +54,10 @@ const B1Day8PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 
     {activeTab === "lesen" && <section style={card}>
       <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
+          <ReadingTranslationHint />
       <WorkbookTaskCard eyebrow="Your assignment · Reading" title={reading.title} submissionNote={reading.submissionNote}><p style={{ margin: 0 }}>{reading.instructions}</p></WorkbookTaskCard>
       <h3 style={{ margin: 0 }}>Ein moderner Held in der Medizinwelt</h3>
-      {B1_DAY8_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}>{paragraph}</p>)}
+      {B1_DAY8_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText text={paragraph} level="B1" day={8} /></p>)}
       <QuestionList items={B1_DAY8_READING_QUESTIONS} />
       <WorkbookSubmissionReminder />
       <Prepared checked={prepared.lesen} onChange={mark("lesen")} />

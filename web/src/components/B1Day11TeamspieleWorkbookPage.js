@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReadingTranslationText, { ReadingTranslationHint } from "./ReadingTranslationText";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
@@ -301,6 +302,7 @@ Mit freundlichen Grüßen
 {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
+          <ReadingTranslationHint />
           <WorkbookTaskCard
             eyebrow="Your assignment · Reading"
             title={reading.title}
@@ -317,18 +319,18 @@ Mit freundlichen Grüßen
           />
 
           <h3 style={sectionTitle}>Spielen: Eine verlorene Kunst oder wichtiger denn je?</h3>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText level="B1" day={11}>
             Das Spielen ist eine Aktivität, die sowohl Kinder als auch Erwachsene auf unterschiedliche Weise genießen können. Früher wurden Spiele meist im Freien gespielt, oft mit einfachen Materialien oder durch kreative Fantasie. In der modernen Welt haben sich die Spielgewohnheiten jedoch stark verändert. Viele Menschen, vor allem Jugendliche, verbringen ihre Freizeit vor Bildschirmen – mit Computerspielen, Konsolenspielen oder Handyspielen.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
+          </ReadingTranslationText></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText level="B1" day={11}>
             Früher waren Spiele ein wichtiges Mittel zur Förderung der sozialen Interaktion. Kinder spielten draußen in Gruppen und lernten, Konflikte zu lösen, zusammenzuarbeiten und Rücksicht auf andere zu nehmen. Heute spielen viele Kinder und Jugendliche allein oder online mit Menschen, die sie nie persönlich treffen. Dadurch können zwar Freundschaften über große Distanzen entstehen, aber echte soziale Interaktion und Bewegung kommen manchmal zu kurz.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
+          </ReadingTranslationText></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText level="B1" day={11}>
             Moderne Computerspiele haben ebenfalls Vorteile. Sie können strategisches Denken, Konzentration und Lernen fördern. Spiele wie Minecraft unterstützen die Kreativität, während andere Spiele historische Ereignisse darstellen oder logisches Denken erfordern. Ein übermäßiger Konsum kann jedoch zu Problemen wie Spielsucht und Bewegungsmangel führen.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
+          </ReadingTranslationText></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText level="B1" day={11}>
             Gleichzeitig gibt es einen Trend zurück zu traditionellen Spielen. Brettspiele und Gruppenspiele wie Fußball oder Verstecken haben weiterhin ihren Platz. Viele Menschen suchen deshalb nach einer Balance zwischen digitalen Spielen und Aktivitäten, die Bewegung und persönliche soziale Kontakte fördern. Insgesamt hat das Spielen nicht an Bedeutung verloren; es sieht heute nur anders aus.
-          </p>
+          </ReadingTranslationText></p>
 
           <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={lesenQuestions} />

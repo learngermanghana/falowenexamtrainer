@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReadingTranslationText, { ReadingTranslationHint } from "./ReadingTranslationText";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
@@ -181,14 +182,15 @@ const B1Day22PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen 1 (Assignment)</h2>
+          <ReadingTranslationHint />
           <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Beziehungen im Wandel: Online-Dating" submissionNote="Antworten unter Teil 3 abgeben: 1B, 2B, 3C.">
             <p style={{ margin: 0 }}>Empfohlene Arbeitszeit: 15 Minuten. Lesen Sie den Text und die Aufgaben 1–3. Welche Lösung (a, b oder c) ist jeweils richtig?</p>
           </WorkbookTaskCard>
           <article style={contentCard}>
             <h3 style={{ margin: 0 }}>Beziehungen im Wandel: Online-Dating</h3>
-            <p style={{ margin: 0 }}>Immer mehr Menschen in Deutschland lernen ihren Partner im Internet kennen. Während früher Kontaktanzeigen in Zeitungen populär waren, nutzen heute besonders junge Erwachsene Dating-Apps auf dem Smartphone.</p>
-            <p style={{ margin: 0 }}>Eine aktuelle Umfrage zeigt, dass sich fast ein Drittel aller Paare zwischen 20 und 35 Jahren online kennengelernt hat. Viele schüchterne Personen finden es einfacher, zuerst Nachrichten zu schreiben, bevor sie sich persönlich treffen. Auf diese Weise lässt sich schnell herausfinden, ob man gemeinsame Hobbys und Interessen teilt.</p>
-            <p style={{ margin: 0 }}>Allerdings gibt es auch Kritik am Online-Dating. Psychologen warnen davor, dass die riesige Auswahl an Profilen dazu führen kann, dass Menschen sich schneller wieder trennen oder niemanden mehr richtig schätzen lernen. Zudem vergleichen viele Nutzer die realen Personen mit perfekten Online-Fotos und sind nach dem ersten Treffen enttäuscht. Trotzdem glauben Experten, dass digitale Plattformen auch in Zukunft die beliebteste Methode bleiben werden, um eine Beziehung einzugehen.</p>
+            <p style={{ margin: 0 }}><ReadingTranslationText level="B1" day={22}>Immer mehr Menschen in Deutschland lernen ihren Partner im Internet kennen. Während früher Kontaktanzeigen in Zeitungen populär waren, nutzen heute besonders junge Erwachsene Dating-Apps auf dem Smartphone.</ReadingTranslationText></p>
+            <p style={{ margin: 0 }}><ReadingTranslationText level="B1" day={22}>Eine aktuelle Umfrage zeigt, dass sich fast ein Drittel aller Paare zwischen 20 und 35 Jahren online kennengelernt hat. Viele schüchterne Personen finden es einfacher, zuerst Nachrichten zu schreiben, bevor sie sich persönlich treffen. Auf diese Weise lässt sich schnell herausfinden, ob man gemeinsame Hobbys und Interessen teilt.</ReadingTranslationText></p>
+            <p style={{ margin: 0 }}><ReadingTranslationText level="B1" day={22}>Allerdings gibt es auch Kritik am Online-Dating. Psychologen warnen davor, dass die riesige Auswahl an Profilen dazu führen kann, dass Menschen sich schneller wieder trennen oder niemanden mehr richtig schätzen lernen. Zudem vergleichen viele Nutzer die realen Personen mit perfekten Online-Fotos und sind nach dem ersten Treffen enttäuscht. Trotzdem glauben Experten, dass digitale Plattformen auch in Zukunft die beliebteste Methode bleiben werden, um eine Beziehung einzugehen.</ReadingTranslationText></p>
           </article>
           <QuestionList questions={[{"stem":"Wie lernen sich viele junge Erwachsene heute kennen?","options":["a) Sie suchen meistens über klassische Anzeigen in Zeitungen.","b) Sie nutzen dafür häufig Apps auf dem Smartphone.","c) Sie treffen sich hauptsächlich auf Partys im echten Leben."]},{"stem":"Warum ist Online-Dating für schüchterne Menschen hilfreich?","options":["a) Sie müssen vor dem ersten Treffen keine Nachrichten schreiben.","b) Sie können schnell feststellen, ob sie dieselben Interessen haben.","c) Sie müssen sich nie persönlich im echten Leben treffen."]},{"stem":"Welches Problem sehen Psychologen beim Online-Dating?","options":["a) Die Auswahl an möglichen Partnern ist viel zu klein.","b) Erste persönliche Treffen verlaufen immer enttäuschend.","c) Das große Angebot kann dazu führen, dass Beziehungen schneller beendet werden."]}]} />
           <WorkbookSubmissionReminder />

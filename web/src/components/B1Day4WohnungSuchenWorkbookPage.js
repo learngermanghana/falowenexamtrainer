@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReadingTranslationText, { ReadingTranslationHint } from "./ReadingTranslationText";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
@@ -169,6 +170,7 @@ const B1Day4PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
       {activeTab === "lesen" ? (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
+          <ReadingTranslationHint />
           <WorkbookTaskCard
             eyebrow="Your assignment · Reading"
             title={reading.title}
@@ -177,8 +179,8 @@ const B1Day4PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <h3 style={sectionTitle}>Die Herausforderungen der Wohnungssuche in Großstädten</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>In vielen Großstädten Deutschlands ist bezahlbarer Wohnraum knapp. Die Mieten steigen, und viele Interessenten bewerben sich um dieselbe Wohnung. Dadurch haben Menschen mit geringerem Einkommen oft schlechtere Chancen.</p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>Zusätzlich kaufen Investoren Wohnungen und nutzen sie als Ferienwohnungen oder Luxusapartments. Die Politik reagiert mit Mietpreisbremse und Neubauprogrammen. Trotzdem brauchen Wohnungssuchende Zeit, Geduld und Flexibilität.</p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}><ReadingTranslationText level="B1" day={4}>In vielen Großstädten Deutschlands ist bezahlbarer Wohnraum knapp. Die Mieten steigen, und viele Interessenten bewerben sich um dieselbe Wohnung. Dadurch haben Menschen mit geringerem Einkommen oft schlechtere Chancen.</ReadingTranslationText></p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}><ReadingTranslationText level="B1" day={4}>Zusätzlich kaufen Investoren Wohnungen und nutzen sie als Ferienwohnungen oder Luxusapartments. Die Politik reagiert mit Mietpreisbremse und Neubauprogrammen. Trotzdem brauchen Wohnungssuchende Zeit, Geduld und Flexibilität.</ReadingTranslationText></p>
           <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={lesenQuestions} />
           <WorkbookSubmissionReminder />

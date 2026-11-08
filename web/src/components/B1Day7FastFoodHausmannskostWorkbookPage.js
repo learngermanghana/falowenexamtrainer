@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReadingTranslationText, { ReadingTranslationHint } from "./ReadingTranslationText";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
@@ -101,13 +102,14 @@ const B1Day7PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
+          <ReadingTranslationHint />
           <WorkbookTaskCard eyebrow="Your assignment · Reading" title={reading.title} submissionNote={reading.submissionNote}>
             <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <h3 style={{ margin: 0 }}>Der Einfluss von Süßigkeiten auf die Gesundheit</h3>
-          {B1_DAY7_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}>{paragraph}</p>)}
+          {B1_DAY7_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}><ReadingTranslationText text={paragraph} level="B1" day={7} /></p>)}
           <QuestionList items={B1_DAY7_READING_QUESTIONS} />
-          <div style={box}><strong>Anzeige-Fragen (A–F)</strong><p style={{ margin: 0 }}>Anzeige A: Sonderangebote im Supermarkt für Fertiggerichte · Anzeige B: Werbung für ein neues Diät-Programm · Anzeige C: Angebot für zuckerfreie Süßigkeiten · Anzeige D: Eröffnung eines neuen Restaurants mit gesunden Gerichten · Anzeige E: Rabatt auf Schokolade im Online-Shop · Anzeige F: Veranstaltung über gesunde Ernährung und Zuckerreduktion</p></div>
+          <div style={box}><strong>Anzeige-Fragen (A–F)</strong><p style={{ margin: 0 }}><ReadingTranslationText level="B1" day={7}>Anzeige A: Sonderangebote im Supermarkt für Fertiggerichte · Anzeige B: Werbung für ein neues Diät-Programm · Anzeige C: Angebot für zuckerfreie Süßigkeiten · Anzeige D: Eröffnung eines neuen Restaurants mit gesunden Gerichten · Anzeige E: Rabatt auf Schokolade im Online-Shop · Anzeige F: Veranstaltung über gesunde Ernährung und Zuckerreduktion</ReadingTranslationText></p></div>
           <QuestionList items={B1_DAY7_AD_QUESTIONS} />
           <WorkbookSubmissionReminder />
           <Prepared checked={prepared.lesen} onChange={mark("lesen")} />
