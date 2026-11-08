@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useEffect, useState } from "react";
 
 // Private-by-default: answer drafts stay in this browser component.
@@ -31,7 +32,7 @@ export default function C1ReadingPracticePanel({ day, reading }) {
       }}>
         <h4 style={{ marginTop: 0 }}>{reading.title}</h4>
         {reading.text.map((paragraph, index) => (
-          <p key={index} style={{ margin: "0 0 14px" }}>{paragraph}</p>
+          <p key={index} style={{ margin: "0 0 14px" }}><InlineReadingTranslations text={paragraph} level="C1" day={day} /></p>
         ))}
       </article>
       <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 16 }}>
