@@ -77,8 +77,10 @@ export const prepareB1PrintView = ({ section = "" } = {}) => {
   const noticeCandidates = [...root.querySelectorAll("p,div,aside,section,small,span,button,label,strong")]
     .filter(el => el.isConnected && normalize(el.textContent).length < 350 &&
       paperOnlyNotices.some(rx => rx.test(normalize(el.textContent))));
+  // Remove the entire matching notice container (including its opaque
+  // background), not just the nested text that was obscuring questions.
   for (const el of noticeCandidates.filter(node =>
-    !noticeCandidates.some(inner => inner !== node && node.contains(inner)))) swap(el);
+    !noticeCandidates.some(outer => outer !== node && outer.contains(node)))) swap(el);
 
 
   // Exclude private session and result widgets before their content can be
