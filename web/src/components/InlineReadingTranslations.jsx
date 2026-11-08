@@ -10,7 +10,7 @@ export default function InlineReadingTranslations({ text = "", level = "", day =
   const scope = String(level).toUpperCase() + ":" + String(day) + ":" + String(text);
   const [selection, setSelection] = useState({ scope: "", index: -1 });
   const segments = useMemo(
-    () => segmentReadingPhrases(text, getReadingPhraseTranslations(level, day), ["B2", "C1", "C2"].includes(String(level).toUpperCase()) ? 3 : 9),
+    () => segmentReadingPhrases(text, getReadingPhraseTranslations(level, day), ["A1", "B2", "C1", "C2"].includes(String(level).toUpperCase()) ? 3 : 9),
     [text, level, day],
   );
   const activeIndex = selection.scope === scope ? selection.index : -1;
