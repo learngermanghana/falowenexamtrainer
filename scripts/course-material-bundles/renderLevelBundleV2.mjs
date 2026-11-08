@@ -338,31 +338,31 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
     if (level === "B1") {
       for (let attempt = 0; attempt < B1_PRINT_SCALES.length; attempt += 1) {
         await renderPdf(B1_PRINT_SCALES[attempt]);
-      const printed = execFileSync("pdftotext", ["-layout", file, "-"],
-        { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
-      const faults = findB1PrintFaults(printed);
-      if (faults.length) throw new Error("B1 Day " + lesson.day + " " + suffix +
-        " printed website/private content: " + faults.join(", "));
-      assertB1PrintedContent(b1ExpectedText, printed);
-      await trimPrintedPdfTail(file, {
-        description: "B1 Day " + lesson.day + " " + suffix,
-        removeBlankInterior: true,
-      });
-      const cleaned = execFileSync("pdftotext", ["-layout", file, "-"],
-        { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
-      const cleanPdf = await PDFDocument.load(fs.readFileSync(file));
-      const audit = scanPdfPageContent(cleaned, cleanPdf.getPageCount());
-      if (!audit.faults.length) break;
-      if (!shouldRetryB1PrintAudit(audit.faults, attempt)) {
-        throw new Error(
-          "B1 Day " + lesson.day + " " + suffix + " failed print-page audit after safe layout retries:\n" +
-          audit.faults.join("\n")
+        const printed = execFileSync("pdftotext", ["-layout", file, "-"],
+          { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+        const faults = findB1PrintFaults(printed);
+        if (faults.length) throw new Error("B1 Day " + lesson.day + " " + suffix +
+          " printed website/private content: " + faults.join(", "));
+        assertB1PrintedContent(b1ExpectedText, printed);
+        await trimPrintedPdfTail(file, {
+          description: "B1 Day " + lesson.day + " " + suffix,
+          removeBlankInterior: true,
+        });
+        const cleaned = execFileSync("pdftotext", ["-layout", file, "-"],
+          { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+        const cleanPdf = await PDFDocument.load(fs.readFileSync(file));
+        const audit = scanPdfPageContent(cleaned, cleanPdf.getPageCount());
+        if (!audit.faults.length) break;
+        if (!shouldRetryB1PrintAudit(audit.faults, attempt)) {
+          throw new Error(
+            "B1 Day " + lesson.day + " " + suffix + " failed print-page audit after safe layout retries:\n" +
+            audit.faults.join("\n")
+          );
+        }
+        console.warn(
+          "B1 Day " + lesson.day + " " + suffix + ": sparse printed page at scale " +
+          B1_PRINT_SCALES[attempt] + "; retrying at " + B1_PRINT_SCALES[attempt + 1]
         );
-      }
-      console.warn(
-        "B1 Day " + lesson.day + " " + suffix + ": sparse printed page at scale " +
-        B1_PRINT_SCALES[attempt] + "; retrying at " + B1_PRINT_SCALES[attempt + 1]
-      );
       }
     }
   } finally {
