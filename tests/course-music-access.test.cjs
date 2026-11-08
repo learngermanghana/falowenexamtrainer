@@ -253,3 +253,24 @@ test('A2 Day 23 commute conversation requires staff and the exact private object
  }
  assert.throws(()=>signTrack('a2-day23-commute-classroom',env),/Unknown/);
 });
+
+test('Day 27 classroom audio signs the exact supplied object for staff only', async () => {
+ const {createClassroomAudioHandler}=require('../server/courseMusic.cjs');
+ const key='b1/day-27/umweltfreundlich-im-alltag.mp3';
+ const staff={localId:'teacher',customAttributes:'{"role":"teacher"}'};
+ for(const [account,level,day,requested,expected] of [
+  [null,'B1',27,key,401],
+  [{localId:'student',email:'student@example.com'},'B1',27,key,403],
+  [staff,'B1',27,key,200],
+  [staff,'A2',27,key,400],
+  [staff,'B1',28,key,400],
+  [staff,'B1',27,'b1/day-27/other.mp3',400],
+ ]) {
+  const res=response();
+  await createClassroomAudioHandler({env,fetchImpl:async()=>({ok:true,json:async()=>({users:account?[account]:[]})})})({method:'GET',headers:account?{authorization:'Bearer test-token',origin:'https://admin.falowen.app'}:{},url:'/?'+new URLSearchParams({level,day:String(day),key:requested})},res);
+  assert.equal(res.code,expected);
+  assert.equal(Boolean(res.body.url),expected===200);
+  if(expected===200) assert.equal(new URL(res.body.url).pathname,'/'+key);
+ }
+ assert.throws(()=>signTrack('b1-day27-environment-everyday',env),/Unknown/);
+});

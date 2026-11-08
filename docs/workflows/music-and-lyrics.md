@@ -197,3 +197,13 @@ valid estimated recording, plus rejection after a text/fingerprint change. It
 runs in the existing music-learning-room workflow. Admin slides consume the same
 `music-lyrics` English response; no duplicate Admin translation pack is needed.
 The 23 additions require learner deployment before they can appear live.
+
+### B1 Day 27 classroom conversation (2026-11-08)
+
+The Admin V2 presenter uses published B1 Day-27 music, then a separate ungraded
+Lisa conversation with six classroom questions. The private recording is
+`b1/day-27/umweltfreundlich-im-alltag.mp3`; it repeats twice in the supplied audio.
+The existing `/api/course-media/classroom/audio-url` gateway signs only this
+exact B1 / 27 / key combination for verified staff. It is not a public music
+track and does not alter the learner workbook assessment or official marks.
+Release this allowlist before the corresponding Admin opening configuration.
