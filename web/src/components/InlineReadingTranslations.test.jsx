@@ -15,6 +15,16 @@ describe("A2/B1 reading phrase support", () => {
     }
   });
 
+  test("A1 workbook text displays contextual English on tap with no API", () => {
+    expect(getReadingPhraseTranslations("A1", 1).length).toBeGreaterThan(200);
+    render(<InlineReadingTranslations level="A1" day={1} text="Guten Morgen! Wie geht es dir? Mir geht es gut." />);
+    const greeting = screen.getByRole("button", { name: "Show English meaning of Guten Morgen" });
+    fireEvent.click(greeting);
+    expect(screen.getByText("good morning")).toBeInTheDocument();
+    fireEvent.click(greeting);
+    expect(screen.queryByText("good morning")).not.toBeInTheDocument();
+  });
+
   test("matches only complete phrases and preserves punctuation", () => {
     const entries = [{ de: "auf Plastik verzichten", en: "avoid plastic" }, { de: "Plastik", en: "plastic" }];
     const segments = segmentReadingPhrases("Wir wollen auf Plastik verzichten. Plastikmüll bleibt.", entries);
