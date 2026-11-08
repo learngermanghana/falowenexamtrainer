@@ -23,6 +23,16 @@ export const B1_PRINT_CSS = `
      on top of the final rows at a page boundary. */
   table, thead, tbody, tr, th, td { break-inside: avoid !important; }
   section:has(> table) { break-inside: avoid-page !important; display: block !important; }
+  /* Chromium can fragment a grid row but paint the following question over
+     its last choices. Print reading question cards in ordinary block flow. */
+  [data-reading-exam-question-grid] {
+    display: block !important; grid-template-columns: none !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  [data-reading-exam-question-grid] > * {
+    display: block !important; margin: 0 0 14px !important;
+    break-inside: avoid-page !important; page-break-inside: avoid !important;
+  }
   /* Live text controls have blue focus outlines but no useful paper content.
      Keep radio/checkbox circles visible for printed multiple-choice questions. */
   input:not([type="radio"]):not([type="checkbox"]), textarea { display: none !important; }
@@ -184,6 +194,23 @@ export const prepareB1PrintView = ({ section = "" } = {}) => {
   }
   window.__b1PrintChanges = undo;
   return { replacements: undo.length };
+};
+
+
+/** Remove large blank link/button outlines left after the text-only web chrome
+ * scrub. Never remove a radio answer, checkbox, image, or instructional text. */
+export const suppressB1EmptyChromeControls = () => {
+  const undo = window.__b1PrintChanges;
+  if (!undo) throw new Error("B1 print state must be prepared first");
+  for (const el of [...document.querySelectorAll("button,a,[role=button]")]) {
+    if (!el.isConnected || (el.textContent || "").trim()) continue;
+    if (el.querySelector("input,img,svg[aria-label],[role=radio],[role=checkbox]")) continue;
+    const rect = el.getBoundingClientRect?.();
+    if (!rect || rect.width < 180 || rect.height < 20) continue;
+    const replacement = document.createElement("span");
+    el.replaceWith(replacement);
+    undo.push(() => { if (replacement.isConnected) replacement.replaceWith(el); });
+  }
 };
 
 export const restoreB1PrintView = () => {
