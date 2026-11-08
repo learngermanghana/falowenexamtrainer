@@ -164,7 +164,7 @@ test("printing a workbook section restores screen media before the next tab clic
   assert.ok(saveStart >= 0 && saveEnd > saveStart);
   const saveMethod = source.slice(saveStart, saveEnd);
   assert.match(saveMethod, /await injectPrintMode\(page\)/);
-  assert.match(saveMethod, /await page\.pdf\(/);
+  assert.match(saveMethod, /const renderPdf = scale => page\.pdf\(/);
   assert.match(saveMethod, /finally\s*\{[\s\S]*?await page\.emulateMedia\(\{ media: "screen" \}\)/);
 });
 
