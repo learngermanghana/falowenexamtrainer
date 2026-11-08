@@ -127,9 +127,9 @@ export function getReadingGlosses(level, day, text = "") {
   return found;
 }
 
-export function splitReadingGlossaryText(text = "", level = "", day = 0) {
+export function splitReadingGlossaryText(text = "", level = "", day = 0, contextText = text) {
   const value = String(text || "");
-  const entries = getReadingGlosses(level, day, value);
+  const entries = getReadingGlosses(level, day, contextText);
   if (!entries.length) return [{ text: value }];
   const sorted = [...entries].sort((a, b) => b[0].length - a[0].length);
   const escaped = sorted.map(([phrase]) => phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
