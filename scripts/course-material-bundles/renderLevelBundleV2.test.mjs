@@ -262,3 +262,14 @@ test("canonical B1 companions use B1 text coverage rather than A2 exact-order as
   assert.doesNotMatch(b1, /assertA2PrintedContent\(expectedText, printedText\)/);
   assert.match(source, /assertA2PrintedContent\(expectedText, printedText\)/);
 });
+
+test("B1 prepublication renderer waits for lazy lesson content before printing", () => {
+  const start = source.indexOf("const saveCurrentPagePdf = async");
+  const end = source.indexOf("const renderA1Lesson =", start);
+  assert.ok(start >= 0 && end > start);
+  const save = source.slice(start, end);
+  assert.match(save, /if \(level === "A2" \|\| level === "B1"\)/);
+  assert.match(save, /await page\.waitForFunction\(/);
+  assert.match(save, /Loading\(\?: grammar notes\)/);
+  assert.match(save, /prepareB1PrintView, \{ section: suffix \}/);
+});
