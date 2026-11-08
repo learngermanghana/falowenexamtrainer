@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
@@ -143,7 +144,7 @@ const B1Day3PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             "Oder denken wir an den alleinerziehenden Vater, der trotz aller Schwierigkeiten jeden Tag hart arbeitet, um seinen Kindern eine gute Zukunft zu ermöglichen. Er könnte leicht aufgeben, aber er kämpft weiter und zeigt damit eine unglaubliche Stärke.",
             "Auch die Freiwilligen, die ihre Zeit opfern, um anderen zu helfen, verdienen unseren Respekt. Sei es durch die Unterstützung von Obdachlosen, die Betreuung von Senioren oder die Rettung von Tieren – sie sind die stillen Helden, die unsere Gesellschaft zusammenhalten.",
             "Es ist leicht, in den Heldengeschichten aus Filmen oder Büchern zu träumen, aber die wahren Helden sind oft viel näher, als wir denken. Sie sind die Menschen, die uns jeden Tag zeigen, dass wahre Stärke und Mut in den kleinen, alltäglichen Taten liegen.",
-          ].map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>)}
+          ].map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}><InlineReadingTranslations text={paragraph} level="B1" day={3} /></p>)}
           <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={lesenQuestions} />
           <WorkbookSubmissionReminder />

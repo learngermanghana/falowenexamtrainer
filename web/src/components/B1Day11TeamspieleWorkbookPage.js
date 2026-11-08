@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
@@ -317,18 +318,10 @@ Mit freundlichen Grüßen
           />
 
           <h3 style={sectionTitle}>Spielen: Eine verlorene Kunst oder wichtiger denn je?</h3>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
-            Das Spielen ist eine Aktivität, die sowohl Kinder als auch Erwachsene auf unterschiedliche Weise genießen können. Früher wurden Spiele meist im Freien gespielt, oft mit einfachen Materialien oder durch kreative Fantasie. In der modernen Welt haben sich die Spielgewohnheiten jedoch stark verändert. Viele Menschen, vor allem Jugendliche, verbringen ihre Freizeit vor Bildschirmen – mit Computerspielen, Konsolenspielen oder Handyspielen.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
-            Früher waren Spiele ein wichtiges Mittel zur Förderung der sozialen Interaktion. Kinder spielten draußen in Gruppen und lernten, Konflikte zu lösen, zusammenzuarbeiten und Rücksicht auf andere zu nehmen. Heute spielen viele Kinder und Jugendliche allein oder online mit Menschen, die sie nie persönlich treffen. Dadurch können zwar Freundschaften über große Distanzen entstehen, aber echte soziale Interaktion und Bewegung kommen manchmal zu kurz.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
-            Moderne Computerspiele haben ebenfalls Vorteile. Sie können strategisches Denken, Konzentration und Lernen fördern. Spiele wie Minecraft unterstützen die Kreativität, während andere Spiele historische Ereignisse darstellen oder logisches Denken erfordern. Ein übermäßiger Konsum kann jedoch zu Problemen wie Spielsucht und Bewegungsmangel führen.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
-            Gleichzeitig gibt es einen Trend zurück zu traditionellen Spielen. Brettspiele und Gruppenspiele wie Fußball oder Verstecken haben weiterhin ihren Platz. Viele Menschen suchen deshalb nach einer Balance zwischen digitalen Spielen und Aktivitäten, die Bewegung und persönliche soziale Kontakte fördern. Insgesamt hat das Spielen nicht an Bedeutung verloren; es sieht heute nur anders aus.
-          </p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><InlineReadingTranslations text={"Das Spielen ist eine Aktivität, die sowohl Kinder als auch Erwachsene auf unterschiedliche Weise genießen können. Früher wurden Spiele meist im Freien gespielt, oft mit einfachen Materialien oder durch kreative Fantasie. In der modernen Welt haben sich die Spielgewohnheiten jedoch stark verändert. Viele Menschen, vor allem Jugendliche, verbringen ihre Freizeit vor Bildschirmen – mit Computerspielen, Konsolenspielen oder Handyspielen."} level="B1" day={11} /></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><InlineReadingTranslations text={"Früher waren Spiele ein wichtiges Mittel zur Förderung der sozialen Interaktion. Kinder spielten draußen in Gruppen und lernten, Konflikte zu lösen, zusammenzuarbeiten und Rücksicht auf andere zu nehmen. Heute spielen viele Kinder und Jugendliche allein oder online mit Menschen, die sie nie persönlich treffen. Dadurch können zwar Freundschaften über große Distanzen entstehen, aber echte soziale Interaktion und Bewegung kommen manchmal zu kurz."} level="B1" day={11} /></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><InlineReadingTranslations text={"Moderne Computerspiele haben ebenfalls Vorteile. Sie können strategisches Denken, Konzentration und Lernen fördern. Spiele wie Minecraft unterstützen die Kreativität, während andere Spiele historische Ereignisse darstellen oder logisches Denken erfordern. Ein übermäßiger Konsum kann jedoch zu Problemen wie Spielsucht und Bewegungsmangel führen."} level="B1" day={11} /></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><InlineReadingTranslations text={"Gleichzeitig gibt es einen Trend zurück zu traditionellen Spielen. Brettspiele und Gruppenspiele wie Fußball oder Verstecken haben weiterhin ihren Platz. Viele Menschen suchen deshalb nach einer Balance zwischen digitalen Spielen und Aktivitäten, die Bewegung und persönliche soziale Kontakte fördern. Insgesamt hat das Spielen nicht an Bedeutung verloren; es sieht heute nur anders aus."} level="B1" day={11} /></p>
 
           <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={lesenQuestions} />

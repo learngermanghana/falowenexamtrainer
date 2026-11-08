@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
@@ -177,8 +178,8 @@ const B1Day4PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <h3 style={sectionTitle}>Die Herausforderungen der Wohnungssuche in Großstädten</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>In vielen Großstädten Deutschlands ist bezahlbarer Wohnraum knapp. Die Mieten steigen, und viele Interessenten bewerben sich um dieselbe Wohnung. Dadurch haben Menschen mit geringerem Einkommen oft schlechtere Chancen.</p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>Zusätzlich kaufen Investoren Wohnungen und nutzen sie als Ferienwohnungen oder Luxusapartments. Die Politik reagiert mit Mietpreisbremse und Neubauprogrammen. Trotzdem brauchen Wohnungssuchende Zeit, Geduld und Flexibilität.</p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}><InlineReadingTranslations text={"In vielen Großstädten Deutschlands ist bezahlbarer Wohnraum knapp. Die Mieten steigen, und viele Interessenten bewerben sich um dieselbe Wohnung. Dadurch haben Menschen mit geringerem Einkommen oft schlechtere Chancen."} level="B1" day={4} /></p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}><InlineReadingTranslations text={"Zusätzlich kaufen Investoren Wohnungen und nutzen sie als Ferienwohnungen oder Luxusapartments. Die Politik reagiert mit Mietpreisbremse und Neubauprogrammen. Trotzdem brauchen Wohnungssuchende Zeit, Geduld und Flexibilität."} level="B1" day={4} /></p>
           <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={lesenQuestions} />
           <WorkbookSubmissionReminder />

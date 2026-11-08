@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
@@ -105,7 +106,7 @@ const B1Day7PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <h3 style={{ margin: 0 }}>Der Einfluss von Süßigkeiten auf die Gesundheit</h3>
-          {B1_DAY7_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}>{paragraph}</p>)}
+          {B1_DAY7_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}><InlineReadingTranslations text={paragraph} level="B1" day={7} /></p>)}
           <QuestionList items={B1_DAY7_READING_QUESTIONS} />
           <div style={box}><strong>Anzeige-Fragen (A–F)</strong><p style={{ margin: 0 }}>Anzeige A: Sonderangebote im Supermarkt für Fertiggerichte · Anzeige B: Werbung für ein neues Diät-Programm · Anzeige C: Angebot für zuckerfreie Süßigkeiten · Anzeige D: Eröffnung eines neuen Restaurants mit gesunden Gerichten · Anzeige E: Rabatt auf Schokolade im Online-Shop · Anzeige F: Veranstaltung über gesunde Ernährung und Zuckerreduktion</p></div>
           <QuestionList items={B1_DAY7_AD_QUESTIONS} />
