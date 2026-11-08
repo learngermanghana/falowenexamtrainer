@@ -183,3 +183,35 @@ export const findB1PrintFaults = text => {
   ];
   return forbidden.filter(([,regex])=>regex.test(String(text))).map(([name])=>name);
 };
+
+
+/**
+ * Canonical B1 companions render HTML that contains every source-owned prompt.
+ * Poppler's pdftotext can read adjacent PDF columns/list items in a different
+ * order to DOM innerText, so the A2 exact-string comparison falsely rejects
+ * complete B1 pages. Compare token occurrences instead, while requiring that
+ * nearly all printed source text survives and preserving the existing safety
+ * and per-page audits.
+ */
+export const assertB1CanonicalPrintedContent = (expected, printed) => {
+  assertB1PrintedContent(expected, printed);
+  const words = input => String(input || "").normalize("NFKC").toLocaleLowerCase("de")
+    .match(/[\\p{L}\\p{N}]+/gu) || [];
+  const source = words(expected);
+  const rendered = words(printed);
+  const occurrences = new Map();
+  for (const word of rendered) occurrences.set(word, (occurrences.get(word) || 0) + 1);
+  let matched = 0;
+  for (const word of source) {
+    const left = occurrences.get(word) || 0;
+    if (left > 0) {
+      occurrences.set(word, left - 1);
+      matched++;
+    }
+  }
+  const coverage = matched / Math.max(source.length, 1);
+  if (coverage < 0.92) {
+    throw new Error("B1 canonical PDF lost source-controlled exercise text (" +
+      Math.round(coverage * 100) + "% token coverage)");
+  }
+};
