@@ -168,9 +168,10 @@ test("printing a workbook section restores screen media before the next tab clic
   assert.match(saveMethod, /finally\s*\{[\s\S]*?await page\.emulateMedia\(\{ media: "screen" \}\)/);
 });
 
-test("A2 PDF builder retries navigation timeouts only and fails closed for content errors", () => {
+test("A2/B1 PDF builder retries only transient navigation races or timeouts and fails closed for content errors", () => {
   assert.match(source, /const renderWithTransientNavigationRetry = async/);
   assert.match(source, /error\?\.name === "TimeoutError"/);
+  assert.ok(source.includes('Execution context was destroyed, most likely because of a navigation'));
   assert.match(source, /if \(!transient \|\| attempt === 3\) throw error/);
   assert.match(source, /page\.goto\("about:blank"/);
   assert.match(source, /await renderWithTransientNavigationRetry\(page, lesson\)/);
@@ -250,4 +251,14 @@ test("B1 sparse PDF print retries preserve page audits and avoid deleting short 
   assert.match(source, /if \(!audit\.faults\.length\) break;/);
   assert.match(source, /assertB1PrintedContent\(b1ExpectedText, printed\)/);
   assert.match(source, /scanPdfPageContent\(cleaned, cleanPdf\.getPageCount\(\)\)/);
+});
+
+test("canonical B1 companions use B1 text coverage rather than A2 exact-order assertion", () => {
+  const start = source.indexOf("const renderReadOnlyB1Section = async");
+  const end = source.indexOf("const getWorkbookTabAvailability =", start);
+  assert.ok(start >= 0 && end > start);
+  const b1 = source.slice(start, end);
+  assert.match(b1, /assertB1CanonicalPrintedContent\(expectedText, printedText\)/);
+  assert.doesNotMatch(b1, /assertA2PrintedContent\(expectedText, printedText\)/);
+  assert.match(source, /assertA2PrintedContent\(expectedText, printedText\)/);
 });

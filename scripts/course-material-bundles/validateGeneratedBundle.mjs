@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { PDFArray, PDFDocument, PDFName } from "pdf-lib";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
+import { hasPdfSectionDivider } from "./pdfSectionDividers.mjs";
 import { findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
 import { findA1PrintChromeLeaks } from "./a1PdfPrintChrome.mjs";
 import { assertA2PrintSafety } from "./a2PdfSafety.mjs";
@@ -207,12 +208,9 @@ if (level === "A2") {
 const missing = [];
 for (const [day, sections] of expectedByDay) {
   for (const section of sections) {
-    const label = section === "grammar" ? "GRAMMAR" : "WORKBOOK";
-    const marker = new RegExp(
-      `${level}\s*[·•]?\s*Day\s+${day}\b[\s\S]{0,500}\b${label}\b`,
-      "i",
-    );
-    if (!marker.test(text)) missing.push(`Day ${day} ${label}`);
+    if (!hasPdfSectionDivider(text, level, day, section)) {
+      missing.push(`Day ${day} ${section.toUpperCase()}`);
+    }
   }
 }
 
