@@ -1,4 +1,5 @@
 import React from "react";
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import { styles } from "../styles";
@@ -151,12 +152,7 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => (
           <strong>Instructions:</strong> Read the text and tap the correct answer for questions 1–10. Only one answer is correct. You can tap again to change your choice.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Text:</strong> Ich gehe oft in den Supermarkt, um Lebensmittel zu kaufen. Ich mag frisches Obst und Gemüse.
-          Besonders gerne mag ich Äpfel und Karotten. Mein Bruder mag keine Karotten, er mag lieber Bananen. Wir kaufen
-          auch oft Brot und Milch. Mein Vater mag keinen Käse, aber meine Mutter mag Käse sehr. Im Supermarkt gibt es viele
-          Sorten Käse. Ich kaufe nie Fleisch, weil ich Vegetarier bin. Meine Schwester isst auch kein Fleisch. Sie mag Tofu
-          und Bohnen. Am Wochenende backen wir oft einen Kuchen. Wir alle mögen Schokolade im Kuchen. Mein Hund mag keinen
-          Kuchen, aber er mag Kekse.
+          <strong>Text:</strong> <InlineReadingTranslations text={"Ich gehe oft in den Supermarkt, um Lebensmittel zu kaufen. Ich mag frisches Obst und Gemüse. Besonders gerne mag ich Äpfel und Karotten. Mein Bruder mag keine Karotten, er mag lieber Bananen. Wir kaufen auch oft Brot und Milch. Mein Vater mag keinen Käse, aber meine Mutter mag Käse sehr. Im Supermarkt gibt es viele Sorten Käse. Ich kaufe nie Fleisch, weil ich Vegetarier bin. Meine Schwester isst auch kein Fleisch. Sie mag Tofu und Bohnen. Am Wochenende backen wir oft einen Kuchen. Wir alle mögen Schokolade im Kuchen. Mein Hund mag keinen Kuchen, aber er mag Kekse."} level="A1" day={16} />
         </p>
         <QuestionList questions={readingQuestions} />
       </section>
