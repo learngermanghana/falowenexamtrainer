@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
@@ -149,7 +150,7 @@ const B1Day2PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             "Ehrlichkeit und Kommunikation sind ebenfalls entscheidend. Ein wahrer Freund sagt die Wahrheit, auch wenn es schwierig ist. Ehrliche Kommunikation hilft, Missverständnisse zu vermeiden und die Beziehung zu stärken.",
             "Schließlich ist Vergebung ein wesentlicher Bestandteil einer wahren Freundschaft. Jeder macht Fehler, und es ist wichtig, diese Fehler zu vergeben und hinter sich zu lassen. Eine Freundschaft, die auf Vergebung basiert, wird mit der Zeit stärker.",
             "Insgesamt bedeutet es, ein wahrer Freund zu sein, sich gegenseitig zu vertrauen, zu unterstützen, gemeinsame Interessen zu pflegen, ehrlich zu kommunizieren und zu vergeben. Diese Elemente bilden die Grundlage für eine stabile und erfüllende Freundschaft.",
-          ].map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>)}
+          ].map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}><InlineReadingTranslations text={paragraph} level="B1" day={2} /></p>)}
           <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={lesenQuestions} />
           <WorkbookSubmissionReminder />
