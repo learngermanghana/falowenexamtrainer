@@ -215,7 +215,7 @@ export const suppressB1EmptyChromeControls = () => {
     const css = window.getComputedStyle(el);
     if (css.display === "none" || css.visibility === "hidden") continue;
     const emptyClickable = el.matches("button,a,[role=button]");
-    const vividBlueFrame = /^(?:rgb\\(37, 99, 235\\)|#2563eb)$/i.test(css.borderTopColor) &&
+    const vividBlueFrame = /^(?:rgb\(37, 99, 235\)|#2563eb)$/i.test(css.borderTopColor) &&
       Number.parseFloat(css.borderTopWidth || "0") >= 1;
     if (!emptyClickable && !vividBlueFrame) continue;
     const replacement = document.createElement("span");
