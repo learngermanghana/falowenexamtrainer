@@ -207,3 +207,21 @@ The existing `/api/course-media/classroom/audio-url` gateway signs only this
 exact B1 / 27 / key combination for verified staff. It is not a public music
 track and does not alter the learner workbook assessment or official marks.
 Release this allowlist before the corresponding Admin opening configuration.
+
+## Workbook song practice analytics — 8 November 2026
+
+The signed-in A1/A2/B1 workbook song player and the optional lesson music card
+now send bounded events to the existing Admin `/music-practice/record` API with
+`source: workbook`. Only actual HTML audio playback starts a practice session.
+A meaningful pause may record listening time once and an attended song ending
+records completion. Frequent time updates, seeking, rendering, and opening the
+Music tab do not write events. A session sends at most one start, one progress
+and one completion request; there is no timer, per-second write, GA4 identity
+link, automatic report refresh, new AI job or private Hören tracking.
+
+Only authenticated non-anonymous Firebase accounts are reported. Students see
+a short notice; music remains optional and ungraded. A `complete` event
+requires approximately 80% of song duration to have been listened to, rather
+than merely skipping near the end. Admin reads its existing bounded query on
+owner tab open or explicit refresh. Deploy the Admin practice API with
+`source=workbook` support before deploying the learner player.
