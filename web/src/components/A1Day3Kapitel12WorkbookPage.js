@@ -1,4 +1,5 @@
 import React from "react";
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
@@ -81,8 +82,7 @@ const A1Day3Kapitel12WorkbookPage = () => {
         <h2 style={{ margin: 0 }}>Teil 1 · Lesen</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Reading Passage: Introducing Yourself (Exercise) (16.6 Marks)</strong>
-          <br />Hallo! Ich heiße Anna. Ich komme aus Spanien und ich wohne in Madrid. Wie heißt du? Woher kommst du?
-          Wo wohnst du? Mein Freund Peter kommt aus Deutschland und wohnt in Berlin. Er heißt Peter.
+          <br /><InlineReadingTranslations level="A1" day={3} text="Hallo! Ich heiße Anna. Ich komme aus Spanien und ich wohne in Madrid. Wie heißt du? Woher kommst du? Wo wohnst du? Mein Freund Peter kommt aus Deutschland und wohnt in Berlin. Er heißt Peter." />
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Exercise: Complete the Sentences</strong> (use the verbs <em>heißen</em>, <em>wohnen</em>, and <em>kommen</em>.
