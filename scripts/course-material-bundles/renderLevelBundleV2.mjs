@@ -302,7 +302,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
     if (level === "B1") {
-      await page.evaluate(prepareB1PrintView);
+      await page.evaluate(prepareB1PrintView, { section: suffix });
       await suppressPdfChromeText(page);
     }
     if (level === "A2") {
