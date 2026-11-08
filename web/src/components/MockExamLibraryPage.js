@@ -15,6 +15,7 @@ const statusLabel = (status, mock) => {
   }
   if (mock?.id === "a2-mock-02") return "4-module mock · grading verification pending";
   if (mock?.id === "b1-mock-02") return "Complete 4-module mock";
+  if (mock?.id === "b1-mock-03" && status === "preview") return "4-module mock · verification pending";
   if (status === "preview") return "Section practice only";
   if (status === "ready") return "Complete 4-module mock";
   return "Full mock not published";
@@ -106,7 +107,7 @@ export default function MockExamLibraryPage() {
                     </p>
                   )}
                 </div>
-                {mock.id === "b1-mock-03-pending" ? (
+                {false ? (
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     <button type="button" style={styles.primaryButton} onClick={() => { announceExamSuccess("B1 Mock 3 Lesen opened."); navigate("/exams/lesen/b1/mock-3"); }}>
                       Open Lesen
