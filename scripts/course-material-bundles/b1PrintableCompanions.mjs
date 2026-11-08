@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B1_PRESERVED_READING_PRINT_DATA, B1_DAY22_SECOND_READING_PRINT_DATA } from "./b1PreservedReadingPrintData.mjs";
+import { getB1RetailWritingTask } from "./b1RetailWritingEditorial.mjs";
 
 const dataDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/src/data");
 const modules = new Map();
@@ -64,7 +65,7 @@ const pageHtml = ({ day, section, title, body, intro = "" }) => {
 
 const writing = async (day) => {
   const { getB1WritingTask } = await canonical("b1WritingTasks.js");
-  const task = getB1WritingTask(day);
+  const task = getB1RetailWritingTask(day, getB1WritingTask(day));
   if (!task?.instructions || !task.title) throw new Error("B1 Day " + day + ": canonical writing task missing");
   const prompt = [task.instructions, task.sourceTitle, task.sourceText].filter(Boolean).join(" ");
   if (prompt.length < 70) throw new Error("B1 Day " + day + ": writing prompt is incomplete");
