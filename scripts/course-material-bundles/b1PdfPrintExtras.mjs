@@ -196,7 +196,7 @@ export const findB1PrintFaults = text => {
 export const assertB1CanonicalPrintedContent = (expected, printed) => {
   assertB1PrintedContent(expected, printed);
   const words = input => String(input || "").normalize("NFKC").toLocaleLowerCase("de")
-    .match(/[\\p{L}\\p{N}]+/gu) || [];
+    .match(/[\p{L}\p{N}]+/gu) || [];
   const source = words(expected);
   const rendered = words(printed);
   const occurrences = new Map();
