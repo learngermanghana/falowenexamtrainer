@@ -6,18 +6,19 @@ import "./ReadingTranslationText.css";
  * A small, tap-friendly English vocabulary aid for the German reading passages.
  * No external translator, network request, answer key or raw HTML is involved.
  */
-export default function ReadingTranslationText({ text = "", level = "", day = 0, contextText }) {
+export default function ReadingTranslationText({ text, children, level = "", day = 0, contextText }) {
+  const source = typeof text === "string" ? text : (typeof children === "string" ? children : "");
   const root = useRef(null);
   const [openIndex, setOpenIndex] = useState(-1);
   const [alignRight, setAlignRight] = useState(false);
   const segments = useMemo(
-    () => splitReadingGlossaryText(text, level, day, contextText ?? text),
-    [text, level, day, contextText],
+    () => splitReadingGlossaryText(source, level, day, contextText ?? source),
+    [source, level, day, contextText],
   );
 
   useEffect(() => {
     setOpenIndex(-1);
-  }, [text, level, day]);
+  }, [source, level, day]);
 
   useEffect(() => {
     if (openIndex < 0) return undefined;
