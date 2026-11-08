@@ -91,6 +91,11 @@ export function A1TutorMarkedReadingFrame({ label = "", children }) {
   );
 }
 
+// Use inside existing passage paragraphs without changing layout or answer controls.
+export function A1ReadingInlineContent({ children }) {
+  return <>{translateA1ReadingSource(children)}</>;
+}
+
 export function A1ReadingDocument({ label = "Text", title = "", children }) {
   return (
     <article
