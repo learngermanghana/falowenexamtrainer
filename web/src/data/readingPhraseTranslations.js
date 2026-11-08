@@ -1,3 +1,4 @@
+import { getAdvancedReadingPhraseTranslations } from "./advancedReadingGlossary";
 // Human-reviewed German → English support for A2/B1 lesson reading passages.
 // Keep the wording short and contextual; never translate assessment answers or use an API.
 const BY_DAY = {
@@ -71,6 +72,7 @@ const COMMON = {
 /** Saved meanings, intentionally separate from the source question/answer data. */
 export function getReadingPhraseTranslations(level, day) {
   const key = String(level || "").trim().toUpperCase();
+  if (["B2", "C1", "C2"].includes(key)) return getAdvancedReadingPhraseTranslations(key);
   if (!["A2", "B1"].includes(key)) return [];
   const entries = [...(BY_DAY[key]?.[Number(day)] || []), ...COMMON[key]];
   const seen = new Set();
