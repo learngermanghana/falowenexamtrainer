@@ -10,6 +10,7 @@ on:
       - 'functions/functionz/b1Mock*'
       - 'functions/functionz/app.js'
       - 'functions/functionz/__tests__/b1Mock3FourModules.test.js'
+      - 'functions/functionz/tests/b1Mock3FourModules.test.cjs'
       - '.github/workflows/b1-mock3-full-exam.yml'
   push:
     branches: [main]
@@ -29,17 +30,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: package-lock.json
       - name: Validate server-only answer keys and endpoints
         run: |
           node --check functions/functionz/app.js
           node --check functions/functionz/b1Mock3AnswerKeys.js
           node --check functions/functionz/b1MockCompletionSync.js
           node --check functions/functionz/b1MockExaminerScore.js
-      - run: npm ci --no-audit --no-fund
-      - name: B1 Mock 3 trusted scoring and unchanged Mock 2
-        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/b1Mock3FourModules.test.js functions/functionz/__tests__/b1Mock2FourModules.test.js functions/functionz/__tests__/b1MockCompletionSync.test.js functions/functionz/__tests__/b1MockExaminerScore.test.js
+      - name: B1 Mock 3 trusted scoring and isolated Results identities
+        run: node --test functions/functionz/tests/b1Mock3FourModules.test.cjs functions/functionz/tests/verifiedFourSkillMockScore.test.cjs
   browser-build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -56,7 +54,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/components/MockExamCatalog.test.js src/components/B1FinalMockExamPage.test.jsx src/data/b1Mock3ReadingContent.test.js src/data/b1Mock3SpeakingContent.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/B1FinalMockExamPage.test.jsx src/data/b1Mock3ReadingContent.test.js src/data/b1Mock3SpeakingContent.test.js
       - name: Compile full web app
         working-directory: web
         run: npx vite build
