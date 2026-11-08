@@ -16,6 +16,7 @@ import { applyB2WritingTaskToLesson, getB2WritingTask } from "../data/b2WritingT
 import { getB2GrammarLesson } from "../data/b2GrammarLessons";
 import { getB2ListeningPractice, hasB2ListeningSource } from "../data/b2ListeningPractice";
 import { getB2ReadingPractice } from "../data/b2ReadingPractice";
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import { getAdditionalLessonVideoResources } from "../data/additionalLessonVideoResources";
 import { getB2DayTabs, getB2SkillFocus, getB2SkillLabel } from "../data/b2SkillCycle";
 import {
@@ -133,7 +134,7 @@ function ReadingPractice({ day, progress, setProgress }) {
     <ReadingExamFrame level="B2" title={practice.title} format="Lesetext" variant="document">
       <ReadingExamDocument title={practice.title}>
         <div data-b2-reading-text="true" style={{ display: "grid", gap: 12 }}>
-          {practice.paragraphs.map((paragraph, index) => <p key={index} style={{ margin: 0 }}>{paragraph}</p>)}
+          {practice.paragraphs.map((paragraph, index) => <p key={index} style={{ margin: 0 }}><InlineReadingTranslations text={paragraph} level="B2" day={day} /></p>)}
         </div>
       </ReadingExamDocument>
     </ReadingExamFrame>

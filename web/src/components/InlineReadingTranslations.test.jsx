@@ -10,7 +10,9 @@ describe("A2/B1 reading phrase support", () => {
         expect(getReadingPhraseTranslations(level, day).length).toBeGreaterThanOrEqual(5);
       }
     }
-    expect(getReadingPhraseTranslations("C1", 1)).toEqual([]);
+    for (const level of ["B2", "C1", "C2"]) {
+      expect(getReadingPhraseTranslations(level, 1).length).toBeGreaterThan(100);
+    }
   });
 
   test("matches only complete phrases and preserves punctuation", () => {
@@ -52,7 +54,17 @@ describe("A2/B1 reading phrase support", () => {
     expect(screen.queryByText("lunch break")).not.toBeInTheDocument();
   });
 
-  test("does not decorate words without saved meanings or anything outside the two lesson levels", () => {
+  test("offers offline advanced reading phrases without exposing question answers", () => {
+    for (const level of ["B2", "C1", "C2"]) {
+      const { unmount } = render(<InlineReadingTranslations level={level} day={5} text="In der Praxis muss man die Rahmenbedingungen berücksichtigen." />);
+      const phrase = screen.getByRole("button", { name: /Show English meaning of Rahmenbedingungen/i });
+      fireEvent.click(phrase);
+      expect(screen.getByText("framework conditions")).toBeInTheDocument();
+      unmount();
+    }
+  });
+
+  test("does not decorate words without a matching saved meaning", () => {
     const { rerender, container } = render(<InlineReadingTranslations level="A2" day={1} text="Ein ganz unbekanntes Wort." />);
     expect(container.querySelector("[data-reading-glossary-phrase]")).toBeNull();
     rerender(<InlineReadingTranslations level="B2" day={1} text="Mittagspause" />);

@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import C2GrammarTeaching from "./C2GrammarTeaching";
 import React,{useEffect,useMemo,useRef,useState}from"react";
 import{useLocation,useNavigate}from"react-router-dom";
@@ -204,7 +205,7 @@ function ReadingPractice({day,completed,onCompleteChange}){
  if(!practice)return <Section title="Lesen"><p style={{margin:0}}>Für diesen Tag ist keine Leseaufgabe vorgesehen.</p></Section>;
  return <Section title={`Lesen · ${practice.title}`}>
   <div style={{...sub,background:"#eff6ff"}}><strong>So arbeiten Sie</strong><span>Lesen Sie den Text aufmerksam. Klicken Sie bei jeder Frage auf eine Antwort. Sie sehen sofort, ob sie richtig ist und warum. Eine falsche erste Antwort blockiert den Abschluss nicht.</span></div>
-  <ReadingExamFrame level="C2" title={practice.title} format="Lesetext" variant="document"><ReadingExamDocument title={practice.title}><div style={{display:"grid",gap:12}}>{practice.text.map((paragraph,index)=><p key={index} style={{margin:0}}>{paragraph}</p>)}</div></ReadingExamDocument></ReadingExamFrame>
+  <ReadingExamFrame level="C2" title={practice.title} format="Lesetext" variant="document"><ReadingExamDocument title={practice.title}><div style={{display:"grid",gap:12}}>{practice.text.map((paragraph,index)=><p key={index} style={{margin:0}}><InlineReadingTranslations text={paragraph} level="C2" day={day}/></p>)}</div></ReadingExamDocument></ReadingExamFrame>
   <ReadingQuestionGrid>{questions.map((item,index)=>{
    const selected=answers[index];
    const hasAnswer=Number.isInteger(selected);
