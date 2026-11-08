@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReadingTranslationText, { ReadingTranslationHint } from "./ReadingTranslationText";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
@@ -131,6 +132,7 @@ const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
+          <ReadingTranslationHint />
           <WorkbookTaskCard eyebrow="Your assignment · Reading" title={reading.title} submissionNote={reading.submissionNote}>
             <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
@@ -138,10 +140,10 @@ const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             <h3 style={{ margin: 0 }}>E-Mail von Felix an seine Freundin Sarah</h3>
             <p style={{ margin: 0 }}><strong>Betreff: Mein Vorstellungsgespräch gestern – wie es gelaufen ist!</strong></p>
             <p style={{ margin: 0 }}><strong>Liebe Sarah,</strong></p>
-            <p>wie du weißt, hatte ich gestern Nachmittag endlich mein Vorstellungsgespräch bei der Marketing-Agentur „MediaPlus“ in Frankfurt. Ich war vorher schrecklich nervös, weil ich die Stelle als Junior-Projektmanager unbedingt bekommen möchte.</p>
-            <p>Das Gespräch hat um 14:00 Uhr begonnen und dauerte fast eine Stunde. Zuerst haben sich die Personalleiterin, Frau Weber, und der Abteilungsleiter kurz vorgestellt. Danach sollte ich meinen bisherigen Werdegang beschreiben. Zum Glück hatte ich mich gut vorbereitet und konnte flüssig erklären, welche Erfahrungen ich bereits während meines Praktikums gesammelt habe.</p>
-            <p>Besonders überrascht war ich, als Frau Weber plötzlich auf Englisch wechselte. Sie wollte wissen, wie ich mit stressigen Situationen und knappen Fristen umgehe. Obwohl ich kurz ins Stocken geriet, konnte ich die Frage verständlich beantworten. Am Ende durfte ich selbst noch Fragen stellen. Ich habe nach den flexiblen Arbeitszeiten und den Weiterbildungsmöglichkeiten im Betrieb gefragt.</p>
-            <p>Frau Weber meinte, dass sie diese Woche noch mit drei anderen Kandidaten sprechen werden. Bis Ende nächster Woche wollen sie mir Bescheid geben. Wenn alles klappt, könnte ich schon am 1. des nächsten Monats anfangen. Drück mir die Daumen!</p>
+            <p><ReadingTranslationText level="B1" day={19}>wie du weißt, hatte ich gestern Nachmittag endlich mein Vorstellungsgespräch bei der Marketing-Agentur „MediaPlus“ in Frankfurt. Ich war vorher schrecklich nervös, weil ich die Stelle als Junior-Projektmanager unbedingt bekommen möchte.</ReadingTranslationText></p>
+            <p><ReadingTranslationText level="B1" day={19}>Das Gespräch hat um 14:00 Uhr begonnen und dauerte fast eine Stunde. Zuerst haben sich die Personalleiterin, Frau Weber, und der Abteilungsleiter kurz vorgestellt. Danach sollte ich meinen bisherigen Werdegang beschreiben. Zum Glück hatte ich mich gut vorbereitet und konnte flüssig erklären, welche Erfahrungen ich bereits während meines Praktikums gesammelt habe.</ReadingTranslationText></p>
+            <p><ReadingTranslationText level="B1" day={19}>Besonders überrascht war ich, als Frau Weber plötzlich auf Englisch wechselte. Sie wollte wissen, wie ich mit stressigen Situationen und knappen Fristen umgehe. Obwohl ich kurz ins Stocken geriet, konnte ich die Frage verständlich beantworten. Am Ende durfte ich selbst noch Fragen stellen. Ich habe nach den flexiblen Arbeitszeiten und den Weiterbildungsmöglichkeiten im Betrieb gefragt.</ReadingTranslationText></p>
+            <p><ReadingTranslationText level="B1" day={19}>Frau Weber meinte, dass sie diese Woche noch mit drei anderen Kandidaten sprechen werden. Bis Ende nächster Woche wollen sie mir Bescheid geben. Wenn alles klappt, könnte ich schon am 1. des nächsten Monats anfangen. Drück mir die Daumen!</ReadingTranslationText></p>
             <p style={{ margin: 0 }}><strong>Liebe Grüße<br />Felix</strong></p>
           </article>
           <QuestionList items={interviewReadingQuestions} />
