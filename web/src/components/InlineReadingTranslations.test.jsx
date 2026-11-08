@@ -23,6 +23,10 @@ describe("A2/B1 reading phrase support", () => {
   test("translates an underlined A2 reading word on tap and closes on another tap", () => {
     render(<InlineReadingTranslations level="A2" day={1} text="In der Mittagspause essen wir in der Kantine." />);
     const phrase = screen.getByRole("button", { name: "Show English meaning of Mittagspause" });
+    expect(phrase).toHaveClass("reading-glossary-trigger");
+    // Native button remains keyboard-focusable after resetting its visual appearance.
+    phrase.focus();
+    expect(phrase).toHaveFocus();
     expect(phrase).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByText("lunch break")).not.toBeInTheDocument();
     fireEvent.click(phrase);
