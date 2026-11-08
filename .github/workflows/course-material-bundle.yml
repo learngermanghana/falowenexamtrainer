@@ -131,6 +131,7 @@ jobs:
           node --check scripts/course-material-bundles/runA1BundleCleanPdf.mjs
           node --test scripts/course-material-bundles/a1PrintHelpers.test.mjs
           node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
+          node --test scripts/course-material-bundles/pdfSectionDividers.test.mjs
           node --test scripts/course-material-bundles/pdfLoginFailures.test.mjs
           node --check scripts/course-material-bundles/a2PrintableCompanions.mjs
           node --test scripts/course-material-bundles/a2PrintableCompanions.test.mjs
