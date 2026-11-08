@@ -318,3 +318,81 @@ jobs:
             artifacts/course-material-bundles/${{ inputs.level }}/render-diagnostics.json
           if-no-files-found: warn
           retention-days: 7
+
+  # TEMP: B1 prepublication proof for PR #3419. Remove before merging.
+  b1-prepublication-proof:
+    name: B1 full PDF and print-layout proof (temporary)
+    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'fix/b1-print-publication-audit-20261108' }}
+    needs: validate-manifests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build B1 manifest
+        run: node scripts/course-material-bundles/buildLevelManifest.mjs B1
+      - name: Install print dependencies
+        run: |
+          npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1 qrcode@1.5.4
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+      - name: Render B1 PDF and enforce release audit
+        run: |
+          node scripts/course-material-bundles/renderLevelBundleV2.mjs B1
+          node scripts/course-material-bundles/validateGeneratedBundle.mjs B1
+        env:
+          FALOWEN_PDF_BASE_URL: https://www.falowen.app
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+          FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+      - name: Create PDF visual inspection samples
+        if: success()
+        run: |
+          python3 - <<'PY'
+          import os,subprocess
+          pdf='artifacts/course-material-bundles/B1/Falowen-B1-Course-Materials.pdf'
+          out='artifacts/course-material-bundles/B1/proof-pages'
+          os.makedirs(out,exist_ok=True)
+          txt=subprocess.check_output(['pdftotext','-layout',pdf,'-'],text=True)
+          pages=txt.split('\f')
+          phrases={
+            'day1-grammar-typische-fehler':'Typische Fehler',
+            'day2-reading-question7':'Was ist die Grundlage für eine stabile Freundschaft',
+            'day13-film-question7':'Würde der Erzähler den Film empfehlen',
+            'day13-film-source':'Sind spannende Filme besser als ruhige Filme',
+            'day20-felix-opinion':'Eine gute Ausbildung hilft, einen guten Job zu finden',
+            'day28-climate-task':'Busfahren und Energiesparen',
+          }
+          chosen={}
+          for slug,needle in phrases.items():
+            hits=[i+1 for i,p in enumerate(pages) if needle.lower() in p.lower()]
+            if hits: chosen[slug]=hits[-1] if slug=='day1-grammar-typische-fehler' else hits[0]
+          import json
+          open(out+'/source-pages.json','w').write(json.dumps(chosen,indent=2))
+          print('Visual proof pages',chosen)
+          for slug,n in chosen.items():
+            subprocess.run(['pdftoppm','-f',str(n),'-l',str(n),'-scale-to','1250','-png','-singlefile',pdf,f'{out}/{slug}-page-{n}'],check=True)
+          PY
+      - name: Upload B1 publication proof
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-B1-prepublication-PDF-pr3419
+          path: |
+            artifacts/course-material-bundles/B1/Falowen-B1-Course-Materials.pdf
+            artifacts/course-material-bundles/B1/proof-pages
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-B1-prepublication-diagnostics-pr3419
+          path: |
+            artifacts/course-material-bundles/B1/Falowen-B1-Course-Materials-manifest.json
+            artifacts/course-material-bundles/B1/render-diagnostics.json
+          if-no-files-found: warn
+          retention-days: 7
