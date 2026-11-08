@@ -750,9 +750,10 @@ const renderWithTransientNavigationRetry = async (page, lesson) => {
       return await renderLesson(page, lesson);
     } catch (error) {
       const transient = error?.name === "TimeoutError" ||
-        /net::ERR_|Navigation timeout|Timeout \d+ms exceeded/i.test(String(error?.message || ""));
+        /net::ERR_|Navigation timeout|Timeout \d+ms exceeded/i.test(String(error?.message || "")) ||
+        /Execution context was destroyed, most likely because of a navigation/i.test(String(error?.message || ""));
       if (!transient || attempt === 3) throw error;
-      console.warn(`${level} Day ${lesson.day}: transient navigation timeout (attempt ${attempt}/3); reopening lesson.`);
+      console.warn(`${level} Day ${lesson.day}: transient navigation race or timeout (attempt ${attempt}/3); reopening lesson.`);
       await page.goto("about:blank", { waitUntil: "domcontentloaded" }).catch(() => {});
       await page.waitForTimeout(1000 * attempt);
     }
