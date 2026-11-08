@@ -312,7 +312,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
         const framed = await page.evaluate(() => [...document.querySelectorAll("body *")]
           .map(el => {
             const st = getComputedStyle(el);
-            if (!/rgb\\(37, 99, 235\\)/i.test(st.borderTopColor) ||
+            if (!/rgb\(37, 99, 235\)/i.test(st.borderTopColor) ||
                 parseFloat(st.borderTopWidth) < 1) return null;
             const rect = el.getBoundingClientRect();
             if (rect.width < 220) return null;
