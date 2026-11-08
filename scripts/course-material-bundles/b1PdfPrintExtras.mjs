@@ -107,6 +107,13 @@ export const prepareB1PrintView = ({ section = "" } = {}) => {
     swap(el);
   }
 
+  // The "Lösungen anzeigen" disclosure belongs to the interactive web
+  // lesson and must never enter a student print book (including its answer).
+  for (const details of [...root.querySelectorAll("details")]) {
+    const summary = details.querySelector(":scope > summary");
+    if (/^Lösungen anzeigen$/i.test(normalize(summary?.textContent))) swap(details);
+  }
+
   // Shared B1 workbooks render an online-only <details> accordion whose
   // summary is "Day N · B1 workbook · how to complete this workbook".
   // The closed summary survived the generic paragraph scrub in earlier proofs.
