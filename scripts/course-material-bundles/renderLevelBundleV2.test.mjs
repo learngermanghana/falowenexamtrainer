@@ -168,9 +168,10 @@ test("printing a workbook section restores screen media before the next tab clic
   assert.match(saveMethod, /finally\s*\{[\s\S]*?await page\.emulateMedia\(\{ media: "screen" \}\)/);
 });
 
-test("A2 PDF builder retries navigation timeouts only and fails closed for content errors", () => {
+test("A2/B1 PDF builder retries only transient navigation races or timeouts and fails closed for content errors", () => {
   assert.match(source, /const renderWithTransientNavigationRetry = async/);
   assert.match(source, /error\?\.name === "TimeoutError"/);
+  assert.ok(source.includes('Execution context was destroyed, most likely because of a navigation'));
   assert.match(source, /if \(!transient \|\| attempt === 3\) throw error/);
   assert.match(source, /page\.goto\("about:blank"/);
   assert.match(source, /await renderWithTransientNavigationRetry\(page, lesson\)/);
