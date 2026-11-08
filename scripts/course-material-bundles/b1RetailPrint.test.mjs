@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B1_PRESERVED_READING_PRINT_DATA, B1_DAY22_SECOND_READING_PRINT_DATA } from "./b1PreservedReadingPrintData.mjs";
-import { B1_PRINT_CSS, findB1PrintFaults, isB1WorkbookGuideLabel, prepareB1PrintView, assertB1PrintedContent, assertB1CanonicalPrintedContent } from "./b1PdfPrintExtras.mjs";
+import { B1_PRINT_CSS, findB1PrintFaults, isB1WorkbookGuideLabel, prepareB1PrintView, suppressB1EmptyChromeControls, assertB1PrintedContent, assertB1CanonicalPrintedContent } from "./b1PdfPrintExtras.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/src/components");
 const sourceFor = day => fs.readFileSync(path.join(root, ({
@@ -108,4 +108,12 @@ test("B1 prepublication audit excludes website submission overlays and blank blu
   assert.match(prepareB1PrintView.toString(), /Lösungen anzeigen/);
   assert.match(prepareB1PrintView.toString(), /B1 Grammar Notes/);
   assert.equal(findB1PrintFaults("Was macht eine Freundschaft wichtig? a) Ehrlichkeit b) Respekt").length, 0);
+});
+
+test("B1 print uses stable block flow for reading questions and removes empty web buttons", () => {
+  assert.match(B1_PRINT_CSS, /data-reading-exam-question-grid/);
+  assert.match(B1_PRINT_CSS, /page-break-inside: avoid !important/);
+  assert.match(suppressB1EmptyChromeControls.toString(), /querySelectorAll\("button,a,\[role=button\]"\)/);
+  assert.match(suppressB1EmptyChromeControls.toString(), /rect\.width < 180/);
+  assert.match(suppressB1EmptyChromeControls.toString(), /el\.querySelector\("input,img/);
 });
