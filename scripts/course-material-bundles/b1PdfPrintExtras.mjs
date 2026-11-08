@@ -19,6 +19,15 @@ export const B1_PRINT_CSS = `
   h1, h2, h3, h4 { break-after: avoid; }
   p, li { orphans: 3; widows: 3; }
   table { max-width: 100% !important; }
+  /* Keep short grammar tables intact and prevent the next card from printing
+     on top of the final rows at a page boundary. */
+  table, thead, tbody, tr, th, td { break-inside: avoid !important; }
+  section:has(> table) { break-inside: avoid-page !important; display: block !important; }
+  /* Live text controls have blue focus outlines but no useful paper content.
+     Keep radio/checkbox circles visible for printed multiple-choice questions. */
+  input:not([type="radio"]):not([type="checkbox"]), textarea { display: none !important; }
+  div:has(> input:not([type="radio"]):not([type="checkbox"]):only-child) { display: none !important; }
+  [style*="position: sticky"], [style*="position: fixed"] { position: static !important; }
   pre { white-space: pre-wrap !important; overflow-wrap: anywhere; }
   a { color: inherit !important; text-decoration: none !important; }
 `;
@@ -27,7 +36,7 @@ export const isB1WorkbookGuideLabel = value =>
   /^Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook$/i
     .test(String(value || "").replace(/\s+/g, " ").trim());
 
-export const prepareB1PrintView = () => {
+export const prepareB1PrintView = ({ section = "" } = {}) => {
   if (window.__b1PrintChanges) throw new Error("B1 print view already active");
   const undo = [];
   const normalize = value => String(value || "").replace(/\s+/g, " ").trim();
@@ -43,6 +52,34 @@ export const prepareB1PrintView = () => {
     undo.push(() => { if (replacement.isConnected) replacement.replaceWith(node); });
   };
   const root = document.body;
+  // The screen grammars reuse an old "B1 Workbook" masthead. Correct
+  // the print title without changing React or the authenticated workbook.
+  if (section === "grammar") {
+    for (const heading of [...root.querySelectorAll("h1,h2,h3")]) {
+      if (!/^B1 Workbook\s*[·•-]/i.test(normalize(heading.textContent))) continue;
+      const previous = heading.textContent;
+      heading.textContent = previous.replace(/^B1 Workbook/, "B1 Grammar Notes");
+      undo.push(() => { heading.textContent = previous; });
+    }
+  }
+
+  // Strictly remove notices about online answer persistence. They are
+  // positioned over live reading questions and cover printed answer choices.
+  // Only an entire matching notice is removable, never its surrounding question.
+  const paperOnlyNotices = [
+    /^Answer directly in the workbook\..*Review\s*&\s*Submit.*before submitting\.?$/i,
+    /^Click an answer option\..*saved automatically to Submit.*$/i,
+    /^Your choice is saved automatically to Submit.*$/i,
+    /^Choose one answer for each question$/i,
+    /^Prepare a 60[–-]90 second answer for class\. Teil 1 is not submitted\.?$/i,
+    /^Lösungen anzeigen$/i,
+  ];
+  const noticeCandidates = [...root.querySelectorAll("p,div,aside,section,small,span,button,label,strong")]
+    .filter(el => el.isConnected && normalize(el.textContent).length < 350 &&
+      paperOnlyNotices.some(rx => rx.test(normalize(el.textContent))));
+  for (const el of noticeCandidates.filter(node =>
+    !noticeCandidates.some(inner => inner !== node && node.contains(inner)))) swap(el);
+
 
   // Exclude private session and result widgets before their content can be
   // serialized. This is a static book, not a screenshot of an export account.
@@ -177,6 +214,8 @@ export const findB1PrintFaults = text => {
     ["workbook web guidance", /Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook/i],
     ["workbook tab instructions", /Select Grammar,\s*Teil\s*1/i],
     ["saved learner state", /Draft saved|Your saved answers|Recognised speech|Recognized speech|Your corrected sentences/i],
+    ["online answer-saving overlay", /Answer directly in the workbook|Your choice is saved automatically to Submit|Click an answer option/i],
+    ["answer reveal web action", /^\s*Lösungen anzeigen\s*$/mi],
     ["unhydrated lesson", /Loading grammar notes|Loading the app|Unexpected Application Error/i],
     ["unresolved audio-loading placeholder", /Audio wird geladen\s*(?:…|\.{2,3})?/i],
     ["private media token", /X-Amz-(?:Signature|Credential)|[?&](?:token|signature|access_token)=|r2\.cloudflarestorage\.com/i],
