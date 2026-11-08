@@ -1,5 +1,6 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { getA1RadioResource } from "../data/a1RadioResources";
 import { styles } from "../styles";
@@ -59,7 +60,7 @@ const A1Day1GreetingsWorkbookPage = () => {
           <img src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=70" alt="Students greeting each other in a classroom" loading="lazy" style={imageStyle} />
           <h2 style={{ margin: 0, fontSize: 18 }}>Teil 1 · Reading Text</h2>
           <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}><strong>Instruction:</strong> Read the text first. The multiple-choice questions are directly below on this same page.</p>
-          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}><strong>Text:</strong> Guten Morgen! Wie geht es dir? Mir geht es gut, danke. Guten Tag! Wie geht es Ihnen? Ich bin ein bisschen müde. Guten Abend! Ich bin glücklich, dich zu sehen. Gute Nacht! Schlaf gut! Auf Wiedersehen! Tschüss!</p>
+          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}><strong>Text:</strong> <InlineReadingTranslations text="Guten Morgen! Wie geht es dir? Mir geht es gut, danke. Guten Tag! Wie geht es Ihnen? Ich bin ein bisschen müde. Guten Abend! Ich bin glücklich, dich zu sehen. Gute Nacht! Schlaf gut! Auf Wiedersehen! Tschüss!" level="A1" day={1} /></p>
           <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}><strong>Translation:</strong> Good morning! How are you? I am good, thank you. Good day! How are you? I am a bit tired. Good evening! I am happy to see you. Good night! Sleep well! Goodbye! Bye!</p>
         </section>
 
