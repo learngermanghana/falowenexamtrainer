@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { sungGermanLines } from '../utils/musicEnglishTranslations';
 import './WorkbookMusicPlayer.css';
+import useWorkbookMusicPractice from './useWorkbookMusicPractice';
 
 export function workbookLyricCues(pack, lyrics) {
   const lines = sungGermanLines(lyrics), cues = pack?.cues;
@@ -14,8 +15,9 @@ export function workbookLyricCues(pack, lyrics) {
   }
   return cues;
 }
-export default function WorkbookMusicPlayer({ song, artwork, story, recording, lyrics, english, showEnglish }) {
+export default function WorkbookMusicPlayer({ song, artwork, story, recording, lyrics, english, showEnglish, level = 'ALL', day = null }) {
   const audio=useRef(null);
+  const practice = useWorkbookMusicPractice({ trackId: song.id, title: song.title, level, day });
   const [playing,setPlaying]=useState(false),[video,setVideo]=useState(false),[time,setTime]=useState(0),[error,setError]=useState('');
   useEffect(()=>{setPlaying(false);setTime(0);setVideo(false);setError('');},[song.id]);
   const lines=sungGermanLines(lyrics);
@@ -43,9 +45,11 @@ export default function WorkbookMusicPlayer({ song, artwork, story, recording, l
     </div>
     <audio key={song.id} ref={audio} data-music-audio="true" controls preload="none" src={song.audioUrl}
       aria-label={'Play '+song.title} style={{display:'block',width:'100%',height:50,colorScheme:'dark'}}
-      onPlay={()=>{setPlaying(true);setError('');}} onPause={()=>setPlaying(false)} onEnded={()=>{setPlaying(false);setTime(-1);}}
-      onTimeUpdate={event=>setTime(event.currentTarget.currentTime)}
-      onSeeked={event=>setTime(event.currentTarget.currentTime)}
+      onPlay={event=>{setPlaying(true);setError('');practice.play(event.currentTarget.currentTime);}}
+      onPause={event=>{setPlaying(false);if(!event.currentTarget.ended) practice.pause(event.currentTarget.currentTime);}}
+      onEnded={event=>{setPlaying(false);setTime(-1);practice.ended(event.currentTarget.currentTime,event.currentTarget.duration);}}
+      onTimeUpdate={event=>{setTime(event.currentTarget.currentTime);practice.timeUpdate(event.currentTarget.currentTime);}}
+      onSeeked={event=>{setTime(event.currentTarget.currentTime);practice.seeked(event.currentTarget.currentTime);}}
       onError={()=>{setPlaying(false);setError('This song could not load. Check your connection and try again.');}} />
     {error && <p role="alert">{error}</p>}
     <a className="workbook-music-credits" href="/music/covers/credits.html" target="_blank" rel="noopener noreferrer">Artwork credits ↗</a>

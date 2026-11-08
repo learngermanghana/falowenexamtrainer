@@ -5,6 +5,12 @@ on:
       - "web/src/components/CampusMusicPage.js"
       - "web/src/components/musicPracticeTracking.js"
       - "web/src/components/musicPracticeTracking.test.mjs"
+      - "web/src/components/FalowenLessonMusic.jsx"
+      - "web/src/components/WorkbookDayMusic.jsx"
+      - "web/src/components/WorkbookMusicPlayer.jsx"
+      - "web/src/components/useWorkbookMusicPractice.js"
+      - "web/src/components/workbookMusicPractice.js"
+      - "web/src/components/workbookMusicPractice.test.mjs"
       - "web/public/music/app.js"
       - "web/public/music/index.html"
       - ".github/workflows/campus-music-practice.yml"
@@ -14,6 +20,12 @@ on:
       - "web/src/components/CampusMusicPage.js"
       - "web/src/components/musicPracticeTracking.js"
       - "web/src/components/musicPracticeTracking.test.mjs"
+      - "web/src/components/FalowenLessonMusic.jsx"
+      - "web/src/components/WorkbookDayMusic.jsx"
+      - "web/src/components/WorkbookMusicPlayer.jsx"
+      - "web/src/components/useWorkbookMusicPractice.js"
+      - "web/src/components/workbookMusicPractice.js"
+      - "web/src/components/workbookMusicPractice.test.mjs"
       - "web/public/music/app.js"
       - "web/public/music/index.html"
 jobs:
@@ -25,4 +37,4 @@ jobs:
         with:
           node-version: '22'
       - run: node --check web/public/music/app.js
-      - run: node --test web/src/components/musicPracticeTracking.test.mjs
+      - run: node --test web/src/components/musicPracticeTracking.test.mjs web/src/components/workbookMusicPractice.test.mjs

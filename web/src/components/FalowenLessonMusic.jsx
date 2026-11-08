@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import useWorkbookMusicPractice from "./useWorkbookMusicPractice";
 
 // Optional lesson song: the coursebook never waits for music to render and
 // never reads private Hören audio. Only approved public catalog entries appear.
 export default function FalowenLessonMusic({ level, day, assignmentKey = "" }) {
   const [track, setTrack] = useState(null);
+  const practice = useWorkbookMusicPractice({ trackId: track?.id, title: track?.title, level, day });
   useEffect(() => {
     const controller = new AbortController();
     setTrack(null);
@@ -30,7 +32,13 @@ export default function FalowenLessonMusic({ level, day, assignmentKey = "" }) {
     <section aria-label="Music for this lesson" data-falowen-lesson-music="true" style={{ padding: 18, borderRadius: 14, border: "1px solid #b5d7ba", background: "#f2f8e9", display: "grid", gap: 10 }}>
       <strong style={{ color: "#204a3d", fontSize: 16 }}>♫ Listen & learn · {track.title}</strong>
       <p style={{ margin: 0, fontSize: 13, color: "#496d5a" }}>Practise this lesson with a German song. Listen, repeat, and sing along.</p>
-      <audio controls preload="none" src={track.audioUrl} aria-label={`Listen to ${track.title}`} style={{ width: "100%" }} />
+      <p style={{ margin: 0, fontSize: 12, color: "#496d5a" }}>Signed-in students: music listening is recorded for staff review, not grading.</p>
+      <audio controls preload="none" src={track.audioUrl} aria-label={`Listen to ${track.title}`} style={{ width: "100%" }}
+        onPlay={event => practice.play(event.currentTarget.currentTime)}
+        onPause={event => { if (!event.currentTarget.ended) practice.pause(event.currentTarget.currentTime); }}
+        onEnded={event => practice.ended(event.currentTarget.currentTime, event.currentTarget.duration)}
+        onTimeUpdate={event => practice.timeUpdate(event.currentTarget.currentTime)}
+        onSeeked={event => practice.seeked(event.currentTarget.currentTime)} />
       <a href={libraryUrl.href} target="_blank" rel="noopener noreferrer" style={{ color: "#245d43", fontWeight: 700, fontSize: 13 }}>Open in Falowen Music ↗</a>
     </section>
   );
