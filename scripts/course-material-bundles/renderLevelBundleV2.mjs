@@ -13,6 +13,7 @@ import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanion
 import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2PrintSafety, assertA2PrintedContent } from "./a2PdfSafety.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
+import { B1_PRINT_SCALES, shouldRetryB1PrintAudit } from "./b1PrintRetry.mjs";
 import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent } from "./b1PdfPrintExtras.mjs";
 import { addB1RetailCover } from "./b1RetailCover.mjs";
 import { classifyPdfLoginFailure } from "./pdfLoginFailures.mjs";
@@ -316,8 +317,13 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
     }
     const b1ExpectedText = level === "B1" ? await page.locator("body").innerText() : "";
     // The actual printed PDF, not screen-mode DOM text, is the publication gate.
-    await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true,
-      scale: level === "A2" || level === "B1" ? 0.95 : 1, timeout: 30000 });
+    const renderPdf = scale => page.pdf({
+      path: file, format: "A4", printBackground: true, preferCSSPageSize: true,
+      scale, timeout: 30000,
+    });
+    // B1 may require a little less space to prevent orphaned Chrome print
+    // overflow sheets. Re-render, never erase unknown lesson content.
+    if (level !== "B1") await renderPdf(level === "A2" ? 0.95 : 1);
     if (level === "A2") {
       // Fail on the first affected lesson instead of rebuilding all 28 days
       // before discovering the same leaked website controls in the final PDF.
@@ -330,6 +336,8 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       await trimPrintedPdfTail(file, { description: `A2 Day ${lesson.day} ${suffix}` });
     }
     if (level === "B1") {
+      for (let attempt = 0; attempt < B1_PRINT_SCALES.length; attempt += 1) {
+        await renderPdf(B1_PRINT_SCALES[attempt]);
       const printed = execFileSync("pdftotext", ["-layout", file, "-"],
         { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
       const faults = findB1PrintFaults(printed);
@@ -344,9 +352,18 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
         { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
       const cleanPdf = await PDFDocument.load(fs.readFileSync(file));
       const audit = scanPdfPageContent(cleaned, cleanPdf.getPageCount());
-      if (audit.faults.length) throw new Error(
-        "B1 Day " + lesson.day + " " + suffix + " failed print-page audit:\n" + audit.faults.join("\n")
+      if (!audit.faults.length) break;
+      if (!shouldRetryB1PrintAudit(audit.faults, attempt)) {
+        throw new Error(
+          "B1 Day " + lesson.day + " " + suffix + " failed print-page audit after safe layout retries:\n" +
+          audit.faults.join("\n")
+        );
+      }
+      console.warn(
+        "B1 Day " + lesson.day + " " + suffix + ": sparse printed page at scale " +
+        B1_PRINT_SCALES[attempt] + "; retrying at " + B1_PRINT_SCALES[attempt + 1]
       );
+      }
     }
   } finally {
     if (level === "B1") await page.evaluate(restoreB1PrintView).catch(() => {});
