@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReadingTranslationText, { ReadingTranslationHint } from "./ReadingTranslationText";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import B1ProtectedAudioPlayer from "./B1ProtectedAudioPlayer";
 import { getB1WritingTask } from "../data/b1WritingTasks";
@@ -275,6 +276,7 @@ const B1Day20PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
+          <ReadingTranslationHint />
           <WorkbookTaskCard
             eyebrow="Your assignment · Reading"
             title={reading.title}
@@ -293,10 +295,10 @@ const B1Day20PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <article style={questionCardStyle}>
             <h3 style={{ margin: 0 }}>Berufsbild · Wie wird man eigentlich Reiseleiter/in?</h3>
             <p style={{ margin: 0, color: "#475569" }}>Magazin „Beruf & Zukunft“</p>
-            <p>Viele Menschen träumen davon, ihr Hobby zum Beruf zu machen und fremde Länder zu bereisen. Der Beruf des Reiseleiters klingt für viele nach Urlaub, doch der Arbeitsalltag ist anspruchsvoll und erfordert hohe Flexibilität. Aber wie wird man überhaupt Reiseleiter oder Reiseleiterin?</p>
-            <p>In Deutschland gibt es keine klassische, staatlich geregelte Berufsausbildung für Reiseleiter. Das bedeutet, dass der Zugang zu diesem Beruf nicht gesetzlich geschützt ist und man keine mehrjährige Lehre absolvieren muss. Viele Reiseveranstalter suchen Bewerber mit einer Ausbildung im Tourismusbereich oder einem abgeschlossenen Studium, beispielsweise in Geschichte, Geografie, Kulturwissenschaften oder Sprachen.</p>
-            <p>Wichtiger als ein bestimmter Studienabschluss sind jedoch praktische Fähigkeiten. Gute Sprachkenntnisse – vor allem fließendes Englisch und idealerweise die Landessprache des Zielgebiets – sind eine grundlegende Voraussetzung. Zudem muss ein Reiseleiter organisatorisches Talent besitzen, stressresistent sein und gut mit Menschen umgehen können. Wenn vor Ort Probleme auftreten, etwa wenn ein Bus Verspätung hat oder ein Hotelzimmer nicht bereitsteht, muss der Reiseleiter schnell und ruhig eine Lösung finden.</p>
-            <p style={{ margin: 0 }}>Wer als Reiseleiter arbeiten möchte, nimmt häufig an speziellen Schulungen und Vorbereitungskursen von Reiseagenturen teil. Diese Kompaktkurse dauern meist einige Wochen und vermitteln Kenntnisse in Rhetorik, Erste Hilfe, Gruppenführung und Reiserecht. Anschließend beginnt man oft als Nachwuchskraft auf kürzeren Fahrten, bevor man eigenverantwortlich große Reisegruppen im Ausland betreut.</p>
+            <p><ReadingTranslationText level="B1" day={20}>Viele Menschen träumen davon, ihr Hobby zum Beruf zu machen und fremde Länder zu bereisen. Der Beruf des Reiseleiters klingt für viele nach Urlaub, doch der Arbeitsalltag ist anspruchsvoll und erfordert hohe Flexibilität. Aber wie wird man überhaupt Reiseleiter oder Reiseleiterin?</ReadingTranslationText></p>
+            <p><ReadingTranslationText level="B1" day={20}>In Deutschland gibt es keine klassische, staatlich geregelte Berufsausbildung für Reiseleiter. Das bedeutet, dass der Zugang zu diesem Beruf nicht gesetzlich geschützt ist und man keine mehrjährige Lehre absolvieren muss. Viele Reiseveranstalter suchen Bewerber mit einer Ausbildung im Tourismusbereich oder einem abgeschlossenen Studium, beispielsweise in Geschichte, Geografie, Kulturwissenschaften oder Sprachen.</ReadingTranslationText></p>
+            <p><ReadingTranslationText level="B1" day={20}>Wichtiger als ein bestimmter Studienabschluss sind jedoch praktische Fähigkeiten. Gute Sprachkenntnisse – vor allem fließendes Englisch und idealerweise die Landessprache des Zielgebiets – sind eine grundlegende Voraussetzung. Zudem muss ein Reiseleiter organisatorisches Talent besitzen, stressresistent sein und gut mit Menschen umgehen können. Wenn vor Ort Probleme auftreten, etwa wenn ein Bus Verspätung hat oder ein Hotelzimmer nicht bereitsteht, muss der Reiseleiter schnell und ruhig eine Lösung finden.</ReadingTranslationText></p>
+            <p style={{ margin: 0 }}><ReadingTranslationText level="B1" day={20}>Wer als Reiseleiter arbeiten möchte, nimmt häufig an speziellen Schulungen und Vorbereitungskursen von Reiseagenturen teil. Diese Kompaktkurse dauern meist einige Wochen und vermitteln Kenntnisse in Rhetorik, Erste Hilfe, Gruppenführung und Reiserecht. Anschließend beginnt man oft als Nachwuchskraft auf kürzeren Fahrten, bevor man eigenverantwortlich große Reisegruppen im Ausland betreut.</ReadingTranslationText></p>
           </article>
 
           <h3 style={sectionTitle}>Questions</h3>
