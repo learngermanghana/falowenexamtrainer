@@ -14,7 +14,7 @@ import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2P
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
 import { B1_PRINT_SCALES, shouldRetryB1PrintAudit } from "./b1PrintRetry.mjs";
-import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent, assertB1CanonicalPrintedContent } from "./b1PdfPrintExtras.mjs";
+import { B1_PRINT_CSS, prepareB1PrintView, suppressB1EmptyChromeControls, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent, assertB1CanonicalPrintedContent } from "./b1PdfPrintExtras.mjs";
 import { addB1RetailCover } from "./b1RetailCover.mjs";
 import { classifyPdfLoginFailure } from "./pdfLoginFailures.mjs";
 
@@ -304,6 +304,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
     if (level === "B1") {
       await page.evaluate(prepareB1PrintView, { section: suffix });
       await suppressPdfChromeText(page);
+      await page.evaluate(suppressB1EmptyChromeControls);
     }
     if (level === "A2") {
       const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
