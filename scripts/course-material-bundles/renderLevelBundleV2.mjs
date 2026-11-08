@@ -288,7 +288,7 @@ const restorePdfChromeText = async (page) => page.evaluate(() => {
   delete window.__falowenPdfChromeChanges;
 });
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
-  if (level === "A2") {
+  if (level === "A2" || level === "B1") {
     // Wait for lazy grammar/Teil panels, not a fixed 350ms snapshot.
     await page.waitForFunction(() => ![...document.querySelectorAll("main *")].some(node =>
       node.children.length === 0 && node.getBoundingClientRect().height > 0 &&
