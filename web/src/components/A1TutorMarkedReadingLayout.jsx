@@ -3,7 +3,7 @@ import InlineReadingTranslations from "./InlineReadingTranslations";
 
 // Enrich only plain textual descendants of authored workbook reading sources.
 // Never touch questions, input controls or timed mock exam components.
-const A1_SOURCE_TEXT_ELEMENTS = new Set(["p", "span", "div", "strong", "em", "b", "i", "small", "li"]);
+const A1_SOURCE_TEXT_ELEMENTS = new Set(["p", "span", "div", "strong", "em", "b", "i", "small", "li", "ul", "ol"]);
 function translateA1ReadingSource(children) {
   return React.Children.map(children, (child) => {
     if (typeof child === "string") {
