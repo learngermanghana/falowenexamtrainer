@@ -5,6 +5,7 @@
 export const B1_PRINT_CSS = `
   @page { size: A4; margin: 10mm 9mm 12mm; }
   .app-header, header.app-header--compact, .app-shell > header.app-header,
+  .app-back-button,
   [data-course-inline-practice], [data-live-class-response],
   [data-live-class-response-mount], [data-submission-feedback],
   [data-teacher-only], [data-admin-only], [data-pdf-exclude],
@@ -202,11 +203,21 @@ export const prepareB1PrintView = ({ section = "" } = {}) => {
 export const suppressB1EmptyChromeControls = () => {
   const undo = window.__b1PrintChanges;
   if (!undo) throw new Error("B1 print state must be prepared first");
-  for (const el of [...document.querySelectorAll("button,a,[role=button]")]) {
+  // Browser-state panels sometimes retain a vivid blue outline after their
+  // online-only content is scrubbed. Remove only empty, shallow, wide panels;
+  // never touch actual answer choices, notes, diagrams or question containers.
+  const candidates = [...document.querySelectorAll("button,a,[role=button],div,section,aside,article")];
+  for (const el of candidates) {
     if (!el.isConnected || (el.textContent || "").trim()) continue;
-    if (el.querySelector("input,img,svg[aria-label],[role=radio],[role=checkbox]")) continue;
+    if (el.querySelector("input,img,svg,canvas,[role=radio],[role=checkbox],[data-reading-exam-question-grid],table")) continue;
     const rect = el.getBoundingClientRect?.();
-    if (!rect || rect.width < 180 || rect.height < 20) continue;
+    if (!rect || rect.width < 180 || rect.height < 20 || rect.height > 110) continue;
+    const css = window.getComputedStyle(el);
+    if (css.display === "none" || css.visibility === "hidden") continue;
+    const emptyClickable = el.matches("button,a,[role=button]");
+    const vividBlueFrame = /^(?:rgb\\(37, 99, 235\\)|#2563eb)$/i.test(css.borderTopColor) &&
+      Number.parseFloat(css.borderTopWidth || "0") >= 1;
+    if (!emptyClickable && !vividBlueFrame) continue;
     const replacement = document.createElement("span");
     el.replaceWith(replacement);
     undo.push(() => { if (replacement.isConnected) replacement.replaceWith(el); });
