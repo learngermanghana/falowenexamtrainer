@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
@@ -318,21 +319,11 @@ const B1Day1PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           />
 
           <h3 style={sectionTitle}>Traumdeutung und ihre Bedeutung</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Träume faszinieren die Menschheit seit Jahrtausenden. In vielen Kulturen werden Träume als Botschaften aus einer anderen Welt betrachtet. In der Antike glaubte man, dass Träume von den Göttern gesendet wurden und wichtige Hinweise auf das Schicksal geben konnten. Auch heute noch versuchen viele Menschen, die Bedeutung ihrer Träume zu entschlüsseln.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Es gibt verschiedene Ansätze zur Traumdeutung. Der bekannteste ist wahrscheinlich die psychoanalytische Traumdeutung nach Sigmund Freud. Freud glaubte, dass Träume eine Art Ventil für unterdrückte Wünsche und Ängste sind. Seiner Meinung nach sind viele Traumbilder symbolisch und müssen interpretiert werden, um ihre wahre Bedeutung zu verstehen. Zum Beispiel könnte ein Traum von fallenden Zähnen auf Angst vor dem Älterwerden oder Machtverlust hinweisen.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Ein weiterer Ansatz ist die analytische Traumdeutung nach Carl Gustav Jung. Jung sah Träume als Ausdruck des kollektiven Unbewussten, einer Art gemeinsamen psychologischen Erbes der Menschheit. Für ihn waren Träume voller Archetypen, universeller Symbole wie der Held oder die Mutter, die tief in der menschlichen Psyche verwurzelt sind. Jung glaubte, dass Träume uns helfen können, unser wahres Selbst zu erkennen und persönliche Probleme zu lösen.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In der modernen Traumforschung gibt es auch wissenschaftliche Erklärungen für Träume. Viele Wissenschaftler sehen Träume als eine Art Gedächtnisverarbeitung. Während wir schlafen, sortiert unser Gehirn die Erlebnisse des Tages, speichert wichtige Informationen und verwirft Unnötiges. Träume könnten also eine Nebenwirkung dieses Prozesses sein.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Unabhängig davon, welchem Ansatz man folgt, bleibt die Frage, ob Träume wirklich eine tiefere Bedeutung haben. Manche Menschen sind fest davon überzeugt, dass ihre Träume ihnen wichtige Hinweise auf ihr Leben geben. Andere sehen Träume eher als zufällige Gedankenspiele ohne besonderen Sinn. Trotz aller wissenschaftlichen Fortschritte bleibt die Welt der Träume ein geheimnisvolles und faszinierendes Gebiet. Vielleicht werden wir eines Tages genau verstehen, warum wir träumen und was unsere Träume bedeuten. Bis dahin können wir uns weiterhin von unseren Träumen inspirieren lassen und versuchen, ihre Rätsel zu lösen.
-          </p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}><InlineReadingTranslations text={"Träume faszinieren die Menschheit seit Jahrtausenden. In vielen Kulturen werden Träume als Botschaften aus einer anderen Welt betrachtet. In der Antike glaubte man, dass Träume von den Göttern gesendet wurden und wichtige Hinweise auf das Schicksal geben konnten. Auch heute noch versuchen viele Menschen, die Bedeutung ihrer Träume zu entschlüsseln."} level="B1" day={1} /></p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}><InlineReadingTranslations text={"Es gibt verschiedene Ansätze zur Traumdeutung. Der bekannteste ist wahrscheinlich die psychoanalytische Traumdeutung nach Sigmund Freud. Freud glaubte, dass Träume eine Art Ventil für unterdrückte Wünsche und Ängste sind. Seiner Meinung nach sind viele Traumbilder symbolisch und müssen interpretiert werden, um ihre wahre Bedeutung zu verstehen. Zum Beispiel könnte ein Traum von fallenden Zähnen auf Angst vor dem Älterwerden oder Machtverlust hinweisen."} level="B1" day={1} /></p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}><InlineReadingTranslations text={"Ein weiterer Ansatz ist die analytische Traumdeutung nach Carl Gustav Jung. Jung sah Träume als Ausdruck des kollektiven Unbewussten, einer Art gemeinsamen psychologischen Erbes der Menschheit. Für ihn waren Träume voller Archetypen, universeller Symbole wie der Held oder die Mutter, die tief in der menschlichen Psyche verwurzelt sind. Jung glaubte, dass Träume uns helfen können, unser wahres Selbst zu erkennen und persönliche Probleme zu lösen."} level="B1" day={1} /></p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}><InlineReadingTranslations text={"In der modernen Traumforschung gibt es auch wissenschaftliche Erklärungen für Träume. Viele Wissenschaftler sehen Träume als eine Art Gedächtnisverarbeitung. Während wir schlafen, sortiert unser Gehirn die Erlebnisse des Tages, speichert wichtige Informationen und verwirft Unnötiges. Träume könnten also eine Nebenwirkung dieses Prozesses sein."} level="B1" day={1} /></p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}><InlineReadingTranslations text={"Unabhängig davon, welchem Ansatz man folgt, bleibt die Frage, ob Träume wirklich eine tiefere Bedeutung haben. Manche Menschen sind fest davon überzeugt, dass ihre Träume ihnen wichtige Hinweise auf ihr Leben geben. Andere sehen Träume eher als zufällige Gedankenspiele ohne besonderen Sinn. Trotz aller wissenschaftlichen Fortschritte bleibt die Welt der Träume ein geheimnisvolles und faszinierendes Gebiet. Vielleicht werden wir eines Tages genau verstehen, warum wir träumen und was unsere Träume bedeuten. Bis dahin können wir uns weiterhin von unseren Träumen inspirieren lassen und versuchen, ihre Rätsel zu lösen."} level="B1" day={1} /></p>
 
           <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={lesenQuestions} />
