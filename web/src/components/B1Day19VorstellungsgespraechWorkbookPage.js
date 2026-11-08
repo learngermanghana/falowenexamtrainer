@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
@@ -138,10 +139,10 @@ const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             <h3 style={{ margin: 0 }}>E-Mail von Felix an seine Freundin Sarah</h3>
             <p style={{ margin: 0 }}><strong>Betreff: Mein Vorstellungsgespräch gestern – wie es gelaufen ist!</strong></p>
             <p style={{ margin: 0 }}><strong>Liebe Sarah,</strong></p>
-            <p>wie du weißt, hatte ich gestern Nachmittag endlich mein Vorstellungsgespräch bei der Marketing-Agentur „MediaPlus“ in Frankfurt. Ich war vorher schrecklich nervös, weil ich die Stelle als Junior-Projektmanager unbedingt bekommen möchte.</p>
-            <p>Das Gespräch hat um 14:00 Uhr begonnen und dauerte fast eine Stunde. Zuerst haben sich die Personalleiterin, Frau Weber, und der Abteilungsleiter kurz vorgestellt. Danach sollte ich meinen bisherigen Werdegang beschreiben. Zum Glück hatte ich mich gut vorbereitet und konnte flüssig erklären, welche Erfahrungen ich bereits während meines Praktikums gesammelt habe.</p>
-            <p>Besonders überrascht war ich, als Frau Weber plötzlich auf Englisch wechselte. Sie wollte wissen, wie ich mit stressigen Situationen und knappen Fristen umgehe. Obwohl ich kurz ins Stocken geriet, konnte ich die Frage verständlich beantworten. Am Ende durfte ich selbst noch Fragen stellen. Ich habe nach den flexiblen Arbeitszeiten und den Weiterbildungsmöglichkeiten im Betrieb gefragt.</p>
-            <p>Frau Weber meinte, dass sie diese Woche noch mit drei anderen Kandidaten sprechen werden. Bis Ende nächster Woche wollen sie mir Bescheid geben. Wenn alles klappt, könnte ich schon am 1. des nächsten Monats anfangen. Drück mir die Daumen!</p>
+            <p><InlineReadingTranslations text={"wie du weißt, hatte ich gestern Nachmittag endlich mein Vorstellungsgespräch bei der Marketing-Agentur „MediaPlus“ in Frankfurt. Ich war vorher schrecklich nervös, weil ich die Stelle als Junior-Projektmanager unbedingt bekommen möchte."} level="B1" day={19} /></p>
+            <p><InlineReadingTranslations text={"Das Gespräch hat um 14:00 Uhr begonnen und dauerte fast eine Stunde. Zuerst haben sich die Personalleiterin, Frau Weber, und der Abteilungsleiter kurz vorgestellt. Danach sollte ich meinen bisherigen Werdegang beschreiben. Zum Glück hatte ich mich gut vorbereitet und konnte flüssig erklären, welche Erfahrungen ich bereits während meines Praktikums gesammelt habe."} level="B1" day={19} /></p>
+            <p><InlineReadingTranslations text={"Besonders überrascht war ich, als Frau Weber plötzlich auf Englisch wechselte. Sie wollte wissen, wie ich mit stressigen Situationen und knappen Fristen umgehe. Obwohl ich kurz ins Stocken geriet, konnte ich die Frage verständlich beantworten. Am Ende durfte ich selbst noch Fragen stellen. Ich habe nach den flexiblen Arbeitszeiten und den Weiterbildungsmöglichkeiten im Betrieb gefragt."} level="B1" day={19} /></p>
+            <p><InlineReadingTranslations text={"Frau Weber meinte, dass sie diese Woche noch mit drei anderen Kandidaten sprechen werden. Bis Ende nächster Woche wollen sie mir Bescheid geben. Wenn alles klappt, könnte ich schon am 1. des nächsten Monats anfangen. Drück mir die Daumen!"} level="B1" day={19} /></p>
             <p style={{ margin: 0 }}><strong>Liebe Grüße<br />Felix</strong></p>
           </article>
           <QuestionList items={interviewReadingQuestions} />
