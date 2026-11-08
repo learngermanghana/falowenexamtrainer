@@ -103,7 +103,10 @@ for (const day of [...new Set(a1Entries.map((entry) =>
 // The original A1 Day 1 workbook has literal text and questions. Extract only
 // its learner-visible data, not its React UI, marking keys or state.
 function extractA1Day1(source) {
-  const reading = source.match(/<strong>Text:<\/strong>\s*([^<]+)<\/p>/);
+  // A1 Day 1 keeps its literal German text inside an optional offline
+  // InlineReadingTranslations wrapper. Extract only that string literal.
+  const reading = source.match(/<strong>Text:<\/strong>\s*([^<]+)<\/p>/)
+    || source.match(/<strong>Text:<\/strong>\s*<InlineReadingTranslations\s+text="([^"]+)"\s+level="A1"\s+day=\{1\}\s*\/>/);
   const translation = source.match(/<strong>Translation:<\/strong>\s*([^<]+)<\/p>/);
   const literal = source.match(/const questions = (\[[\s\S]*?\n\]);/);
   if (!reading || !literal) throw new Error("A1 Day 1 source reading has changed; review the exporter");
