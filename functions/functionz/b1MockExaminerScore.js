@@ -9,7 +9,7 @@ const rejected = (message,code="B1_MOCK_EXAMINER_RESULT_NOT_VERIFIED",status=409
 async function scoreB1ExaminerSnapshots({
   db,uid,attemptId,sessionIds,mockId="b1-mock-02"
 }={}) {
-  if (!["b1-mock-01","b1-mock-02"].includes(mockId)) throw rejected("Unsupported B1 mock.","B1_MOCK_ID_INVALID",400);
+  if (!["b1-mock-01","b1-mock-02","b1-mock-03"].includes(mockId)) throw rejected("Unsupported B1 mock.","B1_MOCK_ID_INVALID",400);
   if (!uid || !String(attemptId || "").trim()) throw rejected("B1 mock attempt identity is required.","B1_MOCK_ATTEMPT_ID_REQUIRED",400);
   if (!Array.isArray(sessionIds) || sessionIds.length!==3 ||
       sessionIds.some(id=>id!==null && (typeof id!=="string" || id.length<8 || id.length>100))) {
@@ -37,7 +37,11 @@ async function scoreB1ExaminerSnapshots({
     const prompt=String(receipt?.task?.prompt || "");
     // Mock 02 must assess its actual teacher-supplied tasks, not generic B1
     // practice with a spoofed mock ID. Topic A and B are both valid in Teil 2.
-    const promptMatches=mockId!=="b1-mock-02" || (
+    const promptMatches=mockId==="b1-mock-03" ? (
+      i===0 ? /Krankenhaus/.test(prompt) && /besuchen/.test(prompt) :
+      i===1 ? /Folie 1/.test(prompt) && /Folie 5/.test(prompt) :
+      /Feedback/.test(prompt) && /Präsentation/.test(prompt)
+    ) : mockId!=="b1-mock-02" || (
       i===0 ? prompt.includes("interkulturelles Nachbarschaftsfest") && prompt.includes("Integration") :
       i===1 ? /Sprach- und Integrationskurse|Sport- und Kulturvereine/.test(prompt) :
       /Feedback/.test(prompt) && /Präsentation/.test(prompt) &&
