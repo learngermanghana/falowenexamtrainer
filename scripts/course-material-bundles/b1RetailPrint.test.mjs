@@ -115,7 +115,7 @@ test("B1 print uses stable block flow for reading questions and removes empty we
   assert.match(B1_PRINT_CSS, /page-break-inside: avoid !important/);
   assert.ok(suppressB1EmptyChromeControls.toString().includes("document.querySelectorAll"));
   assert.match(suppressB1EmptyChromeControls.toString(), /vividBlueFrame/);
-  assert.match(B1_PRINT_CSS, /\\.app-back-button/);
+  assert.ok(B1_PRINT_CSS.includes(".app-back-button"));
   assert.match(suppressB1EmptyChromeControls.toString(), /rect\.width < 180/);
   assert.match(suppressB1EmptyChromeControls.toString(), /el\.querySelector\("input,img/);
 });
