@@ -883,6 +883,8 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
               <section className="b1-final-writing-task" key={task.id}>
                 <div className="b1-final-part-heading"><h2>{task.title}</h2><span>{task.meta}</span></div>
                 <p>{task.prompt}</p>
+                {task.quote ? <blockquote><strong>{task.quoteBy}</strong><p>{task.quote}</p></blockquote> : null}
+                {task.instruction ? <p><strong>Aufgabe:</strong> {task.instruction}</p> : null}
                 <ul>{task.points.map((point) => <li key={point}>{point}</li>)}</ul>
                 {task.rubric ? <details>
                   <summary>Bewertungskriterien für diesen Prüfungsteil</summary>
