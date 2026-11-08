@@ -251,3 +251,13 @@ test("B1 sparse PDF print retries preserve page audits and avoid deleting short 
   assert.match(source, /assertB1PrintedContent\(b1ExpectedText, printed\)/);
   assert.match(source, /scanPdfPageContent\(cleaned, cleanPdf\.getPageCount\(\)\)/);
 });
+
+test("canonical B1 companions use B1 text coverage rather than A2 exact-order assertion", () => {
+  const start = source.indexOf("const renderReadOnlyB1Section = async");
+  const end = source.indexOf("const getWorkbookTabAvailability =", start);
+  assert.ok(start >= 0 && end > start);
+  const b1 = source.slice(start, end);
+  assert.match(b1, /assertB1CanonicalPrintedContent\(expectedText, printedText\)/);
+  assert.doesNotMatch(b1, /assertA2PrintedContent\(expectedText, printedText\)/);
+  assert.match(source, /assertA2PrintedContent\(expectedText, printedText\)/);
+});
