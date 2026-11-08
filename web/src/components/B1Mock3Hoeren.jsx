@@ -68,8 +68,9 @@ export default function B1Mock3Hoeren({ embedded = false, initialAnswers = {}, i
       .catch(()=>setAudioError("Der Browser konnte das Audio nicht starten. Bitte versuchen Sie es noch einmal."));
   };
   const markPlayback=(partNumber,status)=>{
-    setPlayed(prev=>{const next={...prev,[partNumber]:status};onPlayedChange?.(next);return next;});
+    setPlayed(prev=>({...prev,[partNumber]:status}));
   };
+  useEffect(()=>{if(embedded)onPlayedChange?.(played);},[embedded,onPlayedChange,played]);
   const submit=async()=>{
     if(busy||target!==30||answered!==target)return;
     if(embedded){onComplete?.(answers);return;}
