@@ -164,7 +164,7 @@ test("printing a workbook section restores screen media before the next tab clic
   assert.ok(saveStart >= 0 && saveEnd > saveStart);
   const saveMethod = source.slice(saveStart, saveEnd);
   assert.match(saveMethod, /await injectPrintMode\(page\)/);
-  assert.match(saveMethod, /await page\.pdf\(/);
+  assert.match(saveMethod, /const renderPdf = scale => page\.pdf\(/);
   assert.match(saveMethod, /finally\s*\{[\s\S]*?await page\.emulateMedia\(\{ media: "screen" \}\)/);
 });
 
@@ -241,4 +241,13 @@ test("B1 writing/listening tabs use canonical questions but Lesen stays live whe
   assert.match(section, /renderReadOnlyB1Section\(page, lesson, tabSpec\.key/);
   assert.match(section, /continue;/);
   assert.doesNotMatch(section, /\["teil-2", "teil-3", "teil-4"\]/);
+});
+
+test("B1 sparse PDF print retries preserve page audits and avoid deleting short lesson content", () => {
+  assert.match(source, /import \{ B1_PRINT_SCALES, shouldRetryB1PrintAudit \} from "\.\/b1PrintRetry\.mjs"/);
+  assert.match(source, /await renderPdf\(B1_PRINT_SCALES\[attempt\]\)/);
+  assert.match(source, /if \(!shouldRetryB1PrintAudit\(audit\.faults, attempt\)\)/);
+  assert.match(source, /if \(!audit\.faults\.length\) break;/);
+  assert.match(source, /assertB1PrintedContent\(b1ExpectedText, printed\)/);
+  assert.match(source, /scanPdfPageContent\(cleaned, cleanPdf\.getPageCount\(\)\)/);
 });
