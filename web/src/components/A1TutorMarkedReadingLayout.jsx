@@ -1,4 +1,24 @@
 import React from "react";
+import InlineReadingTranslations from "./InlineReadingTranslations";
+
+// Enrich only plain textual descendants of authored workbook reading sources.
+// Never touch questions, input controls or timed mock exam components.
+const A1_SOURCE_TEXT_ELEMENTS = new Set(["p", "span", "div", "strong", "em", "b", "i", "small", "li", "ul", "ol"]);
+function translateA1ReadingSource(children) {
+  return React.Children.map(children, (child) => {
+    if (typeof child === "string") {
+      return <InlineReadingTranslations level="A1" text={child} />;
+    }
+    if (!React.isValidElement(child)) return child;
+    if (child.type === React.Fragment) {
+      return React.cloneElement(child, undefined, translateA1ReadingSource(child.props.children));
+    }
+    if (typeof child.type !== "string" || !A1_SOURCE_TEXT_ELEMENTS.has(child.type) || child.props.onClick || child.props.contentEditable) {
+      return child;
+    }
+    return React.cloneElement(child, undefined, translateA1ReadingSource(child.props.children));
+  });
+}
 
 const paper = {
   border: "1px solid #cbd5e1",
@@ -71,6 +91,11 @@ export function A1TutorMarkedReadingFrame({ label = "", children }) {
   );
 }
 
+// Use inside existing passage paragraphs without changing layout or answer controls.
+export function A1ReadingInlineContent({ children }) {
+  return <>{translateA1ReadingSource(children)}</>;
+}
+
 export function A1ReadingDocument({ label = "Text", title = "", children }) {
   return (
     <article
@@ -91,7 +116,7 @@ export function A1ReadingDocument({ label = "Text", title = "", children }) {
         </span>
         {title ? <strong style={{ fontSize: 17 }}>{title}</strong> : null}
       </div>
-      <div style={{ lineHeight: 1.75 }}>{children}</div>
+      <div style={{ lineHeight: 1.75 }}>{translateA1ReadingSource(children)}</div>
     </article>
   );
 }
@@ -131,7 +156,7 @@ export function A1ReadingSourceCard({ label, title, children }) {
         </span>
         {title ? <strong>{title}</strong> : null}
       </div>
-      <div style={{ lineHeight: 1.7 }}>{children}</div>
+      <div style={{ lineHeight: 1.7 }}>{translateA1ReadingSource(children)}</div>
     </article>
   );
 }
