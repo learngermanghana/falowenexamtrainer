@@ -2,6 +2,7 @@ import React from "react";
 import { getA2ReadingTask } from "../data/a2ReadingTasks";
 import ReadingExamFrame, { ReadingExamDocument, ReadingQuestionGrid, ReadingSourceCard, ReadingSourceGrid, getReadingExamVariant, readingSourceLabel, splitReadingSourceText } from "./ReadingExamLayout";
 import A2B1ReadingQualityChallenge from "./A2B1ReadingQualityChallenge";
+import InlineReadingTranslations from "./InlineReadingTranslations";
 
 const taskCard = {
   border: "1px solid #dbeafe",
@@ -49,14 +50,14 @@ const A2ReadingTaskPanel = ({ day }) => {
           <ReadingSourceGrid>
             {sourceBlocks.map((source, index) => (
               <ReadingSourceCard key={`${day}-source-${index}`} label={readingSourceLabel(index)}>
-                <div style={{ whiteSpace: "pre-line" }}>{source}</div>
+                <div style={{ whiteSpace: "pre-line" }}><InlineReadingTranslations text={source} level="A2" day={day} /></div>
               </ReadingSourceCard>
             ))}
           </ReadingSourceGrid>
         ) : (
           <ReadingExamDocument title={task?.title || ""}>
             <div style={{ whiteSpace: "pre-line" }}>
-              {text || "Lies einen kurzen A2-Text zum Thema des Tages und finde Hauptinformation und wichtige Details."}
+              <InlineReadingTranslations text={text || "Lies einen kurzen A2-Text zum Thema des Tages und finde Hauptinformation und wichtige Details."} level="A2" day={day} />
             </div>
           </ReadingExamDocument>
         )}
