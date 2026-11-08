@@ -214,7 +214,7 @@ for (let day = 1; day <= 28; day += 1) {
 }
 
 // B1 Day 1's preserved reading is authored directly in the React workbook.
-// Extract its *literal* paragraph and question text at build time. Fail closed
+// Extract its *literal* paragraph and question text at build time, allowing\n// only the optional ReadingTranslationText display wrapper. Fail closed
 // on markup changes rather than silently sending model-generated exercises.
 const firstB1Workbook = fs.readFileSync(
   path.join(root, "web/src/components/B1Day1TraumweltWorkbookPage.js"), "utf8"
@@ -224,7 +224,7 @@ function extractB1Day1Reading(source) {
     /<h3 style=\{sectionTitle\}>(Traumdeutung und ihre Bedeutung)<\/h3>([\s\S]*?)<h3 style=\{sectionTitle\}>Questions<\/h3>/
   );
   if (!section) throw new Error("B1 Day 1 original Lesen section not found; review workbook markup");
-  const paragraphs = [...section[2].matchAll(/<p style=\{\{ margin: 0, lineHeight: 1\.7 \}\}>\s*([^<]+?)\s*<\/p>/g)]
+  const paragraphs = [...section[2].matchAll(/<p style=\{\{ margin: 0, lineHeight: 1\.7 \}\}>\s*(?:<ReadingTranslationText\b[^>]*>)?\s*([^<]+?)\s*(?:<\/ReadingTranslationText>)?\s*<\/p>/g)]
     .map((x) => text(x[1], 2400));
   const literal = source.match(/const lesenQuestions = (\[[\s\S]*?\n\]);/);
   if (!literal) throw new Error("B1 Day 1 source reading questions not found");
