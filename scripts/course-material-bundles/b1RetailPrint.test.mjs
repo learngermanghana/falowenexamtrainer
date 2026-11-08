@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B1_PRESERVED_READING_PRINT_DATA, B1_DAY22_SECOND_READING_PRINT_DATA } from "./b1PreservedReadingPrintData.mjs";
-import { B1_PRINT_CSS, findB1PrintFaults, isB1WorkbookGuideLabel, prepareB1PrintView, assertB1PrintedContent } from "./b1PdfPrintExtras.mjs";
+import { B1_PRINT_CSS, findB1PrintFaults, isB1WorkbookGuideLabel, prepareB1PrintView, assertB1PrintedContent, assertB1CanonicalPrintedContent } from "./b1PdfPrintExtras.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/src/components");
 const sourceFor = day => fs.readFileSync(path.join(root, ({
@@ -78,4 +78,21 @@ test("B1 retail PDF flags forbidden QR-only and live website messages",()=>{
   assert.deepEqual(findB1PrintFaults("Audio wird geladen…"), ["unresolved audio-loading placeholder"]);
   assert.match(B1_PRINT_CSS,/overflow: visible !important/);
   assert.match(B1_PRINT_CSS,/header\.app-header--compact/);
+});
+
+test("B1 canonical exercise printing tolerates list/text ordering changes", () => {
+  const instructions = "Lesen Sie den Text und beantworten Sie die Fragen ausführlich.";
+  const questions = "Antwort Alpha Antwort Beta Antwort Gamma Frage Eins Frage Zwei";
+  assert.doesNotThrow(() => assertB1CanonicalPrintedContent(
+    instructions + " " + questions,
+    questions + " " + instructions,
+  ));
+});
+
+test("B1 canonical exercise printing rejects significant missing text despite word overlap", () => {
+  const words = Array.from({ length: 30 }, (_, i) => "Buchstabe" + i);
+  const expected = words.join(" ");
+  assert.throws(() => assertB1CanonicalPrintedContent(expected, words.slice(0, 26).join(" ")),
+    /lost source-controlled exercise text/);
+  assert.doesNotThrow(() => assertB1CanonicalPrintedContent(expected, words.slice().reverse().join(" ")));
 });
