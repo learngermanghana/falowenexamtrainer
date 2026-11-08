@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useState } from "react";
 import B1ProtectedAudioPlayer from "./B1ProtectedAudioPlayer";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
@@ -102,7 +103,7 @@ const B1Day6PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <h3 style={{ margin: 0 }}>Zeitungsartikel · Stadt oder Land – Wo liegt die Zukunft des Wohnens?</h3>\n          <p style={{ margin: 0, color: "#64748b", fontWeight: 700 }}>Hamburger Nachrichten · Gesellschaft</p>
-          {B1_DAY6_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}>{paragraph}</p>)}
+          {B1_DAY6_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}><InlineReadingTranslations text={paragraph} level="B1" day={6} /></p>)}
           <QuestionList items={B1_DAY6_READING_QUESTIONS} />
           <WorkbookSubmissionReminder />
           <Prepared checked={prepared.lesen} onChange={mark("lesen")} />
