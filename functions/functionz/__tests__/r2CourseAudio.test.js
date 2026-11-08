@@ -216,7 +216,9 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
       .toEqual({ day: 26, key: "b1/day-26/day-26.mp3" });
     expect(validateB1AudioKey({ day: 26, key: "b1/day-25/day-25.mp3" })).toBeNull();
     expect(validateB1AudioKey({ day: 26, key: "../day-26.mp3" })).toBeNull();
-    // Day 27 is an approved private R2 listening exercise, not a public object.
+    // Day 27 classroom recording is a curated private R2 listening object.
+    expect(validateB1AudioKey({ day: 27, key: "b1/day-27/umweltfreundlich-im-alltag.mp3" }))
+      .toEqual({ day: 27, key: "b1/day-27/umweltfreundlich-im-alltag.mp3" });
     expect(validateB1AudioKey({ day: 27, key: "b1/day-27/day-27.mp3" }))
       .toEqual({ day: 27, key: "b1/day-27/day-27.mp3" });
     expect(validateB1AudioKey({ day: 27, key: "b1/day-26/day-26.mp3" })).toBeNull();

@@ -105,9 +105,11 @@ const validateCourseAudioKey = ({ level, day, key }) => {
       && normalizedKey === "b1/day-25/online-shopping-verbraucherservice.mp3";
     const curatedDay24 = normalizedDay === 24
       && normalizedKey === "b1/day-24/day_24.mp3";
+    const curatedDay27 = normalizedDay === 27
+      && normalizedKey === "b1/day-27/umweltfreundlich-im-alltag.mp3";
     if (!normalizedKey.startsWith(legacyFlatStem)
       && !normalizedKey.startsWith(folderPrefix)
-      && !curatedDay25 && !curatedDay24) return null;
+      && !curatedDay25 && !curatedDay24 && !curatedDay27) return null;
   } else if (!normalizedKey.startsWith(expectedPrefixForDay(normalizedLevel, normalizedDay))) {
     return null;
   }
