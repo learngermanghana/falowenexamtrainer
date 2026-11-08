@@ -104,6 +104,8 @@ test("B1 prepublication audit excludes website submission overlays and blank blu
   assert.match(B1_PRINT_CSS, /break-inside: avoid !important/);
   assert.match(B1_PRINT_CSS, /input:not\(\[type="radio"\]\)/);
   assert.match(prepareB1PrintView.toString(), /paperOnlyNotices/);
+  assert.match(prepareB1PrintView.toString(), /:scope > summary/);
+  assert.match(prepareB1PrintView.toString(), /Lösungen anzeigen/);
   assert.match(prepareB1PrintView.toString(), /B1 Grammar Notes/);
   assert.equal(findB1PrintFaults("Was macht eine Freundschaft wichtig? a) Ehrlichkeit b) Respekt").length, 0);
 });
