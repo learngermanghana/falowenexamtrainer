@@ -184,7 +184,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
               </select>
             </label>
           ) : null}
-          <WorkbookMusicPlayer song={chosen} lyrics={approvedLyrics} recording={recordingLyrics}
+          <p style={{ margin: 0, fontSize: 12, color: '#526a5f' }}>Signed-in students: song starts, approximate listening time and completed listens are recorded for staff review. This does not affect your marks.</p>
+          <WorkbookMusicPlayer song={chosen} level={courseLevel} day={lessonDay} lyrics={approvedLyrics} recording={recordingLyrics}
             artwork={'/music/covers/photos/' + (/^[a-z-]+$/.test(artwork?.byObjectKey?.[chosen.objectKey] || '') ? artwork.byObjectKey[chosen.objectKey] : 'music') + '.jpg'}
             story={stories?.byObjectKey?.[chosen.objectKey] || stories?.byTrackId?.[chosen.id]}
             english={englishPack} showEnglish={showEnglish} />
