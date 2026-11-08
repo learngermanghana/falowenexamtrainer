@@ -1,11 +1,12 @@
 import React from "react";
 import "./B1Day26MatchingReading.css";
+import InlineReadingTranslations from "./InlineReadingTranslations";
 
 /**
  * Presenter-friendly and mobile-safe Anzeigen layout. The answer key is
  * intentionally not rendered: students submit letters A–H or X separately.
  */
-export default function B1Day26MatchingReading({ task = {} }) {
+export default function B1Day26MatchingReading({ task = {}, day = 26 }) {
   const situations = Array.isArray(task.text?.situations) ? task.text.situations : [];
   const advertisements = Array.isArray(task.text?.advertisements) ? task.text.advertisements : [];
   if (!situations.length || !advertisements.length) return null;
@@ -25,7 +26,7 @@ export default function B1Day26MatchingReading({ task = {} }) {
             {situations.map(({ number, person, description }) => (
               <li key={number}>
                 <span className="b1-day26-number" aria-hidden="true">{number}</span>
-                <div><strong>{person}</strong><p>{description}</p></div>
+                <div><strong>{person}</strong><p><InlineReadingTranslations text={description} level="B1" day={day} /></p></div>
               </li>
             ))}
           </ol>
@@ -39,7 +40,7 @@ export default function B1Day26MatchingReading({ task = {} }) {
                   <span className="b1-day26-ad-letter">{letter})</span>
                   <strong>{title}</strong>
                 </div>
-                <p>{description}</p>
+                <p><InlineReadingTranslations text={description} level="B1" day={day} /></p>
                 {contact && <small>{contact}</small>}
               </article>
             ))}
