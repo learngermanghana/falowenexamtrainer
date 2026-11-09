@@ -304,6 +304,13 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId: "b1-mock-03",
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "b1-mock-04-sprechen": {
+    id:"b1-mock-04-sprechen",level:"B1",title:"B1 Mock 4 · Sprechen",shortTitle:"B1 Mock 4 · Sprechen",
+    description:"Three speaking practice tasks: plan a hospital visit and aftercare, present Sehen Kinder zu viel fern? with five slides, and respond to a partner’s smartphone presentation. AI partner and saved feedback; not a combined full exam result.",
+    durationLabel:"15 min preparation · 15 min speaking · 3 Teile",
+    status:"preview",route:"/campus/course/b1-mock-4-sprechen",mode:"practice",
+    questionSetId:"b1-mock-04-sprechen",sections:["Sprechen · Teile 1 bis 3"],
+  },
   "b1-mock-04-schreiben": {
     id:"b1-mock-04-schreiben",level:"B1",title:"B1 Mock 4 · Schreiben",shortTitle:"B1 Mock 4 · Schreiben",
     description:"Three B1 writing tasks: birthday email, Tanja online guestbook opinion, and formal email to Frau Müller. 60-minute practice with autosave, AI feedback, and a separate 40/40/20 rubric.",
