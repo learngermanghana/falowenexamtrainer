@@ -37,8 +37,11 @@ const { verifyA2Mock06Audio } = require("./a2Mock06PublishedAudio");
 const { verifyA2Mock07Audio } = require("./a2Mock07PublishedAudio");
 const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
 const { publicB1Mock3Hoeren, markB1Mock3Hoeren } = require("./b1Mock3Hoeren");
+const { publicB1Mock4Hoeren, markB1Mock4Hoeren } = require("./b1Mock4Hoeren");
+const { gradeB1Mock4Lesen } = require("./b1Mock4Lesen");
 const { PART_KEYS: B1_MOCK2_AUDIO, verifyB1Mock2Audio } = require("./b1Mock2PublishedAudio");
 const { PART_KEYS: B1_MOCK3_AUDIO, verifyB1Mock3Audio } = require("./b1Mock3PublishedAudio");
+const { PART_KEYS: B1_MOCK4_AUDIO, verifyB1Mock4Audio } = require("./b1Mock4PublishedAudio");
 const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
 const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
@@ -1399,8 +1402,10 @@ app.get("/course-media/b1/mock-audio-url", async (req, res) => {
       B1_MOCK2_AUDIO[validated.part] === validated.key;
     const isApprovedMock3Part = validated.mockId === "mock-03" &&
       B1_MOCK3_AUDIO[validated.part] === validated.key;
+    const isApprovedMock4Part = validated.mockId === "mock-04" &&
+      B1_MOCK4_AUDIO[validated.part] === validated.key;
     const released = await isReleasedMockHoerenAudio({ db, ...validated });
-    if (!released && !isApprovedMock2Part && !isApprovedMock3Part) {
+    if (!released && !isApprovedMock2Part && !isApprovedMock3Part && !isApprovedMock4Part) {
       return res.status(404).json({ error: "Mock Hören recording is not published." });
     }
 
@@ -1414,6 +1419,11 @@ app.get("/course-media/b1/mock-audio-url", async (req, res) => {
       ...validated, signedUrl: signed.url,
     }))) {
       return res.status(404).json({ error: "This B1 Mock 3 recording has not been verified in R2 yet." });
+    }
+    if (isApprovedMock4Part && !(await verifyB1Mock4Audio({
+      ...validated, signedUrl: signed.url,
+    }))) {
+      return res.status(404).json({ error: "B1 Mock 4 audio has not been uploaded or does not match the teacher package." });
     }
     res.set("Cache-Control", "private, no-store");
     return res.json({
@@ -1546,6 +1556,78 @@ app.post("/b1-mock-03/hoeren/score", async (req, res) => {
   } catch (error) {
     console.error("B1 Mock 3 Hören score error", error);
     return res.status(503).json({ error:"Could not save the practice score. Your answers remain on this device; please retry." });
+  }
+});
+
+// B1 Mock 04: Hören-only preview. Do not aggregate into a four-module result.
+app.get("/b1-mock-04/hoeren/questions", async (req,res)=>{
+  try {
+    const access=await requireB1Mock2PracticeAccess(req,res);
+    if(!access)return;
+    res.set("Cache-Control","private, no-store");
+    return res.json(publicB1Mock4Hoeren());
+  }catch(error){
+    console.error("B1 Mock 04 Hören questions error",error);
+    return res.status(500).json({error:"Could not load B1 Mock 04 listening questions."});
+  }
+});
+app.post("/b1-mock-04/hoeren/score", async(req,res)=>{
+  try{
+    const access=await requireB1Mock2PracticeAccess(req,res);
+    if(!access)return;
+    let result;
+    try{result=markB1Mock4Hoeren(req.body?.answers);}
+    catch{return res.status(400).json({error:"Answer all 30 listening questions using the available options."});}
+    const answers=Object.fromEntries(Object.entries(req.body.answers).sort(([a],[b])=>Number(a)-Number(b)));
+    const attemptId=crypto.createHash("sha256")
+      .update(access.authedUser.uid+":b1-mock-04:hoeren:"+JSON.stringify(answers))
+      .digest("hex").slice(0,40);
+    await access.db.collection("b1Mock4HoerenPracticeResults").doc(access.authedUser.uid)
+      .collection("attempts").doc(attemptId).set({
+        uid:access.authedUser.uid,
+        email:access.authedUser.email?String(access.authedUser.email).toLowerCase():null,
+        level:"B1",mockId:"b1-mock-04",section:"hoeren",
+        practiceOnly:true,questionCount:30,verifiedQuestionCount:30,
+        answers,correct:result.correct,total:result.total,percentage:result.percentage,
+        perPart:result.perPart,status:"completed",verifiedBy:"server-answer-key",
+        submittedAt:admin.firestore.FieldValue.serverTimestamp(),
+      },{merge:true});
+    res.set("Cache-Control","private, no-store");
+    return res.json({...result,attemptId,saved:true,practiceOnly:true,partial:false});
+  }catch(error){
+    console.error("B1 Mock 04 Hören score error",error);
+    return res.status(503).json({error:"Could not save the listening result. Answers remain on this device; retry."});
+  }
+});
+
+// Mock 04 Lesen-only practice: use server-owned marking and student-scoped result history.
+// This must not create a four-module B1 completion or certificate.
+app.post("/b1-mock-04/lesen/score", async (req,res)=>{
+  try{
+    const access=await requireB1Mock2PracticeAccess(req,res);
+    if(!access)return;
+    let result;
+    try{result=gradeB1Mock4Lesen(req.body?.answers);}
+    catch(error){return res.status(400).json({error:error?.message||"Submit all 30 reading answers."});}
+    const answers=Object.fromEntries(Object.entries(req.body.answers).sort(([a],[b])=>Number(a)-Number(b)));
+    const attemptId=crypto.createHash("sha256")
+      .update(access.authedUser.uid+":b1-mock-04:lesen:"+JSON.stringify(answers))
+      .digest("hex").slice(0,40);
+    await access.db.collection("b1Mock4LesenPracticeResults").doc(access.authedUser.uid)
+      .collection("attempts").doc(attemptId).set({
+        uid:access.authedUser.uid,
+        email:access.authedUser.email?String(access.authedUser.email).toLowerCase():null,
+        level:"B1",mockId:"b1-mock-04",section:"lesen",
+        practiceOnly:true,questionCount:30,
+        answers,correct:result.correct,total:30,percentage:result.percentage,
+        perPart:result.perPart,status:"completed",verifiedBy:"server-answer-key",
+        submittedAt:admin.firestore.FieldValue.serverTimestamp(),
+      },{merge:true});
+    res.set("Cache-Control","private, no-store");
+    return res.json({...result,attemptId,saved:true,practiceOnly:true});
+  }catch(error){
+    console.error("B1 Mock 04 Lesen score error",error);
+    return res.status(503).json({error:"Could not save the reading score. Your answers remain on this device; retry."});
   }
 });
 
@@ -2937,12 +3019,12 @@ const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "", mockId="
   "AUFGABE 3 — formal email, 5 points; use the canonical word target.",
   "Use formal address/register and an appropriate closing.",
   "For MOCK 02, report required_points_met as three booleans per part following the ordered points below. Do not penalise reasonable differences of opinion. In Teil 3, evaluate the four criterion weights 4/4/6/6 and scale their sum by 1/4 to the 5-point Falowen part score.",
-  "For MOCK 03, use the three teacher-provided tasks below. Award 10/10/5 points internally, displayed as 40/40/20 (100 total). Assess Aufgabenerfüllung, Kohärenz, Wortschatz and Strukturen. If a part has fewer than half the required words (under 40 words in Teil 1 or 2, under 20 in Teil 3), its task-fulfilment criterion is zero. Do not score against any model answer, and do not accept unrelated writing as task-complete.",
+  "For MOCK 03 and 04, use the three teacher-provided tasks below. Award 10/10/5 points internally, displayed as 40/40/20 (100 total). Assess Aufgabenerfüllung, Kohärenz, Wortschatz and Strukturen. If a part has fewer than half the required words (under 40 words in Teil 1 or 2, under 20 in Teil 3), its task-fulfilment criterion is zero. Do not score against any model answer, and do not accept unrelated writing as task-complete.",
   "",
-  mockId==="b1-mock-02" ? [
-    "MOCK 02 TASK 1: Informal email to a friend who was too ill to attend the learner's birthday party a week ago. Exactly THREE required points, in this order: (1) describe how the birthday celebration went; (2) say which gift was especially great and why; (3) propose meeting the friend. Include an informal salutation and closing. Target circa 80 words. Do NOT judge against the old Julian invitation scenario.",
-    "MOCK 02 TASK 2: Online guestbook entry responding to Tanja (15.01., 16:55) on Persönliche Kontakte und Internet. She believes online contact is useful for distant friends but cannot replace in-person meetings. Exactly THREE required points: (1) refer to her opinion and the subject; (2) state the learner's own view and justify it with an example or everyday experience; (3) end with a brief conclusion. The learner may agree OR disagree; neither viewpoint is automatically more correct. Target circa 80 words. Do NOT judge against the old cashless payment scenario.",
-    "MOCK 02 TASK 3: Brief formal email to Kursleiterin Frau Müller. The learner was invited to a meeting about personal learning goals but cannot attend. Exactly THREE required points: (1) apologise politely for missing the meeting; (2) explain why they cannot attend; (3) use polite Sie-register with appropriate salutation and sign-off. A replacement meeting proposal is optional, not compulsory. Target circa 40 words. Assess diagnostic criteria on a 20-point scale: task fulfilment 0–4, cohesion 0–4, vocabulary 0–6, grammatical structures 0–6; report the four criterion marks as teil3.rubric_scores and report normalized teil3.score out of 5 for Falowen's /25 mock writing score. Do NOT judge against the old lost library card scenario."
+  (mockId==="b1-mock-02" || mockId==="b1-mock-04") ? [
+    "MOCK 02/04 TASK 1: Informal email to a friend who was too ill to attend the learner's birthday party a week ago. Exactly THREE required points, in this order: (1) describe how the birthday celebration went; (2) say which gift was especially great and why; (3) propose meeting the friend. Include an informal salutation and closing. Target circa 80 words. Do NOT judge against the old Julian invitation scenario.",
+    "MOCK 02/04 TASK 2: Online guestbook entry responding to Tanja (15.01., 16:55) on Persönliche Kontakte und Internet. She believes online contact is useful for distant friends but cannot replace in-person meetings. Exactly THREE required points: (1) refer to her opinion and the subject; (2) state the learner's own view and justify it with an example or everyday experience; (3) end with a brief conclusion. The learner may agree OR disagree; neither viewpoint is automatically more correct. Target circa 80 words. Do NOT judge against the old cashless payment scenario.",
+    "MOCK 02/04 TASK 3: Brief formal email to Kursleiterin Frau Müller. The learner was invited to a meeting about personal learning goals but cannot attend. Exactly THREE required points: (1) apologise politely for missing the meeting; (2) explain why they cannot attend; (3) use polite Sie-register with appropriate salutation and sign-off. A replacement meeting proposal is optional, not compulsory. Target circa 40 words. Assess diagnostic criteria on a 20-point scale: task fulfilment 0–4, cohesion 0–4, vocabulary 0–6, grammatical structures 0–6; report the four criterion marks as teil3.rubric_scores and report normalized teil3.score out of 5 for Falowen's /25 mock writing score. Do NOT judge against the old lost library card scenario."
   ].join("\\n") : mockId==="b1-mock-03" ? [
     "MOCK 03 TASK 1: Informal email to a friend who could not join a trip to another city last weekend because they had to study. Check three points (in order): (1) say which city the learner visited AND describe the excursion; (2) say what they liked best there AND why; (3) suggest meeting the friend to show photographs and tell them about the trip. Require suitable informal salutation and closing. Target circa 80 German words.",
     "MOCK 03 TASK 2: An ONLINE GUESTBOOK opinion response (not a letter) to Laura (12.10., 18:30) on 'Brauchen wir noch gedruckte Bücher oder reichen E-Books?'. Laura says she reads on an E-reader, can take hundreds of books anywhere, saves shelf space, and considers print books outdated and bad for the environment. Check three indicators: (1) address the printed books versus E-books issue and/or Laura's argument; (2) state the learner's own opinion with coherent reason(s); (3) provide relevant discussion or conclusion. Both pro-print and pro-e-book positions are valid. NO salutation or sign-off. Target circa 80 German words.",
@@ -4887,7 +4969,8 @@ app.post("/writing/b1-mock-score", async (req, res) => {
     const teil3 = String(req.body?.teil3 || "").trim().slice(0, 6000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     const mockId=String(req.body?.mockId || "b1-mock-01");
-    if (!["b1-mock-01","b1-mock-02","b1-mock-03"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
+    if (!["b1-mock-01","b1-mock-02","b1-mock-03","b1-mock-04"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
+    
     
 
     let result;
@@ -4929,7 +5012,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
         {
            partKeys: ["teil1", "teil2", "teil3"],
            pointCounts: { teil1: 3, teil2: 3, teil3: 3 },
-           validateResult: mockId !== "b1-mock-02" ? undefined : validateB1Mock2Teil3Rubric,
+           validateResult: !["b1-mock-02","b1-mock-04"].includes(mockId) ? undefined : validateB1Mock2Teil3Rubric,
          },
       );
       const cleanedReply = String(reply || "")
@@ -4954,7 +5037,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
         const flags = [0, 1, 2].map((index) => rawFlags[index] === true);
         const missing = flags.filter((value) => !value).length;
         const missingCaps = maxScore === 5 ? [4, 2, 0.5] : [7, 4, 1];
-        const rubric=mockId==="b1-mock-02" && key==="teil3" ? part.rubric_scores : null;
+        const rubric=(mockId==="b1-mock-02" || mockId==="b1-mock-04") && key==="teil3" ? part.rubric_scores : null;
         const rubricScore=rubric
           ? normalizedB1Mock2Teil3Score(rubric)
           : Number(part.score);
@@ -6145,7 +6228,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "b1-mock-01").trim().slice(0, 80);
-    if (!["b1-mock-01","b1-mock-02","b1-mock-03"].includes(mockId)) return res.status(400).json({ error: "Unsupported B1 mockId" });
+    if (!["b1-mock-01","b1-mock-02","b1-mock-03","b1-mock-04"].includes(mockId)) return res.status(400).json({ error: "Unsupported B1 mockId" });
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -6158,7 +6241,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
       const userSnap = await tx.get(userRef);
       const userData = userSnap.exists ? userSnap.data() || {} : {};
 
-      const activeAttemptId = String((mockId==="b1-mock-03" ? userData.activeAttemptIdMock3 : mockId==="b1-mock-02" ? userData.activeAttemptIdMock2 : userData.activeAttemptId) || "").trim();
+      const activeAttemptId = String((mockId==="b1-mock-04" ? userData.activeAttemptIdMock4 : mockId==="b1-mock-03" ? userData.activeAttemptIdMock3 : mockId==="b1-mock-02" ? userData.activeAttemptIdMock2 : userData.activeAttemptId) || "").trim();
       if (activeAttemptId) {
         const activeRef = userRef.collection("attempts").doc(activeAttemptId);
         const activeSnap = await tx.get(activeRef);
@@ -6177,7 +6260,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const attemptCount = Math.max(0, Number((mockId==="b1-mock-03" ? userData.attemptCountMock3 : mockId==="b1-mock-02" ? userData.attemptCountMock2 : userData.attemptCount) || 0));
+      const attemptCount = Math.max(0, Number((mockId==="b1-mock-04" ? userData.attemptCountMock4 : mockId==="b1-mock-03" ? userData.attemptCountMock3 : mockId==="b1-mock-02" ? userData.attemptCountMock2 : userData.attemptCount) || 0));
       const attemptNumber = attemptCount + 1;
       const now = admin.firestore.FieldValue.serverTimestamp();
 
@@ -6186,7 +6269,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
         {
           uid: authedUser.uid,
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
-          ...(mockId==="b1-mock-03" ? {attemptCountMock3:attemptNumber,activeAttemptIdMock3:newAttemptRef.id} : mockId==="b1-mock-02" ? {attemptCountMock2:attemptNumber,activeAttemptIdMock2:newAttemptRef.id} : {attemptCount:attemptNumber,activeAttemptId:newAttemptRef.id}),
+          ...(mockId==="b1-mock-04" ? {attemptCountMock4:attemptNumber,activeAttemptIdMock4:newAttemptRef.id} : mockId==="b1-mock-03" ? {attemptCountMock3:attemptNumber,activeAttemptIdMock3:newAttemptRef.id} : mockId==="b1-mock-02" ? {attemptCountMock2:attemptNumber,activeAttemptIdMock2:newAttemptRef.id} : {attemptCount:attemptNumber,activeAttemptId:newAttemptRef.id}),
           updatedAt: now,
         },
         { merge: true },
@@ -6275,10 +6358,10 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
       }
 
       const userData = userSnap.exists ? userSnap.data() || {} : {};
-      if (!["b1-mock-01","b1-mock-02","b1-mock-03"].includes(existing.mockId) || state.mockId !== existing.mockId) {
+      if (!["b1-mock-01","b1-mock-02","b1-mock-03","b1-mock-04"].includes(existing.mockId) || state.mockId !== existing.mockId) {
         saveOutcome = {forbidden:true}; return;
       }
-      const activeField=existing.mockId==="b1-mock-03" ? "activeAttemptIdMock3" : existing.mockId==="b1-mock-02" ? "activeAttemptIdMock2" : "activeAttemptId";
+      const activeField=existing.mockId==="b1-mock-04" ? "activeAttemptIdMock4" : existing.mockId==="b1-mock-03" ? "activeAttemptIdMock3" : existing.mockId==="b1-mock-02" ? "activeAttemptIdMock2" : "activeAttemptId";
 
       // Completion is monotonic, but a completed record is only publishable when
       // all four section scores can be reconstructed from server-trusted data.
@@ -7070,7 +7153,7 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
     const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     const mockId=String(req.body?.mockId || "b1-mock-01");
-    if (!["b1-mock-01","b1-mock-02","b1-mock-03"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
+    if (!["b1-mock-01","b1-mock-02","b1-mock-03","b1-mock-04"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
     if (Object.prototype.hasOwnProperty.call(req.body || {}, "examinerSessionIds")) {
       // Same immutable-snapshot verification used by A2. Never charge for
       // a second AI grading pass; the examiner has already marked each Teil.
@@ -7095,7 +7178,7 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
     }
     // Mock 2 requires real examiner receipts, not unbound user-supplied
     // transcripts. Mock 1 retains its legacy recorder scoring for saved work.
-    if (mockId==="b1-mock-02" || mockId==="b1-mock-03") return res.status(400).json({
+    if (mockId==="b1-mock-02" || mockId==="b1-mock-03" || mockId==="b1-mock-04") return res.status(400).json({
       code:"B1_MOCK_EXAMINER_REQUIRED",
       error:"Use the three saved AI examiner sessions for this B1 mock.",
     });

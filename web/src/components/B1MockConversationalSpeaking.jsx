@@ -5,11 +5,13 @@ import A2MockSpeakingExaminer from "./A2MockSpeakingExaminer";
 import { B1_SPEAKING } from "../data/b1FinalMockData";
 import { B1_MOCK2_SPEAKING } from "../data/b1Mock2ExamContent";
 import { B1_MOCK3_SPEAKING, buildB1Mock3SpeakingTasks } from "../data/b1Mock3SpeakingContent";
+import { B1_MOCK4_SPEAKING, buildB1Mock4SpeakingTasks } from "../data/b1Mock4SpeakingContent";
 
 // Shared A2/B1 LiveSpeak examiner: real German turns, one immutable session
 // receipt per Teil, resumable progress and server-verified /25 speaking score.
 // Mock 1 and Mock 2 retain their own task cards, attempts, and marking identities.
 export function makeB1MockSpeakingTasks(mockId, topicChoice = "a") {
+  if (mockId === "b1-mock-04") return buildB1Mock4SpeakingTasks("b");
   if (mockId === "b1-mock-03") return buildB1Mock3SpeakingTasks(topicChoice);
   const data = mockId === "b1-mock-02" ? B1_MOCK2_SPEAKING : B1_SPEAKING;
   const selectedTopic = topicChoice === "b" && data.teil2.alternativeTopic
@@ -47,11 +49,12 @@ export default function B1MockConversationalSpeaking({
 }) {
   const {idToken} = useAuth();
   const [parts,setParts] = useState(() => initialAttempts?.examinerParts || {});
-  const [topicChoice,setTopicChoice] = useState(() => initialAttempts?.examinerTopic || "a");
+  const [topicChoice,setTopicChoice] = useState(() => mockId === "b1-mock-04" ? "b" : initialAttempts?.examinerTopic || "a");
   const [error,setError] = useState("");
   const isSecond = mockId === "b1-mock-02";
   const isThird = mockId === "b1-mock-03";
-  const data = isThird ? B1_MOCK3_SPEAKING : isSecond ? B1_MOCK2_SPEAKING : B1_SPEAKING;
+  const isFourth = mockId === "b1-mock-04";
+  const data = isFourth ? B1_MOCK4_SPEAKING : isThird ? B1_MOCK3_SPEAKING : isSecond ? B1_MOCK2_SPEAKING : B1_SPEAKING;
   const tasks = useMemo(() => makeB1MockSpeakingTasks(mockId,topicChoice),[mockId,topicChoice]);
   const completed = ["1","2","3"].filter(k=>parts[k]?.sessionId && parts[k]?.assessment).length;
 
@@ -89,11 +92,11 @@ export default function B1MockConversationalSpeaking({
   if (!attemptId || !idToken) return <p role="status">Connecting your B1 speaking session to its saved mock attempt …</p>;
   return <section data-b1-mock-live-examiner={mockId}>
     <header className="b1-final-module-header">
-      <p>GOETHE-ZERTIFIKAT B1 · Mock {isThird ? 3 : isSecond ? 2 : 1}</p>
+      <p>GOETHE-ZERTIFIKAT B1 · Mock {isFourth ? 4 : isThird ? 3 : isSecond ? 2 : 1}</p>
       <h1>Sprechen mit KI-Prüfungspartner</h1>
       <p>Three interactive parts. Falowen saves each examiner session; the score remains private until verified.</p>
     </header>
-    {(isThird || data.teil2.alternativeTopic) ? <fieldset style={{display:"grid",gap:10,padding:16,borderRadius:12,border:"1px solid #cbd5e1"}}>
+    {(!isFourth && (isThird || data.teil2.alternativeTopic)) ? <fieldset style={{display:"grid",gap:10,padding:16,borderRadius:12,border:"1px solid #cbd5e1"}}>
       <legend><strong>Teil 2 · Präsentationsthema wählen</strong></legend>
       <label><input type="radio" name={`${mockId}-presentation-topic`} checked={topicChoice==="a"}
         disabled={Boolean(completed)} onChange={()=>selectTopic("a")}/> Thema A: {isThird ? data.teil2.topics[0].title : data.teil2.topic}</label>

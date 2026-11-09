@@ -19,8 +19,11 @@ import { B1_LISTENING, B1_READING, B1_WRITING_TASKS } from "../data/b1FinalMockD
 import { B1_MOCK2_READING, B1_MOCK2_WRITING_TASKS, B1_MOCK2_SPEAKING } from "../data/b1Mock2ExamContent";
 import B1Mock2Hoeren from "./B1Mock2Hoeren";
 import B1Mock3Hoeren from "./B1Mock3Hoeren";
+import B1Mock4Hoeren from "./B1Mock4Hoeren";
 import { B1_MOCK3_LESEN } from "../data/b1Mock3ReadingContent";
+import { B1_MOCK4_LESEN } from "../data/b1Mock4ReadingContent";
 import { B1_MOCK3_WRITING_TASKS } from "../data/b1Mock3WritingTasks";
+import { B1_MOCK4_WRITING_TASKS } from "../data/b1Mock4WritingTasks";
 import B1FinalMockSpeaking from "./B1FinalMockSpeaking";
 import B1MockConversationalSpeaking from "./B1MockConversationalSpeaking";
 import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
@@ -36,6 +39,7 @@ const SECTION_DURATIONS = Object.freeze({
 });
 const B1_MOCK2_SECTION_DURATIONS = Object.freeze({ ...SECTION_DURATIONS, schreiben: 60 * 60 });
 const B1_MOCK3_SECTION_DURATIONS = Object.freeze({ ...SECTION_DURATIONS, schreiben: 60 * 60, sprechen: 30 * 60 });
+const B1_MOCK4_SECTION_DURATIONS = Object.freeze({ ...SECTION_DURATIONS, schreiben: 60 * 60, sprechen: 30 * 60 });
 
 const SECTION_LABELS = Object.freeze({
   lesen: "Lesen",
@@ -227,15 +231,16 @@ const ReadingPart = ({ children, title, time }) => (
 export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
   const isSecond = mockId === "b1-mock-02";
   const isThird = mockId === "b1-mock-03";
-  const isVerified = isSecond || isThird;
-  const sectionDurations = isThird ? B1_MOCK3_SECTION_DURATIONS : isSecond ? B1_MOCK2_SECTION_DURATIONS : SECTION_DURATIONS;
-  const reading = isThird ? B1_MOCK3_LESEN : isSecond ? B1_MOCK2_READING : B1_READING;
-  const writingTasks = isThird ? B1_MOCK3_WRITING_TASKS : isSecond ? B1_MOCK2_WRITING_TASKS : B1_WRITING_TASKS;
+  const isFourth = mockId === "b1-mock-04";
+  const isVerified = isSecond || isThird || isFourth;
+  const sectionDurations = isFourth ? B1_MOCK4_SECTION_DURATIONS : isThird ? B1_MOCK3_SECTION_DURATIONS : isSecond ? B1_MOCK2_SECTION_DURATIONS : SECTION_DURATIONS;
+  const reading = isFourth ? B1_MOCK4_LESEN : isThird ? B1_MOCK3_LESEN : isSecond ? B1_MOCK2_READING : B1_READING;
+  const writingTasks = isFourth ? B1_MOCK4_WRITING_TASKS : isThird ? B1_MOCK3_WRITING_TASKS : isSecond ? B1_MOCK2_WRITING_TASKS : B1_WRITING_TASKS;
   const speakingData = isSecond ? B1_MOCK2_SPEAKING : undefined;
   const lesenQuestions = buildLesenQuestions(reading);
   useAssessmentRestriction();
   const { idToken, user } = useAuth();
-  const storageKey = `${isThird ? "falowen:b1-mock-03:full:v1" : isSecond ? "falowen:b1-mock-02:full:v1" : B1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
+  const storageKey = `${isFourth ? "falowen:b1-mock-04:full:v1" : isThird ? "falowen:b1-mock-03:full:v1" : isSecond ? "falowen:b1-mock-02:full:v1" : B1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey,mockId));
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
@@ -600,8 +605,8 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
       <main className="b1-final-shell">
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <header className="b1-final-hero">
-          <p>{isThird ? "B1 · Mock 3" : isSecond ? "B1 · Mock 2" : "B1 · Day 29 · Complete mock"}</p>
-          <h1>GOETHE-ZERTIFIKAT B1 Mock {isThird ? 3 : isSecond ? 2 : 1}</h1>
+          <p>{isFourth ? "B1 · Mock 4" : isThird ? "B1 · Mock 3" : isSecond ? "B1 · Mock 2" : "B1 · Day 29 · Complete mock"}</p>
+          <h1>GOETHE-ZERTIFIKAT B1 Mock {isFourth ? 4 : isThird ? 3 : isSecond ? 2 : 1}</h1>
           <p>This is <strong>one four-section exam</strong>, not four separate short mocks. You must finish Lesen, Hören, Schreiben <strong>and</strong> Sprechen to receive your final result.</p>
         </header>
         <section className="b1-final-rules">
@@ -611,7 +616,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
             <div><strong>Lesen</strong><span>65 min</span></div>
             <div><strong>Hören</strong><span>40 min</span></div>
             <div><strong>Schreiben</strong><span>{isVerified ? "60" : "75"} min</span></div>
-            <div><strong>Sprechen</strong><span>{isThird ? "30" : "20"} min</span></div>
+            <div><strong>Sprechen</strong><span>{(isThird || isFourth) ? "30" : "20"} min</span></div>
           </div>
           <p><strong>How it works:</strong> Finish Lesen (1 of 4), then Hören (2 of 4), Schreiben (3 of 4), and Sprechen (4 of 4). Hören contains four audio Teile, and Sprechen has three speaking tasks.</p>
           <p><strong>If you leave early:</strong> Your answers are saved. Return to this mock to continue your unfinished attempt; the section timer is <strong>not paused</strong> while you are away. An unfinished mock is not a failed mock.</p>
@@ -634,7 +639,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
       <main className="b1-final-shell">
         <AppBackButton label="Back to Exams Room" fallbackPath="/exams/overview" />
         <header className="b1-final-hero">
-          <p>B1 Mock {isThird ? 3 : isSecond ? 2 : 1} · All four sections completed</p>
+          <p>B1 Mock {isFourth ? 4 : isThird ? 3 : isSecond ? 2 : 1} · All four sections completed</p>
           <h1>{exam.overall?.score || 0}%</h1>
           <p className={exam.overall?.passed ? "b1-final-pass" : "b1-final-needs-work"}>
             {exam.overall?.passed ? "PASS" : "NEEDS MORE PRACTICE"}
@@ -668,7 +673,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
     );
   }
 
-  if(isVerified && exam.stage==="result" && !exam.serverConfirmed && !exam.writingPending) return <main className="b1-final-shell"><section className="b1-final-rules"><h2>Verifying B1 Mock {isThird ? 3 : 2} results</h2><p>Your four modules are submitted. The official /100 result will appear only after server-side verification and Results synchronization.</p>{error ? <p role="alert">{error}</p> : null}<button type="button" onClick={()=>setCompletionRetryNonce(n=>n+1)}>Retry result verification</button></section></main>;
+  if(isVerified && exam.stage==="result" && !exam.serverConfirmed && !exam.writingPending) return <main className="b1-final-shell"><section className="b1-final-rules"><h2>Verifying B1 Mock {isFourth ? 4 : isThird ? 3 : 2} results</h2><p>Your four modules are submitted. The official /100 result will appear only after server-side verification and Results synchronization.</p>{error ? <p role="alert">{error}</p> : null}<button type="button" onClick={()=>setCompletionRetryNonce(n=>n+1)}>Retry result verification</button></section></main>;
   return (
     <main className="b1-final-shell">
       <AppBackButton label="Leave mock (answers saved; timer continues)" fallbackPath="/campus/course" />
@@ -765,7 +770,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
                   >
                     <option value="">Anzeige wählen</option>
                     <option value={reading.teil3.noMatchValue || "0"}>{reading.teil3.noMatchValue || "0"} · keine passende Anzeige</option>
-                    {reading.teil3.ads.map(([letter]) => letter).filter((letter) => isThird ? letter !== reading.teil3.exampleAd : isSecond || letter !== "C").map((letter) => (
+                    {reading.teil3.ads.map(([letter]) => letter).filter((letter) => (isThird || isFourth) ? letter !== reading.teil3.exampleAd : isSecond || letter !== "C").map((letter) => (
                       <option value={letter.toLowerCase()} key={letter}>{letter}</option>
                     ))}
                   </select>
@@ -808,6 +813,13 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
         </>
       ) : null}
 
+      {exam.stage === "hoeren" && isFourth ? <B1Mock4Hoeren embedded
+        initialAnswers={Object.fromEntries(Object.entries(exam.hoerenAnswers || {}).map(([key,value])=>[key.split("-")[1],value]))}
+        initialPlayed={exam.hoerenPlayed || {}}
+        onAnswersChange={onThirdHoerenAnswers}
+        onPlayedChange={onThirdHoerenPlayed}
+        onComplete={() => submitHoeren()}
+      /> : null}
       {exam.stage === "hoeren" && isThird ? <B1Mock3Hoeren embedded
         initialAnswers={Object.fromEntries(Object.entries(exam.hoerenAnswers || {}).map(([key,value])=>[key.split("-")[1],value]))}
         initialPlayed={exam.hoerenPlayed || {}}
