@@ -1,0 +1,50 @@
+name: B1 Mock 04 Hören verification
+on:
+  pull_request:
+    paths:
+      - 'functions/functionz/b1Mock4*'
+      - 'functions/functionz/tests/b1Mock4Hoeren.test.cjs'
+      - 'functions/functionz/app.js'
+      - 'web/src/components/B1Mock4Hoeren.jsx'
+      - 'web/src/services/b1Mock4HoerenService.js'
+      - 'web/src/data/mockExamCatalog.js'
+      - 'web/src/App.js'
+      - '.github/workflows/b1-mock04-hoeren.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'functions/functionz/b1Mock4*'
+      - 'functions/functionz/tests/b1Mock4Hoeren.test.cjs'
+      - '.github/workflows/b1-mock04-hoeren.yml'
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and server-only grading
+        run: |
+          node --check functions/functionz/app.js
+          node --check functions/functionz/b1Mock4Hoeren.js
+          node --check functions/functionz/b1Mock4PublishedAudio.js
+          node --test functions/functionz/tests/b1Mock4Hoeren.test.cjs
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+        working-directory: web
+      - name: Production web build (no deployment)
+        working-directory: web
+        run: npx vite build
