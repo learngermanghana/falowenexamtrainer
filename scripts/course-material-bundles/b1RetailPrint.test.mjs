@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B1_PRESERVED_READING_PRINT_DATA, B1_DAY22_SECOND_READING_PRINT_DATA } from "./b1PreservedReadingPrintData.mjs";
-import { B1_PRINT_CSS, findB1PrintFaults, isB1WorkbookGuideLabel, prepareB1PrintView, assertB1PrintedContent, assertB1CanonicalPrintedContent } from "./b1PdfPrintExtras.mjs";
+import { B1_PRINT_CSS, findB1PrintFaults, isB1WorkbookGuideLabel, prepareB1PrintView, suppressB1EmptyChromeControls, assertB1PrintedContent, assertB1CanonicalPrintedContent } from "./b1PdfPrintExtras.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/src/components");
 const sourceFor = day => fs.readFileSync(path.join(root, ({
@@ -95,4 +95,32 @@ test("B1 canonical exercise printing rejects significant missing text despite wo
   assert.throws(() => assertB1CanonicalPrintedContent(expected, words.slice(0, 26).join(" ")),
     /lost source-controlled exercise text/);
   assert.doesNotThrow(() => assertB1CanonicalPrintedContent(expected, words.slice().reverse().join(" ")));
+});
+
+test("B1 prepublication audit excludes website submission overlays and blank blue input fields", () => {
+  assert.ok(findB1PrintFaults("Answer directly in the workbook. Your required choices and writing are saved to Review & Submit automatically. You can edit the final answer there before submitting.").length);
+  assert.ok(findB1PrintFaults("Click an answer option. Your choice is saved automatically to Submit, and you can change it at any time.").length);
+  assert.ok(findB1PrintFaults("Lösungen anzeigen").length);
+  assert.match(B1_PRINT_CSS, /break-inside: avoid !important/);
+  assert.match(B1_PRINT_CSS, /input:not\(\[type="radio"\]\)/);
+  assert.match(prepareB1PrintView.toString(), /paperOnlyNotices/);
+  assert.match(prepareB1PrintView.toString(), /:scope > summary/);
+  assert.match(prepareB1PrintView.toString(), /Lösungen anzeigen/);
+  assert.match(prepareB1PrintView.toString(), /B1 Grammar Notes/);
+  assert.equal(findB1PrintFaults("Was macht eine Freundschaft wichtig? a) Ehrlichkeit b) Respekt").length, 0);
+});
+
+test("B1 print uses stable block flow for reading questions and removes empty web buttons", () => {
+  assert.match(B1_PRINT_CSS, /data-reading-exam-question-grid/);
+  assert.match(B1_PRINT_CSS, /page-break-inside: avoid !important/);
+  assert.ok(suppressB1EmptyChromeControls.toString().includes("document.querySelectorAll"));
+  assert.match(suppressB1EmptyChromeControls.toString(), /vividBlueFrame/);
+  assert.ok(B1_PRINT_CSS.includes(".app-back-button"));
+  assert.match(suppressB1EmptyChromeControls.toString(), /rect\.width < 180/);
+  assert.match(suppressB1EmptyChromeControls.toString(), /el\.querySelector\("input,img/);
+});
+
+test("B1 print suppresses the source-confirmed empty workbook lesson navigation panel", () => {
+  assert.ok(B1_PRINT_CSS.includes('[aria-label="Workbook lesson navigation"]'));
+  assert.ok(prepareB1PrintView.toString().includes('querySelectorAll(\'[aria-label="Workbook lesson navigation"]\')'));
 });

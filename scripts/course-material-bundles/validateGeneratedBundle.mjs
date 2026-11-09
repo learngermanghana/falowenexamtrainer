@@ -11,6 +11,7 @@ import { assertA2PrintSafety } from "./a2PdfSafety.mjs";
 import { getA2ReadOnlyParts } from "./a2PrintableCompanions.mjs";
 import { getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
 import { findB1PrintFaults } from "./b1PdfPrintExtras.mjs";
+import { assertB1PublicationReady } from "./b1PrintReadiness.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -135,6 +136,7 @@ if (level === "A2") {
     shortPages.slice(0, 35).map(page => page.index).join(", "));
 }
 if (level === "B1") {
+  assertB1PublicationReady(text);
   const faults = findB1PrintFaults(text);
   if (faults.length) throw new Error("B1 retail PDF preflight failed: " + faults.join(", "));
   const audit = scanPdfPageContent(text, pdf.getPageCount());

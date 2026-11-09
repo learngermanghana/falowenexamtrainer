@@ -12,9 +12,9 @@ import { buildB1ReadOnlyPrintHtml, getB1ReadOnlyParts, getB1PdfLessonCompanionUr
 import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
 import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2PrintSafety, assertA2PrintedContent } from "./a2PdfSafety.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
-import { scanPdfPageContent } from "./pdfPageAudit.mjs";
-import { B1_PRINT_SCALES, shouldRetryB1PrintAudit } from "./b1PrintRetry.mjs";
-import { B1_PRINT_CSS, prepareB1PrintView, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent, assertB1CanonicalPrintedContent } from "./b1PdfPrintExtras.mjs";
+import { scanPdfPageContent, extractPdfPages } from "./pdfPageAudit.mjs";
+import { B1_PRINT_SCALES, shouldRetryB1PrintAudit, shouldRetryB1SparseTail } from "./b1PrintRetry.mjs";
+import { B1_PRINT_CSS, prepareB1PrintView, suppressB1EmptyChromeControls, restoreB1PrintView, findB1PrintFaults, assertB1PrintedContent, assertB1CanonicalPrintedContent } from "./b1PdfPrintExtras.mjs";
 import { addB1RetailCover } from "./b1RetailCover.mjs";
 import { classifyPdfLoginFailure } from "./pdfLoginFailures.mjs";
 
@@ -288,7 +288,7 @@ const restorePdfChromeText = async (page) => page.evaluate(() => {
   delete window.__falowenPdfChromeChanges;
 });
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
-  if (level === "A2") {
+  if (level === "A2" || level === "B1") {
     // Wait for lazy grammar/Teil panels, not a fixed 350ms snapshot.
     await page.waitForFunction(() => ![...document.querySelectorAll("main *")].some(node =>
       node.children.length === 0 && node.getBoundingClientRect().height > 0 &&
@@ -302,8 +302,9 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
     if (level === "B1") {
-      await page.evaluate(prepareB1PrintView);
+      await page.evaluate(prepareB1PrintView, { section: suffix });
       await suppressPdfChromeText(page);
+      await page.evaluate(suppressB1EmptyChromeControls);
     }
     if (level === "A2") {
       const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
@@ -352,7 +353,18 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
           { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
         const cleanPdf = await PDFDocument.load(fs.readFileSync(file));
         const audit = scanPdfPageContent(cleaned, cleanPdf.getPageCount());
-        if (!audit.faults.length) break;
+
+        if (!audit.faults.length) {
+          const sourcePages = extractPdfPages(cleaned);
+          if (shouldRetryB1SparseTail(sourcePages, attempt)) {
+            console.warn(
+              "B1 Day " + lesson.day + " " + suffix + ": trailing exercise fragment at scale " +
+              B1_PRINT_SCALES[attempt] + "; retrying compact page flow at " + B1_PRINT_SCALES[attempt + 1]
+            );
+            continue;
+          }
+          break;
+        }
         if (!shouldRetryB1PrintAudit(audit.faults, attempt)) {
           throw new Error(
             "B1 Day " + lesson.day + " " + suffix + " failed print-page audit after safe layout retries:\n" +

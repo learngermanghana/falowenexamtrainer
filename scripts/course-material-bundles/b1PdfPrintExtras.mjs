@@ -5,6 +5,8 @@
 export const B1_PRINT_CSS = `
   @page { size: A4; margin: 10mm 9mm 12mm; }
   .app-header, header.app-header--compact, .app-shell > header.app-header,
+  .app-back-button,
+  [aria-label="Workbook lesson navigation"],
   [data-course-inline-practice], [data-live-class-response],
   [data-live-class-response-mount], [data-submission-feedback],
   [data-teacher-only], [data-admin-only], [data-pdf-exclude],
@@ -19,6 +21,43 @@ export const B1_PRINT_CSS = `
   h1, h2, h3, h4 { break-after: avoid; }
   p, li { orphans: 3; widows: 3; }
   table { max-width: 100% !important; }
+  /* Keep short grammar tables intact and prevent the next card from printing
+     on top of the final rows at a page boundary. */
+  table, thead, tbody, tr, th, td { break-inside: avoid !important; }
+  section:has(> table) { break-inside: avoid-page !important; display: block !important; }
+  /* Chromium can fragment a grid row but paint the following question over
+     its last choices. Print reading question cards in ordinary block flow. */
+  [data-reading-exam-question-grid] {
+    display: block !important; grid-template-columns: none !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  [data-reading-exam-question-grid] > * {
+    display: block !important; margin: 0 0 14px !important;
+    break-inside: avoid-page !important; page-break-inside: avoid !important;
+  }
+  /* Paper needs compact choice rows; screen-only touch-target padding caused
+     Day 7 ads and Day 13 film questions to spill onto extra A4 pages.
+     Preserve every answer and radio circle, only reduce empty row spacing. */
+  [role="radiogroup"], .b1-final-choices {
+    gap: 3px !important;
+  }
+  [role="radiogroup"] label, .b1-final-choices label,
+  label:has(> input[type="radio"]) {
+    min-height: 0 !important;
+    padding: 4px 8px !important;
+    line-height: 1.3 !important;
+    margin-block: 1px !important;
+    break-inside: avoid !important;
+  }
+  [role="radiogroup"] input[type="radio"] {
+    flex-shrink: 0 !important;
+  }
+
+  /* Live text controls have blue focus outlines but no useful paper content.
+     Keep radio/checkbox circles visible for printed multiple-choice questions. */
+  input:not([type="radio"]):not([type="checkbox"]), textarea { display: none !important; }
+  div:has(> input:not([type="radio"]):not([type="checkbox"]):only-child) { display: none !important; }
+  [style*="position: sticky"], [style*="position: fixed"] { position: static !important; }
   pre { white-space: pre-wrap !important; overflow-wrap: anywhere; }
   a { color: inherit !important; text-decoration: none !important; }
 `;
@@ -27,7 +66,7 @@ export const isB1WorkbookGuideLabel = value =>
   /^Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook$/i
     .test(String(value || "").replace(/\s+/g, " ").trim());
 
-export const prepareB1PrintView = () => {
+export const prepareB1PrintView = ({ section = "" } = {}) => {
   if (window.__b1PrintChanges) throw new Error("B1 print view already active");
   const undo = [];
   const normalize = value => String(value || "").replace(/\s+/g, " ").trim();
@@ -43,6 +82,42 @@ export const prepareB1PrintView = () => {
     undo.push(() => { if (replacement.isConnected) replacement.replaceWith(node); });
   };
   const root = document.body;
+  // This screen-only wrapper becomes an empty ~50px-high blue outline after
+  // the navigation text is scrubbed. It contains no printed lesson material.
+  for (const panel of [...root.querySelectorAll('[aria-label="Workbook lesson navigation"]')]) {
+    swap(panel);
+  }
+
+  // The screen grammars reuse an old "B1 Workbook" masthead. Correct
+  // the print title without changing React or the authenticated workbook.
+  if (section === "grammar") {
+    for (const heading of [...root.querySelectorAll("h1,h2,h3")]) {
+      if (!/^B1 Workbook\s*[·•-]/i.test(normalize(heading.textContent))) continue;
+      const previous = heading.textContent;
+      heading.textContent = previous.replace(/^B1 Workbook/, "B1 Grammar Notes");
+      undo.push(() => { heading.textContent = previous; });
+    }
+  }
+
+  // Strictly remove notices about online answer persistence. They are
+  // positioned over live reading questions and cover printed answer choices.
+  // Only an entire matching notice is removable, never its surrounding question.
+  const paperOnlyNotices = [
+    /^Answer directly in the workbook\..*Review\s*&\s*Submit.*before submitting\.?$/i,
+    /^Click an answer option\..*saved automatically to Submit.*$/i,
+    /^Your choice is saved automatically to Submit.*$/i,
+    /^Choose one answer for each question$/i,
+    /^Prepare a 60[–-]90 second answer for class\. Teil 1 is not submitted\.?$/i,
+    /^Lösungen anzeigen$/i,
+  ];
+  const noticeCandidates = [...root.querySelectorAll("p,div,aside,section,small,span,button,label,strong")]
+    .filter(el => el.isConnected && normalize(el.textContent).length < 350 &&
+      paperOnlyNotices.some(rx => rx.test(normalize(el.textContent))));
+  // Remove the entire matching notice container (including its opaque
+  // background), not just the nested text that was obscuring questions.
+  for (const el of noticeCandidates.filter(node =>
+    !noticeCandidates.some(outer => outer !== node && outer.contains(node)))) swap(el);
+
 
   // Exclude private session and result widgets before their content can be
   // serialized. This is a static book, not a screenshot of an export account.
@@ -66,6 +141,13 @@ export const prepareB1PrintView = () => {
     const rect = el.getBoundingClientRect?.();
     if (rect && rect.height > 160) continue;
     swap(el);
+  }
+
+  // The "Lösungen anzeigen" disclosure belongs to the interactive web
+  // lesson and must never enter a student print book (including its answer).
+  for (const details of [...root.querySelectorAll("details")]) {
+    const summary = details.querySelector(":scope > summary");
+    if (/^Lösungen anzeigen$/i.test(normalize(summary?.textContent))) swap(details);
   }
 
   // Shared B1 workbooks render an online-only <details> accordion whose
@@ -140,6 +222,33 @@ export const prepareB1PrintView = () => {
   return { replacements: undo.length };
 };
 
+
+/** Remove large blank link/button outlines left after the text-only web chrome
+ * scrub. Never remove a radio answer, checkbox, image, or instructional text. */
+export const suppressB1EmptyChromeControls = () => {
+  const undo = window.__b1PrintChanges;
+  if (!undo) throw new Error("B1 print state must be prepared first");
+  // Browser-state panels sometimes retain a vivid blue outline after their
+  // online-only content is scrubbed. Remove only empty, shallow, wide panels;
+  // never touch actual answer choices, notes, diagrams or question containers.
+  const candidates = [...document.querySelectorAll("button,a,[role=button],div,section,aside,article")];
+  for (const el of candidates) {
+    if (!el.isConnected || (el.textContent || "").trim()) continue;
+    if (el.querySelector("input,img,svg,canvas,[role=radio],[role=checkbox],[data-reading-exam-question-grid],table")) continue;
+    const rect = el.getBoundingClientRect?.();
+    if (!rect || rect.width < 180 || rect.height < 20 || rect.height > 110) continue;
+    const css = window.getComputedStyle(el);
+    if (css.display === "none" || css.visibility === "hidden") continue;
+    const emptyClickable = el.matches("button,a,[role=button]");
+    const vividBlueFrame = /^(?:rgb\(37, 99, 235\)|#2563eb)$/i.test(css.borderTopColor) &&
+      Number.parseFloat(css.borderTopWidth || "0") >= 1;
+    if (!emptyClickable && !vividBlueFrame) continue;
+    const replacement = document.createElement("span");
+    el.replaceWith(replacement);
+    undo.push(() => { if (replacement.isConnected) replacement.replaceWith(el); });
+  }
+};
+
 export const restoreB1PrintView = () => {
   for (const reverse of [...(window.__b1PrintChanges || [])].reverse()) reverse();
   delete window.__b1PrintChanges;
@@ -177,6 +286,8 @@ export const findB1PrintFaults = text => {
     ["workbook web guidance", /Day\s*\d+\s*[·•-]\s*B1 workbook\s*[·•-]\s*how to complete this workbook/i],
     ["workbook tab instructions", /Select Grammar,\s*Teil\s*1/i],
     ["saved learner state", /Draft saved|Your saved answers|Recognised speech|Recognized speech|Your corrected sentences/i],
+    ["online answer-saving overlay", /Answer directly in the workbook|Your choice is saved automatically to Submit|Click an answer option/i],
+    ["answer reveal web action", /^\s*Lösungen anzeigen\s*$/mi],
     ["unhydrated lesson", /Loading grammar notes|Loading the app|Unexpected Application Error/i],
     ["unresolved audio-loading placeholder", /Audio wird geladen\s*(?:…|\.{2,3})?/i],
     ["private media token", /X-Amz-(?:Signature|Credential)|[?&](?:token|signature|access_token)=|r2\.cloudflarestorage\.com/i],

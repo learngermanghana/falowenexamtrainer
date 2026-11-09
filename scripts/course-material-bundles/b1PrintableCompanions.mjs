@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B1_PRESERVED_READING_PRINT_DATA, B1_DAY22_SECOND_READING_PRINT_DATA } from "./b1PreservedReadingPrintData.mjs";
+import { getB1RetailWritingTask } from "./b1RetailWritingEditorial.mjs";
 
 const dataDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/src/data");
 const modules = new Map();
@@ -53,9 +54,9 @@ const pageHtml = ({ day, section, title, body, intro = "" }) => {
     'header{border-bottom:2px solid #2257aa;padding-bottom:12px;margin-bottom:16px}' +
     'header small{color:#3b6599;font-weight:700}h1{font-size:19pt;margin:6px 0}h2{font-size:13pt;margin:20px 0 8px}' +
     'p{white-space:pre-line}li{margin:7px 0}li,aside{break-inside:avoid}' +
-    '.questions>li{margin:16px 0}.questions ul{list-style:none;padding-left:18px}' +
+    '.questions>li{margin:11px 0}.questions ul{list-style:none;padding-left:18px}' +
     '.hint{background:#edf4ff;border-left:4px solid #3970b8;padding:10px}' +
-    'footer{border-top:1px solid #cbd5e1;margin-top:24px;padding-top:10px;font-size:9pt;color:#4b5563}' +
+    'footer{border-top:1px solid #cbd5e1;margin-top:6px;padding-top:4px;font-size:8.5pt;color:#4b5563}' +
     '</style></head><body><header><small>FALOWEN · B1 · Tag ' + day + '</small><h1>' +
     escapeHtml(title) + '</h1><div>' + escapeHtml(section) + '</div></header>' +
     (intro ? '<div class="hint">' + paragraph(intro) + '</div>' : "") +
@@ -64,7 +65,7 @@ const pageHtml = ({ day, section, title, body, intro = "" }) => {
 
 const writing = async (day) => {
   const { getB1WritingTask } = await canonical("b1WritingTasks.js");
-  const task = getB1WritingTask(day);
+  const task = getB1RetailWritingTask(day, getB1WritingTask(day));
   if (!task?.instructions || !task.title) throw new Error("B1 Day " + day + ": canonical writing task missing");
   const prompt = [task.instructions, task.sourceTitle, task.sourceText].filter(Boolean).join(" ");
   if (prompt.length < 70) throw new Error("B1 Day " + day + ": writing prompt is incomplete");

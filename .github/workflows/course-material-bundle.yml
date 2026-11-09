@@ -140,7 +140,10 @@ jobs:
           node --check scripts/course-material-bundles/b1PreservedReadingPrintData.mjs
           node --test scripts/course-material-bundles/b1PrintableCompanions.test.mjs
           node --test scripts/course-material-bundles/b1RetailPrint.test.mjs
+          node --test scripts/course-material-bundles/b1RetailWritingEditorial.test.mjs
+          node --test scripts/course-material-bundles/b1PrintReadiness.test.mjs
           node --test scripts/course-material-bundles/b1PrintRetry.test.mjs
+          node --test scripts/course-material-bundles/b1PrintPagination.test.mjs
           node --test scripts/course-material-bundles/a2PdfPrintExtras.test.mjs
           if [ "${{ matrix.level }}" = "A1" ]; then node --test scripts/course-material-bundles/validateA1RenderPlan.test.mjs; fi
 

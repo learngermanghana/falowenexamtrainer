@@ -245,10 +245,13 @@ test("B1 writing/listening tabs use canonical questions but Lesen stays live whe
 });
 
 test("B1 sparse PDF print retries preserve page audits and avoid deleting short lesson content", () => {
-  assert.match(source, /import \{ B1_PRINT_SCALES, shouldRetryB1PrintAudit \} from "\.\/b1PrintRetry\.mjs"/);
+  assert.match(source, /import \{ B1_PRINT_SCALES, shouldRetryB1PrintAudit, shouldRetryB1SparseTail \} from "\.\/b1PrintRetry\.mjs"/);
+  assert.match(source, /if \(shouldRetryB1SparseTail\(sourcePages, attempt\)\)/);
   assert.match(source, /await renderPdf\(B1_PRINT_SCALES\[attempt\]\)/);
   assert.match(source, /if \(!shouldRetryB1PrintAudit\(audit\.faults, attempt\)\)/);
-  assert.match(source, /if \(!audit\.faults\.length\) break;/);
+  assert.match(source, /if \(!audit\.faults\.length\) \{/);
+  assert.match(source, /if \(shouldRetryB1SparseTail\(sourcePages, attempt\)\)/);
+  assert.match(source, /if \(!shouldRetryB1PrintAudit\(audit\.faults, attempt\)\)/);
   assert.match(source, /assertB1PrintedContent\(b1ExpectedText, printed\)/);
   assert.match(source, /scanPdfPageContent\(cleaned, cleanPdf\.getPageCount\(\)\)/);
 });
@@ -261,4 +264,15 @@ test("canonical B1 companions use B1 text coverage rather than A2 exact-order as
   assert.match(b1, /assertB1CanonicalPrintedContent\(expectedText, printedText\)/);
   assert.doesNotMatch(b1, /assertA2PrintedContent\(expectedText, printedText\)/);
   assert.match(source, /assertA2PrintedContent\(expectedText, printedText\)/);
+});
+
+test("B1 prepublication renderer waits for lazy lesson content before printing", () => {
+  const start = source.indexOf("const saveCurrentPagePdf = async");
+  const end = source.indexOf("const renderA1Lesson =", start);
+  assert.ok(start >= 0 && end > start);
+  const save = source.slice(start, end);
+  assert.match(save, /if \(level === "A2" \|\| level === "B1"\)/);
+  assert.match(save, /await page\.waitForFunction\(/);
+  assert.match(save, /Loading\(\?: grammar notes\)/);
+  assert.match(save, /prepareB1PrintView, \{ section: suffix \}/);
 });
