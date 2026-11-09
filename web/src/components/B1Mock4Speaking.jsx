@@ -137,7 +137,8 @@ function B1Mock4SpeakingAttempt({ storageKey }) {
 
           <section className="b1-final-writing-task" lang="de">
             <h2>Teil 2 · {SOURCE.teil2.title}</h2>
-            <p><strong>Gewähltes Thema:</strong> {topic.title}</p>
+            <p><strong>Präsentationsthema:</strong> {topic.title}</p>
+            <blockquote>„{topic.quote}“</blockquote>
             <ol>{SOURCE.teil2.slides.map(slide => <li key={slide.number}>
               <strong>Folie {slide.number} – {slide.label}:</strong> {slide.prompt}
               <p style={{ marginTop: 3, fontStyle: "italic" }}>{slide.phrase}</p>
@@ -147,6 +148,7 @@ function B1Mock4SpeakingAttempt({ storageKey }) {
           <section className="b1-final-writing-task" lang="de">
             <h2>Teil 3 · {SOURCE.teil3.title}</h2>
             <p>{SOURCE.teil3.objective}</p>
+            <blockquote>„Zusammenfassend meine ich, dass Kinder im Grundschulalter kein Smartphone brauchen, sondern erst ab etwa 12 Jahren ein eigenes Handy bekommen sollten. Vielen Dank fürs Zuhören!“</blockquote>
             <ol>{SOURCE.teil3.steps.map(item => <li key={item.label}><strong>{item.label}:</strong> {item.phrase}</li>)}</ol>
           </section>
 
