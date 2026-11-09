@@ -1,8 +1,12 @@
-name: B1 Mock 04 Hören verification
+name: B1 Mock 04 Lesen and Hören verification
 on:
   pull_request:
     paths:
       - 'functions/functionz/b1Mock4*'
+      - 'functions/functionz/tests/b1Mock4Lesen.test.cjs'
+      - 'web/src/data/b1Mock4ReadingContent.js'
+      - 'web/src/components/B1Mock4Lesen.jsx'
+      - 'web/src/services/b1Mock4LesenService.js'
       - 'functions/functionz/tests/b1Mock4Hoeren.test.cjs'
       - 'functions/functionz/app.js'
       - 'web/src/components/B1Mock4Hoeren.jsx'
@@ -15,6 +19,7 @@ on:
     paths:
       - 'functions/functionz/b1Mock4*'
       - 'functions/functionz/tests/b1Mock4Hoeren.test.cjs'
+      - 'functions/functionz/tests/b1Mock4Lesen.test.cjs'
       - '.github/workflows/b1-mock04-hoeren.yml'
 permissions:
   contents: read
@@ -31,8 +36,9 @@ jobs:
         run: |
           node --check functions/functionz/app.js
           node --check functions/functionz/b1Mock4Hoeren.js
+          node --check functions/functionz/b1Mock4Lesen.js
           node --check functions/functionz/b1Mock4PublishedAudio.js
-          node --test functions/functionz/tests/b1Mock4Hoeren.test.cjs
+          node --test functions/functionz/tests/b1Mock4Hoeren.test.cjs functions/functionz/tests/b1Mock4Lesen.test.cjs
   web:
     runs-on: ubuntu-latest
     timeout-minutes: 20
