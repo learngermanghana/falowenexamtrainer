@@ -249,7 +249,9 @@ test("B1 sparse PDF print retries preserve page audits and avoid deleting short 
   assert.match(source, /if \(shouldRetryB1SparseTail\(sourcePages, attempt\)\)/);
   assert.match(source, /await renderPdf\(B1_PRINT_SCALES\[attempt\]\)/);
   assert.match(source, /if \(!shouldRetryB1PrintAudit\(audit\.faults, attempt\)\)/);
-  assert.match(source, /if \(!audit\.faults\.length\) break;/);
+  assert.match(source, /if \(!audit\.faults\.length\) \{/);
+  assert.match(source, /if \(shouldRetryB1SparseTail\(sourcePages, attempt\)\)/);
+  assert.match(source, /if \(!shouldRetryB1PrintAudit\(audit\.faults, attempt\)\)/);
   assert.match(source, /assertB1PrintedContent\(b1ExpectedText, printed\)/);
   assert.match(source, /scanPdfPageContent\(cleaned, cleanPdf\.getPageCount\(\)\)/);
 });
