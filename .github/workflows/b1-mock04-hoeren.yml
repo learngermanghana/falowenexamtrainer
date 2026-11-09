@@ -1,4 +1,4 @@
-name: B1 Mock 04 Lesen and Hören verification
+name: B1 Mock 04 Lesen Hören Schreiben verification
 on:
   pull_request:
     paths:
@@ -6,6 +6,10 @@ on:
       - 'functions/functionz/tests/b1Mock4Lesen.test.cjs'
       - 'web/src/data/b1Mock4ReadingContent.js'
       - 'web/src/data/b1Mock4ReadingContent.test.js'
+      - 'web/src/data/b1Mock4WritingTasks.js'
+      - 'web/src/data/b1Mock4WritingTasks.test.js'
+      - 'web/src/components/B1Mock4Schreiben.jsx'
+      - 'web/src/services/b1FinalMockService.js'
       - 'web/src/components/B1Mock4Lesen.jsx'
       - 'web/src/services/b1Mock4LesenService.js'
       - 'functions/functionz/tests/b1Mock4Hoeren.test.cjs'
@@ -56,7 +60,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/data/b1Mock4ReadingContent.test.js
+        run: npx jest --runInBand --runTestsByPath src/data/b1Mock4ReadingContent.test.js src/data/b1Mock4WritingTasks.test.js
       - name: Production web build (no deployment)
         working-directory: web
         run: npx vite build
