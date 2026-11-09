@@ -66,7 +66,17 @@ test('quick questions stay collapsed until requested, and account help links dir
   fireEvent.change(input,{target:{value:'How do I create an account?'}});
   fireEvent.click(screen.getByRole('button',{name:'Ask',exact:true}));
   const signupLink=await screen.findByRole('link',{name:/Create a free account/});
-  expect(signupLink.getAttribute('href')).toBe('/signup?program=german');
-  expect(screen.getByRole('link',{name:/Already registered\\? Log in/}).getAttribute('href')).toBe('/login/');
+  expect(signupLink.href).toBe('https://www.falowen.app/signup?program=german');
+  expect(screen.getByRole('link',{name:/Already registered\? Log in/}).href).toBe('https://www.falowen.app/login/');
   expect(input).toBeInTheDocument();
+});
+
+
+test('registration links point to the main Falowen site on the Exams subdomain', async () => {
+  const originalHost = window.location.hostname;
+  // Absolute links never inherit a different host, including exams.falowen.app.
+  const answer = visitorAnswer('How do I create an account?', {context: 'exams'});
+  expect(new URL(answer.href).hostname).toBe('www.falowen.app');
+  expect(new URL(answer.alternateHref).hostname).toBe('www.falowen.app');
+  expect(originalHost).toBeTruthy();
 });
