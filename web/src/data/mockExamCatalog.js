@@ -304,6 +304,13 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId: "b1-mock-03",
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "b1-mock-04-lesen": {
+    id:"b1-mock-04-lesen",level:"B1",title:"B1 Mock 4 · Lesen",shortTitle:"B1 Mock 4 · Lesen",
+    description:"Five Goethe-style reading parts and 30 questions, with saved answers and private server-verified grading. Lesen is graded separately while Mock 04 is being built.",
+    durationLabel:"65 min · 30 questions · 5 Teile",
+    status:"preview",route:"/campus/course/b1-mock-4-lesen",mode:"practice",
+    questionSetId:"b1-mock-04-lesen",sections:["Lesen · Teile 1 bis 5"],
+  },
   "b1-mock-04-hoeren": {
     id:"b1-mock-04-hoeren",level:"B1",title:"B1 Mock 4 · Hören",shortTitle:"B1 Mock 4 · Hören",
     description:"B1 Mock 4 listening-only preview: four original recordings, 30 questions and server-graded Hören results. This is not yet a four-module mock. Audio playback requires private R2 upload verification.",
