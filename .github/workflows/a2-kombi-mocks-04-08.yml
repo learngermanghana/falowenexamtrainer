@@ -9,6 +9,7 @@ on:
       - 'web/src/data/a2Mock04Hoeren*'
       - 'web/src/data/a2Mock06Hoeren*'
       - 'web/src/data/a2Mock07Hoeren*'
+      - 'web/src/data/a2Mock08Hoeren*'
       - 'web/src/data/a2Mock05Hoeren*'
       - 'web/src/components/HorenPage.js'
       - 'web/src/components/A2MockListeningPractice*'
@@ -23,6 +24,8 @@ on:
       - 'functions/functionz/a2Mock06PublishedAudio.js'
       - 'functions/functionz/a2Mock07HoerenKeys.js'
       - 'functions/functionz/a2Mock07PublishedAudio.js'
+      - 'functions/functionz/a2Mock08HoerenKeys.js'
+      - 'functions/functionz/a2Mock08PublishedAudio.js'
       - 'functions/functionz/a2Mock05PublishedAudio.js'
       - 'functions/functionz/a2Mock05HoerenKeys.js'
       - 'functions/functionz/a2HoerenOnlyScore.js'
@@ -30,6 +33,7 @@ on:
       - 'functions/functionz/tests/a2Mock04HoerenAudio.test.cjs'
       - 'functions/functionz/tests/a2Mock06HoerenAudio.test.cjs'
       - 'functions/functionz/tests/a2Mock07HoerenAudio.test.cjs'
+      - 'functions/functionz/tests/a2Mock08HoerenAudio.test.cjs'
       - 'functions/functionz/tests/a2HoerenOnlyScore.test.cjs'
       - 'functions/functionz/assessmentTaskContext.js'
       - 'functions/functionz/a2MockExaminerScore.js'
@@ -65,10 +69,12 @@ jobs:
           node --check functions/functionz/a2Mock04PublishedAudio.js
           node --check functions/functionz/a2Mock06PublishedAudio.js
           node --check functions/functionz/a2Mock07PublishedAudio.js
+          node --check functions/functionz/a2Mock08HoerenKeys.js
+          node --check functions/functionz/a2Mock08PublishedAudio.js
           node --check functions/functionz/a2Mock05PublishedAudio.js
           node --check functions/functionz/a2HoerenOnlyScore.js
           node --check functions/functionz/assessmentTaskContext.js
-          node --test functions/functionz/tests/a2Kombi04to08.test.cjs functions/functionz/tests/a2Mock04HoerenAudio.test.cjs functions/functionz/tests/a2Mock06HoerenAudio.test.cjs functions/functionz/tests/a2Mock07HoerenAudio.test.cjs functions/functionz/tests/a2HoerenOnlyScore.test.cjs
+          node --test functions/functionz/tests/a2Kombi04to08.test.cjs functions/functionz/tests/a2Mock04HoerenAudio.test.cjs functions/functionz/tests/a2Mock06HoerenAudio.test.cjs functions/functionz/tests/a2Mock07HoerenAudio.test.cjs functions/functionz/tests/a2Mock08HoerenAudio.test.cjs functions/functionz/tests/a2HoerenOnlyScore.test.cjs
   web-release:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -85,7 +91,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/data/a2KombiMockSets.test.js src/data/a2Mock04Hoeren.test.js src/data/a2Mock06Hoeren.test.js src/data/a2Mock07Hoeren.test.js src/data/a2Mock05Hoeren.test.js src/components/A2HorenPracticeRoutes.test.jsx src/data/a2FullMockContract.test.js src/data/mockExamCatalog.a2Library.test.js
+        run: npx jest --runInBand --runTestsByPath src/data/a2KombiMockSets.test.js src/data/a2Mock04Hoeren.test.js src/data/a2Mock06Hoeren.test.js src/data/a2Mock07Hoeren.test.js src/data/a2Mock08Hoeren.test.js src/data/a2Mock05Hoeren.test.js src/components/A2HorenPracticeRoutes.test.jsx src/data/a2FullMockContract.test.js src/data/mockExamCatalog.a2Library.test.js
       - name: Verify production web bundle (no preview deployment)
         working-directory: web
         run: npx vite build
