@@ -304,6 +304,13 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId: "b1-mock-03",
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "b1-mock-04-schreiben": {
+    id:"b1-mock-04-schreiben",level:"B1",title:"B1 Mock 4 · Schreiben",shortTitle:"B1 Mock 4 · Schreiben",
+    description:"Three B1 writing tasks: birthday email, Tanja online guestbook opinion, and formal email to Frau Müller. 60-minute practice with autosave, AI feedback, and a separate 40/40/20 rubric.",
+    durationLabel:"60 min · 3 Aufgaben · 100 rubric points",
+    status:"preview",route:"/campus/course/b1-mock-4-schreiben",mode:"practice",
+    questionSetId:"b1-mock-04-schreiben",sections:["Schreiben · Aufgaben 1 bis 3"],
+  },
   "b1-mock-04-lesen": {
     id:"b1-mock-04-lesen",level:"B1",title:"B1 Mock 4 · Lesen",shortTitle:"B1 Mock 4 · Lesen",
     description:"Five Goethe-style reading parts and 30 questions, with saved answers and private server-verified grading. Lesen is graded separately while Mock 04 is being built.",
