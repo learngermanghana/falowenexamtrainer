@@ -48,10 +48,12 @@ describe("lean first-login onboarding", () => {
       "studentProfile?.balanceDue",
       "detectLevelKey(studentProfile)",
       "getTrialLifecycleState(studentProfile)",
-      "Start Day 1",
-      "View class and account details",
-      "Open billing",
-      "Where can I get help?",
+      "Pay now",
+      "Start 7-day trial",
+      "Campus",
+      "Exams Room",
+      "Course Book",
+      "Starting early is optional.",
     ].forEach((contract) => expect(source).toContain(contract));
 
     expect(source).not.toContain("LESSON_VIDEO_DICTIONARY");
