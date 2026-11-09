@@ -417,9 +417,16 @@ View courses and registration: https://www.falowen.app/classes
 
 ### How do I register?
 
-Create a free Falowen account to get started. You can also view available classes before registering.
+To create your free Falowen account:
+1. Open the signup page.
+2. Enter your full name, email and a password.
+3. Choose your German level, class and learning mode.
+4. Select the 7-day free trial or a tuition payment option.
+5. Complete your contact details and submit the registration.
+6. Follow the setup instructions to activate access.
+Creating an account is free; tuition is separate.
 
-View classes and registration: https://www.falowen.app/classes
+Create a free account: https://www.falowen.app/signup?program=german
 
 ### Where are you located?
 
