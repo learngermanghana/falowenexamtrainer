@@ -1,4 +1,4 @@
-name: B1 Mock 04 Lesen Hören Schreiben verification
+name: B1 Mock 04 four skill source verification
 on:
   pull_request:
     paths:
@@ -8,6 +8,9 @@ on:
       - 'web/src/data/b1Mock4ReadingContent.test.js'
       - 'web/src/data/b1Mock4WritingTasks.js'
       - 'web/src/data/b1Mock4WritingTasks.test.js'
+      - 'web/src/data/b1Mock4SpeakingContent.js'
+      - 'web/src/data/b1Mock4SpeakingContent.test.js'
+      - 'web/src/components/B1Mock4Speaking.jsx'
       - 'web/src/components/B1Mock4Schreiben.jsx'
       - 'web/src/services/b1FinalMockService.js'
       - 'web/src/components/B1Mock4Lesen.jsx'
@@ -60,7 +63,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/data/b1Mock4ReadingContent.test.js src/data/b1Mock4WritingTasks.test.js
+        run: npx jest --runInBand --runTestsByPath src/data/b1Mock4ReadingContent.test.js src/data/b1Mock4WritingTasks.test.js src/data/b1Mock4SpeakingContent.test.js
       - name: Production web build (no deployment)
         working-directory: web
         run: npx vite build
