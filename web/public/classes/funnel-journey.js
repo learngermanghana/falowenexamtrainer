@@ -2,7 +2,6 @@
   var CONTEXT_KEY = "falowen:public-funnel-context";
   var FIRST_TOUCH_KEY = "falowen:public-funnel-first-touch";
   var EVENTS_KEY = "falowen:public-funnel-events";
-  var VIDEO_ID = "CFkrrVxhdL4";
   var LEAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbzrUe3IC5w24Rmf_Ed-8HmdKzV3mn0BQyg2qsaveOSQOYunQj89MM23mgDhjGbsMa2gSA/exec";
   var ATTR_KEYS = ["source", "src", "video", "lesson", "level", "class", "leadId", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
 
@@ -46,13 +45,19 @@
 
   function journeyBase() {
     var existing = context();
-    var source = existing.source || existing.src || "classes_video";
-    var video = existing.video || existing.lesson || VIDEO_ID;
+    var requested = queryContext();
+    var source = requested.source || requested.src || existing.source || existing.src || "classes_brochure";
+    if (source === "classes_video") source = "classes_brochure";
+    var video = requested.video || requested.lesson || (source === "classes_brochure" ? "" : (existing.video || existing.lesson || ""));
+    var utmSource = requested.utm_source || existing.utm_source || "";
+    if (utmSource === "youtube" && !requested.utm_source && source === "classes_brochure") utmSource = "falowen";
+    var utmMedium = requested.utm_medium || existing.utm_medium || "";
+    if (utmMedium === "classes_video" && source === "classes_brochure") utmMedium = "class_brochure";
     return {
       source: source,
       video: video,
-      utm_source: existing.utm_source || (source === "classes_video" ? "youtube" : source),
-      utm_medium: existing.utm_medium || "classes_video",
+      utm_source: utmSource || (source === "classes_brochure" ? "falowen" : source),
+      utm_medium: utmMedium || "class_brochure",
       utm_campaign: existing.utm_campaign || "public_funnel",
     };
   }
@@ -102,20 +107,20 @@
 
   function updateIncompleteWhatsApp(form) {
     if (!form) return;
-    var attribution = journeyBase();
     var name = form.querySelector("#leadName")?.value.trim() || "";
     var email = form.querySelector("#leadEmail")?.value.trim() || "";
     var phone = form.querySelector("#leadPhone")?.value.trim() || "";
     var classSlug = form.querySelector("#leadClass")?.value || "";
+    var classLabel = (form.querySelector("#leadClass option:checked")?.textContent || "").split(" · ")[0].trim();
+    var question = form.querySelector("#leadQuestion")?.value.trim() || "";
     var link = form.querySelector(".lead-whatsapp");
     if (!link) return;
-    var text = "Hello Falowen, I started a class enquiry but have not completed it.";
+    var text = "Hello Falowen, I am contacting you through the Falowen class brochure page.";
     if (name) text += " My name is " + name + ".";
     if (email) text += " Email: " + email + ".";
     if (phone) text += " Phone: " + phone + ".";
-    if (classSlug) text += " Selected class: " + classSlug + ".";
-    if (attribution.video) text += " I came from YouTube lesson " + attribution.video + ".";
-    text += " Please help me continue.";
+    if (classLabel || classSlug) text += " Selected class: " + (classLabel || classSlug) + ".";
+    text += question ? " My question: " + question : " I have a question about this class.";
     link.href = "https://wa.me/233205706589?text=" + encodeURIComponent(text);
   }
 
@@ -129,6 +134,7 @@
       name: form.querySelector("#leadName")?.value.trim() || "",
       phone: form.querySelector("#leadPhone")?.value.trim() || "",
       email: form.querySelector("#leadEmail")?.value.trim() || "",
+      question: form.querySelector("#leadQuestion")?.value.trim() || "",
       classSlug: form.querySelector("#leadClass")?.value || "",
       className: form.querySelector("#leadClass option:checked")?.textContent || "",
       level: new URLSearchParams(window.location.search).get("level") || data.level || "",
