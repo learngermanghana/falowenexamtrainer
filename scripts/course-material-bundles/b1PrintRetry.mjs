@@ -38,3 +38,13 @@ export const isB1OrphanWorkbookHeaderPage = (first = "", second = "", descriptio
     String(second).replace(/\s+/g, " ").trim().length > 400;
 };
 
+/** A source-controlled B1 companion may overflow its repeated, generic
+ * paper/audio notice onto an otherwise empty final sheet. Only this exact
+ * notice, after a substantive exercise page, is safe to discard. */
+export const isB1RedundantNoticeOnlyTail = (lastPage = "", previousPage = "", description = "") => {
+  const normalized = String(lastPage).replace(/\s+/g, " ").trim();
+  const previousLength = String(previousPage).replace(/\s+/g, " ").trim().length;
+  return /^B1 Day (?:[1-9]|1\d|2[0-8]) teil-[1-4] companion$/.test(description) &&
+    normalized === "Schriftliche Übungen können Sie auf Papier bearbeiten. Audio und benotete Abgabe bleiben in der Falowen-Lektion." &&
+    previousLength > 300;
+};
