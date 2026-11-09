@@ -55,7 +55,7 @@ test('class answers exclude past, hidden, closed, self-learning and wrong-level 
 
 test('quick questions stay collapsed until requested, and account help links directly to signup',async()=>{
   render(<VisitorQuestionHelper />);
-  fireEvent.click(screen.getByRole('button',{name:/Questions\\? Ask us/}));
+  fireEvent.click(screen.getByRole('button',{name:/Questions\? Ask us/}));
   const input=screen.getByLabelText('Your question');
   expect(input).toHaveFocus();
   expect(screen.queryByRole('button',{name:'What are the fees?'})).toBeNull();
