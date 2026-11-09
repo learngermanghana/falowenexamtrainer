@@ -5,6 +5,7 @@ on:
       - 'functions/functionz/b1Mock4*'
       - 'functions/functionz/tests/b1Mock4Lesen.test.cjs'
       - 'web/src/data/b1Mock4ReadingContent.js'
+      - 'web/src/data/b1Mock4ReadingContent.test.js'
       - 'web/src/components/B1Mock4Lesen.jsx'
       - 'web/src/services/b1Mock4LesenService.js'
       - 'functions/functionz/tests/b1Mock4Hoeren.test.cjs'
@@ -51,6 +52,11 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci --legacy-peer-deps --no-audit --no-fund
         working-directory: web
+      - name: Mock 04 Lesen source and no-answer-leak checks
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/data/b1Mock4ReadingContent.test.js
       - name: Production web build (no deployment)
         working-directory: web
         run: npx vite build
