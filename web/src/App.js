@@ -1129,6 +1129,7 @@ const AppShell = ({
           <Route path="/campus/course/b1-mock-3" element={<B1FinalMockExamPage key="b1-mock-03" mockId="b1-mock-03" />} />
           <Route path="/campus/course/b1-mock-2-hoeren" element={<B1Mock2Hoeren />} />
           <Route path="/campus/course/b1-mock-3-hoeren" element={<B1Mock3Hoeren />} />
+          <Route path="/campus/course/b1-mock-4" element={<B1FinalMockExamPage key="b1-mock-04" mockId="b1-mock-04" />} />
           <Route path="/campus/course/b1-mock-4-hoeren" element={<B1Mock4Hoeren />} />
           <Route path="/campus/course/b1-mock-4-lesen" element={<B1Mock4Lesen />} />
           <Route path="/campus/course/b1-mock-4-schreiben" element={<B1Mock4Schreiben />} />
