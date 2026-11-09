@@ -72,11 +72,8 @@ test('quick questions stay collapsed until requested, and account help links dir
 });
 
 
-test('registration links point to the main Falowen site on the Exams subdomain', async () => {
-  const originalHost = window.location.hostname;
-  // Absolute links never inherit a different host, including exams.falowen.app.
+test('registration links remain on the learner site when reached from Exams', () => {
   const answer = visitorAnswer('How do I create an account?', {context: 'exams'});
-  expect(new URL(answer.href).hostname).toBe('www.falowen.app');
-  expect(new URL(answer.alternateHref).hostname).toBe('www.falowen.app');
-  expect(originalHost).toBeTruthy();
+  expect(new URL(answer.href, 'https://exams.falowen.app').href).toBe('https://www.falowen.app/signup?program=german');
+  expect(new URL(answer.alternateHref, 'https://exams.falowen.app').href).toBe('https://www.falowen.app/login/');
 });
