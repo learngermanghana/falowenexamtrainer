@@ -4,7 +4,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { PDFDocument } from "pdf-lib";
 import { extractPdfPages } from "./pdfPageAudit.mjs";
-import { isB1OrphanWorkbookHeaderPage } from "./b1PrintRetry.mjs";
+import { isB1OrphanWorkbookHeaderPage, isB1RedundantNoticeOnlyTail } from "./b1PrintRetry.mjs";
 
 // A trailing, textless browser-print page is safe to discard ONLY when
 // a low-resolution render is visually empty as well. Never remove an
@@ -78,6 +78,16 @@ export const trimPrintedPdfTail = async (file, { description = "", removeBlankIn
     const a2Companion = /^A2 Day (?:[1-9]|1\d|2[0-8]) teil-[1-4] companion$/.test(description);
     const footerOnly = textPages[index].replace(/\s+/g, " ").trim() ===
       "Read-only printed practice. Submit graded coursework in Falowen.";
+
+    if (isB1RedundantNoticeOnlyTail(textPages[index], textPages[index - 1], description)) {
+      // B1 questions and the audio QR are on the substantive preceding page.
+      // The standalone instruction is identical on other workbook companions.
+      if (removed >= 3) throw new Error("Too many notice-only B1 pages in " + description);
+      pdf.removePage(index);
+      removed++;
+      continue;
+    }
+
     if (a2Companion && footerOnly && textPages[index - 1].trim().length > 100) {
       if (removed >= 3) throw new Error("Too many trailing print pages in " + description);
       pdf.removePage(index);
