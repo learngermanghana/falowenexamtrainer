@@ -115,8 +115,8 @@ test.each(['How do I know I am ready for the official exam?', 'How can I check m
 
 test.each(['How do I create an account?', 'How do i create account', 'How do I register?', 'Where can I sign up?', 'I want to open a Falowen account'])('signup instructions and correct link: %s', question => {
   const answer = visitorAnswer(question);
-  expect(answer.href).toBe('/signup?program=german');
-  expect(answer.alternateHref).toBe('/login/');
+  expect(answer.href).toBe('https://www.falowen.app/signup?program=german');
+  expect(answer.alternateHref).toBe('https://www.falowen.app/login/');
   expect(answer.text).toContain('Enter your full name, email and a password');
   expect(answer.text).toContain('7-day free trial');
   expect(answer.text).toContain('Creating an account is free');
