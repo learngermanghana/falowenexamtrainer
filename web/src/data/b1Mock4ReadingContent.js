@@ -1,6 +1,5 @@
 // B1 Mock 04 teacher-supplied Lesen paper. Duplicates Mock 03 source in places.
 // Student-facing question data intentionally excludes answer keys.
-// The teacher source had erroneously marked Aufgabe 2 as Falsch.
 const statements = (start, rows) => rows.map(([question], index) => ({
   number: start + index, question,
 }));
@@ -52,7 +51,7 @@ export const B1_MOCK4_LESEN = {
       paragraphs: [
         "Mit der Rundfahrt „Zeitreise per Velo“ können Touristen das Städtchen Murten und seine Geschichte sportlich neu entdecken. Die Tour startet am Bahnhof von Murten, wo die sportlichen Teilnehmer auf das eigene oder ein gemietetes Velo steigen. Die weniger sportlichen Teilnehmer steigen einfach aufs Elektro-Velo. Dieses kann ebenfalls am Bahnhof gemietet werden.",
         "Vom Bahnhof führt der Weg auf den historischen Hügel. Die Sportlichen kommen bei der Fahrt auf den Hügel ins Schwitzen, während die E-Biker ganz einfach den Elektromotor nutzen. Oben angekommen kann man die wunderbare Aussicht auf den Murtensee genießen. „Mit der Velorundfahrt für Gruppen wollen wir unser Angebot für aktive Radfahrer erweitern“, sagt der Geschäftsführer von Murten Tourismus. Damit soll sowohl das Gebiet für Velo-Touristen interessant gemacht als auch der Trend zum E-Bike unterstützt werden.",
-        "Velo = Schweizer Standard für „Fahrrad“",
+        "Velo = Schweizer Standarddeutsch für „Fahrrad“",
       ],
       questions: choices(10, [
         ["In diesem Text geht es darum, dass...", "die Geschichte von Murten neu erzählt wird.", "es ein neues Tourismus-Angebot gibt.", "man in Murten neue Velo-Wege bauen will."],
@@ -63,19 +62,19 @@ export const B1_MOCK4_LESEN = {
   },
   teil3: {
     title: "Teil 3", time: "10 Minuten",
-    context: "Nach dem Ende Ihres gemeinsamen Deutschkurses suchen einige Ihrer Kolleginnen und Kollegen nach passenden Möglichkeiten zum Weiterlernen. Lesen Sie die Situationen 13 bis 19 und die Anzeigen A bis J. Jede Anzeige darf nur einmal verwendet werden. Gibt es keine passende Anzeige, wählen Sie 0. Anzeige I ist das Beispiel.",
+    context: "Nach dem Ende Ihres gemeinsamen Deutschkurses möchten einige Ihrer Kolleginnen und Kollegen weiter Deutsch lernen und suchen dafür passende Möglichkeiten. Lesen Sie die Situationen 13 bis 19 und die Anzeigen A bis J. Jede Anzeige darf nur einmal verwendet werden. Gibt es keine passende Anzeige, wählen Sie 0. Anzeige I ist das Beispiel.",
     exampleAd: "I",
     ads: [
-      ["A", "Schweizer Autoren, leicht gemacht", "Nach 100 Lernstunden schon literarische Kurzgeschichten & Romane lesen? Kein Problem! Die Reihe bietet vereinfachte Originalversionen für Sprachlerner. www.schweizer-leseverlag.ch"],
-      ["B", "Trainingsprogramm Deutsch", "Sie wollen Deutsch verbessern, haben aber keine Zeit für Kurse? Lernen Sie gratis im Internet! 10 Kurslektionen, Grammatik & Übungen online. www.sprachenlernen.de"],
-      ["C", "DEUTSCH IN DER SCHWEIZ", "Intensivkurse (20-30 Std), Schreibkurse (Fernstudium!), Sommerkurse für Jugendliche & Erwachsene. Kurs: Deutsch im Hotel. Nur Tageskurse! www.deutschinderschweiz.ch"],
-      ["D", "Job & Sprache-Net", "Jobs für Deutschlernende in Deutschland, Österreich & Schweiz. Erfahrungen in Hotel & Restaurant sammeln (Juni–August). Unterkunft frei! www.jobundsprache-net.com"],
-      ["E", "Sprachschule ORION", "Trainer/innen gesucht (Vollzeit). Kurszeiten 8:00–17:00h, Niveaus A1–C1. Allgemein & Berufsbezogen (z.B. Deutsch für Tourismus). office@deutschintensiv.de"],
-      ["F", "Deutsch erLesen", "Das Magazin richtet sich an Deutschinteressierte im In- und Ausland. Erscheint monatlich mit aktuellen Originalartikeln aus der deutschen Presse. info@deutsch-erlesen.de"],
-      ["G", "Verlag für deutsche Literatur", "Lektor/in gesucht für Auswahl & Korrektur von Werken junger Autoren. Romane, Gedichtbände & Hörbücher. junge-literatur@berlin.de"],
-      ["H", "Deutsch in Linz", "Deutsch-Intensivkurse Mo–Fr (9:30–13h & 14–17h). Für Berufstätige bieten wir flexible Kurszeiten an (Termine nach Wunsch, auch abends!). www.deutschinlinz-schule.at"],
+      ["A", "Schweizer Autoren, leicht gemacht", "Nach 100 Lernstunden schon literarische Kurzgeschichten, Romane und Gedichte lesen? Kein Problem! Die Reihe bietet Deutschlernern vereinfachte Originalversionen für uneingeschränktes Lesevergnügen. www.schweizer-leseverlag.ch"],
+      ["B", "Trainingsprogramm Deutsch", "Sie wollen Ihre Sprachkenntnisse verbessern, haben aber keine Zeit für Kurse? Dann lernen Sie Deutsch im Internet! Unser Lernportal bietet Ihnen gratis: 10 Kurslektionen für Anfänger und Fortgeschrittene, Erklärungen zur Grammatik, alle Übungen online verfügbar. www.sprachenlernen.de"],
+      ["C", "DEUTSCH IN DER SCHWEIZ", "Unser Angebot: Intensivkurse mit 20–30 Wochenstunden, Schreibkurse (auch als Fernstudium!), Sommerkurse für Jugendliche und Erwachsene (mit Freizeitprogramm), Kurs: Deutsch im Hotel. Wir bieten nur Tageskurse an! www.deutschinderschweiz.ch"],
+      ["D", "Job & Sprache-Net", "Wir bieten Jobs für Deutschlernende in Deutschland, Österreich und in der Schweiz. Perfektionieren Sie Ihre Sprachkenntnisse und sammeln Sie Erfahrungen in den Arbeitsbereichen Hotel und Restaurant. Dauer: bis zu 3 Monate (Juni–August). Kosten für Unterkunft und Verpflegung werden übernommen. www.jobundsprache-net.com"],
+      ["E", "Sprachschule ORION", "Sprachschule ORION sucht engagierte Trainer/Trainerinnen (Vollzeit). Kurszeiten von 8:00–17:00 h, Niveaus A1–C1, allgemeine und berufsbezogene Sprachkurse (z. B. Deutsch für den Tourismus). office@deutschintensiv.de"],
+      ["F", "Deutsch erLesen", "Das Magazin Deutsch erLesen richtet sich an Deutschinteressierte im In- und Ausland. Es erscheint einmal im Monat und enthält aktuelle Originalartikel aus der deutschen Presse. Deutschland erfahren & Deutsch lernen! info@deutsch-erlesen.de"],
+      ["G", "Verlag für deutsche Literatur", "Für die Auswahl und Korrektur von Werken junger deutscher Autoren. Unser Verlagsprogramm umfasst Romane, Gedichtbände und Hörbücher. junge-literatur@berlin.de"],
+      ["H", "Deutsch in Linz", "Deutsch-Intensivkurse Mo bis Fr von 9:30–13 h und von 14:00–17 h. Für Berufstätige und Vielbeschäftigte bieten wir flexible Kurszeiten an (Termine nach Wunsch). www.deutschinlinz-schule.at"],
       ["I", "Sprache und Kultur in Wien", "Deutschkurse ganzjährig! Spezialangebote für den Sommer. Infos unter: www.sprache-kultur@aon.at"],
-      ["J", "DIGITAL LEARNING", "Neues Computerprogramm für Büromanagement und Buchhaltung in englischer und deutscher Sprache. Im Buchhandel erhältlich. software@digital-learning.net"],
+      ["J", "DIGITAL LEARNING", "Neues Computerprogramm für Büromanagement und Buchhaltung in englischer und deutscher Sprache. Ab sofort im Buchhandel erhältlich. software@digital-learning.net"],
     ],
     situations: [
       { number: 13, text: "Leon möchte im Sommer im Tourismus-Bereich arbeiten, um sein Deutsch zu verbessern." },
