@@ -35,6 +35,24 @@ export const B1_PRINT_CSS = `
     display: block !important; margin: 0 0 14px !important;
     break-inside: avoid-page !important; page-break-inside: avoid !important;
   }
+  /* Paper needs compact choice rows; screen-only touch-target padding caused
+     Day 7 ads and Day 13 film questions to spill onto extra A4 pages.
+     Preserve every answer and radio circle, only reduce empty row spacing. */
+  [role="radiogroup"], .b1-final-choices {
+    gap: 3px !important;
+  }
+  [role="radiogroup"] label, .b1-final-choices label,
+  label:has(> input[type="radio"]) {
+    min-height: 0 !important;
+    padding: 4px 8px !important;
+    line-height: 1.3 !important;
+    margin-block: 1px !important;
+    break-inside: avoid !important;
+  }
+  [role="radiogroup"] input[type="radio"] {
+    flex-shrink: 0 !important;
+  }
+
   /* Live text controls have blue focus outlines but no useful paper content.
      Keep radio/checkbox circles visible for printed multiple-choice questions. */
   input:not([type="radio"]):not([type="checkbox"]), textarea { display: none !important; }
