@@ -62,13 +62,13 @@ const renderPageToGrayscale = (file, pageNumber, cropInterior = false) => {
 // The book already has a full WORKBOOK divider, so this header-only sheet has
 // no educational content. Drop it only with exact two-line + next-page proof.
 export const isB1OrphanWorkbookHeaderPage = (first = "", second = "", description = "") => {
-  if (!/^B1 Day (?:[1-9]|1\\d|2[0-8]) workbook-teil-1$/.test(description)) return false;
-  const lines = String(first).split(/\\r?\\n/).map(x => x.trim()).filter(Boolean);
+  if (!/^B1 Day (?:[1-9]|1\d|2[0-8]) workbook-teil-1$/.test(description)) return false;
+  const lines = String(first).split(/\r?\n/).map(x => x.trim()).filter(Boolean);
   return lines.length === 2 &&
-    /^B1\\s*·\\s*Day\\s+\\d+\\s*·\\s*Kapitel\\s+[\\w.]+$/.test(lines[0]) &&
-    /^B1 Workbook\\s*·\\s*\\S.+$/.test(lines[1]) &&
-    /Teil 1\\s*·\\s*Sprechen/i.test(String(second).slice(0,700)) &&
-    String(second).replace(/\\s+/g, " ").trim().length > 400;
+    /^B1\s*·\s*Day\s+\d+\s*·\s*Kapitel\s+[\w.]+$/.test(lines[0]) &&
+    /^B1 Workbook\s*·\s*\S.+$/.test(lines[1]) &&
+    /Teil 1\s*·\s*Sprechen/i.test(String(second).slice(0,700)) &&
+    String(second).replace(/\s+/g, " ").trim().length > 400;
 };
 
 export const trimPrintedPdfTail = async (file, { description = "", removeBlankInterior = false } = {}) => {
