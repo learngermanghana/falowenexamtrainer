@@ -1,0 +1,60 @@
+name: B1 Mock 3 full four-module exam
+on:
+  pull_request:
+    paths:
+      - 'web/src/components/B1*'
+      - 'web/src/components/MockExamLibraryPage.js'
+      - 'web/src/data/b1Mock3*'
+      - 'web/src/data/mockExamCatalog.js'
+      - 'web/src/App.js'
+      - 'functions/functionz/b1Mock*'
+      - 'functions/functionz/app.js'
+      - 'functions/functionz/__tests__/b1Mock3FourModules.test.js'
+      - 'functions/functionz/tests/b1Mock3FourModules.test.cjs'
+      - '.github/workflows/b1-mock3-full-exam.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/src/components/B1*'
+      - 'functions/functionz/b1Mock*'
+      - 'functions/functionz/app.js'
+      - '.github/workflows/b1-mock3-full-exam.yml'
+permissions:
+  contents: read
+jobs:
+  backend-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate server-only answer keys and endpoints
+        run: |
+          node --check functions/functionz/app.js
+          node --check functions/functionz/b1Mock3AnswerKeys.js
+          node --check functions/functionz/b1MockCompletionSync.js
+          node --check functions/functionz/b1MockExaminerScore.js
+      - name: B1 Mock 3 trusted scoring and isolated Results identities
+        run: node --test functions/functionz/tests/b1Mock3FourModules.test.cjs functions/functionz/tests/verifiedFourSkillMockScore.test.cjs
+  browser-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+        working-directory: web
+      - name: Mock catalog and B1 exam regressions
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/components/B1FinalMockExamPage.test.jsx src/data/b1Mock3ReadingContent.test.js src/data/b1Mock3SpeakingContent.test.js
+      - name: Compile full web app
+        working-directory: web
+        run: npx vite build

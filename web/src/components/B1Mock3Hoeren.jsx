@@ -12,17 +12,17 @@ function readDraft(uid){
   catch {return {};}
 }
 
-export default function B1Mock3Hoeren() {
+export default function B1Mock3Hoeren({ embedded = false, initialAnswers = {}, initialPlayed = {}, onAnswersChange, onPlayedChange, onComplete } = {}) {
   const { idToken, user } = useAuth();
   const [exam, setExam] = useState(null);
   const [active, setActive] = useState(0);
-  const [answers, setAnswers] = useState(() => readDraft(user?.uid));
+  const [answers, setAnswers] = useState(() => embedded ? initialAnswers : readDraft(user?.uid));
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [audioError, setAudioError] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
   const [audioBusy, setAudioBusy] = useState(false);
-  const [played, setPlayed] = useState({});
+  const [played, setPlayed] = useState(initialPlayed);
   const [busy, setBusy] = useState(false);
   const audioRef = useRef(null);
   const parts = exam?.parts || [];
@@ -30,7 +30,7 @@ export default function B1Mock3Hoeren() {
   const target = Number(exam?.verifiedQuestionCount || 0);
   const answered = parts.flatMap(x=>x.questions).filter(q=>typeof answers[q.number]==="string").length;
 
-  useEffect(()=>{setAnswers(readDraft(user?.uid));setResult(null);setPlayed({});},[user?.uid]);
+  useEffect(()=>{if(!embedded){setAnswers(readDraft(user?.uid));setResult(null);setPlayed({});}},[user?.uid,embedded]);
   useEffect(()=>{
     let cancelled=false;
     if(!idToken){setExam(null);setError("Bitte melden Sie sich an.");return undefined;}
@@ -40,10 +40,11 @@ export default function B1Mock3Hoeren() {
     return ()=>{cancelled=true;};
   },[idToken]);
   useEffect(()=>{
+    if(embedded){onAnswersChange?.(answers);return;}
     if(!user?.uid || result)return;
     try{localStorage.setItem(storageKey(user.uid),JSON.stringify(answers));}
     catch {setError("Antworten konnten auf diesem Gerät nicht gespeichert werden.");}
-  },[user?.uid,answers,result]);
+  },[user?.uid,answers,result,embedded,onAnswersChange]);
 
   useEffect(()=>{
     if(audioRef.current){audioRef.current.pause();audioRef.current.currentTime=0;}
@@ -63,11 +64,16 @@ export default function B1Mock3Hoeren() {
   };
   const startPlayback=()=>{
     if(!audioRef.current||!part||played[part.part])return;
-    audioRef.current.play().then(()=>setPlayed(prev=>({...prev,[part.part]:"started"})))
+    audioRef.current.play().then(()=>markPlayback(part.part,"started"))
       .catch(()=>setAudioError("Der Browser konnte das Audio nicht starten. Bitte versuchen Sie es noch einmal."));
   };
+  const markPlayback=(partNumber,status)=>{
+    setPlayed(prev=>({...prev,[partNumber]:status}));
+  };
+  useEffect(()=>{if(embedded)onPlayedChange?.(played);},[embedded,onPlayedChange,played]);
   const submit=async()=>{
     if(busy||target!==30||answered!==target)return;
+    if(embedded){onComplete?.(answers);return;}
     setBusy(true);setError("");
     try{
       const scored=await scoreB1Mock3Hoeren({idToken,answers});
@@ -85,7 +91,7 @@ export default function B1Mock3Hoeren() {
 
   return <main className="a2-mock2-shell" data-b1-mock3-hoeren lang="de">
     <div className="a2-mock2-top">
-      <AppBackButton label="Zurück zu den Probeprüfungen" fallbackPath="/exams/mocks"/>
+      {!embedded ? <AppBackButton label="Zurück zu den Probeprüfungen" fallbackPath="/exams/mocks"/> : null}
       <span>B1 · Mock 3 · Hören (30 Aufgaben)</span>
     </div>
     <header className="a2-mock2-progress">
@@ -96,7 +102,7 @@ export default function B1Mock3Hoeren() {
       <strong>Teil {part?.part||1}</strong>
     </header>
     <p role="note" style={{padding:12,borderRadius:8,background:"#f8fafc",border:"1px solid #cbd5e1"}}>
-      <strong>Hören-Modul mit 30 Aufgaben.</strong> Alle vier Originalaufnahmen und die passenden Aufgaben sind vorhanden. Ihre Antworten werden anhand des serverseitigen Lösungsschlüssels bewertet. Das Ergebnis gilt für Hören, nicht automatisch als Gesamtbewertung der vier Prüfungsmodule.
+      <strong>Hören-Modul mit 30 Aufgaben.</strong> Alle vier Originalaufnahmen und die passenden Aufgaben sind vorhanden. Ihre Antworten werden anhand des serverseitigen Lösungsschlüssels bewertet. {embedded ? "Nach der Abgabe geht es mit Schreiben weiter. Das Gesamtergebnis wird nach allen vier Modulen serverseitig geprüft." : "Das Ergebnis gilt für Hören, nicht automatisch als Gesamtbewertung der vier Prüfungsmodule."}
     </p>
     {error?<p role="alert">{error}</p>:null}
     {!exam&&!error?<p role="status">Höraufgaben werden geladen …</p>:null}
@@ -117,7 +123,7 @@ export default function B1Mock3Hoeren() {
         <p>Geschützte Aufnahme aus Falowen R2. Starten Sie das Audio erst, wenn Sie bereit sind. Einmal pro Versuch; vorhandene Audio-Wiederholungen sind bereits enthalten.</p>
         {audioUrl?<><audio ref={audioRef} src={audioUrl} preload="metadata" controls={false}
           onError={()=>setAudioError("Die R2-Audiodatei konnte nicht abgespielt werden.")}
-          onEnded={()=>setPlayed(prev=>({...prev,[part.part]:"ended"}))}/>
+          onEnded={()=>markPlayback(part.part,"ended")}/>
           <button type="button" disabled={Boolean(played[part.part])} onClick={startPlayback}>
             {played[part.part]?"Aufnahme gestartet":"Audio starten"}
           </button>
@@ -140,7 +146,7 @@ export default function B1Mock3Hoeren() {
       </fieldset>)}
 
       {!result ? <button type="button" disabled={busy || answered!==target} onClick={submit}>
-        {busy?"Bewertung wird gespeichert …":`Alle ${target} Hören-Antworten einreichen`}
+        {busy?"Bewertung wird gespeichert …":embedded ? "Hören abschließen → Schreiben" : `Alle ${target} Hören-Antworten einreichen` }
       </button>:null}
       {result?<section role="status" aria-live="polite">
         <h2>Hören-Ergebnis: {result.correct}/{result.total} ({result.percentage} %)</h2>

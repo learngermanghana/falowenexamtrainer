@@ -37,13 +37,14 @@ const LISTENING_ANSWER_KEY = Object.freeze({
 const clean = (value = "") => String(value ?? "").trim();
 const {scoreObjectiveAnswers,buildVerifiedFourSkillScore}=require("./verifiedFourSkillMockScore");
 const {B1_MOCK2_READING_KEY}=require("./b1Mock2ReadingKey");
+const {B1_MOCK3_READING_KEY,B1_MOCK3_HOEREN_KEY}=require("./b1Mock3AnswerKeys");
 const {QUESTIONS:B1_MOCK2_HOEREN_QUESTIONS}=require("./b1Mock2Hoeren");
 const B1_MOCK2_HOEREN_KEY=Object.freeze(Object.fromEntries(B1_MOCK2_HOEREN_QUESTIONS.map(q=>[`t${q.part}-${q.number}`,q.answer])));
 
 const buildVerifiedB1MockScore = ({ state = {}, verifiedSections = {}, mockId = "b1-mock-01" } = {}) =>
   buildVerifiedFourSkillScore({
     level:"B1",state,verifiedSections,
-    answerKeys:mockId==="b1-mock-02"
+    answerKeys:mockId==="b1-mock-03" ? {lesen:B1_MOCK3_READING_KEY,hoeren:B1_MOCK3_HOEREN_KEY} : mockId==="b1-mock-02"
       ? {lesen:B1_MOCK2_READING_KEY,hoeren:B1_MOCK2_HOEREN_KEY}
       : {lesen:READING_ANSWER_KEY,hoeren:LISTENING_ANSWER_KEY},
   });
@@ -140,6 +141,7 @@ const resolveStudentIdentity = ({ authedUser = {}, studentProfile = null } = {})
 
 const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false, mockId = "b1-mock-01" } = {}) => {
   const number = Math.max(1, Number(attemptNumber) || 1);
+  if (mockId === "b1-mock-03") return `B1-MOCK-03-ATTEMPT-${number}`;
   if (mockId === "b1-mock-02") return `B1-MOCK-02-ATTEMPT-${number}`;
   return firstAttempt || number === 1 ? "B1-FINAL-MOCK" : `B1-FINAL-MOCK-PRACTICE-${number}`;
 };
@@ -154,8 +156,9 @@ const buildB1MockCompletionArtifacts = ({
   const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores);
   const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt, mockId });
   const isSecond = mockId === "b1-mock-02";
-  const mockTitle = isSecond ? "B1 Mock 2" : MOCK_TITLE;
-  const resultPrefix = isSecond ? "b1-mock-02" : "b1-final-mock";
+  const isThird = mockId === "b1-mock-03";
+  const mockTitle = isThird ? "B1 Mock 3" : isSecond ? "B1 Mock 2" : MOCK_TITLE;
+  const resultPrefix = isThird ? "b1-mock-03" : isSecond ? "b1-mock-02" : "b1-final-mock";
   const attemptLabel = firstAttempt || Number(attemptNumber) === 1 ? "First readiness attempt" : `Practice attempt ${Math.max(1, Number(attemptNumber) || 1)}`;
   const breakdownText = breakdown.map((item) => `${item.label} ${formatScore(item.score)}/25`).join(" · ");
   const statusLabel = passed ? "PASS" : "NEEDS MORE PRACTICE";
@@ -172,20 +175,20 @@ const buildB1MockCompletionArtifacts = ({
     assignment: mockTitle, assignmentId, assignment_id: assignmentId, canonicalAssignmentKey: assignmentId,
     score, finalScore: score, status: passed ? "passed" : "needs_more_practice",
     result: passed ? "passed" : "needs_more_practice", passed, failed: !passed, comments, feedback: comments,
-    date: iso, link: isSecond ? "/campus/course/b1-mock-2" : "/campus/course/b1-final-mock-exam",
+    date: iso, link: isThird ? "/campus/course/b1-mock-3" : isSecond ? "/campus/course/b1-mock-2" : "/campus/course/b1-final-mock-exam",
     attempt: Math.max(1, Number(attemptNumber) || 1), firstAttempt: Boolean(firstAttempt),
     attemptLabel, attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
     mockAttemptId: clean(attemptId),
     sectionScores: Object.fromEntries(breakdown.map((item) => [item.key, item.score])),
     scoreBreakdown: breakdown, strongestArea: strongest, practiseNext: weakest,
-    source: isSecond ? "b1_mock_02" : "b1_final_mock", mockId, certificateEligible: false, progressionEligible: false,
+    source: isThird ? "b1_mock_03" : isSecond ? "b1_mock_02" : "b1_final_mock", mockId, certificateEligible: false, progressionEligible: false,
   };
 
   const notificationDocument = {
     type: "Scores", category: "feedback",
-    title: isSecond ? "Your B1 Mock 2 result is ready" : firstAttempt ? "Your B1 Final Mock result is ready" : "Your B1 Final Mock practice result is ready",
+    title: isThird ? "Your B1 Mock 3 result is ready" : isSecond ? "Your B1 Mock 2 result is ready" : firstAttempt ? "Your B1 Final Mock result is ready" : "Your B1 Final Mock practice result is ready",
     body: notificationBody, message: notificationBody, timestamp: timestamp.getTime(), sentAt: iso,
-    route: MOCK_ROUTE, source: isSecond ? "b1_mock_02" : "b1_final_mock", studentCode: identity.studentCode,
+    route: MOCK_ROUTE, source: isThird ? "b1_mock_03" : isSecond ? "b1_mock_02" : "b1_final_mock", studentCode: identity.studentCode,
     studentCodeOriginal: identity.studentCode, studentName: identity.name, assignment: mockTitle,
     assignmentId, level: "B1", score, status: passed ? "passed" : "needs_improvement", read: false,
     data: {

@@ -52,11 +52,11 @@ describe("B1 Mock 3 Sprechen source content", () => {
     expect(second[2].prompt).toContain("Feedback");
   });
 
-  test("Mock 3 is a set of separate practice modules, not a verified full mock", () => {
-    const item = MOCK_EXAM_CATALOG["b1-mock-03-pending"];
+  test("Mock 3 uses one four-module exam entry, with publication verification pending", () => {
+    const item = MOCK_EXAM_CATALOG["b1-mock-03"];
     expect(item.status).toBe("preview");
-    expect(item.mode).toBe("section-preview");
-    expect(item.sections).toContain("Sprechen · 3 parts");
-    expect(item.sections).toContain("Hören · 30 questions");
+    expect(item.mode).toBe("full");
+    expect(item.route).toBe("/campus/course/b1-mock-3");
+    expect(item.sections).toEqual(["Lesen", "Hören", "Schreiben", "Sprechen"]);
   });
 });
