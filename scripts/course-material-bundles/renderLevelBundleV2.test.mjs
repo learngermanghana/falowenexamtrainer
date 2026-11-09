@@ -245,7 +245,8 @@ test("B1 writing/listening tabs use canonical questions but Lesen stays live whe
 });
 
 test("B1 sparse PDF print retries preserve page audits and avoid deleting short lesson content", () => {
-  assert.match(source, /import \{ B1_PRINT_SCALES, shouldRetryB1PrintAudit \} from "\.\/b1PrintRetry\.mjs"/);
+  assert.match(source, /import \{ B1_PRINT_SCALES, shouldRetryB1PrintAudit, shouldRetryB1SparseTail \} from "\.\/b1PrintRetry\.mjs"/);
+  assert.match(source, /if \(shouldRetryB1SparseTail\(sourcePages, attempt\)\)/);
   assert.match(source, /await renderPdf\(B1_PRINT_SCALES\[attempt\]\)/);
   assert.match(source, /if \(!shouldRetryB1PrintAudit\(audit\.faults, attempt\)\)/);
   assert.match(source, /if \(!audit\.faults\.length\) break;/);
