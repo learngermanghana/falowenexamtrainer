@@ -80,6 +80,18 @@ Buddy AI, timetable transfers/pauses within six months, enrolment from abroad an
 Exams Room readiness practice with timers and an AI examiner. They do not promise
 a passing score or an official qualification.
 
+## Exams Room tutor email — 4 November 2026
+
+After AI marking, Send to tutor submits the complete letter and AI assessment
+to the same-origin `/api/exam-writing/send-tutor` route. The existing Admin
+Firebase API verifies the learner token, retains a review copy and sends an
+individual email to the academy owner via its existing Announcement webhook.
+No recipient is accepted from the browser and student identity comes from Auth.
+The button reports success only after the server acknowledges saving and email
+acceptance; failed requests remain retryable. No mail is sent merely by marking.
+The existing queue stays available for questions/replies and saved records.
+See Admin `docs/integration-event-hub.md` for delivery dedupe, limits and rollout.
+
 ## App speaking assessments — 4 November 2026
 
 A2 Day 22 (`A2-8.22`) and B1 Day 23 (`B1-7.23`) are app assessments with

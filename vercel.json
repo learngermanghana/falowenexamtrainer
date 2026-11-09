@@ -281,6 +281,10 @@
   ],
   "routes": [
     {
+      "src": "/api/exam-writing/send-tutor",
+      "dest": "https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/exam-writing/send-tutor"
+    },
+    {
       "src": "/book/?",
       "status": 308,
       "headers": {
