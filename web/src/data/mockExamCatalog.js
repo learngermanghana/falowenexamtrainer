@@ -304,7 +304,15 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId: "b1-mock-03",
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "b1-mock-04": {
+    id:"b1-mock-04",level:"B1",title:"B1 Mock 4",shortTitle:"B1 Mock 4",
+    description:"One four-module B1 mock with 30 Lesen questions, 30 protected Hören questions, three Schreiben tasks and an AI-partner Sprechen assessment. Progress can resume and the final /100 score is independently verified by the server.",
+    durationLabel:"65 min Lesen · 40 min Hören · 60 min Schreiben · 30 min Sprechen",
+    status:"preview",route:"/campus/course/b1-mock-4",mode:"full",
+    questionSetId:"b1-mock-04",sections:["Lesen","Hören","Schreiben","Sprechen"],
+  },
   "b1-mock-04-sprechen": {
+    showInMockLibrary:false,
     id:"b1-mock-04-sprechen",level:"B1",title:"B1 Mock 4 · Sprechen",shortTitle:"B1 Mock 4 · Sprechen",
     description:"Three speaking practice tasks: plan a hospital visit and aftercare, present Sehen Kinder zu viel fern? with five slides, and respond to a partner’s smartphone presentation. AI partner and saved feedback; not a combined full exam result.",
     durationLabel:"15 min preparation · 15 min speaking · 3 Teile",
@@ -312,6 +320,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId:"b1-mock-04-sprechen",sections:["Sprechen · Teile 1 bis 3"],
   },
   "b1-mock-04-schreiben": {
+    showInMockLibrary:false,
     id:"b1-mock-04-schreiben",level:"B1",title:"B1 Mock 4 · Schreiben",shortTitle:"B1 Mock 4 · Schreiben",
     description:"Three B1 writing tasks: birthday email, Tanja online guestbook opinion, and formal email to Frau Müller. 60-minute practice with autosave, AI feedback, and a separate 40/40/20 rubric.",
     durationLabel:"60 min · 3 Aufgaben · 100 rubric points",
@@ -319,6 +328,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId:"b1-mock-04-schreiben",sections:["Schreiben · Aufgaben 1 bis 3"],
   },
   "b1-mock-04-lesen": {
+    showInMockLibrary:false,
     id:"b1-mock-04-lesen",level:"B1",title:"B1 Mock 4 · Lesen",shortTitle:"B1 Mock 4 · Lesen",
     description:"Five Goethe-style reading parts and 30 questions, with saved answers and private server-verified grading. Lesen is graded separately while Mock 04 is being built.",
     durationLabel:"65 min · 30 questions · 5 Teile",
@@ -326,6 +336,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId:"b1-mock-04-lesen",sections:["Lesen · Teile 1 bis 5"],
   },
   "b1-mock-04-hoeren": {
+    showInMockLibrary:false,
     id:"b1-mock-04-hoeren",level:"B1",title:"B1 Mock 4 · Hören",shortTitle:"B1 Mock 4 · Hören",
     description:"B1 Mock 4 listening-only preview: four original recordings, 30 questions and server-graded Hören results. This is not yet a four-module mock. Audio playback requires private R2 upload verification.",
     durationLabel:"40 min practice · 30 questions · 4 Teile",
