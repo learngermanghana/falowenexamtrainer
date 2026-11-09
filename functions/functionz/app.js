@@ -7153,7 +7153,7 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
     const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     const mockId=String(req.body?.mockId || "b1-mock-01");
-    if (!["b1-mock-01","b1-mock-02","b1-mock-03"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
+    if (!["b1-mock-01","b1-mock-02","b1-mock-03","b1-mock-04"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
     if (Object.prototype.hasOwnProperty.call(req.body || {}, "examinerSessionIds")) {
       // Same immutable-snapshot verification used by A2. Never charge for
       // a second AI grading pass; the examiner has already marked each Teil.
@@ -7178,7 +7178,7 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
     }
     // Mock 2 requires real examiner receipts, not unbound user-supplied
     // transcripts. Mock 1 retains its legacy recorder scoring for saved work.
-    if (mockId==="b1-mock-02" || mockId==="b1-mock-03") return res.status(400).json({
+    if (mockId==="b1-mock-02" || mockId==="b1-mock-03" || mockId==="b1-mock-04") return res.status(400).json({
       code:"B1_MOCK_EXAMINER_REQUIRED",
       error:"Use the three saved AI examiner sessions for this B1 mock.",
     });
