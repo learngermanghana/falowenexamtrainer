@@ -8,6 +8,7 @@ export default function VisitorQuestionHelper() {
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState([]);
   const [busy, setBusy] = useState(false);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const input = useRef(null);
   const trigger = useRef(null);
   const log = useRef(null);
@@ -16,11 +17,11 @@ export default function VisitorQuestionHelper() {
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => { if (open) input.current?.focus(); }, [open]);
   useEffect(() => { if (log.current) log.current.scrollTop = log.current.scrollHeight; }, [messages, busy, open]);
-  function close() { setOpen(false); trigger.current?.focus(); }
+  function close() { setOpen(false); setSuggestionsOpen(false); trigger.current?.focus(); }
   async function ask(value) {
     const text = String(value).trim().slice(0,500);
     if (!text || busy) return;
-    setQuestion(''); setBusy(true);
+    setQuestion(''); setSuggestionsOpen(false); setBusy(true);
     setMessages(previous => [...previous.slice(-18), {question:text}]);
     let classes = [];
     try {
@@ -44,12 +45,14 @@ export default function VisitorQuestionHelper() {
         <p className="visitor-helper-answer">Hi! Ask about classes, fees, registration or learning options. I use saved answers; our team can help on WhatsApp if you need more.</p>
         {messages.map((message,index) => message.question ? <p key={index} className="visitor-helper-question">{message.question}</p> : <div key={index} className="visitor-helper-answer"><p>{message.answer.text}</p>
           {message.answer.href && <a href={message.answer.href}>{message.answer.label} →</a>}
+          {message.answer.alternateHref && <a href={message.answer.alternateHref}>{message.answer.alternateLabel} →</a>}
           {message.answer.handoff && <a href={visitorWhatsAppLink(message.questionText)} target="_blank" rel="noopener noreferrer">Ask our team on WhatsApp ↗</a>}
         </div>)}
         {busy && <p role="status">Checking your question…</p>}
       </div>
-      <div className="visitor-helper-suggestions" aria-label="Common questions">{QUICK_QUESTIONS.map(text=><button key={text} type="button" disabled={busy} onClick={()=>ask(text)}>{text}</button>)}</div>
-      <form onSubmit={event=>{event.preventDefault();ask(question);}}><label className="visitor-helper-input-label" htmlFor="visitor-question">Your question</label><div><input ref={input} id="visitor-question" value={question} onChange={event=>setQuestion(event.target.value)} maxLength={500} placeholder="Ask about classes or fees…" autoComplete="off"/><button type="submit" disabled={busy || !question.trim()}>Ask</button></div></form>
+      <div className="visitor-helper-suggestion-toggle"><button type="button" aria-controls="visitor-helper-suggestions" aria-expanded={suggestionsOpen} onClick={() => setSuggestionsOpen(value => !value)}>{suggestionsOpen ? 'Hide common questions' : 'Common questions'}</button></div>
+      {suggestionsOpen && <div id="visitor-helper-suggestions" className="visitor-helper-suggestions" aria-label="Common questions">{QUICK_QUESTIONS.map(text=><button key={text} type="button" disabled={busy} onClick={()=>ask(text)}>{text}</button>)}</div>}
+      <form onSubmit={event=>{event.preventDefault();ask(question);}}><label className="visitor-helper-input-label" htmlFor="visitor-question">Your question</label><div><input ref={input} id="visitor-question" value={question} onChange={event=>setQuestion(event.target.value)} onFocus={()=>setSuggestionsOpen(false)} maxLength={500} placeholder="Ask about classes or fees…" autoComplete="off"/><button type="submit" disabled={busy || !question.trim()}>Ask</button></div></form>
       <footer><a href="/help#admissions-faq">Read all FAQs →</a><br /><a href={visitorWhatsAppLink(question)} target="_blank" rel="noopener noreferrer">Prefer a person? WhatsApp us ↗</a><small>Keep personal and payment details out of chat.</small></footer>
     </section>}
     <button ref={trigger} className="visitor-helper-trigger" type="button" aria-expanded={open} aria-controls="visitor-question-panel" onClick={()=>open ? close() : setOpen(true)}>💬 {open ? 'Close' : 'Questions? Ask us'}</button>
