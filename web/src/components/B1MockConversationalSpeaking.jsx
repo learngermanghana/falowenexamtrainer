@@ -49,7 +49,7 @@ export default function B1MockConversationalSpeaking({
 }) {
   const {idToken} = useAuth();
   const [parts,setParts] = useState(() => initialAttempts?.examinerParts || {});
-  const [topicChoice,setTopicChoice] = useState(() => isFourth ? "b" : initialAttempts?.examinerTopic || "a");
+  const [topicChoice,setTopicChoice] = useState(() => mockId === "b1-mock-04" ? "b" : initialAttempts?.examinerTopic || "a");
   const [error,setError] = useState("");
   const isSecond = mockId === "b1-mock-02";
   const isThird = mockId === "b1-mock-03";
