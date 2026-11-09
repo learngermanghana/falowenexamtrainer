@@ -249,9 +249,9 @@
       if (!course) return;
       renderSummary(summary, course);
       if (whatsapp) {
-        whatsapp.href = buildWhatsAppUrl(data, course);
-        whatsapp.textContent = "Send selected class on WhatsApp";
-        whatsapp.setAttribute("aria-label", `Send ${getCourseTitle(course)} details on WhatsApp`);
+        // The enquiry funnel owns the personalized WhatsApp URL; do not overwrite it.
+        whatsapp.textContent = "Ask a question on WhatsApp";
+        whatsapp.setAttribute("aria-label", `Ask Falowen about ${getCourseTitle(course)} on WhatsApp`);
       }
     };
 
