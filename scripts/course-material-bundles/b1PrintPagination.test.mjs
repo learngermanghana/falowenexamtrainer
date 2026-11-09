@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isB1OrphanWorkbookHeaderPage } from "./trimPrintedPdfTail.mjs";
-import { shouldRetryB1SparseTail } from "./b1PrintRetry.mjs";
+
+import { shouldRetryB1SparseTail, isB1OrphanWorkbookHeaderPage } from "./b1PrintRetry.mjs";
 import { B1_PRINT_CSS } from "./b1PdfPrintExtras.mjs";
 
 test("B1 book drops only a provable first-page repeated heading", () => {
