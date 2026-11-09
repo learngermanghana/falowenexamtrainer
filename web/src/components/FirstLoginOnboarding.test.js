@@ -43,7 +43,7 @@ describe("lean first-login onboarding", () => {
     const source = read("OnboardingChecklist.js");
 
     [
-      "studentProfile?.className",
+      "initializeOnboardingPaystackCheckout",
       "studentProfile?.paymentStatus",
       "studentProfile?.balanceDue",
       "detectLevelKey(studentProfile)",

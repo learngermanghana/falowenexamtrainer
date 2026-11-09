@@ -4,6 +4,12 @@ import { styles } from "../styles";
 import { detectLevelKey } from "../lib/day0Workbook";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { getTrialLifecycleState } from "../lib/trialAccess";
+import {
+  getRecommendedTuitionAmount,
+  initializeOnboardingPaystackCheckout,
+  redirectToPaystackCheckout,
+} from "../lib/onboardingPaystackCheckout";
+import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
 
@@ -12,8 +18,11 @@ const SELF_LEARNING_LEVELS = new Set(["B2", "C1", "C2"]);
 const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { logout } = useAuth();
+  const { logout, idToken, user } = useAuth();
   const [savingAction, setSavingAction] = useState("");
+  const [paymentError, setPaymentError] = useState("");
+  const paymentsEnabled = isPaymentsEnabled();
+  const proposedTuitionAmount = getRecommendedTuitionAmount(studentProfile);
 
   const level = detectLevelKey(studentProfile);
   const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
@@ -38,6 +47,27 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
     } catch (error) {
       console.error("Failed to complete onboarding", error);
       showToast("We could not finish setup. Please try again.", "error");
+    } finally {
+      setSavingAction("");
+    }
+  };
+
+  const handlePayNow = async () => {
+    if (savingAction) return;
+    setPaymentError("");
+    setSavingAction("payment");
+    try {
+      if (!paymentsEnabled) {
+        throw new Error("Online payments are temporarily unavailable. Please try Account & Billing.");
+      }
+      const checkoutUrl = await initializeOnboardingPaystackCheckout({
+        studentProfile, idToken, user,
+      });
+      await onSaveOnboarding?.();
+      redirectToPaystackCheckout(checkoutUrl);
+    } catch (error) {
+      console.error("Could not open Paystack checkout", error);
+      setPaymentError(error?.message || "Could not open Paystack checkout. Please try again.");
     } finally {
       setSavingAction("");
     }
@@ -72,16 +102,17 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
           {!paymentComplete ? (
             <button
               type="button"
-              style={{ ...styles.secondaryButton, padding: "12px 20px", flex: "1 1 180px" }}
-              onClick={() => finishAndGo("/campus/account?tab=billing", "payment")}
+              data-testid="onboarding-pay-now"
+              style={{ ...styles.primaryButton, padding: "14px 22px", minHeight: 50, flex: "1 1 220px", fontSize: 16 }}
+              onClick={handlePayNow}
               disabled={Boolean(savingAction)}
             >
-              {savingAction === "payment" ? "Opening billing…" : "Pay now"}
+              {savingAction === "payment" ? "Opening Paystack…" : "Pay now"}
             </button>
           ) : null}
           <button
             type="button"
-            style={{ ...styles.primaryButton, padding: "12px 20px", flex: "1 1 180px" }}
+            style={{ ...styles.secondaryButton, padding: "14px 22px", minHeight: 50, flex: "1 1 220px", fontSize: 15 }}
             onClick={() => finishAndGo("/", "campus")}
             disabled={Boolean(savingAction)}
           >
@@ -94,6 +125,30 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
                   : "Continue to Falowen"}
           </button>
         </div>
+
+        {!paymentComplete ? (
+          <div style={{ marginTop: -8, display: "grid", gap: 8 }}>
+            <p style={{ margin: 0, fontSize: 13, color: "#475569", lineHeight: 1.5 }}>
+              Pay securely with Paystack{proposedTuitionAmount > 0
+                ? " · Tuition amount GH₵" + proposedTuitionAmount.toLocaleString("en-GH")
+                : ""}. Payment is recorded only after confirmation.
+            </p>
+            {paymentError ? (
+              <div role="alert" style={{ ...styles.errorBox, margin: 0 }}>
+                <strong>Paystack checkout could not open.</strong>
+                <p style={{ margin: "6px 0" }}>{paymentError}</p>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  disabled={Boolean(savingAction)}
+                  onClick={() => finishAndGo("/campus/account?tab=billing", "billing")}
+                >
+                  Open Account &amp; Billing
+                </button>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
         <section
           aria-label="Where to go after signup"
@@ -113,8 +168,9 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
             you'll see two main options: <strong>Campus</strong> and <strong>Exams Room</strong>.
           </p>
           <p style={{ margin: 0 }}>
-            For now, select <strong>Campus</strong>. This is where you'll find your course materials,
-            lessons and learning activities.
+            For now, select <strong>Campus</strong> on the home page. On a phone,
+            you can also tap <strong>Course Book</strong> directly in the bottom navigation.
+            This is where you'll find your course materials, lessons and learning activities.
           </p>
           <p style={{ margin: 0 }}>
             Open <strong>Course Book</strong>, scroll down to find your course lessons,
