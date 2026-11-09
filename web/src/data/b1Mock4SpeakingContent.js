@@ -78,7 +78,7 @@ export const B1_MOCK4_SPEAKING = Object.freeze({
 
 export const B1_MOCK4_SPEAKING_TEILS = Object.freeze(["teil1", "teil2", "teil3"]);
 
-export const buildB1Mock3SpeakingTasks = (topicChoice = "a") => {
+export const buildB1Mock4SpeakingTasks = (topicChoice = "b") => {
   const chosen = B1_MOCK4_SPEAKING.teil2.topics.find(topic => topic.id === "b")
     || B1_MOCK4_SPEAKING.teil2.topics[0];
   const { teil1, teil2, teil3 } = B1_MOCK4_SPEAKING;
