@@ -4970,7 +4970,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     const mockId=String(req.body?.mockId || "b1-mock-01");
     if (!["b1-mock-01","b1-mock-02","b1-mock-03","b1-mock-04"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
-    if (mockId==="b1-mock-04" && attemptId) return res.status(400).json({error:"B1 Mock 04 Schreiben is practice-only; no verified full mock attempt is available yet."});
+    
     
 
     let result;
@@ -6228,7 +6228,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "b1-mock-01").trim().slice(0, 80);
-    if (!["b1-mock-01","b1-mock-02","b1-mock-03"].includes(mockId)) return res.status(400).json({ error: "Unsupported B1 mockId" });
+    if (!["b1-mock-01","b1-mock-02","b1-mock-03","b1-mock-04"].includes(mockId)) return res.status(400).json({ error: "Unsupported B1 mockId" });
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -6241,7 +6241,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
       const userSnap = await tx.get(userRef);
       const userData = userSnap.exists ? userSnap.data() || {} : {};
 
-      const activeAttemptId = String((mockId==="b1-mock-03" ? userData.activeAttemptIdMock3 : mockId==="b1-mock-02" ? userData.activeAttemptIdMock2 : userData.activeAttemptId) || "").trim();
+      const activeAttemptId = String((mockId==="b1-mock-04" ? userData.activeAttemptIdMock4 : mockId==="b1-mock-03" ? userData.activeAttemptIdMock3 : mockId==="b1-mock-02" ? userData.activeAttemptIdMock2 : userData.activeAttemptId) || "").trim();
       if (activeAttemptId) {
         const activeRef = userRef.collection("attempts").doc(activeAttemptId);
         const activeSnap = await tx.get(activeRef);
@@ -6260,7 +6260,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const attemptCount = Math.max(0, Number((mockId==="b1-mock-03" ? userData.attemptCountMock3 : mockId==="b1-mock-02" ? userData.attemptCountMock2 : userData.attemptCount) || 0));
+      const attemptCount = Math.max(0, Number((mockId==="b1-mock-04" ? userData.attemptCountMock4 : mockId==="b1-mock-03" ? userData.attemptCountMock3 : mockId==="b1-mock-02" ? userData.attemptCountMock2 : userData.attemptCount) || 0));
       const attemptNumber = attemptCount + 1;
       const now = admin.firestore.FieldValue.serverTimestamp();
 
@@ -6269,7 +6269,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
         {
           uid: authedUser.uid,
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
-          ...(mockId==="b1-mock-03" ? {attemptCountMock3:attemptNumber,activeAttemptIdMock3:newAttemptRef.id} : mockId==="b1-mock-02" ? {attemptCountMock2:attemptNumber,activeAttemptIdMock2:newAttemptRef.id} : {attemptCount:attemptNumber,activeAttemptId:newAttemptRef.id}),
+          ...(mockId==="b1-mock-04" ? {attemptCountMock4:attemptNumber,activeAttemptIdMock4:newAttemptRef.id} : mockId==="b1-mock-03" ? {attemptCountMock3:attemptNumber,activeAttemptIdMock3:newAttemptRef.id} : mockId==="b1-mock-02" ? {attemptCountMock2:attemptNumber,activeAttemptIdMock2:newAttemptRef.id} : {attemptCount:attemptNumber,activeAttemptId:newAttemptRef.id}),
           updatedAt: now,
         },
         { merge: true },
@@ -6358,10 +6358,10 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
       }
 
       const userData = userSnap.exists ? userSnap.data() || {} : {};
-      if (!["b1-mock-01","b1-mock-02","b1-mock-03"].includes(existing.mockId) || state.mockId !== existing.mockId) {
+      if (!["b1-mock-01","b1-mock-02","b1-mock-03","b1-mock-04"].includes(existing.mockId) || state.mockId !== existing.mockId) {
         saveOutcome = {forbidden:true}; return;
       }
-      const activeField=existing.mockId==="b1-mock-03" ? "activeAttemptIdMock3" : existing.mockId==="b1-mock-02" ? "activeAttemptIdMock2" : "activeAttemptId";
+      const activeField=existing.mockId==="b1-mock-04" ? "activeAttemptIdMock4" : existing.mockId==="b1-mock-03" ? "activeAttemptIdMock3" : existing.mockId==="b1-mock-02" ? "activeAttemptIdMock2" : "activeAttemptId";
 
       // Completion is monotonic, but a completed record is only publishable when
       // all four section scores can be reconstructed from server-trusted data.
