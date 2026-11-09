@@ -16,6 +16,7 @@ const statusLabel = (status, mock) => {
   if (mock?.id === "a2-mock-02") return "4-module mock · grading verification pending";
   if (mock?.id === "b1-mock-02") return "Complete 4-module mock";
   if (mock?.id === "b1-mock-03" && status === "preview") return "4-module mock · verification pending";
+  if (mock?.id === "b1-mock-04" && status === "preview") return "4-module mock · verification pending";
   if (status === "preview") return "Section practice only";
   if (status === "ready") return "Complete 4-module mock";
   return "Full mock not published";
