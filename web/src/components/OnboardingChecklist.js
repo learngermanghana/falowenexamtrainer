@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { detectLevelKey } from "../lib/day0Workbook";
@@ -7,6 +7,8 @@ import { getTrialLifecycleState } from "../lib/trialAccess";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
 
+const SELF_LEARNING_LEVELS = new Set(["B2", "C1", "C2"]);
+
 const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -14,33 +16,24 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const [savingAction, setSavingAction] = useState("");
 
   const level = detectLevelKey(studentProfile);
-  const className = studentProfile?.className || "Not assigned yet";
+  const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
   const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
-  const balanceDue = Math.max(Number(studentProfile?.balanceDue ?? studentProfile?.balance) || 0, 0);
+  const balanceDue = studentProfile?.balanceDue ?? studentProfile?.balance;
   const paymentComplete = paymentStatus === "paid" || hasClearedBalance(balanceDue);
-  const trialLifecycle = useMemo(() => getTrialLifecycleState(studentProfile), [studentProfile]);
-  const firstLessonPath = level ? `/campus/course/lesson/${level}/1` : "/campus/course";
-  // Reuse the authenticated profile and existing routes. No extra database
-  // reads, AI calls, Firestore listeners, or scheduled functions on login.
-  const learnerFirstName = String(studentProfile?.firstName || studentProfile?.name || studentProfile?.fullName || "").trim().split(/\s+/)[0];
+  const trialLifecycle = getTrialLifecycleState(studentProfile);
+  const hasTrialAccess = trialLifecycle.active;
+  const learnerFirstName = String(
+    studentProfile?.firstName || studentProfile?.name || studentProfile?.fullName || ""
+  ).trim().split(/\s+/)[0];
 
-  const accessLabel = paymentComplete
-    ? "Paid access active"
-    : trialLifecycle.key === "ending_soon"
-      ? `Trial ending soon · ${trialLifecycle.daysRemaining} day${trialLifecycle.daysRemaining === 1 ? "" : "s"} remaining`
-      : trialLifecycle.key === "active"
-        ? `7-day trial · ${trialLifecycle.daysRemaining} day${trialLifecycle.daysRemaining === 1 ? "" : "s"} remaining`
-        : trialLifecycle.key === "expired_retained"
-          ? `Trial expired · progress retained ${trialLifecycle.retentionDaysRemaining} more day${trialLifecycle.retentionDaysRemaining === 1 ? "" : "s"}`
-          : trialLifecycle.key === "retention_ending_soon"
-            ? `Recovery window ending · ${trialLifecycle.retentionDaysRemaining} day${trialLifecycle.retentionDaysRemaining === 1 ? "" : "s"} left`
-            : "Access setup required";
-
+  // Finish the existing one-time onboarding flag before navigating away.
+  // Starting a trial here does not reset its dates; the account's original
+  // trial and Paystack confirmation rules remain authoritative.
   const finishAndGo = async (destination, actionName) => {
+    if (savingAction) return;
     setSavingAction(actionName);
     try {
       await onSaveOnboarding?.();
-      showToast("Your Falowen setup is ready.", "success");
       navigate(destination, { replace: true });
     } catch (error) {
       console.error("Failed to complete onboarding", error);
@@ -52,49 +45,93 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
 
   return (
     <div className="onboarding-page">
-      <section className="onboarding-focus-card" aria-label="Welcome to your course" style={{ display: "grid", gap: 20, maxWidth: 660, margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>Welcome to your course</span>
-          <button type="button" style={styles.secondaryButton} onClick={logout} disabled={Boolean(savingAction)}>Sign out</button>
-        </div>
-        <div style={{ display: "grid", gap: 10 }}>
-          <h1 style={{ margin: 0, fontSize: "clamp(28px, 5vw, 38px)", lineHeight: 1.18 }}>Hallo{learnerFirstName ? `, ${learnerFirstName}` : ""}. Let’s get you started.</h1>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>Your account is ready. Begin with Day 1. Your teacher will explain how to use Falowen and submit your work.</p>
-        </div>
-        <div aria-label="Your course details" style={{ display: "flex", gap: 8, flexWrap: "wrap", color: "#475569", fontSize: 13 }}>
-          <span style={{ background: "#f1f5f9", padding: "7px 10px", borderRadius: 8 }}>{level ? `${level} German` : "German course"}</span>
-          <span style={{ background: "#f1f5f9", padding: "7px 10px", borderRadius: 8 }}>{accessLabel}</span>
-        </div>
-        <section aria-label="Start here" style={{ display: "grid", gap: 12, padding: 22, borderRadius: 14, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#1e40af" }}>START HERE · DAY 1</span>
-          <h2 style={{ margin: 0, fontSize: 22 }}>Begin your first lesson</h2>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>Open Day 1 to begin your course and follow your teacher’s instructions.</p>
-          <button type="button" style={{ ...styles.primaryButton, padding: 15 }} disabled={Boolean(savingAction)} onClick={() => finishAndGo(firstLessonPath, "lesson")}>
-            {savingAction === "lesson" ? "Opening…" : "Start Day 1 →"}
+      <section
+        className="onboarding-focus-card"
+        aria-label="Welcome to Falowen"
+        style={{ display: "grid", gap: 18, maxWidth: 660, margin: "0 auto" }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>
+            Welcome to Falowen
+          </span>
+          <button type="button" onClick={logout} disabled={Boolean(savingAction)} style={styles.secondaryButton}>
+            Sign out
           </button>
+        </div>
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <h1 style={{ margin: 0, fontSize: "clamp(26px, 5vw, 34px)", lineHeight: 1.2 }}>
+            Hallo{learnerFirstName ? `, ${learnerFirstName}` : ""}! Your account is ready.
+          </h1>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+            Choose how you would like to continue.
+          </p>
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+          {!paymentComplete ? (
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, padding: "12px 20px", flex: "1 1 180px" }}
+              onClick={() => finishAndGo("/campus/account?tab=billing", "payment")}
+              disabled={Boolean(savingAction)}
+            >
+              {savingAction === "payment" ? "Opening billing…" : "Pay now"}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            style={{ ...styles.primaryButton, padding: "12px 20px", flex: "1 1 180px" }}
+            onClick={() => finishAndGo("/", "campus")}
+            disabled={Boolean(savingAction)}
+          >
+            {savingAction === "campus"
+              ? "Opening Falowen…"
+              : paymentComplete
+                ? "Continue to Falowen"
+                : hasTrialAccess
+                  ? "Start 7-day trial"
+                  : "Continue to Falowen"}
+          </button>
+        </div>
+
+        <section
+          aria-label="Where to go after signup"
+          style={{
+            display: "grid",
+            gap: 12,
+            padding: "18px 20px",
+            border: "1px solid #bfdbfe",
+            borderRadius: 14,
+            background: "#eff6ff",
+            color: "#1e293b",
+            lineHeight: 1.65,
+          }}
+        >
+          <p style={{ margin: 0 }}>
+            When you open <a href="https://www.falowen.app" style={{ color: "#1d4ed8", fontWeight: 700 }}>Falowen</a>,
+            you'll see two main options: <strong>Campus</strong> and <strong>Exams Room</strong>.
+          </p>
+          <p style={{ margin: 0 }}>
+            For now, select <strong>Campus</strong>. This is where you'll find your course materials,
+            lessons and learning activities.
+          </p>
+          <p style={{ margin: 0 }}>
+            Open <strong>Course Book</strong>, scroll down to find your course lessons,
+            and select <strong>Day 1</strong> to begin.
+          </p>
+          {isSelfLearning ? (
+            <p style={{ margin: 0 }}>
+              <strong>Start when you're ready.</strong> This is a self-learning course,
+              so you can begin at a time that suits you.
+            </p>
+          ) : (
+            <p style={{ margin: 0 }}>
+              <strong>Starting early is optional.</strong> You can begin learning immediately
+              or wait until your official class start date. Both are perfectly fine.
+            </p>
+          )}
         </section>
-        <button type="button" style={{ border: 0, background: "transparent", color: "#1d4ed8", textAlign: "left", padding: "8px 0", cursor: "pointer", justifySelf: "start", minHeight: 44 }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/campus/course", "course")}>
-          {savingAction === "course" ? "Opening…" : "Already familiar? Go to Course Book"}
-        </button>
-        <details style={{ borderTop: "1px solid #e2e8f0", paddingTop: 16 }}>
-          <summary style={{ cursor: "pointer", color: "#475569", minHeight: 36 }}>Where can I get help?</summary>
-          <div style={{ display: "grid", gap: 12, paddingTop: 8 }}>
-            <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>Study Buddy is your AI assistant for German practice and finding things in Falowen. Your tutor leads your class and reviews assigned work.</p>
-            <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/?studyBuddy=open&welcome=1", "ask")}>
-              {savingAction === "ask" ? "Opening…" : "Ask Study Buddy"}
-            </button>
-            <p style={{ ...styles.helperText, margin: 0 }}>Your class: {className}</p>
-            <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/campus/account", "account")}>
-              {savingAction === "account" ? "Opening…" : "View class and account details"}
-            </button>
-          </div>
-        </details>
-        {!trialLifecycle.active && !paymentComplete ? <div role="status" style={{ display: "grid", gap: 10, color: "#92400e" }}>
-          <p style={{ margin: 0, lineHeight: 1.6 }}>Your trial is not currently active. Open billing to restore access. Your normal course access rules still apply.</p>
-          <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/campus/account?tab=billing", "payment")}>
-            {savingAction === "payment" ? "Opening…" : "Open billing"}
-          </button>
-        </div> : null}
       </section>
     </div>
   );
