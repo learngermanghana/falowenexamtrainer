@@ -6,6 +6,7 @@ export const B1_PRINT_CSS = `
   @page { size: A4; margin: 10mm 9mm 12mm; }
   .app-header, header.app-header--compact, .app-shell > header.app-header,
   .app-back-button,
+  [aria-label="Workbook lesson navigation"],
   [data-course-inline-practice], [data-live-class-response],
   [data-live-class-response-mount], [data-submission-feedback],
   [data-teacher-only], [data-admin-only], [data-pdf-exclude],
@@ -63,6 +64,12 @@ export const prepareB1PrintView = ({ section = "" } = {}) => {
     undo.push(() => { if (replacement.isConnected) replacement.replaceWith(node); });
   };
   const root = document.body;
+  // This screen-only wrapper becomes an empty ~50px-high blue outline after
+  // the navigation text is scrubbed. It contains no printed lesson material.
+  for (const panel of [...root.querySelectorAll('[aria-label="Workbook lesson navigation"]')]) {
+    swap(panel);
+  }
+
   // The screen grammars reuse an old "B1 Workbook" masthead. Correct
   // the print title without changing React or the authenticated workbook.
   if (section === "grammar") {
