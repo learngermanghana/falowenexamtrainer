@@ -11,6 +11,7 @@ test('floating helper answers fees locally and hands unknown questions to the ex
   fireEvent.click(screen.getByRole('button',{name:/Questions\? Ask us/}));
   const input=screen.getByLabelText('Your question');
   expect(input).toHaveFocus();
+  fireEvent.click(screen.getByRole('button',{name:'Common questions'}));
   fireEvent.click(screen.getByRole('button',{name:'What are the fees?'}));
   expect(await screen.findByText(/Current tuition per level:/)).toHaveTextContent('A1: GHS 3,000');
   expect(loadPublicClasses).not.toHaveBeenCalled();
@@ -29,6 +30,7 @@ test('date answers use the current public catalog and are loaded only when reque
   loadPublicClasses.mockResolvedValue([{level:'A1',title:'A1 future class',startDate:'2099-01-05',meetingDays:[{day:'Monday',startTime:'18:00',endTime:'19:00'}],timeZone:'Africa/Accra'}]);
   render(<VisitorQuestionHelper />);
   fireEvent.click(screen.getByRole('button',{name:/Questions\? Ask us/}));
+  fireEvent.click(screen.getByRole('button',{name:'Common questions'}));
   fireEvent.click(screen.getByRole('button',{name:'When is the next A1 class?'}));
   await waitFor(()=>expect(screen.getByText(/A1 future class: starts/)).toHaveTextContent('Monday 18:00–19:00 (Africa/Accra)'));
 });
@@ -48,4 +50,23 @@ test('class answers exclude past, hidden, closed, self-learning and wrong-level 
   expect(visitorAnswer('Next A2 class?',{classes:rows}).handoff).toBe(true);
   expect(visitorAnswer('C2 fees').handoff).toBe(true);
   expect(visitorAnswer('Can I get a discount on fees?').handoff).toBe(true);
+});
+
+
+test('quick questions stay collapsed until requested, and account help links directly to signup',async()=>{
+  render(<VisitorQuestionHelper />);
+  fireEvent.click(screen.getByRole('button',{name:/Questions\\? Ask us/}));
+  const input=screen.getByLabelText('Your question');
+  expect(input).toHaveFocus();
+  expect(screen.queryByRole('button',{name:'What are the fees?'})).toBeNull();
+  fireEvent.click(screen.getByRole('button',{name:'Common questions'}));
+  expect(screen.getByRole('button',{name:'What are the fees?'})).toBeInTheDocument();
+  fireEvent.focus(input);
+  expect(screen.queryByRole('button',{name:'What are the fees?'})).toBeNull();
+  fireEvent.change(input,{target:{value:'How do I create an account?'}});
+  fireEvent.click(screen.getByRole('button',{name:'Ask',exact:true}));
+  const signupLink=await screen.findByRole('link',{name:/Create a free account/});
+  expect(signupLink.getAttribute('href')).toBe('/signup?program=german');
+  expect(screen.getByRole('link',{name:/Already registered\\? Log in/}).getAttribute('href')).toBe('/login/');
+  expect(input).toBeInTheDocument();
 });
