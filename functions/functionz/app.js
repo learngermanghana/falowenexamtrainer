@@ -38,6 +38,7 @@ const { verifyA2Mock07Audio } = require("./a2Mock07PublishedAudio");
 const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
 const { publicB1Mock3Hoeren, markB1Mock3Hoeren } = require("./b1Mock3Hoeren");
 const { publicB1Mock4Hoeren, markB1Mock4Hoeren } = require("./b1Mock4Hoeren");
+const { gradeB1Mock4Lesen } = require("./b1Mock4Lesen");
 const { PART_KEYS: B1_MOCK2_AUDIO, verifyB1Mock2Audio } = require("./b1Mock2PublishedAudio");
 const { PART_KEYS: B1_MOCK3_AUDIO, verifyB1Mock3Audio } = require("./b1Mock3PublishedAudio");
 const { PART_KEYS: B1_MOCK4_AUDIO, verifyB1Mock4Audio } = require("./b1Mock4PublishedAudio");
@@ -1596,6 +1597,37 @@ app.post("/b1-mock-04/hoeren/score", async(req,res)=>{
   }catch(error){
     console.error("B1 Mock 04 Hören score error",error);
     return res.status(503).json({error:"Could not save the listening result. Answers remain on this device; retry."});
+  }
+});
+
+// Mock 04 Lesen-only practice: use server-owned marking and student-scoped result history.
+// This must not create a four-module B1 completion or certificate.
+app.post("/b1-mock-04/lesen/score", async (req,res)=>{
+  try{
+    const access=await requireB1Mock2PracticeAccess(req,res);
+    if(!access)return;
+    let result;
+    try{result=gradeB1Mock4Lesen(req.body?.answers);}
+    catch(error){return res.status(400).json({error:error?.message||"Submit all 30 reading answers."});}
+    const answers=Object.fromEntries(Object.entries(req.body.answers).sort(([a],[b])=>Number(a)-Number(b)));
+    const attemptId=crypto.createHash("sha256")
+      .update(access.authedUser.uid+":b1-mock-04:lesen:"+JSON.stringify(answers))
+      .digest("hex").slice(0,40);
+    await access.db.collection("b1Mock4LesenPracticeResults").doc(access.authedUser.uid)
+      .collection("attempts").doc(attemptId).set({
+        uid:access.authedUser.uid,
+        email:access.authedUser.email?String(access.authedUser.email).toLowerCase():null,
+        level:"B1",mockId:"b1-mock-04",section:"lesen",
+        practiceOnly:true,questionCount:30,
+        answers,correct:result.correct,total:30,percentage:result.percentage,
+        perPart:result.perPart,status:"completed",verifiedBy:"server-answer-key",
+        submittedAt:admin.firestore.FieldValue.serverTimestamp(),
+      },{merge:true});
+    res.set("Cache-Control","private, no-store");
+    return res.json({...result,attemptId,saved:true,practiceOnly:true});
+  }catch(error){
+    console.error("B1 Mock 04 Lesen score error",error);
+    return res.status(503).json({error:"Could not save the reading score. Your answers remain on this device; retry."});
   }
 });
 
