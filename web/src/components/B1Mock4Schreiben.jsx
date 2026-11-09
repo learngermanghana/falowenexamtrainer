@@ -89,7 +89,7 @@ function B1Mock4SchreibenAttempt({ storageKey }) {
         title: "B1 Mock 4 · Schreiben",
         score, total: 25, percent: Math.round(score * 4), passed: score >= 15,
         attemptId: `b1-mock-04-schreiben-${submittedAttempt.startedAt}`, attemptNumber: 1,
-        resultType: "practice", route: "/campus/course/b1-mock-3-schreiben",
+        resultType: "practice", route: "/campus/course/b1-mock-4-schreiben",
         sectionScores: {
           teil1: Number(result.parts?.teil1?.score || 0) * 4,
           teil2: Number(result.parts?.teil2?.score || 0) * 4,
