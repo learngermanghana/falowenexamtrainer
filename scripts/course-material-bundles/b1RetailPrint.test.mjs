@@ -119,3 +119,8 @@ test("B1 print uses stable block flow for reading questions and removes empty we
   assert.match(suppressB1EmptyChromeControls.toString(), /rect\.width < 180/);
   assert.match(suppressB1EmptyChromeControls.toString(), /el\.querySelector\("input,img/);
 });
+
+test("B1 print suppresses the source-confirmed empty workbook lesson navigation panel", () => {
+  assert.ok(B1_PRINT_CSS.includes('[aria-label="Workbook lesson navigation"]'));
+  assert.ok(prepareB1PrintView.toString().includes('querySelectorAll(\'[aria-label="Workbook lesson navigation"]\')'));
+});
