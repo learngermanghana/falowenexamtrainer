@@ -510,7 +510,9 @@ const renderReadOnlyB1Section = async (page, lesson, part, filename = part) => {
     await printPage.setContent(html, { waitUntil: "load" });
     const expectedText = (await printPage.locator("body").innerText()).trim();
     if (expectedText.length < 140) throw new Error("B1 Day " + lesson.day + " " + part + ": empty print companion");
-    await printPage.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+    // B1 Hören companion: keep the required audio/graded-work notice with the
+    // fifth answer instead of printing a footer-only extra A4 sheet.
+    await printPage.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, scale: part === "teil-4" ? 0.92 : 1, timeout: 30000 });
     const printedText = execFileSync("pdftotext", ["-layout", file, "-"], { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
     if (printedText.replace(/\s+/g, " ").trim().length < 140) {
       throw new Error("B1 Day " + lesson.day + " " + part + ": printed companion is empty");
