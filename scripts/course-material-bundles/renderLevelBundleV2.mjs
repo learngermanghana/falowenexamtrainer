@@ -305,29 +305,6 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
       await page.evaluate(prepareB1PrintView, { section: suffix });
       await suppressPdfChromeText(page);
       await page.evaluate(suppressB1EmptyChromeControls);
-      // TEMP prepublication diagnostic: no learner text, answers or account
-      // identifiers. Identify which empty blue-bordered DOM element prints
-      // as a full-width blank outline after the Day 13 reading questions.
-      if (Number(lesson.day) === 13 && suffix === "workbook-teil-3") {
-        const framed = await page.evaluate(() => [...document.querySelectorAll("body *")]
-          .map(el => {
-            const st = getComputedStyle(el);
-            if (!/rgb\(37, 99, 235\)/i.test(st.borderTopColor) ||
-                parseFloat(st.borderTopWidth) < 1) return null;
-            const rect = el.getBoundingClientRect();
-            if (rect.width < 220) return null;
-            return {
-              tag: el.tagName, classes: String(el.className || "").slice(0, 90),
-              aria: (el.getAttribute("aria-label") || "").slice(0, 80),
-              textLength: el.textContent?.trim().length || 0,
-              visibleTextLength: el.innerText?.trim().length || 0,
-              children: el.children.length, inputs: el.querySelectorAll("input").length,
-              width: Math.round(rect.width), height: Math.round(rect.height),
-              display: st.display,
-            };
-          }).filter(Boolean).slice(0, 30));
-        console.log("B1 EMPTY BLUE FRAME DOM DIAGNOSTICS:", JSON.stringify(framed));
-      }
     }
     if (level === "A2") {
       const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
