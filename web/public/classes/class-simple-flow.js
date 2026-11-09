@@ -114,12 +114,12 @@
     if (!hero || hero.querySelector(".simple-class-steps")) return;
     var steps = document.createElement("div");
     steps.className = "simple-class-steps";
-    steps.setAttribute("aria-label", "Four steps to view a class brochure");
+    steps.setAttribute("aria-label", "Four steps to choose or enquire about a class");
     steps.innerHTML =
-      '<div class="simple-class-step"><span class="simple-class-step-number">1</span><span>Enter your full name</span></div>' +
-      '<div class="simple-class-step"><span class="simple-class-step-number">2</span><span>Add your phone number and email</span></div>' +
-      '<div class="simple-class-step"><span class="simple-class-step-number">3</span><span>Choose your German level and class</span></div>' +
-      '<div class="simple-class-step"><span class="simple-class-step-number">4</span><span>Save and open the class brochure</span></div>';
+      '<div class="simple-class-step"><span class="simple-class-step-number">1</span><span>Choose your German class</span></div>' +
+      '<div class="simple-class-step"><span class="simple-class-step-number">2</span><span>Open the brochure without signing up</span></div>' +
+      '<div class="simple-class-step"><span class="simple-class-step-number">3</span><span>Check the fee, timetable and FAQs</span></div>' +
+      '<div class="simple-class-step"><span class="simple-class-step-number">4</span><span>Register or ask a specific question</span></div>';
     hero.appendChild(steps);
   }
 
@@ -162,18 +162,18 @@
     var title = document.querySelector(".hero h1");
     var text = document.querySelector(".hero p");
     setText(eyebrow, "FALOWEN GERMAN CLASSES");
-    setText(title, "Choose the German class you want");
-    setText(text, "Complete four simple steps to view the brochure for your preferred class.");
+    setText(title, "Choose your German class");
+    setText(text, "Choose a class and read its brochure before you register or contact us.");
     ensureSteps();
 
     var cardTitle = document.querySelector("#leadCaptureCard h2");
     var cardText = document.querySelector("#leadCaptureCard p");
     var submit = document.querySelector("#leadCaptureForm button[type='submit']");
     var classLabel = document.querySelector("label[for='leadClass']");
-    setText(cardTitle, "Enter your details to continue");
-    setText(cardText, "Choose your level and class, then open the brochure with the full class details.");
+    setText(cardTitle, "Choose your class and view the brochure");
+    setText(cardText, "Select your class to view fees, timetable and FAQs without logging in. Leave your details only if you want a follow-up.");
     setText(classLabel, "German level and class");
-    if (submit && !submit.disabled) setText(submit, "Save and view class brochure");
+    if (submit && !submit.disabled) setText(submit, "Save my details and view brochure");
 
     removeTechnicalCopy();
     removeDuplicateRegisterButtons();
