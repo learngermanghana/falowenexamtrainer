@@ -56,7 +56,7 @@ export const VISITOR_QUESTIONS = [
   { id: 'classes', pattern: /\b(next|upcoming|start|starting|schedule|timetable|intake|when|class times?)\b/i },
   { id: 'register', pattern: /\b(register|registration|sign[ -]?up|signup|enrol|enroll|join|(?:create|open|make|set up)\s+(?:(?:a|an|my|new|free|falowen)\s+){0,3}accounts?)\b/i,
     text: 'To create your free Falowen account:\n1. Open the signup page.\n2. Enter your full name, email and a password.\n3. Choose your German level, class and learning mode.\n4. Select the 7-day free trial or a tuition payment option.\n5. Complete your contact details and submit the registration.\n6. Follow the setup instructions to activate access.\nCreating an account is free; tuition is separate.',
-    href: '/signup?program=german', label: 'Create a free account', alternateHref: '/login/', alternateLabel: 'Already registered? Log in' },
+    href: 'https://www.falowen.app/signup?program=german', label: 'Create a free account', alternateHref: 'https://www.falowen.app/login/', alternateLabel: 'Already registered? Log in' },
   { id: 'location', pattern: /\b(location|located|address|where|visit|office)\b/i,
     text: `${academy.academyName} is in ${academy.locationLabel}.`, href: academy.mapsUrl, label: 'Open location' },
   { id: 'levels', pattern: /\b(levels?|beginner|placement)\b/i,
