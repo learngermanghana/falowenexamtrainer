@@ -673,7 +673,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
     );
   }
 
-  if(isVerified && exam.stage==="result" && !exam.serverConfirmed && !exam.writingPending) return <main className="b1-final-shell"><section className="b1-final-rules"><h2>Verifying B1 Mock {isThird ? 3 : 2} results</h2><p>Your four modules are submitted. The official /100 result will appear only after server-side verification and Results synchronization.</p>{error ? <p role="alert">{error}</p> : null}<button type="button" onClick={()=>setCompletionRetryNonce(n=>n+1)}>Retry result verification</button></section></main>;
+  if(isVerified && exam.stage==="result" && !exam.serverConfirmed && !exam.writingPending) return <main className="b1-final-shell"><section className="b1-final-rules"><h2>Verifying B1 Mock {isFourth ? 4 : isThird ? 3 : 2} results</h2><p>Your four modules are submitted. The official /100 result will appear only after server-side verification and Results synchronization.</p>{error ? <p role="alert">{error}</p> : null}<button type="button" onClick={()=>setCompletionRetryNonce(n=>n+1)}>Retry result verification</button></section></main>;
   return (
     <main className="b1-final-shell">
       <AppBackButton label="Leave mock (answers saved; timer continues)" fallbackPath="/campus/course" />
