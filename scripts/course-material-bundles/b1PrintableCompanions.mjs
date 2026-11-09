@@ -54,9 +54,9 @@ const pageHtml = ({ day, section, title, body, intro = "" }) => {
     'header{border-bottom:2px solid #2257aa;padding-bottom:12px;margin-bottom:16px}' +
     'header small{color:#3b6599;font-weight:700}h1{font-size:19pt;margin:6px 0}h2{font-size:13pt;margin:20px 0 8px}' +
     'p{white-space:pre-line}li{margin:7px 0}li,aside{break-inside:avoid}' +
-    '.questions>li{margin:16px 0}.questions ul{list-style:none;padding-left:18px}' +
+    '.questions>li{margin:11px 0}.questions ul{list-style:none;padding-left:18px}' +
     '.hint{background:#edf4ff;border-left:4px solid #3970b8;padding:10px}' +
-    'footer{border-top:1px solid #cbd5e1;margin-top:24px;padding-top:10px;font-size:9pt;color:#4b5563}' +
+    'footer{border-top:1px solid #cbd5e1;margin-top:6px;padding-top:4px;font-size:8.5pt;color:#4b5563}' +
     '</style></head><body><header><small>FALOWEN · B1 · Tag ' + day + '</small><h1>' +
     escapeHtml(title) + '</h1><div>' + escapeHtml(section) + '</div></header>' +
     (intro ? '<div class="hint">' + paragraph(intro) + '</div>' : "") +
