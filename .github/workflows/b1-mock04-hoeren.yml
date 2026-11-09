@@ -1,9 +1,14 @@
-name: B1 Mock 04 four skill source verification
+name: B1 Mock 04 full four-module exam verification
 on:
   pull_request:
     paths:
       - 'functions/functionz/b1Mock4*'
       - 'functions/functionz/tests/b1Mock4Lesen.test.cjs'
+      - 'functions/functionz/tests/b1Mock4FourModules.test.cjs'
+      - 'functions/functionz/b1MockCompletionSync.js'
+      - 'functions/functionz/b1MockExaminerScore.js'
+      - 'web/src/components/B1FinalMockExamPage.jsx'
+      - 'web/src/components/B1MockConversationalSpeaking.jsx'
       - 'web/src/data/b1Mock4ReadingContent.js'
       - 'web/src/data/b1Mock4ReadingContent.test.js'
       - 'web/src/data/b1Mock4WritingTasks.js'
@@ -45,8 +50,11 @@ jobs:
           node --check functions/functionz/app.js
           node --check functions/functionz/b1Mock4Hoeren.js
           node --check functions/functionz/b1Mock4Lesen.js
+          node --check functions/functionz/b1Mock4AnswerKeys.js
+          node --check functions/functionz/b1MockCompletionSync.js
+          node --check functions/functionz/b1MockExaminerScore.js
           node --check functions/functionz/b1Mock4PublishedAudio.js
-          node --test functions/functionz/tests/b1Mock4Hoeren.test.cjs functions/functionz/tests/b1Mock4Lesen.test.cjs
+          node --test functions/functionz/tests/b1Mock4Hoeren.test.cjs functions/functionz/tests/b1Mock4Lesen.test.cjs functions/functionz/tests/b1Mock4FourModules.test.cjs functions/functionz/tests/b1Mock3FourModules.test.cjs functions/functionz/tests/verifiedFourSkillMockScore.test.cjs
   web:
     runs-on: ubuntu-latest
     timeout-minutes: 20
