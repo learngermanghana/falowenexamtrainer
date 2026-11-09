@@ -277,9 +277,12 @@
       .lead-capture-form { display: grid; gap: 11px; min-width: 0; }
       .lead-field { display: grid; gap: 5px; }
       .lead-field label { font-weight: 850; color: #0f172a; font-size: 13px; }
-      .lead-field input, .lead-field select { width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid #cbd5e1; background: #ffffff; padding: 10px 12px; font: inherit; color: #111827; line-height: 1.35; }
-      .lead-field input:focus, .lead-field select:focus { outline: 2px solid #bfdbfe; border-color: #1455f5; }
+      .lead-field input, .lead-field select, .lead-field textarea { width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid #cbd5e1; background: #ffffff; padding: 10px 12px; font: inherit; color: #111827; line-height: 1.35; }
+      .lead-field input:focus, .lead-field select:focus, .lead-field textarea:focus { outline: 2px solid #bfdbfe; border-color: #1455f5; }
       .lead-form-grid { display: grid; gap: 10px; }
+      .lead-field textarea { min-height: 74px; resize: vertical; }
+      .lead-view-brochure { width: 100%; min-height: 50px; display: inline-flex; text-align: center; align-items: center; justify-content: center; white-space: normal; }
+      .lead-capture-card .lead-brochure-explain { color: #475569; font-size: 12px; line-height: 1.5; }
       .lead-help { color: #64748b; font-size: 12px; line-height: 1.45; }
       .lead-selected-class { border: 1px solid #dbeafe; border-radius: 10px; background: #f8fbff; color: #1e3a8a; font-size: 12px; font-weight: 800; line-height: 1.45; padding: 8px 10px; overflow-wrap: anywhere; }
       .lead-actions { display: grid; gap: 10px; }
@@ -379,6 +382,20 @@
       </div>
       <form class="lead-capture-form" id="leadCaptureForm" novalidate>
         <div class="lead-form-grid">
+          <div class="lead-field full">
+            <label for="leadClass">Class / level you want</label>
+            <select id="leadClass" name="classSlug" required>
+              ${classes.map((course) => {
+                const slug = getCourseSlug(course);
+                const isSelected = slug === selectedSlug;
+                return `<option value="${slug}" ${isSelected ? "selected" : ""}>${getClassSummary(course)}</option>`;
+              }).join("")}
+            </select>
+            <p class="lead-selected-class" id="leadSelectedClassSummary">${getClassSummary(selected)}</p>
+            <div class="lead-inline-error" id="leadClassError"></div>
+            <a class="button primary lead-view-brochure" id="leadViewBrochure" href="${buildClassUrl(selected)}">View selected class brochure &amp; FAQs</a>
+            <p class="lead-brochure-explain">See fees, dates, meeting times, location, payment options and common questions. No login or personal details required.</p>
+          </div>
           <div class="lead-field">
             <label for="leadName">Full name</label>
             <input id="leadName" name="name" autocomplete="name" required placeholder="Enter your full name" />
@@ -394,18 +411,11 @@
             <input id="leadEmail" name="email" type="email" autocomplete="email" required placeholder="name@email.com" />
             <div class="lead-inline-error" id="leadEmailError"></div>
           </div>
-          <div class="lead-field">
-            <label for="leadClass">Class / level you want</label>
-            <select id="leadClass" name="classSlug" required>
-              ${classes.map((course) => {
-                const slug = getCourseSlug(course);
-                const isSelected = slug === selectedSlug;
-                return `<option value="${slug}" ${isSelected ? "selected" : ""}>${getClassSummary(course)}</option>`;
-              }).join("")}
-            </select>
-            <p class="lead-selected-class" id="leadSelectedClassSummary">${getClassSummary(selected)}</p>
-            <div class="lead-inline-error" id="leadClassError"></div>
-          </div>
+
+        </div>
+        <div class="lead-field lead-question-field">
+          <label for="leadQuestion">Still have a question? (optional)</label>
+          <textarea id="leadQuestion" name="question" rows="2" placeholder="Ask about something not covered by the brochure"></textarea>
         </div>
         <label class="lead-consent" for="leadConsent">
           <input id="leadConsent" name="consent" type="checkbox" />
@@ -414,8 +424,8 @@
         <div class="lead-inline-error" id="leadConsentError"></div>
         <p class="lead-help">Your details sync to the Falowen lead sheet. After saving, we will open the class page you selected.</p>
         <div class="lead-actions">
-          <button class="button primary lead-submit" id="leadSubmitButton" type="submit">${getLeadCtaCopy()}</button>
-          <a class="button amber lead-whatsapp" href="https://wa.me/233241113054?text=${encodeURIComponent("Hello Falowen, I would like more information about your German classes.")}" target="_blank" rel="noreferrer">Contact us on WhatsApp</a>
+          <button class="button lead-submit" id="leadSubmitButton" type="submit">${getLeadCtaCopy()}</button>
+          <a class="button amber lead-whatsapp" href="https://wa.me/233241113054?text=${encodeURIComponent("Hello Falowen, I would like more information about your German classes.")}" target="_blank" rel="noreferrer">Ask a question on WhatsApp</a>
         </div>
         <a class="lead-open-link" id="leadOpenClassLink" href="${buildClassUrl(selected)}">Open selected class information without saving</a>
         <div class="lead-status" id="leadStatus"></div>
@@ -455,6 +465,7 @@
     const consentError = card.querySelector("#leadConsentError");
     const submitButton = card.querySelector("#leadSubmitButton");
     const openLink = card.querySelector("#leadOpenClassLink");
+    const brochureLink = card.querySelector("#leadViewBrochure");
     const debugBox = card.querySelector("#leadDebugBox");
 
     function selectedCourse() {
@@ -465,6 +476,7 @@
       const course = selectedCourse();
       const url = buildClassUrl(course);
       if (openLink && url) openLink.href = url;
+      if (brochureLink && url) brochureLink.href = url;
       if (selectedSummary) selectedSummary.textContent = getClassSummary(course);
       if (decisionTitle) decisionTitle.textContent = getCourseTitle(course);
       if (decisionFee) decisionFee.textContent = formatMoney(getCourseFee(course, data));
@@ -586,6 +598,7 @@
       name: card.querySelector("#leadName").value.trim(),
       phone: card.querySelector("#leadPhone").value.trim(),
       email: card.querySelector("#leadEmail").value.trim(),
+      question: card.querySelector("#leadQuestion")?.value.trim() || "",
       consentToContact: !!card.querySelector("#leadConsent")?.checked,
       classId: course.id || getCourseSlug(course),
       classSlug: getCourseSlug(course),
