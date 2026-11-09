@@ -113,8 +113,9 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
             you'll see two main options: <strong>Campus</strong> and <strong>Exams Room</strong>.
           </p>
           <p style={{ margin: 0 }}>
-            For now, select <strong>Campus</strong>. This is where you'll find your course materials,
-            lessons and learning activities.
+            For now, select <strong>Campus</strong> on the home page. On a phone,
+            you can also tap <strong>Course Book</strong> directly in the bottom navigation.
+            This is where you'll find your course materials, lessons and learning activities.
           </p>
           <p style={{ margin: 0 }}>
             Open <strong>Course Book</strong>, scroll down to find your course lessons,
