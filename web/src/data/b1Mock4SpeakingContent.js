@@ -79,7 +79,7 @@ export const B1_MOCK4_SPEAKING = Object.freeze({
 export const B1_MOCK4_SPEAKING_TEILS = Object.freeze(["teil1", "teil2", "teil3"]);
 
 export const buildB1Mock4SpeakingTasks = (topicChoice = "b") => {
-  const chosen = B1_MOCK4_SPEAKING.teil2.topics.find(topic => topic.id === "b")
+  const chosen = B1_MOCK4_SPEAKING.teil2.topics.find(topic => topic.id === topicChoice)
     || B1_MOCK4_SPEAKING.teil2.topics[0];
   const { teil1, teil2, teil3 } = B1_MOCK4_SPEAKING;
   return [
@@ -104,7 +104,7 @@ export const buildB1Mock4SpeakingTasks = (topicChoice = "b") => {
       title: teil3.title,
       english: "React to the AI partner's mobile-phone presentation: give feedback and ask one question.",
       prompt: `Der Partner hat seine Präsentation zum Thema „Brauchen Kinder Mobiltelefone?“ mit diesem Satz beendet: „Zusammenfassend meine ich, dass Kinder im Grundschulalter kein Smartphone brauchen, sondern erst ab etwa 12 Jahren ein eigenes Handy bekommen sollten. Vielen Dank fürs Zuhören!“ Geben Sie Rückmeldung und stellen Sie eine passende Frage. ${teil3.objective}`,
-      keywords: chosen.title,
+      keywords: "Brauchen Kinder Mobiltelefone?",
       hint: "Give feedback on the mobile-phone presentation and ask one relevant question. No follow-up answer is required in the supplied exercise.",
     },
   ];
