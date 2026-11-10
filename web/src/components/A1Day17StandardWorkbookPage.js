@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useState } from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import A1ProtectedAudioPlayer from "./A1ProtectedAudioPlayer";
@@ -161,7 +162,7 @@ export default function A1Day17StandardWorkbookPage() {
           <div key={text.title} style={{ display: "grid", gap: 10 }}>
             <h3 style={{ margin: 0 }}>{text.title}</h3>
             <div style={textStyle}>
-              {text.paragraphs.map((paragraph) => <p key={paragraph} style={{ margin: 0 }}>{paragraph}</p>)}
+              {text.paragraphs.map((paragraph) => <p key={paragraph} style={{ margin: 0 }}><InlineReadingTranslations level="A1" day={17} text={paragraph} /></p>)}
             </div>
             <QuestionList questions={text.questions.map((stem) => ({ stem, options: ["Richtig", "Falsch"] }))} />
           </div>

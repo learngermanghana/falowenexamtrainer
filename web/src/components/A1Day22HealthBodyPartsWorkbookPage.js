@@ -210,13 +210,13 @@ const Teil1Content = () => (
             <p style={{ margin: 0, lineHeight: 1.7 }}><strong>{index + 1}. {question.prompt}</strong></p>
 
             <A1ReadingSourceGrid minWidth={220}>
-              <A1ReadingSourceCard label="Anzeige A" title={question.adA[0]}>
+              <A1ReadingSourceCard day={22} label="Anzeige A" title={question.adA[0]}>
                 {question.adA.slice(1).map((line) => (
                   <span key={`${question.title}-a-${line}`}>{line}</span>
                 ))}
               </A1ReadingSourceCard>
 
-              <A1ReadingSourceCard label="Anzeige B" title={question.adB[0]}>
+              <A1ReadingSourceCard day={22} label="Anzeige B" title={question.adB[0]}>
                 {question.adB.slice(1).map((line) => (
                   <span key={`${question.title}-b-${line}`}>{line}</span>
                 ))}
@@ -238,7 +238,7 @@ const Teil1Content = () => (
 const Teil2Content = () => (
       <section style={sectionStyle} data-a1-day22-health-teil="2">
         <h2 style={{ margin: 0 }}>Teil 2 · Lesen: Ihr Termin</h2>
-        <A1ReadingSourceCard label="E-Mail" title="Betreff: Ihr Termin">
+        <A1ReadingSourceCard day={22} label="E-Mail" title="Betreff: Ihr Termin">
           <p style={{ margin: 0 }}>Hallo Frau Perez,</p>
           <p style={{ margin: 0 }}>Ihr Termin bei Dr. Schmidt ist am Dienstag, 12. Oktober um 10:30 Uhr.</p>
           <p style={{ margin: 0 }}>Bitte beachten Sie:</p>

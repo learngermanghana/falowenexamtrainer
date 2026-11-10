@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React, { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
@@ -465,7 +466,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
                     <article key={row.train} style={{ background: "#1e293b", border: "1px solid #475569", borderRadius: 12, padding: 12 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
                         <strong>{row.train} → {row.destination}</strong>
-                        <span style={{ color: row.status === "pünktlich" ? "#bbf7d0" : "#fde68a", fontWeight: 800 }}>{row.status}</span>
+                        <span style={{ color: row.status === "pünktlich" ? "#bbf7d0" : "#fde68a", fontWeight: 800 }}><InlineReadingTranslations level="A1" day={14} text={row.status} /></span>
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(105px, 1fr))", gap: 8, marginTop: 10 }}>
                         <div><span style={{ color: "#cbd5e1", fontSize: 12 }}>Abfahrt</span><br /><strong>{row.departure}</strong></div>

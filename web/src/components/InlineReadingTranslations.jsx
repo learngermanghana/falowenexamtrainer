@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { getReadingPhraseTranslations, segmentReadingPhrases } from "../data/readingPhraseTranslations";
+import { ReadingStudentContext, saveReadingPhrase, sourceSentence } from "../services/savedReadingPhrases";
 import "./InlineReadingTranslations.css";
 
 /**
@@ -7,6 +8,8 @@ import "./InlineReadingTranslations.css";
  * No network calls and no answer or hint data is read by this component.
  */
 export default function InlineReadingTranslations({ text = "", level = "", day = 0 }) {
+  const uid = useContext(ReadingStudentContext);
+  const [saveFeedback, setSaveFeedback] = useState("");
   const scope = String(level).toUpperCase() + ":" + String(day) + ":" + String(text);
   const [selection, setSelection] = useState({ scope: "", index: -1 });
   const [expandedScope, setExpandedScope] = useState(null);
@@ -33,7 +36,10 @@ export default function InlineReadingTranslations({ text = "", level = "", day =
               data-reading-glossary-phrase={segment.de}
               aria-label={`Show English meaning of ${segment.de}`}
               aria-expanded={open}
-              onClick={() => setSelection({ scope, index: open ? -1 : index })}
+              onClick={() => {
+                setSaveFeedback("");
+                setSelection({ scope, index: open ? -1 : index });
+              }}
               onKeyDown={(event) => {
                 if (event.key === "Escape") {
                   setSelection({ scope, index: -1 });
@@ -87,7 +93,21 @@ export default function InlineReadingTranslations({ text = "", level = "", day =
                 }}
               >
                 <strong style={{ display: "block", marginBottom: 3, color: "#075985" }}>{segment.de}</strong>
+                {segment.simple && <span lang="de" style={{ display: "block" }}>{segment.simple}</span>}
                 {segment.en}
+                {uid && Number(day) > 0 && <button type="button" className="reading-glossary-save"
+                  onClick={event => {
+                    const trigger = event.currentTarget.closest('[role="status"]').previousElementSibling;
+                    try {
+                      saveReadingPhrase(uid, { level, day, de: segment.de, en: segment.en, simple: segment.simple,
+                        lessonPath: window.location.pathname.startsWith("/campus/course/") ? window.location.pathname + window.location.search : undefined,
+                        sentence: sourceSentence(trigger, text, segment.start) });
+                      setSaveFeedback("Saved to Vocab on this device");
+                    } catch {
+                      setSaveFeedback("Could not save on this device. Try again.");
+                    }
+                  }}>Save phrase</button>}
+                {saveFeedback && <span>{saveFeedback}</span>}
               </span>
             ) : null}
           </span>

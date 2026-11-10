@@ -1,3 +1,4 @@
+import { ReadingStudentContext } from "../services/savedReadingPhrases";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   auth,
@@ -1188,7 +1189,9 @@ export const AuthProvider = ({ children }) => {
     ]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>
+    <ReadingStudentContext.Provider value={user?.uid}>{children}</ReadingStudentContext.Provider>
+  </AuthContext.Provider>;
 };
 
 export const useAuth = () => {

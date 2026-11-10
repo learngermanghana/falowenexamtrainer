@@ -69,7 +69,7 @@ const A1Day18Kapitel121WorkbookPage = () => (
       <p><strong>Aufgabe:</strong> Lesen Sie die Schilder/Aushänge 1–3 und die Aussagen 1–5. Ist die Aussage <strong>Richtig</strong> oder <strong>Falsch</strong>?</p>
       <A1ReadingSourceGrid>
         {readingSigns.map((sign, index) => (
-          <A1ReadingSourceCard key={sign.title} label={`Schild ${index + 1}`} title={sign.title}>
+          <A1ReadingSourceCard day={18} key={sign.title} label={`Schild ${index + 1}`} title={sign.title}>
             <p style={{ margin: 0, lineHeight: 1.75 }}>{sign.text}</p>
             {sign.questions.map(([number, statement]) => <article key={number} style={questionCard}>
               <strong>{number}. {statement}</strong>

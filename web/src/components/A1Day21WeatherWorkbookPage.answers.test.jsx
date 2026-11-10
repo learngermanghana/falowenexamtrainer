@@ -12,6 +12,7 @@ jest.mock("./A1TutorMarkedWorkbookShell", () => {
   const { A1TutorWorkbookDraftProvider } = require("./A1TutorWorkbookDraftContext");
   const Capture = require("./A1TutorDraftSectionCapture").default;
   return {
+    __esModule: true,
     WorkbookSection: ({ children }) => children,
     default: function WorkbookShell({ children }) {
       return (

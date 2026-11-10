@@ -40,7 +40,7 @@ export default function A1Day12TwentyFourHourClockAndDatesWorkbookPage() {
         <h2>Teil 1: E-Mails und SMS (Lesen Teil 1)</h2>
         <p>Lesen Sie die Texte 1–3 und die Aussagen 1–5. Ist die Aussage <strong>Richtig</strong> oder <strong>Falsch</strong>?</p>
         {t1.map(text => <article key={text.title} style={{ display: "grid", gap: 10 }}>
-          <h3>{text.title}</h3><p style={{ lineHeight: 1.7 }}><A1ReadingInlineContent>{text.content}</A1ReadingInlineContent></p>
+          <h3>{text.title}</h3><p style={{ lineHeight: 1.7 }}><A1ReadingInlineContent day={12}>{text.content}</A1ReadingInlineContent></p>
           {text.questions.map(q => <Question key={q} text={q} />)}
         </article>)}
       </section>
@@ -48,7 +48,7 @@ export default function A1Day12TwentyFourHourClockAndDatesWorkbookPage() {
         <h2>Teil 2: Schilder &amp; Fahrpläne (Lesen Teil 2 &amp; 3)</h2>
         <p>Lesen Sie die Schilder und die Fragen 6–8. Wählen Sie die richtige Antwort a, b oder c.</p>
         {t2.map(item => <article key={item.title} style={{ display: "grid", gap: 10 }}>
-          <h3>{item.title}</h3><p style={{ lineHeight: 1.7 }}><A1ReadingInlineContent>{item.content}</A1ReadingInlineContent></p>
+          <h3>{item.title}</h3><p style={{ lineHeight: 1.7 }}><A1ReadingInlineContent day={12}>{item.content}</A1ReadingInlineContent></p>
           <Question text={item.question} options={item.options} />
         </article>)}
       </section>

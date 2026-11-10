@@ -1,3 +1,4 @@
+import { A1ReadingInlineContent } from "./A1TutorMarkedReadingLayout";
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import A1TutorSpeakingCheckpoint from "./A1TutorSpeakingCheckpoint";
@@ -48,11 +49,11 @@ export default function A1Day4NumbersForBeginnersWorkbookPage() {
         <div style={softCard}>
           <strong>Informationen zu Elena</strong>
           <p style={{ margin: 0 }}>
-            Elena Popov ist <strong>26 Jahre</strong> alt.
+            <A1ReadingInlineContent day={4}>Elena Popov ist <strong>26 Jahre</strong> alt.
             Sie wohnt in der <strong>Müllerstraße 87</strong> in Berlin.
             Ihre Telefonnummer ist <strong>0171 33 55 90</strong>.
             Der Deutschkurs dauert <strong>3 Monate</strong>.
-            Er kostet <strong>240 Euro</strong>.
+            Er kostet <strong>240 Euro</strong>.</A1ReadingInlineContent>
           </p>
         </div>
         <div style={{ overflowX: "auto" }}>

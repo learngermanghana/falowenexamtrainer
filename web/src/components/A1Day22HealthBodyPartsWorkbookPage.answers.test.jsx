@@ -12,6 +12,7 @@ jest.mock("./A1TutorMarkedWorkbookShell", () => {
   const { A1TutorWorkbookDraftProvider } = require("./A1TutorWorkbookDraftContext");
   const Capture = require("./A1TutorDraftSectionCapture").default;
   return {
+    __esModule: true,
     WorkbookSection: ({ children }) => children,
     default: function WorkbookShell({ children }) {
       return (
@@ -45,7 +46,7 @@ test("Day 22 captures five Anzeige choices, five R/F answers and six listening a
   });
   expect(reading.getByText("Notfall-Zahnarzt Berlin")).toBeTruthy();
   expect(appointment.getByText("Betreff: Ihr Termin")).toBeTruthy();
-  expect(appointment.getByText(/Ihr Termin bei Dr. Schmidt ist am Dienstag, 12. Oktober um 10:30 Uhr/)).toBeTruthy();
+  expect(screen.getByTestId("teil-2")).toHaveTextContent("Ihr Termin bei Dr. Schmidt ist am Dienstag, 12. Oktober um 10:30 Uhr");
   for (const [scope, answers] of [
     [reading, ["B", "B", "A", "A", "B"]],
     [appointment, ["Richtig", "Richtig", "Richtig", "Richtig", "Falsch"]],
