@@ -84,14 +84,14 @@ export const __TESTING__ = {
 };
 
 
-const SECTION_HEADER = /^\\s*(?:teil|part)\\s*([1-4])\\b/i;
+const SECTION_HEADER = /^\s*(?:teil|part)\s*([1-4])\b/i;
 const SECTION_LABEL_ONLY = /^(?:schreiben|writing|lesen|reading|h[oö]ren|listening)$/i;
-const SECTION_PROMPT_ONLY = /^(?:frage|aufgabe|question)\\s*\\d+\\s*[).:：-]?$/i;
-const EMPTY_NUMBERED_ANSWER = /^(?:q\\s*)?\\d{1,2}\\s*[).:：-]?$/i;
+const SECTION_PROMPT_ONLY = /^(?:frage|aufgabe|question)\s*\d+\s*[).:：-]?$/i;
+const EMPTY_NUMBERED_ANSWER = /^(?:q\s*)?\d{1,2}\s*[).:：-]?$/i;
 const VERSION_MARKER_ONLY = /^(?:A2|B1)[-_][A-Z0-9_.-]{4,}$/i;
 
 const hasSubmissionAnswer = (value = "") => String(value || "")
-  .split(/\\r?\\n/)
+  .split(/\r?\n/)
   .map((line) => line.trim())
   .filter(Boolean)
   .some((line) => !SECTION_LABEL_ONLY.test(line)
@@ -101,16 +101,16 @@ const hasSubmissionAnswer = (value = "") => String(value || "")
 
 const extractRequiredAnswer = (tail = "") => {
   let value = String(tail || "").trim();
-  value = value.replace(/^[·•—–-]\\s*/, "").trim();
-  value = value.replace(/^(?:schreiben|writing|lesen|reading|h[oö]ren|listening)\\b\\s*(?:[:：—–-]\\s*)?/i, "").trim();
-  value = value.replace(/^[:：—–-]\\s*/, "").trim();
+  value = value.replace(/^[·•—–-]\s*/, "").trim();
+  value = value.replace(/^(?:schreiben|writing|lesen|reading|h[oö]ren|listening)\b\s*(?:[:：—–-]\s*)?/i, "").trim();
+  value = value.replace(/^[:：—–-]\s*/, "").trim();
   return SECTION_LABEL_ONLY.test(value) ? "" : value;
 };
 
 const collectSubmissionSections = (text = "") => {
   const sections = new Map();
   let currentPart = "";
-  String(text || "").split(/\\r?\\n/).forEach((rawLine) => {
+  String(text || "").split(/\r?\n/).forEach((rawLine) => {
     const line = rawLine.trim();
     if (!line) return;
     const heading = line.match(SECTION_HEADER);
@@ -137,7 +137,7 @@ export const validateA2B1WorkbookSubmissionSections = ({ level = "", day = null,
   const sections = collectSubmissionSections(text);
   const missingParts = requiredParts.filter((part) => {
     const sectionText = sections.get(part.partId);
-    if (sectionText) return !hasSubmissionAnswer(sectionText.join("\\n"));
+    if (sectionText) return !hasSubmissionAnswer(sectionText.join("\n"));
     // A single-part assignment can safely accept a legacy unlabelled response.
     if (requiredParts.length === 1 && sections.size === 0) return !hasSubmissionAnswer(text);
     return true;
