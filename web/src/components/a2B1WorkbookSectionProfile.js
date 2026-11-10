@@ -110,7 +110,7 @@ const extractRequiredAnswer = (tail = "") => {
 const collectSubmissionSections = (text = "") => {
   const sections = new Map();
   let currentPart = "";
-  const normalizedText = String(text || "").replace(/\\r?\\n/g, "\n");
+  const normalizedText = String(text || "").replaceAll("\\r", "\r").replaceAll("\\n", "\n");
   normalizedText.split(/\r?\n/).forEach((rawLine) => {
     const line = rawLine.trim();
     if (!line) return;
