@@ -5,6 +5,7 @@ import {
 import {
   getA2B1WorkbookIncludedSectionLabels,
   getA2B1WorkbookSectionProfile,
+  validateA2B1WorkbookSubmissionSections,
 } from "./a2B1WorkbookSectionProfile";
 
 const tabsFor = (ariaLabel) =>
@@ -107,5 +108,51 @@ describe("A2/B1 workbook section profiles", () => {
     });
 
     expect(result.tabs).toEqual([{ key: "custom", label: "Custom" }]);
+  });
+});
+
+
+describe("A2/B1 submission section completeness", () => {
+  test("blocks an A2 submission when a required Teil is missing", () => {
+    const result = validateA2B1WorkbookSubmissionSections({
+      level: "A2",
+      day: 21,
+      text: "TEIL 2\\nHallo! Ich schreibe Ihnen wegen des Wochenendes.\\nTEIL 3\\n1. A\\n2. B\\n3. C",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.missingParts).toEqual(["teil4"]);
+    expect(result.message).toMatch(/Teil 4 · Hören/);
+    expect(result.message).toMatch(/still a draft and has not been submitted/i);
+  });
+
+  test("blocks a heading-only section and a fully blank A2/B1 submission", () => {
+    const headingOnly = validateA2B1WorkbookSubmissionSections({
+      level: "B1",
+      day: 24,
+      text: "TEIL 3 · Lesen\\n1. A\\n2. B\\nTEIL 4 · Hören",
+    });
+    const blank = validateA2B1WorkbookSubmissionSections({ level: "A2", day: 21, text: "  " });
+
+    expect(headingOnly.ok).toBe(false);
+    expect(headingOnly.missingParts).toContain("teil4");
+    expect(blank.ok).toBe(false);
+    expect(blank.missingParts).toEqual(["teil2", "teil3", "teil4"]);
+  });
+
+  test("accepts every required part and does not require omitted or self-check parts", () => {
+    const complete = validateA2B1WorkbookSubmissionSections({
+      level: "A2",
+      day: 21,
+      text: "TEIL 2 · Schreiben\\nHallo Jan, ich komme am Samstag.\\nTEIL 3 · Lesen\\n1. A\\n2. B\\nTEIL 4 · Hören\\n1. Richtig\\n2. Falsch",
+    });
+    const readingOnly = validateA2B1WorkbookSubmissionSections({
+      level: "A2",
+      day: 25,
+      text: "I get up at seven, have breakfast, and go to class.",
+    });
+
+    expect(complete).toMatchObject({ ok: true, missingParts: [] });
+    expect(readingOnly).toMatchObject({ ok: true, missingParts: [] });
   });
 });

@@ -82,3 +82,73 @@ export const filterA2B1WorkbookTabsByProfile = (tabs = [], profile = {}) =>
 export const __TESTING__ = {
   tabToSection: TAB_TO_SECTION,
 };
+
+
+const SECTION_HEADER = /^\s*(?:teil|part)\s*([1-4])\b/i;
+const SECTION_LABEL_ONLY = /^(?:schreiben|writing|lesen|reading|h[oö]ren|listening)$/i;
+const SECTION_PROMPT_ONLY = /^(?:frage|aufgabe|question)\s*\d+\s*[).:：-]?$/i;
+const EMPTY_NUMBERED_ANSWER = /^(?:q\s*)?\d{1,2}\s*[).:：-]?$/i;
+const VERSION_MARKER_ONLY = /^(?:A2|B1)[-_][A-Z0-9_.-]{4,}$/i;
+
+const hasSubmissionAnswer = (value = "") => String(value || "")
+  .split(/\r?\n/)
+  .map((line) => line.trim())
+  .filter(Boolean)
+  .some((line) => !SECTION_LABEL_ONLY.test(line)
+    && !SECTION_PROMPT_ONLY.test(line)
+    && !EMPTY_NUMBERED_ANSWER.test(line)
+    && !VERSION_MARKER_ONLY.test(line));
+
+const extractRequiredAnswer = (tail = "") => {
+  let value = String(tail || "").trim();
+  value = value.replace(/^[·•—–-]\s*/, "").trim();
+  value = value.replace(/^(?:schreiben|writing|lesen|reading|h[oö]ren|listening)\b\s*(?:[:：—–-]\s*)?/i, "").trim();
+  value = value.replace(/^[:：—–-]\s*/, "").trim();
+  return SECTION_LABEL_ONLY.test(value) ? "" : value;
+};
+
+const collectSubmissionSections = (text = "") => {
+  const sections = new Map();
+  let currentPart = "";
+  String(text || "").split(/\r?\n/).forEach((rawLine) => {
+    const line = rawLine.trim();
+    if (!line) return;
+    const heading = line.match(SECTION_HEADER);
+    if (heading) {
+      currentPart = `teil${Number(heading[1])}`;
+      if (!sections.has(currentPart)) sections.set(currentPart, []);
+      const tail = line.slice(heading[0].length);
+      const answer = extractRequiredAnswer(tail);
+      if (answer) sections.get(currentPart).push(answer);
+      return;
+    }
+    if (currentPart) sections.get(currentPart).push(line);
+  });
+  return sections;
+};
+
+export const validateA2B1WorkbookSubmissionSections = ({ level = "", day = null, text = "" } = {}) => {
+  const profile = getA2B1LessonProfile(level, day);
+  if (!profile) return { ok: true, missingParts: [], message: "" };
+
+  const requiredParts = profile.requiredSubmissionParts || [];
+  if (!requiredParts.length) return { ok: true, missingParts: [], message: "" };
+
+  const sections = collectSubmissionSections(text);
+  const missingParts = requiredParts.filter((part) => {
+    const sectionText = sections.get(part.partId);
+    if (sectionText) return !hasSubmissionAnswer(sectionText.join("\n"));
+    // A single-part assignment can safely accept a legacy unlabelled response.
+    if (requiredParts.length === 1 && sections.size === 0) return !hasSubmissionAnswer(text);
+    return true;
+  });
+
+  if (!missingParts.length) return { ok: true, missingParts: [], message: "" };
+
+  const labels = missingParts.map((part) => `Teil ${part.number} · ${part.label}`).join("; ");
+  return {
+    ok: false,
+    missingParts: missingParts.map((part) => part.partId),
+    message: `Your workbook is incomplete. Add at least one answer under each required part: ${labels}. Use a heading such as “Teil ${missingParts[0].number}”. Your work is still a draft and has not been submitted.`,
+  };
+};
