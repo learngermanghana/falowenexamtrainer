@@ -15,7 +15,7 @@ test("writing book social page replaces generic homepage previews before JavaScr
   const html = makeWritingBookSocialHtml(source);
   assert.match(html, /<title>How to Unlock Your German Writing Skills \(A1–C2\) \| Falowen Books<\/title>/);
   assert.match(html, /property="og:title" content="How to Unlock Your German Writing Skills/);
-  assert.match(html, /property="og:description" content="A 68-page German writing guide/);
+  assert.match(html, /property="og:description"\s+content="A 68-page German writing guide/);
   assert.match(html, /property="og:url" content="https:\/\/www\.falowen\.app\/books\/how-to-unlock-your-german-writing-skills-a1-c2"/);
   assert.match(html, /property="og:image" content="https:\/\/www\.falowen\.app\/books\/previews\/writing-skills-a1-c2-5\.webp"/);
   assert.match(html, /name="twitter:image" content="https:\/\/www\.falowen\.app\/books\/previews\/writing-skills-a1-c2-5\.webp"/);
