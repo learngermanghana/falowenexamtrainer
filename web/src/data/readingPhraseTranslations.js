@@ -1,3 +1,4 @@
+import { contextualReadingVocabulary } from "./contextualReadingVocabulary.js";
 import { getAdvancedReadingPhraseTranslations } from "./advancedReadingGlossary";
 import { getA1ReadingPhraseTranslations } from "./a1ReadingGlossary";
 // Human-reviewed German → English support for A2/B1 lesson reading passages.
@@ -35,7 +36,7 @@ const BY_DAY = {
   },
   B1: {
     1: [["Traumdeutung","dream interpretation"],["entschlüsseln","to decipher / interpret"],["Jahrtausenden","for thousands of years"],["Gedächtnisverarbeitung","processing memories"],["Schicksal","fate / destiny"]],
-    2: [["Freundschaft","friendship"],["Vertrauen","trust"],["Geheimnisse","secrets"],["Unterstützung","support"],["verlassen","to rely on"]],
+    2: [["Freundschaft","friendship"],["Vertrauen","trust"],["Geheimnisse","secrets"],["Unterstützung","support"],["auf den man sich verlassen kann","whom you can rely on"],["sich auf den Freund verlassen kann","can rely on their friend"]],
     3: [["Helden","heroes"],["im Stillen","quietly / without recognition"],["Hingabe","dedication"],["Mitgefühl","compassion"],["alleinerziehenden","single parent / raising children alone"]],
     4: [["Wohnraum","housing / living space"],["Mieten","rents"],["Interessenten","prospective tenants / applicants"],["Mietpreisbremse","rent-control regulation"],["Neubauprogrammen","new housing development programmes"]],
     5: [["bezahlbaren", "affordable"], ["Besichtigungstermin", "apartment viewing appointment"], ["Interessenten", "interested applicants"], ["Vermieter", "landlord"], ["entspricht", "meets / matches"]],
@@ -73,10 +74,11 @@ const COMMON = {
 /** Saved meanings, intentionally separate from the source question/answer data. */
 export function getReadingPhraseTranslations(level, day) {
   const key = String(level || "").trim().toUpperCase();
-  if (key === "A1") return getA1ReadingPhraseTranslations();
-  if (["B2", "C1", "C2"].includes(key)) return getAdvancedReadingPhraseTranslations(key);
-  if (!["A2", "B1"].includes(key)) return [];
-  const entries = [...(BY_DAY[key]?.[Number(day)] || []), ...COMMON[key]];
+  const priority = contextualReadingVocabulary[key]?.[Number(day)] || [];
+  const fallback = key === "A1" ? getA1ReadingPhraseTranslations() : getAdvancedReadingPhraseTranslations(key);
+  if (fallback.length) return [...priority.map(([de, en]) => ({ de, en })), ...fallback];
+  if (!COMMON[key]) return [];
+  const entries = [...priority, ...(BY_DAY[key]?.[Number(day)] || []), ...COMMON[key]];
   const seen = new Set();
   return entries.filter(([de, en]) => {
     const identifier = de.toLocaleLowerCase("de");
