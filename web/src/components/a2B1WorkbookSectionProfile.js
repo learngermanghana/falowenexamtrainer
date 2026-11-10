@@ -110,16 +110,20 @@ const extractRequiredAnswer = (tail = "") => {
 const collectSubmissionSections = (text = "") => {
   const sections = new Map();
   let currentPart = "";
-  String(text || "").split(/\r?\n/).forEach((rawLine) => {
+  const normalizedText = String(text || "").replace(/\\r?\\n/g, "\n");
+  normalizedText.split(/\r?\n/).forEach((rawLine) => {
     const line = rawLine.trim();
     if (!line) return;
-    const heading = line.match(SECTION_HEADER);
-    if (heading) {
-      currentPart = `teil${Number(heading[1])}`;
-      if (!sections.has(currentPart)) sections.set(currentPart, []);
-      const tail = line.slice(heading[0].length);
-      const answer = extractRequiredAnswer(tail);
-      if (answer) sections.get(currentPart).push(answer);
+    const headers = [...line.matchAll(/(?:^|\s)(?:teil|part)\s*([1-4])\b/gi)];
+    if (headers.length) {
+      headers.forEach((heading, index) => {
+        currentPart = `teil${Number(heading[1])}`;
+        if (!sections.has(currentPart)) sections.set(currentPart, []);
+        const start = heading.index + heading[0].length;
+        const end = index + 1 < headers.length ? headers[index + 1].index : line.length;
+        const answer = extractRequiredAnswer(line.slice(start, end));
+        if (answer) sections.get(currentPart).push(answer);
+      });
       return;
     }
     if (currentPart) sections.get(currentPart).push(line);
