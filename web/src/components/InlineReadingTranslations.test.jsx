@@ -81,3 +81,46 @@ describe("A2/B1 reading phrase support", () => {
     expect(container.querySelector("[data-reading-glossary-phrase]")).toBeNull();
   });
 });
+
+test("C2 Day 5 prioritises the argument and reveals additional phrases on demand", () => {
+  const { C2_READING_PRACTICE } = require("../data/c2ReadingPractice");
+  const [opening, , rhetoric] = C2_READING_PRACTICE[5].text;
+  const { rerender } = render(<InlineReadingTranslations level="C2" day={5} text={opening} />);
+  const highlights = () => screen.getAllByRole("button", { name: /^Show English meaning/ });
+  expect(highlights()).toHaveLength(3);
+  fireEvent.click(screen.getByRole("button", { name: /meaning of unkritischer Gefolgschaft/ }));
+  expect(screen.getByRole("status")).toHaveTextContent("unquestioning allegiance");
+  fireEvent.click(screen.getByRole("button", { name: "More vocabulary" }));
+  expect(highlights().length).toBeGreaterThan(3);
+  fireEvent.click(screen.getByRole("button", { name: "Less vocabulary" }));
+  expect(highlights()).toHaveLength(3);
+  rerender(<InlineReadingTranslations level="C2" day={5} text={rhetoric} />);
+  fireEvent.click(screen.getByRole("button", { name: /meaning of rhetorischen Schaufechten/ }));
+  expect(screen.getByRole("status")).toHaveTextContent("staged verbal sparring");
+});
+
+test("new A2 and advanced entries match the authored reading passages", () => {
+  const { contextualReadingVocabulary } = require("../data/contextualReadingVocabulary");
+  const sources = {
+    A2: require("../data/a2ReadingTasks").A2_READING_TASKS,
+    B2: require("../data/b2ReadingPractice").B2_READING_PRACTICE,
+    C1: require("../data/c1ReadingPractice").C1_READING_PRACTICE,
+    C2: require("../data/c2ReadingPractice").C2_READING_PRACTICE,
+  };
+  for (const [level, days] of Object.entries(sources)) {
+    for (const [day, passage] of Object.entries(days)) {
+      const paragraphs = passage.text || passage.paragraphs;
+      const text = Array.isArray(paragraphs) ? paragraphs.join("\n") : paragraphs;
+      for (const [de, en] of contextualReadingVocabulary[level][day]) {
+        expect(segmentReadingPhrases(text, [{ de, en }]).map(part => part.de)).toContain(de);
+      }
+    }
+  }
+});
+
+test("B1 distinguishes relying on a friend from leaving a friend", () => {
+  const entries = getReadingPhraseTranslations("B1", 2);
+  const text = "Ein Freund, auf den man sich verlassen kann. Den Freund verlassen.";
+  expect(segmentReadingPhrases(text, entries).filter(part => part.en).map(part => part.en))
+    .toEqual(["whom you can rely on"]);
+});

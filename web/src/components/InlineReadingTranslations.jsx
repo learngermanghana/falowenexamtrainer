@@ -9,10 +9,15 @@ import "./InlineReadingTranslations.css";
 export default function InlineReadingTranslations({ text = "", level = "", day = 0 }) {
   const scope = String(level).toUpperCase() + ":" + String(day) + ":" + String(text);
   const [selection, setSelection] = useState({ scope: "", index: -1 });
-  const segments = useMemo(
-    () => segmentReadingPhrases(text, getReadingPhraseTranslations(level, day), ["A1", "B2", "C1", "C2"].includes(String(level).toUpperCase()) ? 3 : 9),
-    [text, level, day],
-  );
+  const [expandedScope, setExpandedScope] = useState(null);
+  const expanded = expandedScope === scope;
+  const { compact, all, hasMore } = useMemo(() => {
+    const entries = getReadingPhraseTranslations(level, day);
+    const compact = segmentReadingPhrases(text, entries, 3);
+    const all = segmentReadingPhrases(text, entries, Infinity);
+    return { compact, all, hasMore: all.filter(part => part.en).length > compact.filter(part => part.en).length };
+  }, [text, level, day]);
+  const segments = expanded ? all : compact;
   const activeIndex = selection.scope === scope ? selection.index : -1;
 
   return (
@@ -88,6 +93,15 @@ export default function InlineReadingTranslations({ text = "", level = "", day =
           </span>
         );
       })}
+      {hasMore && (
+        <button type="button" className="reading-glossary-toggle" aria-expanded={expanded}
+          onClick={() => {
+            setSelection({ scope, index: -1 });
+            setExpandedScope(expanded ? null : scope);
+          }}>
+          {expanded ? "Less vocabulary" : "More vocabulary"}
+        </button>
+      )}
     </span>
   );
 }

@@ -8,6 +8,7 @@
 | A1–C2 day, chapter, grammar, section | Canonical learner course content and `scripts/generateFalowenCourseMap.mjs` | Generated `falowen-course-map.json` in build output; public schedules; do not directly commit generated map |
 | A1 tutor workbooks / optional music | `web/src/components/A1TutorMarkedWorkbookShell.js`, navigation and submission components | [A1 shared migration](../a1-shared-workbook-migration.md), `README.md`, targeted workbook tests |
 | A2/B1 workbooks | Level-specific workbook sources | Canonical assignment keys and [assessment sync](../assessment-task-sync.md) |
+| Workbook reading vocabulary | `web/src/data/contextualReadingVocabulary.js`, level glossaries and `InlineReadingTranslations.jsx` | Three inline phrases per text block. More vocabulary expands additional exact matches locally. |
 | Assignment questions or answer keys | Student-facing task source, `scripts/generateAssessmentTaskRegistry.mjs` | Registry `--check`, rubric and marking tests |
 | Full exams / mock publication | Server-owned answer keys and registered exam engines | [Mock factory](../mock-factory-a1-c2.md); review before labeling `ready` |
 | Music MP3 additions | Approved `music/<level>/day-XX/` R2 folder and music discovery API | [Music publishing](../music-publishing.md), [music workflow](../workflows/music-and-lyrics.md) |
