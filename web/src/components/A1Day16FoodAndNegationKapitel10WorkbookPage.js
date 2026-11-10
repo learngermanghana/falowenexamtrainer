@@ -1,3 +1,4 @@
+import { A1ReadingInlineContent } from "./A1TutorMarkedReadingLayout";
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import { styles } from "../styles";
@@ -132,12 +133,12 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => (
           <strong>Instructions:</strong> Read the text below and tap <strong>Wahr</strong> or <strong>Falsch</strong> for every statement.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Einkaufen ist wichtig. Ich mache oft eine Einkaufsliste und kaufe Obst, Gemüse, Brot, Milch und Eier im
+          <A1ReadingInlineContent day={16}>Einkaufen ist wichtig. Ich mache oft eine Einkaufsliste und kaufe Obst, Gemüse, Brot, Milch und Eier im
           Supermarkt. Ich gehe zweimal pro Woche einkaufen. Auf dem Wochenmarkt kaufe ich frisches Obst und Gemüse, die
           oft frischer sind als im Supermarkt. Letzten Samstag habe ich Tomaten, Gurken, Salat und Kartoffeln gekauft.
           Die Preise sind manchmal höher, aber die Qualität ist besser. Nach dem Einkaufen koche ich gerne. Ein
           einfaches Rezept ist Tomatensalat: Tomaten und Zwiebeln schneiden, mit Salz, Pfeffer und Olivenöl mischen.
-          Dieser Salat ist schnell gemacht und sehr lecker.
+          Dieser Salat ist schnell gemacht und sehr lecker.</A1ReadingInlineContent>
         </p>
         <p style={{ margin: 0, fontWeight: 600 }}>A) Wahr oder Falsch</p>
         {readingQuestions.map((question) => (

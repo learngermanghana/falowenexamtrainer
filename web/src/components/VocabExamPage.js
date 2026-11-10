@@ -1,5 +1,6 @@
 // web/src/pages/VocabExamPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import { readSavedReadingPhrases } from "../services/savedReadingPhrases";
 import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
@@ -27,7 +28,11 @@ const pickRandom = (arr, count) => shuffle(arr).slice(0, count);
 
 const VocabExamPage = ({ context = "exam" }) => {
   const { level, setLevel, setError } = useExam();
-  const { studentProfile } = useAuth();
+  const { studentProfile, user } = useAuth();
+  const savedPhrases = useMemo(() => {
+    try { return context === "campus" ? readSavedReadingPhrases(user?.uid) : []; }
+    catch { return []; }
+  }, [context, user?.uid]);
 
   const profileLevel = normalizeProfileLevel(studentProfile?.level);
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
@@ -133,6 +138,15 @@ const VocabExamPage = ({ context = "exam" }) => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      {savedPhrases.length > 0 && <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>Saved reading phrases</h2>
+        <ul>{savedPhrases.map(phrase => <li key={JSON.stringify([phrase.level, phrase.day, phrase.de, phrase.sentence])}>
+          <strong lang="de">{phrase.de}</strong> · {phrase.en}
+          {phrase.simple && <div lang="de">{phrase.simple}</div>}
+          <div lang="de">{phrase.sentence}</div>
+          <a href={phrase.lessonPath?.startsWith("/campus/course/") ? phrase.lessonPath : `/campus/course/lesson/${phrase.level}/${phrase.day}?view=lesen`}>{phrase.level} · Day {phrase.day}</a>
+        </li>)}</ul>
+      </section>}
       <section style={styles.card}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <div>

@@ -124,3 +124,20 @@ test("B1 distinguishes relying on a friend from leaving a friend", () => {
   expect(segmentReadingPhrases(text, entries).filter(part => part.en).map(part => part.en))
     .toEqual(["whom you can rely on"]);
 });
+
+test("saving is explicit, scoped to the student, and retains the full sentence", () => {
+  const { ReadingStudentContext, readSavedReadingPhrases } = require("../services/savedReadingPhrases");
+  render(<ReadingStudentContext.Provider value="reader-a"><p>
+    <strong>Heute</strong>{" "}
+    <InlineReadingTranslations level="C2" day={5} text="diskutieren wir Ambiguitätstoleranz. Danach lesen wir weiter." />
+  </p></ReadingStudentContext.Provider>);
+  fireEvent.click(screen.getByRole("button", { name: /meaning of Ambiguitätstoleranz/ }));
+  expect(screen.getByRole("status")).toHaveTextContent("Unsicherheit und verschiedene Deutungen");
+  expect(readSavedReadingPhrases("reader-a")).toEqual([]);
+  fireEvent.click(screen.getByRole("button", { name: "Save phrase" }));
+  fireEvent.click(screen.getByRole("button", { name: "Save phrase" }));
+  expect(readSavedReadingPhrases("reader-a")).toEqual([expect.objectContaining({
+    de: "Ambiguitätstoleranz", level: "C2", day: 5, sentence: "Heute diskutieren wir Ambiguitätstoleranz.",
+  })]);
+  expect(readSavedReadingPhrases("reader-b")).toEqual([]);
+});

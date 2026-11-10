@@ -1,3 +1,4 @@
+import { A1ReadingInlineContent } from "./A1TutorMarkedReadingLayout";
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
@@ -80,8 +81,8 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Reading Passage: Introducing Yourself (Exercise) (16.6 Marks)</strong>
           <br />
-          Hallo! Ich heiße Anna. Ich komme aus Spanien und ich wohne in Madrid. Wie heißt du? Woher kommst du? Wo wohnst du?
-          Mein Freund Peter kommt aus Deutschland und wohnt in Berlin. Er heißt Peter.
+          <A1ReadingInlineContent day={3}>Hallo! Ich heiße Anna. Ich komme aus Spanien und ich wohne in Madrid. Wie heißt du? Woher kommst du? Wo wohnst du?
+          Mein Freund Peter kommt aus Deutschland und wohnt in Berlin. Er heißt Peter.</A1ReadingInlineContent>
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Exercise: Complete the Sentences</strong> (Use the verbs <em>heißen</em>, <em>wohnen</em> and <em>kommen</em>.

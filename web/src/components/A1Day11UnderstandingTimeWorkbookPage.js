@@ -1,3 +1,4 @@
+import InlineReadingTranslations from "./InlineReadingTranslations";
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import A1ProtectedAudioPlayer from "./A1ProtectedAudioPlayer";
@@ -111,7 +112,7 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
               {notice.details.map((detail, rowIndex) => (
                 <p key={rowIndex} style={{ margin: 0, lineHeight: 1.6 }}>
                   {detail.label ? <strong>{detail.label}: </strong> : null}
-                  {detail.value}
+                  <InlineReadingTranslations level="A1" day={11} text={detail.value} />
                 </p>
               ))}
             </div>

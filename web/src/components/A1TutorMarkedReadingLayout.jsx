@@ -4,19 +4,19 @@ import InlineReadingTranslations from "./InlineReadingTranslations";
 // Enrich only plain textual descendants of authored workbook reading sources.
 // Never touch questions, input controls or timed mock exam components.
 const A1_SOURCE_TEXT_ELEMENTS = new Set(["p", "span", "div", "strong", "em", "b", "i", "small", "li", "ul", "ol"]);
-function translateA1ReadingSource(children) {
+function translateA1ReadingSource(children, day) {
   return React.Children.map(children, (child) => {
     if (typeof child === "string") {
-      return <InlineReadingTranslations level="A1" text={child} />;
+      return <InlineReadingTranslations level="A1" day={day} text={child} />;
     }
     if (!React.isValidElement(child)) return child;
     if (child.type === React.Fragment) {
-      return React.cloneElement(child, undefined, translateA1ReadingSource(child.props.children));
+      return React.cloneElement(child, undefined, translateA1ReadingSource(child.props.children, day));
     }
     if (typeof child.type !== "string" || !A1_SOURCE_TEXT_ELEMENTS.has(child.type) || child.props.onClick || child.props.contentEditable) {
       return child;
     }
-    return React.cloneElement(child, undefined, translateA1ReadingSource(child.props.children));
+    return React.cloneElement(child, undefined, translateA1ReadingSource(child.props.children, day));
   });
 }
 
@@ -92,11 +92,11 @@ export function A1TutorMarkedReadingFrame({ label = "", children }) {
 }
 
 // Use inside existing passage paragraphs without changing layout or answer controls.
-export function A1ReadingInlineContent({ children }) {
-  return <>{translateA1ReadingSource(children)}</>;
+export function A1ReadingInlineContent({ children, day }) {
+  return <>{translateA1ReadingSource(children, day)}</>;
 }
 
-export function A1ReadingDocument({ label = "Text", title = "", children }) {
+export function A1ReadingDocument({ label = "Text", title = "", children, day }) {
   return (
     <article
       data-a1-reading-document="true"
@@ -116,7 +116,7 @@ export function A1ReadingDocument({ label = "Text", title = "", children }) {
         </span>
         {title ? <strong style={{ fontSize: 17 }}>{title}</strong> : null}
       </div>
-      <div style={{ lineHeight: 1.75 }}>{translateA1ReadingSource(children)}</div>
+      <div style={{ lineHeight: 1.75 }}>{translateA1ReadingSource(children, day)}</div>
     </article>
   );
 }
@@ -137,7 +137,7 @@ export function A1ReadingSourceGrid({ children, minWidth = 240 }) {
   );
 }
 
-export function A1ReadingSourceCard({ label, title, children }) {
+export function A1ReadingSourceCard({ label, title, children, day }) {
   return (
     <article
       data-a1-reading-source-card="true"
@@ -156,7 +156,7 @@ export function A1ReadingSourceCard({ label, title, children }) {
         </span>
         {title ? <strong>{title}</strong> : null}
       </div>
-      <div style={{ lineHeight: 1.7 }}>{translateA1ReadingSource(children)}</div>
+      <div style={{ lineHeight: 1.7 }}>{translateA1ReadingSource(children, day)}</div>
     </article>
   );
 }

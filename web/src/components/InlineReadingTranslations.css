@@ -25,3 +25,9 @@
   font-size: .85em;
   cursor: pointer;
 }
+
+.reading-glossary-save {
+  display: block;
+  margin-block: .5em .25em;
+  cursor: pointer;
+}

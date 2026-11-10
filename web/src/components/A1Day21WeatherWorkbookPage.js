@@ -155,8 +155,8 @@ const Teil1Content = () => (
         <h3 style={{ margin: 0 }}>Situation {index + 1}</h3>
         <strong>{index + 1}. {item.prompt}</strong>
         <A1ReadingSourceGrid>
-          <A1ReadingSourceCard label="Text A"><p style={{ margin: 0 }}>{item.textA}</p></A1ReadingSourceCard>
-          <A1ReadingSourceCard label="Text B"><p style={{ margin: 0 }}>{item.textB}</p></A1ReadingSourceCard>
+          <A1ReadingSourceCard day={21} label="Text A"><p style={{ margin: 0 }}>{item.textA}</p></A1ReadingSourceCard>
+          <A1ReadingSourceCard day={21} label="Text B"><p style={{ margin: 0 }}>{item.textB}</p></A1ReadingSourceCard>
         </A1ReadingSourceGrid>
         <p style={{ margin: 0 }}>Welcher Text passt?</p>
         <p style={{ margin: 0 }}>a) Text A</p>
@@ -170,7 +170,7 @@ const Teil2Content = () => (
   <section style={card} data-a1-day21-weather-teil="2">
     <h2>Teil 2 · Nachricht</h2>
     <p>Lesen Sie den Wetterbericht aus dem Radio. Sind die Aussagen (1–5) Richtig (R) oder Falsch (F)?</p>
-    <A1ReadingSourceCard label="Radio-Wetterbericht" title="Radio ND2 – Der Wetterbericht für das Wochenende">
+    <A1ReadingSourceCard day={21} label="Radio-Wetterbericht" title="Radio ND2 – Der Wetterbericht für das Wochenende">
       <p>Guten Tag, liebe Hörerinnen und Hörer! Hier ist das Wetter für Samstag und Sonntag.</p>
       <p>Am Samstag ist das Wetter im Norden sehr schön: Die Sonne scheint den ganzen Tag und es wird warm bis 24 Grad. Im Süden ist es kälter (nur 12 Grad) und am Nachmittag gibt es starken Regen. Vergessen Sie dort Ihren Regenschirm nicht!</p>
       <p>Am Sonntag wird es überall sehr windig und viele Wolken sind am Himmel. Es regnet aber nicht mehr und die Temperaturen liegen bei 18 Grad.</p>

@@ -76,7 +76,7 @@ export function getReadingPhraseTranslations(level, day) {
   const key = String(level || "").trim().toUpperCase();
   const priority = contextualReadingVocabulary[key]?.[Number(day)] || [];
   const fallback = key === "A1" ? getA1ReadingPhraseTranslations() : getAdvancedReadingPhraseTranslations(key);
-  if (fallback.length) return [...priority.map(([de, en]) => ({ de, en })), ...fallback];
+  if (fallback.length) return [...priority.map(([de, en, simple]) => ({ de, en, simple })), ...fallback];
   if (!COMMON[key]) return [];
   const entries = [...priority, ...(BY_DAY[key]?.[Number(day)] || []), ...COMMON[key]];
   const seen = new Set();
@@ -108,7 +108,7 @@ export function segmentReadingPhrases(text, entries, maxMatches = 9) {
       offset = end;
       if ((start && wordChar.test(source[start - 1])) || (end < source.length && wordChar.test(source[end]))) continue;
       if (matches.some((match) => start < match.end && end > match.start)) continue;
-      matches.push({ start, end, de: source.slice(start, end), en: entry.en });
+      matches.push({ start, end, de: source.slice(start, end), en: entry.en, simple: entry.simple });
       break; // Don't underline repeated occurrences of the same phrase.
     }
     if (matches.length >= maxMatches) break;
