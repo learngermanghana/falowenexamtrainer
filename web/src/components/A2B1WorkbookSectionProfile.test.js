@@ -155,4 +155,12 @@ describe("A2/B1 submission section completeness", () => {
     expect(complete).toMatchObject({ ok: true, missingParts: [] });
     expect(readingOnly).toMatchObject({ ok: true, missingParts: [] });
   });
+  test("recognizes every required part when headings share one line", () => {
+    const result = validateA2B1WorkbookSubmissionSections({
+      level: "A2",
+      day: 21,
+      text: "TEIL 2 Hallo! TEIL 3 1. A TEIL 4 2. Richtig",
+    });
+    expect(result).toMatchObject({ ok: true, missingParts: [] });
+  });
 });
