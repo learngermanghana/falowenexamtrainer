@@ -8,25 +8,27 @@ jest.mock("./navigation/AppBackButton", () => ({
 }));
 
 describe("A1 Chapter 5 German cases grammar", () => {
-  test("keeps three beginner-focused nominative examples with sein and werden", () => {
+  test("keeps five beginner-focused nominative examples with sein and werden", () => {
     render(<A1Day9NominativeAccusativeGrammarPage />);
     const section = screen.getByRole("heading", { name: "3) Nominative case (Der Nominativ)" }).closest("section");
-    expect(within(section).getAllByRole("listitem")).toHaveLength(3);
+    expect(within(section).getAllByRole("listitem")).toHaveLength(5);
     expect(within(section).getByText("The teacher is happy.")).toBeInTheDocument();
     expect(within(section).getByText("That is a car.")).toBeInTheDocument();
     expect(within(section).getByText("He becomes a doctor.")).toBeInTheDocument();
     expect(within(section).getAllByText(/not a direct object/).length).toBeGreaterThan(0);
-    expect(within(section).queryByText("A female teacher is friendly.")).not.toBeInTheDocument();
+    expect(within(section).getByText("The female teacher is friendly.")).toBeInTheDocument();
+    expect(within(section).getByText("The children become tired.")).toBeInTheDocument();
   });
 
-  test("removes the redundant accusative set but keeps all four requested Student pairs", () => {
+  test("removes the redundant accusative set and keeps five detailed article pairs", () => {
     render(<A1Day9NominativeAccusativeGrammarPage />);
     const section = screen.getByRole("heading", { name: "4) Accusative case (Der Akkusativ)" }).closest("section");
-    expect(within(section).getAllByRole("listitem")).toHaveLength(4);
+    expect(within(section).getAllByRole("listitem")).toHaveLength(5);
     expect(within(section).getByText("The student sees the teacher. / The student sees a teacher.")).toBeInTheDocument();
     expect(within(section).getByText("The student sees the female teacher. / The student sees a female teacher.")).toBeInTheDocument();
     expect(within(section).getByText("The student sees the child. / The student sees a child.")).toBeInTheDocument();
     expect(within(section).getByText("The student sees the children. / The student sees no children.")).toBeInTheDocument();
+    expect(within(section).getByText("The female teacher buys the apple. / The female teacher buys an apple.")).toBeInTheDocument();
     expect(within(section).queryByText("I have the dog.")).not.toBeInTheDocument();
     expect(within(section).queryByText("She buys the flower.")).not.toBeInTheDocument();
   });
