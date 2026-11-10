@@ -50,7 +50,8 @@ test("builds these exact public routes and preserves protected exam noindex poli
     ]) })
   ]));
   const pkg = JSON.parse(fs.readFileSync(path.join(webRoot, "package.json"), "utf8"));
-  expect(pkg.scripts.postbuild).toBe("node scripts/generate-a1-public-seo.mjs");
+  expect(pkg.scripts.postbuild).toContain("node scripts/generate-a1-public-seo.mjs");
+  expect(pkg.scripts.postbuild).toContain("node scripts/generate-book-social-pages.mjs");
 });
 
 test("A1 landing and public Lesen route are already in sitemap", () => {
