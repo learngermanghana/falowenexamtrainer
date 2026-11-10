@@ -142,7 +142,7 @@ function A2KombiAttempt({mockNumber,paper}) {
       const next={stage:"lesen",attemptInfo:{attemptId:reply.attemptId,attemptNumber:reply.attemptNumber,firstAttempt:reply.firstAttempt,assessmentVersion:reply.assessmentVersion||"three-module-v1"},startedAt:Date.now()};
       setFlow(next);
       setLesen(old=>({...old,startedAt:old.startedAt||Date.now(),answers:old.answers||{}}));
-    }catch(error){setConnectionError(error?.response?.data?.error||error.message||"Could not verify all four Hören recordings. Please try again after the MP3s are uploaded.");}
+    }catch(error){setConnectionError(error?.response?.data?.error||error.message||"Could not verify the existing Cloudflare R2 Hören recordings. Falowen cannot start this exam until all four are accessible and match the approved audio.");}
     finally{setConnecting(false);}
   };
 
