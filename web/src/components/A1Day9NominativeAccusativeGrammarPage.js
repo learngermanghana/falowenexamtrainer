@@ -148,143 +148,39 @@ const ArticleTable = ({ title, definite, indefinite }) => (
 
 const nominativeMoreExamples = [
   {
-    id: "nom-more-1",
+    id: "nom-1",
     sentence: (
       <>
-        <span style={subjectHighlightStyle}>Der Lehrer</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+        <span style={subjectHighlightStyle}>Der Lehrer</span> <span style={verbHighlightStyle}>ist</span> glücklich.
       </>
     ),
-    english: "The teacher is friendly.",
+    english: "The teacher is happy.",
     gender: "Lehrer = masculine singular",
-    note: "The teacher is the subject. Definite masculine nominative uses der.",
+    note: "Der Lehrer is the subject (Nominativ). Sein describes the subject with glücklich.",
   },
   {
-    id: "nom-more-2",
+    id: "nom-2",
     sentence: (
       <>
-        <span style={subjectHighlightStyle}>Ein Lehrer</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+        <span style={subjectHighlightStyle}>Das</span> <span style={verbHighlightStyle}>ist</span>{" "}
+        <span style={subjectHighlightStyle}>ein Auto</span>.
       </>
     ),
-    english: "A teacher is friendly.",
-    gender: "Lehrer = masculine singular",
-    note: "The teacher is not a specific teacher here, so indefinite masculine nominative uses ein.",
+    english: "That is a car.",
+    gender: "Auto = neuter singular",
+    note: "Das is the subject. Ein Auto names what the subject is (also Nominativ, not a direct object).",
   },
   {
-    id: "nom-more-3",
+    id: "nom-3",
     sentence: (
       <>
-        <span style={subjectHighlightStyle}>Die Lehrerin</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+        <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>wird</span>{" "}
+        <span style={subjectHighlightStyle}>Arzt</span>.
       </>
     ),
-    english: "The female teacher is friendly.",
-    gender: "Lehrerin = feminine singular",
-    note: "The subject is feminine and specific, so nominative feminine uses die.",
-  },
-  {
-    id: "nom-more-4",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Eine Lehrerin</span> <span style={verbHighlightStyle}>ist</span> freundlich.
-      </>
-    ),
-    english: "A female teacher is friendly.",
-    gender: "Lehrerin = feminine singular",
-    note: "The subject is feminine but not specific, so indefinite nominative feminine uses eine.",
-  },
-  {
-    id: "nom-more-5",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Das Kind</span> <span style={verbHighlightStyle}>ist</span> ruhig.
-      </>
-    ),
-    english: "The child is quiet.",
-    gender: "Kind = neuter singular",
-    note: "The subject is neuter and specific, so nominative neuter uses das.",
-  },
-  {
-    id: "nom-more-6",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Ein Kind</span> <span style={verbHighlightStyle}>ist</span> ruhig.
-      </>
-    ),
-    english: "A child is quiet.",
-    gender: "Kind = neuter singular",
-    note: "The subject is neuter but not specific, so indefinite nominative neuter uses ein.",
-  },
-  {
-    id: "nom-more-7",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Die Kinder</span> <span style={verbHighlightStyle}>sind</span> ruhig.
-      </>
-    ),
-    english: "The children are quiet.",
-    gender: "Kinder = plural",
-    note: "Plural nouns use die as the definite article in nominative.",
-  },
-  {
-    id: "nom-more-8",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Keine Kinder</span> <span style={verbHighlightStyle}>sind</span> laut.
-      </>
-    ),
-    english: "No children are loud.",
-    gender: "Kinder = plural",
-    note: "For plural negation, German uses keine.",
-  },
-];
-
-const accusativeCoreExamples = [
-  {
-    id: "acc-core-1",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Ich</span> <span style={verbHighlightStyle}>habe</span>{" "}
-        <span style={objectHighlightStyle}>den Hund</span>.
-      </>
-    ),
-    english: "I have the dog.",
-    gender: "Hund = masculine singular",
-    note: "Hund is the direct object after haben. Masculine definite article changes from der to den in accusative.",
-  },
-  {
-    id: "acc-core-2",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Sie</span> <span style={verbHighlightStyle}>kauft</span>{" "}
-        <span style={objectHighlightStyle}>die Blume</span>.
-      </>
-    ),
-    english: "She buys the flower.",
-    gender: "Blume = feminine singular",
-    note: "Blume is the direct object, but feminine definite article stays die in accusative.",
-  },
-  {
-    id: "acc-core-3",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>isst</span>{" "}
-        <span style={objectHighlightStyle}>das Brot</span>.
-      </>
-    ),
-    english: "He eats the bread.",
-    gender: "Brot = neuter singular",
-    note: "Brot is the direct object, but neuter definite article stays das in accusative.",
-  },
-  {
-    id: "acc-core-4",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Wir</span> <span style={verbHighlightStyle}>treffen</span>{" "}
-        <span style={objectHighlightStyle}>die Freunde</span>.
-      </>
-    ),
-    english: "We meet the friends.",
-    gender: "Freunde = plural",
-    note: "Freunde is plural and the direct object. Definite plural article stays die in accusative.",
+    english: "He becomes a doctor.",
+    gender: "Arzt = masculine singular",
+    note: "Er is the subject. Arzt names what he becomes (also Nominativ). Professions normally have no article after werden.",
   },
 ];
 
@@ -563,11 +459,9 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
       <section style={cardStyle}>
         <h2 style={sectionTitleStyle}>3) Nominative case (Der Nominativ)</h2>
         <p style={{ margin: 0 }}>
-          Use nominative for the <strong>subject</strong> (who/what the sentence is about, or who/what does the
-          action). <strong>sein</strong> means <strong>"to be"</strong>, and <strong>werden</strong> means{" "}
-          <strong>"to become"</strong>. Beginner tip: first ask, <strong>is the word the subject or the object?</strong>{" "}
-          In simple nominative sentences, you usually describe the subject instead of adding a normal object, for
-          example: <strong>Er ist groß.</strong> / <strong>Das ist ein Auto.</strong>
+          <strong>Subject or object?</strong> The nominative normally identifies the <strong>subject</strong>.
+          With <strong>sein</strong> (to be) and <strong>werden</strong> (to become), a second noun can
+          <strong> name or identify the subject</strong>. This noun is also nominative, not a direct object.
         </p>
 
         <ArticleTable
@@ -577,8 +471,8 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
         />
 
         <p style={{ margin: 0 }}>
-          More nominative examples (subject-focused): in nominative-only patterns, highlight the{" "}
-          <strong>subject</strong>.
+          Focus on <strong>sein</strong> and <strong>werden</strong>. These examples show the subject
+          and a description or noun identifying that subject.
         </p>
         <ExampleList examples={nominativeMoreExamples} />
       </section>
@@ -603,11 +497,9 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           indefinite={["einen", "eine", "ein", "keine"]}
         />
 
-        <ExampleList examples={accusativeCoreExamples} />
-
         <p style={{ margin: 0 }}>
-          More accusative examples (definite + indefinite from masculine to plural). Watch how the{" "}
-          <strong>verb influences the object case</strong>:
+          <strong>Examples:</strong> definite and indefinite articles from masculine to plural.
+          Notice how the article changes for the <strong>direct object</strong>.
         </p>
         <ExampleList examples={accusativeMoreExamples} />
       </section>
@@ -616,20 +508,14 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
         <h2 style={sectionTitleStyle}>5) Helpful verb tips for beginners</h2>
         <ul style={listStyle}>
           <li>
-            <strong>Nominative focus:</strong> sein (to be), werden (to become). Ask: is the word the subject or the
-            object? In simple nominative examples, you mostly describe the subject: <strong>Er ist groß.</strong> /{" "}
-            <strong>Das ist ein Auto.</strong>
+            <strong>Nominative focus:</strong> sein (to be), werden (to become). The noun after these verbs
+            can identify the subject rather than be a direct object.
           </li>
           <li>
             <strong>Accusative object verbs:</strong> haben, sehen, finden, kaufen, nehmen, brauchen, essen, trinken,
             hören, lesen
           </li>
         </ul>
-        <p style={{ margin: 0 }}>
-          Examples: <strong>Ich habe einen Stift.</strong> (Stift = masculine), <strong>Sie hat ein Buch.</strong>{" "}
-          (Buch = neuter), <strong>Er kauft ein Auto.</strong> (Auto = neuter),{" "}
-          <strong>Wir kaufen eine Karte.</strong> (Karte = feminine).
-        </p>
         <p style={{ margin: 0 }}>
           Tip: first find the verb, then identify who does the action (subject = nominative) and who/what receives the
           action (direct object = accusative).
