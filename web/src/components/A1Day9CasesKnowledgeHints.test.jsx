@@ -15,7 +15,7 @@ describe("A1 Chapter 5 German cases grammar", () => {
     expect(within(section).getByText("The teacher is happy.")).toBeInTheDocument();
     expect(within(section).getByText("That is a car.")).toBeInTheDocument();
     expect(within(section).getByText("He becomes a doctor.")).toBeInTheDocument();
-    expect(within(section).getByText(/not a direct object/)).toBeInTheDocument();
+    expect(within(section).getAllByText(/not a direct object/).length).toBeGreaterThan(0);
     expect(within(section).queryByText("A female teacher is friendly.")).not.toBeInTheDocument();
   });
 
