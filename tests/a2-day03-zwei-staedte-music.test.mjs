@@ -77,3 +77,22 @@ test('public lyrics handler returns exact matching text and timing without paid 
  assert.equal(res.body.lyrics,pack.lyrics);
  assert.deepEqual(res.body.cues,pack.cues);
 });
+
+test('both A2 Day 3 choruses highlight slightly before the previous delayed cues',()=>{
+  const first=pack.cues.slice(8,12);
+  const second=pack.cues.slice(20,24);
+  assert.deepEqual(first.map(cue=>cue.start),[49,52.55,56.3,60.2]);
+  assert.deepEqual(second.map(cue=>cue.start),[108,111.6,115.35,119.2]);
+  assert.equal(activeLyricIndex(pack.cues,48.99),-1);
+  assert.equal(activeLyricIndex(pack.cues,49.01),8);
+  assert.equal(activeLyricIndex(pack.cues,107.9),-1);
+  assert.equal(activeLyricIndex(pack.cues,108.01),20);
+  assert.equal(activeLyricIndex(pack.cues,123),-1);
+  assert.equal(activeLyricIndex(pack.cues,124.21),24);
+  assert.equal(pack.cues[7].start,42.2);
+  assert.equal(pack.cues[12].start,77.8);
+  assert.equal(pack.cues[19].start,104.5);
+  assert.equal(pack.cues[24].start,124.2);
+  assert.match(pack.timingMethod,/chorus highlighting lag/);
+  assert.equal(pack.timingStatus,'estimated','a small teacher-reported offset is not acoustic certification');
+});
