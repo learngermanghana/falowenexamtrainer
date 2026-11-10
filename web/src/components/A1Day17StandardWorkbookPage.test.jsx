@@ -101,15 +101,15 @@ describe("A1 Day 17 tutor submission integrity", () => {
     "Speaking exam part: 3",
     "Score: 8/10",
     "Feedback: Clear polite request.",
-  ].join("\\n");
-  const hoeren = "TEIL 2\\n1. Richtig\\n2. Falsch\\n3. Richtig\\n4. B\\n5. A";
-  const lesen = "TEIL 3\\n1. Richtig\\n2. Falsch\\n3. Richtig\\n4. Richtig\\n5. Falsch";
-  const complete = ["TEIL 1\\n" + speaking, hoeren, lesen].join("\\n");
+  ].join("\n");
+  const hoeren = "TEIL 2\n1. Richtig\n2. Falsch\n3. Richtig\n4. B\n5. A";
+  const lesen = "TEIL 3\n1. Richtig\n2. Falsch\n3. Richtig\n4. Richtig\n5. Falsch";
+  const complete = ["TEIL 1\n" + speaking, hoeren, lesen].join("\n");
 
   test.each([
-    ["Sprechen", [hoeren, lesen].join("\\n"), /Teil 1 speaking assessment/],
-    ["Hören", [speaking, lesen].join("\\n"), /Teil 2 answers 1, 2, 3, 4, 5/],
-    ["Lesen", [speaking, hoeren].join("\\n"), /Teil 3 answers 1, 2, 3, 4, 5/],
+    ["Sprechen", [hoeren, lesen].join("\n"), /Teil 1 speaking assessment/],
+    ["Hören", [speaking, lesen].join("\n"), /Teil 2 answers 1, 2, 3, 4, 5/],
+    ["Lesen", [speaking, hoeren].join("\n"), /Teil 3 answers 1, 2, 3, 4, 5/],
   ])("blocks submission when %s is missing and names the missing part", (_part, text, message) => {
     const result = validateA1CanonicalSubmissionCompleteness({ assignmentKey: "A1-11", text });
     expect(result.ok).toBe(false);
@@ -123,7 +123,7 @@ describe("A1 Day 17 tutor submission integrity", () => {
   });
 
   test("blocks a completely empty A1 Day 17 submission before it is sent", () => {
-    const result = validateA1CanonicalSubmissionCompleteness({ assignmentKey: "A1-11", text: "  \\n  " });
+    const result = validateA1CanonicalSubmissionCompleteness({ assignmentKey: "A1-11", text: "  \n  " });
     expect(result.ok).toBe(false);
     expect(result.message).toMatch(/Teil 1 speaking assessment/);
     expect(result.message).toMatch(/Teil 2 answers 1, 2, 3, 4, 5/);
