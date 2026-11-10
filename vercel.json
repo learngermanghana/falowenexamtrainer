@@ -281,6 +281,13 @@
   ],
   "routes": [
     {
+      "src": "/books/how-to-unlock-your-german-writing-skills-a1-c2/?",
+      "dest": "/__books/writing-skills-a1-c2.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/book/?",
       "status": 308,
       "headers": {
