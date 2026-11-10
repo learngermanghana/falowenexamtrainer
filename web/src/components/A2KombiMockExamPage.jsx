@@ -13,7 +13,7 @@ import "./A2GoetheWritingMockPreview.css";
 
 const LEGACY_ORDER=["lesen","schreiben","sprechen"];
 const FULL_ORDER=["lesen","hoeren","schreiben","sprechen"];
-const NEW_HOEREN = new Set(["a2-mock-04", "a2-mock-06", "a2-mock-07"]);
+const NEW_HOEREN = new Set(["a2-mock-04", "a2-mock-05", "a2-mock-06", "a2-mock-07"]);
 const orderFor=flow=>flow?.attemptInfo?.assessmentVersion==="four-module-v2"?FULL_ORDER:LEGACY_ORDER;
 const LABELS={lesen:"Lesen",hoeren:"Hören",schreiben:"Schreiben",sprechen:"Sprechen"};
 const read=key=>{try{return JSON.parse(localStorage.getItem(key)||"{}")||{};}catch{return {};}};
@@ -142,7 +142,7 @@ function A2KombiAttempt({mockNumber,paper}) {
       const next={stage:"lesen",attemptInfo:{attemptId:reply.attemptId,attemptNumber:reply.attemptNumber,firstAttempt:reply.firstAttempt,assessmentVersion:reply.assessmentVersion||"three-module-v1"},startedAt:Date.now()};
       setFlow(next);
       setLesen(old=>({...old,startedAt:old.startedAt||Date.now(),answers:old.answers||{}}));
-    }catch(error){setConnectionError(error?.response?.data?.error||error.message||"Could not verify all four Hören recordings. Please try again after the MP3s are uploaded.");}
+    }catch(error){setConnectionError(error?.response?.data?.error||error.message||"Could not verify the existing Cloudflare R2 Hören recordings. Falowen cannot start this exam until all four are accessible and match the approved audio.");}
     finally{setConnecting(false);}
   };
 

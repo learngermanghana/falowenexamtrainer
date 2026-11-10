@@ -25,6 +25,7 @@ on:
       - 'functions/functionz/a2Mock07PublishedAudio.js'
       - 'functions/functionz/a2Mock05PublishedAudio.js'
       - 'functions/functionz/a2Mock05HoerenKeys.js'
+      - 'functions/functionz/tests/a2Mock05HoerenAudio.test.cjs'
       - 'functions/functionz/a2HoerenOnlyScore.js'
       - 'functions/functionz/a2Mock04PublishedAudio.js'
       - 'functions/functionz/tests/a2Mock04HoerenAudio.test.cjs'
@@ -66,9 +67,10 @@ jobs:
           node --check functions/functionz/a2Mock06PublishedAudio.js
           node --check functions/functionz/a2Mock07PublishedAudio.js
           node --check functions/functionz/a2Mock05PublishedAudio.js
+          node --check functions/functionz/a2Mock05HoerenKeys.js
           node --check functions/functionz/a2HoerenOnlyScore.js
           node --check functions/functionz/assessmentTaskContext.js
-          node --test functions/functionz/tests/a2Kombi04to08.test.cjs functions/functionz/tests/a2Mock04HoerenAudio.test.cjs functions/functionz/tests/a2Mock06HoerenAudio.test.cjs functions/functionz/tests/a2Mock07HoerenAudio.test.cjs functions/functionz/tests/a2HoerenOnlyScore.test.cjs
+          node --test functions/functionz/tests/a2Kombi04to08.test.cjs functions/functionz/tests/a2Mock04HoerenAudio.test.cjs functions/functionz/tests/a2Mock05HoerenAudio.test.cjs functions/functionz/tests/a2Mock06HoerenAudio.test.cjs functions/functionz/tests/a2Mock07HoerenAudio.test.cjs functions/functionz/tests/a2HoerenOnlyScore.test.cjs
   web-release:
     runs-on: ubuntu-latest
     timeout-minutes: 20

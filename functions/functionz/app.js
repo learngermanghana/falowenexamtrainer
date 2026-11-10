@@ -5859,7 +5859,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const assessmentVersion = ["a2-mock-04", "a2-mock-06", "a2-mock-07"].includes(mockId) ? "four-module-v2"
+      const assessmentVersion = ["a2-mock-04", "a2-mock-05", "a2-mock-06", "a2-mock-07"].includes(mockId) ? "four-module-v2"
         : /^a2-mock-0[5-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
       const isSecondMock = mockId !== "a2-mock-01";
       const attemptCount = Math.max(0, Number(isSecondMock

@@ -128,8 +128,29 @@ test("new A2 Mock 04 Hören is verified as the fourth /25 module without alterin
   assert.equal(artifacts07.scoreDocument.maxPoints,100);
   assert.equal(artifacts07.scoreDocument.hoerenPending,false);
   assert.deepEqual(artifacts07.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
+  const listening05=require("../a2Mock05HoerenKeys");
+  const result05=buildVerifiedA2MockScore({
+    mockId:"a2-mock-05",
+    state:{mockId:"a2-mock-05",assessmentVersion:"four-module-v2",
+      lesenAnswers:sets["a2-mock-05"].reading,hoerenAnswers:listening05},
+    verifiedSections:verification,
+  });
+  assert.equal(result05.overall.points,100);
+  assert.equal(result05.overall.maxPoints,100);
+  assert.equal(result05.sectionScores.hoeren,25);
+  assert.deepEqual(result05.overall.sections,["lesen","hoeren","schreiben","sprechen"]);
+  const artifacts05=buildA2MockCompletionArtifacts({
+    mockId:"a2-mock-05",authedUser:{uid:"student-05"},attemptId:"fresh",
+    overall:result05.overall,sectionScores:result05.sectionScores,
+  });
+  assert.equal(artifacts05.scoreDocument.maxPoints,100);
+  assert.equal(artifacts05.scoreDocument.hoerenPending,false);
+  assert.deepEqual(artifacts05.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
+
+  // Mock 08 still has no vetted listening question bank; never award a fake fourth score.
   assert.throws(()=>buildVerifiedA2MockScore({
-    mockId:"a2-mock-05",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
+    mockId:"a2-mock-08",state:{assessmentVersion:"four-module-v2",
+      lesenAnswers:sets["a2-mock-08"].reading,hoerenAnswers:listening05},
     verifiedSections:verification,
   }),/Unsupported/);
 });
