@@ -149,8 +149,8 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     route: "/campus/course/a2-mock-3", mode: "full",
     questionSetId: "a2-mock-03", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
-  // Published three-module tests. Hören will be added later as a separate
-  // version; existing /75 attempts and marks must never be rewritten.
+  // New four-module tests use /100; prior three-module /75 attempts remain
+  // unchanged. Mock 08 is still awaiting Hören question-bank integration.
   "a2-mock-04": {
     id:"a2-mock-04", level:"A2", title:"A2 Mock 4", shortTitle:"A2 Mock 4",
     description:"Four-module A2 Kombiprüfung · Lesen, Hören, Schreiben and Sprechen with verified /100 scoring for new attempts; earlier /75 results are preserved.",
@@ -160,11 +160,10 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
   },
   "a2-mock-05": {
     id:"a2-mock-05", level:"A2", title:"A2 Mock 5", shortTitle:"A2 Mock 5",
-    description:"Published A2 Kombiprüfung · Lesen, Schreiben and Sprechen with verified /75 score. Hören will be added later.",
-    durationLabel:"about 75 min · 3 modules", status:"ready",
+    description:"Four-module A2 Kombiprüfung with protected Hören and verified /100 scoring for new attempts; earlier /75 results are preserved.",
+    durationLabel:"about 105 min · 4 modules", status:"ready",
     route:"/campus/course/a2-kombi-mock-5", mode:"kombi",
-    questionSetId:"a2-mock-05", sections:["Lesen","Schreiben","Sprechen"],
-    futureOptionalSection:"Hören",
+    questionSetId:"a2-mock-05", sections:["Lesen","Hören","Schreiben","Sprechen"],
   },
   "a2-mock-06": {
     id:"a2-mock-06", level:"A2", title:"A2 Mock 6", shortTitle:"A2 Mock 6",
