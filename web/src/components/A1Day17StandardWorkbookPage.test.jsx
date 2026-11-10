@@ -104,12 +104,13 @@ describe("A1 Day 17 tutor submission integrity", () => {
   ].join("\n");
   const hoeren = "TEIL 2\n1. Richtig\n2. Falsch\n3. Richtig\n4. B\n5. A";
   const lesen = "TEIL 3\n1. Richtig\n2. Falsch\n3. Richtig\n4. Richtig\n5. Falsch";
-  const complete = ["TEIL 1\n" + speaking, hoeren, lesen].join("\n");
+  const speakingSection = "TEIL 1\n" + speaking;
+  const complete = [speakingSection, hoeren, lesen].join("\n");
 
   test.each([
     ["Sprechen", [hoeren, lesen].join("\n"), /Teil 1 speaking assessment/],
-    ["Hören", [speaking, lesen].join("\n"), /Teil 2 answers 1, 2, 3, 4, 5/],
-    ["Lesen", [speaking, hoeren].join("\n"), /Teil 3 answers 1, 2, 3, 4, 5/],
+    ["Hören", [speakingSection, lesen].join("\n"), /Teil 2 answers 1, 2, 3, 4, 5/],
+    ["Lesen", [speakingSection, hoeren].join("\n"), /Teil 3 answers 1, 2, 3, 4, 5/],
   ])("blocks submission when %s is missing and names the missing part", (_part, text, message) => {
     const result = validateA1CanonicalSubmissionCompleteness({ assignmentKey: "A1-11", text });
     expect(result.ok).toBe(false);
