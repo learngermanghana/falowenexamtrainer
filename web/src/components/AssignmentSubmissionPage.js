@@ -43,6 +43,7 @@ import {
   buildAssignmentSubmissionWordError,
   getAssignmentSubmissionWordMinimum,
 } from "../utils/assignmentSubmissionWordMinimum";
+import { validateA2B1WorkbookSubmissionSections } from "./a2B1WorkbookSectionProfile";
 
 const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
@@ -2053,6 +2054,18 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
+    if (!timedSubmitAfterExpiry && ["A2", "B1"].includes(selectedAssignmentLevel)) {
+      const sectionCheck = validateA2B1WorkbookSubmissionSections({
+        level: selectedAssignmentLevel,
+        day: workbookSubmissionContext.locked ? workbookSubmissionContext.day : selectedAssignmentDay,
+        text: form.submissionText,
+      });
+      if (!sectionCheck.ok) {
+        setStatus({ loading: false, error: sectionCheck.message, success: "" });
+        return;
+      }
+    }
+
     if (!timedWorkbookSubmission && form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {
       setStatus({
         loading: false,
@@ -2459,6 +2472,18 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     if (!correctedText) {
       setResubmissionStatus({ loading: false, error: "Please add your improved text before resubmitting.", success: "" });
       return;
+    }
+
+    if (["A2", "B1"].includes(selectedAssignmentLevel)) {
+      const sectionCheck = validateA2B1WorkbookSubmissionSections({
+        level: selectedAssignmentLevel,
+        day: workbookSubmissionContext.locked ? workbookSubmissionContext.day : selectedAssignmentDay,
+        text: correctedText,
+      });
+      if (!sectionCheck.ok) {
+        setResubmissionStatus({ loading: false, error: sectionCheck.message, success: "" });
+        return;
+      }
     }
 
     if (appearsToContainFalowenUiText(correctedText)) {
