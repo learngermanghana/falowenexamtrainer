@@ -6,6 +6,9 @@ on:
       - 'web/src/components/ExamGuide*'
       - 'web/src/App.js'
       - 'web/public/books/**'
+      - 'web/scripts/generate-book-social-pages*'
+      - 'web/package.json'
+      - 'vercel.json'
       - 'functions/functionz/bookCommerce.js'
       - 'functions/__tests__/bookCheckoutFlow.test.js'
       - '.github/workflows/book-detail-checkout.yml'
@@ -24,5 +27,6 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci --prefix web --ignore-scripts
       - run: node --test functions/__tests__/bookCheckoutFlow.test.js functions/__tests__/bookCommerce.test.js functions/__tests__/bookReceiptVerification.test.js functions/functionz/bookPricing.test.js functions/functionz/privateBookDelivery.test.js
+      - run: node --test web/scripts/generate-book-social-pages.test.mjs
       - working-directory: web
         run: npx jest --runInBand --runTestsByPath src/components/BookStoreCheckout.test.js src/components/ExamGuideStorefront.test.jsx src/components/BooksCatalog.test.jsx src/components/BookProductRoute.test.js
