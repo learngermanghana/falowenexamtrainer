@@ -8,13 +8,27 @@ jest.mock("./navigation/AppBackButton", () => ({
 }));
 
 describe("A1 Chapter 5 German cases grammar", () => {
-  test("removes the repeated first nominative example set, retaining the detailed examples", () => {
+  test("keeps three beginner-focused nominative examples with sein and werden", () => {
     render(<A1Day9NominativeAccusativeGrammarPage />);
-    expect(screen.queryByText("The man is nice.")).not.toBeInTheDocument();
-    expect(screen.queryByText("The woman works.")).not.toBeInTheDocument();
-    expect(screen.queryByText("The child plays.")).not.toBeInTheDocument();
-    expect(screen.getByText("The teacher is friendly.")).toBeInTheDocument();
-    expect(screen.getByText("A female teacher is friendly.")).toBeInTheDocument();
+    const section = screen.getByRole("heading", { name: "3) Nominative case (Der Nominativ)" }).closest("section");
+    expect(within(section).getAllByRole("listitem")).toHaveLength(3);
+    expect(within(section).getByText("The teacher is happy.")).toBeInTheDocument();
+    expect(within(section).getByText("That is a car.")).toBeInTheDocument();
+    expect(within(section).getByText("He becomes a doctor.")).toBeInTheDocument();
+    expect(within(section).getByText(/not a direct object/)).toBeInTheDocument();
+    expect(within(section).queryByText("A female teacher is friendly.")).not.toBeInTheDocument();
+  });
+
+  test("removes the redundant accusative set but keeps all four requested Student pairs", () => {
+    render(<A1Day9NominativeAccusativeGrammarPage />);
+    const section = screen.getByRole("heading", { name: "4) Accusative case (Der Akkusativ)" }).closest("section");
+    expect(within(section).getAllByRole("listitem")).toHaveLength(4);
+    expect(within(section).getByText("The student sees the teacher. / The student sees a teacher.")).toBeInTheDocument();
+    expect(within(section).getByText("The student sees the female teacher. / The student sees a female teacher.")).toBeInTheDocument();
+    expect(within(section).getByText("The student sees the child. / The student sees a child.")).toBeInTheDocument();
+    expect(within(section).getByText("The student sees the children. / The student sees no children.")).toBeInTheDocument();
+    expect(within(section).queryByText("I have the dog.")).not.toBeInTheDocument();
+    expect(within(section).queryByText("She buys the flower.")).not.toBeInTheDocument();
   });
 
   test("all eight knowledge questions show correct dictionary articles and noun gender/number", () => {
