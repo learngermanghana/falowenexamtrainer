@@ -97,7 +97,6 @@ describe("A1 Day 17 native standard workbook", () => {
 
 describe("A1 Day 17 tutor submission integrity", () => {
   const speaking = [
-    "TEIL 1",
     "GOETHE_A1_TUTOR_SPEAKING_V1",
     "Speaking exam part: 3",
     "Score: 8/10",
@@ -105,7 +104,7 @@ describe("A1 Day 17 tutor submission integrity", () => {
   ].join("\\n");
   const hoeren = "TEIL 2\\n1. Richtig\\n2. Falsch\\n3. Richtig\\n4. B\\n5. A";
   const lesen = "TEIL 3\\n1. Richtig\\n2. Falsch\\n3. Richtig\\n4. Richtig\\n5. Falsch";
-  const complete = [speaking, hoeren, lesen].join("\\n");
+  const complete = ["TEIL 1\\n" + speaking, hoeren, lesen].join("\\n");
 
   test.each([
     ["Sprechen", [hoeren, lesen].join("\\n"), /Teil 1 speaking assessment/],
