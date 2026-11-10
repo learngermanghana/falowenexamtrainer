@@ -1640,23 +1640,23 @@
           "text": "und entdeckte jeden Tag etwas Neues."
         },
         {
-          "start": 49.5,
-          "end": 52.35,
+          "start": 49,
+          "end": 51.85,
           "text": "Zwei Städte, so viel zu erleben,"
         },
         {
-          "start": 53.05,
-          "end": 56.1,
+          "start": 52.55,
+          "end": 55.6,
           "text": "so viele Orte, die ich noch nicht kannte."
         },
         {
-          "start": 56.8,
-          "end": 60,
+          "start": 56.3,
+          "end": 59.5,
           "text": "Ich habe schöne Tage verbracht,"
         },
         {
-          "start": 60.7,
-          "end": 64.45,
+          "start": 60.2,
+          "end": 63.95,
           "text": "und denke gern an diese Reise."
         },
         {
@@ -1700,23 +1700,23 @@
           "text": "und genoss die Ruhe am Wasser."
         },
         {
-          "start": 108.5,
-          "end": 111.4,
+          "start": 108,
+          "end": 110.9,
           "text": "Zwei Städte, so viel zu erleben,"
         },
         {
-          "start": 112.1,
-          "end": 115.2,
+          "start": 111.6,
+          "end": 114.7,
           "text": "so viele Orte, die ich noch nicht kannte."
         },
         {
-          "start": 115.85,
-          "end": 119.05,
+          "start": 115.35,
+          "end": 118.55,
           "text": "Ich habe schöne Tage verbracht,"
         },
         {
-          "start": 119.7,
-          "end": 123.25,
+          "start": 119.2,
+          "end": 122.75,
           "text": "und denke gern an diese Reise."
         },
         {
@@ -1756,7 +1756,7 @@
       "genre": "Acoustic Afro-Soul",
       "source": "Owner-provided 'Zwei Städte.mp3' and matching exact text, Nov 1, 2026; R2 object key independently confirmed by live discovery. Remote R2 bytes not SHA-compared.",
       "timingStatus": "estimated",
-      "timingMethod": "Approximate vocal line windows against supplied recording, including both separately sung choruses and instrumental breaks. Needs manual playback review; not word-level or ear-certified."
+      "timingMethod": "Approximate vocal line windows against supplied recording, including both separately sung choruses and instrumental breaks. Needs manual playback review; not word-level or ear-certified. Teacher-reported chorus highlighting lag (2026-11-10): both four-line choruses advanced by 0.50 s; all verses/outro unchanged. Still estimated pending audio-by-audio listening review."
     },
     {
       "trackId": "r2-a2-day-01-b64_RWluIG5ldHRlcyBHZXNwcsOkY2gubXAz",
