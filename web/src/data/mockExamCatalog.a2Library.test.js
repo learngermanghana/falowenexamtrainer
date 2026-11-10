@@ -19,3 +19,14 @@ test("A2 Mock 3 preserves standalone listening practice alongside a four-module 
  expect(getMockExam("a2-mock-03").status).toBe("preview");
  expect(getMockExam("a2-mock-03").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
 });
+
+
+test("A2 Mock 05 includes protected Hören in new four-module attempts without rewriting prior results", () => {
+  const mock5 = getMockExam("a2-mock-05");
+  expect(mock5.status).toBe("ready");
+  expect(mock5.sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
+  expect(mock5.description).toContain("/75 results are preserved");
+  const mock8 = getMockExam("a2-mock-08");
+  expect(mock8.sections).not.toContain("Hören");
+  expect(mock8.futureOptionalSection).toBe("Hören");
+});
