@@ -182,6 +182,28 @@ const nominativeMoreExamples = [
     gender: "Arzt = masculine singular",
     note: "Er is the subject. Arzt names what he becomes (also Nominativ). Professions normally have no article after werden.",
   },
+  {
+    id: "nom-4",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Die Lehrerin</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+      </>
+    ),
+    english: "The female teacher is friendly.",
+    gender: "Lehrerin = feminine singular",
+    note: "Die Lehrerin is the subject (Nominativ). Sein describes her with freundlich.",
+  },
+  {
+    id: "nom-5",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Die Kinder</span> <span style={verbHighlightStyle}>werden</span> müde.
+      </>
+    ),
+    english: "The children become tired.",
+    gender: "Kinder = plural",
+    note: "Die Kinder is the plural subject (Nominativ). Werden describes their change of state with müde.",
+  },
 ];
 
 const accusativeMoreExamples = [
@@ -236,6 +258,19 @@ const accusativeMoreExamples = [
     english: "The student sees the children. / The student sees no children.",
     gender: "Kinder = plural",
     note: "Plural definite article stays die in accusative. For plural negation, German uses keine.",
+  },
+  {
+    id: "acc-more-5",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Die Lehrerin</span> <span style={verbHighlightStyle}>kauft</span>{" "}
+        <span style={objectHighlightStyle}>den Apfel</span>. / <span style={subjectHighlightStyle}>Die Lehrerin</span>{" "}
+        <span style={verbHighlightStyle}>kauft</span> <span style={objectHighlightStyle}>einen Apfel</span>.
+      </>
+    ),
+    english: "The female teacher buys the apple. / The female teacher buys an apple.",
+    gender: "Apfel = masculine singular",
+    note: "Apfel is the direct object after kaufen. Definite der changes to den; indefinite ein changes to einen.",
   },
 ];
 
