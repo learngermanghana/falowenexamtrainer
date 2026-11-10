@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { fetchA1AudioPlaybackUrl } from "../services/a1AudioService";
 import A1Day17InstructionsDirectionsKapitel11WorkbookPage from "./A1Day17InstructionsDirectionsKapitel11WorkbookPage";
+import { validateA1CanonicalSubmissionCompleteness } from "./A1CanonicalSubmissionPanel";
 
 jest.mock("../context/AuthContext", () => ({
   useAuth: () => ({ idToken: "test-token" }),
@@ -90,5 +91,43 @@ describe("A1 Day 17 native standard workbook", () => {
     fireEvent.click(screen.getByRole("tab", { name: /Teil 3/i }));
     expect(screen.getByRole("heading", { name: /Lesen: Wegbeschreibung/i })).toBeVisible();
     expect(screen.getByText(/Annas Haus steht direkt neben der Bäckerei/)).toBeVisible();
+  });
+});
+
+
+describe("A1 Day 17 tutor submission integrity", () => {
+  const speaking = [
+    "TEIL 1",
+    "GOETHE_A1_TUTOR_SPEAKING_V1",
+    "Speaking exam part: 3",
+    "Score: 8/10",
+    "Feedback: Clear polite request.",
+  ].join("\\n");
+  const hoeren = "TEIL 2\\n1. Richtig\\n2. Falsch\\n3. Richtig\\n4. B\\n5. A";
+  const lesen = "TEIL 3\\n1. Richtig\\n2. Falsch\\n3. Richtig\\n4. Richtig\\n5. Falsch";
+  const complete = [speaking, hoeren, lesen].join("\\n");
+
+  test.each([
+    ["Sprechen", [hoeren, lesen].join("\\n"), /Teil 1 speaking assessment/],
+    ["Hören", [speaking, lesen].join("\\n"), /Teil 2 answers 1, 2, 3, 4, 5/],
+    ["Lesen", [speaking, hoeren].join("\\n"), /Teil 3 answers 1, 2, 3, 4, 5/],
+  ])("blocks submission when %s is missing and names the missing part", (_part, text, message) => {
+    const result = validateA1CanonicalSubmissionCompleteness({ assignmentKey: "A1-11", text });
+    expect(result.ok).toBe(false);
+    expect(result.message).toMatch(message);
+    expect(result.message).toMatch(/still a draft and has not been submitted/i);
+  });
+
+  test("accepts A1 Day 17 only when speaking, all five Hören answers, and all five Lesen answers are present", () => {
+    expect(validateA1CanonicalSubmissionCompleteness({ assignmentKey: "A1-11", text: complete }))
+      .toEqual({ ok: true, message: "" });
+  });
+
+  test("blocks a completely empty A1 Day 17 submission before it is sent", () => {
+    const result = validateA1CanonicalSubmissionCompleteness({ assignmentKey: "A1-11", text: "  \\n  " });
+    expect(result.ok).toBe(false);
+    expect(result.message).toMatch(/Teil 1 speaking assessment/);
+    expect(result.message).toMatch(/Teil 2 answers 1, 2, 3, 4, 5/);
+    expect(result.message).toMatch(/Teil 3 answers 1, 2, 3, 4, 5/);
   });
 });
