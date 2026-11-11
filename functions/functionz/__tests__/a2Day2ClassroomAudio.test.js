@@ -59,3 +59,30 @@ test('A2 Day 24 classroom signer accepts the newly uploaded vacation recording a
   await handle(request('23','a2/day-24/einen-urlaub-planen.mp3'),wrongDay);
   expect(wrongDay.code).toBe(400);
 });
+
+
+test('A2 Day 4 teacher signer returns a signed URL only for the uploaded exact key',async()=>{
+  const handle=createClassroomBankAudioHandler({env,fetchImpl});
+  const key='a2/day-04/wo-mochten-wir-uns-treffen.mp3';
+  const good=response();
+  await handle(request('4',key),good);
+  expect(good.code).toBe(200);
+  expect(good.body.track).toBe('a2-day4-meeting-classroom');
+  expect(good.body.url).toContain('/a2/day-04/wo-mochten-wir-uns-treffen.mp3?');
+  expect(good.headers['Access-Control-Allow-Origin']).toBe('https://admin.falowen.app');
+
+  const wrongKey=response();
+  await handle(request('4','a2/day-04/another-recording.mp3'),wrongKey);
+  expect(wrongKey.code).toBe(400);
+  expect(wrongKey.body.error).toMatch(/Invalid classroom audio request/);
+
+  const wrongDay=response();
+  await handle(request('3',key),wrongDay);
+  expect(wrongDay.code).toBe(400);
+
+  const unauthenticated=request('4',key);
+  delete unauthenticated.headers.authorization;
+  const denied=response();
+  await handle(unauthenticated,denied);
+  expect(denied.code).toBe(401);
+});
