@@ -44,3 +44,18 @@ test('A2 Day 2 classroom recording cannot be fetched without staff login',async(
   const res=response();await handle(req,res);
   expect(res.code).toBe(401);
 });
+
+test('A2 Day 24 classroom signer accepts the newly uploaded vacation recording and rejects wrong keys',async()=>{
+  const handle=createClassroomBankAudioHandler({env,fetchImpl});
+  const good=response();
+  await handle(request('24','a2/day-24/einen-urlaub-planen.mp3'),good);
+  expect(good.code).toBe(200);
+  expect(good.body.track).toBe('a2-day24-urlaub-classroom');
+  expect(good.body.url).toContain('/a2/day-24/einen-urlaub-planen.mp3?');
+  const wrong=response();
+  await handle(request('24','a2/day-24/other.mp3'),wrong);
+  expect(wrong.code).toBe(400);
+  const wrongDay=response();
+  await handle(request('23','a2/day-24/einen-urlaub-planen.mp3'),wrongDay);
+  expect(wrongDay.code).toBe(400);
+});
