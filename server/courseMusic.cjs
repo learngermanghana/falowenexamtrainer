@@ -98,6 +98,7 @@ const CLASSROOM_RECORDINGS = Object.freeze({
   // Day 3 classroom Hören only. The owner provided the folder prefix and question key;
   // confirm this candidate MP3 basename in R2 before relying on playback.
   'A2-3': Object.freeze({ id: 'a2-day3-dinge-und-personen-vergleichen', key: 'a2/day-03/dinge-und-personen-vergleichen.mp3' }),
+  'A2-4': Object.freeze({ id: 'a2-day4-meeting-classroom', key: 'a2/day-04/wo-mochten-wir-uns-treffen.mp3' }),
   'A2-18': Object.freeze({ id: 'a2-day18-bank-telephone', key: 'a2/day-18/bank-telefonat.mp3' }),
   'A2-20': Object.freeze({ id: 'a2-day20-complaint', key: 'a2/day-20/reklamation-falsches-hemd.mp3' }),
   'A2-19': Object.freeze({ id: 'a2-day19-shopping', key: 'a2/day-19/einkaufen-wo-und-wie.mp3' }),
