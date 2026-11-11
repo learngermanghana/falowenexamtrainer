@@ -1162,7 +1162,7 @@ exports.cleanupExpiredTrials = onSchedule(
   {
     region: "europe-west1",
     timeoutSeconds: 540,
-    schedule: "every day 02:45",
+    schedule: "45 2 * * SUN",
     timeZone: "Etc/UTC",
     secrets: [
       GOOGLE_SERVICE_ACCOUNT_JSON_B64,
@@ -1417,7 +1417,7 @@ exports.cleanupStaleUnpaidSignups = onSchedule(
 exports.cleanupExpiredStudentContracts = onSchedule(
   {
     region: "europe-west1",
-    schedule: "every day 03:00",
+    schedule: "0 3 * * SUN",
     timeZone: "Etc/UTC",
   },
   async () => {
