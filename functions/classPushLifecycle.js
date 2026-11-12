@@ -1,11 +1,8 @@
 const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
 const admin = require("firebase-admin");
 const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
-const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { loadCandidateClassSessions } = require("./classSessionReminderQueries");
 
 const REGION = "europe-west1";
-const TIME_ZONE = "Africa/Accra";
 const APP_ORIGIN = process.env.FRONTEND_URL || "https://www.falowen.app";
 const REMINDER_KINDS = ["tomorrow", "one-hour", "fifteen-minutes", "checkin-open"];
 const INACTIVE_STATUSES = new Set(["cancelled", "canceled", "completed", "finished", "ended", "deleted"]);
@@ -271,40 +268,6 @@ const sendImmediateClassChange = async ({ sessionId, session, oldSession, kind }
   await markEvent(eventId, "sent", { studentCount: targets.length, pushSuccessCount: pushes });
 };
 
-const reminderKindDue = ({ session, nowMs }) => {
-  const startMs = getSessionStartMs(session);
-  if (!startMs) return [];
-  const minutes = (startMs - nowMs) / 60_000;
-  const due = [];
-  if (minutes >= 1435 && minutes < 1445) due.push("tomorrow");
-  if (minutes >= 55 && minutes < 65) due.push("one-hour");
-  if (minutes >= 10 && minutes < 20) due.push("fifteen-minutes");
-  if (isCheckinOpen(session)) due.push("checkin-open");
-  return due;
-};
-
-const runClassReminderScan = async () => {
-  const nowMs = Date.now();
-  const candidateDocs = await loadCandidateClassSessions({
-    collection: db().collection("classSessions"),
-    Timestamp: getAdmin().firestore.Timestamp,
-    nowMs,
-  });
-  let considered = 0;
-  let sent = 0;
-  for (const docSnap of candidateDocs) {
-    const session = docSnap.data() || {};
-    const startMs = getSessionStartMs(session);
-    if (!startMs || startMs < nowMs - 3 * 60 * 60_000 || startMs > nowMs + 25 * 60 * 60_000 || !isSessionActive(session, nowMs)) continue;
-    considered += 1;
-    for (const kind of reminderKindDue({ session, nowMs })) {
-      const result = await sendClassLifecycleNotification({ sessionId: docSnap.id, session, kind });
-      if (result?.sent) sent += result.sent;
-    }
-  }
-  console.log("Class push lifecycle scan complete", { candidates: candidateDocs.length, considered, sent });
-};
-
 const didStartChange = (before = {}, after = {}) => {
   const left = getSessionStartMs(before);
   const right = getSessionStartMs(after);
@@ -318,9 +281,6 @@ const becameCancelled = (before = {}, after = {}) => {
 const becameCheckinOpen = (before = {}, after = {}) => !isCheckinOpen(before) && isCheckinOpen(after) && isSessionActive(after);
 
 module.exports = {
-  sendClassPushLifecycleReminders: onSchedule({ region: REGION, schedule: "every 5 minutes", timeZone: TIME_ZONE }, async () => {
-    await runClassReminderScan();
-  }),
   onClassSessionPushLifecycleUpdated: onDocumentUpdated({ region: REGION, document: "classSessions/{sessionId}" }, async (event) => {
     const before = event.data?.before?.data() || {};
     const after = event.data?.after?.data() || {};
@@ -337,5 +297,5 @@ module.exports = {
     }
     return null;
   }),
-  _classPushLifecycle: { classRoute, checkinRoute, getSessionStartMs, isSessionActive, reminderKindDue, didStartChange, becameCancelled, becameCheckinOpen },
+  _classPushLifecycle: { classRoute, checkinRoute, getSessionStartMs, isSessionActive, didStartChange, becameCancelled, becameCheckinOpen },
 };
