@@ -1,3 +1,4 @@
+import BookShare from "./BookShare";
 import React, {useEffect, useRef, useState} from "react";
 import {getBackendUrl} from "../services/backendUrl";
 import {BOOK_PAGES, indicativeUsd} from "./BooksCatalog";
@@ -193,6 +194,7 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
             {!checkout && (canPay ? <a className="fb-btn fb-btn-primary fb-pay" href={`${bookHref(page.href)}/checkout?edition=${encodeURIComponent(selected.id)}`}>Buy Now</a>
               : <button className="fb-btn fb-btn-primary" disabled>Checkout temporarily unavailable</button>)}
           </> : <p role="status">Coming Soon · Unavailable for purchase</p>}
+          {!checkout && <BookShare key={slug} page={page} title={listing.title} description={listing.description} />}
           {checkout && available && <form className="fb-form" onSubmit={pay}>
             <h2>Your contact details</h2>
             {[["name","Full name","text"],["email","Email address","email"],["phone","Phone / WhatsApp","tel"]].map(([id,label,type])=><label key={id}>{label}
