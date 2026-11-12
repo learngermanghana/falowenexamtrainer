@@ -1,4 +1,4 @@
-import { FRENCH_A1_SCHEDULE } from "./frenchCourseSchedule";
+import { FRENCH_A1_SCHEDULE } from "./archive/french/courseSchedule";
 import { getAssignmentDictionaryEntry } from "./germanAssignmentCatalog";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import { getC1CanonicalGrammarTitle, getC1CanonicalTitle, getC1ContentProfile } from "./c1ContentRefresh";

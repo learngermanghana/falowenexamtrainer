@@ -1,11 +1,13 @@
+// Archived historical French sign-up component. Do not expose as a live course signup.
+// Kept for reversibility; existing French records are not migrated to Kiswahili.
 import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
-import { frenchClassCatalog } from "../data/french/classCatalog";
+import { FRENCH_A1_SCHEDULE } from "../data/archive/french/courseSchedule";
+import { frenchClassCatalog } from "../data/archive/french/classCatalog";
 import { computeTuitionStatus } from "../data/levelFees";
 import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { generateStudentCode } from "../services/studentCode";
