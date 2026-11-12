@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { classCatalog, ZOOM_DETAILS } from "../data/classCatalog";
-import { frenchClassCatalog } from "../data/french/classCatalog";
+import { frenchClassCatalog } from "../data/archive/french/classCatalog";
 import {
   downloadClassCalendar,
   findNextClassSession,
