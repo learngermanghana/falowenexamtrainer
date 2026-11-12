@@ -7,8 +7,8 @@ import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "re
 import { useTranslation } from "react-i18next";
 import { ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
-import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import NextLevelPreviewPage from "./components/NextLevelPreviewPage";
+import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import CourseLessonPage from "./components/CourseLessonPage";
 import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
 import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
