@@ -1,3 +1,4 @@
+import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
@@ -8,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import { ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
 import NextLevelPreviewPage from "./components/NextLevelPreviewPage";
-import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import CourseLessonPage from "./components/CourseLessonPage";
 import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
 import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
