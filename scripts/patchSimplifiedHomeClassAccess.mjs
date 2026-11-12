@@ -7,7 +7,23 @@ const targetPath = path.join(root, "web/src/components/GeneralHome.js");
 let source = fs.readFileSync(targetPath, "utf8");
 const hasPinnedClassCalendar = (source.match(/initialClassId=\{preferredClassId\}/g) || []).length === 2;
 
-if (hasPinnedClassCalendar) {
+// The student homepage now uses a live-class Highlights slide and ends at
+// Home Metrics. Future builds must not re-insert duplicate class panels.
+const hasHomepageHighlights = source.includes("<HomepageHighlights") &&
+  source.includes("classId={preferredClassId}") &&
+  source.includes("<HomeMetrics studentProfile={metricsStudentProfile} />");
+
+if (hasHomepageHighlights) {
+  const dashboard = source.slice(source.lastIndexOf("  return ("));
+  const highlightsIndex = dashboard.indexOf("<HomepageHighlights");
+  const metricsIndex = dashboard.indexOf("<HomeMetrics");
+  const footerIndex = dashboard.indexOf("<LegalFooter");
+  if (dashboard.includes("homepageCompact") || dashboard.includes("<ClassCalendarCard") ||
+      highlightsIndex < 0 || metricsIndex < highlightsIndex || footerIndex < metricsIndex) {
+    throw new Error("The compact homepage must end with Home Metrics and footer, without a duplicate class panel.");
+  }
+  console.log("Falowen Home uses the Highlights carousel; no legacy class panel needed.");
+} else if (hasPinnedClassCalendar) {
   console.log("Falowen Home keeps both class-ID-pinned calendar mounts.");
 } else {
 
