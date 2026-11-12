@@ -1,18 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
+import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import "./SwahiliCourseBook.css";
 
-const TABS = [
-  ["intro", "Somo"],
-  ["music", "Muziki"],
-  ["grammar", "Sarufi"],
-  ["speaking", "Sehemu ya 1"],
-  ["reading", "Sehemu ya 2"],
-  ["writing", "Sehemu ya 3"],
-  ["listening", "Sehemu ya 4"],
-];
 const LETTERS = ["A", "E", "I", "O", "U"];
+const TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
+const TAB_DESCRIPTIONS = {
+  references: "Hiari",
+  grammar: "Matamshi",
+  sprechen: "Kuzungumza",
+  schreiben: "Kuandika",
+  lesen: "Kusoma",
+  hoeren: "Kusikiliza",
+  submit: "Wasilisha",
+};
+const EMPTY_WRITING = { vowels: "", syllables: "", words: "" };
 
 export const scoreListeningAnswers = (answers) =>
   SWAHILI_DAY_ONE.listening.reduce(
@@ -20,144 +25,297 @@ export const scoreListeningAnswers = (answers) =>
     0
   );
 
-function DayOneContent({ activeTab }) {
-  const [writing, setWriting] = useState("");
-  const [responses, setResponses] = useState({});
-  const [checked, setChecked] = useState(false);
-  const lesson = SWAHILI_DAY_ONE;
-
-  if (activeTab === "intro") return (
-    <section className="swahili-book__card" aria-label="Muhtasari wa somo">
-      <h2>Lengo la somo</h2>
-      <p>{lesson.objective}</p>
-      <h2 className="swahili-book__spaced">Vokali tano</h2>
-      <div className="swahili-book__grid">
-        {lesson.vowels.map((item) => (
-          <div className="swahili-book__tile" key={item.letter}>
-            <div className="swahili-book__letter">{item.letter}</div>
-            <strong>{item.word}</strong>
-            <div className="swahili-book__small">{item.meaning}</div>
-          </div>
-        ))}
-      </div>
-      <p className="swahili-book__note swahili-book__spaced">Sikiliza mwalimu, rudia kila vokali mara tatu, kisha sema U · O · I · E · A.</p>
-    </section>
+export const scoreReadingAnswers = (answers) =>
+  SWAHILI_DAY_ONE.reading.reduce(
+    (total, item) => total + (answers[item.id] === item.answer ? 1 : 0),
+    0
   );
 
-  if (activeTab === "music") return (
-    <section className="swahili-book__card" aria-label="Muziki wa somo">
-      <h2>Muziki · Sauti za vokali</h2>
-      <p>Imba na darasa huku ukitamka vokali kwa uwazi.</p>
-      <div className="swahili-book__song">A, E, I, O, U{"\n"}Sauti zetu, A, E, I, O, U{"\n"}Mama, kiti, mtoto, kuku{"\n"}Sema tena, A, E, I, O, U</div>
-      <p className="swahili-book__note">Rekodi ya wimbo bado haijaongezwa. Haya ni maneno ya mazoezi tu; hakuna sauti bandia au kiungo kisichofanya kazi.</p>
+export const getMissingSwahiliDayOneWork = ({ writing, readingAnswers }) => {
+  const missing = [];
+  if (!String(writing?.vowels || "").trim()) missing.push("Teil 2 · Vokali");
+  if (!String(writing?.syllables || "").trim()) missing.push("Teil 2 · Silabi");
+  if (!String(writing?.words || "").trim()) missing.push("Teil 2 · Maneno");
+  if (!SWAHILI_DAY_ONE.reading.every((question) => Boolean(readingAnswers?.[question.id]))) {
+    missing.push("Teil 3 · Kusoma");
+  }
+  // Teil 1 is teacher-led; Teil 4 is optional until the instructor provides listening audio.
+  return missing;
+};
+
+function DayOneContent({
+  activeTab,
+  writing,
+  setWriting,
+  readingAnswers,
+  setReadingAnswers,
+  readingChecked,
+  setReadingChecked,
+  listeningAnswers,
+  setListeningAnswers,
+  listeningChecked,
+  setListeningChecked,
+  user,
+  submitting,
+  submissionResult,
+  submitWork,
+  previouslySubmitted,
+}) {
+  const lesson = SWAHILI_DAY_ONE;
+  const changeWriting = (field, value) => setWriting((prior) => ({ ...prior, [field]: value }));
+
+  if (activeTab === "references") return (
+    <section className="swahili-book__card swahili-book__activity" aria-label="Music">
+      <h2>Music · Muziki wa Somo la 1</h2>
+      <p>Wimbo wa alfabeti na matamshi utaongezwa hapa mara tu utakapopakiwa. Sehemu hii ni ya hiari.</p>
+      <p className="swahili-book__note">Rekodi ya muziki bado haijapakiwa. Hakuna wimbo wa kubuni au kicheza sauti kisichofanya kazi.</p>
     </section>
   );
 
   if (activeTab === "grammar") return (
-    <section className="swahili-book__card" aria-label="Sarufi na matamshi">
-      <h2>Sarufi · Silabi na mkazo</h2>
-      <p>Silabi nyingi zinaweza kujengwa kwa konsonanti na vokali. Soma mstari kwa sauti.</p>
-      <div className="swahili-book__grid">
-        {lesson.syllables.map((item) => (
-          <div className="swahili-book__tile" key={item.stem}>
-            <strong>{item.stem}</strong><p>{item.forms}</p>
-          </div>
-        ))}
+    <section className="swahili-book__card swahili-book__activity" aria-label="Grammar">
+      <div>
+        <h2>Grammar · Sarufi na matamshi</h2>
+        <p className="swahili-book__prompt">{lesson.objective}</p>
       </div>
-      <h2 className="swahili-book__spaced">Mkazo wa neno</h2>
-      <p>Kwa kawaida, mkazo huangukia silabi ya pili kutoka mwisho.</p>
-      <p><strong>{lesson.stress.join(" · ")}</strong></p>
-      <h2 className="swahili-book__spaced">Miunganiko ya herufi</h2>
-      <div className="swahili-book__grid">
-        {lesson.combinations.map((item) => (
-          <div className="swahili-book__tile" key={item.letters}>
-            <strong>{item.letters}</strong> · {item.word}
-            <div className="swahili-book__small">{item.meaning}</div>
-          </div>
-        ))}
+      <div>
+        <h2>Vokali tano · A E I O U</h2>
+        <p>Sikiliza, rudia, na linganisha vokali na maneno.</p>
+        <div className="swahili-book__grid">
+          {lesson.vowels.map((item) => (
+            <div className="swahili-book__tile" key={item.letter}>
+              <div className="swahili-book__letter">{item.letter}</div>
+              <strong>{item.word}</strong>
+              <div className="swahili-book__small">{item.meaning}</div>
+            </div>
+          ))}
+        </div>
       </div>
-      <p className="swahili-book__note swahili-book__spaced">Linganisha: ng / ng’ · s / sh · t / th. Tofauti za sauti zisomwe na mwalimu.</p>
+      <div>
+        <h2>Silabi · Kuunganisha konsonanti na vokali</h2>
+        <div className="swahili-book__grid">
+          {lesson.syllables.map((item) => (
+            <div className="swahili-book__tile" key={item.stem}>
+              <strong>{item.stem}</strong>
+              <p>{item.forms}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <h2>Miunganiko ya herufi</h2>
+        <div className="swahili-book__grid">
+          {lesson.combinations.map((item) => (
+            <div className="swahili-book__tile" key={item.letters}>
+              <strong>{item.letters}</strong> · {item.word}
+              <div className="swahili-book__small">{item.meaning}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <h2>Mkazo wa neno</h2>
+        <p>Kwa kawaida, mkazo huwa kwenye silabi ya pili kutoka mwisho. Silabi yenye herufi kubwa ina mkazo.</p>
+        <p><strong>{lesson.stress.join(" · ")}</strong></p>
+      </div>
+      <p className="swahili-book__note">Mwalimu asome tofauti za sauti: ng / ng’ · s / sh · t / th.</p>
     </section>
   );
 
-  if (activeTab === "speaking") return (
-    <section className="swahili-book__card" aria-label="Sehemu ya 1 Kuzungumza">
-      <h2>Sehemu ya 1 · Kuzungumza</h2>
-      <p><strong>Rudia baada ya mwalimu.</strong> Tamka kwa sauti, kisha jaribu bila kusoma.</p>
+  if (activeTab === "sprechen") return (
+    <section className="swahili-book__card swahili-book__activity" aria-label="Teil 1">
+      <h2>Teil 1 · Kuzungumza (Speaking)</h2>
+      <p><strong>Rudia baada ya mwalimu.</strong> Tamka polepole, kisha jaribu bila kusoma.</p>
       <ol>
-        <li>A · E · I · O · U</li>
-        <li>ba · be · bi · bo · bu</li>
-        <li>cha · che · chi · cho · chu</li>
-        <li>ma-ma · ra-fi-ki · mwa-li-mu</li>
+        <li>A · E · I · O · U, halafu U · O · I · E · A.</li>
+        <li>ba · be · bi · bo · bu.</li>
+        <li>cha · che · chi · cho · chu.</li>
+        <li>MA-ma · ra-FI-ki · mwa-LI-mu.</li>
+        <li>chai · shule · nyanya · ng’ombe.</li>
       </ol>
-      <p className="swahili-book__note">Fanya mazoezi na mwanafunzi mwenzako. Mwalimu asikilize na kusaidia matamshi.</p>
+      <p className="swahili-book__note">Katika jozi, mwanafunzi mmoja asome, mwenzake arudie. Mwalimu arekebishe matamshi. Sehemu hii ni mazoezi ya darasani, si kazi ya kuandika.</p>
     </section>
   );
 
-  if (activeTab === "reading") return (
-    <section className="swahili-book__card" aria-label="Sehemu ya 2 Kusoma">
-      <h2>Sehemu ya 2 · Kusoma</h2>
-      <p>Soma maneno haya na utambue vokali zinazosikika. Maneno haya ndiyo msamiati mdogo wa Somo la 1.</p>
+  if (activeTab === "schreiben") return (
+    <section className="swahili-book__card swahili-book__activity" aria-label="Teil 2">
+      <h2>Teil 2 · Kuandika (Writing)</h2>
+      <p>Andika vokali tano, silabi tano za B na maneno matatu kutoka somo. Majibu haya yataonekana kwenye Submit.</p>
+      <div className="swahili-book__form">
+        <label htmlFor="swahili-vowels">1. Vokali tano
+          <input id="swahili-vowels" value={writing.vowels} onChange={(e) => changeWriting("vowels", e.target.value)} placeholder="A, E, I, O, U" />
+        </label>
+        <label htmlFor="swahili-syllables">2. Silabi za B
+          <input id="swahili-syllables" value={writing.syllables} onChange={(e) => changeWriting("syllables", e.target.value)} placeholder="ba, be, bi, bo, bu" />
+        </label>
+        <label htmlFor="swahili-words">3. Maneno matatu
+          <textarea id="swahili-words" rows={3} value={writing.words} onChange={(e) => changeWriting("words", e.target.value)} placeholder="mama, kiti, kuku" />
+        </label>
+      </div>
+      <p className="swahili-book__note">Andika mwenyewe. Majibu yanabaki kwenye ukurasa huu mpaka uwasilishe; usifunge ukurasa kabla ya kuwasilisha.</p>
+    </section>
+  );
+
+  if (activeTab === "lesen") return (
+    <section className="swahili-book__card swahili-book__activity" aria-label="Teil 3">
+      <h2>Teil 3 · Kusoma (Reading)</h2>
+      <p>Soma na tambua maneno. Kisha jibu maswali manne mafupi.</p>
       <div className="swahili-book__grid">
         {lesson.vowels.map((item) => (
           <div className="swahili-book__tile" key={item.word}>
             <strong>{item.word}</strong>
-            <div className="swahili-book__small">{item.meaning} · {item.letter}</div>
+            <div className="swahili-book__small">{item.meaning}</div>
           </div>
         ))}
       </div>
-      <p className="swahili-book__muted swahili-book__spaced">Kamusi kubwa na maneno zaidi vitaongezwa kwenye masomo yajayo.</p>
-    </section>
-  );
-
-  if (activeTab === "writing") return (
-    <section className="swahili-book__card" aria-label="Sehemu ya 3 Kuandika">
-      <h2>Sehemu ya 3 · Kuandika</h2>
-      <p>Andika vokali tano, silabi tano za B na maneno matatu kutoka somo hili.</p>
-      <div className="swahili-book__fields">
-        <label htmlFor="swahili-writing">Mazoezi yako
-          <textarea id="swahili-writing" rows={6} value={writing} onChange={(event) => setWriting(event.target.value)}
-            placeholder="A, E, I, O, U&#10;ba, be, bi, bo, bu&#10;mama, ..." />
-        </label>
+      <div className="swahili-book__quiz">
+        {lesson.reading.map((item, index) => (
+          <div className="swahili-book__exercise" key={item.id}>
+            <fieldset>
+              <legend>{index + 1}. {item.question}</legend>
+              <div className="swahili-book__choices">
+                {item.choices.map((choice) => (
+                  <label className="swahili-book__choice" key={choice}>
+                    <input type="radio" name={"swahili-reading-" + item.id}
+                      checked={readingAnswers[item.id] === choice}
+                      onChange={() => { setReadingAnswers((prior) => ({ ...prior, [item.id]: choice })); setReadingChecked(false); }} />
+                    {choice}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            {readingChecked ? <span className="swahili-book__small">{readingAnswers[item.id] === item.answer ? "Sahihi ✓" : "Jaribu tena"}</span> : null}
+          </div>
+        ))}
       </div>
-      <p className="swahili-book__note swahili-book__spaced">Hii ni nafasi ya mazoezi tu. Majibu hayajatumwa wala kuhifadhiwa kwenye akaunti.</p>
+      <div className="swahili-book__row">
+        <button type="button" className="swahili-book__button"
+          disabled={lesson.reading.some((item) => !readingAnswers[item.id])}
+          onClick={() => setReadingChecked(true)}>Kagua majibu</button>
+        {readingChecked ? <p className="swahili-book__result" role="status">{scoreReadingAnswers(readingAnswers)} / {lesson.reading.length} sahihi</p> : null}
+      </div>
     </section>
   );
 
-  return (
-    <section className="swahili-book__card" aria-label="Sehemu ya 4 Kusikiliza">
-      <h2>Sehemu ya 4 · Kusikiliza</h2>
-      <p>Mwalimu aseme neno moja moja. Chagua vokali inayojirudia katika kila neno. Kisha kagua majibu yako.</p>
-      <p className="swahili-book__note">Sauti iliyorekodiwa bado haijapatikana. Zoezi hili linafanywa kwa sauti ya mwalimu darasani, si kwa kicheza sauti.</p>
+  if (activeTab === "hoeren") return (
+    <section className="swahili-book__card swahili-book__activity" aria-label="Teil 4">
+      <h2>Teil 4 · Kusikiliza (Listening)</h2>
+      <p>Mwalimu aseme neno moja moja. Chagua vokali inayojirudia katika kila neno; kisha kagua majibu yako.</p>
+      <p className="swahili-book__note">Sauti iliyorekodiwa bado haijapatikana. Kwa sasa mwalimu atasoma maneno. Hii ni sehemu ya mazoezi ya hiari mpaka sauti itakapopakiwa.</p>
       <div className="swahili-book__quiz">
         {lesson.listening.map((item, index) => (
           <div className="swahili-book__quizItem" key={item.word}>
             <label htmlFor={"swahili-listen-" + index}>Neno la {index + 1}</label>
-            <select id={"swahili-listen-" + index} value={responses[index] || ""}
-              onChange={(event) => { setResponses((prior) => ({ ...prior, [index]: event.target.value })); setChecked(false); }}>
+            <select id={"swahili-listen-" + index} value={listeningAnswers[index] || ""}
+              onChange={(event) => { setListeningAnswers((prior) => ({ ...prior, [index]: event.target.value })); setListeningChecked(false); }}>
               <option value="">Chagua vokali</option>
               {LETTERS.map((vowel) => <option key={vowel} value={vowel}>{vowel}</option>)}
             </select>
-            {checked ? <span className="swahili-book__small">{responses[index] === item.answer ? "Sahihi ✓" : "Jaribu tena"}</span> : null}
+            {listeningChecked ? <span className="swahili-book__small">{listeningAnswers[index] === item.answer ? "Sahihi ✓" : "Jaribu tena"}</span> : null}
           </div>
         ))}
       </div>
-      <div className="swahili-book__row swahili-book__spaced">
-        <button type="button" className="swahili-book__button" disabled={Object.keys(responses).length !== lesson.listening.length}
-          onClick={() => setChecked(true)}>Kagua majibu</button>
-        {checked ? <p className="swahili-book__result" role="status">{scoreListeningAnswers(responses)} / {lesson.listening.length} sahihi · mazoezi tu</p> : null}
+      <div className="swahili-book__row">
+        <button type="button" className="swahili-book__button"
+          disabled={lesson.listening.some((item, index) => !listeningAnswers[index])}
+          onClick={() => setListeningChecked(true)}>Kagua majibu</button>
+        {listeningChecked ? <p className="swahili-book__result" role="status">{scoreListeningAnswers(listeningAnswers)} / {lesson.listening.length} sahihi · mazoezi tu</p> : null}
       </div>
-      <details className="swahili-book__spaced">
+      <details>
         <summary>Kwa mwalimu: maneno ya kusoma</summary>
         <p>{lesson.listening.map((item) => item.word).join(" · ")}</p>
       </details>
     </section>
   );
+
+  const missing = getMissingSwahiliDayOneWork({ writing, readingAnswers });
+  const isReady = missing.length === 0;
+  return (
+    <section className="swahili-book__card swahili-book__activity" aria-label="Submit">
+      <h2>Submit · Wasilisha kazi ya Somo la 1</h2>
+      <p>Kagua majibu yako kabla ya kuwasilisha. Teil 1 ni mazoezi ya darasani. Teil 4 ni ya hiari mpaka rekodi itakapopakiwa.</p>
+      <ul className="swahili-book__submit-summary">
+        <li>Teil 2 · Vokali: <strong>{writing.vowels || "Bado"}</strong></li>
+        <li>Teil 2 · Silabi: <strong>{writing.syllables || "Bado"}</strong></li>
+        <li>Teil 2 · Maneno: <strong>{writing.words || "Bado"}</strong></li>
+        <li>Teil 3 · Kusoma: <strong>{lesson.reading.filter((item) => readingAnswers[item.id]).length} / {lesson.reading.length} majibu</strong></li>
+        <li>Teil 4 · Kusikiliza: <strong>{Object.values(listeningAnswers).filter(Boolean).length} / {lesson.listening.length} majibu (hiari)</strong></li>
+      </ul>
+      {missing.length ? <p className="swahili-book__note" role="status">Kamilisha kwanza: {missing.join(" · ")}</p> : null}
+      {!user ? (
+        <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ili kuwasilisha. <Link to="/login">Ingia</Link></p>
+      ) : (
+        <>
+          <button className="swahili-book__button" type="button"
+            onClick={submitWork} disabled={!isReady || submitting || !db}>
+            {submitting ? "Inahifadhi..." : previouslySubmitted ? "Wasilisha tena" : "Wasilisha kazi"}
+          </button>
+          {submissionResult?.type === "success" ? (
+            <p className="swahili-book__feedback" role="status">Kazi imehifadhiwa kwenye akaunti yako ya Falowen. Hakuna alama za moja kwa moja.</p>
+          ) : null}
+          {submissionResult?.type === "error" ? <p className="swahili-book__error" role="alert">{submissionResult.message}</p> : null}
+          <p className="swahili-book__note">Kazi hii inahifadhiwa kwenye akaunti yako. Mfumo wa alama na ukurasa wa mwalimu wa Kiswahili bado haujaunganishwa.</p>
+        </>
+      )}
+    </section>
+  );
 }
 
 export default function SwahiliCourseBook({ day = null, basePath = "/swahili", preview = false }) {
-  const [activeTab, setActiveTab] = useState("intro");
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState("grammar");
+  const [writing, setWriting] = useState(EMPTY_WRITING);
+  const [readingAnswers, setReadingAnswers] = useState({});
+  const [readingChecked, setReadingChecked] = useState(false);
+  const [listeningAnswers, setListeningAnswers] = useState({});
+  const [listeningChecked, setListeningChecked] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState(null);
+  const [previouslySubmitted, setPreviouslySubmitted] = useState(false);
+  const checkedUser = useRef(null);
   const lesson = SWAHILI_DAY_ONE;
+
+  // A single Firestore read only when a logged-in learner opens Submit. No live listeners or autosave writes.
+  useEffect(() => {
+    if (day !== 1 || activeTab !== "submit" || !user?.uid || !db || checkedUser.current === user.uid) return;
+    checkedUser.current = user.uid;
+    let cancelled = false;
+    getDoc(doc(db, "users", user.uid, "swahiliLessons", "day-1"))
+      .then((snapshot) => { if (!cancelled && snapshot.exists()) setPreviouslySubmitted(true); })
+      .catch(() => { /* Keep the workbook available if prior-submission lookup fails. */ });
+    return () => { cancelled = true; };
+  }, [activeTab, day, user?.uid]);
+
+  const submitWork = async () => {
+    if (!user?.uid || !db || submitting) return;
+    if (getMissingSwahiliDayOneWork({ writing, readingAnswers }).length) return;
+    setSubmitting(true);
+    setSubmissionResult(null);
+    try {
+      await setDoc(doc(db, "users", user.uid, "swahiliLessons", "day-1"), {
+        userId: user.uid,
+        studentId: user.uid,
+        program: "swahili",
+        level: "beginner",
+        day: 1,
+        lessonId: "swahili-day-1",
+        title: lesson.title,
+        status: "submitted",
+        writing: { ...writing },
+        readingAnswers: { ...readingAnswers },
+        listeningAnswers: { ...listeningAnswers },
+        listeningTeacherLed: true,
+        submittedAt: serverTimestamp(),
+      }, { merge: true });
+      setPreviouslySubmitted(true);
+      setSubmissionResult({ type: "success" });
+    } catch (error) {
+      setSubmissionResult({ type: "error", message: "Imeshindikana kuhifadhi kazi. Kagua muunganisho wako na ujaribu tena." });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <main className="swahili-book" lang="sw" data-swahili-course-book="true">
       <div className="swahili-book__top">
@@ -167,23 +325,29 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
       <header className="swahili-book__hero">
         <p className="swahili-book__eyebrow">KISWAHILI · KIWANGO CHA MWANZO</p>
         <h1>{day ? lesson.chapter + " · " + lesson.title : "Kitabu cha Kozi ya Kiswahili"}</h1>
-        <p>{day ? lesson.objective : "Jifunze Kiswahili kwa masomo mafupi, matamshi, sarufi, muziki na mazoezi ya darasani."}</p>
+        <p>{day ? lesson.objective : "Jifunze Kiswahili kwa matamshi, sarufi, muziki na mazoezi ya darasani."}</p>
         <div className="swahili-book__meta">
-          <span>Somo 1 pekee</span><span>Alfabeti na matamshi</span><span>Mazoezi ya darasani</span>
+          <span>Somo 1 pekee</span><span>Alfabeti na matamshi</span><span>Music · Grammar · Teil 1–4 · Submit</span>
         </div>
       </header>
       {day === 1 ? (
         <>
-          <nav aria-label="Sehemu za somo" className="swahili-book__tabs" role="tablist">
-            {TABS.map(([key, label]) => (
-              <button key={key} type="button" role="tab" aria-selected={activeTab === key} className="swahili-book__tab"
-                onClick={() => setActiveTab(key)}>{label}</button>
-            ))}
-          </nav>
-          <div role="tabpanel" aria-label={TABS.find(([key]) => key === activeTab)[1]}>
-            <DayOneContent activeTab={activeTab} />
+          <div className="swahili-book__workbook-nav">
+            <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab}
+              tabs={TABS} ariaLabel="Kiswahili Day 1 workbook sections"
+              renderLegacyGrammarPanel={false} tabDescriptionOverrides={TAB_DESCRIPTIONS} />
           </div>
-          <p className="swahili-book__muted swahili-book__spaced">Mazoezi haya ni ya kujifunza, si mtihani uliowekewa alama. {preview ? "Huu ni mfano wa kitabu cha kozi." : ""}</p>
+          <div role="tabpanel" aria-label={TABS.find((tab) => tab.key === activeTab)?.label}>
+            <DayOneContent
+              activeTab={activeTab} writing={writing} setWriting={(updater) => { setWriting(updater); setSubmissionResult(null); }}
+              readingAnswers={readingAnswers} setReadingAnswers={(updater) => { setReadingAnswers(updater); setSubmissionResult(null); }}
+              readingChecked={readingChecked} setReadingChecked={setReadingChecked}
+              listeningAnswers={listeningAnswers} setListeningAnswers={(updater) => { setListeningAnswers(updater); setSubmissionResult(null); }}
+              listeningChecked={listeningChecked} setListeningChecked={setListeningChecked}
+              user={user} submitting={submitting} submissionResult={submissionResult}
+              submitWork={submitWork} previouslySubmitted={previouslySubmitted} />
+          </div>
+          <p className="swahili-book__muted swahili-book__spaced">Mazoezi haya ni ya kiwango cha mwanzo. {preview ? "Huu ni mfano wa kitabu cha kozi." : ""}</p>
         </>
       ) : (
         <section className="swahili-book__card swahili-book__section">
@@ -192,7 +356,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
               <p className="swahili-book__caption">SOMO LA 1 · LINAPATIKANA</p>
               <h2>{lesson.title}</h2>
               <p>{lesson.objective}</p>
-              <p className="swahili-book__small">Muziki · Sarufi · Kuzungumza · Kusoma · Kuandika · Kusikiliza</p>
+              <p className="swahili-book__small">Music · Grammar · Teil 1–4 · Submit</p>
             </div>
             <Link to={basePath + "/day-1"} className="swahili-book__button">Fungua Somo la 1</Link>
           </div>
