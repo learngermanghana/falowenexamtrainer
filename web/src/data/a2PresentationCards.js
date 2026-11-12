@@ -9,10 +9,11 @@ export const A2_PRESENTATION_CARDS = {
       "Name und Herkunft",
       "Familie und Wohnort",
       "Sprachen und Beruf",
-      "Freizeit"
+      "Freizeit",
+      "Deutschlernen"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -41,6 +42,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Freizeit?",
         "starter": "In meiner Freizeit ...",
         "modelSentence": "In meiner Freizeit spiele ich gern Fußball, weil ich Sport mag."
+      },
+      {
+        "id": "point-5",
+        "label": "Deutschlernen",
+        "question": "Deutschlernen?",
+        "starter": "Ich lerne Deutsch, weil ...",
+        "modelSentence": "Ich lerne Deutsch, weil ich mich mit mehr Menschen unterhalten möchte."
       }
     ]
   },
@@ -53,10 +61,11 @@ export const A2_PRESENTATION_CARDS = {
       "Beziehung",
       "Aussehen",
       "Charakter",
-      "Gemeinsame Zeit"
+      "Gemeinsame Zeit",
+      "Gemeinsames Erlebnis"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -85,6 +94,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Gemeinsame Zeit?",
         "starter": "Wir ... gern zusammen.",
         "modelSentence": "Wir kochen am Wochenende gern zusammen."
+      },
+      {
+        "id": "point-5",
+        "label": "Gemeinsames Erlebnis",
+        "question": "Gemeinsames Erlebnis?",
+        "starter": "Wir haben zusammen ...",
+        "modelSentence": "Letzten Sommer haben wir zusammen einen schönen Ausflug gemacht."
       }
     ]
   },
@@ -97,10 +113,11 @@ export const A2_PRESENTATION_CARDS = {
       "Gemeinsamkeiten",
       "Unterschiede",
       "Preis",
-      "Deine Wahl"
+      "Deine Wahl",
+      "Akku und Kamera"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -129,6 +146,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Deine Wahl?",
         "starter": "Ich finde ... besser, weil ...",
         "modelSentence": "Ich finde das neue Handy besser, weil ich damit gute Fotos machen kann."
+      },
+      {
+        "id": "point-5",
+        "label": "Akku und Kamera",
+        "question": "Akku und Kamera?",
+        "starter": "Der Akku ...",
+        "modelSentence": "Das neue Handy hat einen besseren Akku und macht schönere Fotos."
       }
     ]
   },
@@ -141,10 +165,11 @@ export const A2_PRESENTATION_CARDS = {
       "Treffpunkt",
       "Zeit",
       "Aktivitäten",
-      "Anreise"
+      "Anreise",
+      "Warum dieser Ort"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -173,6 +198,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Anreise?",
         "starter": "Ich komme ...",
         "modelSentence": "Ich komme mit dem Bus, weil das Café weit weg ist."
+      },
+      {
+        "id": "point-5",
+        "label": "Warum dieser Ort",
+        "question": "Warum dieser Ort?",
+        "starter": "Ich mag den Ort, weil ...",
+        "modelSentence": "Ich mag das Café, weil es ruhig und gemütlich ist."
       }
     ]
   },
@@ -185,10 +217,11 @@ export const A2_PRESENTATION_CARDS = {
       "Hobbys",
       "Wann und wie oft?",
       "Wo und mit wem?",
-      "Warum?"
+      "Warum?",
+      "Seit wann"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -217,6 +250,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Warum??",
         "starter": "Ich mag ..., weil ...",
         "modelSentence": "Ich mag Fußball, weil ich mich dabei bewege und Freunde treffe."
+      },
+      {
+        "id": "point-5",
+        "label": "Seit wann",
+        "question": "Seit wann?",
+        "starter": "Ich mache das seit ...",
+        "modelSentence": "Ich spiele seit zwei Jahren Fußball."
       }
     ]
   },
@@ -229,10 +269,11 @@ export const A2_PRESENTATION_CARDS = {
       "Größe",
       "Möbel",
       "Position",
-      "Lieblingsplatz"
+      "Lieblingsplatz",
+      "Farben und Stil"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -261,6 +302,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Lieblingsplatz?",
         "starter": "Am liebsten ...",
         "modelSentence": "Am liebsten sitze ich am Fenster, weil ich dort gut lesen kann."
+      },
+      {
+        "id": "point-5",
+        "label": "Farben und Stil",
+        "question": "Farben und Stil?",
+        "starter": "Die Wände sind ...",
+        "modelSentence": "Die Wände sind weiß, und mein Zimmer sieht modern aus."
       }
     ]
   },
@@ -273,10 +321,11 @@ export const A2_PRESENTATION_CARDS = {
       "Größe und Zimmer",
       "Lage",
       "Miete",
-      "Ausstattung"
+      "Ausstattung",
+      "Umgebung"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -305,6 +354,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Ausstattung?",
         "starter": "Mir ist ... wichtig.",
         "modelSentence": "Mir ist ein Balkon wichtig, weil ich gern draußen sitze."
+      },
+      {
+        "id": "point-5",
+        "label": "Umgebung",
+        "question": "Umgebung?",
+        "starter": "In der Nähe gibt es ...",
+        "modelSentence": "In der Nähe gibt es einen Supermarkt und eine Bushaltestelle."
       }
     ]
   },
@@ -317,10 +373,11 @@ export const A2_PRESENTATION_CARDS = {
       "Wie oft und mit wem?",
       "Essen und Getränke",
       "Auswahl",
-      "Bezahlen"
+      "Bezahlen",
+      "Lieblingsgericht"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -349,6 +406,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Bezahlen?",
         "starter": "Wir bezahlen meistens ...",
         "modelSentence": "Wir bezahlen meistens mit Karte und teilen die Rechnung."
+      },
+      {
+        "id": "point-5",
+        "label": "Lieblingsgericht",
+        "question": "Lieblingsgericht?",
+        "starter": "Am liebsten esse ich ...",
+        "modelSentence": "Am liebsten esse ich Gemüse mit Reis."
       }
     ]
   },
@@ -361,10 +425,11 @@ export const A2_PRESENTATION_CARDS = {
       "Reiseziel und Zeit",
       "Reise und Begleitung",
       "Aktivitäten und Wetter",
-      "Deine Meinung"
+      "Deine Meinung",
+      "Besonderes Erlebnis"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -393,6 +458,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Deine Meinung?",
         "starter": "Mir hat ... gefallen, weil ...",
         "modelSentence": "Mir hat der Urlaub gefallen, weil ich mich gut erholt habe."
+      },
+      {
+        "id": "point-5",
+        "label": "Besonderes Erlebnis",
+        "question": "Besonderes Erlebnis?",
+        "starter": "Besonders schön war ...",
+        "modelSentence": "Besonders schön war unser Ausflug zum Strand."
       }
     ]
   },
@@ -405,10 +477,11 @@ export const A2_PRESENTATION_CARDS = {
       "Stadt und Grund",
       "Sehenswürdigkeiten",
       "Essen",
-      "Begleitung und Reise"
+      "Begleitung und Reise",
+      "Reisezeit"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -437,6 +510,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Begleitung und Reise?",
         "starter": "Ich möchte mit ... reisen.",
         "modelSentence": "Ich möchte mit meiner Freundin mit dem Zug reisen."
+      },
+      {
+        "id": "point-5",
+        "label": "Reisezeit",
+        "question": "Reisezeit?",
+        "starter": "Ich möchte ... reisen.",
+        "modelSentence": "Ich möchte die Stadt im Sommer besuchen."
       }
     ]
   },
@@ -449,10 +529,11 @@ export const A2_PRESENTATION_CARDS = {
       "Alltag",
       "Preis",
       "Dauer und Komfort",
-      "Vergleich und Grund"
+      "Vergleich und Grund",
+      "Umwelt"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -481,6 +562,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Vergleich und Grund?",
         "starter": "Ich finde ... besser als ...",
         "modelSentence": "Ich finde den Bus besser als das Auto, weil ich keinen Parkplatz suchen muss."
+      },
+      {
+        "id": "point-5",
+        "label": "Umwelt",
+        "question": "Umwelt?",
+        "starter": "Für die Umwelt ist ...",
+        "modelSentence": "Ich fahre gern mit dem Fahrrad, weil es umweltfreundlich ist."
       }
     ]
   },
@@ -493,10 +581,11 @@ export const A2_PRESENTATION_CARDS = {
       "Beruf",
       "Aufgaben und Arbeitsplatz",
       "Stärken",
-      "Vorbereitung"
+      "Vorbereitung",
+      "Warum dieser Beruf"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -525,6 +614,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Vorbereitung?",
         "starter": "Ich lerne ..., weil ...",
         "modelSentence": "Ich lerne Deutsch, weil ich eine Ausbildung in Deutschland machen möchte."
+      },
+      {
+        "id": "point-5",
+        "label": "Warum dieser Beruf",
+        "question": "Warum dieser Beruf?",
+        "starter": "Ich möchte ... werden, weil ...",
+        "modelSentence": "Ich möchte Ingenieur werden, weil ich gern technische Probleme löse."
       }
     ]
   },
@@ -537,10 +633,11 @@ export const A2_PRESENTATION_CARDS = {
       "Ausbildung",
       "Erfahrung",
       "Fähigkeiten",
-      "Wunschstelle"
+      "Wunschstelle",
+      "Warum diese Stelle"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -569,6 +666,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Wunschstelle?",
         "starter": "Ich möchte ..., weil ...",
         "modelSentence": "Ich möchte im Kundenservice arbeiten, weil ich gern anderen helfe."
+      },
+      {
+        "id": "point-5",
+        "label": "Warum diese Stelle",
+        "question": "Warum diese Stelle?",
+        "starter": "Ich interessiere mich für ...",
+        "modelSentence": "Ich interessiere mich für die Stelle, weil ich gern im Team arbeite."
       }
     ]
   },
@@ -581,10 +685,11 @@ export const A2_PRESENTATION_CARDS = {
       "Beruf oder Studium",
       "Aufgaben",
       "Weg zum Beruf",
-      "Zukunft"
+      "Zukunft",
+      "Arbeitszeiten"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -613,6 +718,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Zukunft?",
         "starter": "In Zukunft möchte ich ...",
         "modelSentence": "In Zukunft möchte ich einen Kurs besuchen, um mehr zu lernen."
+      },
+      {
+        "id": "point-5",
+        "label": "Arbeitszeiten",
+        "question": "Arbeitszeiten?",
+        "starter": "Ich arbeite ...",
+        "modelSentence": "Ich arbeite normalerweise von acht bis sechzehn Uhr."
       }
     ]
   },
@@ -625,10 +737,11 @@ export const A2_PRESENTATION_CARDS = {
       "Sportart",
       "Seit wann und wie oft?",
       "Ort und Personen",
-      "Warum?"
+      "Warum?",
+      "Gesundheit"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -657,6 +770,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Warum??",
         "starter": "Ich mag ..., weil ...",
         "modelSentence": "Ich mag Fußball, weil ich danach glücklich bin und mich fit fühle."
+      },
+      {
+        "id": "point-5",
+        "label": "Gesundheit",
+        "question": "Gesundheit?",
+        "starter": "Sport hilft mir ...",
+        "modelSentence": "Sport hilft mir, gesund und fit zu bleiben."
       }
     ]
   },
@@ -669,10 +789,11 @@ export const A2_PRESENTATION_CARDS = {
       "Stress",
       "Entspannung",
       "Schlaf und Bewegung",
-      "Wirkung"
+      "Wirkung",
+      "Tipp für den Alltag"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -701,6 +822,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Wirkung?",
         "starter": "Danach fühle ich mich ...",
         "modelSentence": "Danach fühle ich mich besser, weil ich Zeit für mich habe."
+      },
+      {
+        "id": "point-5",
+        "label": "Tipp für den Alltag",
+        "question": "Tipp für den Alltag?",
+        "starter": "Mir hilft ...",
+        "modelSentence": "Mir hilft es, nach der Arbeit einen kurzen Spaziergang zu machen."
       }
     ]
   },
@@ -713,10 +841,11 @@ export const A2_PRESENTATION_CARDS = {
       "Beschwerden",
       "Hilfe",
       "Fragen",
-      "Erholung"
+      "Erholung",
+      "Apotheke"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -745,6 +874,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Erholung?",
         "starter": "Zu Hause ...",
         "modelSentence": "Zu Hause ruhe ich mich aus und schlafe viel."
+      },
+      {
+        "id": "point-5",
+        "label": "Apotheke",
+        "question": "Apotheke?",
+        "starter": "In der Apotheke ...",
+        "modelSentence": "In der Apotheke frage ich nach einem passenden Medikament."
       }
     ]
   },
@@ -757,10 +893,11 @@ export const A2_PRESENTATION_CARDS = {
       "Konto",
       "Bargeld",
       "Online-Banking",
-      "Hilfe bei Problemen"
+      "Hilfe bei Problemen",
+      "Sicherheit"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -789,6 +926,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Hilfe bei Problemen?",
         "starter": "Wenn meine Karte nicht funktioniert, ...",
         "modelSentence": "Wenn meine Karte nicht funktioniert, rufe ich die Bank an und bitte um Hilfe."
+      },
+      {
+        "id": "point-5",
+        "label": "Sicherheit",
+        "question": "Sicherheit?",
+        "starter": "Ich achte darauf, ...",
+        "modelSentence": "Beim Online-Banking achte ich auf sichere Passwörter."
       }
     ]
   },
@@ -801,10 +945,11 @@ export const A2_PRESENTATION_CARDS = {
       "Geschäfte",
       "Produkte",
       "Preis und Qualität",
-      "Online oder vor Ort?"
+      "Online oder vor Ort?",
+      "Bezahlung"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -833,6 +978,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Online oder vor Ort??",
         "starter": "Ich kaufe lieber ..., weil ...",
         "modelSentence": "Ich kaufe lieber im Geschäft, weil ich die Produkte sehen kann."
+      },
+      {
+        "id": "point-5",
+        "label": "Bezahlung",
+        "question": "Bezahlung?",
+        "starter": "Meistens bezahle ich ...",
+        "modelSentence": "Meistens bezahle ich mit Karte, aber manchmal auch bar."
       }
     ]
   },
@@ -845,10 +997,11 @@ export const A2_PRESENTATION_CARDS = {
       "Produkt und Kauf",
       "Problem",
       "Reklamation und Beleg",
-      "Gewünschte Lösung"
+      "Gewünschte Lösung",
+      "Was danach passiert"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -877,6 +1030,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Gewünschte Lösung?",
         "starter": "Ich wollte ..., weil ...",
         "modelSentence": "Ich wollte einen neuen Wasserkocher, weil ich ihn jeden Tag brauche."
+      },
+      {
+        "id": "point-5",
+        "label": "Was danach passiert",
+        "question": "Was danach passiert?",
+        "starter": "Danach ...",
+        "modelSentence": "Danach warte ich auf die Antwort des Geschäfts."
       }
     ]
   },
@@ -889,10 +1049,11 @@ export const A2_PRESENTATION_CARDS = {
       "Aktivitäten",
       "Mit wem und wohin?",
       "Zeit und Anreise",
-      "Wetter und Plan B"
+      "Wetter und Plan B",
+      "Kosten"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -921,6 +1082,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Wetter und Plan B?",
         "starter": "Falls es regnet, ...",
         "modelSentence": "Falls es regnet, gehen wir ins Museum. Ich weiß noch nicht, ob alle Zeit haben."
+      },
+      {
+        "id": "point-5",
+        "label": "Kosten",
+        "question": "Kosten?",
+        "starter": "Das kostet ungefähr ...",
+        "modelSentence": "Für das Wochenende plane ich ungefähr fünfzig Euro ein."
       }
     ]
   },
@@ -933,10 +1101,11 @@ export const A2_PRESENTATION_CARDS = {
       "Hobbys",
       "Sport",
       "Mit wem?",
-      "Wann?"
+      "Wann?",
+      "Warum es Spaß macht"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -965,6 +1134,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Wann??",
         "starter": "Nach der Arbeit ...",
         "modelSentence": "Nach der Arbeit habe ich abends Zeit, weil mein Kurs am Vormittag ist."
+      },
+      {
+        "id": "point-5",
+        "label": "Warum es Spaß macht",
+        "question": "Warum es Spaß macht?",
+        "starter": "Das macht Spaß, weil ...",
+        "modelSentence": "Das macht mir Spaß, weil ich dabei meine Freunde treffe."
       }
     ]
   },
@@ -977,10 +1153,11 @@ export const A2_PRESENTATION_CARDS = {
       "Verkehrsmittel",
       "Zeit und Dauer",
       "Weg und Kosten",
-      "Probleme und Alternative"
+      "Probleme und Alternative",
+      "Vorteile und Nachteile"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -1009,6 +1186,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Probleme und Alternative?",
         "starter": "Wenn ..., ...",
         "modelSentence": "Wenn der Bus zu spät kommt, nehme ich ein Taxi."
+      },
+      {
+        "id": "point-5",
+        "label": "Vorteile und Nachteile",
+        "question": "Vorteile und Nachteile?",
+        "starter": "Ein Vorteil ist ...",
+        "modelSentence": "Der Bus ist günstig, aber manchmal kommt er zu spät."
       }
     ]
   },
@@ -1021,10 +1205,11 @@ export const A2_PRESENTATION_CARDS = {
       "Reiseziel und Zeit",
       "Transport und Unterkunft",
       "Aktivitäten",
-      "Geld und Vorbereitung"
+      "Geld und Vorbereitung",
+      "Reisebegleitung"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -1053,6 +1238,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Geld und Vorbereitung?",
         "starter": "Ich spare ..., um ...",
         "modelSentence": "Ich spare Geld, um die Reise zu bezahlen, und buche das Hotel früh."
+      },
+      {
+        "id": "point-5",
+        "label": "Reisebegleitung",
+        "question": "Reisebegleitung?",
+        "starter": "Ich reise mit ...",
+        "modelSentence": "Ich möchte mit meiner Schwester verreisen."
       }
     ]
   },
@@ -1065,10 +1257,11 @@ export const A2_PRESENTATION_CARDS = {
       "Morgen",
       "Arbeit oder Schule",
       "Freizeit",
-      "Abend"
+      "Abend",
+      "Wochenende"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -1097,6 +1290,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Abend?",
         "starter": "Abends ...",
         "modelSentence": "Abends koche ich, sehe kurz fern und gehe um zehn Uhr schlafen."
+      },
+      {
+        "id": "point-5",
+        "label": "Wochenende",
+        "question": "Wochenende?",
+        "starter": "Am Wochenende ...",
+        "modelSentence": "Am Wochenende schlafe ich länger und besuche meine Familie."
       }
     ]
   },
@@ -1109,10 +1309,11 @@ export const A2_PRESENTATION_CARDS = {
       "Freude",
       "Nervosität",
       "Stress",
-      "Unterstützung"
+      "Unterstützung",
+      "Wie ich reagiere"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -1141,6 +1342,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Unterstützung?",
         "starter": "Mir hilft ...",
         "modelSentence": "Mir hilft ein Gespräch mit meiner Schwester. Danach fühle ich mich ruhiger."
+      },
+      {
+        "id": "point-5",
+        "label": "Wie ich reagiere",
+        "question": "Wie ich reagiere?",
+        "starter": "Wenn ich ..., dann ...",
+        "modelSentence": "Wenn ich nervös bin, atme ich tief durch und spreche mit einem Freund."
       }
     ]
   },
@@ -1153,10 +1361,11 @@ export const A2_PRESENTATION_CARDS = {
       "Apps und Geräte",
       "Mit wem?",
       "Wann und wie oft?",
-      "Vorteile und Probleme"
+      "Vorteile und Probleme",
+      "Datenschutz"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -1185,6 +1394,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Vorteile und Probleme?",
         "starter": "Ich finde ..., weil ...",
         "modelSentence": "Ich finde Videoanrufe praktisch, weil meine Familie weit weg wohnt. Manchmal ist das Internet langsam."
+      },
+      {
+        "id": "point-5",
+        "label": "Datenschutz",
+        "question": "Datenschutz?",
+        "starter": "Ich teile ... nicht.",
+        "modelSentence": "Ich teile meine Passwörter nicht mit anderen."
       }
     ]
   },
@@ -1197,10 +1413,11 @@ export const A2_PRESENTATION_CARDS = {
       "Deutsch und Ausbildung",
       "Beruf",
       "Persönliche Wünsche",
-      "Vorbereitung und Grund"
+      "Vorbereitung und Grund",
+      "Nächste Ziele"
     ],
-    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen vier Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
-    "instructionEn": "Give a short individual talk about yourself and your life. Cover all four keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
+    "instruction": "Erzähle etwas über dich und dein Leben. Sprich zu allen fünf Stichpunkten in ganzen Sätzen. Ergänze Details, Beispiele oder einen Grund.",
+    "instructionEn": "Give a short individual talk about yourself and your life. Cover all five keywords in full sentences and add details, examples or a reason. This is classroom practice for Goethe A2 Speaking Part 2.",
     "branches": [
       {
         "id": "point-1",
@@ -1229,6 +1446,13 @@ export const A2_PRESENTATION_CARDS = {
         "question": "Vorbereitung und Grund?",
         "starter": "Heute ..., weil ...",
         "modelSentence": "Heute lerne ich jeden Tag, weil ich meine Ziele erreichen möchte."
+      },
+      {
+        "id": "point-5",
+        "label": "Nächste Ziele",
+        "question": "Nächste Ziele?",
+        "starter": "Als Nächstes möchte ich ...",
+        "modelSentence": "Als Nächstes möchte ich meine Deutschprüfung bestehen."
       }
     ]
   }
