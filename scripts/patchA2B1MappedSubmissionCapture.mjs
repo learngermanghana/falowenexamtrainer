@@ -39,7 +39,7 @@ const standardMarkers = [
 standardMarkers.forEach((marker) => {
   if (!standardWorkbook.includes(marker)) throw new Error(`Mapped submission marker missing: ${marker}`);
 });
-if (!/<WorkbookSubmissionCaptureRuntime\s+context=\{legacyGrammarContext\}\s+activeTab=\{activeTab\}(?:\s+onChange=\{onChange\})?\s*\/>/.test(standardWorkbook)) {
+if (!/<WorkbookSubmissionCaptureRuntime\s+context=\{legacyGrammarContext\}\s+activeTab=\{activeTab\}(?=\s|\/>)/.test(standardWorkbook)) {
   throw new Error("Mapped submission runtime must receive the legacy grammar context and active tab.");
 }
 fs.writeFileSync(standardWorkbookPath, standardWorkbook, "utf8");

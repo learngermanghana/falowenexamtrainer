@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "../context/AuthContext";
 import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
 import {
@@ -16,6 +17,7 @@ import {
 
 const OBJECTIVE_OPTION_RE = /^\s*([A-H])\s*[.)\-:]\s*/i;
 const ANZEIGE_OPTION_RE = /^\s*Anzeige\s+([A-H])\b/i;
+const PART_TABS = { teil2: ["schreiben"], teil3: ["lesen"], teil4: ["lesen2", "hoeren"] };
 const QUESTION_NUMBER_RE = /^\s*(\d+)\s*[.)\-:]/;
 
 export const extractWorkbookObjectiveLetter = (value = "") => {
@@ -63,7 +65,7 @@ const dispatchTextareaInput = (textarea) => {
 };
 
 const findActiveSectionRoot = (root, activeTab) => {
-  const teilNumber = activeTab === "lesen" ? 3 : activeTab === "hoeren" ? 4 : null;
+  const teilNumber = activeTab === "lesen" ? 3 : ["hoeren", "lesen2"].includes(activeTab) ? 4 : null;
   if (!teilNumber) return null;
   const heading = Array.from(root.querySelectorAll("h2")).find((candidate) =>
     new RegExp(`^\\s*Teil\\s*${teilNumber}\\b`, "i").test(String(candidate.textContent || "").trim()),
@@ -134,14 +136,13 @@ const applyOptionPresentation = (optionNode, selected) => {
   });
 };
 
-const formatSavedTime = (timestamp) => {
-  if (!timestamp) return "";
-  const date = new Date(timestamp);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-};
-
-export default function WorkbookSubmissionCaptureRuntime({ context = null, activeTab = "" }) {
+export default function WorkbookSubmissionCaptureRuntime({
+  context = null,
+  activeTab = "",
+  onChange = null,
+  canOpenPart = () => false,
+  progressHost = null,
+}) {
   const { user, studentProfile } = useAuth();
   const level = String(context?.level || "").toUpperCase();
   const day = Number(context?.day || 0);
@@ -162,6 +163,7 @@ export default function WorkbookSubmissionCaptureRuntime({ context = null, activ
     [day, level],
   );
   const [draft, setDraft] = useState(() => readWorkbookSubmissionDraft(draftContext));
+  const [submitWarning, setSubmitWarning] = useState(false);
   const latestDraftRef = useRef(draft);
 
   useEffect(() => {
@@ -187,7 +189,7 @@ export default function WorkbookSubmissionCaptureRuntime({ context = null, activ
   }, [storageKey]);
 
   useEffect(() => {
-    if (typeof document === "undefined" || !["lesen", "hoeren"].includes(activeTab)) return undefined;
+    if (typeof document === "undefined" || !["lesen", "hoeren", "lesen2"].includes(activeTab)) return undefined;
     const root = document.getElementById("root") || document.body;
     const sectionKey = activeTab === "lesen" ? "teil3" : "teil4";
     const includeInSubmission =
@@ -408,72 +410,116 @@ export default function WorkbookSubmissionCaptureRuntime({ context = null, activ
     };
   }, [activeTab, draftContext]);
 
+  useEffect(() => {
+    if (typeof document === "undefined" || activeTab !== "submit") {
+      setSubmitWarning(false);
+      return undefined;
+    }
+
+    const root = document.getElementById("root") || document.body;
+    const onSubmitCapture = (event) => {
+      if (!event.target.querySelector?.("textarea[data-minimum-words]")) return;
+      const currentDraft = latestDraftRef.current || readWorkbookSubmissionDraft(draftContext);
+      const currentReview = getWorkbookSubmissionReview(currentDraft);
+      const incompleteParts = currentReview.parts.filter((part) => !part.complete);
+      if (!incompleteParts.length || currentReview.manualOverrideActive) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      setSubmitWarning(true);
+      window.requestAnimationFrame(() => {
+        root.querySelector('[data-workbook-incomplete-submit-warning="true"]')?.scrollIntoView?.({
+          behavior: "smooth",
+          block: "center",
+        });
+      });
+    };
+
+    root.addEventListener("submit", onSubmitCapture, true);
+    return () => root.removeEventListener("submit", onSubmitCapture, true);
+  }, [activeTab, draftContext]);
+
   if (!context || !["A2", "B1"].includes(level) || day <= 0) return null;
 
   const review = getWorkbookSubmissionReview(draft);
-  const activePartId = activeTab === "schreiben" ? "teil2" : activeTab === "lesen" ? "teil3" : activeTab === "hoeren" ? "teil4" : "";
-  const activePart = review.parts.find((part) => part.partId === activePartId) || null;
-  const savedTime = formatSavedTime(draft.updatedAt);
+  const activePartId = Object.keys(PART_TABS).find((partId) => PART_TABS[partId].includes(activeTab));
+  const activePart = review.parts.find((part) => part.partId === activePartId);
+  const totalParts = review.parts.length;
+  const readyParts = review.parts.filter((part) => part.complete).length;
+  const readyLabel = `${readyParts} of ${totalParts} required ${totalParts === 1 ? "part" : "parts"} ready`;
 
   if (activeTab === "submit") {
+    if (!totalParts) return null;
     return (
-      <div data-workbook-mapped-submit-review="true" style={{ ...panelStyle, marginTop: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <strong style={{ color: "#1e3a8a" }}>Review & Submit</strong>
-          {savedTime ? <span style={{ color: "#64748b", fontSize: 12 }}>Last mapped {savedTime}</span> : null}
-        </div>
-        <p style={{ margin: 0, color: "#475569" }}>
-          Your latest workbook answers are mapped into the submission box below. Check them, confirm the task, then submit.
-        </p>
-        <div style={{ display: "grid", gap: 7 }}>
-          {review.parts.map((part) => (
-            <div key={part.partId} style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: "9px 10px", background: "#fff" }}>
-              <strong>{part.heading} · {part.label}</strong>
-              {part.kind === "text" ? (
-                <div style={{ color: part.complete ? "#166534" : "#92400e", marginTop: 3 }}>
-                  {part.complete ? `${part.wordCount} words saved` : "Not answered yet"}
-                </div>
-              ) : (
-                <>
-                  <div style={{ color: part.complete ? "#166534" : "#92400e", marginTop: 3 }}>
-                    {part.total ? `${part.answered} of ${part.total} answers saved` : `${part.answered} answers saved`}
-                    {part.missing?.length ? ` · Missing: ${part.missing.map((number) => `Q${number}`).join(", ")}` : ""}
-                  </div>
-                  {part.answers?.length ? <div style={{ marginTop: 3, color: "#334155" }}>{part.answers.join(" · ")}</div> : null}
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-        {review.manualOverrideActive ? (
-          <div style={{ color: "#1e40af", fontWeight: 700 }}>
-            You edited the combined Submit text after mapping. That manual version is now the current final draft; a later Teil 2/3/4 change will remap the newest workbook answers.
-          </div>
+      <section aria-label="Required parts" data-workbook-mapped-submit-review="true" style={{ ...panelStyle, marginTop: 10, gap: 6 }}>
+        <strong>{readyLabel}</strong>
+        {submitWarning && readyParts < totalParts ? (
+          <p data-workbook-incomplete-submit-warning="true" role="alert" style={{ margin: 0, color: "#92400e" }}>
+            Finish the required parts before submitting.
+          </p>
         ) : null}
-      </div>
+        <ul style={{ display: "grid", gap: 4, margin: 0, padding: 0, listStyle: "none" }}>
+          {review.parts.map((part) => {
+            const destination = PART_TABS[part.partId]?.find(canOpenPart);
+            return (
+              <li key={part.partId} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 6, padding: "4px 0" }}>
+                <span>
+                  <span aria-hidden="true">{part.complete ? "✓" : "○"} </span>
+                  <strong>{part.heading} · {part.label}</strong>
+                  {" · "}{part.complete ? "Ready to review" : "Still to do"}
+                  {!part.complete && part.total ? ` (${part.answered}/${part.total} answered)` : ""}
+                </span>
+                {!part.complete && destination && onChange ? (
+                  <button type="button" onClick={() => { setSubmitWarning(false); onChange(destination); }}
+                    style={{ border: "1px solid #bfdbfe", borderRadius: 8, padding: "6px 9px", background: "#fff", color: "#1d4ed8", fontWeight: 700, cursor: "pointer" }}>
+                    Open {part.heading}
+                  </button>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+        {review.manualOverrideActive ? (
+          <p style={{ margin: 0, color: "#475569" }}>Review your manually edited answers in the submission box below.</p>
+        ) : null}
+      </section>
     );
   }
 
-  if (!activePartId) return null;
+  const progress = progressHost && totalParts ? createPortal(
+    <span role="status" style={{ color: "#334155", fontSize: 13, fontWeight: 700 }}>{readyLabel}</span>,
+    progressHost,
+  ) : null;
+
+  if (!activePartId || activePartId === "teil2") return progress;
 
   const isSelfCheck =
     activePartId === "teil4" && sectionProfile?.part4Submission !== "submit";
+  const answeredCount = Number(activePart?.answered || 0);
+  const totalCount = Number(activePart?.total || 0);
+  const progressPercent = totalCount ? Math.round((answeredCount / totalCount) * 100) : 0;
+
   return (
-    <div data-workbook-mapped-save-status="true" style={{ ...panelStyle, marginTop: 10, padding: "9px 11px" }}>
-      <strong style={{ color: "#1e3a8a" }}>
-        {activePartId === "teil2" ? "Teil 2 autosave" : `${activePartId === "teil3" ? "Teil 3" : "Teil 4"} answer capture`}
-      </strong>
-      <span style={{ color: "#475569" }}>
-        {activePartId === "teil2"
-          ? activePart?.complete
-            ? `${activePart.wordCount} words saved automatically to Submit${savedTime ? ` · ${savedTime}` : ""}. Analyse uses the same text, and your newest edit remains the saved version.`
-            : "Start typing in the German text box. Your latest text will be saved automatically to Submit."
-          : isSelfCheck
-            ? "Your choices are saved for this self-check, but this Teil 4 is not added to the final submission for this lesson."
-            : activePart
-              ? `${activePart.answered}${activePart.total ? ` of ${activePart.total}` : ""} answers saved automatically to Submit${savedTime ? ` · ${savedTime}` : ""}. Click another option any time to replace an answer.`
-              : "Click an answer option. Your choice will be saved automatically to Submit."}
-      </span>
-    </div>
+    <>
+      {progress}
+      <div data-workbook-mapped-save-status="true" style={{ ...panelStyle, marginTop: 10, padding: "10px 11px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <strong style={{ color: "#1e3a8a" }}>Choose one answer for each question</strong>
+          <span style={{ color: answeredCount === totalCount && totalCount > 0 ? "#166534" : "#475569", fontWeight: 800 }}>
+            {totalCount ? `${answeredCount} of ${totalCount} answered` : `${answeredCount} answered`}
+          </span>
+        </div>
+        <span style={{ color: "#475569" }}>
+          {isSelfCheck
+            ? "Click an answer option. Your choices are saved for this self-check."
+            : "Click an answer option. Your choice is saved automatically to Submit, and you can change it at any time."}
+        </span>
+        {totalCount ? (
+          <div role="progressbar" aria-label={(activePartId === "teil3" ? "Teil 3" : "Teil 4") + " answer progress"} aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent} style={{ width: "100%", height: 7, borderRadius: 999, background: "#dbeafe", overflow: "hidden" }}>
+            <div style={{ width: `${progressPercent}%`, height: "100%", borderRadius: 999, background: "#2563eb", transition: "width 160ms ease" }} />
+          </div>
+        ) : null}
+      </div>
+    </>
   );
 }

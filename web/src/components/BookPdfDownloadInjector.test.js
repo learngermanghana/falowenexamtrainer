@@ -187,3 +187,15 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(document.querySelector('a[href*="HMEs3mEKdrk"]')).not.toBeNull();
     expect(document.querySelector('a[href*="AxSh8t71Jlo"]')).toBeNull();
   });
+
+it("shows the configured A2 Day 4 AI grammar preview alongside the teacher preview", () => {
+  render(
+    <MemoryRouter initialEntries={["/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook?view=grammar"]}>
+      <BookPdfDownloadInjector />
+    </MemoryRouter>
+  );
+  const link = screen.getByRole("link", { name: /Watch grammar explanation/i });
+  expect(link).toHaveAttribute("href", "https://youtu.be/U14gkjld0ys");
+  expect(link.querySelector("img")).toHaveAttribute("src", "https://i.ytimg.com/vi/U14gkjld0ys/mqdefault.jpg");
+  expect(screen.getByRole("link", { name: /Watch lesson/i })).toBeInTheDocument();
+});

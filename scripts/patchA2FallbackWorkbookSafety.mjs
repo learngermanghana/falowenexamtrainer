@@ -235,7 +235,7 @@ const displayTabsBlock = `  const displayTabs = tabDescriptionOverrides
     : effectiveTabs;
   const activeIndex = Math.max(0, displayTabs.findIndex((tab) => tab.key === activeTab));
   const tabNames = displayTabs.map((tab) => tab.label).join(", ");`;
-if (!standardSource.includes("const displayTabs = tabDescriptionOverrides")) {
+if (!standardSource.includes("Object.prototype.hasOwnProperty.call(tabDescriptionOverrides, tab.key)")) {
   if (!standardSource.includes(effectiveTabsAnchor)) {
     throw new Error("Could not find WorkbookTabNav effective-tabs block.");
   }
@@ -273,7 +273,7 @@ if (!guidanceSource.includes("const navigationTargets = workbookDay === 25")) {
 if (!guidanceSource.includes(day25FallbackNav)) {
   throw new Error("Day 25 custom tabs are not mounted by the shared fallback navigation.");
 }
-if (!standardSource.includes("const displayTabs = tabDescriptionOverrides")) {
+if (!standardSource.includes("Object.prototype.hasOwnProperty.call(tabDescriptionOverrides, tab.key)")) {
   throw new Error("WorkbookTabNav cannot safely apply post-integration label overrides.");
 }
 
