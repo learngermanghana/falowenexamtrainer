@@ -12,7 +12,7 @@ const titles = [
     status: "available", bookIds: ["writing-skills-a1-c2-digital"] },
 ];
 const offers = [
-  { id: "a1-digital", format: "digital", priceGhs: 100 },
+  { id: "a1-digital", format: "digital", priceGhs: 249 },
   { id: "a1-printed", format: "printed", priceGhs: 800 },
   { id: "writing-skills-a1-c2-digital", format: "digital", priceGhs: 39 },
 ];
@@ -62,12 +62,12 @@ test("only the published A2 course book appears when old guide data is still cac
    formats:["digital"],pages:50,status:"available",bookIds:[id+"-digital"]})),
  ];
  const offers=[
-  {id:"a2-course-workbook-digital",format:"digital",priceGhs:100},
+  {id:"a2-course-workbook-digital",format:"digital",priceGhs:299},
   ...retired.map(id=>({id:id+"-digital",format:"digital",priceGhs:39})),
  ];
  render(<BooksCatalog catalogTitles={titles} books={offers}/>);
  expect(screen.getByText("1 book found")).toBeInTheDocument();
- expect(screen.getByText("GH₵100.00")).toBeInTheDocument();
+ expect(screen.getByText("GH₵299.00")).toBeInTheDocument();
  expect(screen.getByRole("link",{name:"View Book"}))
   .toHaveAttribute("href","/books/deutsch-a2-course-workbook");
  for(const name of retired)expect(screen.queryByText(name)).not.toBeInTheDocument();
@@ -78,4 +78,17 @@ test("A2 Course Book replaces the three old exam guides in the real product page
  });
  for(const hidden of ["a1-writing-model-exams","a2-four-skills-exam-guide","b1-four-skills-exam-guide"])
   expect(BOOK_PAGES[hidden]).toBeUndefined();
+});
+
+test("B1 digital course book is listed at GH₵399 with its own product route",()=>{
+ const titles=[{id:"b1-course-workbook",title:"Deutsch B1 — Course & Workbook",description:"420-page B1 learning course",
+  levelTags:["B1"],formats:["digital","printed"],pages:420,status:"available",
+  bookIds:["b1-course-workbook-digital","b1-course-workbook-printed"]}];
+ const books=[{id:"b1-course-workbook-digital",format:"digital",priceGhs:399},
+  {id:"b1-course-workbook-printed",format:"printed",priceGhs:1350}];
+ render(<BooksCatalog catalogTitles={titles} books={books}/>);
+ expect(screen.getByText("GH₵399.00")).toBeInTheDocument();
+ expect(screen.getByText("GH₵1350.00")).toBeInTheDocument();
+ expect(screen.getByRole("link",{name:"View Book"})).toHaveAttribute("href","/books/deutsch-b1-course-workbook");
+ expect(BOOK_PAGES["b1-course-workbook"].cover).toBe("/books/b1-cover.svg");
 });

@@ -56,10 +56,41 @@ function A2BookPreviewSample({page}) {
   </article>;
 }
 
+
+function B1BookPreviewSample({page}) {
+  return <article className="fb-slide-paper fb-a2-preview" aria-label={`B1 book sample from page ${page}`}>
+    <div className="fb-a2-preview-top"><strong>FALOWEN</strong><span>B1 COURSE BOOK · SAMPLE</span></div>
+    {page === 2 ? <>
+      <h2>Contents</h2>
+      <p className="fb-a2-preview-lead">Course &amp; Workbook · 28 learning days</p>
+      <dl className="fb-a2-preview-contents">
+        <div><dt>Day 1 · Traumwelten</dt><dd>5</dd></div>
+        <div><dt>Day 2 · Freunde fürs Leben</dt><dd>22</dd></div>
+        <div><dt>Day 3 · Erfolgsgeschichten</dt><dd>36</dd></div>
+        <div><dt>Day 4 · Wohnung suchen</dt><dd>52</dd></div>
+      </dl>
+    </> : page === 7 ? <>
+      <p className="fb-a2-preview-lead">B1 · Day 1 · Grammar Notes</p>
+      <h2>Präsens &amp; Perfekt</h2>
+      <p>Use Präsens for what is happening now, habits and scheduled future plans. Form Perfekt with haben/sein and Partizip II at the end.</p>
+      <div className="fb-a2-preview-example">
+        <p>Ich lerne Deutsch.</p><p>Ich habe Deutsch gelernt.</p>
+      </div>
+    </> : <>
+      <p className="fb-a2-preview-lead">B1 · Day 1 · Teil 3 · Lesen</p>
+      <h2>Traumdeutung und ihre Bedeutung</h2>
+      <p>Träume faszinieren die Menschheit seit Jahrtausenden. In vielen Kulturen werden Träume als Botschaften aus einer anderen Welt betrachtet.</p>
+      <p className="fb-a2-preview-lead">Read the full passage and complete the B1 comprehension questions in the book.</p>
+    </>}
+    <div className="fb-a2-preview-footer"><span>Selected excerpt · not a full PDF page</span><span>{page} / 420</span></div>
+  </article>;
+}
+
 function PreviewSlides({productId, title, cover}) {
   const track = useRef(null);
   const [current, setCurrent] = useState(0);
   const pages = productId === "a2-course-workbook" ? [2,7,14] // Selected, verified excerpts; the complete PDF remains private.
+    : productId === "b1-course-workbook" ? [2,7,16]
     : productId === "a1-course-workbook" ? [1,2,3]
     : productId === "a1-writing-model-exams" ? [5,11,21]
     : productId === "writing-skills-a1-c2" ? [5,7,9] : [5,21,31];
@@ -72,6 +103,7 @@ function PreviewSlides({productId, title, cover}) {
       <div className="fb-slide"><img src={cover} alt={`${title} cover`} width="300" height="425" /></div>
       {pages.map(page=><div className="fb-slide" key={page}>
         {productId === "a2-course-workbook" ? <A2BookPreviewSample page={page} />
+          : productId === "b1-course-workbook" ? <B1BookPreviewSample page={page} />
           : <a href={`/books/previews/${productId}-${page}.webp`} target="_blank" rel="noopener noreferrer" aria-label={`Enlarge preview page ${page}`}>
               <img src={`/books/previews/${productId}-${page}.webp`} alt={`${title} · Preview page ${page}`} loading="lazy" width="950" height="1344" />
             </a>}
@@ -84,6 +116,8 @@ function PreviewSlides({productId, title, cover}) {
     </div>
     <p className="fb-muted">{productId === "a2-course-workbook"
       ? "Preview selected contents, grammar and reading excerpts · The full 328-page PDF is delivered privately after verified payment."
+      : productId === "b1-course-workbook"
+      ? "Preview selected contents, grammar and reading excerpts · The full 420-page PDF is delivered privately after verified payment."
       : "Swipe to preview · Tap a page to enlarge."}</p>
   </section>;
 }
@@ -150,7 +184,7 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
             <fieldset className="fb-product-editions"><legend>Choose your format</legend>
               {offers.map(book=><label key={book.id} className="fb-edition">
                 <input type="radio" name="edition" checked={book.id===selected.id} onChange={()=>{setEdition(book.id);setQuantity(1);}} />
-                <span>{book.format==="digital"?"Digital PDF":productId==="a2-course-workbook"?"Printed on demand":"Printed book"}</span>
+                <span>{book.format==="digital"?"Digital PDF":["a2-course-workbook","b1-course-workbook"].includes(productId)?"Printed on demand":"Printed book"}</span>
                 <strong>{money(book.priceGhs)}<small>{indicativeUsd(book.priceGhs,fx)}</small></strong>
               </label>)}
             </fieldset>

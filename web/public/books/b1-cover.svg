@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="595" height="842" viewBox="0 0 595 842">
+  <title>Falowen Deutsch B1 Course and Workbook</title>
+  <desc>Minimalist editorial book cover, B1 level, printed typography and flat accent color.</desc>
+  <rect x="0" y="0" width="595" height="842" fill="#FAF9F6"/>
+  <rect x="0" y="0" width="16" height="842" fill="#176B5B"/>
+  <g font-family="Lato, Arial, Helvetica, sans-serif">
+    <text x="58" y="82" fill="#1D2730" font-size="24" font-weight="900" letter-spacing="2.8">FALOWEN</text>
+    <text x="58" y="106" fill="#62717C" font-size="11" font-weight="700" letter-spacing="1.7">GERMAN LANGUAGE LEARNING</text>
+    <text x="540" y="84" text-anchor="end" fill="#176B5B" font-size="11" font-weight="700" letter-spacing="1.4">B1 · INTERMEDIATE</text>
+    <line x1="58" y1="134" x2="537" y2="134" stroke="#B8BDBD" stroke-width="1"/>
+    <text x="58" y="270" fill="#21272A" font-size="74" font-weight="900" letter-spacing="0.5">DEUTSCH</text>
+    <text x="51" y="477" fill="#176B5B" font-size="208" font-weight="900" letter-spacing="-9">B1</text>
+    <line x1="58" y1="526" x2="537" y2="526" stroke="#176B5B" stroke-width="5"/>
+    <text x="58" y="583" fill="#1D2730" font-size="34" font-weight="900">Course &amp; Workbook</text>
+    <text x="58" y="620" fill="#52606A" font-size="17" font-weight="400">Independent language skills</text>
+    <text x="58" y="678" fill="#1D2730" font-size="12.8" font-weight="700" letter-spacing="0.55">GRAMMAR  /  READING  /  WRITING  /  SPEAKING</text>
+    <rect x="58" y="712" width="479" height="42" fill="#E2EEE8"/>
+    <text x="76" y="738" fill="#173F39" font-size="13" font-weight="700" letter-spacing="1.0">FALOWEN GERMAN COURSE SERIES</text>
+    <line x1="58" y1="786" x2="537" y2="786" stroke="#C6C9C7" stroke-width="0.75"/>
+    <rect x="58" y="798" width="39" height="7" fill="#181818"/>
+    <rect x="58" y="805" width="39" height="7" fill="#C63934"/>
+    <rect x="58" y="812" width="39" height="7" fill="#EEB941"/>
+    <text x="112" y="813" fill="#505B60" font-size="11" font-weight="700" letter-spacing="0.6">FALOWEN EDITION</text>
+    <text x="537" y="813" text-anchor="end" fill="#505B60" font-size="10" font-weight="700" letter-spacing="0.9">CEFR B1</text>
+  </g>
+</svg>

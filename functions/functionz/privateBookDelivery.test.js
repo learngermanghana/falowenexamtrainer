@@ -18,11 +18,11 @@ const receipt={status:"paid",reference:"paystack_ok",checkoutPesewas:9900};
 test("private books are exact allowlisted objects and never arbitrary user keys",()=>{
  assert.deepEqual(Object.keys(DIGITAL_BOOK_OBJECTS).sort(),[
   "a1-writing-model-exams-digital","a2-four-skills-exam-guide-digital","b1-four-skills-exam-guide-digital",
-  "a2-course-workbook-digital"
+  "a2-course-workbook-digital", "a1-digital", "b1-course-workbook-digital"
  ].sort());
  for (const {bucket,key} of Object.values(DIGITAL_BOOK_OBJECTS)) {
    assert.equal(bucket,"falowen-books-private");
-   assert.match(key,/^book\/Falowen[-_][A-Za-z0-9_-]+\.pdf$/);
+   assert.match(key,/^(?:book\/)?Falowen[-_][A-Za-z0-9_-]+\.pdf$/);
  }
  assert.equal(URL_EXPIRES_SECONDS,90);
  assert.throws(()=>signPrivateBookDownload({bookId:"a1-printed",env}),/No delivery mapping/);
@@ -141,10 +141,22 @@ test("published A2 course PDF maps only to the clean 328-page private R2 object"
  const obj=DIGITAL_BOOK_OBJECTS["a2-course-workbook-digital"];
  assert.deepEqual(obj,{
    bucket:"falowen-books-private",
-   key:"book/Falowen-A2-Course-Materials-Clean.pdf",
+   key:"Falowen-A2-Course-Materials-Clean.pdf",
    filename:"Falowen-A2-Course-Materials-Clean.pdf",
  });
  const url=signPrivateBookDownload({bookId:"a2-course-workbook-digital",env}).url;
- assert.equal(new URL(url).pathname,"/book/Falowen-A2-Course-Materials-Clean.pdf");
+ assert.equal(new URL(url).pathname,"/Falowen-A2-Course-Materials-Clean.pdf");
  assert.match(url,/X-Amz-Expires=90/);
+});
+
+test("A1 and B1 full course PDFs are exact private paid objects", () => {
+ const expected=[
+  ["a1-digital","Falowen-A1-Course-Materials.pdf"],
+  ["b1-course-workbook-digital","Falowen-B1-Course-Materials.pdf"],
+ ];
+ for(const [bookId,key] of expected){
+  assert.equal(DIGITAL_BOOK_OBJECTS[bookId].bucket,"falowen-books-private");
+  assert.equal(DIGITAL_BOOK_OBJECTS[bookId].key,key);
+  assert.equal(new URL(signPrivateBookDownload({bookId,env}).url).pathname,"/"+key);
+ }
 });
