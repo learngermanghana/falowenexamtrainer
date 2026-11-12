@@ -149,7 +149,7 @@ export const a2SpeakingMindMaps = lessons.map(([day, lessonId, title]) => {
   const branches = card.branches.map((point, index) => ({
     id: point.id,
     label: point.label,
-    type: ["topic", "detail", "example", "closing"][index],
+    type: ["topic", "detail", "example", "opinion", "closing"][index],
     keywords: [point.label],
     guidingQuestion: point.question,
     sentenceStarter: point.starter,
