@@ -45,7 +45,7 @@ test("moves through the configured speaking route", async () => {
   expect(
     screen.getByRole("heading", { name: config.branches[1].label }),
   ).toBeInTheDocument();
-  expect(screen.getByText(/2\s*\/\s*4/)).toBeInTheDocument();
+  expect(screen.getByText(new RegExp(`2\\s*\\/\\s*${config.speakingRoute.length}`))).toBeInTheDocument();
 });
 
 test("starts A2 focus mode with speaking help open and allows it to collapse", async () => {

@@ -106,14 +106,10 @@ describe("A2 and B1 course books", () => {
     expect(source).toContain("Included in this day:");
   });
 
-  test("describes the four workbook parts plus optional Music and Submit", () => {
-    render(<A2B1WorkbookGuidance level="B1" />);
-
-    const navigationGuide = screen.getByText(/Complete the lesson’s speaking, writing, reading and listening tasks/i);
-    expect(navigationGuide).toHaveTextContent("Music");
-    expect(navigationGuide).toHaveTextContent("Submit");
-    expect(navigationGuide).toHaveTextContent("The Submit tab is for final work only.");
-    expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
+  test("does not reintroduce an obsolete B1 workbook navigation guide", () => {
+    const { container } = render(<A2B1WorkbookGuidance level="B1" />);
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByText(/Complete the lesson’s speaking, writing, reading and listening tasks/i)).not.toBeInTheDocument();
   });
 
   test("keeps the native custom A2 Day 2 workbook focused on four content parts after Radio", () => {

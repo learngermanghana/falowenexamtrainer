@@ -44,7 +44,8 @@ describe("homepage and Exams Room student-facing cleanup", () => {
     expect(homeSource).not.toContain("formatContractStatus");
     expect(homeSource).toContain("<WelcomeHero");
     expect(homeSource).toContain("<QuickMainAccess");
-    expect(homeSource).toContain("<FirstLessonGuide");
+    expect(homeSource).not.toContain("<FirstLessonGuide");
+    expect(homeSource).toContain('className="falowen-home-discover"');
     expect(homeSource).toContain("<HomeMetrics");
     expect(homeSource).toContain("<ClassCalendarCard");
     expect(homeSource).toContain("onOpenAccount={openAccount}");
