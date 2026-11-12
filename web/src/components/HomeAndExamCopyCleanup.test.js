@@ -13,9 +13,9 @@ describe("homepage and Exams Room student-facing cleanup", () => {
   const writingSource = readSource("components/WritingPage.js");
   const footerSource = readSource("components/LegalFooter.js");
 
-  test("normal homepage ends with compact class access and the footer", () => {
-    expect(homeSource).toContain("homepageCompact");
-    expect((homeSource.match(/homepageCompact/g) || []).length).toBe(1);
+  test("normal homepage ends after Home Metrics and the footer", () => {
+    expect(homeSource).toContain("<HomepageHighlights");
+    expect(homeSource).not.toContain("homepageCompact");
     expect(homeSource).not.toContain("AnnouncementSection");
     expect(homeSource).not.toContain("fetchAnnouncements");
     expect(homeSource).not.toContain("YouTubeSubscribeButton");
@@ -45,13 +45,13 @@ describe("homepage and Exams Room student-facing cleanup", () => {
     expect(homeSource).toContain("<WelcomeHero");
     expect(homeSource).toContain("<QuickMainAccess");
     expect(homeSource).not.toContain("<FirstLessonGuide");
-    expect(homeSource).toContain('className="falowen-home-discover"');
+    expect(homeSource).toContain("<HomepageHighlights");
     expect(homeSource).toContain("<HomeMetrics");
     expect(homeSource).toContain("<ClassCalendarCard");
     expect(homeSource).toContain("onOpenAccount={openAccount}");
     expect(homeSource).toContain("onOpenExamFile={openExamFile}");
     expect(homeSource).toContain("initialClassName={preferredClass}");
-    expect(homeSource).toContain("homepageCompact");
+    expect(homeSource).not.toContain("homepageCompact");
   });
 
   test("signed-in Home keeps next class access while replacing bulky Zoom panel with book covers", () => {
