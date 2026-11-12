@@ -19,7 +19,7 @@ beforeEach(()=>{
    catalogTitles:[
     {id:"a2-course-workbook",title:"Deutsch A2 — Course & Workbook",description:"328 pages of German A2 practice",pages:328,status:"available",bookIds:["a2-course-workbook-digital","a2-course-workbook-printed"],levelTags:["A2"]},
    ],
-   books:[{id:"a2-course-workbook-digital",priceGhs:100,format:"digital"},{id:"a2-course-workbook-printed",priceGhs:1050,format:"printed"}],
+   books:[{id:"a2-course-workbook-digital",priceGhs:299,format:"digital"},{id:"a2-course-workbook-printed",priceGhs:1050,format:"printed"}],
   })};
   if(String(url).includes("/fx/usd-ghs"))return {ok:true,json:async()=>({usdToGhs:10})};
   throw Error("Unexpected API call");
@@ -43,7 +43,7 @@ test("new A2 book is discoverable with the correct private digital edition",asyn
  expect(await screen.findByRole("link",{name:"Buy Now"})).toHaveAttribute(
   "href","/books/deutsch-a2-course-workbook/checkout?edition=a2-course-workbook-digital"
  );
- expect(screen.getByText("GH₵100.00")).toBeInTheDocument();
+ expect(screen.getByText("GH₵299.00")).toBeInTheDocument();
  expect(screen.getByText(/Preview selected contents, grammar and reading excerpts/)).toBeInTheDocument();
  expect(screen.getByRole("radio",{name:/Printed on demand/})).toBeInTheDocument();
  const printed=screen.getByRole("radio",{name:/Printed on demand/});
