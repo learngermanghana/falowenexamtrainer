@@ -14,7 +14,7 @@ const titles = [
 const offers = [
   { id: "a1-digital", format: "digital", priceGhs: 249 },
   { id: "a1-printed", format: "printed", priceGhs: 800 },
-  { id: "writing-skills-a1-c2-digital", format: "digital", priceGhs: 39 },
+  { id: "writing-skills-a1-c2-digital", format: "digital", priceGhs: 79 },
 ];
 
 describe("Falowen Books discovery, currency and checkout safety", () => {
@@ -33,10 +33,10 @@ describe("Falowen Books discovery, currency and checkout safety", () => {
     expect(indicativeUsd(99, { usdToGhs: 0 })).toBe("");
   });
 
-  test("offers an independently purchasable GH₵39 writing guide and preserves A1 selection", () => {
+  test("offers an independently purchasable GH₵79 writing guide and preserves A1 selection", () => {
     const choose = jest.fn();
     render(<BooksCatalog catalogTitles={titles} books={offers} fxQuote={{ usdToGhs: 11 }} onSelectBook={choose} />);
-    expect(screen.getByText("GH₵39.00")).toBeInTheDocument();
+    expect(screen.getByText("GH₵79.00")).toBeInTheDocument();
     expect(screen.getAllByText(/Paystack charges in Ghana cedis/i)).toHaveLength(1);
     const productLinks = screen.getAllByRole("link",{name:"View Book"});
     expect(productLinks).toHaveLength(2);
