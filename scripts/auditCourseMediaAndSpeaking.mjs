@@ -137,7 +137,7 @@ if (Object.keys(A2_PRESENTATION_CARDS).length !== 28) {
 }
 for (let day = 1; day <= 28; day += 1) {
   const card = A2_PRESENTATION_CARDS[day];
-  if (!card?.prompt || card.keywords?.length !== 4 || card.branches?.length !== 4 ||
+  if (!card?.prompt || card.keywords?.length !== 5 || card.branches?.length !== 5 ||
       !card.instruction || !card.instructionEn ||
       card.branches.some((point, index) => point.label !== card.keywords[index] || !point.starter || !point.modelSentence)) {
     throw new Error(`Incomplete A2 presentation card for Day ${day}.`);

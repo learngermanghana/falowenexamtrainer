@@ -386,3 +386,96 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Printable A2 workbook: the interactive 900px radial canvas was clipped at PDF
+ * page width, hiding the right branches and sometimes the fifth branch.  Print
+ * all speaking cues as a fluid grid while leaving the on-screen mindmap intact. */
+@media print {
+  .speaking-mind-map {
+    overflow: visible !important;
+    gap: 10px !important;
+    padding: 12px !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    break-inside: auto;
+  }
+  .speaking-mind-map__viewport {
+    overflow: visible !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+  }
+  .speaking-mind-map__canvas {
+    position: static !important;
+    display: grid !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    gap: 12px !important;
+    padding: 14px !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    break-inside: avoid;
+  }
+  .speaking-mind-map__connections { display: none !important; }
+  .speaking-mind-map__centre {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    transform: none !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+    box-shadow: none !important;
+    background: #1e40af !important;
+    box-sizing: border-box !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .speaking-mind-map__branches {
+    position: static !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    border: 0 !important;
+  }
+  .speaking-mind-map__branch,
+  .speaking-mind-map__branch:hover,
+  .speaking-mind-map__branch:focus-visible,
+  .speaking-mind-map__branch.is-active {
+    position: static !important;
+    inset: auto !important;
+    left: auto !important;
+    top: auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 60px !important;
+    max-width: none !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    break-inside: avoid;
+  }
+  .speaking-mind-map__branch-number {
+    background: #1e40af !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .speaking-mind-map__branch-copy { min-width: 0 !important; }
+  .speaking-mind-map__branch-copy strong,
+  .speaking-mind-map__branch-copy small {
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+  .speaking-mind-map__details,
+  .speaking-mind-map__help-panel { break-inside: auto !important; }
+}

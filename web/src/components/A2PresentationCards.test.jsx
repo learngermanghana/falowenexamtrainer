@@ -11,12 +11,12 @@ import { getA2SpeakingMindMap, validateSpeakingMindMapConfig } from "../data/spe
 
 afterEach(cleanup);
 
-test.each(Array.from({ length: 28 }, (_, i) => i + 1))("Day %i displays an individual task and all four cues before opening branches", (day) => {
+test.each(Array.from({ length: 28 }, (_, i) => i + 1))("Day %i displays an individual task and all five cues before opening branches", (day) => {
   const config = getA2SpeakingMindMap(day);
   const card = A2_PRESENTATION_CARDS[day];
   expect(validateSpeakingMindMapConfig(config)).toBe(true);
-  expect(card.keywords).toHaveLength(4);
-  expect(new Set(card.keywords).size).toBe(4);
+  expect(card.keywords).toHaveLength(5);
+  expect(new Set(card.keywords).size).toBe(5);
   expect(config.branches.map(b => b.label)).toEqual(card.keywords);
   render(<SpeakingMindMap config={config} />);
   const task = within(screen.getByRole("region", { name: "A2 presentation task" }));
@@ -34,7 +34,7 @@ test.each(Array.from({ length: 28 }, (_, i) => i + 1))("Day %i displays an indiv
 test("Small Talk has a personal introduction rather than dialogue instructions", () => {
   const config = getA2SpeakingMindMap(1);
   expect(config.centralQuestion).toBe("Wer bist du?");
-  expect(config.presentation.keywords).toEqual(["Name und Herkunft", "Familie und Wohnort", "Sprachen und Beruf", "Freizeit"]);
+  expect(config.presentation.keywords).toEqual(["Name und Herkunft", "Familie und Wohnort", "Sprachen und Beruf", "Freizeit", "Deutschlernen"]);
   render(<SpeakingMindMap config={config} />);
   expect(screen.queryByText(/Small Talk ist kein langer Vortrag/)).not.toBeInTheDocument();
 });
