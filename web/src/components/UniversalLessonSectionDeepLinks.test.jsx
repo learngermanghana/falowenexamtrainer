@@ -14,6 +14,8 @@ import {
   normalizeAdvancedSectionView,
 } from "../utils/lessonSectionDeepLinks";
 
+jest.mock("./WorkbookSubmissionCaptureRuntime", () => () => null);
+
 const LocationProbe = () => {
   const location = useLocation();
   return <output data-testid="location-search">{location.search}</output>;
