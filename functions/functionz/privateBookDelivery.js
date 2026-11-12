@@ -1,22 +1,23 @@
 "use strict";
 const crypto = require("crypto");
 
-// These are EXACT private object keys confirmed through the user's Cloudflare
-// dashboard. Nothing here is a publicly accessible PDF link.
+// Private R2 keys reflect the full object names shown in the user's Cloudflare
+// book/ folder on 12 Nov 2026. Download filenames remain clean for buyers.
+// These are not publicly accessible PDF links.
 const DIGITAL_BOOK_OBJECTS = Object.freeze({
   "a1-digital": Object.freeze({
     bucket: "falowen-books-private",
-    key: "Falowen-A1-Course-Materials.pdf",
+    key: "book/Falowen-A1-Course-Materials-1.pdf",
     filename: "Falowen-A1-Course-Materials.pdf",
   }),
   "b1-course-workbook-digital": Object.freeze({
     bucket: "falowen-books-private",
-    key: "Falowen-B1-Course-Materials.pdf",
+    key: "book/Falowen-B1-Course-Materials-1.pdf",
     filename: "Falowen-B1-Course-Materials.pdf",
   }),
   "a2-course-workbook-digital": Object.freeze({
     bucket: "falowen-books-private",
-    key: "Falowen-A2-Course-Materials-Clean.pdf",
+    key: "book/Falowen-A2-Course-Materials-Clean-2.pdf",
     filename: "Falowen-A2-Course-Materials-Clean.pdf",
   }),
   "a1-writing-model-exams-digital": Object.freeze({
