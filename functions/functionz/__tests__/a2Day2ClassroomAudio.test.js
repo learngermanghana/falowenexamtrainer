@@ -86,3 +86,22 @@ test('A2 Day 4 teacher signer returns a signed URL only for the uploaded exact k
   await handle(unauthenticated,denied);
   expect(denied.code).toBe(401);
 });
+
+test('A2 Day 25 classroom audio requires staff and the exact uploaded key', async () => {
+  const handle = createClassroomBankAudioHandler({ env, fetchImpl });
+  const key = 'a2/day-25/tagesablauf.mp3';
+  const allowed = response();
+  await handle(request('25', key), allowed);
+  expect(allowed.code).toBe(200);
+  expect(allowed.body.url).toContain('/a2/day-25/tagesablauf.mp3?');
+
+  const wrongDay = response();
+  await handle(request('24', key), wrongDay);
+  expect(wrongDay.code).toBe(400);
+
+  const unauthenticated = request('25', key);
+  delete unauthenticated.headers.authorization;
+  const denied = response();
+  await handle(unauthenticated, denied);
+  expect(denied.code).toBe(401);
+});
