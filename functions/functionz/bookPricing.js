@@ -17,7 +17,7 @@ function pricePrintedGuide(pages) {
 
 // Small downloadable exam guides are priced by editorial scope rather than
 // pretending PDF page count incurs the same cost as a printed book.
-// The existing Writing Skills PDF is GH₵39; standalone full A1/A2/B1 books use fixed prices in bookCommerce.
+// The Writing Skills PDF is GH₵79; standalone full A1/A2/B1 books use fixed prices in bookCommerce.
 function priceDigitalExamGuide({ skills }) {
   if (!Number.isInteger(skills) || skills < 1 || skills > 4)
     throw new RangeError("Guide skills must be 1–4");

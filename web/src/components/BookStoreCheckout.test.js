@@ -5,7 +5,7 @@ const originalFetch=global.fetch;
 const catalog={paymentsEnabled:true,catalogTitles:[
  {id:"a1-course-workbook",title:"A1 Course",status:"available",bookIds:["a1-digital","a1-printed"],pages:250},
  {id:"writing-skills-a1-c2",title:"Writing guide",status:"coming_soon",bookIds:["writing-skills-a1-c2-digital"],pages:32}
-],books:[{id:"a1-digital",format:"digital",priceGhs:249},{id:"a1-printed",format:"printed",priceGhs:800},{id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:39}]};
+],books:[{id:"a1-digital",format:"digital",priceGhs:249},{id:"a1-printed",format:"printed",priceGhs:800},{id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:79}]};
 beforeEach(()=>{window.history.replaceState({},"","/books");global.fetch=jest.fn(async url=>({ok:true,json:async()=>String(url).includes("/books/catalog")?catalog:{usdToGhs:10}}));});
 afterEach(()=>{global.fetch=originalFetch;});
 test("detail uses actual selected pages, separate checkout and related books without customer fields",async()=>{
@@ -85,7 +85,7 @@ test("writing guide provides both paid editions and clearly discloses manual PDF
     {id:"writing-skills-a1-c2",title:"Writing guide",status:"available",pages:68,
       bookIds:["writing-skills-a1-c2-digital","writing-skills-a1-c2-printed"],levelTags:["A1","C2"]}
   ],books:[
-    {id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:39,deliveryMode:"manual_email"},
+    {id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:79,deliveryMode:"manual_email"},
     {id:"writing-skills-a1-c2-printed",format:"printed",priceGhs:250,deliveryMode:"print_on_demand"}
   ]};
   global.fetch=jest.fn(async url=>({ok:true,json:async()=>String(url).includes("/books/catalog")?writingCatalog:{usdToGhs:10}}));
