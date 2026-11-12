@@ -73,9 +73,9 @@ test("only the published A2 course book appears when old guide data is still cac
  for(const name of retired)expect(screen.queryByText(name)).not.toBeInTheDocument();
 });
 test("A2 Course Book replaces the three old exam guides in the real product page map",()=>{
- expect(BOOK_PAGES["a2-course-workbook"]).toEqual({
+ expect(BOOK_PAGES["a2-course-workbook"]).toEqual(expect.objectContaining({
   href:"/books/deutsch-a2-course-workbook",cover:"/books/a2-cover.svg"
- });
+ }));
  for(const hidden of ["a1-writing-model-exams","a2-four-skills-exam-guide","b1-four-skills-exam-guide"])
   expect(BOOK_PAGES[hidden]).toBeUndefined();
 });

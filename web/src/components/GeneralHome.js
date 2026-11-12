@@ -14,7 +14,7 @@ import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
 import LegalFooter from "./LegalFooter";
-import "./GeneralHome.css";
+import HomepageHighlights from "./HomepageHighlights";
 import { detectLevelKey } from "../lib/day0Workbook";
 
 const classLevelFromName = (className = "") => {
@@ -268,7 +268,7 @@ const GeneralHome = ({
           <SectionHeader
             eyebrow="Class access"
             title="Check your Zoom and calendar here"
-            subtitle="Use this during onboarding only. After setup, it will move into the dashboard under Live class access & calendar."
+            subtitle="Use this during onboarding only. After setup, your next scheduled class will appear in the homepage Highlights section."
           />
           <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />
         </section>
@@ -315,37 +315,14 @@ const GeneralHome = ({
       ) : null}
 
       <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
-      <section className="falowen-home-discover" aria-label="More learning resources">
-        <div className="falowen-home-discover__intro">
-          <span className="falowen-home-discover__eyebrow">BEYOND THE CLASSROOM</span>
-          <h3>More ways to learn German with Falowen</h3>
-          <p>Discover songs for listening practice and books you can learn from at your own pace.</p>
-        </div>
-        <div className="falowen-home-discover__links">
-          <button type="button" className="falowen-home-discover__link"
-            onClick={() => navigate("/campus/music")} aria-label="Explore Falowen Music">
-            <span className="falowen-home-discover__symbol" aria-hidden="true">♫</span>
-            <span className="falowen-home-discover__copy">
-              <strong>Falowen Music</strong>
-              <small>Listen, repeat and build vocabulary with German songs.</small>
-              <span className="falowen-home-discover__cta">Explore Music →</span>
-            </span>
-          </button>
-          <button type="button" className="falowen-home-discover__link"
-            onClick={() => navigate("/campus/books")} aria-label="Browse Falowen Books">
-            <span className="falowen-home-discover__symbol falowen-home-discover__symbol--books" aria-hidden="true">▤</span>
-            <span className="falowen-home-discover__copy">
-              <strong>German Books</strong>
-              <small>Explore course books and writing guides from A1 to C2.</small>
-              <span className="falowen-home-discover__cta">Browse Books →</span>
-            </span>
-          </button>
-        </div>
-      </section>
+      <HomepageHighlights
+        className={preferredClass}
+        classId={preferredClassId}
+        level={assignedClassLevel || levelKey}
+        program={studentProfile?.program}
+      />
 
       <HomeMetrics studentProfile={metricsStudentProfile} />
-
-      <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} homepageCompact />
 
       <LegalFooter />
     </div>

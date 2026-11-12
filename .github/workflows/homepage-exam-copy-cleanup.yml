@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - 'web/src/components/GeneralHome.js'
+      - 'web/src/components/GeneralHomeResources.test.js'
+      - 'web/src/components/HomepageHighlights.jsx'
+      - 'web/src/components/HomepageHighlights.css'
+      - 'web/src/components/HomepageHighlights.test.jsx'
       - 'web/src/components/ClassCalendarCardV2.js'
       - 'web/src/components/NextLiveClassCard.js'
       - 'web/src/components/LegalFooter.js'
@@ -22,6 +26,10 @@ on:
       - main
     paths:
       - 'web/src/components/GeneralHome.js'
+      - 'web/src/components/GeneralHomeResources.test.js'
+      - 'web/src/components/HomepageHighlights.jsx'
+      - 'web/src/components/HomepageHighlights.css'
+      - 'web/src/components/HomepageHighlights.test.jsx'
       - 'web/src/components/ClassCalendarCardV2.js'
       - 'web/src/components/NextLiveClassCard.js'
       - 'web/src/components/LegalFooter.js'
@@ -51,6 +59,6 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - name: Homepage and exam copy regression
-        run: npx jest --runInBand --runTestsByPath src/components/HomeAndExamCopyCleanup.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/HomeAndExamCopyCleanup.test.js src/components/GeneralHomeResources.test.js src/components/HomepageHighlights.test.jsx
       - name: Direct web compile
         run: npx vite build
