@@ -113,10 +113,15 @@ describe("A2 and B1 course books", () => {
   });
 
   test("keeps the native custom A2 Day 2 workbook focused on four content parts after Radio", () => {
+    // The workbook tab library consumes React Router's actual context, while
+    // this suite also uses a small fake provider for older course components.
+    const ActualMemoryRouter = jest.requireActual("react-router-dom").MemoryRouter;
     render(
-      <MemoryRouter initialEntries={["/campus/course/a2-day-2-small-talk?radio=done"]}>
-        <A2Day2SmallTalkWorkbookEnhancedPage />
-      </MemoryRouter>
+      <ActualMemoryRouter initialEntries={["/campus/course/a2-day-2-small-talk?radio=done"]}>
+        <MemoryRouter initialEntries={["/campus/course/a2-day-2-small-talk?radio=done"]}>
+          <A2Day2SmallTalkWorkbookEnhancedPage />
+        </MemoryRouter>
+      </ActualMemoryRouter>
     );
 
     expect(screen.getAllByRole("tab", { name: /Teil [1-4]/i })).toHaveLength(4);
