@@ -1344,7 +1344,7 @@ exports.cleanupExpiredTrials = onSchedule(
 exports.cleanupStaleUnpaidSignups = onSchedule(
   {
     region: "europe-west1",
-    schedule: "every day 02:30",
+    schedule: "30 2 * * SUN",
     timeZone: "Etc/UTC",
   },
   async () => {
