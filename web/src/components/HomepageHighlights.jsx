@@ -25,6 +25,7 @@ const WRITING_BOOK = Object.freeze({
   cover: "/books/writing-skills-a1-c2-cover.svg",
 });
 const INACTIVE_SESSION_STATUSES = new Set(["cancelled", "superseded", "deleted"]);
+const HIGHLIGHTS_ROTATION_MS = 5000;
 
 export const selectNextHomepageSession = (summary, now = new Date()) => {
   if (!summary) return null;
@@ -74,6 +75,13 @@ export default function HomepageHighlights({ className = "", classId = "", level
   const [scheduleStatus, setScheduleStatus] = useState("loading");
   const [now, setNow] = useState(() => new Date());
   const [activeId, setActiveId] = useState(hasAssignedClass ? "class" : "music");
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [pageVisible, setPageVisible] = useState(() => typeof document === "undefined" || !document.hidden);
+  const [reduceMotion, setReduceMotion] = useState(() =>
+    typeof window !== "undefined" &&
+    Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches)
+  );
 
   useEffect(() => {
     if (!hasAssignedClass) {
@@ -112,6 +120,31 @@ export default function HomepageHighlights({ className = "", classId = "", level
     setActiveId(slideIds[(activeIndex + offset + slideIds.length) % slideIds.length]);
   }, [activeIndex, slideIds]);
 
+  useEffect(() => {
+    const onVisibilityChange = () => setPageVisible(!document.hidden);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, []);
+
+  useEffect(() => {
+    const motionQuery = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!motionQuery) return undefined;
+    const onChange = event => setReduceMotion(event.matches);
+    motionQuery.addEventListener?.("change", onChange);
+    return () => motionQuery.removeEventListener?.("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (slideIds.length < 2 || hovered || focused || !pageVisible || reduceMotion) return undefined;
+    const timer = window.setInterval(() => {
+      setActiveId(current => {
+        const index = slideIds.indexOf(current);
+        return slideIds[(index + 1 + slideIds.length) % slideIds.length];
+      });
+    }, HIGHLIGHTS_ROTATION_MS);
+    return () => window.clearInterval(timer);
+  }, [slideIds, selectedId, hovered, focused, pageVisible, reduceMotion]);
+
   const selectedLevel = String(level || "").trim().toUpperCase();
   const featuredBook = LEVEL_BOOKS[selectedLevel] || WRITING_BOOK;
   const fullCalendarParams = new URLSearchParams();
@@ -126,7 +159,13 @@ export default function HomepageHighlights({ className = "", classId = "", level
   const isLoadingClass = !nextSession && scheduleStatus === "loading";
 
   return (
-    <section className="fh-highlights" aria-label="Falowen Highlights">
+    <section className="fh-highlights" aria-label="Falowen Highlights"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={event => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
+      }}>
       <header className="fh-highlights__header">
         <div>
           <span className="fh-highlights__eyebrow">DISCOVER MORE ON FALOWEN</span>
