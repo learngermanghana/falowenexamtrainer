@@ -251,7 +251,8 @@ const validateB2MockAudioKey = ({ mockId, part, key }) => {
   // should use the canonical mock-hoeren/mock-XX/teil-X.mp3 key.
   const existingFile = normalizedKey.startsWith(`${expectedKey}.`) && isAudioObjectKey(normalizedKey);
   const canonicalFile = isCanonicalMockHoerenObjectKey({ level: "B2", mockId: normalizedMockId, part: normalizedPart, key: normalizedKey });
-  if (!existingFile && !canonicalFile) return null;
+  const uploadedMock03 = normalizedMockId === "mock-03" && normalizedKey === `b2/mock-hoeren-1/mock-03/${normalizedPart}.mp3`;
+  if (!existingFile && !canonicalFile && !uploadedMock03) return null;
 
   return {
     level: "B2",

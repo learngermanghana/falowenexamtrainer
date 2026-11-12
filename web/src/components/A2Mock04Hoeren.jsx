@@ -7,8 +7,8 @@ import { A2_MOCK_07_HOEREN } from "../data/a2Mock07Hoeren";
 import "./A2Mock2Hoeren.css";
 
 // No answer key or transcript is shipped to the student browser.
-export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value = {}, onChange, onSubmit, timeRemaining, submitLabel = "Hören abgeben → Schreiben", submitDisabled = false, readOnly = false }) {
-  const parts = mockId === "a2-mock-07" ? A2_MOCK_07_HOEREN : mockId === "a2-mock-06" ? A2_MOCK_06_HOEREN : mockId === "a2-mock-05" ? A2_MOCK_05_HOEREN : A2_MOCK_04_HOEREN;
+export default function A2Mock04Hoeren({ mockId = "a2-mock-04", parts: suppliedParts, fetchAudio = fetchA2MockAudioPlaybackUrl, idToken, value = {}, onChange, onSubmit, timeRemaining, submitLabel = "Hören abgeben → Schreiben", submitDisabled = false, readOnly = false }) {
+  const parts = suppliedParts || (mockId === "a2-mock-07" ? A2_MOCK_07_HOEREN : mockId === "a2-mock-06" ? A2_MOCK_06_HOEREN : mockId === "a2-mock-05" ? A2_MOCK_05_HOEREN : A2_MOCK_04_HOEREN);
   const [active,setActive] = useState(0);
   const [urls,setUrls] = useState({});
   const [loading,setLoading] = useState(false);
@@ -25,7 +25,7 @@ export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value =
     if(!idToken){setAudioError("Bitte melden Sie sich erneut an.");return;}
     setLoading(true);setAudioError("");
     try {
-      const result=await fetchA2MockAudioPlaybackUrl({
+      const result=await fetchAudio({
         mockId:mockId.slice(3),part:part.id,key:part.audioObjectKey,idToken
       });
       setUrls(previous=>({...previous,[part.id]:result.url}));
@@ -36,14 +36,14 @@ export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value =
   return <section className="a2-mock2-shell" lang="de" data-a2-kombi-hoeren={mockId}>
     <header className="a2-mock2-progress">
       <div><strong>Hören · Teil {active+1} von 4</strong>
-        <span>{totalAnswered} / 20 Antworten</span></div>
+        <span>{totalAnswered} / {parts.reduce((sum,p)=>sum+p.questions.length,0)} Antworten</span></div>
       {timeRemaining ? <strong aria-label="Time remaining">{timeRemaining}</strong> : null}
     </header>
     <nav className="a2-mock2-nav" aria-label="Hören Teile">
       {parts.map((section,index)=>
         <button type="button" key={section.id}
           className={index===active?"selected":""} onClick={()=>setActive(index)}>
-          Teil {index+1} <small>{section.questions.filter(q=>value[q.number]).length}/5</small>
+          Teil {index+1} <small>{section.questions.filter(q=>value[q.number]).length}/{section.questions.length}</small>
         </button>)}
     </nav>
     <article className="a2-mock2-paper">
@@ -68,7 +68,7 @@ export default function A2Mock04Hoeren({ mockId = "a2-mock-04", idToken, value =
           <input type="radio" disabled={readOnly} name={`a2-${mockId}-hoeren-${q.number}`}
             checked={value[q.number]===option.id}
             onChange={()=>onChange({...value,[q.number]:option.id})}/>
-          <span><strong>{active===3?"":`${option.id.toUpperCase()})`}</strong> {option.label}</span>
+          <span><strong>{(suppliedParts ? !/^[a-z]$/.test(option.id) : active===3)?"":`${option.id.toUpperCase()})`}</strong> {option.label}</span>
         </label>)}
       </fieldset>)}
       <footer className="a2-mock2-actions">

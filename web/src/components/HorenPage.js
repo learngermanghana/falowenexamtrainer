@@ -8,6 +8,8 @@ import ListeningPracticeSamplePage from "./ListeningPracticeSamplePage";
 import A2Mock3Hoeren from "./A2Mock3Hoeren";
 import A2MockListeningPractice from "./A2MockListeningPractice";
 
+import B2Mock03ListeningPractice from "./B2Mock03ListeningPractice";
+
 const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
 
   if (["A1", "A2", "B1", "B2", "C1"].includes(normalizedLevel)) {
     if (sampleId) {
+      if (normalizedLevel === "B2" && sampleId === "sample-3") return <B2Mock03ListeningPractice />;
       const sampleExists =
         sampleId === "sample-1" ||
         (normalizedLevel === "A1" && ["sample-2", "sample-3"].includes(sampleId)) ||
@@ -74,6 +77,14 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
                   : "30 questions · Teil 1–4"}
             </span>
           </button>
+
+          {normalizedLevel === "B2" && (
+            <button type="button" style={{ ...styles.secondaryButton, textAlign: "left", padding: "14px 16px" }}
+              onClick={() => openListeningSample("/exams/horen/b2/sample-3")}>
+              <strong>B2 Mock 03 · Hören</strong><br />
+              25 questions · Teil 1–4
+            </button>
+          )}
 
           {normalizedLevel === "B1" ? (
             <button
