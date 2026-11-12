@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import HomepageHighlights from "./HomepageHighlights";
 import { subscribeCanonicalLiveClass } from "../services/canonicalLiveClassService";
@@ -70,9 +70,72 @@ test("does not advertise cancelled or missing next classes", () => {
   expect(screen.getByText("Listen. Sing. Learn German.")).toBeInTheDocument();
 });
 
-test("the carousel never starts an automatic rotation timer for unassigned learners", () => {
-  const setIntervalSpy = jest.spyOn(window, "setInterval");
-  mount({ level: "B2" });
-  expect(setIntervalSpy).not.toHaveBeenCalled();
-  setIntervalSpy.mockRestore();
+test("automatically rotates Music and Books every five seconds without a class", () => {
+  jest.useFakeTimers();
+  try {
+    mount({ level: "A1" });
+    expect(screen.getByText("Listen. Sing. Learn German.")).toBeInTheDocument();
+    act(() => jest.advanceTimersByTime(4999));
+    expect(screen.getByText("Listen. Sing. Learn German.")).toBeInTheDocument();
+    act(() => jest.advanceTimersByTime(1));
+    expect(screen.getByText("Keep learning with German books")).toBeInTheDocument();
+    act(() => jest.advanceTimersByTime(5000));
+    expect(screen.getByText("Listen. Sing. Learn German.")).toBeInTheDocument();
+  } finally {
+    jest.useRealTimers();
+  }
+});
+
+test("pauses auto-rotation on hover and resumes after pointer leaves", () => {
+  jest.useFakeTimers();
+  try {
+    mount({ level: "B1" });
+    const slider = screen.getByRole("region", { name: "Falowen Highlights" });
+    fireEvent.mouseEnter(slider);
+    act(() => jest.advanceTimersByTime(10000));
+    expect(screen.getByText("Listen. Sing. Learn German.")).toBeInTheDocument();
+    fireEvent.mouseLeave(slider);
+    act(() => jest.advanceTimersByTime(5000));
+    expect(screen.getByText("Keep learning with German books")).toBeInTheDocument();
+  } finally {
+    jest.useRealTimers();
+  }
+});
+
+test("pauses auto-rotation when a carousel control has keyboard focus", () => {
+  jest.useFakeTimers();
+  try {
+    mount({ level: "A2" });
+    const slider = screen.getByRole("region", { name: "Falowen Highlights" });
+    const next = screen.getByRole("button", { name: "Next highlight" });
+    next.focus();
+    fireEvent.focus(next);
+    act(() => jest.advanceTimersByTime(10000));
+    expect(screen.getByText("Listen. Sing. Learn German.")).toBeInTheDocument();
+    fireEvent.blur(next, { relatedTarget: document.body });
+    act(() => jest.advanceTimersByTime(5000));
+    expect(screen.getByText("Keep learning with German books")).toBeInTheDocument();
+  } finally {
+    jest.useRealTimers();
+  }
+});
+
+test("reduced-motion preference disables automatic rotation", () => {
+  jest.useFakeTimers();
+  const originalMatchMedia = window.matchMedia;
+  window.matchMedia = jest.fn().mockReturnValue({
+    matches: true,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  });
+  try {
+    mount({ level: "A1" });
+    act(() => jest.advanceTimersByTime(15000));
+    expect(screen.getByText("Listen. Sing. Learn German.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Show Books" }));
+    expect(screen.getByText("Keep learning with German books")).toBeInTheDocument();
+  } finally {
+    window.matchMedia = originalMatchMedia;
+    jest.useRealTimers();
+  }
 });
