@@ -5,7 +5,7 @@ const originalFetch=global.fetch;
 const catalog={paymentsEnabled:true,catalogTitles:[
  {id:"a1-course-workbook",title:"A1 Course",status:"available",bookIds:["a1-digital","a1-printed"],pages:250},
  {id:"writing-skills-a1-c2",title:"Writing guide",status:"coming_soon",bookIds:["writing-skills-a1-c2-digital"],pages:32}
-],books:[{id:"a1-digital",format:"digital",priceGhs:100},{id:"a1-printed",format:"printed",priceGhs:800},{id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:39}]};
+],books:[{id:"a1-digital",format:"digital",priceGhs:249},{id:"a1-printed",format:"printed",priceGhs:800},{id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:39}]};
 beforeEach(()=>{window.history.replaceState({},"","/books");global.fetch=jest.fn(async url=>({ok:true,json:async()=>String(url).includes("/books/catalog")?catalog:{usdToGhs:10}}));});
 afterEach(()=>{global.fetch=originalFetch;});
 test("detail uses actual selected pages, separate checkout and related books without customer fields",async()=>{
@@ -71,10 +71,10 @@ test("A2 printed edition uses the published unit price, quantity and address fie
  });
 });
 
-test("A1 digital checkout shows flat GH₵100, restricts quantity and hides delivery address",async()=>{
+test("A1 digital checkout shows flat GH₵249, restricts quantity and hides delivery address",async()=>{
  window.history.replaceState({},"","/books/deutsch-a1-course-workbook/checkout?edition=a1-digital");
  render(<BookStoreCheckout checkout/>);await screen.findByLabelText("Quantity");
- expect(screen.getByRole("button",{name:"Continue to Paystack · GH₵100.00"})).toBeEnabled();
+ expect(screen.getByRole("button",{name:"Continue to Paystack · GH₵249.00"})).toBeEnabled();
  expect(screen.getByLabelText("Quantity")).toBeDisabled();
  expect(screen.queryByLabelText("Collection or delivery")).toBeNull();
 });
@@ -98,4 +98,18 @@ test("writing guide provides both paid editions and clearly discloses manual PDF
   expect(screen.getByRole("link",{name:"Buy Now"})).toHaveAttribute("href",
     "/books/how-to-unlock-your-german-writing-skills-a1-c2/checkout?edition=writing-skills-a1-c2-printed");
   view.unmount();
+});
+
+test("B1 digital checkout uses GH₵399 and does not collect a delivery address", async()=>{
+ const b1Catalog={paymentsEnabled:true,catalogTitles:[{id:"b1-course-workbook",
+  title:"Deutsch B1 — Course & Workbook",status:"available",pages:420,
+  bookIds:["b1-course-workbook-digital","b1-course-workbook-printed"],levelTags:["B1"]}],
+  books:[{id:"b1-course-workbook-digital",format:"digital",priceGhs:399,deliveryMode:"secure_download"},
+         {id:"b1-course-workbook-printed",format:"printed",priceGhs:1350}]};
+ window.history.replaceState({},"","/books/deutsch-b1-course-workbook/checkout?edition=b1-course-workbook-digital");
+ global.fetch=jest.fn(async url=>({ok:true,json:async()=>String(url).includes("/books/catalog")?b1Catalog:{usdToGhs:10}}));
+ render(<BookStoreCheckout slug="deutsch-b1-course-workbook" checkout/>);
+ expect(await screen.findByRole("button",{name:"Continue to Paystack · GH₵399.00"})).toBeEnabled();
+ expect(screen.getByLabelText("Quantity")).toBeDisabled();
+ expect(screen.queryByLabelText("Delivery address")).toBeNull();
 });
