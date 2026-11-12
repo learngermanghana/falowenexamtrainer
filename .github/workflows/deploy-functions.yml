@@ -126,7 +126,7 @@ jobs:
             catalog="$(curl --fail --silent --show-error --max-time 12 "$catalog_url" || true)"
             if echo "$catalog" | jq -e '
               .receiptConfirmationAvailable == true
-              and ([.books[] | select(.id == "a1-digital" and .priceGhs == 99)] | length) == 1
+              and ([.books[] | select(.id == "a1-digital" and .priceGhs == 249)] | length) == 1
               and ([.books[] | select(.id == "a1-printed" and .priceGhs == 800)] | length) == 1
             ' >/dev/null 2>&1; then
               ready=true
