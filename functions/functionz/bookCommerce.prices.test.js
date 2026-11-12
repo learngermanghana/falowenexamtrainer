@@ -6,7 +6,7 @@ const {DIGITAL_BOOK_OBJECTS}=require("./privateBookDelivery");
 
 test("A1 A2 and B1 complete digital books charge the approved standalone GHS prices",()=>{
  for(const [id,price] of [
-  ["a1-digital",249],["a2-course-workbook-digital",299],["b1-course-workbook-digital",399]
+  ["a1-digital",249],["a2-course-workbook-digital",299],["b1-course-workbook-digital",399],["writing-skills-a1-c2-digital",79]
  ]){
   assert.equal(BOOKS[id].priceGhs,price,id);
   assert.equal(BOOKS[id].format,"digital");
