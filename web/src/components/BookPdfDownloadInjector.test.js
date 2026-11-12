@@ -98,8 +98,8 @@ describe("BookPdfDownloadInjector helpers", () => {
     const overview = screen.getByRole("region", { name: "How to use this lesson" });
     const teacherVideo = screen.getByRole("link", { name: /Watch lesson.*Teacher lecture video/i });
     expect(overview).toHaveTextContent("Music is optional listening practice.");
-    expect(overview).toHaveTextContent("Teil 2 · Schreiben and Teil 3 · Lesen");
-    expect(overview).not.toHaveTextContent("Teil 4");
+    expect(overview).toHaveTextContent("Teil 3 · Lesen through the Submit tab");
+    expect(overview).not.toHaveTextContent(/Teil 2|Teil 4/);
     expect(overview).toHaveTextContent("Teil 1 · Sprechen is group practice we do together in class.");
     expect(overview.compareDocumentPosition(teacherVideo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(teacherVideo).toHaveAttribute("href", expect.stringContaining("peuEAMRsFKI"));
