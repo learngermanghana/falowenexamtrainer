@@ -23,6 +23,7 @@ import A1Day18Kapitel122WorkbookPage from "./A1Day18Kapitel122WorkbookPage";
 import WorkbookContextSync from "./WorkbookContextSync";
 import WorkbookInlineEnhancements from "./WorkbookInlineEnhancements";
 import WorkbookStartGuide from "./WorkbookStartGuide";
+import { getA2B1WorkbookExperienceContext } from "./BookPdfDownloadInjector";
 
 export {
   SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS,
@@ -167,7 +168,8 @@ const AutoWorkbookStartGuide = () => {
     () => findGrammarWorkbookTarget({ pathname, search }),
     [pathname, search]
   );
-  const shouldRenderGuide = shouldRenderWorkbookGuide({ pathname, search, match });
+  const shouldRenderGuide = !getA2B1WorkbookExperienceContext(pathname, search)
+    && shouldRenderWorkbookGuide({ pathname, search, match });
   const tutorMarkedAssignment = resolveTutorMarkedWorkbookAssignment({
     level: match?.level,
     day: match?.day,

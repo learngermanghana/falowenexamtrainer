@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
+import { getAdditionalLessonVideoResources } from "../data/additionalLessonVideoResources";
+import { normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
 import { getLessonVideoResources } from "../data/lessonVideoDictionary";
 import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
 
@@ -104,8 +107,9 @@ export const getA2B1WorkbookExperienceContext = (pathname = "", search = "") => 
   if (lessonMatch) {
     const level = String(lessonMatch[1] || "").toUpperCase();
     const day = Number(lessonMatch[2] || 0);
-    const view = new URLSearchParams(search || "").get("view");
-    if (!A2_B1_LEVELS.has(level) || view !== "workbook" || day < 1 || day > MAX_A2_B1_DAY) return null;
+    const view = normalizeA2B1SectionView(new URLSearchParams(search || "").get("view") || "");
+    if (!A2_B1_LEVELS.has(level) || !view || view === "radio" || day < 1 || day > MAX_A2_B1_DAY) return null;
+    if (view === "grammar" && (level !== "B1" || day === 23)) return null;
     const entry = (courseSchedules?.[level] || []).find((item) => Number(item?.day) === day) || null;
     return {
       level,
@@ -266,73 +270,75 @@ const disabledActionStyle = {
   cursor: "not-allowed",
 };
 
-const mediaGridStyle = {
+const overviewStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
-  gap: 12,
-};
-
-const mediaCardStyle = {
-  border: "1px solid #cbd5e1",
-  borderRadius: 16,
-  background: "#ffffff",
-  padding: 12,
-  display: "grid",
-  gap: 10,
-};
-
-const teacherMediaCardStyle = {
-  ...mediaCardStyle,
-  border: "2px solid #2563eb",
-  boxShadow: "0 10px 24px rgba(37, 99, 235, 0.12)",
-};
-
-const videoFrameStyle = {
-  width: "100%",
-  aspectRatio: "16 / 9",
-  border: 0,
+  gap: 4,
+  padding: "10px 12px",
+  border: "1px solid #dbeafe",
   borderRadius: 12,
-  background: "#0f172a",
+  background: "#f8fbff",
+  color: "#334155",
+  fontSize: 14,
+  lineHeight: 1.45,
 };
 
-const WorkbookVideoCard = ({ resource, kind }) => {
-  const youtubeId = extractYouTubeId(resource?.url);
-  const isTeacher = kind === "teacher";
+const WorkbookOverview = ({ level, day }) => {
+  const profile = getA2B1LessonProfile(level, day);
+  const assignment = profile?.submission.requiredLabel;
+
   return (
-    <section style={isTeacher ? teacherMediaCardStyle : mediaCardStyle} aria-label={isTeacher ? "Teacher lecture" : "AI explanation"}>
-      <span style={{ ...badgeStyle, background: isTeacher ? "#dbeafe" : "#f1f5f9", color: isTeacher ? "#1e3a8a" : "#334155" }}>
-        {isTeacher ? "1 · Teacher lecture" : "2 · AI explanation"}
-      </span>
-      <div style={{ display: "grid", gap: 5 }}>
-        <strong style={{ fontSize: "1.05rem" }}>{resource?.title || (isTeacher ? "Teacher lecture video" : "AI explanation video")}</strong>
-        <span style={{ color: "#475569", lineHeight: 1.55 }}>
-          {resource?.description || (isTeacher ? "Start here for the tutor explanation." : "Use this after the teacher lecture for revision and self-study.")}
-        </span>
-      </div>
-      {youtubeId ? (
-        <iframe
-          title={resource?.title || (isTeacher ? "Teacher lecture video" : "AI explanation video")}
-          src={`https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          loading="lazy"
-          style={videoFrameStyle}
-        />
+    <section style={overviewStyle} aria-label="How to use this lesson">
+      <h3 style={{ margin: 0, color: "#0f172a", fontSize: 15 }}>How to use this lesson</h3>
+      <p style={{ margin: 0 }}><strong>Music</strong> is optional listening practice.</p>
+      {profile?.sections.grammar.visible ? (
+        <p style={{ margin: 0 }}><strong>Grammar</strong> contains notes and examples for review.</p>
       ) : null}
-      <a href={resource?.url} target="_blank" rel="noreferrer" style={{ ...inlineButtonStyle, width: "fit-content", textDecoration: "none" }}>
-        Open video
-      </a>
+      {profile?.sections.speaking.visible ? (
+        <p style={{ margin: 0 }}><strong>Teil 1 · Sprechen</strong> is group practice we do together in class.</p>
+      ) : null}
+      {assignment ? (
+        <p style={{ margin: 0 }}><strong>Assignment</strong> · Send your final answers for {assignment} through the <strong>Submit</strong> tab.</p>
+      ) : null}
     </section>
   );
 };
 
-// Students keep all in-app workbook exercises. A2's complete book is offered
-// once in Supporting Materials (WorkbookStartGuide), not again in this toolbar.
+const WorkbookVideoLink = ({ resource, teacher = false }) => {
+  const youtubeId = teacher ? extractYouTubeId(resource.url) : "";
+  return (
+    <a
+      href={resource.url}
+      target="_blank"
+      rel="noreferrer"
+      style={{ ...inlineButtonStyle, display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}
+    >
+      {youtubeId ? (
+        <img
+          src={`https://i.ytimg.com/vi/${youtubeId}/mqdefault.jpg`}
+          alt=""
+          width="96"
+          height="54"
+          loading="lazy"
+          style={{ borderRadius: 6, objectFit: "cover", flexShrink: 0 }}
+        />
+      ) : null}
+      <span style={{ display: "grid", gap: 2, minWidth: 0, overflowWrap: "anywhere" }}>
+        <strong style={{ color: "#1d4ed8" }}>{teacher ? "Watch lesson" : "Watch grammar explanation"}</strong>
+        <span style={{ fontSize: 12, fontWeight: 600 }}>{resource.title}</span>
+      </span>
+    </a>
+  );
+};
+
 const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
-  const { level, day, chapter, title } = context;
-  const resources = getLessonVideoResources(level, day);
+  const { level, day, chapter, title, entry } = context;
+  const resources = getLessonVideoResources(level, day, entry || {});
+  const aiResourcesByUrl = new Map(
+    getAdditionalLessonVideoResources(level, day).filter(isAiResource).map((resource) => [resource.url, resource]),
+  );
+  resources.filter(isAiResource).forEach((resource) => aiResourcesByUrl.set(resource.url, resource));
   const teacherResources = resources.filter(isTeacherResource);
-  const aiResources = resources.filter(isAiResource);
+  const aiResources = [...aiResourcesByUrl.values()];
   const courseProgress = Math.max(0, Math.min(100, Math.round((day / MAX_A2_B1_DAY) * 100)));
   const previousDay = day > 1 ? day - 1 : null;
   const nextDay = day < MAX_A2_B1_DAY ? day + 1 : null;
@@ -349,15 +355,6 @@ const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
         </div>
         <div style={{ display: "grid", gap: 4 }}>
           <h2 style={{ margin: 0, color: "#0f172a", fontSize: "clamp(1.25rem, 3vw, 1.65rem)" }}>Workbook learning path · {title}</h2>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-            {teacherResources.length && aiResources.length
-              ? "Start with the teacher lecture. Use the AI explanation afterwards for revision, then continue with the workbook sections below."
-              : teacherResources.length
-                ? "Start with the teacher lecture, then continue with the workbook sections below."
-                : aiResources.length
-                  ? "Use the AI explanation for revision, then continue with the workbook sections below."
-                  : "Continue with the workbook sections below."}
-          </p>
         </div>
       </div>
 
@@ -395,10 +392,12 @@ const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
         </button>
       </div>
 
+      <WorkbookOverview level={level} day={day} />
+
       {teacherResources.length || aiResources.length ? (
-        <div style={mediaGridStyle}>
-          {teacherResources.map((resource) => <WorkbookVideoCard key={resource.key || resource.url} resource={resource} kind="teacher" />)}
-          {aiResources.map((resource) => <WorkbookVideoCard key={resource.key || resource.url} resource={resource} kind="ai" />)}
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+          {teacherResources.map((resource) => <WorkbookVideoLink key={resource.url} resource={resource} teacher />)}
+          {aiResources.map((resource) => <WorkbookVideoLink key={resource.url} resource={resource} />)}
         </div>
       ) : null}
     </section>
@@ -424,7 +423,7 @@ export default function BookPdfDownloadInjector() {
   const isSpeakingMock = (a2B1Context?.level === "A2" && Number(a2B1Context.day) === 22)
     || (a2B1Context?.level === "B1" && Number(a2B1Context.day) === 23);
   // These are graded speaking exams, not print workbooks with chapter videos.
-  if (!isBookRoute || isSpeakingMock) return null;
+  if ((!isBookRoute && !a2B1Context) || isSpeakingMock) return null;
 
   return (
     <>

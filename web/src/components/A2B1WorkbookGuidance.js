@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
-import { getLessonsByLevel } from "../data/lessonCatalog";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookDayMusic from "./WorkbookDayMusic";
 import A2MiniLearningBlock from "./A2MiniLearningBlock";
@@ -376,82 +375,12 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
   );
 };
 
-export const A2B1WorkbookGuidance = ({ level = "" }) => {
-  const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
-  const workbookLabel = workbookLevel ? `${workbookLevel} workbook` : "workbook";
-  const levelPrefix = workbookLevel || "A2/B1";
-  const lessonDay = typeof window === "undefined" ? null
-    : resolveA2B1WorkbookDayFromLocation(workbookLevel, window.location.pathname);
-  const lessonContext = lessonDay ? `Day ${lessonDay} · ${workbookLabel}` : workbookLabel;
-  const lessonLearning = workbookLevel === "A2" ? A2_DAYS_11_TO_15_LEARNING[lessonDay] : null;
-  const catalogLesson = useMemo(() => {
-    if (!workbookLevel || typeof window === "undefined") return null;
-    const currentPath = window.location.pathname.replace(/\/$/, "");
-    const lessons = getLessonsByLevel(workbookLevel);
-    // Match the actual workbook route. A day may contain multiple chapters,
-    // so guessing by day would show guidance for the wrong assignment.
-    return lessons.find((entry) => String(entry.workbookRoute || "").replace(/\/$/, "") === currentPath) || null;
-  }, [workbookLevel]);
-  const specificLessonTitle = catalogLesson?.title || "";
-  const hasLessonSubmission = Boolean(catalogLesson?.submissionRequired);
-
-
-  return (
-    <>
-      <UniversalA2WorkbookTabs level={workbookLevel} />
-      <A2Days11To15QuickLearning level={workbookLevel} />
-      <details
-        style={{
-          ...styles.card,
-          margin: 0,
-          border: "1px solid #bfdbfe",
-          background: "#eff6ff",
-          color: "#1e3a8a",
-          padding: 0,
-          overflow: "hidden",
-        }}
-      >
-        <summary
-          style={{
-            cursor: "pointer",
-            padding: 14,
-            fontWeight: 800,
-            fontSize: "1.02rem",
-            listStylePosition: "inside",
-          }}
-        >
-          {lessonContext} · how to complete this workbook
-        </summary>
-
-        <div style={{ display: "grid", gap: 10, padding: "0 14px 14px", lineHeight: 1.6 }}>
-          <p style={{ margin: 0 }}>
-            Review the <strong>Grammar</strong> notes for {lessonContext} when needed. Complete the lesson’s speaking, writing, reading and listening tasks, use <strong>Music</strong> for optional day-specific listening with lyrics. Music is not an assignment. The <strong>Submit</strong> tab is for final work only.
-          </p>
-          {specificLessonTitle ? (
-            <p style={{ margin: 0 }}>
-              <strong>Lesson focus:</strong> {specificLessonTitle}.
-              {catalogLesson?.assignmentType ? ` This lesson focuses on ${catalogLesson.assignmentType}.` : ""}
-              {hasLessonSubmission ? " Your final work is submitted through the course workbook." : " This lesson does not require a graded workbook submission."}
-            </p>
-          ) : null}
-          {lessonLearning ? (
-            <div style={{ background: "#fff", border: "1px solid #bfdbfe", borderRadius: 10, padding: "10px 12px" }}>
-              <strong>{lessonLearning.title}</strong>
-              <p style={{ margin: "6px 0" }}>{lessonLearning.rule}</p>
-              <p style={{ margin: 0 }}><strong>Apply it:</strong> {lessonLearning.outputPrompt}</p>
-            </div>
-          ) : null}
-          <p style={{ margin: 0 }}>
-            <strong>{levelPrefix} · Teil 1 · Sprechen:</strong> prepare for class and practise with the AI speaking coach. Teil 1 is not submitted.
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören:</strong> complete the tasks and send only your final answers through the <strong>Submit</strong> tab.
-          </p>
-        </div>
-      </details>
-    </>
-  );
-};
+export const A2B1WorkbookGuidance = ({ level = "" }) => (
+  <>
+    <UniversalA2WorkbookTabs level={level} />
+    <A2Days11To15QuickLearning level={level} />
+  </>
+);
 
 export const WorkbookSubmissionReminder = () => {
   const reminderRef = useRef(null);
