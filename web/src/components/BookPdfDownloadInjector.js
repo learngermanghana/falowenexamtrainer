@@ -304,7 +304,7 @@ const WorkbookOverview = ({ level, day }) => {
 };
 
 const WorkbookVideoLink = ({ resource, teacher = false }) => {
-  const youtubeId = teacher ? extractYouTubeId(resource.url) : "";
+  const youtubeId = extractYouTubeId(resource.url);
   return (
     <a
       href={resource.url}
@@ -333,10 +333,16 @@ const WorkbookVideoLink = ({ resource, teacher = false }) => {
 const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
   const { level, day, chapter, title, entry } = context;
   const resources = getLessonVideoResources(level, day, entry || {});
-  const aiResourcesByUrl = new Map(
-    getAdditionalLessonVideoResources(level, day).filter(isAiResource).map((resource) => [resource.url, resource]),
-  );
-  resources.filter(isAiResource).forEach((resource) => aiResourcesByUrl.set(resource.url, resource));
+  // A schedule's generic video can share a URL with a typed AI dictionary entry.
+  // Keep the dictionary classification when the generic entry wins deduplication.
+  const aiResourcesByUrl = new Map();
+  for (const resource of [
+    ...getAdditionalLessonVideoResources(level, day),
+    ...getLessonVideoResources(level, day),
+    ...resources,
+  ]) {
+    if (isAiResource(resource)) aiResourcesByUrl.set(resource.url, resource);
+  }
   const teacherResources = resources.filter(isTeacherResource);
   const aiResources = [...aiResourcesByUrl.values()];
   const courseProgress = Math.max(0, Math.min(100, Math.round((day / MAX_A2_B1_DAY) * 100)));

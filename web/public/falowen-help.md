@@ -95,7 +95,7 @@ A1 mixes foundation lessons, self-practice and teacher-marked assignments. AI as
 
 ### A2 and B1
 
-A2 and B1 use a consistent lesson flow with grammar/learning material, workbook tasks and teacher-marked submissions. Where Falowen Radio is required, it comes before the workbook. The workbook overview above the lesson videos lists the parts to hand in through **Submit**. **Music** is optional listening practice, **Grammar** contains review notes, and **Teil 1 · Sprechen** is group practice in class.
+A2 and B1 use a consistent lesson flow with grammar/learning material, workbook tasks and teacher-marked submissions. Where Falowen Radio is required, it comes before the workbook. The workbook overview above the lesson videos lists the parts to hand in through **Submit**. **Music** is optional listening practice, **Grammar** contains review notes, and **Teil 1 · Sprechen** is group practice in class. The workbook shows how many required parts are ready from saved answers. In **Submit**, use the checklist to review those parts and open any unfinished work. The submission confirmation checkbox is still required.
 
 ### B2 and C1
 

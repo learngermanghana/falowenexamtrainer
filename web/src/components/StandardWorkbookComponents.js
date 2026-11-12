@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { normalizeA2B1SectionView, normalizeAdvancedSectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
 import { getC2DayTabs } from "../data/c2SkillCycle";
 import { getB2DayTabs } from "../data/b2SkillCycle";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
+import WorkbookSubmissionCaptureRuntime from "./WorkbookSubmissionCaptureRuntime";
 import WorkbookSectionPdfAction from "./WorkbookSectionPdfAction";
 import { TimedAssignmentPanel } from "./SharedTimedAssignment";
 import {
@@ -14,7 +15,7 @@ import {
 
 export const A2_B1_WORKBOOK_TABS = [
   { key: "references", label: "Music", description: "Optional" },
-  { key: "sprechen", label: "Teil 1", description: "Sprechen · Group practice" },
+  { key: "sprechen", label: "Teil 1", description: "Group practice" },
   { key: "schreiben", label: "Teil 2", description: "Schreiben" },
   { key: "lesen", label: "Teil 3", description: "Lesen" },
   { key: "hoeren", label: "Teil 4", description: "Hören" },
@@ -156,13 +157,16 @@ export const WorkbookTabNav = ({
   tabs = STANDARD_WORKBOOK_TABS,
   ariaLabel = "Workbook sections",
   renderLegacyGrammarPanel = true,
+  tabDescriptionOverrides = null,
   isTabLocked = () => false,
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [progressHost, setProgressHost] = useState(null);
   const {
     context: legacyGrammarContext,
     integratesLegacyGrammar,
+    sectionProfile,
     tabs: effectiveTabs,
   } = getWorkbookTabsWithLegacyGrammar({ tabs, ariaLabel });
   const effectiveKeys = useMemo(() => new Set(effectiveTabs.map((tab) => tab.key)), [effectiveTabs]);
@@ -190,20 +194,50 @@ export const WorkbookTabNav = ({
     );
   };
 
-  const activeIndex = Math.max(0, effectiveTabs.findIndex((tab) => tab.key === activeTab));
-  const tabNames = effectiveTabs.map((tab) => tab.label).join(", ");
-  const activeTabDefinition = effectiveTabs[activeIndex] || null;
-  const sectionProgress = effectiveTabs.length
-    ? Math.round(((activeIndex + 1) / effectiveTabs.length) * 100)
-    : 0;
+  const displayTabs = effectiveTabs.map((tab) => {
+    if (tab.key === "sprechen" && legacyGrammarContext) return { ...tab, description: "Group practice" };
+    if (tab.key === "hoeren" && sectionProfile?.part4Submission === "self-check") {
+      return { ...tab, description: "Hören · Self-check" };
+    }
+    if (tabDescriptionOverrides && Object.prototype.hasOwnProperty.call(tabDescriptionOverrides, tab.key)) {
+      return { ...tab, description: tabDescriptionOverrides[tab.key] };
+    }
+    return tab;
+  });
+  const activeTabDefinition = effectiveTabs.find((tab) => tab.key === activeTab);
+  const sectionPdf = activeTab !== "submit" && legacyGrammarContext?.level !== "A2";
+  const canOpenPart = (key) => effectiveKeys.has(key) && !isTabLocked(key);
+
+  const navRef = useRef(null);
+  const workbookNavigationKey = legacyGrammarContext
+    ? `${legacyGrammarContext.level}-${legacyGrammarContext.day}`
+    : "";
+
+  useEffect(() => {
+    if (!workbookNavigationKey || typeof window === "undefined" || !navRef.current) return undefined;
+
+    const alignNavigation = () => {
+      navRef.current?.scrollIntoView?.({ behavior: "auto", block: "start", inline: "nearest" });
+    };
+
+    const frame = window.requestAnimationFrame(alignNavigation);
+    const settleTimer = window.setTimeout(alignNavigation, 450);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(settleTimer);
+    };
+  }, [workbookNavigationKey]);
 
   return (
     <>
       <nav
+        ref={navRef}
         aria-label={ariaLabel}
         data-workbook-tab-navigation
         style={{
           position: "relative",
+          scrollMarginTop: 96,
           zIndex: 30,
           display: "grid",
           gap: 10,
@@ -230,7 +264,7 @@ export const WorkbookTabNav = ({
             visibility: "visible",
           }}
         >
-          {effectiveTabs.map((tab) => {
+          {displayTabs.map((tab) => {
             const locked = isTabLocked(tab.key);
             return (
               <TabButton
@@ -248,30 +282,24 @@ export const WorkbookTabNav = ({
 
         <TimedAssignmentPanel />
 
-        <div style={{ display: "grid", gap: 6 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <p style={{ margin: 0, color: "#1e3a8a", fontWeight: 800, fontSize: 13 }}>
-              Section {activeIndex + 1} of {effectiveTabs.length} · Select {tabNames}.
-            </p>
-            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-              <span style={{ color: "#475569", fontWeight: 800, fontSize: 12 }}>{sectionProgress}% through sections</span>
-              {activeTabDefinition?.key !== "submit" && getA2B1WorkbookContextFromAriaLabel(ariaLabel)?.level !== "A2" ? (
-                <WorkbookSectionPdfAction sectionLabel={activeTabDefinition?.label || "section"} />
-              ) : null}
-            </div>
+        {activeTab !== "submit" ? (
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            {legacyGrammarContext && effectiveKeys.has("submit") ? <div ref={setProgressHost} /> : null}
+            {sectionPdf ? <WorkbookSectionPdfAction sectionLabel={activeTabDefinition?.label || "section"} /> : null}
           </div>
-          <div
-            role="progressbar"
-            aria-label="Workbook section progress"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-valuenow={sectionProgress}
-            style={{ width: "100%", height: 7, borderRadius: 999, background: "#bfdbfe", overflow: "hidden" }}
-          >
-            <div style={{ width: `${sectionProgress}%`, height: "100%", borderRadius: 999, background: "#2563eb" }} />
-          </div>
-        </div>
+        ) : null}
       </nav>
+
+      {legacyGrammarContext ? (
+        <WorkbookSubmissionCaptureRuntime
+          context={legacyGrammarContext}
+          activeTab={activeTab}
+          onChange={selectTab}
+          key={workbookNavigationKey}
+          canOpenPart={canOpenPart}
+          progressHost={progressHost}
+        />
+      ) : null}
 
       {integratesLegacyGrammar && renderLegacyGrammarPanel && activeTab === "grammar" && legacyGrammarContext ? (
         <section

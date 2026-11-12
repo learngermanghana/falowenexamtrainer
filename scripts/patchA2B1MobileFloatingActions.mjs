@@ -40,10 +40,6 @@ await import("./patchWorkbookSubmissionAutoSelection.mjs");
 // every build/test/start finishes with clickable Teil 3/4 answers and Teil 2 autosave.
 await import("./patchA2B1MappedSubmissionCapture.mjs");
 
-// Final presentation pass: keep the objective guidance/progress and completion
-// review on top of the mapped-submit runtime that production actually ships.
-await import("./patchA2B1WorkbookProgressReview.mjs");
-
 // Keep all learner-facing instructions consistent with the mapped workflow:
 // answer in the workbook, review the mapped draft, and edit the final text before submit.
 await import("./patchMappedWorkbookInteractionCopy.mjs");
