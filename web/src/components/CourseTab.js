@@ -7,7 +7,7 @@ import { getCurriculumEntriesForLevel } from "../data/curriculumManifest";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
 import { getAssignmentDisplayTitle, getAssignmentDisplayType } from "../data/germanAssignmentCatalog";
-import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
+import { FRENCH_A1_SCHEDULE } from "../data/archive/french/courseSchedule";
 import ClassMembersTab from "./ClassMembersTab";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import CourseCompletionConclusion from "./CourseCompletionConclusion";

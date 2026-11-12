@@ -7,6 +7,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "re
 import { useTranslation } from "react-i18next";
 import { ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
+import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import NextLevelPreviewPage from "./components/NextLevelPreviewPage";
 import CourseLessonPage from "./components/CourseLessonPage";
 import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
@@ -433,6 +434,12 @@ function App() {
     Boolean(studentProfile) &&
     !isStaff &&
     !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
+
+  // Public Day 1 preview is independent of German enrollment and Firebase sign-in.
+  const swahiliPreview = location.pathname.match(/^\/swahili(?:\/(day-1))?\/?$/);
+  if (swahiliPreview) {
+    return <SwahiliCourseBook day={swahiliPreview[1] ? 1 : null} basePath="/swahili" preview />;
+  }
 
   if (location.pathname === "/visitor-guide" || location.pathname === "/visitor-guide/") {
     return <PublicAdmissionsVisitorGuidePage />;
@@ -882,6 +889,7 @@ const AppShell = ({
             }
           />
           <Route path="/campus/course/preview/:level" element={<NextLevelPreviewPage />} />
+          <Route path="/campus/course/swahili/day-1" element={<SwahiliCourseBook day={1} basePath="/campus/course/swahili" />} />
           <Route path="/campus/course/lesson/:level/:day" element={<CourseLessonPage />} />
           <Route path="/campus/course/speaking-exams-intro-4-7" element={<SpeakingExamIntroPage />} />
           <Route
@@ -1567,11 +1575,15 @@ const CampusArea = ({
       {resolvedSection === "music" && allowedSections.music ? <CampusMusicPage /> : null}
       {resolvedSection === "books" && allowedSections.books ? <CampusBooksPage /> : null}
       {resolvedSection === "course" && allowedSections.course ? (
-        <CourseTab
-          defaultLevel={campusStudentProfile?.level}
-          defaultClassName={campusStudentProfile?.className}
-          program={campusStudentProfile?.program}
-        />
+        String(campusStudentProfile?.program || "").toLowerCase() === "swahili" ? (
+          <SwahiliCourseBook basePath="/campus/course/swahili" />
+        ) : (
+          <CourseTab
+            defaultLevel={campusStudentProfile?.level}
+            defaultClassName={campusStudentProfile?.className}
+            program={campusStudentProfile?.program}
+          />
+        )
       ) : null}
       {resolvedSection === "vocab" && allowedSections.vocab ? <VocabExamPage context="campus" /> : null}
       {resolvedSection === "attendance" && allowedSections.attendance ? <AttendanceTab /> : null}
