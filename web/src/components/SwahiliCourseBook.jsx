@@ -161,7 +161,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
   return (
     <main className="swahili-book" lang="sw" data-swahili-course-book="true">
       <div className="swahili-book__top">
-        <div className="swahili-book__brand">Falowen · Swale Swaps Swahili Hub</div>
+        <div className="swahili-book__brand">Falowen · Kiswahili</div>
         <Link className="swahili-book__link" to={basePath}>{day ? "← Rudi kwenye kitabu cha kozi" : "Kitabu cha kozi"}</Link>
       </div>
       <header className="swahili-book__hero">
