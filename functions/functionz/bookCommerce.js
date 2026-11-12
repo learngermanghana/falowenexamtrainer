@@ -4,13 +4,15 @@ const { registerPrivateBookDeliveryRoute, DIGITAL_BOOK_OBJECTS } = require("./pr
 const { pricePrintedGuide, priceDigitalExamGuide } = require("./bookPricing");
 
 const BOOKS = Object.freeze({
-  "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 100 }),
+  "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 249 }),
   "a1-printed": Object.freeze({ id: "a1-printed", title: "Falowen Deutsch A1 – Printed Course & Workbook", format: "printed", priceGhs: 800 }),
   "writing-skills-a1-c2-digital": Object.freeze({ id: "writing-skills-a1-c2-digital", title: "How to Unlock Your German Writing Skills (A1–C2)", format: "digital", priceGhs: 39 }),
   "writing-skills-a1-c2-printed": Object.freeze({ id: "writing-skills-a1-c2-printed", title: "How to Unlock Your German Writing Skills (A1–C2) — Printed", format: "printed", priceGhs: pricePrintedGuide(68) }),
-  // The digital price matches A1; printed A2 uses the existing 250-page A1 retail benchmark.
-  "a2-course-workbook-digital": Object.freeze({ id: "a2-course-workbook-digital", title: "Falowen Deutsch A2 – Digital Course & Workbook", format: "digital", priceGhs: 100 }),
+  // Standalone digital workbooks are priced by their editorial scope; printed prices retain the existing retail benchmark.
+  "a2-course-workbook-digital": Object.freeze({ id: "a2-course-workbook-digital", title: "Falowen Deutsch A2 – Digital Course & Workbook", format: "digital", priceGhs: 299 }),
   "a2-course-workbook-printed": Object.freeze({ id: "a2-course-workbook-printed", title: "Falowen Deutsch A2 – Printed Course & Workbook", format: "printed", priceGhs: pricePrintedGuide(328) }),
+  "b1-course-workbook-digital": Object.freeze({ id: "b1-course-workbook-digital", title: "Falowen Deutsch B1 – Digital Course & Workbook", format: "digital", priceGhs: 399 }),
+  "b1-course-workbook-printed": Object.freeze({ id: "b1-course-workbook-printed", title: "Falowen Deutsch B1 – Printed Course & Workbook", format: "printed", priceGhs: pricePrintedGuide(420) }),
   "a1-writing-model-exams-digital": Object.freeze({ id: "a1-writing-model-exams-digital", title: "Falowen A1 Writing Model Exams & Practice Workbook — PDF", format: "digital", priceGhs: priceDigitalExamGuide({skills:1}) }),
   "a1-writing-model-exams-printed": Object.freeze({ id: "a1-writing-model-exams-printed", title: "Falowen A1 Writing Model Exams & Practice Workbook — Printed", format: "printed", priceGhs: pricePrintedGuide(30) }),
   "a2-four-skills-exam-guide-digital": Object.freeze({ id: "a2-four-skills-exam-guide-digital", title: "Falowen A2 Four-Skills Exam Preparation Guide — PDF", format: "digital", priceGhs: priceDigitalExamGuide({skills:4}) }),
@@ -29,7 +31,7 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     levelTags: ["A1"],
     topics: ["grammar", "vocabulary", "beginner", "reading", "speaking", "writing", "course workbook"],
     formats: ["digital", "printed"],
-    pages: 250,
+    pages: 228,
     status: "available",
     bookIds: ["a1-digital", "a1-printed"],
   }),
@@ -54,6 +56,17 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     pages: 328,
     status: "available",
     bookIds: ["a2-course-workbook-digital", "a2-course-workbook-printed"],
+  }),
+  Object.freeze({
+    id: "b1-course-workbook",
+    title: "Deutsch B1 — Course & Workbook",
+    description: "The complete 420-page B1 Course & Workbook, covering 28 learning days with grammar, speaking, writing and reading activities, listening questions and exam practice. Audio and graded submissions require Falowen access and are not embedded in the PDF.",
+    levelTags: ["B1"],
+    topics: ["b1", "grammar", "course workbook", "speaking", "writing", "reading", "listening", "hören", "exam preparation"],
+    formats: ["digital", "printed"],
+    pages: 420,
+    status: "available",
+    bookIds: ["b1-course-workbook-digital", "b1-course-workbook-printed"],
   }),
 ]);
 const CALLBACK_ORIGIN = "https://www.falowen.app";
