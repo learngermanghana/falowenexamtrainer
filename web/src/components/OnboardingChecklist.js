@@ -164,17 +164,11 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
           }}
         >
           <p style={{ margin: 0 }}>
-            When you open <a href="https://www.falowen.app" style={{ color: "#1d4ed8", fontWeight: 700 }}>Falowen</a>,
-            you'll see two main options: <strong>Campus</strong> and <strong>Exams Room</strong>.
+            On Falowen Home, select <strong>Open Campus</strong> to go to your <strong>Course Book</strong>.
+            Scroll down to your lessons and select <strong>Day 1</strong> to begin.
           </p>
           <p style={{ margin: 0 }}>
-            For now, select <strong>Campus</strong> on the home page. On a phone,
-            you can also tap <strong>Course Book</strong> directly in the bottom navigation.
-            This is where you'll find your course materials, lessons and learning activities.
-          </p>
-          <p style={{ margin: 0 }}>
-            Open <strong>Course Book</strong>, scroll down to find your course lessons,
-            and select <strong>Day 1</strong> to begin.
+            For exam practice, select <strong>Open Exams Room</strong> from Falowen Home.
           </p>
           {isSelfLearning ? (
             <p style={{ margin: 0 }}>

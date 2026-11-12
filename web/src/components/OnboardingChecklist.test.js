@@ -37,9 +37,12 @@ it("shows only two next-step choices and the requested Campus explanation", asyn
 
   expect(screen.getByRole("button", { name: "Pay now" })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Start 7-day trial" })).toBeInTheDocument();
-  expect(screen.getByText(/you'll see two main options/)).toHaveTextContent("Campus");
-  expect(screen.getByText(/For now, select/)).toHaveTextContent("Campus");
-  expect(screen.getByText(/scroll down to find your course lessons/)).toHaveTextContent("Day 1");
+  expect(screen.getByText(/^On Falowen Home/)).toHaveTextContent(
+    "On Falowen Home, select Open Campus to go to your Course Book. Scroll down to your lessons and select Day 1 to begin."
+  );
+  expect(screen.getByText(/^For exam practice/)).toHaveTextContent(
+    "For exam practice, select Open Exams Room from Falowen Home."
+  );
   expect(screen.getByText(/Starting early is optional/)).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: /Start Day 1|Ask Study Buddy|Replay registration|Reset demo/ })).not.toBeInTheDocument();
 
