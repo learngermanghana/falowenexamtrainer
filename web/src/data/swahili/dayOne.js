@@ -26,7 +26,14 @@ export const SWAHILI_DAY_ONE = Object.freeze({
     { stem: "CH", forms: "cha · che · chi · cho · chu" },
     { stem: "L", forms: "la · le · li · lo · lu" },
   ],
-  stress: ["ma-MA", "ra-FI-ki", "mwa-LI-mu", "cha-KU-la", "Ki-swa-HI-li"],
+  stress: ["MA-ma", "ra-FI-ki", "mwa-LI-mu", "cha-KU-la", "Ki-swa-HI-li"],
+  // Small reading checks extend the vocabulary from the supplied Day 1 teaching material.
+  reading: [
+    { id: "mother", question: "Ni neno gani lina maana ya mother?", choices: ["kiti", "mama", "kuku"], answer: "mama" },
+    { id: "child", question: "Ni neno gani lina maana ya child?", choices: ["mtoto", "wewe", "kiti"], answer: "mtoto" },
+    { id: "chair", question: "Ni neno gani lina maana ya chair?", choices: ["kuku", "mama", "kiti"], answer: "kiti" },
+    { id: "u", question: "Ni neno gani lina vokali U mara mbili?", choices: ["wewe", "kuku", "kiti"], answer: "kuku" },
+  ],
   // The teacher reads these words; there is no approved recorded audio for this pilot.
   listening: [
     { word: "mama", answer: "A" },
