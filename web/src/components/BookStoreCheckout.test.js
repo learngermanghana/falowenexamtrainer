@@ -42,7 +42,7 @@ test("A2 printed edition uses the published unit price, quantity and address fie
   paymentsEnabled:true,
   catalogTitles:[{id:"a2-course-workbook",title:"Deutsch A2 — Course & Workbook",status:"available",
     bookIds:["a2-course-workbook-digital","a2-course-workbook-printed"],pages:328,levelTags:["A2"]}],
-  books:[{id:"a2-course-workbook-digital",format:"digital",priceGhs:100},
+  books:[{id:"a2-course-workbook-digital",format:"digital",priceGhs:299},
     {id:"a2-course-workbook-printed",format:"printed",priceGhs:1050}],
  };
  window.history.replaceState({},"",
