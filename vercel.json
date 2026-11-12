@@ -281,8 +281,36 @@
   ],
   "routes": [
     {
+      "src": "/books/deutsch-a1-course-workbook/?",
+      "dest": "/__books/a1-course-workbook.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/books/deutsch-a2-course-workbook/?",
+      "dest": "/__books/a2-course-workbook.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/books/deutsch-b1-course-workbook/?",
+      "dest": "/__books/b1-course-workbook.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/books/how-to-unlock-your-german-writing-skills-a1-c2/?",
       "dest": "/__books/writing-skills-a1-c2.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/books/?",
+      "dest": "/__books/catalog.html",
       "headers": {
         "Cache-Control": "public, max-age=0, must-revalidate"
       }

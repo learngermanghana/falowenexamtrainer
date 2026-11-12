@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import "./BooksCatalog.css";
+import sharePages from "../data/bookSharePages.json";
+import BookShare from "./BookShare";
 
 const ghs = amount => "GH₵" + Number(amount || 0).toFixed(2);
 export const indicativeUsd = (ghsAmount, fxQuote) => {
@@ -24,12 +26,8 @@ export const matchCatalogTitles = (titles = [], search = "", level = "all", form
   });
 };
 
-export const BOOK_PAGES = Object.freeze({
-  "a1-course-workbook": {href:"/books/deutsch-a1-course-workbook",cover:"/books/a1-cover.svg"},
-  "writing-skills-a1-c2": {href:"/books/how-to-unlock-your-german-writing-skills-a1-c2",cover:"/books/writing-skills-a1-c2-cover.svg"},
-  "a2-course-workbook": {href:"/books/deutsch-a2-course-workbook",cover:"/books/a2-cover.svg"},
-  "b1-course-workbook": {href:"/books/deutsch-b1-course-workbook",cover:"/books/b1-cover.svg"},
-});
+const { catalog: catalogSharePage, ...bookPages } = sharePages;
+export const BOOK_PAGES = Object.freeze(bookPages);
 
 export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook, basePath = "/books" }) {
   const bookHref = page => basePath + page.href.slice("/books".length);
@@ -49,6 +47,7 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
         <h1>Find your next German learning book</h1>
         <p>Browse book covers, prices and formats. Select View Book for previews and checkout.</p>
       </div>
+      <BookShare page={catalogSharePage} />
       <div className="fb-library-fx">
         <strong>GHS is the checkout currency.</strong>
         <span>{fxQuote
@@ -104,6 +103,7 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
               ? <button className="fb-btn fb-btn-soft fb-library-action" type="button"
                   onClick={() => onSelectBook(offers[0].id)}>View Book</button>
               : <p className="fb-library-pending">Ask Falowen about availability.</p>}
+          <BookShare page={BOOK_PAGES[title.id]} title={title.title} description={title.description} />
         </article>;
       })}
       {!results.length && <div className="fb-library-empty">

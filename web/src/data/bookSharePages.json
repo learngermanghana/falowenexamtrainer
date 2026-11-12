@@ -1,0 +1,36 @@
+{
+  "a1-course-workbook": {
+    "title": "Deutsch A1 Course & Workbook",
+    "description": "Beginner German lessons, grammar notes and workbook practice from Falowen.",
+    "href": "/books/deutsch-a1-course-workbook",
+    "thumbnail": "/books/share/a1-course-workbook.jpg",
+    "cover": "/books/a1-cover.svg"
+  },
+  "a2-course-workbook": {
+    "title": "Deutsch A2 Course & Workbook",
+    "description": "Elementary German lessons, grammar notes and workbook practice from Falowen.",
+    "href": "/books/deutsch-a2-course-workbook",
+    "thumbnail": "/books/share/a2-course-workbook.jpg",
+    "cover": "/books/a2-cover.svg"
+  },
+  "b1-course-workbook": {
+    "title": "Deutsch B1 Course & Workbook",
+    "description": "Intermediate German lessons, grammar notes and workbook practice from Falowen.",
+    "href": "/books/deutsch-b1-course-workbook",
+    "thumbnail": "/books/share/b1-course-workbook.jpg",
+    "cover": "/books/b1-cover.svg"
+  },
+  "writing-skills-a1-c2": {
+    "title": "How to Unlock Your German Writing Skills (A1–C2)",
+    "description": "A 68-page German writing guide for A1–C2 learners covering sentence structure, connectors, model texts and exercises.",
+    "href": "/books/how-to-unlock-your-german-writing-skills-a1-c2",
+    "thumbnail": "/books/share/writing-skills-a1-c2.jpg",
+    "cover": "/books/writing-skills-a1-c2-cover.svg"
+  },
+  "catalog": {
+    "title": "Falowen Books",
+    "description": "Explore German course books, workbooks and writing practice from Falowen.",
+    "href": "/books",
+    "thumbnail": "/books/share/catalog.jpg"
+  }
+}
