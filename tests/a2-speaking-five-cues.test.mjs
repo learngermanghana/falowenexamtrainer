@@ -25,3 +25,20 @@ test('the A2 speaking mind-map defines a valid type for all five branches', () =
   const code = readFileSync(new URL('../web/src/data/speakingMindMaps/a2/index.js', import.meta.url), 'utf8');
   assert.match(code, /type: \["topic", "detail", "example", "opinion", "closing"\]\[index\]/);
 });
+
+test('printed A2 speaking mind maps fit the page and retain every branch', () => {
+  const css = readFileSync(new URL('../web/src/components/SpeakingMindMap.css', import.meta.url), 'utf8');
+  const printRules = css.split('@media print')[1];
+  assert.ok(printRules, 'A dedicated print layout is required for the A2 course PDF');
+  for (const selector of [
+    '.speaking-mind-map__viewport',
+    '.speaking-mind-map__canvas',
+    '.speaking-mind-map__centre',
+    '.speaking-mind-map__branches',
+    '.speaking-mind-map__branch,',
+  ]) assert.ok(printRules.includes(selector), 'Missing print-safe selector: ' + selector);
+  assert.match(printRules, /min-width:\s*0\s*!important/);
+  assert.match(printRules, /overflow:\s*visible\s*!important/);
+  assert.match(printRules, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(printRules, /position:\s*static\s*!important/);
+});
