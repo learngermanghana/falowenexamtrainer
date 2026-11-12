@@ -362,16 +362,26 @@ notification = replaceOnce(
   `<div ref={rootRef} className="notification-bell" style={{ position: "relative", maxWidth: "100%" }}>`,
   "notification root class",
 );
-notification = replaceOnce(
-  notification,
-  `      <button\n        type="button"\n        style={{ ...styles.secondaryButton, display: "inline-flex", alignItems: "center", gap: 6, maxWidth: "100%" }}\n        onClick={handleToggle}`,
-  `      <button
-        type="button"
-        className="notification-bell-button"
-        style={{ ...styles.secondaryButton, display: "inline-flex", alignItems: "center", gap: 6, maxWidth: "100%" }}
-        onClick={handleToggle}`,
-  "notification trigger class",
-);
+if (notification.includes('        aria-label="Notifications"')) {
+  const triggerLabel = '        aria-label="Notifications"';
+  notification = replaceOnce(
+    notification,
+    triggerLabel,
+    '        className="notification-bell-button"\n' + triggerLabel,
+    "notification trigger class",
+  );
+} else {
+  notification = replaceOnce(
+    notification,
+    `      <button\n        type="button"\n        style={{ ...styles.secondaryButton, display: "inline-flex", alignItems: "center", gap: 6, maxWidth: "100%" }}\n        onClick={handleToggle}`,
+    `      <button
+          type="button"
+          className="notification-bell-button"
+          style={{ ...styles.secondaryButton, display: "inline-flex", alignItems: "center", gap: 6, maxWidth: "100%" }}
+          onClick={handleToggle}`,
+    "notification trigger class",
+  );
+}
 
 // Course Book: keep canonical completion, but make the first screen smaller and student-focused.
 if (!courseTab.includes("const latestCourseResult = useMemo(")) {
