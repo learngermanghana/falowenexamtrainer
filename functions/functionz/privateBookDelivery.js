@@ -6,17 +6,17 @@ const crypto = require("crypto");
 const DIGITAL_BOOK_OBJECTS = Object.freeze({
   "a1-digital": Object.freeze({
     bucket: "falowen-books-private",
-    key: "book/Falowen-A1-Course-Materials.pdf",
+    key: "Falowen-A1-Course-Materials.pdf",
     filename: "Falowen-A1-Course-Materials.pdf",
   }),
   "b1-course-workbook-digital": Object.freeze({
     bucket: "falowen-books-private",
-    key: "book/Falowen-B1-Course-Materials.pdf",
+    key: "Falowen-B1-Course-Materials.pdf",
     filename: "Falowen-B1-Course-Materials.pdf",
   }),
   "a2-course-workbook-digital": Object.freeze({
     bucket: "falowen-books-private",
-    key: "book/Falowen-A2-Course-Materials-Clean.pdf",
+    key: "Falowen-A2-Course-Materials-Clean.pdf",
     filename: "Falowen-A2-Course-Materials-Clean.pdf",
   }),
   "a1-writing-model-exams-digital": Object.freeze({
