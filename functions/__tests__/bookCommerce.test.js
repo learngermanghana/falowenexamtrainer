@@ -119,7 +119,7 @@ test("new A2 course book is the only A2 shop product and old guides cannot be so
   }
   assert.equal(BOOKS["a1-digital"].priceGhs, 249);
   assert.equal(BOOKS["a1-printed"].priceGhs, 800);
-  assert.equal(BOOKS["writing-skills-a1-c2-digital"].priceGhs, 39);
+  assert.equal(BOOKS["writing-skills-a1-c2-digital"].priceGhs, 79);
   assert.equal(BOOKS["writing-skills-a1-c2-printed"].priceGhs, 250);
   assert.equal(Object.keys(BOOKS).length, 14);
 });
