@@ -36,7 +36,7 @@ if (!services.includes("<CourseBookPriorityLayoutService />")) {
   throw new Error("Course Book layout-only priority service is missing.");
 }
 const hasPinnedClassCalendar = (home.match(/initialClassId=\{preferredClassId\}/g) || []).length === 2;
-if (!hasPinnedClassCalendar && !home.includes("<HomeNextClassCard className={preferredClass}")) {
+if (!hasPinnedClassCalendar && !home.includes("<HomepageHighlights") && !home.includes("<HomeNextClassCard className={preferredClass}")) {
   throw new Error("Homepage next-class card is missing.");
 }
 if (home.includes("<HomeClassAccess className={preferredClass}")) {
@@ -47,4 +47,6 @@ fs.writeFileSync(servicesPath, services, "utf8");
 fs.writeFileSync(homePath, home, "utf8");
 console.log(hasPinnedClassCalendar
   ? "Course Book removes Next live class; Home owns both class-ID-pinned calendar mounts."
-  : "Course Book removes Next live class; Home owns the canonical next-class card.");
+  : home.includes("<HomepageHighlights")
+    ? "Course Book removes Next live class; Home Highlights owns the class schedule."
+    : "Course Book removes Next live class; Home owns the canonical next-class card.");
