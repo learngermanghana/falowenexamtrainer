@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import SwahiliCourseBook, { scoreListeningAnswers, scoreReadingAnswers, getMissingSwahiliDayOneWork } from "./SwahiliCourseBook";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
@@ -95,8 +95,9 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     fireEvent.change(screen.getByLabelText(/Silabi za B/), { target: { value: "ba be bi bo bu" } });
     fireEvent.change(screen.getByLabelText(/Maneno matatu/), { target: { value: "mama kiti kuku" } });
     openTab("Teil 3");
-    SWAHILI_DAY_ONE.reading.forEach((question) => {
-      fireEvent.click(screen.getByLabelText(question.answer));
+    SWAHILI_DAY_ONE.reading.forEach((question, index) => {
+      const questionGroup = document.querySelectorAll("fieldset")[index];
+      fireEvent.click(within(questionGroup).getByLabelText(question.answer));
     });
     openTab("Submit");
     await waitFor(() => expect(getDoc).toHaveBeenCalledTimes(1));
