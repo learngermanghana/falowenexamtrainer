@@ -1,11 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const listeningPath = path.join(root, "web/src/data/a2ListeningTasks.js");
-const { A2_SELF_CHECK_LISTENING_DAYS } = await import(pathToFileURL(listeningPath).href);
-const selfCheckDaysLiteral = JSON.stringify(A2_SELF_CHECK_LISTENING_DAYS);
 const targetPath = path.join(root, "web/src/components/a2GoetheListeningOnlyCleanup.js");
 const guidancePath = path.join(root, "web/src/components/A2B1WorkbookGuidance.js");
 const regressionPath = path.join(root, "web/src/components/A2SharedWorkbookRegression.test.js");
@@ -211,47 +208,6 @@ for (const [unsafe, safe] of textMutations) {
   source = source.replaceAll(unsafe, safe);
 }
 
-// Render the lesson-specific submission rule inside React so the cleanup layer
-// never needs to replace nested <strong> children in the shared guide.
-const guidanceDayAnchor = `  const workbookLabel = workbookLevel ? \`${"${workbookLevel}"} workbook\` : "workbook";
-  const levelPrefix = workbookLevel || "A2/B1";`;
-const guidanceDayReplacement = `${guidanceDayAnchor}
-  const workbookDay = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    return resolveA2B1WorkbookDayFromLocation(
-      workbookLevel,
-      \`${"${window.location.pathname || \"\"}"}${"${window.location.search || \"\"}"}\`,
-    );
-  }, [workbookLevel]);
-  const isGoetheSelfCheckDay =
-    workbookLevel === "A2" && ${selfCheckDaysLiteral}.includes(Number(workbookDay));
-  const isDay25ReadingOnly = workbookLevel === "A2" && Number(workbookDay) === 25;`;
-if (!guidanceSource.includes("const isGoetheSelfCheckDay =")) {
-  if (!guidanceSource.includes(guidanceDayAnchor)) {
-    throw new Error("Could not add route-aware A2 workbook guidance.");
-  }
-  guidanceSource = guidanceSource.replace(guidanceDayAnchor, guidanceDayReplacement);
-}
-
-const genericGuidanceParagraph = `          <p style={{ margin: 0 }}>
-            <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören:</strong> complete the tasks and send only your final answers through the <strong>Submit</strong> tab.
-          </p>`;
-const routeAwareGuidanceParagraph = `          <p style={{ margin: 0 }}>
-            {isDay25ReadingOnly ? (
-              <><strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Lesen:</strong> complete the tasks and send only your final answers through the <strong>Submit</strong> tab. This workbook has no Hören assignment.</>
-            ) : isGoetheSelfCheckDay ? (
-              <><strong>Teil 2 · Schreiben and Teil 3 · Lesen:</strong> complete the tasks and send only your final answers through the <strong>Submit</strong> tab. <strong>Teil 4 · Hören</strong> is Goethe self-check practice in the video and is not submitted.</>
-            ) : (
-              <><strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören:</strong> complete the tasks and send only your final answers through the <strong>Submit</strong> tab.</>
-            )}
-          </p>`;
-if (!guidanceSource.includes("isDay25ReadingOnly ? (")) {
-  if (!guidanceSource.includes(genericGuidanceParagraph)) {
-    throw new Error("Could not replace generic A2 workbook submission guidance.");
-  }
-  guidanceSource = guidanceSource.replace(genericGuidanceParagraph, routeAwareGuidanceParagraph);
-}
-
 // Day 25 has reading in Teil 4. Keep the universal fallback's standard key so
 // it can proxy-click the existing Teil 4 button, but render the correct label.
 const fallbackTabsAnchor = `  const [showSubmit, setShowSubmit] = useState(false);
@@ -360,9 +316,6 @@ if (/\b(?:child|note|panel|paragraph|element|listeningItem|sibling|questionHeadi
 }
 if (/\b(?:guidance|submitCopy|description|heading|headerCopy|submitTitle|note)\.textContent\s*=/.test(source)) {
   throw new Error("A2 cleanup still replaces React-owned text content structurally.");
-}
-if (!guidanceSource.includes("const isGoetheSelfCheckDay =") || !guidanceSource.includes("isDay25ReadingOnly ? (")) {
-  throw new Error("A2 workbook guidance is not route-aware for self-check lessons.");
 }
 if (!regressionSource.includes("expect(oldFinalSubmission.isConnected).toBe(true)")) {
   throw new Error("A2 shared regression still expects cleanup to detach React-owned nodes.");

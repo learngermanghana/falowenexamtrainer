@@ -11,6 +11,8 @@ import BookPdfDownloadInjector, {
   SCHOOL_PRINT_STAMP,
 } from "./BookPdfDownloadInjector";
 
+jest.mock("./WorkbookSubmissionCaptureRuntime", () => () => null);
+
 describe("BookPdfDownloadInjector helpers", () => {
   it("treats the dedicated A1 Day 15 workbook as printable", () => {
     const pathname = "/campus/course/speaking-exams-intro-4-7";
@@ -68,7 +70,8 @@ describe("BookPdfDownloadInjector helpers", () => {
       level: "B1",
       day: 8,
     });
-    expect(getA2B1WorkbookExperienceContext("/campus/course/lesson/B1/8", "?view=grammar")).toBeNull();
+    expect(getA2B1WorkbookExperienceContext("/campus/course/lesson/B1/8", "?view=grammar")).toMatchObject({ level: "B1", day: 8 });
+    expect(getA2B1WorkbookExperienceContext("/campus/course/lesson/B1/8", "?view=radio")).toBeNull();
   });
 
   it("opens adjacent A2 workbooks directly and skips the repeated Radio gate", () => {
@@ -92,14 +95,16 @@ describe("BookPdfDownloadInjector helpers", () => {
     );
 
     expect(screen.getByLabelText("A2 workbook tools")).toBeInTheDocument();
-    expect(screen.getByLabelText("Teacher lecture")).toBeInTheDocument();
-    expect(screen.getByLabelText("AI explanation")).toBeInTheDocument();
-    expect(screen.getByTitle("Kapitel 5.14 · Teacher lecture video")).toHaveAttribute(
-      "src",
-      expect.stringContaining("peuEAMRsFKI")
-    );
-    expect(screen.getByTitle("AI grammar video")).toHaveAttribute(
-      "src",
+    const overview = screen.getByRole("region", { name: "How to use this lesson" });
+    const teacherVideo = screen.getByRole("link", { name: /Watch lesson.*Teacher lecture video/i });
+    expect(overview).toHaveTextContent("Music is optional listening practice.");
+    expect(overview).toHaveTextContent("Teil 3 · Lesen through the Submit tab");
+    expect(overview).not.toHaveTextContent(/Teil 2|Teil 4/);
+    expect(overview).toHaveTextContent("Teil 1 · Sprechen is group practice we do together in class.");
+    expect(overview.compareDocumentPosition(teacherVideo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(teacherVideo).toHaveAttribute("href", expect.stringContaining("peuEAMRsFKI"));
+    expect(screen.getByRole("link", { name: /Watch grammar explanation.*AI grammar video/i })).toHaveAttribute(
+      "href",
       expect.stringContaining("qWy7yMgwmvQ")
     );
     expect(screen.getByRole("progressbar", { name: "Course progress" })).toHaveAttribute("aria-valuenow", "50");
@@ -108,7 +113,6 @@ describe("BookPdfDownloadInjector helpers", () => {
 
     expect(screen.queryByRole("button", { name: "Download or print workbook PDF" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /View complete A2 book/ })).not.toBeInTheDocument();
-    // The bookshop offer belongs only in Supporting Materials to avoid duplicate cards.
   });
 
   it("preserves the B1 workbook PDF action while the B1 textbook is being prepared", () => {
@@ -119,6 +123,7 @@ describe("BookPdfDownloadInjector helpers", () => {
       </MemoryRouter>
     );
     expect(screen.getByLabelText("B1 workbook tools")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "How to use this lesson" })).toHaveTextContent("Submit");
     fireEvent.click(screen.getByRole("button", { name: "Download or print workbook PDF" }));
     expect(printSpy).toHaveBeenCalledTimes(1);
     printSpy.mockRestore();
@@ -179,6 +184,6 @@ describe("BookPdfDownloadInjector helpers", () => {
     const search = "?radio=done&view=submit&level=A2&assignmentKey=A2-1.1&assignmentId=A2-1.1";
     expect(getA2B1WorkbookExperienceContext(pathname, search)).toMatchObject({ level: "A2", day: 1 });
     render(<MemoryRouter initialEntries={[pathname + search]}><BookPdfDownloadInjector /></MemoryRouter>);
-    expect(document.querySelector('iframe[src*="HMEs3mEKdrk"]')).not.toBeNull();
-    expect(document.querySelector('iframe[src*="AxSh8t71Jlo"]')).toBeNull();
+    expect(document.querySelector('a[href*="HMEs3mEKdrk"]')).not.toBeNull();
+    expect(document.querySelector('a[href*="AxSh8t71Jlo"]')).toBeNull();
   });

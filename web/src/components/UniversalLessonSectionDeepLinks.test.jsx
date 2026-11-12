@@ -14,6 +14,16 @@ import {
   normalizeAdvancedSectionView,
 } from "../utils/lessonSectionDeepLinks";
 
+jest.mock("./WorkbookSubmissionCaptureRuntime", () => () => null);
+
+beforeAll(() => {
+  HTMLElement.prototype.scrollIntoView = jest.fn();
+});
+
+afterAll(() => {
+  delete HTMLElement.prototype.scrollIntoView;
+});
+
 const LocationProbe = () => {
   const location = useLocation();
   return <output data-testid="location-search">{location.search}</output>;

@@ -14,7 +14,7 @@ import {
 
 export const A2_B1_WORKBOOK_TABS = [
   { key: "references", label: "Music", description: "Optional" },
-  { key: "sprechen", label: "Teil 1", description: "Sprechen" },
+  { key: "sprechen", label: "Teil 1", description: "Sprechen · Group practice" },
   { key: "schreiben", label: "Teil 2", description: "Schreiben" },
   { key: "lesen", label: "Teil 3", description: "Lesen" },
   { key: "hoeren", label: "Teil 4", description: "Hören" },

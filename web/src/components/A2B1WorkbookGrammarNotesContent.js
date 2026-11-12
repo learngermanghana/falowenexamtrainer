@@ -1,3 +1,4 @@
+import { getA2GrammarRoute } from "../data/a2GrammarRoutes";
 import React from "react";
 import A2StarterConjunctionsPage from "./A2StarterConjunctionsPage";
 import A2Day2Kapitel12GrammarNotesPage from "./A2Day2Kapitel12GrammarNotesPage";
@@ -114,11 +115,13 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
   }
 
   if (normalizedLevel === "A2") {
+    const grammarBookRoute = getA2GrammarRoute({ day: numericDay });
     return (
       <div
         data-a2-focused-grammar={numericDay}
         style={{ display: "grid", gap: 16 }}
       >
+        {grammarBookRoute ? <a href={grammarBookRoute}>Open grammar book</a> : null}
         <GrammarNotes embedded />
       </div>
     );
