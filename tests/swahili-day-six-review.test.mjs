@@ -5,6 +5,7 @@ const source = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const teacher = source("../web/src/components/SwahiliTeacherDayOne.jsx");
 const day6 = source("../web/src/components/SwahiliDaySixWorkbook.jsx");
 const day1 = source("../web/src/components/SwahiliCourseBook.jsx");
+const rules = source("../firestore.rules");
 
 test("Day 6 and Day 1 share one guarded teacher review component", () => {
   assert.match(day6, /teacherView\) return isTeacher/);
@@ -30,4 +31,12 @@ test("Day 6 teacher can see restaurant submissions and students see feedback", (
   assert.match(teacher, /lesson.reading.map/);
   assert.match(day6, /Teacher feedback/);
   assert.match(day6, /\?teacher=1/);
+});
+
+test("Firestore allows a learner to get only their own Day 6 teacher feedback", () => {
+  assert.match(rules, /match \/swahiliTeacherReviews\/\{studentId\}/);
+  assert.match(rules, /resource\.data\.studentId == request\.auth\.uid/);
+  assert.match(rules, /resource\.data\.lessonId == 'swahili-day-6'/);
+  assert.match(rules, /studentId == request\.auth\.uid \+ '_day-6'/);
+  assert.match(rules, /allow create, update, delete: if isStaff\(\)/);
 });
