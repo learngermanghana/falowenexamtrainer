@@ -37,7 +37,7 @@ export default function SwahiliDictionary() {
   return (
     <section className="swahili-book__card swahili-book__activity" aria-label="Kamusi ya Kiswahili">
       <h2>Kamusi ya Kiswahili · Swahili Dictionary</h2>
-      <p>Search Kiswahili words or English meanings. The first entries come from Somo la 1; the curriculum below shows future vocabulary topics.</p>
+      <p>Search the words from Somo la 1 by Kiswahili or English. Other topics will be added after review.</p>
       <div className="swahili-book__form">
         <label htmlFor="swahili-dictionary-search">Tafuta neno · Search
           <input id="swahili-dictionary-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="e.g. mama, mother, chai" />
@@ -60,9 +60,6 @@ export default function SwahiliDictionary() {
           ))}
         </div>
       ) : <p>No matching words yet. Try another search.</p>}
-      <h3>Mada 20 · Curriculum topics</h3>
-      <p className="swahili-book__note">These topics are from Dr. Ruth's A1–A2 syllabus. They are not yet populated as dictionary entries; no words are invented from topic headings.</p>
-      <ol>{SWAHILI_DICTIONARY_TOPICS.map((topic) => <li key={topic}>{topic} · vocabulary pending</li>)}</ol>
     </section>
   );
 }
