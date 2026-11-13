@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
+import SwahiliDictionary from "./SwahiliDictionary";
 import "./SwahiliCourseBook.css";
 
 const LETTERS = ["A", "E", "I", "O", "U"];
@@ -264,6 +265,7 @@ function DayOneContent({
 export default function SwahiliCourseBook({ day = null, basePath = "/swahili", preview = false }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("grammar");
+  const [dictionaryOpen, setDictionaryOpen] = useState(false);
   const [writing, setWriting] = useState(EMPTY_WRITING);
   const [readingAnswers, setReadingAnswers] = useState({});
   const [readingChecked, setReadingChecked] = useState(false);
@@ -330,6 +332,12 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
           <span>Somo 1 pekee</span><span>Alfabeti na matamshi</span><span>Music · Grammar · Teil 1–4 · Submit</span>
         </div>
       </header>
+      <div className="swahili-book__card swahili-book__section">
+        <button type="button" className="swahili-book__button" aria-expanded={dictionaryOpen} onClick={() => setDictionaryOpen((open) => !open)}>
+          {dictionaryOpen ? "Funga kamusi · Close dictionary" : "Kamusi · Open Swahili dictionary"}
+        </button>
+        {dictionaryOpen ? <SwahiliDictionary /> : null}
+      </div>
       {day === 1 ? (
         <>
           <div className="swahili-book__workbook-nav">
@@ -360,7 +368,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
             </div>
             <Link to={basePath + "/day-1"} className="swahili-book__button">Fungua Somo la 1</Link>
           </div>
-          <p className="swahili-book__note swahili-book__spaced">Masomo mengine na kamusi pana vitaongezwa baadaye. Masomo ya Kijerumani hayajabadilishwa.</p>
+          <p className="swahili-book__note swahili-book__spaced">Masomo mengine na msamiati zaidi vitaongezwa baadaye. Masomo ya Kijerumani hayajabadilishwa.</p>
         </section>
       )}
     </main>
