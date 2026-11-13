@@ -1,0 +1,75 @@
+// A1 Lesson 6 classroom material supplied by Ruth:
+// "FOOD&DRINKS=LIKE&DISLIKES.pdf" and "Odering Food.pdf".
+// Original syllabus heading: Mgahawani (topic 4), course placement: Lesson 6.
+// All language examples below occur in those two supplied slide decks.
+// Question formats and English glosses are workbook adaptations, not quotations.
+export const SWAHILI_DAY_SIX = Object.freeze({
+  day: 6,
+  chapter: "Somo la 6",
+  title: "Mgahawani · Restaurant",
+  topic: "Mgahawani",
+  objective: "Read a menu, say which foods and drinks you like or dislike, and order food and a drink at an East African restaurant.",
+  food: [
+    {sw:"wali", en:"rice", source:"both"},
+    {sw:"wali kuku",en:"rice with chicken",source:"both"},
+    {sw:"wali samaki",en:"rice with fish",source:"both"},
+    {sw:"ugali",en:"ugali (maize meal)",source:"both"},
+    {sw:"ugali nyama",en:"ugali with meat",source:"both"},
+    {sw:"ugali samaki",en:"ugali with fish",source:"ordering"},
+    {sw:"pilau nyama",en:"pilau with meat",source:"ordering"},
+    {sw:"ndizi nyama",en:"bananas with meat",source:"ordering"},
+  ],
+  drinks:[
+    {sw:"maji",en:"water",source:"both"},
+    {sw:"juisi",en:"juice",source:"both"},
+    {sw:"soda",en:"soda",source:"both"},
+    {sw:"juisi ya kiwi",en:"kiwi juice",source:"ordering"},
+    {sw:"juisi ya chungwa",en:"orange juice",source:"ordering"},
+    {sw:"juisi ya karoti",en:"carrot juice",source:"ordering"},
+    {sw:"sharubati",en:"syrup / sweet drink",source:"ordering"},
+    {sw:"juisi ya embe",en:"mango juice",source:"ordering-dialogue"},
+  ],
+  phrases:[
+    {sw:"Ninapenda wali samaki.",en:"I like rice with fish."},
+    {sw:"Sipendi ugali nyama.",en:"I don't like ugali with meat."},
+    {sw:"Ninapenda kunywa soda.",en:"I like drinking soda."},
+    {sw:"Sipendi kunywa juisi.",en:"I don't like drinking juice."},
+    {sw:"Unapenda chakula gani?",en:"What food do you like?"},
+    {sw:"Unapenda kunywa nini?",en:"What do you like to drink?"},
+    {sw:"Wewe unapenda kula nini?",en:"What do you like to eat?"},
+    {sw:"Mimi ninapenda kula wali na kuku.",en:"I like to eat rice with chicken."},
+    {sw:"Mimi ninapenda kunywa juisi ya embe.",en:"I like to drink mango juice."},
+  ],
+  preferenceDialogue:[
+    {speaker:"Amani",text:"Hujambo?"},
+    {speaker:"Furaha",text:"Sijambo."},
+    {speaker:"Amani",text:"Unapenda chakula gani?"},
+    {speaker:"Furaha",text:"Ninapenda wali kuku, na wewe?"},
+    {speaker:"Amani",text:"Ninapenda ugali nyama."},
+    {speaker:"Amani",text:"Unapenda kunywa nini?"},
+    {speaker:"Furaha",text:"Ninapenda kunywa juisi, na wewe?"},
+    {speaker:"Amani",text:"Ninapenda kunywa soda."},
+    {speaker:"Amani",text:"Sawa."},
+    {speaker:"Furaha",text:"Asante."},
+  ],
+  restaurantDialogue:[
+    {speaker:"Mhudumu",text:"Hujambo?"},
+    {speaker:"Mteja",text:"Sijambo."},
+    {speaker:"Mhudumu",text:"Wewe unapenda kula nini?"},
+    {speaker:"Mteja",text:"Mimi ninapenda kula wali na kuku."},
+    {speaker:"Mhudumu",text:"Wewe unapenda kunywa nini?"},
+    {speaker:"Mteja",text:"Mimi ninapenda kunywa juisi ya embe."},
+    {speaker:"Mhudumu",text:"Sawa. Karibu."},
+    {speaker:"Mteja",text:"Asante."},
+  ],
+  reading:[
+    {id:"food",question:"Mteja anapenda kula nini?",choices:["wali na kuku","ugali samaki","pilau nyama"],answer:"wali na kuku"},
+    {id:"drink",question:"Mteja anapenda kunywa nini?",choices:["maji","juisi ya embe","soda"],answer:"juisi ya embe"},
+    {id:"server",question:"Nani anauliza ‘Wewe unapenda kula nini?’",choices:["Mhudumu","Mteja","Furaha"],answer:"Mhudumu"},
+    {id:"menu",question:"Ni chakula gani kina samaki?",choices:["ugali samaki","ndizi nyama","pilau nyama"],answer:"ugali samaki"},
+  ],
+  listening:[
+    {id:"listen-food",question:"Mteja anapenda kula nini?",choices:["wali na kuku","pilau nyama","ugali nyama"],answer:"wali na kuku"},
+    {id:"listen-drink",question:"Mteja anapenda kunywa nini?",choices:["juisi ya embe","soda","maji"],answer:"juisi ya embe"},
+  ],
+});
