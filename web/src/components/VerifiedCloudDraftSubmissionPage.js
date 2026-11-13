@@ -1003,7 +1003,7 @@ const VerifiedCloudDraftSubmissionPage = ({
         {status.error ? <InfoBox tone="error">{status.error}</InfoBox> : null}
         {status.success ? <InfoBox tone="success">{status.success}</InfoBox> : null}
 
-        <form style={{ display: "grid", gap: compact ? 10 : 12 }} onSubmit={handleSubmit}>
+        <form data-a1-recorded-speaking={assignmentKey === "A1-5.9" ? "true" : undefined} style={{ display: "grid", gap: compact ? 10 : 12 }} onSubmit={handleSubmit}>
           {!compact ? (
             <div
               style={{
