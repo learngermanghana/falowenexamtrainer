@@ -29,16 +29,23 @@ test("individual book pages show LinkedIn and Instagram at the bottom", () => {
   expect(screen.getByRole("button", { name: "More sharing options" })).toBeInTheDocument();
 });
 
-test("Instagram offers an honest thumbnail and caption workflow rather than a broken share link", () => {
+test("Instagram displays a working inline post-preparation panel without relying on a popup", () => {
   render(<BookShare page={page} inlineActions />);
-  fireEvent.click(screen.getByRole("button", { name: /Prepare an Instagram post/ }));
+  const instagramButton = screen.getByRole("button", { name: /Prepare an Instagram post for/ });
+  expect(instagramButton).toHaveAttribute("aria-expanded", "false");
+  fireEvent.click(instagramButton);
+  expect(instagramButton).toHaveAttribute("aria-expanded", "true");
+  expect(screen.getByRole("region", { name: "Instagram post preparation" })).toBeInTheDocument();
   expect(screen.getByText(/Instagram does not offer a direct prefilled web share link/)).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Download thumbnail" })).toHaveAttribute("href", page.thumbnail);
+  expect(screen.getByRole("img", { name: /book cover/ })).toHaveAttribute("src", page.cover);
+  expect(screen.getByRole("link", { name: "Download share image (JPG)" })).toHaveAttribute("href", page.thumbnail);
   expect(screen.getByRole("link", { name: "Open Instagram" })).toHaveAttribute("href", "https://www.instagram.com/");
-  expect(screen.getByRole("button", { name: "Copy message" })).toBeInTheDocument();
-  expect(screen.getByRole("textbox", { name: "Your message" })).toHaveValue(
+  expect(screen.getByRole("button", { name: "Copy caption and book link" })).toBeInTheDocument();
+  expect(screen.getByRole("textbox", { name: "Your Instagram caption" })).toHaveValue(
     page.title + "\n\n" + page.description,
   );
+  fireEvent.click(instagramButton);
+  expect(screen.queryByRole("region", { name: "Instagram post preparation" })).not.toBeInTheDocument();
 });
 
 test("catalog cards keep their compact Share book button", () => {
