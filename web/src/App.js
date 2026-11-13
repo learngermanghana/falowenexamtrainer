@@ -388,8 +388,8 @@ function App() {
   );
 
   const defaultCampusSection = useMemo(
-    () => getPreferredSection(allowedSections, savedSection, tabStructure),
-    [allowedSections, savedSection, tabStructure]
+    () => studentProfile?.program === "swahili" ? "course" : getPreferredSection(allowedSections, savedSection, tabStructure),
+    [allowedSections, savedSection, tabStructure, studentProfile?.program]
   );
 
   const paymentStatus = useMemo(
@@ -761,6 +761,10 @@ const AppShell = ({
 
   if (requiresOnboarding && !isOnboarding) {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  if (studentProfile?.program === "swahili" && allowedSections.course && location.pathname === "/") {
+    return <Navigate to="/campus/course" replace />;
   }
 
   if (!requiresOnboarding && isOnboarding) {

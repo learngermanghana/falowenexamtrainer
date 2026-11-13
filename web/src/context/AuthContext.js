@@ -583,8 +583,9 @@ export const AuthProvider = ({ children }) => {
   // ✅ UPDATED signup: now includes address
   const signup = useCallback(
     async (email, password, profile = {}) => {
-      if (profile.program && profile.program !== "german") {
-        throw new Error("Falowen currently offers German courses only. Please register for German.");
+      const program = profile.program || "german";
+      if (!["german", "swahili"].includes(program)) {
+        throw new Error("Please choose German or Swahili to register.");
       }
       if (!isFirebaseConfigured || !auth) {
         throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
@@ -638,7 +639,7 @@ export const AuthProvider = ({ children }) => {
         className: profile.className || "",
         phone: profile.phone || "",
         location: profile.location || "",
-        program: "german",
+        program,
 
         learningMode: profile.learningMode || "", // already there ✅
         address: profile.address || "",            // ✅ NEW FIELD

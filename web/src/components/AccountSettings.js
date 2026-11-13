@@ -79,7 +79,7 @@ const AccountSettings = () => {
 
   const billingSummary = useMemo(() => {
     const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);
-    const tuition = Math.max(Number(studentProfile?.tuitionFee ?? getTuitionFeeForLevel(studentProfile?.level)) || 0, 0);
+    const tuition = Math.max(Number(studentProfile?.tuitionFee ?? (studentProfile?.program === "swahili" ? 0 : getTuitionFeeForLevel(studentProfile?.level))) || 0, 0);
     const explicitBalanceRaw = studentProfile?.balanceDue ?? studentProfile?.balance;
     const explicitBalance = explicitBalanceRaw === undefined || explicitBalanceRaw === null
       ? null

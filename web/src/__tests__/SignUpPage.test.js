@@ -109,7 +109,25 @@ describe("three-step signup", () => {
     expect(mockSignup).not.toHaveBeenCalled();
     await userEvent.type(screen.getByLabelText("Emergency contact phone"), "+233209876543");
     await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
-    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith("learner@example.com", "password123", expect.objectContaining({ className: "A1 Test Class", phone: "+233241234567", address: "12 Test Street", location: "Accra", learningMode: "Online", emergencyContactPhone: "+233209876543", paymentStatus: "pending", initialPaymentAmount: 0, trialStatus: "active" })));
+    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith("learner@example.com", "password123", expect.objectContaining({ program: "german", className: "A1 Test Class", phone: "+233241234567", address: "12 Test Street", location: "Accra", learningMode: "Online", emergencyContactPhone: "+233209876543", paymentStatus: "pending", initialPaymentAmount: 0, trialStatus: "active" })));
+  });
+  it("starts the Kiswahili workbook trial without assigning German tuition or a cohort", async () => {
+    render(<SignUpPage />);
+    await fillAccount();
+    await userEvent.click(screen.getByRole("button", { name: /Continue to your learning/ }));
+    const language = screen.getByRole("combobox", { name: /Which language/ });
+    expect(language).toHaveValue("german");
+    await userEvent.click(screen.getByRole("button", { name: /Pay full fee now/ }));
+    await userEvent.selectOptions(language, "swahili");
+    expect(screen.queryByRole("button", { name: /Pay full fee now|A1 Test Class/ })).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: /Continue to contact details/ }));
+    await fillContact();
+    await userEvent.type(screen.getByLabelText("Emergency contact phone"), "+233209876543");
+    await userEvent.click(screen.getByRole("checkbox"));
+    await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
+    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith("learner@example.com", "password123",
+      expect.objectContaining({ program: "swahili", level: "A1", className: "", learningMode: "Online",
+        tuitionFee: null, balanceDue: null, paystackLink: "", paymentIntentAmount: null, trialStatus: "active" })));
   });
   it("requires learning mode and class on step two", async () => {
     render(<SignUpPage />); await fillAccount();

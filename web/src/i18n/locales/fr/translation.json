@@ -234,8 +234,11 @@
     }
   },
   "signup": {
+    "courseLanguage": "Quelle langue souhaitez-vous apprendre ?",
+    "swahiliTrial": "Commencez votre essai de 7 jours avec le cahier de kiswahili A1 en ligne.",
     "interfaceNote": "Ce programme enseigne le {{program}}. L’interface est disponible en anglais.",
     "programs": {
+      "swahili": "Swahili (kiswahili)",
       "german": "allemand",
       "french": "français"
     }

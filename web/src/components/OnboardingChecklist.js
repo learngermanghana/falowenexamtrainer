@@ -25,10 +25,12 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const proposedTuitionAmount = getRecommendedTuitionAmount(studentProfile);
 
   const level = detectLevelKey(studentProfile);
-  const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
+  const isSwahili = studentProfile?.program === "swahili";
+  const isSelfLearning = isSwahili || SELF_LEARNING_LEVELS.has(level);
   const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
   const balanceDue = studentProfile?.balanceDue ?? studentProfile?.balance;
   const paymentComplete = paymentStatus === "paid" || hasClearedBalance(balanceDue);
+  const offerPayment = !paymentComplete && (!isSwahili || studentProfile?.tuitionFee > 0);
   const trialLifecycle = getTrialLifecycleState(studentProfile);
   const hasTrialAccess = trialLifecycle.active;
   const learnerFirstName = String(
@@ -91,7 +93,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
 
         <div style={{ display: "grid", gap: 8 }}>
           <h1 style={{ margin: 0, fontSize: "clamp(26px, 5vw, 34px)", lineHeight: 1.2 }}>
-            Hallo{learnerFirstName ? `, ${learnerFirstName}` : ""}! Your account is ready.
+            {isSwahili ? "Karibu" : "Hallo"}{learnerFirstName ? `, ${learnerFirstName}` : ""}! Your account is ready.
           </h1>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
             Choose how you would like to continue.
@@ -99,7 +101,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-          {!paymentComplete ? (
+          {offerPayment ? (
             <button
               type="button"
               data-testid="onboarding-pay-now"
@@ -113,7 +115,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
           <button
             type="button"
             style={{ ...styles.secondaryButton, padding: "14px 22px", minHeight: 50, flex: "1 1 220px", fontSize: 15 }}
-            onClick={() => finishAndGo("/", "campus")}
+            onClick={() => finishAndGo(isSwahili ? "/campus/course" : "/", "campus")}
             disabled={Boolean(savingAction)}
           >
             {savingAction === "campus"
@@ -126,7 +128,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
           </button>
         </div>
 
-        {!paymentComplete ? (
+        {offerPayment ? (
           <div style={{ marginTop: -8, display: "grid", gap: 8 }}>
             <p style={{ margin: 0, fontSize: 13, color: "#475569", lineHeight: 1.5 }}>
               Pay securely with Paystack{proposedTuitionAmount > 0
@@ -163,6 +165,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
             lineHeight: 1.65,
           }}
         >
+          {isSwahili ? <p style={{ margin: 0 }}>Open your Kiswahili Course Book and choose <strong>Day 1</strong> to begin.</p> : <>
           <p style={{ margin: 0 }}>
             On Falowen Home, select <strong>Open Campus</strong> to go to your <strong>Course Book</strong>.
             Scroll down to your lessons and select <strong>Day 1</strong> to begin.
@@ -170,6 +173,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
           <p style={{ margin: 0 }}>
             For exam practice, select <strong>Open Exams Room</strong> from Falowen Home.
           </p>
+          </>}
           {isSelfLearning ? (
             <p style={{ margin: 0 }}>
               <strong>Start when you're ready.</strong> This is a self-learning course,
