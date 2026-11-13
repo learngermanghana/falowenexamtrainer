@@ -12,7 +12,7 @@ jest.mock("../context/AuthContext", () => ({
 }));
 jest.mock("../firebase", () => ({
   db: {},
-  doc: jest.fn((...args) => args.join("/")),
+  doc: jest.fn((_db, ...segments) => "/" + segments.join("/")),
   getDoc: jest.fn(async () => ({ exists: () => false })),
   getDocs: jest.fn(async () => ({ docs: [] })),
   query: jest.fn((...args) => args),
@@ -32,11 +32,11 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     jest.clearAllMocks();
   });
 
-  it("offers only Day 1 and no invented later lessons", () => {
-    render(<MemoryRouter><SwahiliCourseBook /></MemoryRouter>);
+  it("opens both published lessons in the signed-in Campus workbook", () => {
+    render(<MemoryRouter><SwahiliCourseBook basePath="/campus/course/swahili" /></MemoryRouter>);
     expect(screen.getByText("Alfabeti, sauti na matamshi")).toBeTruthy();
-    expect(screen.getByText("Somo 1 pekee")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Fungua Somo la 1" }).getAttribute("href")).toBe("/swahili/day-1");
+    expect(screen.getByRole("link", { name: "Fungua Somo la 6" })).toHaveAttribute("href", "/campus/course/swahili/day-6");
+    expect(screen.getByRole("link", { name: "Fungua Somo la 1" }).getAttribute("href")).toBe("/campus/course/swahili/day-1");
     expect(screen.queryByText(/Somo la 2/)).toBeNull();
   });
 
