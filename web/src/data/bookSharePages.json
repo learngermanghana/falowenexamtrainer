@@ -6,6 +6,13 @@
     "thumbnail": "/books/share/a1-course-workbook.jpg",
     "cover": "/books/a1-cover.svg"
   },
+  "german-a1-exam-preparation": {
+    "title": "German A1 Exam Preparation — The Falowen Method",
+    "description": "50-page German A1 exam preparation workbook: 30-day plan, Lesen, Hören, Schreiben and Sprechen, picture cards and two practice tests. Hören audio requires separate Falowen Exams Room access.",
+    "href": "/books/german-a1-exam-preparation",
+    "thumbnail": "/books/share/catalog.jpg",
+    "cover": "/books/german-a1-exam-preparation-cover.svg"
+  },
   "a2-course-workbook": {
     "title": "Deutsch A2 Course & Workbook",
     "description": "Elementary German lessons, grammar notes and workbook practice from Falowen.",
