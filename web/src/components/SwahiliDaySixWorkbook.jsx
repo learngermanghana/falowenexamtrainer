@@ -184,7 +184,6 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         {listeningChecked && <p role="status" className="swahili-book__result">{checkScore(lesson.listening,listeningAnswers)} / {lesson.listening.length} sahihi · mazoezi tu</p>}</div>
       <details><summary>Kwa mwalimu · Read the original dialogue aloud</summary><Dialogue lines={lesson.restaurantDialogue} label="Teacher listening script" /></details>
     </section>;
-    }
     return <section className="swahili-book__card swahili-book__activity" aria-label="Submit">
       <h2>Submit · Wasilisha kazi ya Somo la 6</h2>
       <p>Teil 1 is spoken classroom practice; Teil 4 is optional until an audio recording is supplied. Only writing and reading are required for this submission.</p>
