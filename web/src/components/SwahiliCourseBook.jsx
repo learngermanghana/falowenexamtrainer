@@ -62,6 +62,7 @@ function DayOneContent({
   submissionResult,
   submitWork,
   previouslySubmitted,
+  teacherReview,
 }) {
   const lesson = SWAHILI_DAY_ONE;
   const changeWriting = (field, value) => setWriting((prior) => ({ ...prior, [field]: value }));
@@ -260,6 +261,11 @@ function DayOneContent({
             <p className="swahili-book__feedback" role="status">Kazi imehifadhiwa kwenye akaunti yako ya Falowen. Hakuna alama za moja kwa moja.</p>
           ) : null}
           {submissionResult?.type === "error" ? <p className="swahili-book__error" role="alert">{submissionResult.message}</p> : null}
+          {teacherReview && <div className="swahili-book__tile" role="status">
+            <strong>Maoni ya mwalimu · Teacher feedback</strong>
+            <p>{teacherReview.status === "needs_revision" ? "Needs revision" : "Reviewed"}</p>
+            {teacherReview.feedback && <p>{teacherReview.feedback}</p>}
+          </div>}
           <p className="swahili-book__note">Kazi hii inahifadhiwa kwenye akaunti yako. Mwalimu anaweza kukagua na kutoa maoni; hakuna alama za moja kwa moja.</p>
         </>
       )}
@@ -282,6 +288,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
   const [submitting, setSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState(null);
   const [previouslySubmitted, setPreviouslySubmitted] = useState(false);
+  const [teacherReview, setTeacherReview] = useState(null);
   const checkedUser = useRef(null);
   const lesson = SWAHILI_DAY_ONE;
 
@@ -293,6 +300,9 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
     getDoc(doc(db, "users", user.uid, "swahiliLessons", "day-1"))
       .then((snapshot) => { if (!cancelled && snapshot.exists()) setPreviouslySubmitted(true); })
       .catch(() => { /* Keep the workbook available if prior-submission lookup fails. */ });
+    getDoc(doc(db, "swahiliTeacherReviews", user.uid))
+      .then((snapshot) => { if (!cancelled && snapshot.exists()) setTeacherReview(snapshot.data()); })
+      .catch(() => { /* Keep the workbook available when feedback has not been published. */ });
     return () => { cancelled = true; };
   }, [activeTab, day, user?.uid]);
 
@@ -364,7 +374,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
               listeningAnswers={listeningAnswers} setListeningAnswers={(updater) => { setListeningAnswers(updater); setSubmissionResult(null); }}
               listeningChecked={listeningChecked} setListeningChecked={setListeningChecked}
               user={user} submitting={submitting} submissionResult={submissionResult}
-              submitWork={submitWork} previouslySubmitted={previouslySubmitted} />
+              submitWork={submitWork} previouslySubmitted={previouslySubmitted} teacherReview={teacherReview} />
           </div>
           <p className="swahili-book__muted swahili-book__spaced">Mazoezi haya ni ya kiwango cha mwanzo. {preview ? "Huu ni mfano wa kitabu cha kozi." : ""}</p>
         </>
