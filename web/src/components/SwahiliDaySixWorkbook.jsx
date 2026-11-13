@@ -3,7 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
-import SwahiliDictionary from "./SwahiliDictionary";
+import MgahawaniGrammar from "./MgahawaniGrammar";
+import MgahawaniSong from "./MgahawaniSong";
 import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import "./SwahiliCourseBook.css";
@@ -128,26 +129,10 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
   }
 
   function section() {
-    if (activeTab === "references") return <section className="swahili-book__card swahili-book__activity" aria-label="Music">
-      <h2>Music · Muziki wa Mgahawani</h2>
-      <p>Wimbo wa Somo la 6 bado haujapakiwa. Jifunze maneno ya chakula na vinywaji hapa kwanza.</p>
-      <p className="swahili-book__note">No song or recording has been published for this lesson. The Falowen music player will be connected only when a real lesson track exists.</p>
-    </section>;
-    if (activeTab === "grammar") return <section className="swahili-book__card swahili-book__activity" aria-label="Grammar">
-      <div><h2>Grammar · Sarufi na msamiati</h2><p>{lesson.objective}</p></div>
-      <div><h2>Chakula · Food</h2><div className="swahili-book__grid">
-        {lesson.food.map(item => <div className="swahili-book__tile" key={item.sw}><strong>{item.sw}</strong><div className="swahili-book__small" lang="en">{item.en}</div></div>)}
-      </div></div>
-      <div><h2>Vinywaji · Drinks</h2><div className="swahili-book__grid">
-        {lesson.drinks.map(item => <div className="swahili-book__tile" key={item.sw}><strong>{item.sw}</strong><div className="swahili-book__small" lang="en">{item.en}</div></div>)}
-      </div></div>
-      <div><h2>Ninapenda / Sipendi · Likes and dislikes</h2><p>Compare the patterns from Ruth's lesson. Say them aloud before writing.</p>
-        <div className="swahili-book__phrase-list">{lesson.phrases.map(item => <div className="swahili-book__tile" key={item.sw}><strong>{item.sw}</strong><p className="swahili-book__small" lang="en">{item.en}</p></div>)}</div>
-      </div>
-      <details><summary>Kamusi · Search Swahili dictionary</summary><SwahiliDictionary /></details>
-    </section>;
+    if (activeTab === "references") return <MgahawaniSong />;
+    if (activeTab === "grammar") return <MgahawaniGrammar />;
     if (activeTab === "sprechen") return <section className="swahili-book__card swahili-book__activity" aria-label="Teil 1">
-      <h2>Teil 1 · Kuzungumza (Speaking)</h2>
+      <div className="mgahawani-workbook__section-header"><span>01 · PRACTISE WITH A PARTNER</span><h2>Teil 1 · Kuzungumza (Speaking)</h2><p>From likes and dislikes to a complete restaurant order.</p></div>
       <p><strong>Hatua ya 1: Mapendeleo.</strong> Read the conversation between Amani and Furaha with a partner.</p>
       <Dialogue lines={lesson.preferenceDialogue} label="Amani and Furaha: food and drink preferences" />
       <p><strong>Hatua ya 2: Mgahawani.</strong> Take turns as Mhudumu (server) and Mteja (customer).</p>
@@ -155,7 +140,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
       <p className="swahili-book__note">Scenario from the source: you are in an East African restaurant with friends. Read the menu and tell the server what you like and want to order. Switch roles and ask follow-up questions: “Unapenda chakula gani?” and “Unapenda kunywa nini?”</p>
     </section>;
     if (activeTab === "schreiben") return <section className="swahili-book__card swahili-book__activity" aria-label="Teil 2">
-      <h2>Teil 2 · Kuandika (Writing)</h2>
+      <div className="mgahawani-workbook__section-header"><span>02 · WRITE</span><h2>Teil 2 · Kuandika (Writing)</h2><p>Use the patterns from Grammar to write your own answers.</p></div>
       <p>Use Ruth's sentence models. Write your own preferences and an order, using the foods and drinks above.</p>
       <div className="swahili-book__form">
         <label htmlFor="swahili-six-likes">1. Ninapenda... · What food and drink do you like?
@@ -171,7 +156,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
       <p className="swahili-book__note">The prompts are workbook adaptations of the supplied PDFs. Answers stay in this page until Submit; no automatic grading.</p>
     </section>;
     if (activeTab === "lesen") return <section className="swahili-book__card swahili-book__activity" aria-label="Teil 3">
-      <h2>Teil 3 · Kusoma (Reading)</h2>
+      <div className="mgahawani-workbook__section-header"><span>03 · READ AND UNDERSTAND</span><h2>Teil 3 · Kusoma (Reading)</h2><p>Read a menu and find information in a restaurant dialogue.</p></div>
       <p>Read the restaurant menu and the original Mhudumu/Mteja dialogue. Answer the questions using the text.</p>
       <div className="swahili-book__menu">
         <h3>Menyu · Mgahawani</h3><p className="swahili-book__small">Practice menu assembled from the items in the Ordering Food PDF; no prices were supplied.</p>
@@ -186,7 +171,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         {readingChecked && <p role="status" className="swahili-book__result">{checkScore(lesson.reading,readingAnswers)} / {lesson.reading.length} sahihi · mazoezi tu</p>}</div>
     </section>;
     if (activeTab === "hoeren") return <section className="swahili-book__card swahili-book__activity" aria-label="Teil 4">
-      <h2>Teil 4 · Kusikiliza (Listening)</h2>
+      <div className="mgahawani-workbook__section-header"><span>04 · LISTEN</span><h2>Teil 4 · Kusikiliza (Listening)</h2><p>Teacher-led listening while recorded audio is pending.</p></div>
       <p className="swahili-book__note">No approved recording yet. The teacher reads the original restaurant dialogue; hide the text while listening. This is optional classroom practice until audio is uploaded.</p>
       <QuestionSet items={lesson.listening} answers={listeningAnswers} checked={listeningChecked}
         namePrefix="swahili-six-listening" onChange={(id,v) => setAnswer(setListeningAnswers,id,v,setListeningChecked)} />
@@ -196,7 +181,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
       <details><summary>Kwa mwalimu · Read the original dialogue aloud</summary><Dialogue lines={lesson.restaurantDialogue} label="Teacher listening script" /></details>
     </section>;
     return <section className="swahili-book__card swahili-book__activity" aria-label="Submit">
-      <h2>Submit · Wasilisha kazi ya Somo la 6</h2>
+      <div className="mgahawani-workbook__section-header"><span>05 · REVIEW YOUR WORK</span><h2>Submit · Wasilisha kazi ya Somo la 6</h2><p>Check your writing and reading answers before submission.</p></div>
       <p>Teil 1 is spoken classroom practice; Teil 4 is optional until an audio recording is supplied. Only writing and reading are required for this submission.</p>
       <ul className="swahili-book__submit-summary">
         <li>Teil 2 · Ninapenda: <strong>{writing.likes ? "Imeandikwa" : "Bado"}</strong></li>
@@ -225,14 +210,20 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
     ? <SwahiliTeacherDayOne basePath={basePath} day={6} />
     : <main className="swahili-book"><p className="swahili-book__note">Teacher access required. <Link to={basePath + "/day-6"}>Return to Lesson 6</Link></p></main>;
 
-  return <main className="swahili-book" lang="sw" data-swahili-course-book="true">
+  return <main className="swahili-book mgahawani-workbook" lang="sw" data-swahili-course-book="true">
     <div className="swahili-book__top"><strong>Falowen · Kiswahili A1</strong><Link to={basePath}>← Kitabu cha kozi</Link></div>
     <header className="swahili-book__hero">
       <p className="swahili-book__eyebrow">KISWAHILI · A1 · SOMO LA 6</p>
-      <h1>{lesson.chapter} · {lesson.title}</h1><p>{lesson.objective}</p>
+      <h1>{lesson.chapter} · {lesson.title}</h1>
+      <p className="mgahawani-workbook__hero-goal">{lesson.objective}</p>
       <div className="swahili-book__meta"><span>Topic 4 · Mgahawani</span><span>Lesson 6</span><span>Music · Grammar · Teil 1–4 · Submit</span></div>
     </header>
     {isTeacher && <p className="swahili-book__spaced"><Link className="swahili-book__button swahili-book__button--soft" to={basePath + "/day-6?teacher=1"}>Teacher review · Somo la 6</Link></p>}
+    <div className="mgahawani-workbook__intro" aria-label="Lesson pathway">
+      <div><strong>Learn</strong><span>Polite requests, prices, numbers and -ni</span></div>
+      <div><strong>Practise</strong><span>Restaurant dialogues, reading and writing</span></div>
+      <div><strong>Apply</strong><span>Place a food order and submit your work</span></div>
+    </div>
     <div className="swahili-book__workbook-nav">
       <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={TABS}
         ariaLabel="Kiswahili A1 Lesson 6 workbook sections"
