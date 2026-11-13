@@ -21,3 +21,10 @@ test("full course books are distinct from retired B1 exam guides",()=>{
  assert.equal(BOOKS["b1-course-workbook-printed"].priceGhs,1350);
  assert.ok(!BOOK_CATALOG_TITLES.some(t=>(t.bookIds||[]).includes("b1-four-skills-exam-guide-digital")));
 });
+
+test("new German A1 exam preparation has an independent GH₵99 digital SKU", () => {
+ assert.equal(BOOKS["german-a1-exam-preparation-digital"].priceGhs,99);
+ assert.equal(BOOKS["german-a1-exam-preparation-digital"].format,"digital");
+ assert.equal(DIGITAL_BOOK_OBJECTS["german-a1-exam-preparation-digital"].key,"book/Falowen_A1_Book_Download.pdf");
+ assert.equal(BOOKS["a1-digital"].priceGhs,249);
+});
