@@ -355,7 +355,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
         <h1>{day ? lesson.chapter + " · " + lesson.title : "Kitabu cha Kozi ya Kiswahili"}</h1>
         <p>{day ? lesson.objective : "Jifunze Kiswahili kwa matamshi, sarufi, muziki na mazoezi ya darasani."}</p>
         <div className="swahili-book__meta">
-          <span>Somo 1 pekee</span><span>Alfabeti na matamshi</span><span>Music · Grammar · Teil 1–4 · Submit</span>
+          <span>{day ? "Somo la 1" : "Somo la 1 na Somo la 6"}</span><span>{day ? "Alfabeti na matamshi" : "Alfabeti · Mgahawani"}</span><span>Music · Grammar · Teil 1–4 · Submit</span>
         </div>
       </header>
       {day === 1 ? (
@@ -389,7 +389,16 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
             </div>
             <Link to={basePath + "/day-1"} className="swahili-book__button">Fungua Somo la 1</Link>
           </div>
-          <p className="swahili-book__note swahili-book__spaced">Masomo mengine na msamiati zaidi vitaongezwa baadaye. Masomo ya Kijerumani hayajabadilishwa.</p>
+          <div className="swahili-book__lesson swahili-book__lesson--separated">
+            <div className="swahili-book__lessonInfo">
+              <p className="swahili-book__caption">A1 · SOMO LA 6 · LINAPATIKANA</p>
+              <h2>Mgahawani · At the Restaurant</h2>
+              <p>Chakula, vinywaji, kupenda na kutopenda, kusoma menyu na kuagiza chakula.</p>
+              <p className="swahili-book__small">Dictionary topic 4 · Workbook lesson 6 · Music · Grammar · Teil 1–4 · Submit</p>
+            </div>
+            <Link to={basePath + "/day-6"} className="swahili-book__button">Fungua Somo la 6</Link>
+          </div>
+          <p className="swahili-book__note swahili-book__spaced">Somo la 6 limeongezwa kutoka nyaraka mbili za mgahawani. Masomo ya 2–5 bado hayajachapishwa; masomo ya Kijerumani hayajabadilishwa.</p>
         </section>
       )}
     </main>
