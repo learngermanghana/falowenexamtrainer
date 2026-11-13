@@ -21,3 +21,9 @@
 .swahili-book__error{margin:0;color:#a12828;font-weight:700}
 .swahili-book__button:focus-visible{outline:3px solid #86efac;outline-offset:3px}
 @media(max-width:540px){.swahili-book__workbook-nav [data-workbook-tab-navigation]{padding:8px!important}.swahili-book__workbook-nav [role=tablist]{gap:7px!important}}
+
+/* Teacher presentation and review controls share the course visual language. */
+.swahili-book__presentation-text{min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center;white-space:pre-line;line-height:1.8;font-size:clamp(1.25rem,3.5vw,2.2rem);font-weight:800;background:#f2f9f4;border:1px solid #d6e8db;border-radius:16px;padding:clamp(18px,4vw,40px);overflow-wrap:anywhere}
+.swahili-book__activity select,.swahili-book__form select,.swahili-book__form textarea{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid #aebfb5;background:white;color:#14291e;max-width:100%;width:100%}
+.swahili-book__activity>label{display:grid;gap:6px;font-weight:700}
+.swahili-book details summary{cursor:pointer;font-weight:700}
