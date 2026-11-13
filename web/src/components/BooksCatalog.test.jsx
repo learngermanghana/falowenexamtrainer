@@ -92,3 +92,12 @@ test("B1 digital course book is listed at GH₵399 with its own product route",(
  expect(screen.getByRole("link",{name:"View Book"})).toHaveAttribute("href","/books/deutsch-b1-course-workbook");
  expect(BOOK_PAGES["b1-course-workbook"].cover).toBe("/books/b1-cover.svg");
 });
+
+test("German A1 Exam Preparation has a unique title, cover and share path", () => {
+  expect(BOOK_PAGES["german-a1-exam-preparation"]).toEqual(expect.objectContaining({
+    title:"German A1 Exam Preparation — The Falowen Method",
+    href:"/books/german-a1-exam-preparation",
+    cover:"/books/german-a1-exam-preparation-cover.svg",
+  }));
+  expect(BOOK_PAGES["a1-course-workbook"].href).toBe("/books/deutsch-a1-course-workbook");
+});
