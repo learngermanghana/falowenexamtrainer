@@ -6,8 +6,10 @@ import "./BookShare.css";
 export default function BookShare({ page, title = page.title, description = page.description, inlineActions = false }) {
   const dialog = useRef(null);
   const textarea = useRef(null);
+  const inlineTextarea = useRef(null);
   const [open, setOpen] = useState(false);
   const [instagramMode, setInstagramMode] = useState(false);
+  const [inlineInstagram, setInlineInstagram] = useState(false);
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
   const url = "https://www.falowen.app" + page.href;
@@ -15,11 +17,18 @@ export default function BookShare({ page, title = page.title, description = page
   const encodedUrl = encodeURIComponent(url);
   const linkedInUrl = "https://www.linkedin.com/sharing/share-offsite/?url=" + encodedUrl;
 
+  function prepareInstagramInline() {
+    setMessage(title + "\n\n" + description);
+    setStatus("");
+    setInlineInstagram(current => !current);
+  }
+
   function show(forInstagram = false) {
     setMessage(title + "\n\n" + description);
     setInstagramMode(forInstagram);
     setStatus("");
     setOpen(true);
+    setInlineInstagram(false);
     dialog.current?.showModal();
   }
 
@@ -29,8 +38,9 @@ export default function BookShare({ page, title = page.title, description = page
       await navigator.clipboard.writeText(caption);
       setStatus("Message and book link copied. Paste them into your post.");
     } catch {
-      textarea.current?.focus();
-      textarea.current?.select();
+      const field = inlineInstagram ? inlineTextarea.current : textarea.current;
+      field?.focus();
+      field?.select();
       setStatus("Select and copy the message above. The book link is also shown below.");
     }
   }
@@ -48,9 +58,26 @@ export default function BookShare({ page, title = page.title, description = page
       <strong>Share this book</strong>
       <div className="fb-social-share-links">
         <a href={linkedInUrl} target="_blank" rel="noopener noreferrer" aria-label={"Share " + title + " on LinkedIn"}>LinkedIn</a>
-        <button type="button" onClick={() => show(true)} aria-label={"Prepare an Instagram post for " + title}>Instagram</button>
+        <button type="button" onClick={prepareInstagramInline} aria-expanded={inlineInstagram} aria-label={"Prepare an Instagram post for " + title}>Instagram</button>
         <button type="button" onClick={() => show(false)}>More sharing options</button>
       </div>
+      {inlineInstagram && <div className="fb-instagram-inline" role="region" aria-label="Instagram post preparation">
+        <img src={page.cover || page.thumbnail} alt={title + " book cover"} width="145" height="205" />
+        <div>
+          <strong>Prepare an Instagram post</strong>
+          <p>Instagram does not offer a direct prefilled web share link. Download the share image, copy your caption and create a post or Story in Instagram.</p>
+          <label>Your Instagram caption
+            <textarea ref={inlineTextarea} rows="4" value={message} onChange={event => setMessage(event.target.value)} />
+          </label>
+          <div className="fb-social-share-links">
+            <button type="button" onClick={copy}>Copy caption and book link</button>
+            <a href={page.thumbnail} download>Download share image (JPG)</a>
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Open Instagram</a>
+          </div>
+          <small>For a clickable book link, add a Story link sticker or put the URL in your profile bio.</small>
+          <div role="status">{status}</div>
+        </div>
+      </div>}
     </section> : <button type="button" className="fb-btn fb-btn-soft" onClick={() => show(false)}
       aria-label={"Share " + title}>{page.href === "/books" ? "Share bookstore" : "Share book"}</button>}
     <dialog ref={dialog} className="fb-share-dialog" aria-label={"Share " + title} onClose={() => setOpen(false)}>
