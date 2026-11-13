@@ -25,3 +25,19 @@ describe("Kiswahili review ownership",()=>{
     expect(item.studentId).toBe("owner-1");
   });
 });
+
+describe("Day 6 restaurant review queue", () => {
+  it("accepts only canonical owner submissions under day-6", () => {
+    const entry = makeEntry("users/owner-1/swahiliLessons/day-6", { lessonId: "swahili-day-6" });
+    expect(canonicalSwahiliSubmission(entry, 6)).toEqual(expect.objectContaining({
+      studentId: "owner-1", path: "users/owner-1/swahiliLessons/day-6", lessonId: "swahili-day-6",
+    }));
+    expect(canonicalSwahiliSubmission(entry, 1)).toBeNull();
+  });
+  it("rejects cross-lesson identities and forged recipient fields", () => {
+    expect(canonicalSwahiliSubmission(makeEntry("users/owner-1/swahiliLessons/day-6", { lessonId: "swahili-day-1" }), 6)).toBeNull();
+    expect(canonicalSwahiliSubmission(makeEntry("users/owner-1/swahiliLessons/day-6", { lessonId: "swahili-day-6", studentId: "victim" }), 6)).toBeNull();
+    expect(canonicalSwahiliSubmission(makeEntry("users/owner-1/swahiliLessons/day-6", { lessonId: "swahili-day-6", userId: "victim" }), 6)).toBeNull();
+    expect(canonicalSwahiliSubmission(makeEntry("users/owner-1/swahiliLessons/day-6", { lessonId: "swahili-day-6" }), 2)).toBeNull();
+  });
+});
