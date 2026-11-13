@@ -189,7 +189,9 @@
   .falowen-home-shell { gap: 22px; }
   .falowen-home-nav { gap: 9px; padding: 4px 3px; }
   .falowen-home-brand { font-size: 21px; }
-  .falowen-home-nav-signup { display: none; }
+  /* Keep registration visible on phones; move the actions below the brand when space is tight. */
+  .falowen-home-nav-actions { flex: 1 1 100%; justify-content: flex-end; gap: 6px; }
+  .falowen-home-nav-signup { display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; padding: 7px 12px; }
   .falowen-home-login { border: 1px solid #d6dfed; background: #fff; padding: 7px 12px; }
   .falowen-home-language { max-width: 91px; font-size: 12px; }
   .falowen-home-hero { grid-template-columns: 1fr; gap: 22px; padding: 26px 20px 18px; border-radius: 20px; }
