@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { collectionGroup, db, doc, getDoc, getDocs, limit, query, serverTimestamp, setDoc } from "../firebase";
+import { collectionGroup, db, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, startAfter, where } from "../firebase";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
+import { canonicalSwahiliSubmission } from "../utils/swahiliReviewQueue";
 
 // Instructor-only companion to Day 1. It does not add a workbook tab or publish new lessons.
 // Student submissions remain in their original user-owned Firestore documents.
@@ -22,6 +23,8 @@ export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
   const [mode, setMode] = useState("slides");
   const [slideIndex, setSlideIndex] = useState(0);
   const [records, setRecords] = useState([]);
+  const [lastDocument, setLastDocument] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState("");
@@ -31,21 +34,32 @@ export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
   const [notice, setNotice] = useState("");
   const selected = records.find((record) => record.studentId === selectedId);
 
-  const loadSubmissions = async () => {
-    if (!db) { setError("Firebase is unavailable."); return; }
+  const loadSubmissions = async ({ more = false } = {}) => {
+    if (!db || loading) { if (!db) setError("Firebase is unavailable."); return; }
     setLoading(true);
     setError("");
     try {
-      // Load on demand; no real-time subscriptions or background polling.
-      const snapshot = await getDocs(query(collectionGroup(db, "swahiliLessons"), limit(100)));
-      const items = snapshot.docs
-        .map((entry) => ({ ...entry.data(), path: entry.ref.path }))
-        .filter((entry) => entry.program === "swahili" && entry.lessonId === "swahili-day-1" && entry.studentId)
-        .sort((a, b) => (b.submittedAt?.seconds || 0) - (a.submittedAt?.seconds || 0));
-      setRecords(items);
-      if (items.length && !items.some((item) => item.studentId === selectedId)) setSelectedId(items[0].studentId);
+      // Query only Day 1 submissions, newest first, in bounded pages.
+      // Owner identity is derived from /users/{uid}/swahiliLessons/day-1.
+      const constraints = [
+        where("program", "==", "swahili"),
+        where("lessonId", "==", "swahili-day-1"),
+        where("status", "==", "submitted"),
+        orderBy("submittedAt", "desc"),
+      ];
+      if (more && lastDocument) constraints.push(startAfter(lastDocument));
+      constraints.push(limit(25));
+      const snapshot = await getDocs(query(collectionGroup(db, "swahiliLessons"), ...constraints));
+      const items = snapshot.docs.map(canonicalSwahiliSubmission).filter(Boolean);
+      setRecords((previous) => more ? [
+        ...previous,
+        ...items.filter(item => !previous.some(record => record.path === item.path)),
+      ] : items);
+      setLastDocument(snapshot.docs.at(-1) || null);
+      setHasMore(snapshot.docs.length === 25);
+      if (!more) setSelectedId(items[0]?.studentId || "");
     } catch (e) {
-      setError("Could not open the review queue. Check staff access and published Firestore rules.");
+      setError("Could not open the review queue. Check staff access and the collection-group index.");
     } finally { setLoading(false); }
   };
 
@@ -108,8 +122,8 @@ export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
         </section>
       ) : (
         <section className="swahili-book__card swahili-book__activity" aria-label="Swahili student submissions">
-          <div className="swahili-book__row"><h2>Day 1 review queue</h2><button className="swahili-book__button swahili-book__button--soft" onClick={loadSubmissions} disabled={loading}>Refresh</button></div>
-          <p className="swahili-book__small">Manual refresh only. Showing up to 100 recent records; no automatic grading.</p>
+          <div className="swahili-book__row"><h2>Day 1 review queue</h2><button className="swahili-book__button swahili-book__button--soft" onClick={() => loadSubmissions()} disabled={loading}>Refresh</button></div>
+          <p className="swahili-book__small">Manual refresh only. Newest 25 submissions per page; no automatic grading.</p>
           {error && <p role="alert" className="swahili-book__error">{error}</p>}
           {loading && <p>Loading submissions…</p>}
           {!loading && !records.length && !error && <p>No submitted Day 1 work found.</p>}
@@ -140,6 +154,11 @@ export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
                 </>
               )}
             </>
+          )}
+          {hasMore && !error && (
+            <button type="button" className="swahili-book__button swahili-book__button--soft" onClick={() => loadSubmissions({ more: true })} disabled={loading}>
+              {loading ? "Loading…" : "Load more submissions"}
+            </button>
           )}
         </section>
       )}
