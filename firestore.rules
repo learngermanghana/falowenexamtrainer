@@ -77,24 +77,32 @@ service cloud.firestore {
       allow create, update, delete: if isOwner(userId);
     }
 
-    // Staff can query Kiswahili student submissions across user subcollections.
-    // Students still own their original records; reviews are stored separately.
-    match /{path=**}/swahiliLessons/{lessonId} {
-      allow read: if isStaff();
+    function canReviewSwahili() {
+      return signedIn() && (
+        request.auth.token.get('admin', false) == true ||
+        request.auth.token.get('staff', false) == true ||
+        request.auth.token.get('role', '') in ['admin', 'staff', 'tutor'] ||
+        (request.auth.token.get('email_verified', false) == true &&
+          request.auth.token.get('email', '') in ['moxflex@gmail.com', 'staff@falowen.app'])
+      );
     }
 
-    match /swahiliTeacherReviews/{studentId} {
-      // Day 1 feedback uses {uid}; Day 6 uses {uid}_day-6.
-      // The review document is staff-written, so verifying its canonical
-      // recipient and lesson permits read without broadening client writes.
-      allow get: if isOwner(studentId) ||
-        (signedIn() &&
-          resource.data.studentId == request.auth.uid &&
-          resource.data.lessonId == 'swahili-day-6' &&
-          studentId == request.auth.uid + '_day-6') ||
-        isStaff();
-      allow list: if isStaff();
-      allow create, update, delete: if isStaff();
+    match /{path=**}/swahiliLessons/{lessonId} {
+      allow read: if canReviewSwahili();
+    }
+
+    match /swahiliTeacherReviews/{reviewId} {
+      allow get: if canReviewSwahili() || (signedIn() &&
+        (reviewId == request.auth.uid || reviewId == request.auth.uid + '_day-6') &&
+        (resource == null || resource.data.studentId == request.auth.uid));
+      allow list: if canReviewSwahili();
+      allow create, update: if canReviewSwahili() &&
+        request.resource.data.program == 'swahili' &&
+        request.resource.data.status in ['reviewed', 'needs_revision'] &&
+        request.resource.data.feedback is string &&
+        request.resource.data.feedback.size() <= 3000 &&
+        ((request.resource.data.lessonId == 'swahili-day-1' && reviewId == request.resource.data.studentId) ||
+          (request.resource.data.lessonId == 'swahili-day-6' && reviewId == request.resource.data.studentId + '_day-6'));
     }
 
     match /writingProgress/{progressId} {

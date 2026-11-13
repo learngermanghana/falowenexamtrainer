@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
@@ -9,6 +9,7 @@ import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
 import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
+import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import "./SwahiliCourseBook.css";
 
 const TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
@@ -68,22 +69,23 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
   const [submissionResult, setSubmissionResult] = useState(null);
   const [previouslySubmitted, setPreviouslySubmitted] = useState(false);
   const [teacherReview, setTeacherReview] = useState(null);
-  const checkedUser = useRef(null);
-
+  const [submissionVersion, setSubmissionVersion] = useState(0);
   useEffect(() => {
-    if (activeTab !== "submit" || !user?.uid || !db || checkedUser.current === user.uid) return;
-    checkedUser.current = user.uid;
-    let cancelled = false;
-    getDoc(doc(db, "users", user.uid, "swahiliLessons", "day-6"))
-      .then(snapshot => { if (!cancelled && snapshot.exists()) setPreviouslySubmitted(true); })
-      .catch(() => { /* A failed lookup must not block the lesson. */ });
-    getDoc(doc(db, "swahiliTeacherReviews", `${user.uid}_day-6`))
-      .then(snapshot => {
-        if (!cancelled && snapshot.exists() && snapshot.data().lessonId === "swahili-day-6") setTeacherReview(snapshot.data());
-      })
-      .catch(() => { /* No published teacher feedback yet. */ });
-    return () => { cancelled = true; };
-  }, [activeTab, user?.uid]);
+    setTeacherReview(null);
+    if (activeTab !== "submit" || !user?.uid || !db) return undefined;
+    let active = true;
+    Promise.allSettled([
+      getDoc(doc(db, "users", user.uid, "swahiliLessons", "day-6")),
+      getDoc(doc(db, "swahiliTeacherReviews", `${user.uid}_day-6`)),
+    ]).then(([work, feedback]) => {
+      if (!active) return;
+      const submission = work.status === "fulfilled" && work.value.exists() ? work.value : null;
+      const review = feedback.status === "fulfilled" && feedback.value.exists() ? feedback.value.data() : null;
+      setPreviouslySubmitted(Boolean(submission));
+      setTeacherReview(getCurrentSwahiliReview(submission?.data(), review));
+    });
+    return () => { active = false; };
+  }, [activeTab, user?.uid, submissionVersion]);
 
   const setAnswer = (setter, id, value, setChecked) => {
     setter(old => ({ ...old, [id]: value }));
@@ -122,6 +124,8 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         submittedAt: serverTimestamp(),
       }, { merge: true });
       setPreviouslySubmitted(true);
+      setTeacherReview(null);
+      setSubmissionVersion((version) => version + 1);
       setSubmissionResult({ type: "success" });
     } catch {
       setSubmissionResult({ type: "error", message: "Imeshindikana kuhifadhi kazi. Kagua muunganisho wako na ujaribu tena." });

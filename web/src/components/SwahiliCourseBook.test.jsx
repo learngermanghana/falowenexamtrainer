@@ -156,11 +156,23 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     mockUser = { uid: "swahili-student-1" };
     getDoc.mockImplementation(async (path) => path === "/swahiliTeacherReviews/swahili-student-1"
       ? { exists: () => true, data: () => ({ status: "needs_revision", feedback: "Repeat the B syllables." }) }
-      : { exists: () => true });
+      : { exists: () => true, data: () => ({}) });
     renderLesson();
     openTab("Submit");
     expect(await screen.findByText("Repeat the B syllables.")).toBeTruthy();
     expect(screen.getAllByRole("tab")).toHaveLength(7);
+  });
+
+
+  it("hides older feedback when the workbook has been resubmitted", async () => {
+    mockUser = { uid: "swahili-student-1" };
+    getDoc.mockImplementation(async (path) => path.includes("swahiliTeacherReviews")
+      ? { exists: () => true, data: () => ({ feedback: "Old feedback", reviewedAt: { toMillis: () => 10 } }) }
+      : { exists: () => true, data: () => ({ submittedAt: { toMillis: () => 20 } }) });
+    renderLesson();
+    openTab("Submit");
+    await screen.findByRole("button", { name: "Wasilisha tena" });
+    expect(screen.queryByText("Old feedback")).toBeNull();
   });
 
 });
