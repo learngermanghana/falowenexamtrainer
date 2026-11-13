@@ -27,3 +27,16 @@
 .swahili-book__activity select,.swahili-book__form select,.swahili-book__form textarea{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid #aebfb5;background:white;color:#14291e;max-width:100%;width:100%}
 .swahili-book__activity>label{display:grid;gap:6px;font-weight:700}
 .swahili-book details summary{cursor:pointer;font-weight:700}
+
+/* Kiswahili Lesson 6 uses the existing A2/B1 section shell and tab navigation. */
+.swahili-book__lesson--separated{margin-top:20px;padding-top:20px;border-top:1px solid #dce8e0}
+.swahili-book__phrase-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.swahili-book__dialogue{display:grid;gap:6px;background:#f8fbf8;border:1px solid #dce9df;border-radius:14px;padding:16px 18px}
+.swahili-book__dialogue p{line-height:1.55;margin:0}
+.swahili-book__dialogue strong{color:#205c43}
+.swahili-book__menu{background:#fffdf7;border:1px solid #e7dbc0;border-radius:16px;padding:18px 22px}
+.swahili-book__menu h3{text-align:center;margin:0 0 6px;font-size:1.35rem;color:#163f2d}
+.swahili-book__menu h4{margin:10px 0;color:#205c43}
+.swahili-book__menu-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.swahili-book__menu-cols p{padding:5px 0;border-bottom:1px dashed #e2d9c4}
+@media(max-width:560px){.swahili-book__menu{padding:13px}.swahili-book__menu-cols{grid-template-columns:1fr}.swahili-book__phrase-list{grid-template-columns:1fr}}

@@ -1,4 +1,5 @@
 import SwahiliCourseBook from "./components/SwahiliCourseBook";
+import SwahiliDaySixWorkbook from "./components/SwahiliDaySixWorkbook";
 import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
@@ -436,9 +437,10 @@ function App() {
     !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
 
   // Public Day 1 preview is independent of German enrollment and Firebase sign-in.
-  const swahiliPreview = location.pathname.match(/^\/swahili(?:\/(day-1))?\/?$/);
+  const swahiliPreview = location.pathname.match(/^\/swahili(?:\/(day-(?:1|6)))?\/?$/);
   if (swahiliPreview) {
-    return <SwahiliCourseBook day={swahiliPreview[1] ? 1 : null} basePath="/swahili" preview />;
+    if (swahiliPreview[1] === "day-6") return <SwahiliDaySixWorkbook basePath="/swahili" preview />;
+    return <SwahiliCourseBook day={swahiliPreview[1] === "day-1" ? 1 : null} basePath="/swahili" preview />;
   }
 
   if (location.pathname === "/visitor-guide" || location.pathname === "/visitor-guide/") {
@@ -890,6 +892,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/preview/:level" element={<NextLevelPreviewPage />} />
           <Route path="/campus/course/swahili/day-1" element={<SwahiliCourseBook day={1} basePath="/campus/course/swahili" />} />
+          <Route path="/campus/course/swahili/day-6" element={<SwahiliDaySixWorkbook basePath="/campus/course/swahili" />} />
           <Route path="/campus/course/lesson/:level/:day" element={<CourseLessonPage />} />
           <Route path="/campus/course/speaking-exams-intro-4-7" element={<SpeakingExamIntroPage />} />
           <Route
