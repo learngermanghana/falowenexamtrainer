@@ -18,7 +18,7 @@ const receipt={status:"paid",reference:"paystack_ok",checkoutPesewas:9900};
 test("private books are exact allowlisted objects and never arbitrary user keys",()=>{
  assert.deepEqual(Object.keys(DIGITAL_BOOK_OBJECTS).sort(),[
   "a1-writing-model-exams-digital","a2-four-skills-exam-guide-digital","b1-four-skills-exam-guide-digital",
-  "a2-course-workbook-digital", "a1-digital", "b1-course-workbook-digital"
+  "a2-course-workbook-digital", "a1-digital", "b1-course-workbook-digital", "german-a1-exam-preparation-digital"
  ].sort());
  for (const {bucket,key} of Object.values(DIGITAL_BOOK_OBJECTS)) {
    assert.equal(bucket,"falowen-books-private");
@@ -159,4 +159,16 @@ test("A1 and B1 full course PDFs are exact private paid objects", () => {
   assert.equal(DIGITAL_BOOK_OBJECTS[bookId].key,key);
   assert.equal(new URL(signPrivateBookDownload({bookId,env}).url).pathname,"/"+key);
  }
+});
+
+test("German A1 exam preparation maps to the exact private uploaded object", () => {
+  const file = DIGITAL_BOOK_OBJECTS["german-a1-exam-preparation-digital"];
+  assert.deepEqual(file, {
+    bucket: "falowen-books-private",
+    key: "book/Falowen_A1_Book_Download.pdf",
+    filename: "German_A1_Exam_Preparation_The_Falowen_Method.pdf",
+  });
+  const signed = signPrivateBookDownload({bookId:"german-a1-exam-preparation-digital",env});
+  assert.equal(new URL(signed.url).pathname, "/book/Falowen_A1_Book_Download.pdf");
+  assert.equal(signed.expiresIn, 90);
 });
