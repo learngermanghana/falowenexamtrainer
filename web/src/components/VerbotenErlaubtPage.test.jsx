@@ -3,7 +3,19 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import VerbotenErlaubtPage from "./VerbotenErlaubtPage";
 
-jest.mock("./CourseSpeakingMockAssignment", () => ({ assignmentKey }) => <div data-testid="a1-speaking-practice">{assignmentKey}</div>);
+jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: { uid: "learner" } }) }));
+jest.mock("./A1CanonicalSubmissionPanel", () => () => <p>Tutor review</p>);
+jest.mock("./A1WorkbookMediaPanel", () => () => null);
+jest.mock("./WorkbookDayMusic", () => () => null);
+jest.mock("./PublishedHoerenPractice", () => () => null);
+jest.mock("./A1TimedMockExam", () => ({
+  __esModule: true,
+  default: ({ children }) => children,
+  useA1TimedMockExam: () => ({ attemptState: "active", secondsLeft: 900, isTabLocked: () => false }),
+}));
+jest.mock("./A1FamilyRecording", () => ({ task }) => <div data-testid="speaking-recorder">{task.teil}</div>);
+
+const openGrammar = () => fireEvent.click(screen.getByRole("tab", { name: "Grammar" }));
 
 const renderPage = () => render(
   <MemoryRouter>
@@ -16,14 +28,16 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
     renderPage();
 
     expect(screen.getByRole("heading", { name: /Goethe A1 Speaking Confidence Lab/i })).toBeVisible();
-    expect(screen.getByText(/Teil 1 · Sich vorstellen/i)).toBeVisible();
-    expect(screen.getByText(/Teil 2 · Fragen und Antworten/i)).toBeVisible();
-    expect(screen.getByText(/Teil 3 · Bitten und reagieren/i)).toBeVisible();
+    const overview = within(screen.getByRole("heading", { name: "The three speaking parts" }).closest("section"));
+    expect(overview.getByText("Teil 1 · Sich vorstellen")).toBeVisible();
+    expect(overview.getByText("Teil 2 · Fragen und Antworten")).toBeVisible();
+    expect(overview.getByText("Teil 3 · Bitten und Reagieren")).toBeVisible();
     expect(screen.queryByRole("heading", { name: /Erlaubt oder verboten/i })).not.toBeInTheDocument();
   });
 
   test("Teil 1 covers the complete self-introduction plus spelling and number tasks", () => {
     renderPage();
+    openGrammar();
 
     ["Name", "Alter", "Land", "Wohnort", "Sprachen", "Beruf / Studium", "Hobby"].forEach((label) => {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0);
@@ -34,6 +48,7 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
 
   test("Teil 2 requires the learner to ask before revealing the model", () => {
     renderPage();
+    openGrammar();
 
     const teil2Heading = screen.getByRole("heading", { name: "Use the theme and keyword to form a question" });
     const teil2Section = teil2Heading.closest("section");
@@ -54,6 +69,7 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
 
   test("Teil 2 cards separate Goethe theme from the keyword used to form the question", () => {
     renderPage();
+    openGrammar();
 
     const teil2Section = screen.getByRole("heading", { name: "Use the theme and keyword to form a question" }).closest("section");
     const teil2 = within(teil2Section);
@@ -75,6 +91,7 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
 
   test("Teil 3 practises requests and reactions", () => {
     renderPage();
+    openGrammar();
 
     const teil3Heading = screen.getByRole("heading", { name: "Make a request and react" });
     const teil3Section = teil3Heading.closest("section");
@@ -90,13 +107,13 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
     expect(teil3.getByText("Ja, gern.")).toBeVisible();
   });
 
-  test("includes mock exam, speaking practice and readiness checklist", () => {
+  test("shows all three recorders in the Assignment tab and keeps a tutor submission tab", () => {
     renderPage();
-
-    expect(screen.getByRole("heading", { name: /Teil 1 → Teil 2 → Teil 3 · with minimal help/i })).toBeVisible();
-    expect(screen.getByTestId("a1-speaking-practice")).toBeVisible();
-    expect(screen.getByRole("heading", { name: /Can I do this tomorrow in the exam/i })).toBeVisible();
-    expect(screen.getAllByRole("checkbox")).toHaveLength(6);
-    expect(screen.getByText(/fresh prompt/i)).toBeVisible();
+    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
+    fireEvent.click(screen.getByRole("tab", { name: "Assignment" }));
+    expect(screen.getAllByTestId("speaking-recorder")).toHaveLength(3);
+    screen.getAllByTestId("speaking-recorder").forEach((recorder) => expect(recorder).toBeVisible());
+    fireEvent.click(screen.getByRole("tab", { name: "Review & Submit" }));
+    expect(screen.getByText("Tutor review")).toBeVisible();
   });
 });

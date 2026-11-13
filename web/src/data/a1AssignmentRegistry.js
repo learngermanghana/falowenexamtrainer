@@ -38,6 +38,7 @@ const NATIVE_SHARED_LAYOUT_COMPONENTS = new Set([
   "A1Day17InstructionsDirectionsKapitel11WorkbookPage",
   "A1Day18Kapitel121WorkbookPage",
   "A1Day18Kapitel122WorkbookPage",
+  "VerbotenErlaubtPage",
   "A1Day20LetterWritingWorkbookPage",
   "A1Day21WeatherWorkbookPage",
   "A1Day22HealthBodyPartsWorkbookPage",
@@ -87,7 +88,7 @@ export const A1_ASSIGNMENT_REGISTRY = Object.freeze(Object.fromEntries(records.m
       workbookRoute,
       ...routeParts,
       component,
-      layoutMode: assignmentKey === "A1-5.9" ? "graded-speaking" : NATIVE_SHARED_LAYOUT_COMPONENTS.has(component) ? "native" : "bridge",
+      layoutMode: NATIVE_SHARED_LAYOUT_COMPONENTS.has(component) ? "native" : "bridge",
       sections: Object.freeze(labels.map(recordSection)),
       submissionEnabled: true,
     })];

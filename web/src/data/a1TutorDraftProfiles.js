@@ -143,6 +143,13 @@ const profiles = {
       "teil-3": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Hören" }),
     },
   },
+  "A1-5.9": {
+    sections: {
+      "teil-1": section([], { label: "Sich vorstellen", speaking: true }),
+      "teil-2": section([], { label: "Fragen und Antworten", speaking: true }),
+      "teil-3": section([], { label: "Bitten und reagieren", speaking: true }),
+    },
+  },
   "A1-12.3": {
     sections: {
       "teil-1": section([], { label: "Informal letter", embeddedWriting: true }),
@@ -194,9 +201,11 @@ export const getA1TutorDraftSectionProgress = ({ assignmentKey = "", sectionKey 
 
   const savedSection = draft?.sections?.[sectionKey] || {};
   if (sectionProfile.writing || sectionProfile.embeddedWriting || sectionProfile.speaking) {
-    const complete = sectionProfile.speaking
-      ? isA1TutorSpeakingAssessment(sectionKey, assignmentKey, String(savedSection.text || ""))
-      : hasValue(savedSection.text);
+    const complete = assignmentKey === "A1-5.9"
+      ? hasValue(savedSection.recording?.transcript) && /^https:\/\//i.test(savedSection.recording?.audioUrl || "")
+      : sectionProfile.speaking
+        ? isA1TutorSpeakingAssessment(sectionKey, assignmentKey, String(savedSection.text || ""))
+        : hasValue(savedSection.text);
     return { complete, completed: complete ? 1 : 0, total: 1, missing: complete ? [] : [sectionProfile.speaking ? "speaking assessment" : "writing"] };
   }
 

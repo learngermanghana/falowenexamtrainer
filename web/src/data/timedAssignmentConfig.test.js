@@ -1,4 +1,3 @@
-import { getA1Assignment } from "./a1AssignmentRegistry";
 import { isTimedAssignmentTabLocked } from "../utils/timedAssignmentAccess";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import {
@@ -15,6 +14,8 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentDurationSeconds("A1-10")).toBe(20 * 60);
     expect(getTimedAssignmentDurationSeconds("A1-11")).toBe(25 * 60);
     expect(getTimedAssignmentDurationSeconds("A1-12.1")).toBe(25 * 60);
+    expect(getTimedAssignmentDurationSeconds("A1-5.9")).toBe(15 * 60);
+    expect(getTimedAssignmentConfig("A1-5.9").timedTabs).toEqual(["assignment"]);
     expect(getTimedAssignmentDurationSeconds("A1-12.2")).toBe(25 * 60);
     expect(getTimedAssignmentDurationSeconds("A1-12.3")).toBe(30 * 60);
     expect(getTimedAssignmentConfig("A1-12.3")?.mode).toBe("mock");
@@ -154,11 +155,6 @@ describe("shared timed assignment configuration", () => {
 
     expect(required.length).toBeGreaterThan(0);
     required.forEach((assignmentKey) => {
-      // The speaking examiner owns its session timing, outside the written-workbook clock.
-      if (getA1Assignment(assignmentKey)?.layoutMode === "graded-speaking") {
-        expect(assignmentKey).toBe("A1-5.9");
-        return;
-      }
       expect(getTimedAssignmentConfig(assignmentKey)).not.toBeNull();
     });
   });

@@ -11,19 +11,19 @@ import { getA1TutorDraftProgress } from "../data/a1TutorDraftProfiles";
 
 const A1TutorWorkbookDraftContext = createContext(null);
 
-export function A1TutorWorkbookDraftProvider({ assignment, children }) {
+export function A1TutorWorkbookDraftProvider({ assignment, ownerUid = "", children }) {
   const assignmentKey = assignment?.assignmentKey || "";
-  const [draft, setDraft] = useState(() => readA1WorkbookDraft(assignmentKey));
+  const [draft, setDraft] = useState(() => readA1WorkbookDraft(assignmentKey, ownerUid));
   const [saveState, setSaveState] = useState("saved");
 
   const refreshDraft = useCallback((incomingDraft = null) => {
-    const next = incomingDraft?.assignmentKey === assignmentKey
+    const next = incomingDraft?.assignmentKey === assignmentKey && (incomingDraft.ownerUid || "") === ownerUid
       ? incomingDraft
-      : readA1WorkbookDraft(assignmentKey);
+      : readA1WorkbookDraft(assignmentKey, ownerUid);
     setDraft(next);
     setSaveState("saved");
     return next;
-  }, [assignmentKey]);
+  }, [assignmentKey, ownerUid]);
 
   useEffect(() => {
     refreshDraft();
@@ -31,11 +31,12 @@ export function A1TutorWorkbookDraftProvider({ assignment, children }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
-    const storageKey = buildA1WorkbookDraftStorageKey(assignmentKey);
+    const storageKey = buildA1WorkbookDraftStorageKey(assignmentKey, ownerUid);
 
     const handleDraftUpdated = (event) => {
       const eventAssignmentKey = String(event?.detail?.assignmentKey || "").trim().toUpperCase();
       if (eventAssignmentKey && eventAssignmentKey !== String(assignmentKey).trim().toUpperCase()) return;
+      if ((event?.detail?.draft?.ownerUid || "") !== ownerUid) return;
       refreshDraft(event?.detail?.draft || null);
     };
 
@@ -56,11 +57,11 @@ export function A1TutorWorkbookDraftProvider({ assignment, children }) {
     setSaveState("saving");
     setDraft((current) => {
       const nextSections = updater(current?.sections || {});
-      const next = saveA1WorkbookDraft({ assignmentKey, sections: nextSections });
+      const next = saveA1WorkbookDraft({ assignmentKey, sections: nextSections, ownerUid });
       window.setTimeout(() => setSaveState("saved"), 0);
       return next;
     });
-  }, [assignmentKey]);
+  }, [assignmentKey, ownerUid]);
 
   const updateAnswer = useCallback((sectionKey, number, value) => {
     mutateSections((sections) => ({
@@ -85,6 +86,13 @@ export function A1TutorWorkbookDraftProvider({ assignment, children }) {
     }));
   }, [mutateSections]);
 
+  const updateRecording = useCallback((sectionKey, recording) => {
+    mutateSections((sections) => ({
+      ...sections,
+      [sectionKey]: { recording, text: recording.transcript },
+    }));
+  }, [mutateSections]);
+
   const safeDraft = draft || makeEmptyA1WorkbookDraft(assignmentKey);
   const submissionText = useMemo(
     () => buildA1WorkbookSubmissionText({ assignment, draft: safeDraft }),
@@ -105,6 +113,7 @@ export function A1TutorWorkbookDraftProvider({ assignment, children }) {
     refreshDraft,
     updateAnswer,
     updateSectionText,
+    updateRecording,
   }), [
     assignment,
     assignmentKey,
@@ -115,6 +124,7 @@ export function A1TutorWorkbookDraftProvider({ assignment, children }) {
     refreshDraft,
     updateAnswer,
     updateSectionText,
+    updateRecording,
   ]);
 
   return (

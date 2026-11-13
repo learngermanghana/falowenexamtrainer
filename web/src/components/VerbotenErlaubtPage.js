@@ -1,6 +1,9 @@
-import CourseSpeakingMockAssignment from "./CourseSpeakingMockAssignment";
+import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
+import { useAuth } from "../context/AuthContext";
+import A1FamilyRecording from "./A1FamilyRecording";
+import { useA1TutorWorkbookDraft } from "./A1TutorWorkbookDraftContext";
+import { useA1TimedMockExam } from "./A1TimedMockExam";
 import React, { useState } from "react";
-import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 
 const palette = {
@@ -53,12 +56,6 @@ const Callout = ({ children, tone = "blue" }) => {
   );
 };
 
-const BulletList = ({ items }) => (
-  <ul style={{ margin: 0, paddingLeft: 21, display: "grid", gap: 7, lineHeight: 1.6 }}>
-    {items.map((item) => <li key={item}>{item}</li>)}
-  </ul>
-);
-
 const teil1Fields = [
   ["Name", "Ich heiße Ama."],
   ["Alter", "Ich bin 24 Jahre alt."],
@@ -94,37 +91,34 @@ const readinessItems = [
   "I can continue after a small mistake instead of stopping.",
 ];
 
-export default function VerbotenErlaubtPage() {
+const tasks = [
+  { teil: "1", title: "Sich vorstellen", prompt: "Stellen Sie sich vor: Name, Alter, Land, Wohnort, Sprachen, Beruf und Hobby. Buchstabieren Sie Ihren Nachnamen und sagen Sie eine Telefonnummer. Die Nummer darf erfunden sein." },
+  { teil: "2", title: "Fragen und Antworten", prompt: "Thema: Einkaufen. Stichwort: Supermarkt. Stellen Sie eine Frage mit dem Stichwort. Antworten Sie dann auf die Frage: Wann kaufen Sie normalerweise ein?" },
+  { teil: "3", title: "Bitten und reagieren", prompt: "Sie brauchen einen Regenschirm. Bitten Sie höflich darum. Reagieren Sie dann auf die Bitte: Können Sie mir bitte helfen?" },
+];
+
+function Day19SpeakingTask({ task }) {
+  const { draft, updateRecording } = useA1TutorWorkbookDraft();
+  const { attemptState, secondsLeft, startBusy } = useA1TimedMockExam();
+  const sectionKey = `teil-${task.teil}`;
+  return (
+    <Section title={`Teil ${task.teil} · ${task.title}`} description={task.prompt}>
+      <A1FamilyRecording
+        task={task}
+        value={draft.sections?.[sectionKey]?.recording}
+        onMarked={(recording) => updateRecording(sectionKey, recording)}
+        disabled={attemptState !== "active" || secondsLeft <= 0 || startBusy}
+      />
+    </Section>
+  );
+}
+
+function SpeakingGrammar() {
   const [revealedTeil2, setRevealedTeil2] = useState({});
   const [revealedTeil3, setRevealedTeil3] = useState({});
 
   return (
-    <div data-a1-speaking-confidence-lab="true" style={{ ...styles.container, display: "grid", gap: 18, maxWidth: 1100 }}>
-      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-
-      <header style={{ borderRadius: 26, padding: "clamp(24px, 5vw, 48px)", background: "linear-gradient(135deg, #0f172a, #1e3a8a, #4338ca)", color: "#fff", display: "grid", gap: 14 }}>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {["A1", "Day 19", "Chapter 5.9", "Goethe Sprechen"].map((label) => (
-            <span key={label} style={{ borderRadius: 999, padding: "6px 10px", background: "rgba(255,255,255,.14)", border: "1px solid rgba(255,255,255,.24)", fontSize: 12, fontWeight: 900 }}>{label}</span>
-          ))}
-        </div>
-        <div>
-          <p style={{ margin: "0 0 8px", color: "#bfdbfe", fontWeight: 900, textTransform: "uppercase", letterSpacing: 0.8, fontSize: 13 }}>Goethe A1 Sprechen · Prüfungstraining</p>
-          <h1 style={{ margin: 0, fontSize: "clamp(2rem, 6vw, 3.8rem)", lineHeight: 1.04 }}>Goethe A1 Speaking Confidence Lab</h1>
-        </div>
-        <p style={{ margin: 0, color: "#e2e8f0", lineHeight: 1.7, fontSize: "clamp(1rem, 2.3vw, 1.16rem)", maxWidth: 820 }}>
-          This is a required speaking assignment. Review the examples, complete Teil 1, Teil 2 and Teil 3 with the AI examiner, then submit the complete assessment to save your score and feedback.
-        </p>
-      </header>
-
-      <Section eyebrow="Exam map" title="Know the three speaking parts" description="Keep this short. The goal is performance, not a long grammar lesson.">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 12 }}>
-          <Callout><strong>Teil 1 · Sich vorstellen</strong><span>Introduce yourself, spell a name and say a number clearly.</span></Callout>
-          <Callout tone="green"><strong>Teil 2 · Fragen und Antworten</strong><span>Use a topic/keyword to ask a question, then answer your partner.</span></Callout>
-          <Callout tone="amber"><strong>Teil 3 · Bitten und reagieren</strong><span>Make a polite request from a card and react naturally to your partner.</span></Callout>
-        </div>
-      </Section>
-
+    <div style={{ display: "grid", gap: 16 }}>
       <Section eyebrow="Goethe A1 · Teil 1" title="Sich vorstellen · 30–45 seconds" description="Practise a complete introduction without reading a long script.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
           {teil1Fields.map(([label, model]) => (
@@ -195,17 +189,6 @@ export default function VerbotenErlaubtPage() {
         </div>
       </Section>
 
-      <Section eyebrow="Mini mock exam" title="Teil 1 → Teil 2 → Teil 3 · with minimal help" description="This is the real readiness check. Do not stop after every small error. Finish the interaction first, then review.">
-        <BulletList items={[
-          "Teil 1: introduce yourself in 30–45 seconds, then spell your surname and say one number.",
-          "Teil 2: take a fresh topic card, ask a question, listen and answer your partner.",
-          "Teil 3: take a fresh request card, make the request and react to your partner.",
-          "If you make a small mistake, continue with simple German instead of stopping.",
-        ]} />
-      </Section>
-
-      <CourseSpeakingMockAssignment assignmentKey="A1-5.9" />
-
       <Section eyebrow="Readiness" title="Can I do this tomorrow in the exam?" description="Use this checklist after the mock round.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 10 }}>
           {readinessItems.map((item) => (
@@ -221,5 +204,30 @@ export default function VerbotenErlaubtPage() {
         </Callout>
       </Section>
     </div>
+  );
+}
+
+export default function VerbotenErlaubtPage() {
+  const { user } = useAuth();
+  return (
+    <A1TutorMarkedWorkbookShell
+      fallbackAssignmentKey="A1-5.9"
+      subtitle="Goethe A1 Sprechen · Tutor-marked assignment"
+      assignmentIntro="Study the models in Grammar. When you are ready, start the 15-minute timer, open Assignment and save your recording for each Teil. You can submit early in Review & Submit. When time runs out, Falowen sends the work you have saved for tutor review."
+      grammarContent={<SpeakingGrammar />}
+      draftOwnerUid={user?.uid || ""}
+      groupAssignmentSections
+    >
+      <Section title="The three speaking parts">
+        <Callout><strong>Teil 1 · Sich vorstellen</strong><span>Introduce yourself, spell your name and say a number.</span></Callout>
+        <Callout tone="green"><strong>Teil 2 · Fragen und Antworten</strong><span>Ask a question using a keyword and answer a separate question.</span></Callout>
+        <Callout tone="amber"><strong>Teil 3 · Bitten und Reagieren</strong><span>Make a polite request and react to another request.</span></Callout>
+      </Section>
+      {tasks.map((task) => (
+        <WorkbookSection key={task.teil} sectionKey={`teil-${task.teil}`}>
+          <Day19SpeakingTask task={task} />
+        </WorkbookSection>
+      ))}
+    </A1TutorMarkedWorkbookShell>
   );
 }

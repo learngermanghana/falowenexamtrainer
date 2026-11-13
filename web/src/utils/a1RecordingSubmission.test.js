@@ -21,3 +21,14 @@ test('grammar revision is carried into the final immutable recording payload', (
   const payload = buildA1RecordingSubmission({ ...args, draft: { sections: { ...draft.sections, 'teil-3': { revision: 'a1-3-recorded-family-grammar-v2' } } } });
   expect(payload.workbookRevision).toBe('a1-3-recorded-family-grammar-v2');
 });
+
+test("Day 19 preserves only saved speaking parts for expiry submission", () => {
+  const recording = { transcript: "Ich wohne in Accra.", audioUrl: "https://example.com/one.webm", savedAt: "now" };
+  expect(buildA1RecordingSubmission({
+    assignmentKey: "A1-5.9",
+    draft: { sections: { "teil-1": { recording }, "teil-2": { text: "Unsaved recording" } } },
+  })).toEqual({
+    workbookRevision: "a1-5.9-tutor-speaking-v1",
+    recordings: [{ sectionKey: "teil-1", ...recording }],
+  });
+});

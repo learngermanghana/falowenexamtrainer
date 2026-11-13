@@ -197,7 +197,7 @@ describe("all tutor-marked A1 through C1 assignments", () => {
           assignmentKey: entry.assignment_id,
           day: Number(entry.day),
           chapter: entry.chapter,
-          layoutMode: entry.assignment_id === "A1-5.9" ? "graded-speaking" : "native",
+          layoutMode: "native",
         }),
       );
     });
