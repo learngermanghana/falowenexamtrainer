@@ -77,6 +77,18 @@ service cloud.firestore {
       allow create, update, delete: if isOwner(userId);
     }
 
+    // Staff can query Kiswahili student submissions across user subcollections.
+    // Students still own their original records; reviews are stored separately.
+    match /{path=**}/swahiliLessons/{lessonId} {
+      allow read: if isStaff();
+    }
+
+    match /swahiliTeacherReviews/{studentId} {
+      allow get: if isOwner(studentId) || isStaff();
+      allow list: if isStaff();
+      allow create, update, delete: if isStaff();
+    }
+
     match /writingProgress/{progressId} {
       allow create: if ownsIncoming();
       allow read: if ownsResource() || isStaff();
