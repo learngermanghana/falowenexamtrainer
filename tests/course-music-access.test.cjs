@@ -274,3 +274,48 @@ test('Day 27 classroom audio signs the exact supplied object for staff only', as
  }
  assert.throws(()=>signTrack('b1-day27-environment-everyday',env),/Unknown/);
 });
+
+test('B1 Day 28 climate-friendly classroom Hören signs only its exact staff-approved R2 key', async () => {
+ const {createClassroomAudioHandler,createClassroomBankAudioHandler}=require('../server/courseMusic.cjs');
+ const key='b1/day-28/klimafreundlich-leben.mp3';
+ const teacher={localId:'teacher',customAttributes:'{"role":"teacher"}'};
+ const scenarios=[
+   [null,'B1',28,key,401],
+   [{localId:'student',email:'learner@example.com'},'B1',28,key,403],
+   [teacher,'B1',28,key,200],
+   [{...teacher,disabled:true},'B1',28,key,401],
+   [teacher,'A2',28,key,400],
+   [teacher,'B1',27,key,400],
+   [teacher,'B1',28,'b1/day-28/other.mp3',400],
+   [teacher,'B1',28,'b1/day-28/../private.mp3',400],
+   [teacher,'B1',28,'b1/day-28/klimafreundlich-leben.wav',400],
+ ];
+ for (const [account,level,day,requestKey,expected] of scenarios) {
+   const responseObject=response();
+   const handler=createClassroomAudioHandler({
+     env,fetchImpl:async()=>({ok:true,json:async()=>({users:account?[account]:[]})}),
+   });
+   await handler({
+     method:'GET',
+     headers:account?{authorization:'Bearer test-staff-token',origin:'https://admin.falowen.app'}:{},
+     url:'/course-media/classroom/audio-url?'+new URLSearchParams({level,day:String(day),key:requestKey})
+   },responseObject);
+   assert.equal(responseObject.code,expected,`${level} ${day} ${requestKey}`);
+   assert.equal(Boolean(responseObject.body.url),expected===200);
+   if (expected===200) {
+     const url=new URL(responseObject.body.url);
+     assert.equal(url.pathname,'/'+key);
+     assert.equal(url.hostname,`falowen-course-audio.${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`);
+     assert.match(url.searchParams.get('X-Amz-Signature'),/^[a-f0-9]{64}$/);
+     assert.equal(responseObject.headers['Cache-Control'],'private, no-store');
+     assert.equal(responseObject.headers['Access-Control-Allow-Origin'],'https://admin.falowen.app');
+   }
+ }
+ const legacy=createClassroomBankAudioHandler({
+   env,fetchImpl:async()=>({ok:true,json:async()=>({users:[teacher]})}),
+ });
+ const legacyResult=response();
+ await legacy({method:'GET',headers:{authorization:'Bearer staff'},url:'/?'+new URLSearchParams({level:'B1',day:'28',key})},legacyResult);
+ assert.equal(legacyResult.code,400,'legacy A2 playback must not expose B1 Day 28');
+ assert.throws(()=>signTrack('b1-day28-klimafreundlich-leben',env),/Unknown/,'not part of the public music library');
+});
