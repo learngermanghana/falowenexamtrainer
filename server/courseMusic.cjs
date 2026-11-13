@@ -89,6 +89,8 @@ function createMusicHandler({ env = process.env, fetchImpl = fetch, prepare = pr
 // Private course conversations, never exposed by the public music track map.
 // Fixed (level, day, objectKey) triples prevent arbitrary private R2 access.
 const CLASSROOM_RECORDINGS = Object.freeze({
+  // Exact teacher-supplied B1 Day 28 MP3; private classroom playback only.
+  'B1-28': Object.freeze({ id: 'b1-day28-klimafreundlich-leben', key: 'b1/day-28/klimafreundlich-leben.mp3' }),
   'B1-27': Object.freeze({ id: 'b1-day27-environment-everyday', key: 'b1/day-27/umweltfreundlich-im-alltag.mp3' }),
   // The teacher uploaded this B1 lesson recording under an A2 storage prefix.
   'B1-26': Object.freeze({ id: 'b1-day26-travel-problems', key: 'a2/day-26/reiseprobleme-und-losungen.mp3' }),
