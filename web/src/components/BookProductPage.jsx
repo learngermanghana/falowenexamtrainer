@@ -223,7 +223,6 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
             {!checkout && (canPay ? <a className="fb-btn fb-btn-primary fb-pay" href={`${bookHref(page.href)}/checkout?edition=${encodeURIComponent(selected.id)}`}>Buy Now</a>
               : <button className="fb-btn fb-btn-primary" disabled>Checkout temporarily unavailable</button>)}
           </> : <p role="status">Coming Soon · Unavailable for purchase</p>}
-          {!checkout && <BookShare key={slug} page={page} title={listing.title} description={listing.description} />}
           {checkout && available && <form className="fb-form" onSubmit={pay}>
             <h2>Your contact details</h2>
             {[["name","Full name","text"],["email","Email address","email"],["phone","Phone / WhatsApp","tel"]].map(([id,label,type])=><label key={id}>{label}
@@ -248,6 +247,7 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
               <img src={BOOK_PAGES[item.id].cover} alt="" width="70" height="100" /><span>{item.title}{item.status!=="available" && <small>Coming Soon</small>}</span>
             </a>)}</div>
           </section>}
+          {!checkout && <BookShare key={slug} page={page} title={listing.title} description={listing.description} inlineActions />}
         </div>
       </section>
     </>}
