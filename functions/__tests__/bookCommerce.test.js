@@ -121,7 +121,7 @@ test("new A2 course book is the only A2 shop product and old guides cannot be so
   assert.equal(BOOKS["a1-printed"].priceGhs, 800);
   assert.equal(BOOKS["writing-skills-a1-c2-digital"].priceGhs, 79);
   assert.equal(BOOKS["writing-skills-a1-c2-printed"].priceGhs, 250);
-  assert.equal(Object.keys(BOOKS).length, 14);
+  assert.equal(Object.keys(BOOKS).length, 15);
 });
 
 test("public books catalog does not expose the historical unlisted exam-guide SKUs", () => {
@@ -137,10 +137,10 @@ test("public books catalog does not expose the historical unlisted exam-guide SK
     json: value => { payload = value; },
   });
   assert.deepEqual(payload.catalogTitles.map(book => book.id), [
-    "a1-course-workbook", "writing-skills-a1-c2", "a2-course-workbook", "b1-course-workbook"
+    "a1-course-workbook", "writing-skills-a1-c2", "german-a1-exam-preparation", "a2-course-workbook", "b1-course-workbook"
   ]);
   assert.deepEqual(payload.books.map(book => book.id).sort(), [
-    "a1-digital", "a1-printed", "writing-skills-a1-c2-digital", "writing-skills-a1-c2-printed", "a2-course-workbook-digital", "a2-course-workbook-printed", "b1-course-workbook-digital", "b1-course-workbook-printed"
+    "a1-digital", "a1-printed", "writing-skills-a1-c2-digital", "writing-skills-a1-c2-printed", "german-a1-exam-preparation-digital", "a2-course-workbook-digital", "a2-course-workbook-printed", "b1-course-workbook-digital", "b1-course-workbook-printed"
   ].sort());
   const writing = payload.catalogTitles.find(title => title.id === "writing-skills-a1-c2");
   assert.equal(writing.pages, 68);
@@ -148,4 +148,17 @@ test("public books catalog does not expose the historical unlisted exam-guide SK
   assert.deepEqual(writing.bookIds, ["writing-skills-a1-c2-digital", "writing-skills-a1-c2-printed"]);
   assert.equal(payload.books.find(book => book.id === "writing-skills-a1-c2-digital").deliveryMode, "manual_email");
   assert.equal(payload.books.find(book => book.id === "writing-skills-a1-c2-printed").deliveryMode, "print_on_demand");
+});
+
+test("German A1 Exam Preparation is a distinct GH₵99 digital product", () => {
+  const listing = BOOK_CATALOG_TITLES.find(item => item.id === "german-a1-exam-preparation");
+  assert.ok(listing);
+  assert.equal(listing.title, "German A1 Exam Preparation");
+  assert.equal(listing.pages, 50);
+  assert.equal(listing.status, "available");
+  assert.deepEqual(listing.bookIds, ["german-a1-exam-preparation-digital"]);
+  assert.deepEqual(listing.formats, ["digital"]);
+  assert.equal(BOOKS["german-a1-exam-preparation-digital"].priceGhs, 99);
+  assert.equal(BOOKS["a1-digital"].priceGhs, 249, "Existing course book price must not change");
+  assert.match(listing.description, /requires eligible Falowen Exams Room access/);
 });
