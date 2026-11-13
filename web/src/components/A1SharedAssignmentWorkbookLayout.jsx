@@ -57,25 +57,25 @@ export const validateWorkbookSections = (assignment, sectionElements) => {
   });
 };
 
-export const getAllowedWorkbookTabs = (sections, hasGrammar = false, hasMusic = false) => [
+export const getAllowedWorkbookTabs = (sections, hasGrammar = false, hasMusic = false, groupAssignmentSections = false) => [
   sections.length ? "overview" : "assignment",
   ...(hasMusic ? ["music"] : []),
   ...(hasGrammar ? ["grammar"] : []),
-  ...sections.map(({ key }) => key),
+  ...(groupAssignmentSections ? ["assignment"] : sections.map(({ key }) => key)),
   "submit",
 ];
 
-export const useA1WorkbookTabState = ({ assignment, sections = assignment.sections, hasGrammar = false, hasMusic = false }) => {
+export const useA1WorkbookTabState = ({ assignment, sections = assignment.sections, hasGrammar = false, hasMusic = false, groupAssignmentSections = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections, hasGrammar, hasMusic), [hasGrammar, hasMusic, sections]);
+  const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections, hasGrammar, hasMusic, groupAssignmentSections), [hasGrammar, hasMusic, sections, groupAssignmentSections]);
   const fallbackTab = sections.length ? "overview" : "assignment";
   const rawSearch = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const requestedTab = rawSearch.get("workbookTab");
   const requestedView = normalizeA1SectionView(rawSearch.get("view") || "");
   const requestedViewTab =
     requestedView === "workbook"
-      ? fallbackTab
+      ? (groupAssignmentSections ? "assignment" : fallbackTab)
       : requestedView === "grammar" || requestedView === "submit"
         ? requestedView
         : allowedTabs.includes(requestedView)
@@ -163,13 +163,13 @@ const tabButtonStyle = (selected, submit = false) => ({
   whiteSpace: "normal",
 });
 
-export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false, hasMusic = false } = {}) =>
+export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false, hasMusic = false, groupAssignmentSections = false } = {}) =>
   sections.length
     ? [
       { key: "overview", label: "Overview" },
       ...(hasMusic ? [{ key: "music", label: "♫ Music", optional: true }] : []),
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
-      ...sections,
+      ...(groupAssignmentSections ? [{ key: "assignment", label: "Assignment" }] : sections),
       { key: "submit", label: "Review & Submit", submit: true },
     ]
     : [
@@ -225,8 +225,8 @@ export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect })
   );
 };
 
-export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false, hasMusic = false, assignmentLocked = false, isTabLocked = null }) => {
-  const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar, hasMusic });
+export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false, hasMusic = false, assignmentLocked = false, isTabLocked = null, groupAssignmentSections = false }) => {
+  const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar, hasMusic, groupAssignmentSections });
   const requiredTabs = tabs.filter((tab) => !tab.optional);
   const activeIndex = Math.max(0, requiredTabs.findIndex((tab) => tab.key === activeTab));
   const activeTabDefinition = tabs.find((tab) => tab.key === activeTab) || null;
@@ -335,6 +335,7 @@ export default function A1SharedAssignmentWorkbookLayout({
   overview,
   music = null,
   renderSubmission,
+  groupAssignmentSections = false,
 }) {
   const assignment = getA1Assignment(assignmentKey);
   if (!assignment) throw contentError(assignmentKey, "has no canonical registry record.");
@@ -352,10 +353,10 @@ export default function A1SharedAssignmentWorkbookLayout({
     : assignment.sections.filter(({ key }) => renderedKeys.has(key));
   const hasGrammar = Boolean(grammar);
   const hasMusic = Boolean(music);
-  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar, hasMusic });
+  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar, hasMusic, groupAssignmentSections });
   const { assignmentLocked, isTabLocked } = useA1TimedMockExam();
   const overviewTab = availableSections.length ? "overview" : "assignment";
-  const activeTabAllowedWhileLocked = ["overview", "assignment", "grammar", "music"].includes(activeTab);
+  const activeTabAllowedWhileLocked = ["overview", "grammar", "music"].includes(activeTab) || (!groupAssignmentSections && activeTab === "assignment");
   const visibleActiveTab = !activeTabAllowedWhileLocked && isTabLocked(activeTab)
     ? (hasGrammar ? "grammar" : overviewTab)
     : activeTab;
@@ -363,9 +364,9 @@ export default function A1SharedAssignmentWorkbookLayout({
   const pendingViewportTabRef = useRef("");
 
   useEffect(() => {
-    if (["overview", "assignment", "grammar", "music"].includes(activeTab) || !isTabLocked(activeTab)) return;
+    if (activeTabAllowedWhileLocked || !isTabLocked(activeTab)) return;
     openTab(hasGrammar ? "grammar" : overviewTab);
-  }, [activeTab, hasGrammar, isTabLocked, openTab, overviewTab]);
+  }, [activeTab, activeTabAllowedWhileLocked, hasGrammar, isTabLocked, openTab, overviewTab]);
 
   const openTabFromSectionAction = useCallback((key) => {
     pendingViewportTabRef.current = key;
@@ -388,6 +389,7 @@ export default function A1SharedAssignmentWorkbookLayout({
         onSelect={openTab}
         hasGrammar={hasGrammar}
         hasMusic={hasMusic}
+        groupAssignmentSections={groupAssignmentSections}
         assignmentLocked={assignmentLocked}
         isTabLocked={isTabLocked}
       />
@@ -399,7 +401,16 @@ export default function A1SharedAssignmentWorkbookLayout({
             {grammar}
           </div>
         ) : null}
-        {isCombinedDay1 ? (
+        {groupAssignmentSections ? (
+          <div data-workbook-panel="assignment" hidden={visibleActiveTab !== "assignment"}>
+            {sectionElements}
+            <A1WorkbookSectionAction
+              sections={availableSections}
+              sectionKey={availableSections.at(-1)?.key}
+              onSelect={openTabFromSectionAction}
+            />
+          </div>
+        ) : isCombinedDay1 ? (
           <div data-workbook-panel="teil-2" hidden={visibleActiveTab !== "teil-2"} data-workbook-combined-section="reading-questions">
             {sectionElements}
             <A1WorkbookSectionAction

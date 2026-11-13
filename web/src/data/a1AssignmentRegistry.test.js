@@ -31,7 +31,7 @@ describe("canonical A1 assignment registry", () => {
     );
     expect(getA1AssignmentByChapter(assignment.chapter)).toBe(assignment);
     expect(getA1AssignmentByRoute(assignment.workbookPath, assignment.workbookSearch)).toBe(assignment);
-    expect(["native", "bridge", "graded-speaking"]).toContain(assignment.layoutMode);
+    expect(["native", "bridge"]).toContain(assignment.layoutMode);
     expect(new Set(assignment.sections.map(({ key: sectionKey }) => sectionKey)).size)
       .toBe(assignment.sections.length);
     expect(assignment.sections.every(({ key: sectionKey, label }) => label.startsWith(`Teil ${sectionKey.slice(5)}`))).toBe(true);
@@ -49,7 +49,7 @@ describe("canonical A1 assignment registry", () => {
     expect(A1_ASSIGNMENT_ORDER).toHaveLength(18);
     expect(A1_ASSIGNMENT_ORDER.filter(
       (key) => A1_ASSIGNMENT_REGISTRY[key].layoutMode !== "native",
-    )).toEqual(["A1-5.9"]);
+    )).toEqual([]);
   });
 
   test("resolves tutor assignments by both day and chapter so self-practice chapters stay separate", () => {

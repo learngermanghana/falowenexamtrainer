@@ -37,6 +37,12 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
     search: location.search,
   });
 
+  if (routeLevel === "A1" && Number(params.day) === 19 &&
+      (legacyQuery.get("chapter") === "5.9" || !legacyQuery.has("chapter"))) {
+    legacyQuery.delete("hub");
+    return <Navigate replace to={`/campus/course/verboten-erlaubt-5-9?${legacyQuery.toString()}`} />;
+  }
+
   if (!isResourceHubRequest) return fallback;
 
   // Always rebuild the authoritative hub state from the URL. Besides avoiding

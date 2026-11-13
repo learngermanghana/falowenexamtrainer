@@ -32,7 +32,7 @@ const isMobileViewport = () => {
 };
 
 const isCanonicalA1Form = (form) => Boolean(
-  form?.matches?.("form")
+  form?.matches?.("form:not([data-a1-recorded-speaking])")
     && form.querySelector?.("textarea")
     && form.querySelector?.("[data-a1-final-submit-button]")
     && form.closest?.(A1_ROOT_SELECTOR),

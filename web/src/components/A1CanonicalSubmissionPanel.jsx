@@ -242,11 +242,12 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
     });
     setSubmissionGuardMessage("");
 
-    if (!completeness.ok && !timedAutoSubmit && !timedMockExam.enabled) {
+    const missingRecordings = assignmentKey === "A1-5.9" && !draftProgress?.complete && !timedMockExam.expired;
+    if (missingRecordings || (!completeness.ok && !timedAutoSubmit && !timedMockExam.enabled)) {
       event.preventDefault();
       event.stopPropagation();
       event.nativeEvent?.stopImmediatePropagation?.();
-      setSubmissionGuardMessage(completeness.message);
+      setSubmissionGuardMessage(missingRecordings ? "Save all three recordings before submitting early." : completeness.message);
       return;
     }
 
@@ -313,7 +314,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
 
   const openMissingSection = (sectionKey) => {
     const nextSearch = new URLSearchParams(location.search || "");
-    nextSearch.set("workbookTab", sectionKey);
+    nextSearch.set("workbookTab", assignmentKey === "A1-5.9" ? "assignment" : sectionKey);
     nextSearch.set("assignmentKey", assignmentKey);
     nextSearch.set("assignmentId", assignmentKey);
     nextSearch.set("level", "A1");
@@ -338,7 +339,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
         <h2 style={{ margin: "4px 0" }}>{submitTitle || `Submit ${assignmentKey}`}</h2>
         {!submissionLocked ? (
           <p style={{ color: "#475569", margin: 0 }}>
-            Review your answers below. You can edit them before submitting.
+            {assignmentKey === "A1-5.9" ? "Review your saved transcripts below. To change an answer, save a new recording in Assignment." : "Review your answers below. You can edit them before submitting."}
           </p>
         ) : null}
       </div>

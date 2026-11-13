@@ -54,8 +54,8 @@ const sanitizeA1WorkbookDraft = (draft) => {
   return { ...draft, ...readingRevision(draft.assignmentKey), sections };
 };
 
-export const buildA1WorkbookDraftStorageKey = (assignmentKey = "") =>
-  `${STORAGE_PREFIX}:${normalizeAssignmentKey(assignmentKey) || "UNKNOWN"}`;
+export const buildA1WorkbookDraftStorageKey = (assignmentKey = "", ownerUid = "") =>
+  `${STORAGE_PREFIX}:${normalizeAssignmentKey(assignmentKey) || "UNKNOWN"}${ownerUid ? `:${ownerUid}` : ""}`;
 
 export const makeEmptyA1WorkbookDraft = (assignmentKey = "") => ({
   version: 1,
@@ -65,12 +65,12 @@ export const makeEmptyA1WorkbookDraft = (assignmentKey = "") => ({
   updatedAt: "",
 });
 
-export const readA1WorkbookDraft = (assignmentKey = "") => {
+export const readA1WorkbookDraft = (assignmentKey = "", ownerUid = "") => {
   const empty = makeEmptyA1WorkbookDraft(assignmentKey);
   if (typeof window === "undefined" || !window.localStorage) return empty;
 
   try {
-    const raw = window.localStorage.getItem(buildA1WorkbookDraftStorageKey(assignmentKey));
+    const raw = window.localStorage.getItem(buildA1WorkbookDraftStorageKey(assignmentKey, ownerUid));
     if (!raw) return empty;
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return empty;
@@ -105,10 +105,11 @@ const announceA1WorkbookDraftUpdated = (draft) => {
   else Promise.resolve().then(dispatch);
 };
 
-export const saveA1WorkbookDraft = ({ assignmentKey = "", sections = {} } = {}) => {
+export const saveA1WorkbookDraft = ({ assignmentKey = "", sections = {}, ownerUid = "" } = {}) => {
   const next = sanitizeA1WorkbookDraft({
     version: 1,
     assignmentKey: normalizeAssignmentKey(assignmentKey),
+    ...(ownerUid ? { ownerUid } : {}),
     ...readingRevision(assignmentKey),
     sections: sections && typeof sections === "object" ? sections : {},
     updatedAt: new Date().toISOString(),
@@ -116,7 +117,7 @@ export const saveA1WorkbookDraft = ({ assignmentKey = "", sections = {} } = {}) 
 
   if (typeof window !== "undefined" && window.localStorage) {
     try {
-      window.localStorage.setItem(buildA1WorkbookDraftStorageKey(assignmentKey), JSON.stringify(next));
+      window.localStorage.setItem(buildA1WorkbookDraftStorageKey(assignmentKey, ownerUid), JSON.stringify(next));
     } catch (error) {
       console.warn("Could not save A1 workbook draft", error);
     }

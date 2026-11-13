@@ -11,7 +11,7 @@ const makeSerializedSections = (definition = {}) => new Map(
 );
 
 test("defines shared draft capture for every tutor-marked A1 assignment except page-owned A1-3", () => {
-  const expected = A1_ASSIGNMENT_ORDER.filter((key) => !["A1-3", "A1-5.9"].includes(key));
+  const expected = A1_ASSIGNMENT_ORDER.filter((key) => key !== "A1-3");
   expect(Object.keys(A1_TUTOR_DRAFT_PROFILES)).toEqual(expect.arrayContaining(expected));
   expect(Object.keys(A1_TUTOR_DRAFT_PROFILES).sort()).toEqual([...expected, "A1-0.2", "A1-1.1"].sort());
   expected.forEach((key) => expect(getA1TutorDraftProfile(key)).toBeTruthy());
@@ -40,7 +40,6 @@ test("supports mixed question types in one Teil", () => {
   expect(countries.sections["teil-3"].inlineAnswers).toBe(true);
 
   expect(getA1TutorDraftProfile("A1-12.2")).toBeNull();
-  expect(getA1TutorDraftProfile("A1-5.9")).toBeNull();
 });
 
 test("treats the Day 1 reading text as study material and requires the ten questions only", () => {

@@ -813,7 +813,7 @@ const courseSchedules = {
       chapter: "5.9",
       goal: "Build speaking confidence for Goethe A1 with timed drills and exam-style prompts",
       instruction:
-        "Required assignment A1-5.9: complete all three Goethe A1 speaking parts with the AI examiner and submit your combined score.",
+        "Required assignment A1-5.9: record and save the three Goethe A1 speaking parts for tutor review. The 15-minute timer sends your saved work at expiry.",
       grammar_topic: "Goethe A1 Speaking Practice",
       schreiben_sprechen: {
         video: "https://youtu.be/ZfXw4fRQ0Tg",

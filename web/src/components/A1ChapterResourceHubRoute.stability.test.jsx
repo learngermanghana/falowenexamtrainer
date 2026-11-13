@@ -83,3 +83,17 @@ test("completed Day 15 Kapitel 4.7 radio URL redirects to the Course Book", asyn
   );
   expect(screen.queryByTestId("stable-lesson")).not.toBeInTheDocument();
 });
+
+test("the Day 19 Chapter 5.9 hub link opens the tutor workbook", async () => {
+  render(
+    <MemoryRouter initialEntries={["/campus/course/lesson/A1/19?chapter=5.9&hub=1&radio=done"]}>
+      <Routes>
+        <Route path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH} element={<A1ChapterResourceHubRoute level="A1" />} />
+        <Route path="*" element={<LocationProbe />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+  expect(await screen.findByTestId("location-probe")).toHaveTextContent(
+    "/campus/course/verboten-erlaubt-5-9?chapter=5.9&radio=done",
+  );
+});

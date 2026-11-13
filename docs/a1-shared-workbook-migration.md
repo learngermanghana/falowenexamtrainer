@@ -40,3 +40,7 @@ The eight browser smoke cases should continue to run against an authenticated de
 - Parts: Alphabet and spelling (20); Hören/spelling (20); pronouns (20); verbs (20); short writing (20). The five-part workbook is the learner-facing question set. **Before production**, confirm a matching server/admin marking rubric, manual-review fallback for writing, and assessment-version handling. Displaying point values is not proof that the marking service applies these weights.
 - The two original teacher videos are both associated with Day 2 chapter 0.2 (teacher videos 1 and 2). Old grammar URLs remain accessible for archived links.
 - Run `npm run sync:curriculum`, `npm run check:curriculum-sync`, `node scripts/generateAssessmentTaskRegistry.mjs --check`, the scoped A1 Jest tests, and `node scripts/checkAiDocumentation.mjs`. Confirm the actual deployed revision, authenticated submission, and marking before declaring the merged lesson live.
+
+## A1 Day 19 speaking assignment
+
+Chapter 5.9 opens the shared tutor workbook with Overview, Grammar, Assignment and Review & Submit. The Assignment tab contains the three speaking recordings. A single 15-minute attempt starts on learner confirmation. The shared timer sends the saved recordings and transcripts to tutor review on expiry, including partial work. If the lesson is closed at expiry, the browser resumes submission when the learner reopens it and reconnects.

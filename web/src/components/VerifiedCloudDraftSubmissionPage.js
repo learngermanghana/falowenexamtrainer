@@ -645,7 +645,14 @@ const VerifiedCloudDraftSubmissionPage = ({
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const submissionText = normalizeText(currentTextRef.current);
+    const recordedSpeaking = assignmentKey === "A1-5.9";
+    const savedSpeaking = recordedSpeaking
+      ? buildA1RecordingSubmission({ assignmentKey, draft: readA1WorkbookDraft(assignmentKey, user?.uid) })
+      : null;
+    const submissionText = recordedSpeaking
+      ? savedSpeaking.recordings.map(({ sectionKey, transcript }) => `TEIL ${sectionKey.slice(-1)}\n${transcript}`).join("\n\n") ||
+        "Time expired before any speaking answers were saved."
+      : normalizeText(currentTextRef.current);
 
     if (!ready) {
       setStatus({ loading: false, error: "Wait until the cloud draft check is complete.", success: "" });
@@ -740,11 +747,14 @@ const VerifiedCloudDraftSubmissionPage = ({
         chapterKey
       )}::${normalizeIdPart(submissionText.toLowerCase()).slice(0, 240)}`;
 
-      const recordingAttachments = buildA1RecordingSubmission({
+      const recordingAttachments = savedSpeaking || buildA1RecordingSubmission({
         assignmentKey, submissionText, draft: readA1WorkbookDraft(assignmentKey),
       });
       const payload = {
         ...recordingAttachments,
+        ...(savedSpeaking ? { attachments: savedSpeaking.recordings.map(({ sectionKey, audioUrl }) => ({
+          name: `Teil ${sectionKey.slice(-1)} recording`, url: audioUrl,
+        })) } : {}),
         submissionId: submissionRef.id,
         path: submissionPath,
         submissionPath,
@@ -993,7 +1003,7 @@ const VerifiedCloudDraftSubmissionPage = ({
         {status.error ? <InfoBox tone="error">{status.error}</InfoBox> : null}
         {status.success ? <InfoBox tone="success">{status.success}</InfoBox> : null}
 
-        <form style={{ display: "grid", gap: compact ? 10 : 12 }} onSubmit={handleSubmit}>
+        <form data-a1-recorded-speaking={assignmentKey === "A1-5.9" ? "true" : undefined} style={{ display: "grid", gap: compact ? 10 : 12 }} onSubmit={handleSubmit}>
           {!compact ? (
             <div
               style={{
@@ -1057,6 +1067,7 @@ const VerifiedCloudDraftSubmissionPage = ({
             <textarea
               ref={textareaRef}
               value={text}
+              readOnly={assignmentKey === "A1-5.9"}
               onChange={handleTextChange}
               onInput={handleTextChange}
               onCompositionEnd={handleTextChange}
@@ -1067,7 +1078,7 @@ const VerifiedCloudDraftSubmissionPage = ({
               maxLength={MAX_SUBMISSION_CHARACTERS}
               data-minimum-words={MIN_SUBMISSION_WORDS}
               style={{ ...styles.textArea, minHeight: compact ? 240 : 220 }}
-              placeholder={ready ? "Type your answer here or paste it in." : "Checking the newest cloud draft…"}
+              placeholder={ready && assignmentKey === "A1-5.9" ? "Your saved speaking transcripts appear here." : ready ? "Type your answer here or paste it in." : "Checking the newest cloud draft…"}
               disabled={!ready || status.loading}
             />
             {!compact ? (

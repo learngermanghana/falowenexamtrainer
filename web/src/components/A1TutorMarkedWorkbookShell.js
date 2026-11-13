@@ -107,6 +107,9 @@ const A1TutorMarkedWorkbookShell = ({
   backFallbackPath = "/campus/course",
   backTo = "",
   headerActions = null,
+  grammarContent = null,
+  groupAssignmentSections = false,
+  draftOwnerUid = "",
   children,
 }) => {
   const navigate = useNavigate();
@@ -132,7 +135,7 @@ const A1TutorMarkedWorkbookShell = ({
             </div>
           ) : null}
           {sectionMap.get(key)}
-          {sharedDraftCaptureEnabled ? <A1TutorDraftSectionCapture sectionKey={key} /> : null}
+          {sharedDraftCaptureEnabled && !groupAssignmentSections ? <A1TutorDraftSectionCapture sectionKey={key} /> : null}
         </>
       );
 
@@ -180,7 +183,7 @@ const A1TutorMarkedWorkbookShell = ({
         {assignmentIntro || `Complete every required Teil, then review and submit ${assignment.assignmentKey} once.`}
       </p>
       {assignment.assignmentKey === "A1-13" ? <A1Day21WeatherResources /> : null}
-      {isFirstA1Workbook ? firstWorkbookOverview : <A1TutorMarkedOverviewGuidance />}
+      {isFirstA1Workbook ? firstWorkbookOverview : !groupAssignmentSections && <A1TutorMarkedOverviewGuidance />}
       {overviewNodes}
       {assignment.assignmentKey !== "A1-0.2_1.1" ? <PublishedHoerenPractice assignmentKey={assignment.assignmentKey} /> : null}
     </div>
@@ -193,7 +196,7 @@ const A1TutorMarkedWorkbookShell = ({
           <strong>Grammar only.</strong> Read and learn on this page. Your assignment is under <strong>Reading + Questions</strong>. Open <strong>Review &amp; Submit</strong> only after all required parts are finished.
         </div>
       ) : null}
-      <A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />
+      {grammarContent || <A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />}
     </div>
   );
 
@@ -201,6 +204,7 @@ const A1TutorMarkedWorkbookShell = ({
     <A1SharedAssignmentWorkbookLayout
       assignmentKey={assignment.assignmentKey}
       grammar={grammar}
+      groupAssignmentSections={groupAssignmentSections}
       overview={overview}
       music={<WorkbookDayMusic level="A1" day={assignment.day} learningMode="tutor" hideLegacyNotes />}
       renderSubmission={(canonical) => (
@@ -283,7 +287,7 @@ const A1TutorMarkedWorkbookShell = ({
 
       <A1WorkbookMediaPanel day={assignment.day} chapter={assignment.chapter} includeMusic={false} />
 
-      <A1TutorWorkbookDraftProvider assignment={assignment}>
+      <A1TutorWorkbookDraftProvider key={draftOwnerUid} assignment={assignment} ownerUid={draftOwnerUid}>
         <A1TimedMockExam assignment={assignment}>
           {sharedLayout}
         </A1TimedMockExam>
