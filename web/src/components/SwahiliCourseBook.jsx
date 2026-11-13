@@ -5,6 +5,7 @@ import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import SwahiliDictionary from "./SwahiliDictionary";
+import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import "./SwahiliCourseBook.css";
 
@@ -345,6 +346,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
   }
 
   return (
+    <SwahiliWorkbookRadio lesson={day ? lesson : null} preview={preview}>
     <main className="swahili-book" lang="sw" data-swahili-course-book="true">
       <div className="swahili-book__top">
         <div className="swahili-book__brand">Falowen · Kiswahili</div>
@@ -402,5 +404,6 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
         </section>
       )}
     </main>
+    </SwahiliWorkbookRadio>
   );
 }
