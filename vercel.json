@@ -288,6 +288,13 @@
       }
     },
     {
+      "src": "/books/german-a1-exam-preparation/?",
+      "dest": "/__books/german-a1-exam-preparation.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/books/deutsch-a2-course-workbook/?",
       "dest": "/__books/a2-course-workbook.html",
       "headers": {

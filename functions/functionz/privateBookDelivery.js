@@ -19,6 +19,11 @@ const DIGITAL_BOOK_OBJECTS = Object.freeze({
     key: "Falowen-A2-Course-Materials-Clean.pdf",
     filename: "Falowen-A2-Course-Materials-Clean.pdf",
   }),
+  "german-a1-exam-preparation-digital": Object.freeze({
+    bucket: "falowen-books-private",
+    key: "book/Falowen_A1_Book_Download.pdf",
+    filename: "German_A1_Exam_Preparation_The_Falowen_Method.pdf",
+  }),
   "a1-writing-model-exams-digital": Object.freeze({
     bucket: "falowen-books-private",
     key: "book/Falowen_A1_Writing_Exam_Guide_Fresh.pdf",

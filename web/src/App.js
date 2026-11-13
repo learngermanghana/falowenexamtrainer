@@ -488,6 +488,7 @@ function App() {
   if (location.pathname === "/books/how-to-unlock-your-german-writing-skills-a1-c2" || location.pathname === "/books/how-to-unlock-your-german-writing-skills-a1-c2/") return <BookStoreCheckout detailBook="writing" />;
   if (location.pathname === "/books/deutsch-a2-course-workbook" || location.pathname === "/books/deutsch-a2-course-workbook/") return <BookStoreCheckout slug="deutsch-a2-course-workbook" />;
   if (location.pathname === "/books/deutsch-b1-course-workbook" || location.pathname === "/books/deutsch-b1-course-workbook/") return <BookStoreCheckout slug="deutsch-b1-course-workbook" />;
+  if (location.pathname === "/books/german-a1-exam-preparation" || location.pathname === "/books/german-a1-exam-preparation/") return <BookStoreCheckout slug="german-a1-exam-preparation" />;
   const bookCheckout = location.pathname.match(/^\/books\/([^/]+)\/checkout\/?$/);
   if (bookCheckout) return <BookStoreCheckout slug={bookCheckout[1]} checkout />;
   if (location.pathname === "/books/complete") return <BookStoreCheckout completed />;

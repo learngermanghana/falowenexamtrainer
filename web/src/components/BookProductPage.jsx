@@ -87,10 +87,38 @@ function B1BookPreviewSample({page}) {
   </article>;
 }
 
+function FalowenA1ExamPreviewSample({ page }) {
+  return <article className="fb-slide-paper fb-a2-preview" aria-label={`German A1 exam workbook preview page ${page}`}>
+    <div className="fb-a2-preview-top"><strong>FALOWEN</strong><span>GERMAN A1 · SAMPLE</span></div>
+    {page === 2 ? <>
+      <h2>How to use this workbook</h2>
+      <p className="fb-a2-preview-lead">Learn the pattern → Try it → Check → Try again.</p>
+      <p>A 30-day study plan helps you practise all four exam skills.</p>
+      <div className="fb-a2-preview-example"><strong>Listening</strong><p>QR links open existing Falowen Hören exercises. A Falowen account with listening access is required; the PDF purchase does not include audio access.</p></div>
+    </> : page === 14 ? <>
+      <h2>Schreiben · The Falowen Method</h2>
+      <p className="fb-a2-preview-lead">Formal or informal? Choose the right opening.</p>
+      <div className="fb-a2-preview-example">
+        <strong>Formal</strong><p>Ich schreibe Ihnen, weil ich Informationen brauche.</p>
+        <strong>Informal</strong><p>Ich schreibe dir, weil ich dich einladen möchte.</p>
+      </div>
+      <p>Check the comma before <strong>weil</strong> and the conjugated verb at the end.</p>
+    </> : <>
+      <h2>Two guided practice tests</h2>
+      <p className="fb-a2-preview-lead">A1 · Lesen, Hören, Schreiben &amp; Sprechen</p>
+      <p>Read the task, answer independently, then check your responses in the answer key.</p>
+      <div className="fb-a2-preview-example"><strong>Sprechen · Teil 3</strong>
+        <p>Können Sie mir bitte einen Stift geben?</p><p>Ja, natürlich. Bitte schön!</p></div>
+    </>}
+    <div className="fb-a2-preview-footer"><span>Illustrative public sample · full workbook delivered privately</span><span>{page} / 50</span></div>
+  </article>;
+}
+
 function PreviewSlides({productId, title, cover}) {
   const track = useRef(null);
   const [current, setCurrent] = useState(0);
-  const pages = productId === "a2-course-workbook" ? [2,7,14] // Selected, verified excerpts; the complete PDF remains private.
+  const pages = productId === "german-a1-exam-preparation" ? [2,14,22]
+    : productId === "a2-course-workbook" ? [2,7,14] // Selected, verified excerpts; the complete PDF remains private.
     : productId === "b1-course-workbook" ? [2,7,16]
     : productId === "a1-course-workbook" ? [1,2,3]
     : productId === "a1-writing-model-exams" ? [5,11,21]
@@ -103,7 +131,8 @@ function PreviewSlides({productId, title, cover}) {
     }}>
       <div className="fb-slide"><img src={cover} alt={`${title} cover`} width="300" height="425" /></div>
       {pages.map(page=><div className="fb-slide" key={page}>
-        {productId === "a2-course-workbook" ? <A2BookPreviewSample page={page} />
+        {productId === "german-a1-exam-preparation" ? <FalowenA1ExamPreviewSample page={page} />
+          : productId === "a2-course-workbook" ? <A2BookPreviewSample page={page} />
           : productId === "b1-course-workbook" ? <B1BookPreviewSample page={page} />
           : <a href={`/books/previews/${productId}-${page}.webp`} target="_blank" rel="noopener noreferrer" aria-label={`Enlarge preview page ${page}`}>
               <img src={`/books/previews/${productId}-${page}.webp`} alt={`${title} · Preview page ${page}`} loading="lazy" width="950" height="1344" />
