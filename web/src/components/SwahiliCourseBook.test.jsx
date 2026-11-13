@@ -6,13 +6,18 @@ import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import { setDoc, getDoc } from "../firebase";
 
 let mockUser = null;
+let mockStudentProfile = null;
 jest.mock("../context/AuthContext", () => ({
-  useAuth: () => ({ user: mockUser }),
+  useAuth: () => ({ user: mockUser, studentProfile: mockStudentProfile }),
 }));
 jest.mock("../firebase", () => ({
   db: {},
   doc: jest.fn((...args) => args.join("/")),
   getDoc: jest.fn(async () => ({ exists: () => false })),
+  getDocs: jest.fn(async () => ({ docs: [] })),
+  query: jest.fn((...args) => args),
+  collectionGroup: jest.fn((database, name) => name),
+  limit: jest.fn((value) => value),
   setDoc: jest.fn(async () => ({})),
   serverTimestamp: jest.fn(() => "server-now"),
 }));
@@ -23,6 +28,7 @@ const openTab = (label) => fireEvent.click(screen.getByRole("tab", { name: new R
 describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
   beforeEach(() => {
     mockUser = null;
+    mockStudentProfile = null;
     jest.clearAllMocks();
   });
 
@@ -100,7 +106,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
       fireEvent.click(within(questionGroup).getByLabelText(question.answer));
     });
     openTab("Submit");
-    await waitFor(() => expect(getDoc).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(getDoc).toHaveBeenCalledTimes(2));
     const button = screen.getByRole("button", { name: "Wasilisha kazi" });
     expect(button.disabled).toBe(false);
     fireEvent.click(button);
@@ -114,4 +120,23 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     }));
     await waitFor(() => expect(screen.getByText(/Kazi imehifadhiwa kwenye akaunti yako/)).toBeTruthy());
   });
+  it("keeps teacher materials separate from the seven student workbook tabs", () => {
+    mockUser = { uid: "teacher-1" };
+    mockStudentProfile = { role: "tutor" };
+    renderLesson();
+    expect(screen.getAllByRole("tab")).toHaveLength(7);
+    expect(screen.getByRole("link", { name: /Teacher slides & marking/ }).getAttribute("href")).toBe("/swahili/day-1?teacher=1");
+  });
+
+  it("displays reviewed feedback inside Submit only for the student who owns it", async () => {
+    mockUser = { uid: "swahili-student-1" };
+    getDoc.mockImplementation(async (path) => path === "/swahiliTeacherReviews/swahili-student-1"
+      ? { exists: () => true, data: () => ({ status: "needs_revision", feedback: "Repeat the B syllables." }) }
+      : { exists: () => true });
+    renderLesson();
+    openTab("Submit");
+    expect(await screen.findByText("Repeat the B syllables.")).toBeTruthy();
+    expect(screen.getAllByRole("tab")).toHaveLength(7);
+  });
+
 });
