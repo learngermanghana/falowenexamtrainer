@@ -19,3 +19,11 @@ test("B1 course book deep link resolves before the homepage fallback", () => {
  expect(app).toContain('<BookStoreCheckout slug="deutsch-b1-course-workbook" />');
  expect(app.indexOf(b1)).toBeLessThan(app.indexOf("const seoMarkets ="));
 });
+
+test("German A1 exam preparation has its own detail and checkout route without replacing the A1 course book", () => {
+  const app = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
+  expect(app).toContain('location.pathname === "/books/german-a1-exam-preparation"');
+  expect(app).toContain('<BookStoreCheckout slug="german-a1-exam-preparation" />');
+  expect(app).toContain('<BookStoreCheckout detailBook="a1" />');
+  expect(app.indexOf('location.pathname === "/books/german-a1-exam-preparation"')).toBeLessThan(app.indexOf("const seoMarkets ="));
+});
