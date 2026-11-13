@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collectionGroup, db, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, startAfter, where } from "../firebase";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
+import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
 import { canonicalSwahiliSubmission } from "../utils/swahiliReviewQueue";
 
-// Instructor-only companion to Day 1. It does not add a workbook tab or publish new lessons.
+// Instructor-only companion to Day 1 and Lesson 6. It does not add a workbook tab.
 // Student submissions remain in their original user-owned Firestore documents.
 const SLIDES = [
   { title: "Somo la 1 · Alfabeti, sauti na matamshi", prompt: "Leo tunajifunza vokali, silabi na matamshi.", hint: "Introduce the learning goal; model each sound before asking students to repeat." },
@@ -19,8 +20,11 @@ const SLIDES = [
   { title: "Kazi ya nyumbani", prompt: "Teil 2 · Kuandika\nTeil 3 · Kusoma\nSubmit · Wasilisha", hint: "Students complete writing and reading in the course book, then submit." },
 ];
 
-export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
-  const [mode, setMode] = useState("slides");
+export default function SwahiliTeacherDayOne({ basePath = "/swahili", day = 1 }) {
+  const reviewDay = day === 6 ? 6 : 1;
+  const reviewDocId = (studentId) => reviewDay === 1 ? studentId : `${studentId}_day-6`;
+  const lesson = reviewDay === 6 ? SWAHILI_DAY_SIX : SWAHILI_DAY_ONE;
+  const [mode, setMode] = useState(day === 6 ? "reviews" : "slides");
   const [slideIndex, setSlideIndex] = useState(0);
   const [records, setRecords] = useState([]);
   const [lastDocument, setLastDocument] = useState(null);
@@ -33,24 +37,33 @@ export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const selected = records.find((record) => record.studentId === selectedId);
+  useEffect(() => {
+    setMode(reviewDay === 6 ? "reviews" : "slides");
+    setRecords([]);
+    setLastDocument(null);
+    setHasMore(false);
+    setSelectedId("");
+    setComments("");
+    setNotice("");
+  }, [reviewDay]);
 
   const loadSubmissions = async ({ more = false } = {}) => {
     if (!db || loading) { if (!db) setError("Firebase is unavailable."); return; }
     setLoading(true);
     setError("");
     try {
-      // Query only Day 1 submissions, newest first, in bounded pages.
-      // Owner identity is derived from /users/{uid}/swahiliLessons/day-1.
+      // Query only the selected lesson, newest first, in bounded pages.
+      // Owner identity is derived from /users/{uid}/swahiliLessons/day-{reviewDay}.
       const constraints = [
         where("program", "==", "swahili"),
-        where("lessonId", "==", "swahili-day-1"),
+        where("lessonId", "==", `swahili-day-${reviewDay}`),
         where("status", "==", "submitted"),
         orderBy("submittedAt", "desc"),
       ];
       if (more && lastDocument) constraints.push(startAfter(lastDocument));
       constraints.push(limit(25));
       const snapshot = await getDocs(query(collectionGroup(db, "swahiliLessons"), ...constraints));
-      const items = snapshot.docs.map(canonicalSwahiliSubmission).filter(Boolean);
+      const items = snapshot.docs.map(entry => canonicalSwahiliSubmission(entry, reviewDay)).filter(Boolean);
       setRecords((previous) => more ? [
         ...previous,
         ...items.filter(item => !previous.some(record => record.path === item.path)),
@@ -67,29 +80,29 @@ export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
     if (mode === "reviews") loadSubmissions();
     // Fetch only when the instructor chooses the review view.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode]);
+  }, [mode, reviewDay]);
 
   useEffect(() => {
     if (!selectedId || !db || mode !== "reviews") return;
     let alive = true;
     setComments("");
     setDecision("reviewed");
-    getDoc(doc(db, "swahiliTeacherReviews", selectedId)).then(snapshot => {
+    getDoc(doc(db, "swahiliTeacherReviews", reviewDocId(selectedId))).then(snapshot => {
       if (!alive || !snapshot.exists()) return;
       setComments(snapshot.data().feedback || "");
       setDecision(snapshot.data().status || "reviewed");
     }).catch(() => {});
     return () => { alive = false; };
-  }, [selectedId, mode]);
+  }, [selectedId, mode, reviewDay]);
 
   const saveReview = async () => {
     if (!db || !selected) return;
     setSaving(true);
     setNotice("");
     try {
-      await setDoc(doc(db, "swahiliTeacherReviews", selected.studentId), {
+      await setDoc(doc(db, "swahiliTeacherReviews", reviewDocId(selected.studentId)), {
         studentId: selected.studentId,
-        lessonId: "swahili-day-1",
+        lessonId: `swahili-day-${reviewDay}`,
         program: "swahili",
         status: decision,
         feedback: comments.trim().slice(0, 3000),
@@ -103,10 +116,10 @@ export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
 
   return (
     <main className="swahili-book" lang="sw">
-      <div className="swahili-book__top"><strong>Falowen · Kiswahili · Teacher</strong><Link to={basePath + "/day-1"}>← Student workbook</Link></div>
-      <header className="swahili-book__hero"><p className="swahili-book__eyebrow">SOMO LA 1 · MWALIMU</p><h1>Teacher presentation and review</h1><p>Uses yesterday’s Day 1 material. No extra student navigation or invented lessons.</p></header>
+      <div className="swahili-book__top"><strong>Falowen · Kiswahili · Teacher</strong><Link to={basePath + `/day-${reviewDay}`}>← Student workbook</Link></div>
+      <header className="swahili-book__hero"><p className="swahili-book__eyebrow">{`SOMO LA ${reviewDay} · MWALIMU`}</p><h1>{reviewDay === 6 ? "Mgahawani · Teacher review" : "Teacher presentation and review"}</h1><p>{reviewDay === 6 ? "Review restaurant writing and reading submissions. Classroom slides are maintained in Falowen Admin." : "Day 1 classroom preparation and student reviews."}</p></header>
       <div className="swahili-book__row swahili-book__spaced">
-        <button type="button" className="swahili-book__button" onClick={() => setMode("slides")}>Teacher slides</button>
+        {reviewDay === 1 && <button type="button" className="swahili-book__button" onClick={() => setMode("slides")}>Teacher slides</button>}
         <button type="button" className="swahili-book__button swahili-book__button--soft" onClick={() => setMode("reviews")}>Student submissions</button>
       </div>
       {mode === "slides" ? (
@@ -122,11 +135,11 @@ export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
         </section>
       ) : (
         <section className="swahili-book__card swahili-book__activity" aria-label="Swahili student submissions">
-          <div className="swahili-book__row"><h2>Day 1 review queue</h2><button className="swahili-book__button swahili-book__button--soft" onClick={() => loadSubmissions()} disabled={loading}>Refresh</button></div>
+          <div className="swahili-book__row"><h2>Day {reviewDay} review queue</h2><button className="swahili-book__button swahili-book__button--soft" onClick={() => loadSubmissions()} disabled={loading}>Refresh</button></div>
           <p className="swahili-book__small">Manual refresh only. Newest 25 submissions per page; no automatic grading.</p>
           {error && <p role="alert" className="swahili-book__error">{error}</p>}
           {loading && <p>Loading submissions…</p>}
-          {!loading && !records.length && !error && <p>No submitted Day 1 work found.</p>}
+          {!loading && !records.length && !error && <p>No submitted Day {reviewDay} work found.</p>}
           {records.length > 0 && (
             <>
               <label htmlFor="swahili-review-student">Choose student
@@ -136,9 +149,19 @@ export default function SwahiliTeacherDayOne({ basePath = "/swahili" }) {
               </label>
               {selected && (
                 <>
-                  <div className="swahili-book__tile"><strong>Teil 2 · Writing</strong><p>Vokali: {selected.writing?.vowels || "—"}</p><p>Silabi: {selected.writing?.syllables || "—"}</p><p>Maneno: {selected.writing?.words || "—"}</p></div>
-                  <div className="swahili-book__tile"><strong>Teil 3 · Reading</strong>{SWAHILI_DAY_ONE.reading.map(item => <p key={item.id}>{item.question} — {selected.readingAnswers?.[item.id] || "—"}</p>)}</div>
-                  <div className="swahili-book__tile"><strong>Teil 4 · Teacher-led (optional)</strong><p>{Object.values(selected.listeningAnswers || {}).filter(Boolean).length} / {SWAHILI_DAY_ONE.listening.length} selected</p></div>
+                  <div className="swahili-book__tile"><strong>Teil 2 · Writing</strong>
+                    {reviewDay === 6 ? <>
+                      <p>Ninapenda: {selected.writing?.likes || "—"}</p>
+                      <p>Sipendi: {selected.writing?.dislikes || "—"}</p>
+                      <p>Agizo: {selected.writing?.order || "—"}</p>
+                    </> : <>
+                      <p>Vokali: {selected.writing?.vowels || "—"}</p>
+                      <p>Silabi: {selected.writing?.syllables || "—"}</p>
+                      <p>Maneno: {selected.writing?.words || "—"}</p>
+                    </>}
+                  </div>
+                  <div className="swahili-book__tile"><strong>Teil 3 · Reading</strong>{lesson.reading.map(item => <p key={item.id}>{item.question} — {selected.readingAnswers?.[item.id] || "—"}</p>)}</div>
+                  <div className="swahili-book__tile"><strong>Teil 4 · Teacher-led (optional)</strong><p>{Object.values(selected.listeningAnswers || {}).filter(Boolean).length} / {lesson.listening.length} selected</p></div>
                   <div className="swahili-book__form">
                     <label htmlFor="swahili-review-decision">Teacher decision
                       <select id="swahili-review-decision" value={decision} onChange={e=>setDecision(e.target.value)}>
