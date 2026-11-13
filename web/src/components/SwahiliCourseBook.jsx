@@ -120,6 +120,10 @@ function DayOneContent({
         <p><strong>{lesson.stress.join(" · ")}</strong></p>
       </div>
       <p className="swahili-book__note">Mwalimu asome tofauti za sauti: ng / ng’ · s / sh · t / th.</p>
+      <details>
+        <summary>Msamiati wa Somo la 1 · Day 1 vocabulary</summary>
+        <SwahiliDictionary />
+      </details>
     </section>
   );
 
@@ -265,7 +269,6 @@ function DayOneContent({
 export default function SwahiliCourseBook({ day = null, basePath = "/swahili", preview = false }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("grammar");
-  const [dictionaryOpen, setDictionaryOpen] = useState(false);
   const [writing, setWriting] = useState(EMPTY_WRITING);
   const [readingAnswers, setReadingAnswers] = useState({});
   const [readingChecked, setReadingChecked] = useState(false);
@@ -332,12 +335,6 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
           <span>Somo 1 pekee</span><span>Alfabeti na matamshi</span><span>Music · Grammar · Teil 1–4 · Submit</span>
         </div>
       </header>
-      <div className="swahili-book__card swahili-book__section">
-        <button type="button" className="swahili-book__button" aria-expanded={dictionaryOpen} onClick={() => setDictionaryOpen((open) => !open)}>
-          {dictionaryOpen ? "Funga kamusi · Close dictionary" : "Kamusi · Open Swahili dictionary"}
-        </button>
-        {dictionaryOpen ? <SwahiliDictionary /> : null}
-      </div>
       {day === 1 ? (
         <>
           <div className="swahili-book__workbook-nav">
