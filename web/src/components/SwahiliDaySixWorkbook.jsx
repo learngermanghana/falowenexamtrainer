@@ -8,6 +8,7 @@ import MgahawaniSong from "./MgahawaniSong";
 import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
 import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
+import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import "./SwahiliCourseBook.css";
 
 const TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
@@ -57,7 +58,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
   const isTeacher = ["admin", "staff", "tutor"].includes(role) || studentProfile?.isTutor === true;
   const teacherView = new URLSearchParams(location.search).get("teacher") === "1";
   const lesson = SWAHILI_DAY_SIX;
-  const [activeTab, setActiveTab] = useState("grammar");
+  const [activeTab, setActiveTab] = useSwahiliWorkbookTab(TABS);
   const [writing, setWriting] = useState(INITIAL_WRITING);
   const [readingAnswers, setReadingAnswers] = useState({});
   const [listeningAnswers, setListeningAnswers] = useState({});
@@ -212,8 +213,8 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
     : <main className="swahili-book"><p className="swahili-book__note">Teacher access required. <Link to={basePath + "/day-6"}>Return to Lesson 6</Link></p></main>;
 
   return <SwahiliWorkbookRadio lesson={lesson} preview={preview}>
-    <main className="swahili-book mgahawani-workbook" lang="sw" data-swahili-course-book="true">
-    <div className="swahili-book__top"><strong>Falowen · Kiswahili A1</strong><Link to={basePath}>← Kitabu cha kozi</Link></div>
+    <main className="swahili-book swahili-book--workbook mgahawani-workbook" lang="sw" data-swahili-course-book="true">
+    <div className="swahili-book__top"><strong>Falowen · Kiswahili A1</strong><Link to={preview ? basePath : "/campus/course"}>← Kitabu cha kozi</Link></div>
     <header className="swahili-book__hero">
       <p className="swahili-book__eyebrow">KISWAHILI · A1 · SOMO LA 6</p>
       <h1>{lesson.chapter} · {lesson.title}</h1>
@@ -231,8 +232,9 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         ariaLabel="Kiswahili A1 Lesson 6 workbook sections"
         renderLegacyGrammarPanel={false} tabDescriptionOverrides={TAB_DESCRIPTIONS}/>
     </div>
-    <div role="tabpanel" aria-label={TABS.find(tab => tab.key === activeTab)?.label}>{section()}</div>
+    <div role="tabpanel" tabIndex={-1} aria-label={TABS.find(tab => tab.key === activeTab)?.label}>{section()}</div>
     <p className="swahili-book__muted swahili-book__spaced">Practice material based on Ruth's two restaurant lessons. {preview ? "Public preview of this workbook." : ""}</p>
+    <SwahiliWorkbookNavigation tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
     </main>
   </SwahiliWorkbookRadio>;
 }
