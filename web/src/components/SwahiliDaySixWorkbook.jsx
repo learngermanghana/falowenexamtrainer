@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import SwahiliDictionary from "./SwahiliDictionary";
 import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
+import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import "./SwahiliCourseBook.css";
 
 const TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
@@ -49,6 +50,10 @@ function QuestionSet({ items, answers, onChange, checked, namePrefix }) {
 
 export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview = false }) {
   const { user, studentProfile } = useAuth();
+  const location = useLocation();
+  const role = String(studentProfile?.role || "").toLowerCase();
+  const isTeacher = ["admin", "staff", "tutor"].includes(role) || studentProfile?.isTutor === true;
+  const teacherView = new URLSearchParams(location.search).get("teacher") === "1";
   const lesson = SWAHILI_DAY_SIX;
   const [activeTab, setActiveTab] = useState("grammar");
   const [writing, setWriting] = useState(INITIAL_WRITING);
@@ -59,6 +64,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
   const [submitting, setSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState(null);
   const [previouslySubmitted, setPreviouslySubmitted] = useState(false);
+  const [teacherReview, setTeacherReview] = useState(null);
   const checkedUser = useRef(null);
 
   useEffect(() => {
@@ -68,6 +74,11 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
     getDoc(doc(db, "users", user.uid, "swahiliLessons", "day-6"))
       .then(snapshot => { if (!cancelled && snapshot.exists()) setPreviouslySubmitted(true); })
       .catch(() => { /* A failed lookup must not block the lesson. */ });
+    getDoc(doc(db, "swahiliTeacherReviews", `${user.uid}_day-6`))
+      .then(snapshot => {
+        if (!cancelled && snapshot.exists() && snapshot.data().lessonId === "swahili-day-6") setTeacherReview(snapshot.data());
+      })
+      .catch(() => { /* No published teacher feedback yet. */ });
     return () => { cancelled = true; };
   }, [activeTab, user?.uid]);
 
@@ -201,9 +212,18 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         </button>
         {submissionResult?.type === "success" && <p className="swahili-book__feedback" role="status">Kazi ya Somo la 6 imehifadhiwa kwenye akaunti yako. Hakuna alama za moja kwa moja.</p>}
         {submissionResult?.type === "error" && <p className="swahili-book__error" role="alert">{submissionResult.message}</p>}
-        <p className="swahili-book__note">Teacher feedback for Day 6 is not yet enabled. The existing Day 1 review queue is unchanged.</p></>}
+        {teacherReview && <div className="swahili-book__tile" role="status">
+          <strong>Maoni ya mwalimu · Teacher feedback</strong>
+          <p>{teacherReview.status === "needs_revision" ? "Needs revision" : "Reviewed"}</p>
+          {teacherReview.feedback && <p>{teacherReview.feedback}</p>}
+        </div>}
+        <p className="swahili-book__note">Your teacher can review this lesson after submission. There is no automatic grade.</p></>}
     </section>;
   }
+
+  if (teacherView) return isTeacher
+    ? <SwahiliTeacherDayOne basePath={basePath} day={6} />
+    : <main className="swahili-book"><p className="swahili-book__note">Teacher access required. <Link to={basePath + "/day-6"}>Return to Lesson 6</Link></p></main>;
 
   return <main className="swahili-book" lang="sw" data-swahili-course-book="true">
     <div className="swahili-book__top"><strong>Falowen · Kiswahili A1</strong><Link to={basePath}>← Kitabu cha kozi</Link></div>
@@ -212,6 +232,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
       <h1>{lesson.chapter} · {lesson.title}</h1><p>{lesson.objective}</p>
       <div className="swahili-book__meta"><span>Topic 4 · Mgahawani</span><span>Lesson 6</span><span>Music · Grammar · Teil 1–4 · Submit</span></div>
     </header>
+    {isTeacher && <p className="swahili-book__spaced"><Link className="swahili-book__button swahili-book__button--soft" to={basePath + "/day-6?teacher=1"}>Teacher review · Somo la 6</Link></p>}
     <div className="swahili-book__workbook-nav">
       <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={TABS}
         ariaLabel="Kiswahili A1 Lesson 6 workbook sections"
