@@ -107,3 +107,72 @@
 .mgahawani-song__lines p{margin:0 0 3px}
 @media(max-width:750px){.mgahawani-workbook__intro{grid-template-columns:1fr}.mgahawani-song__sections{grid-template-columns:1fr}}
 @media(max-width:550px){.mgahawani-grammar__chapter-body{padding:12px}.mgahawani-grammar__chapter>summary{padding:12px}.mgahawani-grammar__dialogue-line{grid-template-columns:1fr;gap:2px}.mgahawani-grammar__spotlight{padding:15px}.mgahawani-song__verse{padding:14px}}
+
+/* Lesson 6 grammar study flow: controlled chapters, optional local self-checks.
+   Scoped to Mgahawani so German and the remaining Kiswahili lessons are untouched. */
+.mgahawani-grammar__outcomes{display:flex;flex-wrap:wrap;gap:8px;max-width:100%;align-items:stretch}
+.mgahawani-grammar__outcomes button{font:inherit;font-size:.81rem;line-height:1.45;font-weight:700;text-align:left;cursor:pointer;border:1px solid #cde3d4;border-radius:10px;padding:10px 12px;background:#f0f8f1;color:#205b3c;min-height:42px}
+.mgahawani-grammar__outcomes button:hover,.mgahawani-grammar__outcomes button.is-current{background:#d9eee0;border-color:#439d71}
+.mgahawani-grammar__outcomes button:focus-visible,.mgahawani-grammar__chapter>summary:focus-visible{outline:3px solid #268657;outline-offset:3px}
+.mgahawani-grammar__rule-example{border:1px solid #c9e2d0;border-radius:14px;background:#f7fbf7;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:hidden}
+.mgahawani-grammar__rule-example>div{padding:14px 16px;display:grid;align-content:start;gap:7px;min-width:0}
+.mgahawani-grammar__rule-example>div+div{border-left:1px solid #d9e9df}
+.mgahawani-grammar__rule-example p{margin:0;overflow-wrap:anywhere}
+.mgahawani-grammar__model{font-weight:850;font-size:1.06rem;color:#124b31}
+.mgahawani-grammar__translation{color:#5a7163;font-size:.86rem}
+.mgahawani-grammar__source-explanation{padding:12px 14px;border-left:3px solid #2d8460;background:#f6faf7;border-radius:8px}
+.mgahawani-grammar__source-explanation>strong{color:#174d33}
+.mgahawani-grammar__source-explanation>p{margin:5px 0 0}
+.mgahawani-grammar__verb-breakdown{display:grid;gap:13px;border:1px solid #d6e5df;padding:18px;border-radius:15px;background:#fbfdfb}
+.mgahawani-grammar__verb-breakdown h4{margin:0;color:#173e2d}
+.mgahawani-grammar__morphemes,.mgahawani-grammar__negative-example{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.mgahawani-grammar__morpheme{min-width:112px;min-height:88px;padding:12px;display:grid;gap:6px;border-radius:12px;text-align:center;align-content:center}
+.mgahawani-grammar__morpheme strong{font-size:1.4rem}
+.mgahawani-grammar__morpheme small{font-size:.72rem}
+.mgahawani-grammar__morpheme.is-subject{background:#dbeafe;color:#1e40af}
+.mgahawani-grammar__morpheme.is-tense{background:#d1fae5;color:#065f46}
+.mgahawani-grammar__morpheme.is-stem{background:#fef3c7;color:#92400e}
+.mgahawani-grammar__morpheme.is-negative{background:#fee2e2;color:#991b1b}
+.mgahawani-grammar__morpheme-plus{font-size:1.3rem;font-weight:850;color:#62756a}
+.mgahawani-grammar__verb-result{font-size:1.07rem;margin:0}
+.mgahawani-grammar__negative-example{padding-top:12px;border-top:1px solid #dbe8df}
+.mgahawani-grammar__negative-example>p{font-weight:700}
+.mgahawani-grammar__table td.mgahawani-grammar__affirmative{background:#edfaf2;color:#135534}
+.mgahawani-grammar__table td.mgahawani-grammar__negative{background:#fff1ee;color:#923b33}
+.mgahawani-grammar__self-check{border:1px solid #d0e5d6;border-radius:14px;padding:18px;display:grid;gap:12px;background:#fafdfa}
+.mgahawani-grammar__self-check-head{display:flex;gap:12px;justify-content:space-between;align-items:center}
+.mgahawani-grammar__self-check-head small{font-size:.74rem;color:#5b7162}
+.mgahawani-grammar__self-check h4{font-size:1.03rem;margin:0}
+.mgahawani-grammar__answer-list{display:grid;gap:8px}
+.mgahawani-grammar__answer{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:11px 13px;line-height:1.45;border:1px solid #d7e5da;border-radius:11px;background:#fff;min-height:44px}
+.mgahawani-grammar__answer:has(input:checked){background:#edf7ee;border-color:#4b996f}
+.mgahawani-grammar__answer:focus-within{outline:2px solid #267b52;outline-offset:1px}
+.mgahawani-grammar__answer input{margin:4px 0 0;accent-color:#226c48;flex:none}
+.mgahawani-grammar__answer span{overflow-wrap:anywhere}
+.mgahawani-grammar__answer-result{border-radius:10px;padding:10px 13px;line-height:1.55;margin:0}
+.mgahawani-grammar__answer-result.is-correct{background:#e6f5ea;color:#1e613c}
+.mgahawani-grammar__answer-result.is-incorrect{background:#fff5e6;color:#82501b}
+.mgahawani-grammar__chapter-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-top:1px solid #e0e9e2;padding-top:14px}
+.mgahawani-grammar__chapter-footer span{font-size:.85rem;color:#526d5c}
+.mgahawani-grammar__challenge{border-radius:17px;border:1px solid #b4d9bf;background:#f4faf5;padding:clamp(15px,3vw,25px);display:grid;gap:14px}
+.mgahawani-grammar__challenge h3{font-size:clamp(1.18rem,2.6vw,1.5rem);color:#184c32;margin:0}
+.mgahawani-grammar__challenge>p{margin:0}
+.mgahawani-grammar__challenge-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mgahawani-grammar__challenge-step{min-width:0;padding:14px 15px;border:1px solid #d7e6da;border-radius:12px;background:#fff;display:grid;gap:12px}
+.mgahawani-grammar__challenge-step legend{font-weight:700;line-height:1.55;padding:0 4px}
+.mgahawani-grammar__challenge-step legend span{display:block;color:#287047;font-size:.81rem}
+.mgahawani-grammar__challenge-score{font-weight:850;color:#185c3b;background:#e4f4e8;border-radius:11px;padding:12px}
+@media(max-width:780px){
+  .mgahawani-grammar__rule-example{grid-template-columns:1fr}
+  .mgahawani-grammar__rule-example>div+div{border-left:0;border-top:1px solid #d9e9df}
+  .mgahawani-grammar__challenge-steps{grid-template-columns:1fr}
+}
+@media(max-width:540px){
+  .mgahawani-grammar__outcomes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mgahawani-grammar__outcomes button{padding:10px;font-size:.76rem}
+  .mgahawani-grammar__morpheme{min-width:0;flex:1 1 68px;padding:10px 5px;min-height:76px}
+  .mgahawani-grammar__morpheme strong{font-size:1.15rem}
+  .mgahawani-grammar__morpheme-plus{font-size:.95rem}
+  .mgahawani-grammar__self-check,.mgahawani-grammar__verb-breakdown{padding:12px}
+  .mgahawani-grammar__chapter-footer .swahili-book__button{width:auto;max-width:100%}
+}
