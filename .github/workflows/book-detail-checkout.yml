@@ -29,4 +29,4 @@ jobs:
       - run: node --test functions/__tests__/bookCheckoutFlow.test.js functions/__tests__/bookCommerce.test.js functions/__tests__/bookReceiptVerification.test.js functions/functionz/bookPricing.test.js functions/functionz/privateBookDelivery.test.js
       - run: node --test web/scripts/generate-book-social-pages.test.mjs
       - working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/components/BookStoreCheckout.test.js src/components/ExamGuideStorefront.test.jsx src/components/BooksCatalog.test.jsx src/components/BookProductRoute.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/BookShare.test.jsx src/components/BookStoreCheckout.test.js src/components/ExamGuideStorefront.test.jsx src/components/BooksCatalog.test.jsx src/components/BookProductRoute.test.js
