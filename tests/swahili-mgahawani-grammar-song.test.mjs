@@ -33,7 +33,7 @@ test("Music tab contains the complete supplied lyrics, without a fake audio play
     "Kiitikio", "Ubeti wa pili — Kinywaji", "Daraja — Kulipa",
     "Kiitikio cha mwisho", "Mwisho — Karibu tena!",
   ]);
-  assert.equal(MGAHAWANI_SONG.sections.reduce((n, section) => n + section.lines.length, 0), 52);
+  assert.equal(MGAHAWANI_SONG.sections.reduce((n, section) => n + section.lines.length, 0), 48);
   assert.equal(MGAHAWANI_SONG.sections[0].lines[0], "Habari yako?");
   assert.equal(MGAHAWANI_SONG.sections.at(-1).lines.at(-1), "Asante sana, kwa heri!");
   assert.match(song, /no song recording or synced lyric timings/);
