@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
@@ -9,6 +9,7 @@ import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import SwahiliCourseOverview from "./SwahiliCourseOverview";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
+import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import "./SwahiliCourseBook.css";
 
 const LETTERS = ["A", "E", "I", "O", "U"];
@@ -292,22 +293,25 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
   const [submissionResult, setSubmissionResult] = useState(null);
   const [previouslySubmitted, setPreviouslySubmitted] = useState(false);
   const [teacherReview, setTeacherReview] = useState(null);
-  const checkedUser = useRef(null);
+  const [submissionVersion, setSubmissionVersion] = useState(0);
   const lesson = SWAHILI_DAY_ONE;
 
-  // A single Firestore read only when a logged-in learner opens Submit. No live listeners or autosave writes.
   useEffect(() => {
-    if (day !== 1 || activeTab !== "submit" || !user?.uid || !db || checkedUser.current === user.uid) return;
-    checkedUser.current = user.uid;
-    let cancelled = false;
-    getDoc(doc(db, "users", user.uid, "swahiliLessons", "day-1"))
-      .then((snapshot) => { if (!cancelled && snapshot.exists()) setPreviouslySubmitted(true); })
-      .catch(() => { /* Keep the workbook available if prior-submission lookup fails. */ });
-    getDoc(doc(db, "swahiliTeacherReviews", user.uid))
-      .then((snapshot) => { if (!cancelled && snapshot.exists()) setTeacherReview(snapshot.data()); })
-      .catch(() => { /* Keep the workbook available when feedback has not been published. */ });
-    return () => { cancelled = true; };
-  }, [activeTab, day, user?.uid]);
+    setTeacherReview(null);
+    if (day !== 1 || activeTab !== "submit" || !user?.uid || !db) return undefined;
+    let active = true;
+    Promise.allSettled([
+      getDoc(doc(db, "users", user.uid, "swahiliLessons", "day-1")),
+      getDoc(doc(db, "swahiliTeacherReviews", user.uid)),
+    ]).then(([work, feedback]) => {
+      if (!active) return;
+      const submission = work.status === "fulfilled" && work.value.exists() ? work.value : null;
+      const review = feedback.status === "fulfilled" && feedback.value.exists() ? feedback.value.data() : null;
+      setPreviouslySubmitted(Boolean(submission));
+      setTeacherReview(getCurrentSwahiliReview(submission?.data(), review));
+    });
+    return () => { active = false; };
+  }, [activeTab, day, user?.uid, submissionVersion]);
 
   const submitWork = async () => {
     if (!user?.uid || !db || submitting) return;
@@ -333,6 +337,8 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
         submittedAt: serverTimestamp(),
       }, { merge: true });
       setPreviouslySubmitted(true);
+      setTeacherReview(null);
+      setSubmissionVersion((version) => version + 1);
       setSubmissionResult({ type: "success" });
     } catch (error) {
       setSubmissionResult({ type: "error", message: "Imeshindikana kuhifadhi kazi. Kagua muunganisho wako na ujaribu tena." });
