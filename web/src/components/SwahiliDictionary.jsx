@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
+import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
 
 // The emailed "HATUA YA AWALI (Kiswahili A1 and A2)" is a teaching syllabus,
 // not a translation dictionary. Topics are sourced from its 20-topic outline.
-// Vocabulary is seeded only from Ruth's existing Day 1 teaching material;
-// additional topic entries require a checked vocabulary source.
+// Verified vocabulary comes from the original Day 1 teaching material and
+// Ruth's two A1 restaurant PDFs for Lesson 6. Unpublished topics remain headings only.
 export const SWAHILI_DICTIONARY_TOPICS = [
   "Salamu", "Utambulisho", "Familia", "Mgahawani", "Sokoni",
   "Dukani", "Mapishi ya Kitanzania", "Nyumbani", "Shughuli za Kila Siku",
@@ -17,6 +18,7 @@ export const SWAHILI_DICTIONARY_TOPICS = [
 const starterVocabulary = [
   ...SWAHILI_DAY_ONE.vowels.map(({ word, meaning }) => ({ sw: word, en: meaning, source: "day-1" })),
   ...SWAHILI_DAY_ONE.combinations.map(({ word, meaning }) => ({ sw: word, en: meaning, source: "day-1" })),
+  ...[...SWAHILI_DAY_SIX.food, ...SWAHILI_DAY_SIX.drinks].map(({sw,en}) => ({sw,en,source:"day-6"})),
 ];
 
 export const SWAHILI_DICTIONARY_WORDS = Array.from(
@@ -37,7 +39,7 @@ export default function SwahiliDictionary() {
   return (
     <section className="swahili-book__card swahili-book__activity" aria-label="Kamusi ya Kiswahili">
       <h2>Kamusi ya Kiswahili · Swahili Dictionary</h2>
-      <p>Search the words from Somo la 1 by Kiswahili or English. Other topics will be added after review.</p>
+      <p>Search verified words from Somo la 1 and Somo la 6 (Mgahawani). Remaining syllabus topics will be added when their materials are provided.</p>
       <div className="swahili-book__form">
         <label htmlFor="swahili-dictionary-search">Tafuta neno · Search
           <input id="swahili-dictionary-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="e.g. mama, mother, chai" />
@@ -46,6 +48,7 @@ export default function SwahiliDictionary() {
           <select id="swahili-dictionary-topic" value={selected} onChange={(event) => setSelected(event.target.value)}>
             <option value="all">All available words</option>
             <option value="day-1">Somo la 1 · Alfabeti na matamshi</option>
+            <option value="day-6">Somo la 6 · Mgahawani (Topic 4)</option>
           </select>
         </label>
       </div>
