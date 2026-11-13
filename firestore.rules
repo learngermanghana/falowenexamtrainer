@@ -84,7 +84,15 @@ service cloud.firestore {
     }
 
     match /swahiliTeacherReviews/{studentId} {
-      allow get: if isOwner(studentId) || isStaff();
+      // Day 1 feedback uses {uid}; Day 6 uses {uid}_day-6.
+      // The review document is staff-written, so verifying its canonical
+      // recipient and lesson permits read without broadening client writes.
+      allow get: if isOwner(studentId) ||
+        (signedIn() &&
+          resource.data.studentId == request.auth.uid &&
+          resource.data.lessonId == 'swahili-day-6' &&
+          studentId == request.auth.uid + '_day-6') ||
+        isStaff();
       allow list: if isStaff();
       allow create, update, delete: if isStaff();
     }
