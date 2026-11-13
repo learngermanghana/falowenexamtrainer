@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import SwahiliDictionary from "./SwahiliDictionary";
+import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import "./SwahiliCourseBook.css";
 
 const LETTERS = ["A", "E", "I", "O", "U"];
@@ -259,7 +260,7 @@ function DayOneContent({
             <p className="swahili-book__feedback" role="status">Kazi imehifadhiwa kwenye akaunti yako ya Falowen. Hakuna alama za moja kwa moja.</p>
           ) : null}
           {submissionResult?.type === "error" ? <p className="swahili-book__error" role="alert">{submissionResult.message}</p> : null}
-          <p className="swahili-book__note">Kazi hii inahifadhiwa kwenye akaunti yako. Mfumo wa alama na ukurasa wa mwalimu wa Kiswahili bado haujaunganishwa.</p>
+          <p className="swahili-book__note">Kazi hii inahifadhiwa kwenye akaunti yako. Mwalimu anaweza kukagua na kutoa maoni; hakuna alama za moja kwa moja.</p>
         </>
       )}
     </section>
@@ -267,7 +268,11 @@ function DayOneContent({
 }
 
 export default function SwahiliCourseBook({ day = null, basePath = "/swahili", preview = false }) {
-  const { user } = useAuth();
+  const { user, studentProfile } = useAuth();
+  const location = useLocation();
+  const role = String(studentProfile?.role || "").toLowerCase();
+  const isTeacher = ["admin", "staff", "tutor"].includes(role) || studentProfile?.isTutor === true;
+  const teacherView = day === 1 && new URLSearchParams(location.search).get("teacher") === "1";
   const [activeTab, setActiveTab] = useState("grammar");
   const [writing, setWriting] = useState(EMPTY_WRITING);
   const [readingAnswers, setReadingAnswers] = useState({});
@@ -310,6 +315,8 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
         readingAnswers: { ...readingAnswers },
         listeningAnswers: { ...listeningAnswers },
         listeningTeacherLed: true,
+        studentName: studentProfile?.name || studentProfile?.displayName || user?.displayName || "",
+        studentEmail: user?.email || "",
         submittedAt: serverTimestamp(),
       }, { merge: true });
       setPreviouslySubmitted(true);
@@ -320,6 +327,12 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
       setSubmitting(false);
     }
   };
+
+  if (teacherView) {
+    return isTeacher
+      ? <SwahiliTeacherDayOne basePath={basePath} />
+      : <main className="swahili-book"><p className="swahili-book__note">Teacher access required. <Link to={basePath + "/day-1"}>Return to Day 1</Link></p></main>;
+  }
 
   return (
     <main className="swahili-book" lang="sw" data-swahili-course-book="true">
@@ -337,6 +350,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
       </header>
       {day === 1 ? (
         <>
+          {isTeacher && <p className="swahili-book__spaced"><Link className="swahili-book__button swahili-book__button--soft" to={basePath + "/day-1?teacher=1"}>Teacher slides & marking</Link></p>}
           <div className="swahili-book__workbook-nav">
             <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab}
               tabs={TABS} ariaLabel="Kiswahili Day 1 workbook sections"
