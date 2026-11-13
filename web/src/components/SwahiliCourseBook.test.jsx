@@ -12,7 +12,7 @@ jest.mock("../context/AuthContext", () => ({
 }));
 jest.mock("../firebase", () => ({
   db: {},
-  doc: jest.fn((...args) => args.join("/")),
+  doc: jest.fn((_db, ...segments) => "/" + segments.join("/")),
   getDoc: jest.fn(async () => ({ exists: () => false })),
   getDocs: jest.fn(async () => ({ docs: [] })),
   query: jest.fn((...args) => args),
@@ -30,14 +30,38 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     mockUser = null;
     mockStudentProfile = null;
     jest.clearAllMocks();
+    getDoc.mockImplementation(async () => ({ exists: () => false }));
   });
 
-  it("offers only Day 1 and no invented later lessons", () => {
-    render(<MemoryRouter><SwahiliCourseBook /></MemoryRouter>);
-    expect(screen.getByText("Alfabeti, sauti na matamshi")).toBeTruthy();
-    expect(screen.getByText("Somo 1 pekee")).toBeTruthy();
+  it("lists only the published lessons and keeps personal progress out of the public preview", () => {
+    mockUser = { uid: "swahili-student-1" };
+    render(<MemoryRouter><SwahiliCourseBook preview /></MemoryRouter>);
     expect(screen.getByRole("link", { name: "Fungua Somo la 1" }).getAttribute("href")).toBe("/swahili/day-1");
-    expect(screen.queryByText(/Somo la 2/)).toBeNull();
+    expect(screen.getByRole("link", { name: "Fungua Somo la 6" }).getAttribute("href")).toBe("/swahili/day-6");
+    expect(screen.getByText(/Personal progress is available in Campus/)).toBeTruthy();
+    expect(getDoc).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByRole("textbox", { name: "Search lessons" }), { target: { value: "Mgahawani" } });
+    expect(screen.queryByRole("link", { name: "Fungua Somo la 1" })).toBeNull();
+  });
+
+  it("uses the learner's submissions and tutor decisions to show progress and resume", async () => {
+    mockUser = { uid: "swahili-student-1" };
+    getDoc.mockImplementation(async (path) => ({
+      exists: () => path.endsWith("/day-1") || path.endsWith("/swahiliTeacherReviews/swahili-student-1"),
+      data: () => ({ status: "reviewed" }),
+    }));
+    render(<MemoryRouter><SwahiliCourseBook basePath="/campus/course/swahili" /></MemoryRouter>);
+    expect(await screen.findByText("1 of 2 required assignments submitted · 50% complete")).toBeTruthy();
+    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("50");
+    expect(screen.getByText("1 reviewed")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Continue learning" }).getAttribute("href")).toBe("/campus/course/swahili/day-6");
+  });
+
+  it("opens Submit directly and can move back through workbook sections", () => {
+    render(<MemoryRouter initialEntries={["/swahili/day-1?view=submit"]}><SwahiliCourseBook day={1} /></MemoryRouter>);
+    expect(screen.getByRole("tabpanel", { name: "Submit" })).toBeTruthy();
+    fireEvent.click(within(screen.getByRole("navigation", { name: "Workbook navigation" })).getByRole("button", { name: /Teil 4/ }));
+    expect(screen.getByRole("tabpanel", { name: "Teil 4" })).toBeTruthy();
   });
 
   it("reuses the same seven-step shared A2/B1 navigation, including Submit", () => {

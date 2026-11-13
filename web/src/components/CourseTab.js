@@ -24,6 +24,7 @@ import { getC2SkillLabel } from "../data/c2SkillCycle";
 import { getB2SkillLabel } from "../data/b2SkillCycle";
 import { getTimedAssignmentConfig, getTimedAssignmentPhase } from "../data/timedAssignmentConfig";
 import { getA2B1WorkbookIncludedSectionLabels } from "./a2B1WorkbookSectionProfile";
+import { courseBookStyles } from "./courseBookStyles";
 import "./CourseTabResponsive.css";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -512,108 +513,6 @@ const TimedPhaseNotice = ({ phase, level }) => {
       </p>
     </div>
   );
-};
-
-const courseBookStyles = {
-  hero: {
-    borderRadius: 24,
-    padding: 20,
-    background: "linear-gradient(135deg, #172554 0%, #2563eb 54%, #38bdf8 100%)",
-    color: "#f8fafc",
-    boxShadow: "0 22px 50px rgba(37, 99, 235, 0.28)",
-    display: "grid",
-    gap: 16,
-  },
-  heroHeader: { display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start", flexWrap: "wrap" },
-  heroEyebrow: { margin: 0, color: "#bfdbfe", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.6 },
-  heroTitle: { margin: "4px 0 6px", fontSize: 28, lineHeight: 1.08, letterSpacing: -0.6 },
-  heroText: { margin: 0, color: "#dbeafe", fontSize: 14, lineHeight: 1.5, maxWidth: 640 },
-  heroActions: { display: "flex", gap: 8, alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap" },
-  heroSelect: { ...styles.select, minWidth: 110, background: "rgba(255,255,255,0.96)", border: "1px solid rgba(255,255,255,0.35)" },
-  statGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 },
-  statCard: { border: "1px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.12)", borderRadius: 16, padding: 12, backdropFilter: "blur(8px)" },
-  statLabel: { margin: 0, color: "#bfdbfe", fontSize: 12, fontWeight: 700 },
-  statValue: { margin: "4px 0 0", color: "#ffffff", fontSize: 20, fontWeight: 900 },
-  progressShell: { height: 10, borderRadius: 999, background: "rgba(255,255,255,0.22)", overflow: "hidden", border: "1px solid rgba(255,255,255,0.18)" },
-  progressFill: { height: "100%", borderRadius: 999, background: "linear-gradient(90deg, #dcfce7, #86efac)" },
-  toolbar: { ...styles.card, marginBottom: 0, display: "grid", gap: 12, borderRadius: 18, padding: 14 },
-  toolbarTop: { display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" },
-  filterRow: { display: "flex", gap: 8, flexWrap: "wrap" },
-  filterButton: { ...styles.secondaryButton, padding: "8px 12px", fontWeight: 700, background: "#ffffff" },
-  filterButtonActive: { ...styles.primaryButton, padding: "8px 12px", boxShadow: "0 8px 18px rgba(37, 99, 235, 0.22)" },
-  searchInput: { ...styles.input, minHeight: 42, borderRadius: 14, background: "#f8fafc" },
-  nextCard: { border: "1px solid #bfdbfe", background: "linear-gradient(135deg, #eff6ff, #ffffff)", borderRadius: 18, padding: 14, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" },
-  weekSection: { display: "grid", gap: 10 },
-  weekHeader: { display: "flex", alignItems: "center", gap: 10, margin: "6px 0 0" },
-  weekTitle: { margin: 0, fontSize: 14, color: "#1e3a8a", fontWeight: 900, textTransform: "uppercase", letterSpacing: 0.5 },
-  weekLine: { height: 1, background: "#dbeafe", flex: 1 },
-  lessonCard: { background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: 18, padding: 14, boxShadow: "0 10px 24px rgba(15, 23, 42, 0.05)", display: "grid", gap: 10 },
-  lessonCardCurrent: { border: "1px solid #2563eb", background: "linear-gradient(135deg, #eff6ff, #ffffff 60%)", boxShadow: "0 18px 34px rgba(37, 99, 235, 0.16)" },
-  lessonTop: { display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" },
-  lessonMain: { display: "flex", gap: 12, flex: "1 1 320px", minWidth: 0 },
-  dayBubble: { minWidth: 72, minHeight: 48, padding: "6px 8px", borderRadius: 16, background: "#eff6ff", border: "1px solid #bfdbfe", color: "#1d4ed8", display: "grid", placeItems: "center", flexShrink: 0, fontWeight: 900, lineHeight: 1.1, textAlign: "center", fontSize: 12 },
-  lessonTitle: { margin: 0, fontSize: 17, lineHeight: 1.25, color: "#0f172a" },
-  lessonMeta: { display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 },
-  includedRow: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 8 },
-  includedLabel: { color: "#64748b", fontSize: 12, fontWeight: 800 },
-  includedChip: { display: "inline-flex", alignItems: "center", borderRadius: 999, padding: "4px 8px", background: "#f8fafc", border: "1px solid #dbeafe", color: "#1e3a8a", fontSize: 11, fontWeight: 800 },
-  chip: { display: "inline-flex", alignItems: "center", gap: 4, borderRadius: 999, padding: "5px 9px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", fontSize: 12, fontWeight: 700 },
-  statusChip: { display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 999, padding: "6px 10px", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" },
-  lessonActions: { display: "flex", gap: 8, alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap" },
-  floatingSubmitButton: {
-    position: "fixed",
-    right: "max(18px, env(safe-area-inset-right))",
-    bottom: "max(18px, env(safe-area-inset-bottom))",
-    zIndex: 40,
-    alignItems: "center",
-    background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
-    border: "1px solid rgba(255,255,255,0.5)",
-    borderRadius: 999,
-    boxShadow: "0 18px 36px rgba(37,99,235,0.35)",
-    color: "#ffffff",
-    cursor: "pointer",
-    display: "inline-flex",
-    fontWeight: 900,
-    gap: 8,
-    minHeight: 54,
-    padding: "0 20px",
-  },
-  submitOverlay: {
-    position: "fixed",
-    inset: 0,
-    zIndex: 70,
-  },
-  submitBackdrop: {
-    position: "absolute",
-    inset: 0,
-    background: "rgba(15,23,42,0.42)",
-  },
-  submitPanel: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    width: "min(920px, 100%)",
-    overflowY: "auto",
-    background: "#f8fafc",
-    boxShadow: "-24px 0 48px rgba(15,23,42,0.24)",
-    padding: "clamp(14px, 3vw, 24px)",
-  },
-  submitPanelHeader: {
-    position: "sticky",
-    top: 0,
-    zIndex: 2,
-    alignItems: "center",
-    background: "rgba(248,250,252,0.96)",
-    borderBottom: "1px solid #e2e8f0",
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 12,
-    padding: "8px 0 12px",
-  },
-  practiceControls: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 8 },
-  emptyState: { ...styles.card, marginBottom: 0, textAlign: "center", borderRadius: 18, padding: 24 },
 };
 
 const normalizeSearchText = (value) => String(value || "").trim().toLowerCase();

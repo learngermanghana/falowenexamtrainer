@@ -7,6 +7,7 @@ const appPath = path.join(root, "web/src/App.js");
 const appCssPath = path.join(root, "web/src/App.css");
 const healthPath = path.join(root, "web/src/components/HealthIndicator.js");
 const notificationPath = path.join(root, "web/src/components/NotificationBell.js");
+const courseBookStylesPath = path.join(root, "web/src/components/courseBookStyles.js");
 const courseTabPath = path.join(root, "web/src/components/CourseTab.js");
 const studyBuddyCssPath = path.join(root, "web/src/components/StudyBuddyBar.css");
 
@@ -411,8 +412,8 @@ if (!courseTab.includes("const latestCourseResult = useMemo(")) {
   );
 }
 
-courseTab = replaceOnce(
-  courseTab,
+const courseBookStyles = replaceOnce(
+  fs.readFileSync(courseBookStylesPath, "utf8"),
   `  hero: {
     borderRadius: 24,
     padding: 20,
@@ -1085,6 +1086,7 @@ fs.writeFileSync(appPath, app, "utf8");
 fs.writeFileSync(appCssPath, appCss, "utf8");
 fs.writeFileSync(healthPath, health, "utf8");
 fs.writeFileSync(notificationPath, notification, "utf8");
+fs.writeFileSync(courseBookStylesPath, courseBookStyles, "utf8");
 fs.writeFileSync(courseTabPath, courseTab, "utf8");
 fs.writeFileSync(studyBuddyCssPath, studyBuddyCss, "utf8");
 

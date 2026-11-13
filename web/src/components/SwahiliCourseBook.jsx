@@ -7,6 +7,8 @@ import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import SwahiliDictionary from "./SwahiliDictionary";
 import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
+import SwahiliCourseOverview from "./SwahiliCourseOverview";
+import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import "./SwahiliCourseBook.css";
 
 const LETTERS = ["A", "E", "I", "O", "U"];
@@ -280,7 +282,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
   const role = String(studentProfile?.role || "").toLowerCase();
   const isTeacher = ["admin", "staff", "tutor"].includes(role) || studentProfile?.isTutor === true;
   const teacherView = day === 1 && new URLSearchParams(location.search).get("teacher") === "1";
-  const [activeTab, setActiveTab] = useState("grammar");
+  const [activeTab, setActiveTab] = useSwahiliWorkbookTab(TABS);
   const [writing, setWriting] = useState(EMPTY_WRITING);
   const [readingAnswers, setReadingAnswers] = useState({});
   const [readingChecked, setReadingChecked] = useState(false);
@@ -339,6 +341,8 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
     }
   };
 
+  if (!day) return <SwahiliCourseOverview basePath={basePath} preview={preview} uid={user?.uid} />;
+
   if (teacherView) {
     return isTeacher
       ? <SwahiliTeacherDayOne basePath={basePath} />
@@ -346,63 +350,38 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
   }
 
   return (
-    <SwahiliWorkbookRadio lesson={day ? lesson : null} preview={preview}>
-    <main className="swahili-book" lang="sw" data-swahili-course-book="true">
+    <SwahiliWorkbookRadio lesson={lesson} preview={preview}>
+    <main className="swahili-book swahili-book--workbook" lang="sw" data-swahili-course-book="true">
       <div className="swahili-book__top">
         <div className="swahili-book__brand">Falowen · Kiswahili</div>
-        <Link className="swahili-book__link" to={basePath}>{day ? "← Rudi kwenye kitabu cha kozi" : "Kitabu cha kozi"}</Link>
+        <Link className="swahili-book__link" to={preview ? basePath : "/campus/course"}>← Rudi kwenye kitabu cha kozi</Link>
       </div>
       <header className="swahili-book__hero">
         <p className="swahili-book__eyebrow">KISWAHILI · KIWANGO CHA MWANZO</p>
-        <h1>{day ? lesson.chapter + " · " + lesson.title : "Kitabu cha Kozi ya Kiswahili"}</h1>
-        <p>{day ? lesson.objective : "Jifunze Kiswahili kwa matamshi, sarufi, muziki na mazoezi ya darasani."}</p>
+        <h1>{lesson.chapter} · {lesson.title}</h1>
+        <p>{lesson.objective}</p>
         <div className="swahili-book__meta">
-          <span>{day ? "Somo la 1" : "Somo la 1 na Somo la 6"}</span><span>{day ? "Alfabeti na matamshi" : "Alfabeti · Mgahawani"}</span><span>Music · Grammar · Teil 1–4 · Submit</span>
+          <span>Somo la 1</span><span>Alfabeti na matamshi</span><span>Music · Grammar · Teil 1–4 · Submit</span>
         </div>
       </header>
-      {day === 1 ? (
-        <>
-          {isTeacher && <p className="swahili-book__spaced"><Link className="swahili-book__button swahili-book__button--soft" to={basePath + "/day-1?teacher=1"}>Teacher slides & marking</Link></p>}
-          <div className="swahili-book__workbook-nav">
-            <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab}
-              tabs={TABS} ariaLabel="Kiswahili Day 1 workbook sections"
-              renderLegacyGrammarPanel={false} tabDescriptionOverrides={TAB_DESCRIPTIONS} />
-          </div>
-          <div role="tabpanel" aria-label={TABS.find((tab) => tab.key === activeTab)?.label}>
-            <DayOneContent
-              activeTab={activeTab} writing={writing} setWriting={(updater) => { setWriting(updater); setSubmissionResult(null); }}
-              readingAnswers={readingAnswers} setReadingAnswers={(updater) => { setReadingAnswers(updater); setSubmissionResult(null); }}
-              readingChecked={readingChecked} setReadingChecked={setReadingChecked}
-              listeningAnswers={listeningAnswers} setListeningAnswers={(updater) => { setListeningAnswers(updater); setSubmissionResult(null); }}
-              listeningChecked={listeningChecked} setListeningChecked={setListeningChecked}
-              user={user} submitting={submitting} submissionResult={submissionResult}
-              submitWork={submitWork} previouslySubmitted={previouslySubmitted} teacherReview={teacherReview} />
-          </div>
-          <p className="swahili-book__muted swahili-book__spaced">Mazoezi haya ni ya kiwango cha mwanzo. {preview ? "Huu ni mfano wa kitabu cha kozi." : ""}</p>
-        </>
-      ) : (
-        <section className="swahili-book__card swahili-book__section">
-          <div className="swahili-book__lesson">
-            <div className="swahili-book__lessonInfo">
-              <p className="swahili-book__caption">SOMO LA 1 · LINAPATIKANA</p>
-              <h2>{lesson.title}</h2>
-              <p>{lesson.objective}</p>
-              <p className="swahili-book__small">Music · Grammar · Teil 1–4 · Submit</p>
-            </div>
-            <Link to={basePath + "/day-1"} className="swahili-book__button">Fungua Somo la 1</Link>
-          </div>
-          <div className="swahili-book__lesson swahili-book__lesson--separated">
-            <div className="swahili-book__lessonInfo">
-              <p className="swahili-book__caption">A1 · SOMO LA 6 · LINAPATIKANA</p>
-              <h2>Mgahawani · At the Restaurant</h2>
-              <p>Chakula, vinywaji, kupenda na kutopenda, kusoma menyu na kuagiza chakula.</p>
-              <p className="swahili-book__small">Dictionary topic 4 · Workbook lesson 6 · Music · Grammar · Teil 1–4 · Submit</p>
-            </div>
-            <Link to={basePath + "/day-6"} className="swahili-book__button">Fungua Somo la 6</Link>
-          </div>
-          <p className="swahili-book__note swahili-book__spaced">Somo la 6 limeongezwa kutoka nyaraka mbili za mgahawani. Masomo ya 2–5 bado hayajachapishwa; masomo ya Kijerumani hayajabadilishwa.</p>
-        </section>
-      )}
+      {isTeacher && <p className="swahili-book__spaced"><Link className="swahili-book__button swahili-book__button--soft" to={basePath + "/day-1?teacher=1"}>Teacher slides & marking</Link></p>}
+      <div className="swahili-book__workbook-nav">
+        <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab}
+          tabs={TABS} ariaLabel="Kiswahili Day 1 workbook sections"
+          renderLegacyGrammarPanel={false} tabDescriptionOverrides={TAB_DESCRIPTIONS} />
+      </div>
+      <div role="tabpanel" tabIndex={-1} aria-label={TABS.find((tab) => tab.key === activeTab)?.label}>
+        <DayOneContent
+          activeTab={activeTab} writing={writing} setWriting={(updater) => { setWriting(updater); setSubmissionResult(null); }}
+          readingAnswers={readingAnswers} setReadingAnswers={(updater) => { setReadingAnswers(updater); setSubmissionResult(null); }}
+          readingChecked={readingChecked} setReadingChecked={setReadingChecked}
+          listeningAnswers={listeningAnswers} setListeningAnswers={(updater) => { setListeningAnswers(updater); setSubmissionResult(null); }}
+          listeningChecked={listeningChecked} setListeningChecked={setListeningChecked}
+          user={user} submitting={submitting} submissionResult={submissionResult}
+          submitWork={submitWork} previouslySubmitted={previouslySubmitted} teacherReview={teacherReview} />
+      </div>
+      <p className="swahili-book__muted swahili-book__spaced">Mazoezi haya ni ya kiwango cha mwanzo. {preview ? "Huu ni mfano wa kitabu cha kozi." : ""}</p>
+      <SwahiliWorkbookNavigation tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
     </main>
     </SwahiliWorkbookRadio>
   );
