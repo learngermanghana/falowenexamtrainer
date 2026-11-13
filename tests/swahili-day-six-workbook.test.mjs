@@ -35,8 +35,8 @@ test("Somo la 6 reuses workbook nav and saves an isolated learner-owned submissi
   assert.match(workbook, /studentId: user.uid/);
   assert.match(workbook, /userId: user.uid/);
   assert.match(workbook, /getMissingSwahiliDaySixWork/);
-  assert.match(workbook, /Teacher feedback for Day 6 is not yet enabled/);
-  assert.match(workbook, /No approved recording yet/);
+  assert.match(workbook, /Maoni ya mwalimu · Teacher feedback/);
+  assert.equal(SWAHILI_DAY_SIX.radio.youtubeId, "oErMpRojTkg");
 });
 test("Dictionary includes a selectable sourced Lesson 6 group", () => {
   assert.match(dictionary, /SWAHILI_DAY_SIX/);

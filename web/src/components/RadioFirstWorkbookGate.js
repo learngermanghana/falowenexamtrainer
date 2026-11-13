@@ -120,7 +120,7 @@ export const openCompletedWorkbook = (locationLike, windowRef) => {
 export const shouldShowRadioFirst = (level, day) =>
   Boolean(resolveRadioFirstWorkbookResource(level, day));
 
-const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
+const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseBookPath = "/campus/course" }) => {
   const explicitRadio = isFalowenRadioResource(resource) ? resource : null;
   const radio = explicitRadio || resolveRadioFirstWorkbookResource(level, day);
   const location = useLocation();
@@ -176,7 +176,7 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
   };
 
   const handleBackToCourseBook = () => {
-    navigate("/campus/course", { replace: true });
+    navigate(courseBookPath, { replace: true });
   };
 
   return (
@@ -187,7 +187,7 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
       <style>{`.book-pdf-download-action { display: none !important; }`}</style>
       <AppBackButton
         label="Back to Course Book"
-        fallbackPath="/campus/course"
+        fallbackPath={courseBookPath}
         onBack={handleBackToCourseBook}
       />
       <header

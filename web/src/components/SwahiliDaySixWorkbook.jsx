@@ -6,6 +6,7 @@ import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWork
 import MgahawaniGrammar from "./MgahawaniGrammar";
 import MgahawaniSong from "./MgahawaniSong";
 import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
+import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import "./SwahiliCourseBook.css";
 
@@ -210,7 +211,8 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
     ? <SwahiliTeacherDayOne basePath={basePath} day={6} />
     : <main className="swahili-book"><p className="swahili-book__note">Teacher access required. <Link to={basePath + "/day-6"}>Return to Lesson 6</Link></p></main>;
 
-  return <main className="swahili-book mgahawani-workbook" lang="sw" data-swahili-course-book="true">
+  return <SwahiliWorkbookRadio lesson={lesson} preview={preview}>
+    <main className="swahili-book mgahawani-workbook" lang="sw" data-swahili-course-book="true">
     <div className="swahili-book__top"><strong>Falowen · Kiswahili A1</strong><Link to={basePath}>← Kitabu cha kozi</Link></div>
     <header className="swahili-book__hero">
       <p className="swahili-book__eyebrow">KISWAHILI · A1 · SOMO LA 6</p>
@@ -231,5 +233,6 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
     </div>
     <div role="tabpanel" aria-label={TABS.find(tab => tab.key === activeTab)?.label}>{section()}</div>
     <p className="swahili-book__muted swahili-book__spaced">Practice material based on Ruth's two restaurant lessons. {preview ? "Public preview of this workbook." : ""}</p>
-  </main>;
+    </main>
+  </SwahiliWorkbookRadio>;
 }
