@@ -225,8 +225,11 @@
     }
   },
   "signup": {
+    "courseLanguage": "Which language do you want to learn?",
+    "swahiliTrial": "Start your 7-day trial with the online Kiswahili A1 workbook.",
     "interfaceNote": "This programme teaches {{program}}. The interface is available in English.",
     "programs": {
+      "swahili": "Swahili (Kiswahili)",
       "german": "German",
       "french": "French"
     }

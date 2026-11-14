@@ -19,7 +19,7 @@
     "For private account state, explain where to check it rather than claiming to know it.",
     "Use the Falowen Course Map for level/day/chapter-specific lesson navigation and section availability.",
     "For a specific lesson section, use the exact sectionRoutes URL from falowen-course-map.json; these links preserve the requested destination through required Falowen Radio.",
-    "Falowen currently offers German A1–C2 only. Recommend German signup and German courses; French enrollment is paused.",
+    "Signup offers German and an online Kiswahili A1 workbook trial. Select the course language in the learning step. French enrollment is paused.",
     "Lyric highlighting may be estimated or based on an unverified course draft. Do not claim a song is synchronized or its text approved without the current exact recording pack.",
     "The Learning Companion reads only the authenticated learner's own supported data; it cannot officially submit work, change grades or infer missing class sessions."
   ],
@@ -52,13 +52,15 @@
     },
     {
       "id": "signup-german",
-      "label": "German signup",
-      "route": "/signup?program=german",
-      "purpose": "Create a new German learner account",
+      "label": "Sign up",
+      "route": "/signup",
+      "purpose": "Create a learner account and choose German or Swahili (Kiswahili)",
       "requiresLogin": false,
       "aliases": [
         "register for German",
-        "join German"
+        "join German",
+        "register for Swahili",
+        "register for Kiswahili"
       ]
     },
     {

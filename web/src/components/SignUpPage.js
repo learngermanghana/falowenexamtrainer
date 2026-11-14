@@ -174,6 +174,7 @@ const findLevelSelect = (form) =>
   );
 
 const readFormDraft = (form) => ({
+  program: form.elements.namedItem("program")?.value || "german",
   name: form.querySelector('[autocomplete="name"]')?.value || "",
   email: form.querySelector('[autocomplete="email"]')?.value || "",
   phone: form.querySelector('[autocomplete="tel"]')?.value || "",
@@ -425,6 +426,7 @@ export default function SignUpPage(props) {
       email: details.email,
       phone: details.phone,
       level: details.level,
+      program: details.program,
       className: details.className,
       classSlug: slugify(details.className),
       learningMode: details.learningMode,
@@ -438,7 +440,7 @@ export default function SignUpPage(props) {
   return (
     <div ref={rootRef} className="signup-page-mobile-safe">
       <style>{MOBILE_INPUT_CSS}</style>
-      <SignUpPageLegacy {...props} onAccountCreated={handleAccountCreated} />
+      <SignUpPageLegacy {...props} initialProgram={draft?.program} onAccountCreated={handleAccountCreated} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} rootRef={rootRef} />, mount) : null}
       <LegalFooter />
     </div>
