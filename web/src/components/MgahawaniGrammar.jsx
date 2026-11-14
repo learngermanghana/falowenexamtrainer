@@ -59,7 +59,7 @@ function VerbBreakdown() {
   </div>;
 }
 
-export default function MgahawaniGrammar() {
+export default function MgahawaniGrammar({ uid = null, allowSave = false }) {
   const [openChapter, setOpenChapter] = useState("polite");
   const chooseChapter = (id) => setOpenChapter(current => current === id ? null : id);
   return <section className="swahili-book__card swahili-book__activity mgahawani-grammar" aria-label="Grammar">
@@ -144,7 +144,7 @@ export default function MgahawaniGrammar() {
     </details>
     <details className="mgahawani-grammar__extras">
       <summary>Kamusi · Search the Swahili dictionary</summary>
-      <SwahiliDictionary />
+      <SwahiliDictionary uid={uid} allowSave={allowSave} />
     </details>
   </section>;
 }
