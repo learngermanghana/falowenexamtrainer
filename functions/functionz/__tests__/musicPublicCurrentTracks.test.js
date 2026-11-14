@@ -51,8 +51,8 @@ test('retired static timing packs cannot reactivate old learning tracks',()=>{
   expect(lessons['a1-day-04-numbers']).toBeUndefined();
   expect(lessons['a1-day-22-health']).toBeUndefined();
   const app=fs.readFileSync(path.join(music,'app.js'),'utf8');
-  expect(app).toContain('publishedDays.has(track.level+":"+track.day)');
-  expect(app).toContain('catalog=[...pinnedTracks,...dynamic.filter(');
+  expect(app).toContain('publishedDays.has(track.musicLanguage+":"+track.level+":"+track.day)');
+  expect(app).toContain('allTracks=[...pinnedTracks,...dynamic.filter(');
 });
 
 test('Day 25 cue order is complete and the audio-specific timing remains explicitly a draft',()=>{

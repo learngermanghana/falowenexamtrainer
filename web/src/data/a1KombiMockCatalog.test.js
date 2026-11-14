@@ -12,8 +12,12 @@ test.each([4,5,6,7,8])("A1 Mock %s is registered with the matching full or three
  expect(contract.sections).toEqual(number<=8?["lesen","hoeren","schreiben","sprechen"]:["lesen","schreiben","sprechen"]);
  expect(getMockExamsForLevel("A1").some(item=>item.id===id)).toBe(true);
 });
-test("historical A1 mock 1–3 remain published",()=>{
+test("A1 Mock 1 remains published for Campus while only Mocks 2–3 appear in Exams Room",()=>{
+ expect(getMockExam("a1-final-01")).toMatchObject({
+  status:"ready",route:"/campus/course/a1-final-mock-exam",showInMockLibrary:false,
+ });
  expect(getMockExamsForLevel("A1").filter(e=>e.status==="ready").map(e=>e.id))
-  .toEqual(expect.arrayContaining(["a1-final-01","a1-final-02","a1-final-03"]));
+  .toEqual(expect.arrayContaining(["a1-final-02","a1-final-03"]));
+ expect(getMockExamsForLevel("A1").some(e=>e.id==="a1-final-01")).toBe(false);
  expect(A1_KOMBI_MOCKS).toHaveLength(5);
 });
