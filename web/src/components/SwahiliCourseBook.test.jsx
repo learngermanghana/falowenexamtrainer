@@ -133,6 +133,8 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
     expect(setDoc).not.toHaveBeenCalled();
     const button = screen.getByRole("button", { name: "Wasilisha kazi" });
+    expect(button.disabled).toBe(true);
+    screen.getAllByRole("checkbox").forEach(box => fireEvent.click(box));
     expect(button.disabled).toBe(false);
     fireEvent.click(button);
     await waitFor(() => expect(setDoc).toHaveBeenCalledTimes(1));
@@ -202,6 +204,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     }
     fireEvent.click(screen.getByRole("button", { name: "Save & Review" }));
     expect(setDoc).not.toHaveBeenCalled();
+    screen.getAllByRole("checkbox").forEach(box => fireEvent.click(box));
     fireEvent.click(screen.getByRole("button", { name: "Wasilisha kazi" }));
     await waitFor(() => expect(setDoc).toHaveBeenCalledWith(
       "/users/synthetic-day-six/swahiliLessons/day-6",
