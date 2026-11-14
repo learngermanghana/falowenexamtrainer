@@ -6,9 +6,9 @@ import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkb
 import "./SwahiliCourseBook.css";
 
 const practice = {
-  sprechen: ["Kuzungumza · Speaking", "Ask a partner: Unaamka saa ngapi? (What time do you wake up?)"],
-  schreiben: ["Kuandika · Writing", "Write three short sentences about what you do in the morning."],
-  lesen: ["Kusoma · Reading", "Read: Asha anaamka mapema. Anakunywa chai. What does Asha drink?"],
+  sprechen: ["Kuzungumza · Speaking", "Ask a partner: Una ndugu wangapi? (How many siblings do you have?)"],
+  schreiben: ["Kuandika · Writing", "Write three short sentences introducing members of your family."],
+  lesen: ["Kusoma · Reading", "Read: Huyu ni Asha. Ana kaka mmoja na dada wawili. How many sisters does Asha have?"],
   hoeren: ["Kusikiliza · Listening", "Listen to the song in Music and write down one word you recognize."],
   submit: ["Wasilisha · Submit", "The assignment will appear here when your tutor publishes it."],
 };
@@ -56,8 +56,8 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
         {activeTab === "references" && <DayFiveMusic />}
         {activeTab === "grammar" && <>
           <h2>Sarufi · Grammar</h2>
-          <p>Use <strong>ni-na-</strong> for “I” in the present tense and <strong>a-na-</strong> for “he/she”.</p>
-          <p><strong>Ninaamka mapema.</strong> I wake up early. <strong>Anaenda shuleni.</strong> He or she goes to school.</p>
+          <p>Use <strong>huyu ni</strong> to introduce a person and <strong>nina</strong> to say what you have.</p>
+          <p><strong>Huyu ni mama yangu.</strong> This is my mother. <strong>Nina kaka mmoja.</strong> I have one brother.</p>
           {lesson.aiLecture ? <a href={lesson.aiLecture}>Watch AI lecture</a> : <p>The video lecture will appear here after upload.</p>}
         </>}
         {activity && <><h2>{activity[0]}</h2><p>{activity[1]}</p></>}
