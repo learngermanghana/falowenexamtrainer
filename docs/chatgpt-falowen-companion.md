@@ -14,7 +14,7 @@ On the signed-in home page, select **Connect ChatGPT as a study partner** below 
 
 - Endpoint: https://www.falowen.app/api/chatgpt/mcp
 - OAuth issuer: https://www.falowen.app/api/chatgpt
-- OAuth scope: `falowen:read`; public CIMD client ID `https://chatgpt.com/oauth/client.json`
+- Default OAuth scope: `falowen:read`; optional explicit scope: `falowen:practice:write` for student-owned practice notes; public CIMD client ID `https://chatgpt.com/oauth/client.json`
 - Authorization/consent: https://www.falowen.app/chatgpt/connect (via ChatGPT's authorization request)
 - Privacy notice: https://www.falowen.app/chatgpt-privacy.html
 - Terms: https://www.falowen.app/chatgpt-terms.html
