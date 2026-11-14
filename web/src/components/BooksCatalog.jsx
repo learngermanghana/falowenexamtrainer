@@ -29,7 +29,8 @@ export const matchCatalogTitles = (titles = [], search = "", level = "all", form
 const { catalog: catalogSharePage, ...bookPages } = sharePages;
 export const BOOK_PAGES = Object.freeze(bookPages);
 
-export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook, basePath = "/books" }) {
+export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook, basePath = "/books", program = "german" }) {
+  const isSwahili = program === "swahili";
   const bookHref = page => basePath + page.href.slice("/books".length);
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("all");
@@ -44,19 +45,19 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
     <div className="fb-library-heading">
       <div>
         <p className="fb-eyebrow">FALOWEN BOOK LIBRARY</p>
-        <h1>Find your next German learning book</h1>
-        <p>Browse book covers, prices and formats. Select View Book for previews and checkout.</p>
+        <h1>Find your next {isSwahili ? "Swahili" : "German"} learning book</h1>
+        <p>{isSwahili ? "Browse the Swahili book library." : "Browse book covers, prices and formats. Select View Book for previews and checkout."}</p>
       </div>
-      <BookShare page={catalogSharePage} />
-      <div className="fb-library-fx">
+      {!isSwahili && <BookShare page={catalogSharePage} />}
+      {!isSwahili && <div className="fb-library-fx">
         <strong>GHS is the checkout currency.</strong>
         <span>{fxQuote
           ? "USD estimates use Falowen's daily exchange-rate quote" + (fxQuote.stale ? " (last available rate)." : ".")
           : "USD estimates are temporarily unavailable."}</span>
         <span>USD is for comparison only; Paystack charges in Ghana cedis.</span>
-      </div>
+      </div>}
     </div>
-    <div className="fb-library-tools">
+    {!isSwahili && <div className="fb-library-tools">
       <label>Search all books
         <input type="search" value={search} onChange={event => setSearch(event.target.value)}
           placeholder="E.g. writing, A1, grammar, email, exam" aria-label="Search all Falowen books" />
@@ -74,7 +75,7 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
           <option value="printed">Printed</option>
         </select>
       </label>
-    </div>
+    </div>}
     <p className="fb-library-resultcount" role="status">{results.length} {results.length === 1 ? "book" : "books"} found</p>
     <div className="fb-library-grid">
       {results.map(title => {
@@ -106,12 +107,12 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
           <BookShare page={BOOK_PAGES[title.id]} title={title.title} description={title.description} />
         </article>;
       })}
-      {!results.length && <div className="fb-library-empty">
+      {!results.length && (isSwahili ? <div className="fb-library-empty"><strong>No Swahili books are listed yet.</strong><a href="/campus/course">Open your course book</a></div> : <div className="fb-library-empty">
         <strong>No books match those filters.</strong><p>Try another word or CEFR level.</p>
         <button type="button" className="fb-btn fb-btn-ghost" onClick={() => {
           setSearch(""); setLevel("all"); setFormat("all");
         }}>Clear filters</button>
-      </div>}
+      </div>)}
     </div>
   </section>;
 }
