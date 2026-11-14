@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { PASS_MARK } from "../utils/assignmentProgress";
@@ -12,6 +12,7 @@ const lessons = [
 ];
 
 export default function SwahiliResults({ uid }) {
+  const { hash } = useLocation();
   const [rows, setRows] = useState(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -29,7 +30,13 @@ export default function SwahiliResults({ uid }) {
     }).catch(() => {
       if (active) setFailed(true);
     });
-    return () => { active = false; };
+    useEffect(() => {
+    if (/^#swahili-day-(1|6)$/.test(hash) && rows) {
+      document.getElementById(hash.slice(1))?.scrollIntoView?.({ block: "start" });
+    }
+  }, [hash, rows]);
+
+  return () => { active = false; };
   }, [uid]);
 
   return (
@@ -39,10 +46,21 @@ export default function SwahiliResults({ uid }) {
       {!rows && !failed && <p role="status">Loading results…</p>}
       {rows?.length === 0 && <p>Your submitted workbooks will appear here.</p>}
       {rows?.map(({ day, title, review }) => (
-        <article key={day} style={styles.card}>
+        <article id={`swahili-day-${day}`} key={day} style={styles.card}>
           <h3>Day {day} · {title}</h3>
           <p>{!review ? "Awaiting tutor review" : review.status === "needs_revision" ? "Revision needed" : "Reviewed"}</p>
           {Number.isInteger(review?.score) && <p>Score: {review.score}/100 · {review.score >= PASS_MARK ? "Passed" : "Failed"} (pass mark: {PASS_MARK}%)</p>}
+          {review?.answerReference && Number.isInteger(review.score) && (
+            <details open={hash === `#swahili-day-${day}`}>
+              <summary>Reference answers</summary>
+              <h4>Teil 2 · Model writing answers</h4>
+              <ul>{Object.entries(review.answerReference.writing || {}).map(([label, model]) =>
+                <li key={label}><strong>{label}</strong> · {model}</li>)}</ul>
+              <h4>Teil 3 · Reading answers</h4>
+              <ul>{Object.entries(review.answerReference.reading || {}).map(([key, item]) =>
+                <li key={key}><strong>{item.prompt}</strong> · {item.answer}</li>)}</ul>
+            </details>
+          )}
           {review?.feedback && <p style={{ whiteSpace: "pre-wrap" }}>{review.feedback}</p>}
           {(review?.status === "needs_revision" || (Number.isInteger(review?.score) && review.score < PASS_MARK)) && (
             <Link to={`/campus/course/swahili/day-${day}?view=submit`}>Revise submission</Link>
