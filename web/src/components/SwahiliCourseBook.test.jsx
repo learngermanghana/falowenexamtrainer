@@ -188,6 +188,32 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(setDoc).not.toHaveBeenCalled();
   });
 
+  it("sends a completed Day 6 workbook to the tutor queue only on final submit", async () => {
+    mockUser = { uid: "synthetic-day-six" };
+    render(<MemoryRouter initialEntries={["/campus/course/swahili/day-6?view=schreiben&radio=done"]}>
+      <SwahiliDaySixWorkbook basePath="/campus/course/swahili" />
+    </MemoryRouter>);
+    fireEvent.change(screen.getByLabelText(/What food and drink do you like/), { target: { value: "Ninapenda wali." } });
+    fireEvent.change(screen.getByLabelText(/What food or drink do you dislike/), { target: { value: "Sipendi soda." } });
+    fireEvent.change(screen.getByLabelText(/What would you say/), { target: { value: "Ninaomba maji." } });
+    openTab("Teil 3");
+    for (const group of screen.getAllByRole("group")) {
+      fireEvent.click(within(group).getAllByRole("radio")[0]);
+    }
+    fireEvent.click(screen.getByRole("button", { name: "Save & Review" }));
+    expect(setDoc).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Wasilisha kazi" }));
+    await waitFor(() => expect(setDoc).toHaveBeenCalledWith(
+      "/users/synthetic-day-six/swahiliLessons/day-6",
+      expect.objectContaining({
+        program: "swahili", lessonId: "swahili-day-6", status: "submitted",
+        studentId: "synthetic-day-six",
+        writing: expect.objectContaining({ order: "Ninaomba maji." }),
+      }),
+      { merge: true },
+    ));
+  });
+
   it("keeps restaurant submissions read-only for a German account or public preview", () => {
     mockUser = { uid: "german-student" };
     mockStudentProfile = { program: "german" };
