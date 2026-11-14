@@ -1,6 +1,8 @@
 
 /* Falowen marketing carousel: all five options share a consistent slide height. */
 .falowen-carousel { --tone:#0861e9;--soft:#ecf5ff; --deep:#10244a; }
+.falowen-carousel-chatgpt { --tone:#2164c7;--soft:#eaf2ff; }
+.falowen-slide-chatgpt { transform:rotate(-2deg); }
 .falowen-carousel-placement { --tone:#9b622c;--soft:#fff6e7; }
 .falowen-carousel-exams { --tone:#087558;--soft:#e8f8f2; }
 .falowen-carousel-books { --tone:#6951b6;--soft:#f4efff; }
