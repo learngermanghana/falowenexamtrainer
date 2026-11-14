@@ -2,6 +2,7 @@
 // Owner-only publication of a reviewed lyric sidecar alongside the exact R2 MP3.
 // The Firebase token and R2 credentials never reach the browser or video export.
 const crypto = require('node:crypto');
+const { isSwahiliMusicKey } = require('./swahiliMusic.cjs');
 const {musicTrackFromKey} = require('./musicDiscovery.cjs');
 const {signObject} = require('./courseMusic.cjs');
 const {validateLyrics,sameSungLines} = require('./musicLyrics.cjs');
@@ -16,7 +17,7 @@ function ownerAllowed(uid,env=process.env) {
 }
 function validateTimingUpload(body) {
   const key=body?.objectKey;
-  if(typeof key!=='string' || !musicTrackFromKey(key)) throw Object.assign(new Error('Choose an exact published music MP3 key.'),{status:400});
+  if(typeof key!=='string' || (!musicTrackFromKey(key) && !isSwahiliMusicKey(key))) throw Object.assign(new Error('Choose an exact published music MP3 key.'),{status:400});
   const checked=validateLyrics(body,key);
   if (!checked || !checked.cues.length || !Number.isInteger(body.version) || body.version!==1)
     throw Object.assign(new Error('Review and mark every lyric line before saving shared timing.'),{status:400});

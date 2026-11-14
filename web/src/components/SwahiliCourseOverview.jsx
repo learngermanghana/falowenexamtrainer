@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { db, doc, getDoc } from "../firebase";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
+import { SWAHILI_DAY_FIVE } from "../data/swahili/dayFive";
 import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { styles } from "../styles";
@@ -10,7 +11,8 @@ import "./CourseTabResponsive.css";
 
 const primaryLink = { ...styles.primaryButton, ...styles.primaryButtonLink, minHeight: 44 };
 
-const LESSONS = [SWAHILI_DAY_ONE, SWAHILI_DAY_SIX];
+const LESSONS = [SWAHILI_DAY_ONE, SWAHILI_DAY_FIVE, SWAHILI_DAY_SIX];
+const ASSIGNMENTS = LESSONS.filter((lesson) => !lesson.practiceOnly);
 const FILTERS = [
   { key: "all", label: "All lessons" },
   { key: "next", label: "Next lesson" },
@@ -27,7 +29,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
   useEffect(() => {
     if (preview || !uid || !db) return undefined;
     let active = true;
-    Promise.all(LESSONS.map(async ({ day }) => {
+    Promise.all(ASSIGNMENTS.map(async ({ day }) => {
       const [submission, review] = await Promise.allSettled([
         getDoc(doc(db, "users", uid, "swahiliLessons", `day-${day}`)),
         getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_day-${day}`)),
@@ -52,13 +54,13 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
   const records = personal && progress?.uid === uid ? progress.records : null;
   const submissionKnown = records?.every(({ submitted }) => submitted !== null);
   const completed = records?.filter(({ submitted }) => submitted).length ?? 0;
-  const percent = submissionKnown ? Math.round(completed / LESSONS.length * 100) : null;
+  const percent = submissionKnown ? Math.round(completed / ASSIGNMENTS.length * 100) : null;
   const reviewed = records?.filter(({ submitted, review }) => submitted && review === "reviewed").length ?? 0;
   const needsRevision = (lesson) => records?.find((record) => record.day === lesson.day)?.review === "needs_revision";
   const next = LESSONS.find(needsRevision) ??
-    LESSONS.find(({ day }) => records?.find((entry) => entry.day === day)?.submitted !== true) ??
+    ASSIGNMENTS.find(({ day }) => records?.find((entry) => entry.day === day)?.submitted !== true) ??
     LESSONS[0];
-  const nextLabel = submissionKnown && completed === LESSONS.length && !records.some(({ review }) => review === "needs_revision")
+  const nextLabel = submissionKnown && completed === ASSIGNMENTS.length && !records.some(({ review }) => review === "needs_revision")
     ? "Review lessons" : "Continue learning";
   const lessonPath = ({ day }) => `${basePath}/day-${day}`;
   const submitPath = (lesson) => `${lessonPath(lesson)}?view=submit`;
@@ -68,14 +70,14 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
     const record = records?.find((entry) => entry.day === lesson.day);
     const matchesFilter = filter === "all" ||
       (filter === "next" && lesson === next) ||
-      (filter === "toDo" && (record?.submitted !== true || record.review === "needs_revision")) ||
+      (filter === "toDo" && !lesson.practiceOnly && (record?.submitted !== true || record.review === "needs_revision")) ||
       (filter === "needsRevision" && record?.review === "needs_revision");
     return matchesFilter &&
       [`Day ${lesson.day}`, `Somo la ${lesson.day}`, lesson.title, lesson.objective, lesson.chapter]
         .some((value) => String(value).toLowerCase().includes(query));
   });
   const metrics = [
-    ["Completed", submissionKnown ? `${completed}/${LESSONS.length}` : `—/${LESSONS.length}`],
+    ["Completed", submissionKnown ? `${completed}/${ASSIGNMENTS.length}` : `—/${ASSIGNMENTS.length}`],
     ["Next lesson", nextLabel === "Review lessons" ? "Published work submitted" : `Somo la ${next.day}`],
     ["Tutor review", submissionKnown ? `${reviewed} reviewed` : "—"],
   ];
@@ -113,7 +115,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
           <p style={{ ...book.heroText, fontSize: 13 }} role="status">
             {!personal ? "Personal progress is available in Campus." : !records ? "Syncing progress…" :
               !submissionKnown ? "Some submissions could not be loaded." :
-              `${completed} of ${LESSONS.length} required assignments submitted · ${percent}% complete`}
+              `${completed} of ${ASSIGNMENTS.length} required assignments submitted · ${percent}% complete`}
           </p>
         </div>
       </section>
@@ -193,7 +195,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
           <button type="button" style={styles.secondaryButton} onClick={() => submitDialog.current.close()}>Close</button>
         </div>
         <div style={{ display: "grid", gap: 8 }}>
-          {LESSONS.map((lesson) => (
+          {ASSIGNMENTS.map((lesson) => (
             <Link key={lesson.day} to={submitPath(lesson)} style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }}>
               Somo la {lesson.day} · {lesson.title}
             </Link>

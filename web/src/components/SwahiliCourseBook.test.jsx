@@ -229,7 +229,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     const feedback = screen.getByRole("link", { name: "View feedback and resubmit" });
     expect(feedback.getAttribute("href")).toBe("/campus/course/swahili/day-1?view=submit");
     fireEvent.click(screen.getByRole("button", { name: "Needs revision" }));
-    expect(screen.getByText("1 shown from 2")).toBeTruthy();
+    expect(screen.getByText("1 shown from 3")).toBeTruthy();
     expect(screen.queryByRole("link", { name: "Fungua Somo la 6" })).toBeNull();
     const paths = getDoc.mock.calls.map((call) => call[0]);
     expect(paths).toEqual(expect.arrayContaining([
