@@ -696,6 +696,7 @@ const AppShell = ({
   const { showToast } = useToast();
   const { i18n, t } = useTranslation();
   const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
+  const { courseOptions, selectCourse } = useAuth();
   const isSwahiliCampus = getCampusProgram(studentProfile) === "swahili";
   const isOnboarding = location.pathname === "/onboarding";
   const mockAssessment = isMockAssessmentRoute(location.pathname);
@@ -803,6 +804,18 @@ const AppShell = ({
       className={isOnboarding ? "onboarding-shell" : "app-shell"}
       style={isOnboarding ? undefined : styles.container}
     >
+      {!isOnboarding && courseOptions?.length === 2 && (
+        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          Course language
+          <select value={getCampusProgram(studentProfile)} onChange={event => {
+            selectCourse(event.target.value);
+            navigate("/campus/course", { replace: true });
+          }}>
+            <option value="german">German</option>
+            <option value="swahili">Swahili</option>
+          </select>
+        </label>
+      )}
       {!isOnboarding ? (
         <header
         className="app-header"

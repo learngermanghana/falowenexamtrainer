@@ -245,6 +245,7 @@ export const buildProgressByAssignmentId = ({ submissions = [], results = [], le
     });
 
   results
+    .filter(row => row?.program !== "swahili" && !/^swahili-day-/i.test(row?.assignmentId || row?.assignment_id || ""))
     .filter((row) => isSameLevel(row, level) && isSameStudent(row, studentCode, userId, email))
     .forEach((row) => {
       const assignmentId = getAssignmentIdFromRow(row, level);
