@@ -10,6 +10,7 @@ import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
+import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import "./SwahiliCourseBook.css";
 
 const TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
@@ -59,6 +60,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
   const isTeacher = ["admin", "staff", "tutor"].includes(role) || studentProfile?.isTutor === true;
   const teacherView = new URLSearchParams(location.search).get("teacher") === "1";
   const lesson = SWAHILI_DAY_SIX;
+  const canSubmit = canSubmitSwahiliWorkbook({ user, studentProfile, preview });
   const [activeTab, setActiveTab] = useSwahiliWorkbookTab(TABS);
   const [writing, setWriting] = useState(INITIAL_WRITING);
   const [readingAnswers, setReadingAnswers] = useState({});
@@ -72,7 +74,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
   const [submissionVersion, setSubmissionVersion] = useState(0);
   useEffect(() => {
     setTeacherReview(null);
-    if (activeTab !== "submit" || !user?.uid || !db) return undefined;
+    if (activeTab !== "submit" || !canSubmit || !db) return undefined;
     let active = true;
     Promise.allSettled([
       getDoc(doc(db, "users", user.uid, "swahiliLessons", "day-6")),
@@ -85,7 +87,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
       setTeacherReview(getCurrentSwahiliReview(submission?.data(), review));
     });
     return () => { active = false; };
-  }, [activeTab, user?.uid, submissionVersion]);
+  }, [activeTab, user?.uid, canSubmit, submissionVersion]);
 
   const setAnswer = (setter, id, value, setChecked) => {
     setter(old => ({ ...old, [id]: value }));
@@ -102,7 +104,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
   const checkScore = (items, answers) => items.filter(item => answers[item.id] === item.answer).length;
 
   async function submitWork() {
-    if (!user?.uid || !db || submitting || missing.length) return;
+    if (!canSubmit || !db || submitting || missing.length) return;
     setSubmitting(true);
     setSubmissionResult(null);
     try {
@@ -197,7 +199,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         <li>Teil 4 · Kusikiliza: <strong>{listeningCount} / {lesson.listening.length} (hiari)</strong></li>
       </ul>
       {missing.length > 0 && <p className="swahili-book__note" role="status">Kamilisha kwanza: {missing.join(" · ")}</p>}
-      {!user ? <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ili kuwasilisha. <Link to="/login">Ingia</Link></p> :
+      {!canSubmit ? <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ya Kiswahili kupitia Campus ili kuwasilisha. This preview cannot submit work. <Link to="/login">Ingia</Link></p> :
         <><button type="button" className="swahili-book__button" disabled={!!missing.length || submitting || !db} onClick={submitWork}>
           {submitting ? "Inahifadhi..." : previouslySubmitted ? "Wasilisha tena" : "Wasilisha kazi"}
         </button>

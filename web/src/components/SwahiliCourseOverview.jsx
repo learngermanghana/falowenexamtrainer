@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { db, doc, getDoc } from "../firebase";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
+import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { styles } from "../styles";
 import { courseBookStyles as book } from "./courseBookStyles";
 import "./CourseTabResponsive.css";
@@ -13,8 +14,8 @@ const LESSONS = [SWAHILI_DAY_ONE, SWAHILI_DAY_SIX];
 const FILTERS = [
   { key: "all", label: "All lessons" },
   { key: "next", label: "Next lesson" },
-  { key: "assignments", label: "Assignments" },
-  { key: "selfLearning", label: "Self-learning" },
+  { key: "toDo", label: "To complete" },
+  { key: "needsRevision", label: "Needs revision" },
 ];
 
 export default function SwahiliCourseOverview({ basePath, preview, uid }) {
@@ -31,10 +32,15 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
         getDoc(doc(db, "users", uid, "swahiliLessons", `day-${day}`)),
         getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_day-${day}`)),
       ]);
+      const work = submission.status === "fulfilled" && submission.value.exists() ? submission.value.data() : null;
+      const feedback = review.status === "fulfilled" && review.value.exists() ? review.value.data() : null;
+      // A fresh resubmission must not inherit an older tutor decision.
+      const currentReview = getCurrentSwahiliReview(work, feedback);
       return {
         day,
         submitted: submission.status === "fulfilled" ? submission.value.exists() : null,
-        review: review.status === "fulfilled" && review.value.exists() ? review.value.data().status : null,
+        review: currentReview?.status || null,
+        feedback: currentReview?.feedback || "",
       };
     })).then((records) => {
       if (active) setProgress({ uid, records });
@@ -48,21 +54,26 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
   const completed = records?.filter(({ submitted }) => submitted).length ?? 0;
   const percent = submissionKnown ? Math.round(completed / LESSONS.length * 100) : null;
   const reviewed = records?.filter(({ submitted, review }) => submitted && review === "reviewed").length ?? 0;
-  const next = LESSONS.find(({ day }) => {
-    const record = records?.find((entry) => entry.day === day);
-    return !record?.submitted || record.review === "needs_revision";
-  }) ?? LESSONS[0];
+  const needsRevision = (lesson) => records?.find((record) => record.day === lesson.day)?.review === "needs_revision";
+  const next = LESSONS.find(needsRevision) ??
+    LESSONS.find(({ day }) => records?.find((entry) => entry.day === day)?.submitted !== true) ??
+    LESSONS[0];
   const nextLabel = submissionKnown && completed === LESSONS.length && !records.some(({ review }) => review === "needs_revision")
     ? "Review lessons" : "Continue learning";
   const lessonPath = ({ day }) => `${basePath}/day-${day}`;
   const submitPath = (lesson) => `${lessonPath(lesson)}?view=submit`;
-  const showSubmit = () => submitDialog.current.showModal();
+  const showSubmit = () => submitDialog.current?.showModal?.();
   const query = search.trim().toLowerCase();
-  const visible = LESSONS.filter((lesson) =>
-    filter !== "selfLearning" && (filter !== "next" || lesson === next) &&
-    [`Day ${lesson.day}`, `Somo la ${lesson.day}`, lesson.title, lesson.objective, lesson.chapter]
-      .some((value) => String(value).toLowerCase().includes(query))
-  );
+  const visible = LESSONS.filter((lesson) => {
+    const record = records?.find((entry) => entry.day === lesson.day);
+    const matchesFilter = filter === "all" ||
+      (filter === "next" && lesson === next) ||
+      (filter === "toDo" && (record?.submitted !== true || record.review === "needs_revision")) ||
+      (filter === "needsRevision" && record?.review === "needs_revision");
+    return matchesFilter &&
+      [`Day ${lesson.day}`, `Somo la ${lesson.day}`, lesson.title, lesson.objective, lesson.chapter]
+        .some((value) => String(value).toLowerCase().includes(query));
+  });
   const metrics = [
     ["Completed", submissionKnown ? `${completed}/${LESSONS.length}` : `—/${LESSONS.length}`],
     ["Next lesson", nextLabel === "Review lessons" ? "Published work submitted" : `Somo la ${next.day}`],
@@ -124,7 +135,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
           onChange={(event) => setSearch(event.target.value)} style={book.searchInput} />
       </section>
 
-      {visible.length === 0 && <p style={book.emptyState}>{filter === "selfLearning" ? "All published lessons are tutor guided." : "No lessons match your search."}</p>}
+      {visible.length === 0 && <p style={book.emptyState}>{filter === "needsRevision" ? "No lessons currently need revision." : "No lessons match your search or filter."}</p>}
       {visible.map((lesson) => {
         const record = records?.find(({ day }) => day === lesson.day);
         const badge = record?.submitted ? {
@@ -148,6 +159,20 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
                     {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", "Submit"].map((label) =>
                       <span key={label} style={book.includedChip}>{label}</span>)}
                   </div>
+                  {record?.review === "needs_revision" && (
+                    <div className="swahili-course-feedback" role="status">
+                      <strong>Tutor requested revisions</strong>
+                      {record.feedback && <p>{record.feedback}</p>}
+                      <Link to={submitPath(lesson)}>View feedback and resubmit</Link>
+                    </div>
+                  )}
+                  {record?.review === "reviewed" && (
+                    <div className="swahili-course-feedback swahili-course-feedback--reviewed">
+                      <strong>Reviewed by your tutor</strong>
+                      {record.feedback && <p>{record.feedback}</p>}
+                      <Link to={submitPath(lesson)}>View tutor feedback</Link>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="course-book-lesson-actions" style={book.lessonActions}>

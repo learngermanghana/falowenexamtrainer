@@ -1,6 +1,7 @@
 import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import SwahiliDaySixWorkbook from "./components/SwahiliDaySixWorkbook";
 import { getSwahiliCampusRoute } from "./utils/swahiliCourseRoute";
+import { getCampusProgram, getProgramCampusTabs, getProgramAllowedSections, getProgramCourseRedirect } from "./utils/campusProgram";
 import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
@@ -327,16 +328,17 @@ function App() {
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
+  const campusProgram = getCampusProgram(studentProfile);
   const isEnrolled = isStaff || Boolean(studentProfile?.className || studentProfile?.level);
   const levelToken = String(studentProfile?.level || "").toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/)?.[1] || "";
   const isSelfLearningTrack = !isStaff && ["B2", "C1"].includes(levelToken);
   const tabStructure = useMemo(
-    () => getTabStructure(t),
-    [t]
+    () => getProgramCampusTabs(getTabStructure(t), studentProfile),
+    [t, campusProgram]
   );
 
   const allowedSections = useMemo(
-    () => ({
+    () => getProgramAllowedSections({
       submit: isStaff,
       course: true,
       music: true,
@@ -348,8 +350,8 @@ function App() {
       classMembers: (isEnrolled || isStaff) && !isSelfLearningTrack,
       account: true,
       "tutor-marking": isStaff,
-    }),
-    [isEnrolled, isSelfLearningTrack, isStaff]
+    }, studentProfile),
+    [isEnrolled, isSelfLearningTrack, isStaff, campusProgram]
   );
 
   const tabStorageKey = user?.uid ? `falowen:last-tab:${user.uid}` : null;
@@ -646,6 +648,13 @@ function App() {
     return <SetupCheckpoint />;
   }
 
+  const programmeRedirect = getProgramCourseRedirect({
+    pathname: location.pathname,
+    studentProfile,
+    isStaff,
+  });
+  if (programmeRedirect) return <Navigate to={programmeRedirect} replace />;
+
   // All logins on the exams subdomain enter the shared Exams Room, not the Course Book.
   if (isMockPortal() && !location.pathname.startsWith("/exams/") &&
       !Object.values(MOCK_EXAM_CATALOG).some(mock => mock.route === location.pathname && mock.status === "ready")) {
@@ -691,6 +700,7 @@ const AppShell = ({
   const { showToast } = useToast();
   const { i18n, t } = useTranslation();
   const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
+  const isSwahiliCampus = getCampusProgram(studentProfile) === "swahili";
   const isOnboarding = location.pathname === "/onboarding";
   const mockAssessment = isMockAssessmentRoute(location.pathname);
   const onboardingRole = String(studentProfile?.role || "student").toLowerCase();
@@ -709,15 +719,15 @@ const AppShell = ({
 
   const subtitle = useMemo(() => {
     if (location.pathname.startsWith("/campus")) {
-      return t("appNav.subtitle.campus");
+      return isSwahiliCampus ? "Kitabu cha Kiswahili · Tutor-guided learning" : t("appNav.subtitle.campus");
     }
 
     if (location.pathname.startsWith("/exams")) {
       return t("appNav.subtitle.exams");
     }
 
-    return t("appNav.subtitle.default");
-  }, [location.pathname, t]);
+    return isSwahiliCampus ? "Your Kiswahili learning space" : t("appNav.subtitle.default");
+  }, [location.pathname, isSwahiliCampus, t]);
 
   const goHome = () => navigate("/");
 
@@ -806,7 +816,7 @@ const AppShell = ({
         }}
       >
         <div>
-          <h1 style={styles.title}>{t("appNav.title")}</h1>
+          <h1 style={styles.title}>{isSwahiliCampus ? "Falowen · Kiswahili" : t("appNav.title")}</h1>
           <p style={styles.subtitle}>{subtitle}</p>
         </div>
         <div className="app-header-meta" style={{ display: "grid", gap: 6, justifyItems: "end" }}>

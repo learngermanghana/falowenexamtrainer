@@ -16,18 +16,19 @@ import { formatCurrency } from "../lib/formatters";
 import LegalFooter from "./LegalFooter";
 import HomepageHighlights from "./HomepageHighlights";
 import { detectLevelKey } from "../lib/day0Workbook";
+import { getCampusProgram } from "../utils/campusProgram";
 
 const classLevelFromName = (className = "") => {
   const match = String(className || "").toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/);
   return match?.[1] || "";
 };
 
-const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLearning, onOpenAccount }) => {
+const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLearning, onOpenAccount, isSwahili = false }) => {
   const { t } = useTranslation();
   const studentName =
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
   const levelKey = detectLevelKey(studentProfile);
-  const courseLabel = levelKey ? `${levelKey} course` : "your course";
+  const courseLabel = isSwahili ? "Kiswahili A1 course" : levelKey ? `${levelKey} course` : "your course";
 
   return (
     <section
@@ -46,7 +47,9 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
         {t("generalHome.welcome.title", { studentName })}
       </h2>
       <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0 }}>
-        Your {courseLabel} is ready. Use Campus for daily learning, and use Exams Room for exam practice.
+        {isSwahili
+          ? "Your Kiswahili course is ready. Continue published lessons in Campus and submit work for tutor review."
+          : `Your ${courseLabel} is ready. Use Campus for daily learning, and use Exams Room for exam practice.`}
       </p>
 
       <PrimaryActionBar align="start" wrap>
@@ -64,21 +67,21 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
         >
           Account
         </button>
-        <button
+        {!isSwahili && <button
           type="button"
           style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
           onClick={onJoinZoom}
         >
           {t("generalHome.welcome.joinZoom")}
-        </button>
-        <ExamReadinessBadge variant="button" studentProfile={studentProfile} onOpenExamFile={onOpenExamFile} />
+        </button>}
+        {!isSwahili && <ExamReadinessBadge variant="button" studentProfile={studentProfile} onOpenExamFile={onOpenExamFile} />}
       </PrimaryActionBar>
     </section>
   );
 };
 
-const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
-  <div style={styles.gridTwo}>
+const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) => (
+  <div style={isSwahili ? { ...styles.gridTwo, gridTemplateColumns: "minmax(0, 1fr)" } : styles.gridTwo}>
     <section
       style={{
         ...styles.card,
@@ -91,7 +94,9 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
       <SectionHeader
         eyebrow={t("generalHome.campus.eyebrow")}
         title="Continue learning"
-        subtitle="Open Course Book to see your current lesson and next step, practise, or submit finished workbook answers."
+        subtitle={isSwahili
+          ? "Open your Kiswahili Course Book for published lessons, writing and reading tasks, and tutor feedback."
+          : "Open Course Book to see your current lesson and next step, practise, or submit finished workbook answers."}
         actions={
           <PrimaryActionBar align="flex-end">
             <PillBadge tone="success">Daily work</PillBadge>
@@ -105,7 +110,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
       </PrimaryActionBar>
     </section>
 
-    <section
+    {!isSwahili && <section
       style={{
         ...styles.card,
         display: "grid",
@@ -129,9 +134,9 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
           Open Exams Room
         </button>
       </PrimaryActionBar>
-    </section>
+    </section>}
 
-    <section style={{ ...styles.card, gridColumn: "1 / -1", display: "grid", gap: 10 }}>
+    {!isSwahili && <section style={{ ...styles.card, gridColumn: "1 / -1", display: "grid", gap: 10 }}>
       <SectionHeader
         title="Falowen Learning Companion"
         subtitle="Connect Falowen in ChatGPT to ask questions about your German lessons and get guided practice."
@@ -146,7 +151,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
           Connect ChatGPT as a study partner
         </a>
       </PrimaryActionBar>
-    </section>
+    </section>}
   </div>
 );
 
@@ -176,7 +181,8 @@ const GeneralHome = ({
   ).trim();
   const classCalendarId = "class-calendar-card";
   const levelKey = detectLevelKey(studentProfile);
-  const firstLessonPath = levelKey ? `/campus/course/lesson/${levelKey}/1` : "/campus/course";
+  const isSwahiliCampus = getCampusProgram(studentProfile) === "swahili";
+  const firstLessonPath = isSwahiliCampus ? "/campus/course/swahili/day-1" : levelKey ? `/campus/course/lesson/${levelKey}/1` : "/campus/course";
   const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted);
   const assignedClassLevel = classLevelFromName(preferredClass);
   const metricsStudentProfile = useMemo(
@@ -288,6 +294,48 @@ const GeneralHome = ({
             subtitle="Use this during onboarding only. After setup, your next scheduled class will appear in the homepage Highlights section."
           />
           <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />
+        </section>
+        <LegalFooter />
+      </div>
+    );
+  }
+
+  // The same Falowen cards and actions serve both programmes. Do not mount
+  // German exam preparation, German score metrics, German music, or the German
+  // ChatGPT companion for a Kiswahili student.
+  if (isSwahiliCampus) {
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <WelcomeHero
+          studentProfile={studentProfile}
+          isSwahili
+          onContinueLearning={openCampus}
+          onOpenAccount={openAccount}
+        />
+        <TrialCountdownBanner studentProfile={studentProfile} onCompletePayment={openBilling} />
+        {paymentAlert ? (
+          <section style={{ ...styles.card, background: "#fffbeb", border: "1px solid #f59e0b", display: "grid", gap: 8 }}>
+            <strong>{paymentAlert.message}</strong>
+            <PrimaryActionBar align="start">
+              <button style={styles.primaryButton} onClick={openAccount}>{t("generalHome.paymentAlert.cta")}</button>
+            </PrimaryActionBar>
+          </section>
+        ) : null}
+        <QuickMainAccess t={t} openCampus={openCampus} isSwahili />
+        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
+          <SectionHeader
+            eyebrow="Kiswahili A1"
+            title="Published lessons"
+            subtitle="Start with the alphabet or practise ordering in a restaurant. Only these two workbooks are published."
+          />
+          <PrimaryActionBar align="start" wrap>
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course/swahili/day-1")}>
+              Somo la 1 · Alfabeti na matamshi
+            </button>
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course/swahili/day-6")}>
+              Somo la 6 · Mgahawani
+            </button>
+          </PrimaryActionBar>
         </section>
         <LegalFooter />
       </div>

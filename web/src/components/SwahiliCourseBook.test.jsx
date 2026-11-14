@@ -2,6 +2,7 @@ import React from "react";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import SwahiliCourseBook, { scoreListeningAnswers, scoreReadingAnswers, getMissingSwahiliDayOneWork } from "./SwahiliCourseBook";
+import SwahiliDaySixWorkbook from "./SwahiliDaySixWorkbook";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import { setDoc, getDoc } from "../firebase";
 
@@ -28,7 +29,7 @@ const openTab = (label) => fireEvent.click(screen.getByRole("tab", { name: new R
 describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
   beforeEach(() => {
     mockUser = null;
-    mockStudentProfile = null;
+    mockStudentProfile = { program: "swahili" };
     jest.clearAllMocks();
     getDoc.mockImplementation(async () => ({ exists: () => false }));
   });
@@ -173,6 +174,69 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     openTab("Submit");
     await screen.findByRole("button", { name: "Wasilisha tena" });
     expect(screen.queryByText("Old feedback")).toBeNull();
+  });
+
+  it("keeps public previews read-only for a signed-in German account", () => {
+    mockUser = { uid: "german-student" };
+    mockStudentProfile = { program: "german" };
+    render(<MemoryRouter initialEntries={["/swahili/day-1?view=submit"]}>
+      <SwahiliCourseBook day={1} preview />
+    </MemoryRouter>);
+    expect(screen.getByText(/This public preview cannot submit work/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Wasilisha kazi" })).toBeNull();
+    expect(getDoc).not.toHaveBeenCalled();
+    expect(setDoc).not.toHaveBeenCalled();
+  });
+
+  it("keeps restaurant submissions read-only for a German account or public preview", () => {
+    mockUser = { uid: "german-student" };
+    mockStudentProfile = { program: "german" };
+    render(<MemoryRouter initialEntries={["/swahili/day-6?view=submit&radio=done"]}>
+      <SwahiliDaySixWorkbook preview />
+    </MemoryRouter>);
+    expect(screen.getByText(/This preview cannot submit work/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Wasilisha kazi" })).toBeNull();
+    expect(getDoc).not.toHaveBeenCalled();
+    expect(setDoc).not.toHaveBeenCalled();
+  });
+
+  it("shows only current, student-owned tutor feedback and prioritizes revisions", async () => {
+    mockUser = { uid: "swahili-student-1" };
+    getDoc.mockImplementation(async (path) => {
+      const record = ({
+        "/users/swahili-student-1/swahiliLessons/day-1": {
+          submittedAt: { toMillis: () => 100 },
+        },
+        "/swahiliTeacherReviews/swahili-student-1": {
+          status: "needs_revision", feedback: "Please review vowel pronunciation.",
+          reviewedAt: { toMillis: () => 150 },
+        },
+        "/users/swahili-student-1/swahiliLessons/day-6": {
+          submittedAt: { toMillis: () => 300 },
+        },
+        "/swahiliTeacherReviews/swahili-student-1_day-6": {
+          status: "reviewed", feedback: "Outdated restaurant feedback.",
+          reviewedAt: { toMillis: () => 200 },
+        },
+      })[path];
+      return { exists: () => Boolean(record), data: () => record };
+    });
+    render(<MemoryRouter><SwahiliCourseBook basePath="/campus/course/swahili" /></MemoryRouter>);
+    expect(await screen.findByText("Please review vowel pronunciation.")).toBeTruthy();
+    expect(screen.queryByText("Outdated restaurant feedback.")).toBeNull();
+    expect(screen.getByRole("link", { name: "Continue learning" }).getAttribute("href"))
+      .toBe("/campus/course/swahili/day-1");
+    const feedback = screen.getByRole("link", { name: "View feedback and resubmit" });
+    expect(feedback.getAttribute("href")).toBe("/campus/course/swahili/day-1?view=submit");
+    fireEvent.click(screen.getByRole("button", { name: "Needs revision" }));
+    expect(screen.getByText("1 shown from 2")).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Fungua Somo la 6" })).toBeNull();
+    const paths = getDoc.mock.calls.map((call) => call[0]);
+    expect(paths).toEqual(expect.arrayContaining([
+      "/users/swahili-student-1/swahiliLessons/day-1",
+      "/users/swahili-student-1/swahiliLessons/day-6",
+    ]));
+    expect(paths.every((path) => !path.includes("german") && !path.includes("results"))).toBe(true);
   });
 
 });
