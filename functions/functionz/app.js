@@ -3227,6 +3227,10 @@ async function resolveStudentLevelForUser({ uid, fallbackLevel = "A1" }) {
     const snapshot = await db.collection("students").where("uid", "==", uid).limit(1).get();
     if (snapshot.empty) return normalizeCefrLevel(fallbackLevel);
     const student = snapshot.docs[0]?.data() || {};
+    const primary = String(student.program || "german").trim().toLowerCase();
+    if (primary === "swahili" && student.secondaryProgram === "german") {
+      return normalizeCefrLevel(student.coursePlacements?.german?.level);
+    }
     return normalizeCefrLevel(student.level, normalizeCefrLevel(fallbackLevel));
   } catch (error) {
     log.warn("student.level.lookup.failed", { uid, errorMessage: error?.message || "unknown" });
