@@ -6,10 +6,232 @@
       "objectKey": "swahili/music/A1/day-06/Chakula Kizuri Mgahawani.mp3",
       "title": "Chakula Kizuri Mgahawani",
       "lyrics": "[Verse 1]\nHabari yako? Habari yako?\nNzuri, asante! Karibu!\nNikuhudumie nini?\nNaomba orodha ya vyakula.\nNinapenda wali na samaki,\nSipendi soda, napenda maji.\nNaomba wali na kuku,\nNa juisi ya embe, tafadhali.\n\n[Chorus]\nNaomba, naomba, tafadhali,\nChakula kizuri mgahawani.\nAsante sana, karibu tena,\nTunakula pamoja, furaha tele!\n\n[Verse 2]\nMaji ni maji, twafahamu,\nJuisi ya embe, tamu sana.\nJuisi ya chungwa pia ipo,\nNaomba vikombe viwili vya chai.\nNinapenda wali na samaki,\nSipendi soda, napenda maji.\nKaribu, karibu, kaa hapa,\nChakula kitamu, twafurahia!\n\n[Chorus]\nNaomba, naomba, tafadhali,\nChakula kizuri mgahawani.\nAsante sana, karibu tena,\nTunakula pamoja, furaha tele!\n\n[Verse 3]\nNaomba bili, tafadhali,\nJumla ni shilingi ngapi?\nShilingi elfu tano,\nHizi hapa pesa zako.\nAsante sana, asante sana,\nKaribu tena mgahawani.\nChakula kizuri, huduma nzuri,\nTutaonana tena siku nyingine!\n\n[Final Chorus]\nNaomba, naomba, tafadhali,\nChakula kizuri mgahawani.\nAsante sana, karibu tena,\nTunakula pamoja, furaha tele!\n\nNaomba, naomba, tafadhali,\nChakula kizuri mgahawani.\nAsante sana, karibu tena,\nTunakula pamoja, furaha tele!\n\n[Outro]\nAsante sana!\nKaribu tena!\nKwa heri, kwa heri!\nTutaonana tena!",
-      "cues": [],
+      "cues": [
+        {
+          "start": 9.92,
+          "end": 10.82,
+          "text": "Habari yako? Habari yako?"
+        },
+        {
+          "start": 14.1,
+          "end": 18.36,
+          "text": "Nzuri, asante! Karibu!"
+        },
+        {
+          "start": 19.0,
+          "end": 20.84,
+          "text": "Nikuhudumie nini?"
+        },
+        {
+          "start": 20.84,
+          "end": 22.94,
+          "text": "Naomba orodha ya vyakula."
+        },
+        {
+          "start": 22.94,
+          "end": 25.86,
+          "text": "Ninapenda wali na samaki,"
+        },
+        {
+          "start": 25.86,
+          "end": 28.02,
+          "text": "Sipendi soda, napenda maji."
+        },
+        {
+          "start": 28.02,
+          "end": 30.58,
+          "text": "Naomba wali na kuku,"
+        },
+        {
+          "start": 30.58,
+          "end": 33.36,
+          "text": "Na juisi ya embe, tafadhali."
+        },
+        {
+          "start": 33.36,
+          "end": 36.84,
+          "text": "Naomba, naomba, tafadhali,"
+        },
+        {
+          "start": 38.02,
+          "end": 41.46,
+          "text": "Chakula kizuri mgahawani."
+        },
+        {
+          "start": 42.02,
+          "end": 46.02,
+          "text": "Asante sana, karibu tena,"
+        },
+        {
+          "start": 46.62,
+          "end": 50.94,
+          "text": "Tunakula pamoja, furaha tele!"
+        },
+        {
+          "start": 50.94,
+          "end": 55.9,
+          "text": "Maji ni maji, twafahamu,"
+        },
+        {
+          "start": 55.9,
+          "end": 60.48,
+          "text": "Juisi ya embe, tamu sana."
+        },
+        {
+          "start": 60.48,
+          "end": 65.6,
+          "text": "Juisi ya chungwa pia ipo,"
+        },
+        {
+          "start": 65.6,
+          "end": 69.58,
+          "text": "Naomba vikombe viwili vya chai."
+        },
+        {
+          "start": 69.58,
+          "end": 72.9,
+          "text": "Ninapenda wali na samaki,"
+        },
+        {
+          "start": 72.9,
+          "end": 75.14,
+          "text": "Sipendi soda, napenda maji."
+        },
+        {
+          "start": 75.14,
+          "end": 77.82,
+          "text": "Karibu, karibu, kaa hapa,"
+        },
+        {
+          "start": 77.82,
+          "end": 80.14,
+          "text": "Chakula kitamu, twafurahia!"
+        },
+        {
+          "start": 80.14,
+          "end": 85.38,
+          "text": "Naomba, naomba, tafadhali,"
+        },
+        {
+          "start": 85.38,
+          "end": 89.64,
+          "text": "Chakula kizuri mgahawani."
+        },
+        {
+          "start": 89.64,
+          "end": 93.64,
+          "text": "Asante sana, karibu tena,"
+        },
+        {
+          "start": 93.64,
+          "end": 98.22,
+          "text": "Tunakula pamoja, furaha tele!"
+        },
+        {
+          "start": 107.44,
+          "end": 112.18,
+          "text": "Naomba bili, tafadhali,"
+        },
+        {
+          "start": 112.36,
+          "end": 116.62,
+          "text": "Jumla ni shilingi ngapi?"
+        },
+        {
+          "start": 117.86,
+          "end": 120.4,
+          "text": "Shilingi elfu tano,"
+        },
+        {
+          "start": 120.62,
+          "end": 122.62,
+          "text": "Hizi hapa pesa zako."
+        },
+        {
+          "start": 122.62,
+          "end": 126.56,
+          "text": "Asante sana, asante sana,"
+        },
+        {
+          "start": 126.56,
+          "end": 130.86,
+          "text": "Karibu tena mgahawani."
+        },
+        {
+          "start": 130.86,
+          "end": 134.98,
+          "text": "Chakula kizuri, huduma nzuri,"
+        },
+        {
+          "start": 135.68,
+          "end": 139.22,
+          "text": "Tutaonana tena siku nyingine!"
+        },
+        {
+          "start": 141.44,
+          "end": 146.6,
+          "text": "Naomba, naomba, tafadhali,"
+        },
+        {
+          "start": 146.6,
+          "end": 150.8,
+          "text": "Chakula kizuri mgahawani."
+        },
+        {
+          "start": 150.8,
+          "end": 154.68,
+          "text": "Asante sana, karibu tena,"
+        },
+        {
+          "start": 154.9,
+          "end": 159.36,
+          "text": "Tunakula pamoja, furaha tele!"
+        },
+        {
+          "start": 160.42,
+          "end": 165.42,
+          "text": "Naomba, naomba, tafadhali,"
+        },
+        {
+          "start": 165.42,
+          "end": 169.62,
+          "text": "Chakula kizuri mgahawani."
+        },
+        {
+          "start": 169.62,
+          "end": 173.56,
+          "text": "Asante sana, karibu tena,"
+        },
+        {
+          "start": 173.56,
+          "end": 177.9,
+          "text": "Tunakula pamoja, furaha tele!"
+        },
+        {
+          "start": 177.9,
+          "end": 180.5,
+          "text": "Asante sana!"
+        },
+        {
+          "start": 181.28,
+          "end": 183.3,
+          "text": "Karibu tena!"
+        },
+        {
+          "start": 183.3,
+          "end": 185.84,
+          "text": "Kwa heri, kwa heri!"
+        },
+        {
+          "start": 185.84,
+          "end": 187.7,
+          "text": "Tutaonana tena!"
+        }
+      ],
       "duration": 197.64,
       "recordingSha256": "c4beb8e2a9fa4e71b6cc59f9d94bf8ee54aa5c11d04a810fd2996b5fa378b8ee",
-      "source": "Owner-supplied lyrics for this recording; timing pending"
+      "source": "Owner-supplied lyrics with line cues mapped to Swahili word timings from the supplied MP3",
+      "timingStatus": "estimated"
     },
     {
       "trackId": "swahili-a1-day-05",
