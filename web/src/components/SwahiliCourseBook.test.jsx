@@ -191,7 +191,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
   it("keeps restaurant submissions read-only for a German account or public preview", () => {
     mockUser = { uid: "german-student" };
     mockStudentProfile = { program: "german" };
-    render(<MemoryRouter initialEntries={["/swahili/day-6?view=submit"]}>
+    render(<MemoryRouter initialEntries={["/swahili/day-6?view=submit&radio=done"]}>
       <SwahiliDaySixWorkbook preview />
     </MemoryRouter>);
     expect(screen.getByText(/This preview cannot submit work/)).toBeTruthy();
