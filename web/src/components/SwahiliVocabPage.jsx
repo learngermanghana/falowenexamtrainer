@@ -42,9 +42,15 @@ export default function SwahiliVocabPage() {
   useEffect(() => {
     setIndex(0);
     setRevealed(false);
-  }, [search, source, savedOnly, mode, savedIds]);
+  }, [search, source, savedOnly, mode]);
 
-  const current = filtered[Math.min(index, filtered.length - 1)] || null;
+  // Saving a later flashcard should not restart practice at the first card.
+  useEffect(() => {
+    setIndex((previous) => Math.min(previous, Math.max(0, filtered.length - 1)));
+  }, [filtered.length]);
+
+  const currentIndex = Math.min(index, Math.max(0, filtered.length - 1));
+  const current = filtered[currentIndex] || null;
 
   const toggleSave = (entry) => {
     if (!uid) return;
@@ -132,7 +138,7 @@ export default function SwahiliVocabPage() {
       ) : mode === "cards" ? (
         <section style={styles.card}>
           <div style={{ display: "grid", gap: 14 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>Flashcard {index + 1} of {filtered.length}</p>
+            <p style={{ ...styles.helperText, margin: 0 }}>Flashcard {currentIndex + 1} of {filtered.length}</p>
             <div style={{ ...styles.vocabCard, background: "#fff", minHeight: 148, display: "grid", alignContent: "center", gap: 12 }}>
               <strong lang="sw" style={{ fontSize: 26 }}>{current.sw}</strong>
               {revealed ? <p lang="en" style={{ fontSize: 18, margin: 0 }}>{current.en}</p> :
@@ -141,9 +147,9 @@ export default function SwahiliVocabPage() {
               <span style={styles.levelPill}>{sourceLabels[current.source]}</span>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-              <button type="button" style={styles.secondaryButton} disabled={index === 0}
+              <button type="button" style={styles.secondaryButton} disabled={currentIndex === 0}
                 onClick={() => moveCard(-1)}>Previous</button>
-              <button type="button" style={styles.primaryButton} disabled={index >= filtered.length - 1}
+              <button type="button" style={styles.primaryButton} disabled={currentIndex >= filtered.length - 1}
                 onClick={() => moveCard(1)}>Next card</button>
               {revealed && <button type="button" style={styles.secondaryButton} onClick={() => setRevealed(false)}>
                 Hide meaning
