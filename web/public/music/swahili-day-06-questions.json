@@ -1,0 +1,8 @@
+[
+  {"prompt":"What does the customer ask for after the greeting?","options":["The bill","The menu","Two cups of tea"],"answer":1,"evidence":"Naomba orodha ya vyakula."},
+  {"prompt":"Which drink does the customer dislike?","options":["Water","Mango juice","Soda"],"answer":2,"evidence":"Sipendi soda, napenda maji."},
+  {"prompt":"What food and drink does the customer order in Verse 1?","options":["Rice and chicken with mango juice","Rice and fish with orange juice","Chicken and rice with tea"],"answer":0,"evidence":"Naomba wali na kuku, / Na juisi ya embe, tafadhali."},
+  {"prompt":"How many cups of tea does the customer ask for?","options":["One","Two","Three"],"answer":1,"evidence":"Naomba vikombe viwili vya chai."},
+  {"prompt":"How does the customer ask for the bill?","options":["Naomba maji, tafadhali.","Naomba orodha ya vyakula.","Naomba bili, tafadhali."],"answer":2,"evidence":"Naomba bili, tafadhali."},
+  {"prompt":"What is the total in Verse 3?","options":["500 shillings","5,000 shillings","50,000 shillings"],"answer":1,"evidence":"Shilingi elfu tano."}
+]

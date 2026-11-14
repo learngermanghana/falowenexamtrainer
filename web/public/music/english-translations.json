@@ -3,6 +3,187 @@
   "description": "Editor-authored English for exact recording keys and matching German lines. Course-draft translations are separately bound to draft identity and remain explicitly unverified against the audio.",
   "recordings": [
     {
+      "objectKey": "swahili/music/A1/day-06/Chakula Kizuri Mgahawani.mp3",
+      "lines": [
+        {
+          "de": "Habari yako? Habari yako?",
+          "en": "How are you? How are you?"
+        },
+        {
+          "de": "Nzuri, asante! Karibu!",
+          "en": "Fine, thanks! Welcome!"
+        },
+        {
+          "de": "Nikuhudumie nini?",
+          "en": "What can I get you?"
+        },
+        {
+          "de": "Naomba orodha ya vyakula.",
+          "en": "May I have the menu?"
+        },
+        {
+          "de": "Ninapenda wali na samaki,",
+          "en": "I like rice and fish,"
+        },
+        {
+          "de": "Sipendi soda, napenda maji.",
+          "en": "I don't like soda. I like water."
+        },
+        {
+          "de": "Naomba wali na kuku,",
+          "en": "I'd like rice and chicken,"
+        },
+        {
+          "de": "Na juisi ya embe, tafadhali.",
+          "en": "And mango juice, please."
+        },
+        {
+          "de": "Naomba, naomba, tafadhali,",
+          "en": "May I have it, may I have it, please,"
+        },
+        {
+          "de": "Chakula kizuri mgahawani.",
+          "en": "Good food at the restaurant."
+        },
+        {
+          "de": "Asante sana, karibu tena,",
+          "en": "Thank you very much, come again,"
+        },
+        {
+          "de": "Tunakula pamoja, furaha tele!",
+          "en": "We eat together with plenty of joy!"
+        },
+        {
+          "de": "Maji ni maji, twafahamu,",
+          "en": "Water is water, as we know,"
+        },
+        {
+          "de": "Juisi ya embe, tamu sana.",
+          "en": "Mango juice is very sweet."
+        },
+        {
+          "de": "Juisi ya chungwa pia ipo,",
+          "en": "Orange juice is available too,"
+        },
+        {
+          "de": "Naomba vikombe viwili vya chai.",
+          "en": "I'd like two cups of tea."
+        },
+        {
+          "de": "Ninapenda wali na samaki,",
+          "en": "I like rice and fish,"
+        },
+        {
+          "de": "Sipendi soda, napenda maji.",
+          "en": "I don't like soda. I like water."
+        },
+        {
+          "de": "Karibu, karibu, kaa hapa,",
+          "en": "Welcome, welcome. Sit here,"
+        },
+        {
+          "de": "Chakula kitamu, twafurahia!",
+          "en": "We're enjoying the delicious food!"
+        },
+        {
+          "de": "Naomba, naomba, tafadhali,",
+          "en": "May I have it, may I have it, please,"
+        },
+        {
+          "de": "Chakula kizuri mgahawani.",
+          "en": "Good food at the restaurant."
+        },
+        {
+          "de": "Asante sana, karibu tena,",
+          "en": "Thank you very much, come again,"
+        },
+        {
+          "de": "Tunakula pamoja, furaha tele!",
+          "en": "We eat together with plenty of joy!"
+        },
+        {
+          "de": "Naomba bili, tafadhali,",
+          "en": "May I have the bill, please?"
+        },
+        {
+          "de": "Jumla ni shilingi ngapi?",
+          "en": "How many shillings is the total?"
+        },
+        {
+          "de": "Shilingi elfu tano,",
+          "en": "Five thousand shillings,"
+        },
+        {
+          "de": "Hizi hapa pesa zako.",
+          "en": "Here's your money."
+        },
+        {
+          "de": "Asante sana, asante sana,",
+          "en": "Thank you very much, thank you very much,"
+        },
+        {
+          "de": "Karibu tena mgahawani.",
+          "en": "Come back to the restaurant."
+        },
+        {
+          "de": "Chakula kizuri, huduma nzuri,",
+          "en": "Good food, good service,"
+        },
+        {
+          "de": "Tutaonana tena siku nyingine!",
+          "en": "We'll see each other again another day!"
+        },
+        {
+          "de": "Naomba, naomba, tafadhali,",
+          "en": "May I have it, may I have it, please,"
+        },
+        {
+          "de": "Chakula kizuri mgahawani.",
+          "en": "Good food at the restaurant."
+        },
+        {
+          "de": "Asante sana, karibu tena,",
+          "en": "Thank you very much, come again,"
+        },
+        {
+          "de": "Tunakula pamoja, furaha tele!",
+          "en": "We eat together with plenty of joy!"
+        },
+        {
+          "de": "Naomba, naomba, tafadhali,",
+          "en": "May I have it, may I have it, please,"
+        },
+        {
+          "de": "Chakula kizuri mgahawani.",
+          "en": "Good food at the restaurant."
+        },
+        {
+          "de": "Asante sana, karibu tena,",
+          "en": "Thank you very much, come again,"
+        },
+        {
+          "de": "Tunakula pamoja, furaha tele!",
+          "en": "We eat together with plenty of joy!"
+        },
+        {
+          "de": "Asante sana!",
+          "en": "Thank you very much!"
+        },
+        {
+          "de": "Karibu tena!",
+          "en": "Come again!"
+        },
+        {
+          "de": "Kwa heri, kwa heri!",
+          "en": "Goodbye, goodbye!"
+        },
+        {
+          "de": "Tutaonana tena!",
+          "en": "See you again!"
+        }
+      ]
+    },
+    {
       "objectKey": "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
       "lines": [
         {
