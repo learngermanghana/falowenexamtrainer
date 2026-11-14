@@ -1,6 +1,7 @@
 // Public songs are registered explicitly. Other files in the Swahili folder
 // may be private lesson resources.
 const tracks = Object.freeze({
+  "swahili-a1-day-06": "swahili/music/A1/day-06/Chakula Kizuri Mgahawani.mp3",
   "swahili-a1-day-05": "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
 });
 
