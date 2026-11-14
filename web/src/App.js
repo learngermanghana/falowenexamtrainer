@@ -439,8 +439,7 @@ function App() {
     !isStaff &&
     !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
 
-  // Visitors keep the public preview; authenticated Kiswahili learners enter
-  // the existing Campus shell (navigation, account settings and logout).
+  // Visitors can preview Kiswahili; signed-in learners follow their Campus programme.
   const swahiliPreview = location.pathname.match(/^\/swahili(?:\/(day-(?:1|6)))?\/?$/);
   if (swahiliPreview) {
     // Wait for Firebase to resolve the session so signed-in students never
@@ -460,6 +459,8 @@ function App() {
       studentProfile,
     });
     if (campusRoute) return <Navigate to={campusRoute} replace />;
+
+    if (user && studentProfile && !isStaff) return <Navigate to="/campus/course" replace />;
 
     if (swahiliPreview[1] === "day-6") return <SwahiliDaySixWorkbook basePath="/swahili" preview />;
     return <SwahiliCourseBook day={swahiliPreview[1] === "day-1" ? 1 : null} basePath="/swahili" preview />;
@@ -649,7 +650,7 @@ function App() {
   if (programmeRedirect) return <Navigate to={programmeRedirect} replace />;
 
   // All logins on the exams subdomain enter the shared Exams Room, not the Course Book.
-  if (isMockPortal() && !location.pathname.startsWith("/exams/") &&
+  if (isMockPortal() && (campusProgram !== "swahili" || isStaff) && !location.pathname.startsWith("/exams/") &&
       !Object.values(MOCK_EXAM_CATALOG).some(mock => mock.route === location.pathname && mock.status === "ready")) {
     return <Navigate to="/exams/overview" replace />;
   }
