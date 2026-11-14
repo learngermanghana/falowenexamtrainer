@@ -21,7 +21,7 @@ On the signed-in home page, select **Connect ChatGPT as a study partner** below 
 - Support: https://www.falowen.app/help
 - Falowen general legal information: https://register.falowen.app/
 
-The API is read-only. Each request uses the authenticated learner's account and student level. Class-session lookup requires a verified assigned cohort, respects cancellations and reschedules, and does not reveal another cohort's Zoom details. Official work, payment, grades, student management and timed exam submissions remain in Campus.
+The default `falowen:read` connection is read-only. Each request uses the authenticated learner's account and student level. Student accounts that can still sign in to Campus may connect even when trial-limited or trial-expired; the Companion does not treat trial expiry alone as an account deletion or payment block. Non-student and exam-only accounts, blocked payment states, ended contracts and deletion requests remain ineligible. Class-session lookup requires a verified assigned cohort, respects cancellations and reschedules, and does not reveal another cohort's Zoom details. Official work, payment, grades, student management and timed exam submissions remain in Campus.
 
 ### Student-facing MCP tools
 
