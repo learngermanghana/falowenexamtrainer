@@ -522,6 +522,10 @@
       "dest": "/index.html"
     },
     {
+      "src": "/learn-german-with-chatgpt/?",
+      "dest": "/learn-german-with-chatgpt.html"
+    },
+    {
       "src": "/help/?",
       "headers": {
         "Cache-Control": "public, max-age=0, must-revalidate"
