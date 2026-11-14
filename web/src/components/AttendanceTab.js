@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { buildAttendanceSummary, fetchAttendanceRecords } from "../services/attendanceService";
+import { getCampusProgram } from "../utils/campusProgram";
 import { isFirebaseConfigured } from "../firebase";
 import { jsPDF } from "jspdf";
 
@@ -323,6 +324,7 @@ const AttendanceTab = () => {
       "Student",
     [studentProfile, user?.displayName]
   );
+  const program = getCampusProgram(studentProfile);
   const className = useMemo(() => studentProfile?.className || "", [studentProfile]);
   const level = useMemo(() => String(studentProfile?.level || "").toUpperCase(), [studentProfile?.level]);
 
@@ -347,7 +349,7 @@ const AttendanceTab = () => {
 
       setState((prev) => ({ ...prev, loading: true, error: "" }));
       try {
-        const response = await fetchAttendanceRecords({ className, studentCode, studentUid: user?.uid, level });
+        const response = await fetchAttendanceRecords({ className, studentCode, studentUid: user?.uid, level, program });
         if (!mounted) return;
         setState({ loading: false, records: response?.records || [], error: "" });
       } catch (error) {
@@ -360,7 +362,7 @@ const AttendanceTab = () => {
     return () => {
       mounted = false;
     };
-  }, [className, level, studentCode, t, user?.uid]);
+  }, [className, level, program, studentCode, t, user?.uid]);
 
   const levelRecords = useMemo(() => {
     if (!level) return state.records;

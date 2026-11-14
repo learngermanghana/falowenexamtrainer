@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import BooksCatalog from "./BooksCatalog";
 import BookStoreCheckout from "./BookStoreCheckout";
 import "./CampusBooksPage.css";
 
@@ -8,7 +9,7 @@ import "./CampusBooksPage.css";
  * Public /books pages remain available independently for visitors and SEO.
  * Paystack authorization still takes place on the provider's secure website.
  */
-export default function CampusBooksPage() {
+export default function CampusBooksPage({ program = "german" }) {
   const { pathname } = useLocation();
   const sectionPath = "/campus/books";
   const suffix = pathname.startsWith(sectionPath)
@@ -16,7 +17,12 @@ export default function CampusBooksPage() {
     : "";
 
   let store;
-  if (!suffix) {
+  if (program === "swahili") {
+    store = <div className="fb-page"><div className="fb-shell">
+      <Link className="fb-top-back" to="/campus/course">← Back to Campus</Link>
+      <BooksCatalog basePath={sectionPath} program={program} />
+    </div></div>;
+  } else if (!suffix) {
     store = <BookStoreCheckout catalogOnly campus />;
   } else if (suffix === "/complete") {
     store = <BookStoreCheckout completed campus />;
