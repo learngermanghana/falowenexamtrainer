@@ -32,7 +32,7 @@ const COPY = {
     finalEyebrow: "YOUR NEXT STEP",
     finalTitle: "Your German journey starts here.",
     finalText: "Choose a class or learn at your own pace. We bring your lessons, practice and support together.",
-    footerCourses: "German courses A1–C2", footerMusic: "German Music", footerBooks: "German A1 coursebook", footerExam: "Free Goethe exam practice", footerReviews: "Student reviews", footerHelp: "Help",
+    footerCourses: "German courses A1–C2", footerMusic: "German Music", footerBooks: "German A1 coursebook", footerExam: "Free Goethe exam practice", footerReviews: "Student reviews", footerHelp: "Help", footerChatgpt: "Falowen in ChatGPT",
     footerCourseLevels: "German courses by level", footerGoetheLevels: "Goethe-style preparation by level",
     contact: "Questions? Chat with us on WhatsApp",
     featureCopy: {},
@@ -62,7 +62,7 @@ const COPY = {
     finalEyebrow: "DEIN NÄCHSTER SCHRITT",
     finalTitle: "Dein Deutschweg beginnt hier.",
     finalText: "Wähle einen Live-Kurs oder lerne selbstständig. Falowen verbindet Unterricht, Übungen und Unterstützung.",
-    footerCourses: "Deutschkurse A1–C2", footerMusic: "Deutsch mit Musik", footerBooks: "A1 Kursbuch", footerExam: "Goethe-Prüfungsübungen", footerReviews: "Bewertungen", footerHelp: "Hilfe",
+    footerCourses: "Deutschkurse A1–C2", footerMusic: "Deutsch mit Musik", footerBooks: "A1 Kursbuch", footerExam: "Goethe-Prüfungsübungen", footerReviews: "Bewertungen", footerHelp: "Hilfe", footerChatgpt: "Falowen mit ChatGPT",
     footerCourseLevels: "Deutschkurse nach Niveau", footerGoetheLevels: "Goethe-Prüfungsvorbereitung nach Niveau",
     contact: "Fragen? Schreib uns auf WhatsApp",
     featureCopy: {
@@ -97,7 +97,7 @@ const COPY = {
     finalEyebrow: "VOTRE PROCHAINE ÉTAPE",
     finalTitle: "Votre apprentissage commence ici.",
     finalText: "Choisissez un cours en direct ou apprenez à votre rythme. Falowen réunit les cours, exercices et aides.",
-    footerCourses: "Cours A1–C2", footerMusic: "Musique allemande", footerBooks: "Livre d’allemand A1", footerExam: "Examens de type Goethe", footerReviews: "Avis des élèves", footerHelp: "Aide",
+    footerCourses: "Cours A1–C2", footerMusic: "Musique allemande", footerBooks: "Livre d’allemand A1", footerExam: "Examens de type Goethe", footerReviews: "Avis des élèves", footerHelp: "Aide", footerChatgpt: "Falowen dans ChatGPT",
     footerCourseLevels: "Cours d’allemand par niveau", footerGoetheLevels: "Préparation Goethe par niveau",
     contact: "Des questions ? Contactez-nous sur WhatsApp",
     featureCopy: {
@@ -117,6 +117,7 @@ const FOOTER_LINKS = [
   { href: "https://music.falowen.app/", labelKey: "footerMusic" },
   { href: "/exam-practice", labelKey: "footerExam" },
   { href: "/reviews/", labelKey: "footerReviews" },
+  { href: "/learn-german-with-chatgpt", labelKey: "footerChatgpt" },
   { href: "/partnerships", labelKey: "navPartnerships" },
   { href: "/visitor-guide", labelKey: "footerHelp" },
 ];
