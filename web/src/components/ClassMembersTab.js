@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { collection, db, getDocs, isFirebaseConfigured, query, where } from "../firebase";
+import { getCampusProgram } from "../utils/campusProgram";
 import { styles } from "../styles";
 
 const ClassMembersTab = () => {
   const { studentProfile, saveStudentProfile } = useAuth();
+  const program = getCampusProgram(studentProfile);
   const [members, setMembers] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [membersError, setMembersError] = useState("");
@@ -46,10 +48,11 @@ const ClassMembersTab = () => {
       const q = query(
         studentsRef,
         where("level", "==", studentProfile.level),
-        where("className", "==", studentProfile.className)
+        where("className", "==", studentProfile.className),
+        ...(program === "swahili" ? [where("program", "==", "swahili")] : [])
       );
       const snapshot = await getDocs(q);
-      const nextMembers = snapshot.docs.map((docSnapshot) => {
+      const nextMembers = snapshot.docs.filter(entry => getCampusProgram(entry.data()) === program).map((docSnapshot) => {
         const data = docSnapshot.data();
         return {
           id: docSnapshot.id,
@@ -69,7 +72,7 @@ const ClassMembersTab = () => {
     } finally {
       setLoadingMembers(false);
     }
-  }, [studentProfile?.className, studentProfile?.level]);
+  }, [program, studentProfile?.className, studentProfile?.level]);
 
   useEffect(() => {
     loadMembers();
