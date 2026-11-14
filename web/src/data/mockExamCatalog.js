@@ -45,6 +45,8 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     level: "A1",
     title: "A1 Final Mock Exam",
     shortTitle: "A1 Mock 1",
+    // Day 23's graded final mock belongs to eCampus Course Book, not Exams Room practice.
+    showInMockLibrary: false,
     description: "A complete timed A1 mock with autosave, scoring and a final result.",
     durationLabel: "about 80 min",
     status: "ready",
