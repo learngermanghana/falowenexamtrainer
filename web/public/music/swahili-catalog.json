@@ -1,0 +1,17 @@
+{
+  "tracks": [
+    {
+      "id": "swahili-a1-day-05",
+      "title": "Karibu Kufahamu Familia Yangu",
+      "level": "A1",
+      "day": 5,
+      "topic": "Familia yangu · My family",
+      "language": "Swahili",
+      "type": "Lesson song",
+      "coursebook": true,
+      "featured": true,
+      "objectKey": "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
+      "audioUrl": "https://www.falowen.app/api/music?track=swahili-a1-day-05"
+    }
+  ]
+}

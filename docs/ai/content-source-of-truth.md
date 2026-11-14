@@ -74,3 +74,5 @@ Falowen Admin Marking → Swahili reads the existing Day 1 and Day 6 submissions
 Kiswahili A1 Day 5 is a practice workbook at `/swahili/day-5` and `/campus/course/swahili/day-5`. Its registered recording is `swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3`. Published lyric timing comes from the matching R2 sidecar. Day 5 has a lecture slot and is excluded from assignment progress until its assignment is published.
 
 The separate `swahili/A1/day-05/` prefix is reserved for future Hören recordings.
+
+Falowen Music uses the same player for its German and Swahili tabs. Swahili tracks are registered in `web/public/music/swahili-catalog.json` and the exact public R2 music allowlist. The lyrics API supplies the existing recording lyrics and any later published timings.
