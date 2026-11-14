@@ -10,7 +10,10 @@ export const getSwahiliWordId = (word) =>
 
 const approvedWordIds = new Set(SWAHILI_DICTIONARY_WORDS.map(getSwahiliWordId));
 
-const clientStorage = () => (typeof window === "undefined" ? null : window.localStorage);
+const clientStorage = () => {
+  try { return typeof window === "undefined" ? null : window.localStorage; }
+  catch { return null; }
+};
 
 export const readSavedSwahiliWordIds = (uid, storage = clientStorage()) => {
   const key = getSwahiliVocabularyKey(uid);
