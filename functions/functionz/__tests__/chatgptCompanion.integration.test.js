@@ -169,11 +169,15 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(14);
+      expect(list.data.result.tools).toHaveLength(16);
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
       expect(list.data.result.tools[0].securitySchemes[0].type).toBe("oauth2");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_study_plan");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_vocabulary_practice");
+      expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_practice");
+      const writeTool = list.data.result.tools.find((tool) => tool.name === "save_my_falowen_practice_note");
+      expect(writeTool.annotations.readOnlyHint).toBe(false);
+      expect(writeTool.securitySchemes[0].scopes).toContain("falowen:practice:write");
       const unlinked = await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 2, method: "tools/call",
         params: { name: "get_my_falowen_profile", arguments: {} },
