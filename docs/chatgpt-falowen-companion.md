@@ -92,3 +92,11 @@ The first four use the existing course snapshot and tutoring protocol (with one 
 Kiswahili has not yet been exported to the companion's canonical lesson snapshot. New student coach tools return a clear unavailable response for Kiswahili rather than serving German lesson material.
 
 **Publication is a separate step:** Once backend changes are reviewed, tested and deployed, update the existing published Falowen app in the plugin management portal, rescan the endpoint, review tool permissions and submit/publish the revised version. The older installed plugin may still expose only five tools. Do not assert that these additions are live before checking them in a fresh authenticated ChatGPT connection.
+
+## Optional Exams Room practice and student-owned practice notes — proposed update
+
+The next release candidate provides a strictly answer-safe MCP exam question tool for selected published A1/A2 writing and speaking tasks. Learners choose a mock and task, attempt the question in ChatGPT, then get conversational feedback. The tool does not export Lesen/Hören keys, staff rubrics, answer indexes, unpublished mock drafts, hidden transcripts or private listening audio. Continue timed exams and officially graded submission at the existing Exams Room.
+
+A separate practice-note saver requires explicit student consent to the extra `falowen:practice:write` OAuth scope; default `falowen:read` tokens never gain implicit write access. Notes are self-reported, bounded, idempotent and scoped to the connected student. They are not official exam results, grades or assignment completion and should not be marketed as such. 90-day expiry metadata is written; TTL activation is an additional operational step.
+
+**Deployment/review checklist:** test both OAuth scope paths and legacy token renewal, verify cross-level isolation, inspect 16 tools including exactly one write-annotated practice-note tool, and submit a revised version of the *existing* plugin using the exact original `mcp.json` server configuration. The updated user-facing ZIP is not proof the server is deployed or OpenAI has accepted the permission change.

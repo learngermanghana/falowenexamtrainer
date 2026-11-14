@@ -43,6 +43,7 @@ function mockFirebase() {
           return {
             async get() { return { id, exists: stored.has(id), data: () => stored.get(id) }; },
             async set(data) { stored.set(id, data); },
+            async create(data) { if (stored.has(id)) throw Error("ALREADY_EXISTS"); stored.set(id, data); },
           };
         },
         where(field, operator, value) {
@@ -126,10 +127,10 @@ async function withServer(test) {
   }
 }
 
-function requestParams(state) {
+function requestParams(state, scope = constants.SCOPE) {
   return {
     response_type: "code", client_id: constants.CLIENT_ID, redirect_uri: constants.CALLBACK,
-    code_challenge: challenge, code_challenge_method: "S256", scope: constants.SCOPE,
+    code_challenge: challenge, code_challenge_method: "S256", scope,
     resource: constants.RESOURCE, state,
   };
 }
@@ -143,8 +144,8 @@ async function postJson(url, body, bearer) {
   return { status: response.status, data: await response.json() };
 }
 
-async function connectStudent(origin, uid, state) {
-  const approve = await postJson(origin + "/api/chatgpt/approve", { ...requestParams(state), idToken: uid });
+async function connectStudent(origin, uid, state, scope = constants.SCOPE) {
+  const approve = await postJson(origin + "/api/chatgpt/approve", { ...requestParams(state, scope), idToken: uid });
   expect(approve.status).toBe(200);
   const callback = new URL(approve.data.redirectUrl);
   expect(callback.origin).toBe("https://chatgpt.com");
@@ -163,17 +164,56 @@ async function connectStudent(origin, uid, state) {
   return { code, response, tokens: await response.json() };
 }
 
+describe("ChatGPT practice permission and exam export", () => {
+  test("read-only tokens refuse practice notes; explicit extra-scope tokens can write a private note", async () => {
+    await withServer(async (origin) => {
+      const call = (token, name, args) => postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 31, method: "tools/call", params: { name, arguments: args },
+      }, token);
+      const readonly = await connectStudent(origin, "student-1", "scope-readonly");
+      expect(readonly.response.status).toBe(200);
+      const args = { day: 4, skill: "writing", note: "Review sentence order.",
+        requestId: "writing_day4_once_2026" };
+      const denied = await call(readonly.tokens.access_token, "save_my_falowen_practice_note", args);
+      expect(denied.data.result.isError).toBe(true);
+
+      const scoped = await connectStudent(origin, "student-1", "scope-write",
+        constants.SCOPE + " " + constants.PRACTICE_WRITE_SCOPE);
+      expect(scoped.response.status).toBe(200);
+      expect(scoped.tokens.scope).toContain(constants.PRACTICE_WRITE_SCOPE);
+      const saved = await call(scoped.tokens.access_token, "save_my_falowen_practice_note", args);
+      expect(saved.data.result.structuredContent.saved).toBe(true);
+      const retry = await call(scoped.tokens.access_token, "save_my_falowen_practice_note", args);
+      expect(retry.data.result.structuredContent.saved).toBe(true);
+
+      const exam = await call(scoped.tokens.access_token, "get_my_falowen_exam_practice",
+        { mockId: "a2-mock-02", skill: "writing", part: "teil1" });
+      expect(exam.data.result.structuredContent.task.situation).toMatch(/Julia/);
+      expect(JSON.stringify(exam.data.result.structuredContent)).not.toMatch(/readingAnswerKey|rubric/);
+
+      const other = await connectStudent(origin, "student-2", "scope-other");
+      const inaccessible = await call(other.tokens.access_token, "get_my_falowen_exam_practice",
+        { mockId: "a2-mock-02", skill: "writing" });
+      expect(inaccessible.data.result.structuredContent.available).toBe(false);
+    });
+  });
+});
+
 describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
   test("discovers capabilities, protects account tools, exchanges PKCE and rotates refresh token", async () => {
     await withServer(async (origin) => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(14);
+      expect(list.data.result.tools).toHaveLength(16);
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
       expect(list.data.result.tools[0].securitySchemes[0].type).toBe("oauth2");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_study_plan");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_vocabulary_practice");
+      expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_practice");
+      const writeTool = list.data.result.tools.find((tool) => tool.name === "save_my_falowen_practice_note");
+      expect(writeTool.annotations.readOnlyHint).toBe(false);
+      expect(writeTool.securitySchemes[0].scopes).toContain("falowen:practice:write");
       const unlinked = await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 2, method: "tools/call",
         params: { name: "get_my_falowen_profile", arguments: {} },

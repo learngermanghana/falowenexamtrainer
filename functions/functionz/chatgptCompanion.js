@@ -9,6 +9,7 @@ const { getCurriculumEntriesForLevel } = require("../data/curriculumManifest");
 const { getScoresForStudent } = require("./scoresSheet");
 const { getStudentTimetable } = require("./chatgptClassTimetable");
 const { prepareFromTimetable } = require("./chatgptClassPreparation");
+const { getExamPractice } = require("./chatgptExamPractice");
 
 let GENERATED_COURSE_CONTENT = null;
 try {
@@ -122,6 +123,9 @@ const SITE = "https://www.falowen.app";
 const ISSUER = SITE + "/api/chatgpt";
 const RESOURCE = ISSUER + "/mcp";
 const SCOPE = "falowen:read";
+const PRACTICE_WRITE_SCOPE = "falowen:practice:write";
+const ALLOWED_SCOPES = [SCOPE, PRACTICE_WRITE_SCOPE];
+const VALID_SKILLS = new Set(["reading","listening","speaking","writing","grammar","vocabulary"]);
 const CLIENT_ID = "https://chatgpt.com/oauth/client.json";
 const CALLBACK = "https://chatgpt.com/connector_platform_oauth_redirect";
 const AUTH_CODE_MS = 5 * 60 * 1000;
@@ -156,6 +160,7 @@ function oauthParameters(input) {
       params.redirect_uri !== CALLBACK || params.code_challenge_method !== "S256" ||
       !/^[A-Za-z0-9_-]{43,128}$/.test(params.code_challenge) ||
       params.resource !== RESOURCE || !params.scope.split(/\s+/).includes(SCOPE) ||
+      params.scope.split(/\s+/).some(scope => !ALLOWED_SCOPES.includes(scope)) ||
       !params.state || params.state.length > 1024) {
     return null;
   }
@@ -370,6 +375,27 @@ const toolDefinitions = [
     inputSchema: { type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50 } }, required: ["day"], additionalProperties: false },
   },
   {
+    name: "get_my_falowen_exam_practice",
+    description: "Retrieve a safe single writing or speaking prompt from an approved published Falowen mock at my own course level. Not an official exam session or grade; other modules remain in Exams Room.",
+    inputSchema: { type: "object", properties: {
+      mockId: { type: "string", enum: ["a1-mock-02", "a1-mock-03", "a2-mock-02"] },
+      skill: { type: "string", enum: ["writing", "speaking"] },
+      part: { type: "string", maxLength: 24 },
+    }, required: ["mockId", "skill"], additionalProperties: false },
+  },
+  {
+    name: "save_my_falowen_practice_note",
+    description: "With the student's explicit request, save a short, self-reported study note to their own Falowen account. Never save official exam answers, grades, or assignment completion. Requires separately authorized falowen:practice:write scope.",
+    inputSchema: { type: "object", properties: {
+      day: { type: "integer", minimum: 1, maximum: 50 },
+      skill: { type: "string", enum: ["reading","listening","speaking","writing","grammar","vocabulary"] },
+      note: { type: "string", minLength: 1, maxLength: 1200 },
+      requestId: { type: "string", minLength: 8, maxLength: 80, pattern: "^[A-Za-z0-9_-]+$" },
+    }, required: ["day", "skill", "note", "requestId"], additionalProperties: false },
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false, idempotentHint: true },
+    securitySchemes: [{ type: "oauth2", scopes: [SCOPE, PRACTICE_WRITE_SCOPE] }],
+  },
+  {
     name: "get_my_falowen_assignments",
     description: "List my course work and Campus lesson links. A1–B1 have tutor-marked assignments; B2–C2 show self-study lessons without inventing submission or completion status.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
@@ -433,8 +459,8 @@ const toolDefinitions = [
     },
   },
 ].map((tool) => ({
-  ...tool, annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
-  securitySchemes: [{ type: "oauth2", scopes: [SCOPE] }],
+  ...tool, annotations: tool.annotations || { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+  securitySchemes: tool.securitySchemes || [{ type: "oauth2", scopes: [SCOPE] }],
   _meta: { ...(tool._meta || {}) },
 }));
 
@@ -554,6 +580,12 @@ async function callTool(name, args, student, admin) {
       clarification: "This plan is advice, not verified completion, a deadline, a submission or an official result. Continue or submit official work in Falowen Campus.",
     };
   }
+  if (name === "get_my_falowen_exam_practice") {
+    const isSwahili = ["swahili","kiswahili"].includes(
+      normalize(student.data.program || student.data.languageProgram).toLowerCase());
+    if (isSwahili) return { available: false, message: "Kiswahili exams are not yet exported to ChatGPT." };
+    return getExamPractice(view.level, args?.mockId, args?.skill, args?.part);
+  }
   if (name === "get_my_falowen_profile") return {
     id: "flw_" + sha256(student.id).slice(0, 32),
     name: view.name,
@@ -658,7 +690,7 @@ function makeRouter(admin) {
   router.use((_req, res, next) => { res.setHeader("Cache-Control", "no-store"); res.setHeader("X-Content-Type-Options", "nosniff"); next(); });
 
   router.get("/.well-known/oauth-protected-resource", (_req, res) => res.json({
-    resource: RESOURCE, authorization_servers: [ISSUER], scopes_supported: [SCOPE],
+    resource: RESOURCE, authorization_servers: [ISSUER], scopes_supported: ALLOWED_SCOPES,
     resource_documentation: SITE + "/help",
   }));
   router.get("/.well-known/oauth-authorization-server", (_req, res) => res.json({
@@ -690,7 +722,7 @@ function makeRouter(admin) {
         uid: user.uid, email: normalize(user.email).toLowerCase(),
         emailVerified: user.email_verified === true, studentId: student.id,
         clientId: params.client_id, redirectUri: params.redirect_uri,
-        challenge: params.code_challenge, resource: RESOURCE, scope: SCOPE,
+        challenge: params.code_challenge, resource: RESOURCE, scope: params.scope,
         expiresAt: new Date(Date.now() + AUTH_CODE_MS),
       });
       const url = new URL(CALLBACK);
@@ -703,20 +735,20 @@ function makeRouter(admin) {
     }
   });
 
-  const issueTokens = async (uid, studentId, email, emailVerified) => {
+  const issueTokens = async (uid, studentId, email, emailVerified, scope = SCOPE) => {
     const accessToken = randomToken();
     const refreshToken = randomToken();
     const db = admin.firestore();
     const now = Date.now();
     const base = {
       uid, studentId, email, emailVerified: emailVerified === true,
-      clientId: CLIENT_ID, resource: RESOURCE, scope: SCOPE,
+      clientId: CLIENT_ID, resource: RESOURCE, scope,
     };
     const batch = db.batch();
     batch.set(db.collection("chatgptOauthAccessTokens").doc(sha256(accessToken)), { ...base, expiresAt: new Date(now + ACCESS_MS) });
     batch.set(db.collection("chatgptOauthRefreshTokens").doc(sha256(refreshToken)), { ...base, expiresAt: new Date(now + REFRESH_MS) });
     await batch.commit();
-    return { access_token: accessToken, refresh_token: refreshToken, token_type: "Bearer", expires_in: ACCESS_MS / 1000, scope: SCOPE };
+    return { access_token: accessToken, refresh_token: refreshToken, token_type: "Bearer", expires_in: ACCESS_MS / 1000, scope };
   };
 
   router.post("/token", express.urlencoded({ extended: false, limit: "16kb" }), async (req, res) => {
@@ -743,7 +775,8 @@ function makeRouter(admin) {
         const snap = await tx.get(ref);
         const item = snap.data();
         if (!item || isExpired(item.expiresAt) || item.clientId !== CLIENT_ID ||
-          item.resource !== RESOURCE || item.scope !== SCOPE ||
+          item.resource !== RESOURCE || !item.scope?.split(/\s+/).includes(SCOPE) ||
+          item.scope.split(/\s+/).some(scope => !ALLOWED_SCOPES.includes(scope)) ||
           (grant === "authorization_code" && (
             item.redirectUri !== CALLBACK ||
             crypto.createHash("sha256").update(body.code_verifier).digest("base64url") !== item.challenge
@@ -756,7 +789,7 @@ function makeRouter(admin) {
         uid: stored.uid, email: stored.email, email_verified: stored.emailVerified,
       }, stored.studentId);
       if (!student) return res.status(400).json({ error: "invalid_grant" });
-      return res.json(await issueTokens(stored.uid, student.id, stored.email, stored.emailVerified));
+      return res.json(await issueTokens(stored.uid, student.id, stored.email, stored.emailVerified, stored.scope));
     } catch (_error) {
       return res.status(503).json({ error: "temporarily_unavailable" });
     }
@@ -798,7 +831,8 @@ function makeRouter(admin) {
     try {
       const token = await admin.firestore().collection("chatgptOauthAccessTokens").doc(sha256(match[1])).get();
       const session = token.data();
-      if (!session || isExpired(session.expiresAt) || session.scope !== SCOPE ||
+      if (!session || isExpired(session.expiresAt) || !session.scope?.split(/\s+/).includes(SCOPE) ||
+          session.scope.split(/\s+/).some(scope => !ALLOWED_SCOPES.includes(scope)) ||
           session.resource !== RESOURCE || session.clientId !== CLIENT_ID) return challenge(res, id);
       const student = await studentForIdentity(admin, {
         uid: session.uid, email: session.email, email_verified: session.emailVerified,
@@ -807,6 +841,37 @@ function makeRouter(admin) {
       const name = normalize(message.params?.name);
       if (!toolDefinitions.some((tool) => tool.name === name)) {
         return res.json({ jsonrpc: "2.0", id, error: { code: -32602, message: "Unknown tool" } });
+      }
+      if (name === "save_my_falowen_practice_note") {
+        if (!session.scope.split(/\s+/).includes(PRACTICE_WRITE_SCOPE)) {
+          return res.json({ jsonrpc: "2.0", id, result: { isError: true,
+            content: [{ type: "text", text: "This connection is read-only. Reconnect with explicit Falowen practice-write permission to save notes." }] } });
+        }
+        const args = message.params?.arguments || {};
+        const note = typeof args.note === "string" ? args.note.trim() : "";
+        if (!Number.isInteger(args.day) || args.day < 1 || args.day > 50 ||
+            !VALID_SKILLS.has(args.skill) || !note || note.length > 1200 ||
+            typeof args.requestId !== "string" || !/^[A-Za-z0-9_-]{8,80}$/.test(args.requestId)) {
+          return res.json({ jsonrpc: "2.0", id, result: { isError: true,
+            content: [{ type: "text", text: "Invalid practice note, skill, day, or request ID." }] } });
+        }
+        // Student-id-derived immutable record key; idempotent retries do not
+        // create repeated writes, and another account cannot choose the owner.
+        const ownerUid = session.uid;
+        const key = sha256(ownerUid + ":" + args.requestId).slice(0, 40);
+        const ref = admin.firestore().collection("chatgptStudentPracticeNotes").doc(key);
+        const prior = await ref.get();
+        if (!prior.exists) {
+          await ref.create({
+            ownerUid, studentId: student.id, day: args.day, skill: args.skill,
+            note, source: "chatgpt_student_self_report", officialGrade: false,
+            createdAt: new Date(), expireAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+          });
+        }
+        const saved = { saved: true, day: args.day, skill: args.skill,
+          clarification: "Saved your optional practice note; no official exam, assignment result or tutor score was changed." };
+        return res.json({ jsonrpc: "2.0", id, result: {
+          content: [{ type: "text", text: JSON.stringify(saved) }], structuredContent: saved } });
       }
       const result = await callTool(name, message.params?.arguments || {}, student, admin);
       return res.json({ jsonrpc: "2.0", id, result: {
@@ -828,5 +893,5 @@ function makeRouter(admin) {
 module.exports = {
   makeRouter, oauthParameters, safeStudentAccess, scoreRowsForStudent, summarizeStudentAssignments,
   lessonContentResponse, practiceGuideResponse,
-  constants: { ISSUER, RESOURCE, SCOPE, CLIENT_ID, CALLBACK },
+  constants: { ISSUER, RESOURCE, SCOPE, PRACTICE_WRITE_SCOPE, CLIENT_ID, CALLBACK },
 };
