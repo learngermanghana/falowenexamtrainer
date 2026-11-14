@@ -25,6 +25,8 @@ const dayInput = byId("day");
 const genreInput = byId("genre");
 const searchInput = byId("search");
 let catalog = [];
+let allTracks = [];
+let musicLanguage = new URLSearchParams(location.search).get("language") === "swahili" ? "swahili" : "german";
 let pinnedTracks = [];
 let learning = {};
 let studioDrafts = [];
@@ -49,6 +51,7 @@ function referenceLyricsFor(track) {
        assignmentKey:draft.assignmentKey, draftTitle:draft.title} : null;
 }
 function lessonFor(track) {
+  if (track.musicLanguage === "swahili") return null;
   return resolveRecordingLesson(track,learning,pinnedTracks,publishedLyrics.get(track.id));
 }
 function lyricsFor(track) {
@@ -203,6 +206,7 @@ function safeTrack(row) {
     topic: String(row.topic || "German learning").slice(0, 100),
     type: String(row.type || "Lesson song").slice(0, 100),
     language: String(row.language || "German").slice(0, 100),
+    musicLanguage: row.language === "Swahili" ? "swahili" : "german",
     genre: String(row.genre || "").slice(0, 70),
     audioUrl, assignmentKey: String(row.assignmentKey || "").slice(0, 70),
     featured: row.featured === true,
@@ -354,6 +358,7 @@ function setPlayer(track, start = false) {
 }
 function populateFeatured() {
   featured = catalog.find(track => track.featured && track.category === "lesson") || catalog.find(track => track.category === "lesson") || catalog[0] || null;
+  document.querySelector(".hero-resume")?.remove();
   const prompt = byId("featured-description");
   if (featured) {
     prompt.textContent = "Featured: " + featured.title + " · " + (featured.level === "ALL" ? featured.type : featured.level + " · Day " + featured.day) + ". Learn through the recording and a short activity.";
@@ -368,24 +373,33 @@ function populateFeatured() {
     const recentId = localStorage.getItem("falowen_music_recent");
     const recent = catalog.find(track => track.id === recentId);
     if (recent) {
-      const resume = el("button", "hero-secondary", "Continue: " + recent.title + " ↗");
+      const resume = el("button", "hero-secondary hero-resume", "Continue: " + recent.title + " ↗");
       resume.type = "button";
       resume.addEventListener("click", () => showSong(recent, false, true));
       byId("featured-play").after(resume);
     }
   } catch {}
 }
+function updateLanguageCatalog() {
+  catalog = allTracks.filter(track => track.musicLanguage === musicLanguage);
+  document.querySelectorAll("[data-music-language]").forEach(button =>
+    button.setAttribute("aria-pressed", String(button.dataset.musicLanguage === musicLanguage)));
+  populateFeatured();
+  populateFilters();
+  renderCatalog();
+}
+
 function populateFilters() {
   const available = ["A1","A2","B1","B2","C1","C2"];
   const oldLevel = levelInput.value, oldDay = dayInput.value, oldGenre = genreInput.value;
   levelInput.replaceChildren(new Option("All levels", ""));
   available.forEach(level => levelInput.add(new Option(level, level)));
-  const queryLevel=(initialParams.get("level") || "").toUpperCase();
+  const queryLevel=(musicLanguage === "german" ? initialParams.get("level") || "" : "").toUpperCase();
   levelInput.value = available.includes(oldLevel) ? oldLevel : available.includes(queryLevel) ? queryLevel : "";
   dayInput.replaceChildren(new Option("Available days", ""));
   const days = [...new Set(catalog.filter(track => track.category === "lesson" && (!levelInput.value || track.level === levelInput.value)).map(track => track.day).filter(Boolean))].sort((a,b) => a-b);
   for(const day of days) dayInput.add(new Option("Day "+day,String(day)));
-  const queryDay=String(Number(initialParams.get("day")));
+  const queryDay=String(Number(musicLanguage === "german" ? initialParams.get("day") : null));
   dayInput.value = Number(oldDay)>=1 && Number(oldDay)<=28 ? oldDay
     : Number(queryDay)>=1 && Number(queryDay)<=28 ? queryDay : "";
   const genres = [...new Set(catalog.map(track => track.genre).filter(Boolean))].sort();
@@ -518,7 +532,7 @@ function updateMediaSession(track) {
       session.metadata = new MediaMetadata({
         title: track.title,
         artist: "Falowen Music",
-        album: track.level === "ALL" ? "German learning music" : track.level + " German learning songs",
+        album: track.level === "ALL" ? track.language + " learning music" : track.level + " " + track.language + " learning songs",
       });
     }
     session.playbackState = audio.paused ? "paused" : "playing";
@@ -753,7 +767,15 @@ function checkAnswers() {
     : answered + " of " + questions.length + " answered. Finish the remaining question(s).";
 }
 function renderBehindTheSong(track) {
-  const story=songStoryForTrack(track,editorialStories);
+  const swahili = track.musicLanguage === "swahili";
+  const story = swahili ? {
+    storyDe: "Wimbo huu unakutambulisha kwa familia ya Jason.",
+    storyEn: "The song introduces Jason’s family through questions about names, jobs and interests.",
+    focusDe: "Huyu ni nani? Anaitwa nani?",
+    focusEn: "Who is this? What is their name?",
+  } : songStoryForTrack(track,editorialStories);
+  byId("story-language-heading").textContent = swahili ? "Kuhusu wimbo" : "Die Idee hinter dem Song";
+  byId("story-de").lang = byId("story-focus-de").lang = swahili ? "sw" : "de";
   byId("story-de").textContent=story.storyDe;
   byId("story-en").textContent=story.storyEn;
   byId("story-focus-de").textContent=story.focusDe;
@@ -777,12 +799,16 @@ function renderDetail(track) {
   renderBehindTheSong(track);
   byId("listen-prompt").textContent = hasLesson
     ? "First listen without reading. " + lesson.summary + ". Which key words can you hear?"
-    : "Listen, relax and enjoy this Falowen classroom song. You can play it again with the repeat control.";
-  byId("course-link").hidden = !hasLesson;
+    : track.musicLanguage === "swahili"
+      ? "Listen to the song and read the Swahili lyrics."
+      : "Listen, relax and enjoy this Falowen classroom song. You can play it again with the repeat control.";
+  byId("course-link").hidden = !hasLesson && track.musicLanguage !== "swahili";
+  if (track.musicLanguage === "swahili") byId("course-link").href = "https://www.falowen.app/swahili/day-" + track.day;
   if (hasLesson) byId("course-link").href = /^https:\/\/www\.falowen\.app\/campus\/course\/[a-z0-9-]+$/.test(lesson.courseUrl || "")
     ? lesson.courseUrl : "https://www.falowen.app/campus"; 
   byId("listen-next").hidden = !hasLyrics;
   byId("lyrics-next").hidden = !hasLesson;
+  byId("lesson-vocabulary").hidden = !hasLesson;
   for (const tab of ["lyrics","practice"]) {
     document.querySelector('[data-tab="' + tab + '"]').hidden = tab === "lyrics" ? !hasLyrics : !hasLesson;
   }
@@ -804,6 +830,10 @@ function renderDetail(track) {
 }
 function showSong(track, autoplay = false, navigate = true) {
   if (selected?.id !== track.id) showEnglish = track.level === "A1";
+  if (musicLanguage !== track.musicLanguage) {
+    musicLanguage = track.musicLanguage;
+    updateLanguageCatalog();
+  }
   selected = track;
   // The marketing hero belongs to the discovery page, not the listening view.
   document.body.classList.add("song-detail-open");
@@ -817,10 +847,23 @@ function closeDetail(navigate = true) {
   selected = null;
   document.body.classList.remove("song-detail-open");
   byId("song-detail").hidden = true;
-  document.title = "Falowen Music · Learn German through songs";
+  document.title = "Falowen Music · German and Swahili songs";
   if (navigate) history.pushState(null, "", embedded ? "/music/index.html?embedded=1" : "/");
   byId("library").scrollIntoView({ behavior: "smooth", block: "start" });
 }
+document.querySelectorAll("[data-music-language]").forEach(button => button.addEventListener("click", () => {
+  if (button.dataset.musicLanguage === musicLanguage) return;
+  musicLanguage = button.dataset.musicLanguage;
+  searchInput.value = "";
+  levelInput.value = "";
+  dayInput.value = "";
+  genreInput.value = "";
+  category = "all";
+  document.querySelectorAll("[data-category]").forEach(control =>
+    control.setAttribute("aria-pressed", String(control.dataset.category === "all")));
+  updateLanguageCatalog();
+  rebuildPlaybackQueue();
+}));
 for (const control of [searchInput, levelInput, dayInput, genreInput])
   control.addEventListener(control === searchInput ? "input" : "change", renderCatalog);
 document.querySelectorAll("[data-category]").forEach(button => button.addEventListener("click", () => {
@@ -868,7 +911,7 @@ byId("repeat").addEventListener("change", () => {
 audio.addEventListener("error", () => handlePlaybackFailure(audio.error));
 window.addEventListener("popstate", () => {
   const id = songIdFromLocation();
-  const track = catalog.find(song => song.id === id);
+  const track = allTracks.find(song => song.id === id);
   if (track) showSong(track, false, false);
   else closeDetail(false);
 });
@@ -890,18 +933,17 @@ async function refreshMusic() {
     // Day 24 and Day 25 both use Endlich Urlaub.mp3, but their level/day keys
     // differ and therefore remain distinct playable songs.
     const publishedDays=new Set(pinnedTracks.filter(t=>t.level!=="ALL"&&t.day)
-      .map(t=>t.level+":"+t.day));
-    catalog=[...pinnedTracks,...dynamic.filter(track=>!pinnedIds.has(track.id)
+      .map(t=>t.musicLanguage+":"+t.level+":"+t.day));
+    allTracks=[...pinnedTracks,...dynamic.filter(track=>!pinnedIds.has(track.id)
       && !pinnedKeys.has(track.objectKey)
-      && !publishedDays.has(track.level+":"+track.day))];
-    populateFilters();
-    renderCatalog();
+      && !publishedDays.has(track.musicLanguage+":"+track.level+":"+track.day))];
+    updateLanguageCatalog();
     if (current) rebuildPlaybackQueue(current);
     byId("discovery-status").textContent="";
     if(selected){lyricsRequests.delete(selected.id);loadPublishedLyrics(selected);}
     const selectedId=selected?.id || songIdFromLocation() || initialId;
     if(selectedId && !selected) {
-      const track=catalog.find(song=>song.id===selectedId);
+      const track=allTracks.find(song=>song.id===selectedId);
       if(track) showSong(track,false,false);
     }
   }catch(error){
@@ -925,13 +967,15 @@ Promise.all([
     .catch(() => ({byObjectKey:{},byTrackId:{}})),
   fetch("/music/class-timings.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : {recordings:[]})
     .catch(() => ({recordings:[]})),
-]).then(([data, lessons, drafts, translations, stories, classTimings]) => {
+  fetch("/music/swahili-catalog.json", {cache:"no-cache"}).then(res => res.ok ? res.json() : {tracks:[]})
+    .catch(() => ({tracks:[]})),
+]).then(([data, lessons, drafts, translations, stories, classTimings, swahili]) => {
   englishTranslations = Array.isArray(translations?.recordings) ? translations : {recordings:[]};
   editorialStories = stories && typeof stories==="object" ? stories : {byObjectKey:{},byTrackId:{}};
-  pinnedTracks = (Array.isArray(data.tracks) ? data.tracks : [])
+  pinnedTracks = [...(Array.isArray(data.tracks) ? data.tracks : []), ...(Array.isArray(swahili.tracks) ? swahili.tracks : [])]
     .filter(row => row.retired !== true)
     .map(safeTrack).filter(Boolean);
-  catalog = [...pinnedTracks];
+  allTracks = [...pinnedTracks];
   for (const pack of classTimings?.recordings || []) {
     const track=pinnedTracks.find(row=>row.level==="ALL" && row.id===pack.trackId && row.audioUrl===pack.audioUrl);
     if (track && pack.referenceOnly && pack.transcriptionStatus==="automatic" &&
@@ -943,11 +987,9 @@ Promise.all([
     ["A1","A2","B1"].includes(item.level) && Number.isInteger(item.day)
     && typeof item.lyrics === "string" && item.lyrics.length <= 6000
   ) : [];
-  populateFeatured();
-  populateFilters();
-  renderCatalog();
+  updateLanguageCatalog();
   const id = initialId || location.pathname.match(/\/music\/songs\/([A-Za-z0-9_-]{1,245})\.html$/)?.[1];
-  const track = catalog.find(song => song.id === id);
+  const track = allTracks.find(song => song.id === id);
   if (track) showSong(track, false, false);
   refreshMusic();
 }).catch(error => {

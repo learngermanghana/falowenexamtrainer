@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const catalog = require('../web/public/music/catalog.json');
+const swahili = require('../web/public/music/swahili-catalog.json');
 const artwork = require('../web/public/music/covers/artwork-map.json');
 const sources = require('../web/public/music/covers/photo-sources.json');
 const {musicKeyFromAutoId, musicTrackFromKey} = require('../server/musicDiscovery.cjs');
@@ -17,10 +18,10 @@ module.exports = function musicShare(req, res) {
   const id = typeof req.query?.track === 'string' ? req.query.track : '';
   if (!/^[A-Za-z0-9_-]{1,245}$/.test(id)) return res.status(404).end('Song not found');
   const key = musicKeyFromAutoId(id);
-  const track = catalog.tracks.find(row => row.id === id && row.retired !== true) || (key && musicTrackFromKey(key));
+  const track = [...catalog.tracks, ...swahili.tracks].find(row => row.id === id && row.retired !== true) || (key && musicTrackFromKey(key));
   if (!track) return res.status(404).end('Song not found');
   const title = escapeHtml(track.title + ' · Falowen Music');
-  const description = escapeHtml('Listen to ' + track.title + ' on Falowen Music. German songs' + (track.level !== 'ALL' ? ' · ' + track.level + ' · Day ' + track.day : ' for every level') + '.');
+  const description = escapeHtml('Listen to ' + track.title + ' on Falowen Music. ' + (track.language === 'Swahili' ? 'Swahili' : 'German') + ' songs' + (track.level !== 'ALL' ? ' · ' + track.level + ' · Day ' + track.day : ' for every level') + '.');
   const canonical = 'https://music.falowen.app/song/' + encodeURIComponent(id);
   const theme = artwork.byObjectKey[track.objectKey] || artwork.byTrackId[id] || artwork.default;
   const image = 'https://music.falowen.app' + sources[theme].path;
