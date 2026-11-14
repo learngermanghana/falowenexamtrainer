@@ -5,6 +5,8 @@ import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { fetchVocabularyFromSheet } from "../services/vocabService";
+import { getCampusProgram } from "../utils/campusProgram";
+import SwahiliVocabPage from "./SwahiliVocabPage";
 
 const PAGE_SIZE = 40;
 
@@ -26,7 +28,7 @@ const shuffle = (arr) => {
 
 const pickRandom = (arr, count) => shuffle(arr).slice(0, count);
 
-const VocabExamPage = ({ context = "exam" }) => {
+const GermanVocabExamPage = ({ context = "exam" }) => {
   const { level, setLevel, setError } = useExam();
   const { studentProfile, user } = useAuth();
   const savedPhrases = useMemo(() => {
@@ -397,6 +399,15 @@ const VocabExamPage = ({ context = "exam" }) => {
       )}
     </div>
   );
+};
+
+// Keep the same Campus Vocabulary route and styling. Kiswahili does not mount
+// German's sheet loader, level selector, German reading phrases or exam data.
+const VocabExamPage = ({ context = "exam" }) => {
+  const { studentProfile } = useAuth();
+  return context === "campus" && getCampusProgram(studentProfile) === "swahili"
+    ? <SwahiliVocabPage />
+    : <GermanVocabExamPage context={context} />;
 };
 
 export default VocabExamPage;

@@ -138,7 +138,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
 
   function section() {
     if (activeTab === "references") return <MgahawaniSong />;
-    if (activeTab === "grammar") return <MgahawaniGrammar />;
+    if (activeTab === "grammar") return <MgahawaniGrammar uid={user?.uid} allowSave={canSubmit} />;
     if (activeTab === "sprechen") return <section className="swahili-book__card swahili-book__activity" aria-label="Teil 1">
       <div className="mgahawani-workbook__section-header"><span>01 · PRACTISE WITH A PARTNER</span><h2>Teil 1 · Kuzungumza (Speaking)</h2><p>From likes and dislikes to a complete restaurant order.</p></div>
       <p><strong>Hatua ya 1: Mapendeleo.</strong> Read the conversation between Amani and Furaha with a partner.</p>

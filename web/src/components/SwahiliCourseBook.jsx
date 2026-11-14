@@ -130,7 +130,7 @@ function DayOneContent({
       <p className="swahili-book__note">Mwalimu asome tofauti za sauti: ng / ng’ · s / sh · t / th.</p>
       <details>
         <summary>Msamiati wa Somo la 1 · Day 1 vocabulary</summary>
-        <SwahiliDictionary />
+        <SwahiliDictionary uid={user?.uid} allowSave={canSubmit} />
       </details>
     </section>
   );

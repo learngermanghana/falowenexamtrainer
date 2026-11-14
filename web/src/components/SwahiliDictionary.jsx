@@ -1,31 +1,32 @@
-import React, { useMemo, useState } from "react";
-import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
-import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
+import React, { useEffect, useMemo, useState } from "react";
+import { SWAHILI_DICTIONARY_WORDS } from "../data/swahili/vocabulary";
+import {
+  getSwahiliWordId, readSavedSwahiliWordIds, setSwahiliWordSaved,
+} from "../services/swahiliSavedVocabulary";
 
-// The emailed "HATUA YA AWALI (Kiswahili A1 and A2)" is a teaching syllabus,
-// not a translation dictionary. Topics are sourced from its 20-topic outline.
-// Verified vocabulary comes from the original Day 1 teaching material and
-// Ruth's two A1 restaurant PDFs for Lesson 6. Unpublished topics remain headings only.
-export const SWAHILI_DICTIONARY_TOPICS = [
-  "Salamu", "Utambulisho", "Familia", "Mgahawani", "Sokoni",
-  "Dukani", "Mapishi ya Kitanzania", "Nyumbani", "Shughuli za Kila Siku",
-  "Hospitalini", "Kusafiri", "Safari ya Kitalii", "Hali ya Hewa na Majira",
-  "Watu na Taaluma Zao", "Ofisini", "Sikukuu na Matukio Mbalimbali",
-  "Huduma za Malazi", "Kutoa Taarifa za Matukio", "Mawasiliano ya Kirafiki",
-  "Nchi ya Tanzania",
-];
+// Preserve previous named exports for existing lesson consumers.
+export { SWAHILI_DICTIONARY_WORDS, SWAHILI_DICTIONARY_TOPICS } from "../data/swahili/vocabulary";
 
-const starterVocabulary = [
-  ...SWAHILI_DAY_ONE.vowels.map(({ word, meaning }) => ({ sw: word, en: meaning, source: "day-1" })),
-  ...SWAHILI_DAY_ONE.combinations.map(({ word, meaning }) => ({ sw: word, en: meaning, source: "day-1" })),
-  ...[...SWAHILI_DAY_SIX.food, ...SWAHILI_DAY_SIX.drinks].map(({sw,en}) => ({sw,en,source:"day-6"})),
-];
+export default function SwahiliDictionary({ uid = null, allowSave = false }) {
+  const [savedIds, setSavedIds] = useState(() => allowSave ? readSavedSwahiliWordIds(uid) : []);
+  const [saveError, setSaveError] = useState("");
 
-export const SWAHILI_DICTIONARY_WORDS = Array.from(
-  new Map(starterVocabulary.filter(({ sw, en }) => sw && en).map((entry) => [entry.sw.toLocaleLowerCase("sw"), entry])).values()
-).sort((a, b) => a.sw.localeCompare(b.sw, "sw"));
+  useEffect(() => {
+    setSavedIds(allowSave ? readSavedSwahiliWordIds(uid) : []);
+    setSaveError("");
+  }, [uid, allowSave]);
 
-export default function SwahiliDictionary() {
+  const saved = useMemo(() => new Set(savedIds), [savedIds]);
+  const toggleSave = (word) => {
+    if (!allowSave || !uid) return;
+    const id = getSwahiliWordId(word);
+    try {
+      setSavedIds(setSwahiliWordSaved(uid, id, !saved.has(id)));
+      setSaveError("");
+    } catch {
+      setSaveError("Could not save this word. Check browser storage settings.");
+    }
+  };
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState("all");
   const matches = useMemo(() => {
@@ -53,12 +54,21 @@ export default function SwahiliDictionary() {
         </label>
       </div>
       <p className="swahili-book__small" role="status">{matches.length} / {SWAHILI_DICTIONARY_WORDS.length} words</p>
+      {saveError && <p role="alert" className="swahili-book__note">{saveError}</p>}
       {matches.length ? (
         <div className="swahili-book__grid">
-          {matches.map(({ sw, en }) => (
-            <div className="swahili-book__tile" key={sw}>
-              <strong lang="sw">{sw}</strong>
-              <div className="swahili-book__small" lang="en">{en}</div>
+          {matches.map((entry) => (
+            <div className="swahili-book__tile" key={getSwahiliWordId(entry)}>
+              <strong lang="sw">{entry.sw}</strong>
+              <div className="swahili-book__small" lang="en">{entry.en}</div>
+              {allowSave && uid && (
+                <button type="button" className="swahili-book__button swahili-book__button--soft"
+                  aria-label={`${saved.has(getSwahiliWordId(entry)) ? "Remove" : "Save"} ${entry.sw}`}
+                  aria-pressed={saved.has(getSwahiliWordId(entry))}
+                  onClick={() => toggleSave(entry)}>
+                  {saved.has(getSwahiliWordId(entry)) ? "Saved ✓" : "Save word"}
+                </button>
+              )}
             </div>
           ))}
         </div>
