@@ -80,7 +80,7 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
             <p style={{ marginBottom: 0, lineHeight: 1.6 }}>
               With your permission, ChatGPT may save a short learning note to your own Falowen account
               when you explicitly ask it to do so. Notes are stored separately from official exams,
-              grades and submissions, and may be retained for up to 90 days. You can decline by
+              grades and submissions, and have a 90-day expiry marker. You can request deletion through Falowen Help. You can decline by
               cancelling and reconnecting with read-only access. This permission does not allow
               ChatGPT to submit or mark exams, change tutor scores or access other students.
             </p>
