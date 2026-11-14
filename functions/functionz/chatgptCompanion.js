@@ -171,17 +171,15 @@ function safeStudentAccess(student) {
   if (!student || normalize(student.accountType).toLowerCase() === "exam_only") return false;
   const role = normalize(student.role || "student").toLowerCase();
   if (role !== "student" || student.isTutor === true) return false;
+  // Match Campus sign-in eligibility: trial-limited learners may connect to the
+  // Companion, while still receiving only the permissions they explicitly grant.
   const status = normalize(student.status).toLowerCase();
   if (status && !["active", "paid", "partial", "pending", "enrolled", "registered",
-    "ongoing", "current", "trial_active"].includes(status)) return false;
+    "ongoing", "current", "trial_active", "trial_expired"].includes(status)) return false;
   const payment = normalize(student.paymentStatus).toLowerCase();
   if (["failed", "overdue", "rejected", "cancelled", "canceled"].includes(payment)) return false;
   if (student.contractEnd && !isNaN(new Date(student.contractEnd.toDate ? student.contractEnd.toDate() : student.contractEnd).getTime()) &&
       isExpired(student.contractEnd)) return false;
-  if (["expired", "ended", "used"].includes(normalize(student.trialStatus).toLowerCase()) &&
-      !["paid", "partial"].includes(payment) && !(Number(student.paid || student.paidAmount || 0) > 0)) return false;
-  if (student.trialEndsAt && isExpired(student.trialEndsAt) &&
-      !["paid", "partial"].includes(payment) && !(Number(student.paid || student.paidAmount || 0) > 0)) return false;
   return true;
 }
 
