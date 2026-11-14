@@ -7,8 +7,8 @@
 export const getCampusProgram = (studentProfile) =>
   String(studentProfile?.program || "").trim().toLowerCase() === "swahili" ? "swahili" : "german";
 
-const SWAHILI_CAMPUS_SECTIONS = new Set(["course", "account"]);
-const GERMAN_ONLY_SECTIONS = ["music", "books", "vocab", "attendance", "results", "discussion", "classMembers"];
+const SWAHILI_CAMPUS_SECTIONS = new Set(["course", "results", "account"]);
+const GERMAN_ONLY_SECTIONS = ["music", "books", "vocab", "attendance", "discussion", "classMembers"];
 
 export const getProgramCampusTabs = (tabs, studentProfile) =>
   getCampusProgram(studentProfile) === "swahili"
@@ -27,7 +27,7 @@ export const getProgramCourseRedirect = ({ pathname = "", studentProfile, isStaf
   if (getCampusProgram(studentProfile) === "swahili") {
     if (/^\/(exams|attendance|tutor-marking)(?:\/|$)/.test(path)) return "/campus/course";
     if (path.startsWith("/campus/") &&
-        !/^\/campus\/(?:course(?:\/swahili\/day-(?:1|6))?|account)$/.test(path)) {
+        !/^\/campus\/(?:course(?:\/swahili\/day-(?:1|6))?|results|account)$/.test(path)) {
       return "/campus/course";
     }
   } else if (/^\/campus\/course\/swahili(?:\/|$)/.test(path)) {

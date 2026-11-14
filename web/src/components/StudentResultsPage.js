@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
+import SwahiliResults from "./SwahiliResults";
+import { getCampusProgram } from "../utils/campusProgram";
 import ResultHistory from "./ResultHistory";
 import { mergeAutomaticResults } from "../utils/mergeAutomaticResults";
 import { collection, db, onSnapshot, query, where } from "../firebase";
@@ -22,7 +24,7 @@ const TOTAL_ASSIGNMENTS = {
 };
 const TRACKED_LEVELS = Object.keys(TOTAL_ASSIGNMENTS);
 
-const StudentResultsPage = () => {
+const GermanResults = () => {
   const { t } = useTranslation();
   const { idToken, studentProfile, user } = useAuth();
 
@@ -32,7 +34,7 @@ const StudentResultsPage = () => {
     setAutomaticResults([]);
     if (!db || !user?.uid) return undefined;
     return onSnapshot(query(collection(db, "scores"), where("studentId", "==", user.uid)), snapshot => {
-      setAutomaticResults(snapshot.docs.map(entry => ({ id: entry.id, ...entry.data() })));
+      setAutomaticResults(snapshot.docs.map(entry => ({ id: entry.id, ...entry.data() })).filter(row => row.program !== "swahili"));
     }, () => { /* Existing Sheet/API results remain available. */ });
   }, [user?.uid]);
   const visibleResults = useMemo(
@@ -68,20 +70,20 @@ const StudentResultsPage = () => {
       const all = await fetchResultsFromPublishedSheet(SHEET_CSV_URL);
 
       // Filter ONLY this student’s rows (privacy + correctness)
-      const mine = all.filter((r) => norm(r.studentcode) === norm(studentCode));
+      const mine = all.filter((r) => norm(r.studentcode) === norm(studentCode) && !/^swahili-day-/i.test(r.assignmentId || r.assignment_id || ""));
 
       return { mine, all };
     };
 
     const loadFromApi = async () => {
       const rows = await fetchStudentResultsHistory({ idToken, studentCode });
-      return Array.isArray(rows) ? rows : [];
+      return Array.isArray(rows) ? rows.filter(row => !/^swahili-day-/i.test(row.assignmentId || row.assignment_id || "")) : [];
     };
 
     const loadFromResultsStore = async () => {
       const response = await fetchResults({ studentCode, email: studentEmail });
       if (!Array.isArray(response?.results)) return [];
-      return response.results.map((entry) => ({
+      return response.results.filter(row => row.program !== "swahili").map((entry) => ({
         ...entry,
         studentcode: entry.studentcode || entry.studentCode || "",
         name: entry.name || entry.studentName || "",
@@ -420,4 +422,9 @@ const StudentResultsPage = () => {
   );
 };
 
-export default StudentResultsPage;
+export default function StudentResultsPage() {
+  const { studentProfile, user } = useAuth();
+  return getCampusProgram(studentProfile) === "swahili"
+    ? <SwahiliResults key={user?.uid} uid={user?.uid} />
+    : <GermanResults />;
+}
