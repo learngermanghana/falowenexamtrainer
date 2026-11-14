@@ -331,6 +331,20 @@ function summarizeStudentAssignments(student, rows) {
 const toolDefinitions = [
 
   {
+    name: "get_my_falowen_profile",
+    description: "Identify my connected Falowen student profile and course level without exposing student numbers or private records.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    outputSchema: {
+      type: "object", properties: {
+        id: { type: "string", minLength: 1, pattern: "\\S" },
+        name: { type: "string" },
+        nickname: { type: "string" },
+      },
+      required: ["id"], additionalProperties: false,
+    },
+    _meta: { "openai/profile": true },
+  },
+  {
     name: "get_my_falowen_study_plan",
     description: "Suggest a short daily study plan using my own recorded course assignments and learner-safe lesson content. Missing marks are not proof of non-submission; self-study completion cannot be verified.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
@@ -354,20 +368,6 @@ const toolDefinitions = [
     name: "get_my_falowen_music_guide",
     description: "Help me study with Falowen Music and my course lesson. Never claim a specific track is linked to the day unless verified in the course export. Music is optional and ungraded.",
     inputSchema: { type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50 } }, required: ["day"], additionalProperties: false },
-  },
-  {
-    name: "get_my_falowen_profile",
-    description: "Identify my connected Falowen student profile and course level without exposing student numbers or private records.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
-    outputSchema: {
-      type: "object", properties: {
-        id: { type: "string", minLength: 1, pattern: "\\S" },
-        name: { type: "string" },
-        nickname: { type: "string" },
-      },
-      required: ["id"], additionalProperties: false,
-    },
-    _meta: { "openai/profile": true },
   },
   {
     name: "get_my_falowen_assignments",
