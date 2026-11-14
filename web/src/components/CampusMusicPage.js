@@ -11,7 +11,8 @@ import { normalizeCampusMusicPractice, saveCampusMusicPractice } from "./musicPr
  *
  * Do not duplicate music catalogues, R2 credentials or music API requests.
  */
-export default function CampusMusicPage() {
+export default function CampusMusicPage({ program = "german" }) {
+  const isSwahili = program === "swahili";
   const iframeRef = useRef(null);
 
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function CampusMusicPage() {
         <div>
           <p style={{ color: "#a4efbb", textTransform: "uppercase", fontSize: 11, letterSpacing: ".09em", fontWeight: 800, margin: "0 0 6px" }}>Listen · Learn · Practise</p>
           <h2 style={{ color: "#f1fff0", fontSize: 24, margin: 0 }}>Music</h2>
-          <p style={{ color: "#c8dfd7", margin: "7px 0 0", fontSize: 14, lineHeight: 1.5 }}>Learn German with songs, lyrics, vocabulary and listening practice — without leaving Falowen.</p>
+          <p style={{ color: "#c8dfd7", margin: "7px 0 0", fontSize: 14, lineHeight: 1.5 }}>{isSwahili ? "Learn Swahili with songs and lyrics." : "Learn German with songs, lyrics, vocabulary and listening practice — without leaving Falowen."}</p>
         </div>
         <a href="https://music.falowen.app/" target="_blank" rel="noopener noreferrer"
           style={{ color: "#cbf6ab", fontWeight: 700, fontSize: 13, textUnderlineOffset: 3 }}>
@@ -50,8 +51,8 @@ export default function CampusMusicPage() {
       </p>
       <iframe
         ref={iframeRef}
-        title="Falowen Music — German listening room"
-        src="/music/index.html?embedded=1"
+        title={isSwahili ? "Falowen Music — Swahili listening room" : "Falowen Music — German listening room"}
+        src={isSwahili ? "/music/index.html?embedded=1&language=swahili" : "/music/index.html?embedded=1"}
         loading="eager"
         allow="autoplay; clipboard-write"
         referrerPolicy="strict-origin-when-cross-origin"

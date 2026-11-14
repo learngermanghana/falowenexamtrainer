@@ -10,13 +10,13 @@ import { matchingEnglishTranslation, matchingTranscriptEnglishTranslation } from
 const SONG_ID = /^[a-zA-Z0-9_-]{1,245}$/;
 const LEVELS = new Set(["A1", "A2", "B1"]);
 
-export const normalizeWorkbookSong = (track, level, day) => {
+export const normalizeWorkbookSong = (track, level, day, program = "german") => {
   if (!track || !SONG_ID.test(String(track.id || ""))) return null;
   if (track.level !== level || Number(track.day) !== day || track.coursebook !== true) return null;
-  if (!track.autoDiscovered && track.approved !== true) return null;
+  if (program === "swahili" ? track.language !== "Swahili" : !track.autoDiscovered && track.approved !== true) return null;
   const objectKey = String(track.objectKey || "");
   // A course Hören recording must never be mistaken for optional public music.
-  const prefix = `music/${level.toLowerCase()}/day-${String(day).padStart(2, "0")}/`;
+  const prefix = `${program === "swahili" ? "swahili/music/" + level : "music/" + level.toLowerCase()}/day-${String(day).padStart(2, "0")}/`;
   if (!objectKey.startsWith(prefix) || !/^[^/]+\.mp3$/.test(objectKey.slice(prefix.length))) return null;
   const url = new URL("https://www.falowen.app/api/music?track=" + encodeURIComponent(track.id));
   if (track.audioUrl !== url.href) return null;
@@ -28,14 +28,18 @@ export const normalizeWorkbookSong = (track, level, day) => {
     assignmentKey: String(track.assignmentKey || ""),
     audioUrl: url.href,
     autoDiscovered: track.autoDiscovered === true,
+    ...(program === "swahili" ? { language: "Swahili" } : {}),
   };
 };
 
-const listenLinkFor = (song) => song.autoDiscovered
+const listenLinkFor = (song) => song.language === "Swahili"
+  ? `https://music.falowen.app/song/${song.id}`
+  : song.autoDiscovered
   ? `https://music.falowen.app/?track=${encodeURIComponent(song.id)}`
   : `https://music.falowen.app/music/songs/${song.id}.html`;
 
-export default function WorkbookDayMusic({ level, day, title = "", workbookId = "", learningMode = "tutor", hideLegacyNotes = false, compact = false }) {
+export default function WorkbookDayMusic({ level, day, title = "", workbookId = "", learningMode = "tutor", hideLegacyNotes = false, compact = false, program = "german" }) {
+  const isSwahili = program === "swahili";
   const courseLevel = String(level || "").trim().toUpperCase();
   const lessonDay = Number(day);
   const valid = LEVELS.has(courseLevel) && Number.isInteger(lessonDay) && lessonDay >= 1 && lessonDay <= 28;
@@ -60,9 +64,9 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
     };
     setState("loading");
     Promise.allSettled([
-      getJson("/music/catalog.json"),
-      getJson("/api/music-library"),
-      getJson("/music/learning.json"),
+      getJson(isSwahili ? "/music/swahili-catalog.json" : "/music/catalog.json"),
+      isSwahili ? Promise.resolve(null) : getJson("/api/music-library"),
+      isSwahili ? Promise.resolve(null) : getJson("/music/learning.json"),
       getJson("/music/english-translations.json"),
       getJson("/music/covers/artwork-map.json"),
       getJson("/music/song-stories.json"),
@@ -75,7 +79,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
       const combined = new Map();
       const paths = new Set();
       for (const track of [...pinned, ...dynamic]) {
-        const song = normalizeWorkbookSong(track, courseLevel, lessonDay);
+        const song = normalizeWorkbookSong(track, courseLevel, lessonDay, program);
         if (!song || combined.has(song.id)) continue;
         if (song.objectKey && paths.has(song.objectKey)) continue;
         combined.set(song.id, song);
@@ -90,10 +94,10 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
         ? lessons.value.lessons : {});
       setTranslations(english.status === "fulfilled" && Array.isArray(english.value?.recordings)
         ? english.value : {recordings:[]});
-      setState(curated.status === "rejected" && discovered.status === "rejected" ? "error" : "ready");
+      setState(curated.status === "rejected" && (isSwahili || discovered.status === "rejected") ? "error" : "ready");
     }).catch(() => { if (!controller.signal.aborted) setState("error"); });
     return () => controller.abort();
-  }, [courseLevel, lessonDay, valid]);
+  }, [courseLevel, lessonDay, valid, isSwahili, program]);
 
   const chosen = useMemo(() => songs.find(song => song.id === selectedId) || null, [songs, selectedId]);
 
@@ -148,7 +152,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
           Music · {courseLevel} Day {lessonDay}
         </h2>
         <p style={{ color: "#475569", lineHeight: 1.7, margin: 0 }}>
-          Enjoy the song for this lesson and follow the German lyrics when available.
+          Enjoy the song for this lesson and follow the {isSwahili ? "Swahili" : "German"} lyrics when available.
           No answers, submission, AI marking, score or music-specific deadline are required.
           {courseLevel === "A1"
             ? (learningMode === "self"
@@ -196,7 +200,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
           {approvedLyrics ? (
             <details data-music-lyrics="true">
               <summary style={{ cursor: "pointer", fontWeight: 800, color: "#164e36" }}>
-                German lyrics · Mitlesen
+                {isSwahili ? "Swahili lyrics · Soma pamoja" : "German lyrics · Mitlesen"}
               </summary>
               <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
                 <label style={{ display: "inline-flex", alignItems: "center", gap: 9, color: "#245745",
@@ -224,7 +228,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
                         padding: "8px 10px", borderBottom: "1px solid #e2efe5",
                         borderRadius: 7, background: rawIndex % 2 ? "#fbfdfb" : "transparent",
                       }}>
-                      <div lang="de" style={{ fontSize: 16, lineHeight: 1.6, color: "#203c31", fontWeight: 650 }}>{de}</div>
+                      <div lang={isSwahili ? "sw" : "de"} style={{ fontSize: 16, lineHeight: 1.6, color: "#203c31", fontWeight: 650 }}>{de}</div>
                       {showEnglish && translation ? <div data-english-line="true" lang="en"
                         style={{ fontSize: 14, lineHeight: 1.55, color: "#5b7667", marginTop: 3 }}>
                         {translation}

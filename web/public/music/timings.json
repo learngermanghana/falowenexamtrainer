@@ -3,6 +3,236 @@
   "description": "Recording-specific line timings aligned locally against the published MP3s. Original songbook drafts remain separate; instrumental gaps have no active line.",
   "recordings": [
     {
+      "objectKey": "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
+      "lyrics": "Karibu, karibu nyumbani kwetu!\nMimi ni Jason, karibu kwetu!\nHii ni familia yangu,\nKaribu kuifahamu!\n[Chorus]\nHuyu ni nani? Anaitwa nani?\nAnafanya kazi gani?\nHuyu ni nani? Anaitwa nani?\nKaribu kufahamu familia yangu!\n[Baba]\nHuyu ni baba yangu.\nBaba yako anaitwa nani?\nBaba yangu anaitwa Daniel.\nAnafanya kazi gani?\nBaba yangu ni mhandisi.\nAnapenda kufanya nini?\nAnapenda kusoma vitabu.\nHuyu ni baba yangu!\n[Mama]\nHuyu ni mama yangu.\nMama yako anaitwa nani?\nMama yangu anaitwa Maria.\nAnafanya kazi gani?\nMama yangu ni mhadhiri.\nAnapenda kufanya nini?\nAnapenda kupika.\nHuyu ni mama yangu!\n[Chorus]\nHuyu ni nani? Anaitwa nani?\nAnafanya kazi gani?\nHuyu ni nani? Anaitwa nani?\nKaribu kufahamu familia yangu!\n[Kaka na dada]\nKaka yako anaitwa nani?\nKaka yangu anaitwa David.\nAna watoto wangapi?\nAna watoto wawili!\nDada yako anaitwa nani?\nDada yangu anaitwa Neema.\nDada yako anasoma nini?\nAnasoma sheria!\n[END]\nBaba na mama — wazazi wangu!\nKaka na dada — ndugu zangu!\nNinaipenda familia yangu,\nTunaishi kwa amani na upendo!\nFamilia yako ina watu wangapi?\nSasa ni zamu yako, tuambie!\nAsanteni kwa kuimba pamoja,\nTuonane tena, kwa herini!",
+      "cues": [
+        {
+          "start": 10.36,
+          "end": 13.82,
+          "text": "Karibu, karibu nyumbani kwetu!"
+        },
+        {
+          "start": 13.82,
+          "end": 20.34,
+          "text": "Mimi ni Jason, karibu kwetu!"
+        },
+        {
+          "start": 20.34,
+          "end": 24.1,
+          "text": "Hii ni familia yangu,"
+        },
+        {
+          "start": 24.3,
+          "end": 26.68,
+          "text": "Karibu kuifahamu!"
+        },
+        {
+          "start": 27.82,
+          "end": 32.48,
+          "text": "Huyu ni nani? Anaitwa nani?"
+        },
+        {
+          "start": 33.22,
+          "end": 37.14,
+          "text": "Anafanya kazi gani?"
+        },
+        {
+          "start": 38.02,
+          "end": 42.88,
+          "text": "Huyu ni nani? Anaitwa nani?"
+        },
+        {
+          "start": 42.88,
+          "end": 47.42,
+          "text": "Karibu kufahamu familia yangu!"
+        },
+        {
+          "start": 47.42,
+          "end": 50.38,
+          "text": "Huyu ni baba yangu."
+        },
+        {
+          "start": 50.82,
+          "end": 52.92,
+          "text": "Baba yako anaitwa nani?"
+        },
+        {
+          "start": 52.92,
+          "end": 55.84,
+          "text": "Baba yangu anaitwa Daniel."
+        },
+        {
+          "start": 56.1,
+          "end": 58.1,
+          "text": "Anafanya kazi gani?"
+        },
+        {
+          "start": 58.1,
+          "end": 60.74,
+          "text": "Baba yangu ni mhandisi."
+        },
+        {
+          "start": 61.34,
+          "end": 63.42,
+          "text": "Anapenda kufanya nini?"
+        },
+        {
+          "start": 63.42,
+          "end": 66.26,
+          "text": "Anapenda kusoma vitabu."
+        },
+        {
+          "start": 66.38,
+          "end": 68.66,
+          "text": "Huyu ni baba yangu!"
+        },
+        {
+          "start": 68.66,
+          "end": 71.26,
+          "text": "Huyu ni mama yangu."
+        },
+        {
+          "start": 71.76,
+          "end": 73.88,
+          "text": "Mama yako anaitwa nani?"
+        },
+        {
+          "start": 73.88,
+          "end": 76.7,
+          "text": "Mama yangu anaitwa Maria."
+        },
+        {
+          "start": 76.7,
+          "end": 79.1,
+          "text": "Anafanya kazi gani?"
+        },
+        {
+          "start": 79.1,
+          "end": 82.02,
+          "text": "Mama yangu ni mhadhiri."
+        },
+        {
+          "start": 82.02,
+          "end": 84.36,
+          "text": "Anapenda kufanya nini?"
+        },
+        {
+          "start": 84.88,
+          "end": 87.08,
+          "text": "Anapenda kupika."
+        },
+        {
+          "start": 87.08,
+          "end": 90.94,
+          "text": "Huyu ni mama yangu!"
+        },
+        {
+          "start": 90.94,
+          "end": 96.56,
+          "text": "Huyu ni nani? Anaitwa nani?"
+        },
+        {
+          "start": 96.56,
+          "end": 100.22,
+          "text": "Anafanya kazi gani?"
+        },
+        {
+          "start": 102.6,
+          "end": 105.72,
+          "text": "Huyu ni nani? Anaitwa nani?"
+        },
+        {
+          "start": 105.72,
+          "end": 110.54,
+          "text": "Karibu kufahamu familia yangu!"
+        },
+        {
+          "start": 110.54,
+          "end": 113.34,
+          "text": "Kaka yako anaitwa nani?"
+        },
+        {
+          "start": 113.34,
+          "end": 115.9,
+          "text": "Kaka yangu anaitwa David."
+        },
+        {
+          "start": 115.9,
+          "end": 118.46,
+          "text": "Ana watoto wangapi?"
+        },
+        {
+          "start": 119.22,
+          "end": 121.08,
+          "text": "Ana watoto wawili!"
+        },
+        {
+          "start": 121.08,
+          "end": 123.78,
+          "text": "Dada yako anaitwa nani?"
+        },
+        {
+          "start": 123.78,
+          "end": 126.68,
+          "text": "Dada yangu anaitwa Neema."
+        },
+        {
+          "start": 126.68,
+          "end": 129.14,
+          "text": "Dada yako anasoma nini?"
+        },
+        {
+          "start": 129.14,
+          "end": 131.78,
+          "text": "Anasoma sheria!"
+        },
+        {
+          "start": 131.78,
+          "end": 135.53,
+          "text": "Baba na mama — wazazi wangu!"
+        },
+        {
+          "start": 135.7,
+          "end": 138.28,
+          "text": "Kaka na dada — ndugu zangu!"
+        },
+        {
+          "start": 138.28,
+          "end": 140.9,
+          "text": "Ninaipenda familia yangu,"
+        },
+        {
+          "start": 140.9,
+          "end": 143.38,
+          "text": "Tunaishi kwa amani na upendo!"
+        },
+        {
+          "start": 143.38,
+          "end": 146.0,
+          "text": "Familia yako ina watu wangapi?"
+        },
+        {
+          "start": 146.0,
+          "end": 148.26,
+          "text": "Sasa ni zamu yako, tuambie!"
+        },
+        {
+          "start": 148.26,
+          "end": 151.32,
+          "text": "Asanteni kwa kuimba pamoja,"
+        },
+        {
+          "start": 151.32,
+          "end": 153.84,
+          "text": "Tuonane tena, kwa herini!"
+        }
+      ],
+      "timingStatus": "estimated",
+      "recordingSha256": "c6339965fd80e7729c5838a36cf4a2083919de852f10138e51b43551efd9a0d1",
+      "duration": 177.984,
+      "source": "Swahili Whisper word spans mapped to embedded lyrics; playback review pending"
+    },
+    {
       "trackId": "a2-day-18-bank",
       "objectKey": "music/a2/day-18/die-karte-funktioniert-nicht.mp3",
       "lyrics": "Heute möchte ich mit meiner Karte bezahlen.\nAber das Gerät zeigt einen Fehler.\nZu Hause rufe ich meine Bank an.\nEine Mitarbeiterin fragt nach dem Problem.\nGuten Tag, ich habe eine Frage.\nKönnen Sie mir bitte helfen?\nWir finden gemeinsam eine Lösung.\nWir finden gemeinsam eine Lösung.\nSie prüft meine Angaben am Telefon.\nDann erklärt sie mir den nächsten Schritt.\nIch soll die Karte noch einmal testen.\nAm Nachmittag klappt die Zahlung wieder.\nGuten Tag, ich habe eine Frage.\nKönnen Sie mir bitte helfen?\nWir finden gemeinsam eine Lösung.\nIch bedanke mich für die Hilfe.\nIch bedanke mich für die Hilfe.\nDas Problem ist endlich gelöst.\nBei Falowen übe ich schwierige Telefonate.",

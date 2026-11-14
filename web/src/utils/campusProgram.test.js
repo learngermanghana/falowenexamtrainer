@@ -30,8 +30,8 @@ describe("Falowen programme-aware Campus", () => {
     expect(getCampusProgram(null)).toBe("german");
   });
 
-  test("reuses the shared tab definitions, filtering German-only destinations for Kiswahili", () => {
-    expect(getProgramCampusTabs(tabs, swahili).map((tab) => tab.section)).toEqual(["course", "results", "account"]);
+  test("reuses the shared tab definitions, including resource tabs for Kiswahili", () => {
+    expect(getProgramCampusTabs(tabs, swahili).map((tab) => tab.section)).toEqual(["course", "music", "books", "vocab", "results", "account"]);
     expect(getProgramCampusTabs(tabs, german)).toBe(tabs);
     expect(tabs).toHaveLength(6);
   });
@@ -41,15 +41,15 @@ describe("Falowen programme-aware Campus", () => {
     const allowed = getProgramAllowedSections(sections, swahili);
     expect(allowed).toEqual(expect.objectContaining({
       course: true, account: true,
-      music: false, books: false, vocab: false,
-      results: true, attendance: false, classMembers: false, discussion: false,
+      music: true, books: true, vocab: true,
+      results: true, attendance: true, classMembers: true, discussion: true,
     }));
     expect(sections.music).toBe(true);
   });
 
   test("keeps Kiswahili on published course routes and outside German exams", () => {
     for (const route of ["/EXAMS/overview", "/campus/course/lesson/A1/1", "/campus/course/preview/A2",
-      "/campus/live-speak", "/campus/examFile", "/campus/music", "/attendance/class", "/tutor-marking"]) {
+      "/campus/live-speak", "/campus/examFile", "/attendance/class", "/tutor-marking"]) {
       expect(getProgramCourseRedirect({ pathname: route, studentProfile: swahili }))
         .toBe("/campus/course");
     }
