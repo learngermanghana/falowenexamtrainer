@@ -4,7 +4,8 @@
     "https://www.falowen.app/api/chatgpt"
   ],
   "scopes_supported": [
-    "falowen:read"
+    "falowen:read",
+    "falowen:practice:write"
   ],
   "resource_documentation": "https://www.falowen.app/help"
 }
