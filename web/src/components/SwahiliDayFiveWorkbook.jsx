@@ -8,9 +8,9 @@ import "./SwahiliCourseBook.css";
 
 const practice = {
   sprechen: ["Kuzungumza · Speaking", "Ask a partner: Una ndugu wangapi? (How many siblings do you have?)"],
-  schreiben: ["Kuandika · Writing", "Write three short sentences introducing members of your family."],
-  lesen: ["Kusoma · Reading", "Read: Huyu ni Asha. Ana kaka mmoja na dada wawili. How many sisters does Asha have?"],
-  hoeren: ["Kusikiliza · Listening", "Listen to the song in Music and write down one word you recognize."],
+  schreiben: ["Kuandika · Writing", "Introduce three members of your family. Give each person’s name and say what one person does or likes to do."],
+  lesen: ["Kusoma · Reading", "Huyu ni Asha. Ana kaka mmoja na dada wawili. Kaka yake anaitwa Juma. Answer: Asha ana dada wangapi? Kaka yake anaitwa nani?"],
+  hoeren: ["Kusikiliza · Listening", "Listen to the song in Music. Which family members do you hear? Listen again and write down one name and one job."],
   submit: ["Wasilisha · Submit", "The assignment will appear here when your tutor publishes it."],
 };
 
@@ -36,6 +36,11 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
           <h2>Sarufi · Grammar</h2>
           <p>Use <strong>huyu ni</strong> to introduce a person and <strong>nina</strong> to say what you have.</p>
           <p><strong>Huyu ni mama yangu.</strong> This is my mother. <strong>Nina kaka mmoja.</strong> I have one brother.</p>
+          <h3>Msamiati · Family words</h3>
+          <ul><li>mama · mother</li><li>baba · father</li><li>kaka · brother</li><li>dada · sister</li><li>wazazi · parents</li></ul>
+          <h3>Maswali · Questions</h3>
+          <p><strong>Huyu ni nani?</strong> Who is this? <strong>Anaitwa nani?</strong> What is their name?</p>
+          <p><strong>Anafanya kazi gani?</strong> What do they do for work?</p>
           {lesson.aiLecture ? <a href={lesson.aiLecture}>Watch AI lecture</a> : <p>The video lecture will appear here after upload.</p>}
         </>}
         {activity && <><h2>{activity[0]}</h2><p>{activity[1]}</p></>}

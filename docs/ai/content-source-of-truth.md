@@ -78,3 +78,5 @@ The separate `swahili/A1/day-05/` prefix is reserved for future Hören recording
 Falowen Music uses the same player for its German and Swahili tabs. Swahili tracks are registered in `web/public/music/swahili-catalog.json` and the exact public R2 music allowlist. The lyrics API supplies the existing recording lyrics and any later published timings.
 
 Swahili Day 5 uses the shared German-layout workbook music player and exact-key English translations. The bundled Swahili timing comes from recording-based word alignment and is labeled estimated until playback review. Campus Music opens the Swahili library for Swahili learners. Books, Vocabulary, Attendance, Class Members and Discussion use Swahili placeholders until their content is adapted.
+
+Kiswahili Days 1 and 6 use Review & Submit to show the learner’s actual writing and reading answers. Save & Review keeps a device-local draft keyed by learner and lesson. Final submission writes to the existing Swahili tutor queue; Day 5 stays practice-only until its assignment is supplied. Workbook navigation remains in the page on mobile.

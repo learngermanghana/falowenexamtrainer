@@ -60,7 +60,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
 
   it("opens Submit directly and can move back through workbook sections", () => {
     render(<MemoryRouter initialEntries={["/swahili/day-1?view=submit"]}><SwahiliCourseBook day={1} /></MemoryRouter>);
-    expect(screen.getByRole("tabpanel", { name: "Submit" })).toBeTruthy();
+    expect(screen.getByRole("tabpanel", { name: "Review & Submit" })).toBeTruthy();
     fireEvent.click(within(screen.getByRole("navigation", { name: "Workbook navigation" })).getByRole("button", { name: /Teil 4/ }));
     expect(screen.getByRole("tabpanel", { name: "Teil 4" })).toBeTruthy();
   });
@@ -113,7 +113,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(getMissingSwahiliDayOneWork({ writing: { vowels:"A E I O U", syllables:"ba be bi bo bu", words:"mama kiti kuku" }, readingAnswers: {mother:"mama",child:"mtoto",chair:"kiti",u:"kuku"} })).toEqual([]);
     expect(getMissingSwahiliDayOneWork({ writing: {}, readingAnswers: {} })).toEqual(expect.arrayContaining(["Teil 2 · Vokali", "Teil 3 · Kusoma"]));
     renderLesson();
-    openTab("Submit");
+    openTab("Review & Submit");
     expect(screen.getByText(/Ingia kwenye akaunti yako/)).toBeTruthy();
     expect(setDoc).not.toHaveBeenCalled();
   });
@@ -130,8 +130,11 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
       const questionGroup = document.querySelectorAll("fieldset")[index];
       fireEvent.click(within(questionGroup).getByLabelText(question.answer));
     });
-    openTab("Submit");
+    openTab("Review & Submit");
     await waitFor(() => expect(getDoc).toHaveBeenCalledTimes(2));
+    expect(screen.getByText("mama kiti kuku")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
+    expect(setDoc).not.toHaveBeenCalled();
     const button = screen.getByRole("button", { name: "Wasilisha kazi" });
     expect(button.disabled).toBe(false);
     fireEvent.click(button);
@@ -159,7 +162,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
       ? { exists: () => true, data: () => ({ status: "needs_revision", feedback: "Repeat the B syllables." }) }
       : { exists: () => true, data: () => ({}) });
     renderLesson();
-    openTab("Submit");
+    openTab("Review & Submit");
     expect(await screen.findByText("Repeat the B syllables.")).toBeTruthy();
     expect(screen.getAllByRole("tab")).toHaveLength(7);
   });
@@ -171,7 +174,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
       ? { exists: () => true, data: () => ({ feedback: "Old feedback", reviewedAt: { toMillis: () => 10 } }) }
       : { exists: () => true, data: () => ({ submittedAt: { toMillis: () => 20 } }) });
     renderLesson();
-    openTab("Submit");
+    openTab("Review & Submit");
     await screen.findByRole("button", { name: "Wasilisha tena" });
     expect(screen.queryByText("Old feedback")).toBeNull();
   });

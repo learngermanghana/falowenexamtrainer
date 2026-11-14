@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
@@ -9,12 +9,14 @@ import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import SwahiliCourseOverview from "./SwahiliCourseOverview";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
+import SwahiliReviewDraft, { useSwahiliReviewDraft } from "./SwahiliReviewDraft";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import "./SwahiliCourseBook.css";
 
 const LETTERS = ["A", "E", "I", "O", "U"];
-const TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
+const TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.map((tab) =>
+  tab.key === "submit" ? { ...tab, label: "Review & Submit" } : tab);
 const TAB_DESCRIPTIONS = {
   references: "Hiari",
   grammar: "Matamshi",
@@ -67,6 +69,7 @@ function DayOneContent({
   submitting,
   submissionResult,
   submitWork,
+  draft,
   previouslySubmitted,
   teacherReview,
 }) {
@@ -244,27 +247,22 @@ function DayOneContent({
   const missing = getMissingSwahiliDayOneWork({ writing, readingAnswers });
   const isReady = missing.length === 0;
   return (
-    <section className="swahili-book__card swahili-book__activity" aria-label="Submit">
-      <h2>Submit · Wasilisha kazi ya Somo la 1</h2>
+    <section className="swahili-book__card swahili-book__activity" aria-label="Review & Submit">
+      <h2>Review &amp; Submit · Somo la 1</h2>
       <p>Kagua majibu yako kabla ya kuwasilisha. Teil 1 ni mazoezi ya darasani. Teil 4 ni ya hiari mpaka rekodi itakapopakiwa.</p>
-      <ul className="swahili-book__submit-summary">
-        <li>Teil 2 · Vokali: <strong>{writing.vowels || "Bado"}</strong></li>
-        <li>Teil 2 · Silabi: <strong>{writing.syllables || "Bado"}</strong></li>
-        <li>Teil 2 · Maneno: <strong>{writing.words || "Bado"}</strong></li>
-        <li>Teil 3 · Kusoma: <strong>{lesson.reading.filter((item) => readingAnswers[item.id]).length} / {lesson.reading.length} majibu</strong></li>
-        <li>Teil 4 · Kusikiliza: <strong>{Object.values(listeningAnswers).filter(Boolean).length} / {lesson.listening.length} majibu (hiari)</strong></li>
-      </ul>
+      <SwahiliReviewDraft writing={{ Vokali: writing.vowels, Silabi: writing.syllables, Maneno: writing.words }} questions={lesson.reading} reading={readingAnswers}
+        listening={listeningAnswers} draft={canSubmit ? draft : null} />
       {missing.length ? <p className="swahili-book__note" role="status">Kamilisha kwanza: {missing.join(" · ")}</p> : null}
       {!canSubmit ? (
         <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ya Kiswahili na ufungue Campus ili kuwasilisha. This public preview cannot submit work. <Link to="/login">Ingia</Link></p>
       ) : (
         <>
           <button className="swahili-book__button" type="button"
-            onClick={submitWork} disabled={!isReady || submitting || !db}>
+            onClick={submitWork} disabled={!isReady || submitting || !db || submissionResult?.type === "success"}>
             {submitting ? "Inahifadhi..." : previouslySubmitted ? "Wasilisha tena" : "Wasilisha kazi"}
           </button>
           {submissionResult?.type === "success" ? (
-            <p className="swahili-book__feedback" role="status">Kazi imehifadhiwa kwenye akaunti yako ya Falowen. Hakuna alama za moja kwa moja.</p>
+            <p className="swahili-book__feedback" role="status">Kazi imehifadhiwa kwenye akaunti yako ya Falowen. Imetumwa kwa mwalimu kwa ukaguzi.</p>
           ) : null}
           {submissionResult?.type === "error" ? <p className="swahili-book__error" role="alert">{submissionResult.message}</p> : null}
           {teacherReview && <div className="swahili-book__tile" role="status">
@@ -298,6 +296,14 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
   const [submissionVersion, setSubmissionVersion] = useState(0);
   const lesson = SWAHILI_DAY_ONE;
   const canSubmit = canSubmitSwahiliWorkbook({ user, studentProfile, preview });
+  const restoreDraft = useCallback((saved) => {
+    if (saved.writing) setWriting(saved.writing);
+    if (saved.readingAnswers) setReadingAnswers(saved.readingAnswers);
+    if (saved.listeningAnswers) setListeningAnswers(saved.listeningAnswers);
+  }, []);
+  const draft = useSwahiliReviewDraft(canSubmit ? user?.uid : null, day,
+    { writing, readingAnswers, listeningAnswers }, restoreDraft);
+
 
   useEffect(() => {
     setTeacherReview(null);
@@ -310,6 +316,12 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
       if (!active) return;
       const submission = work.status === "fulfilled" && work.value.exists() ? work.value : null;
       const review = feedback.status === "fulfilled" && feedback.value.exists() ? feedback.value.data() : null;
+      const previous = submission?.data();
+      if (previous) {
+        setWriting(current => Object.values(current).some(Boolean) ? current : previous.writing || current);
+        setReadingAnswers(current => Object.keys(current).length ? current : previous.readingAnswers || current);
+        setListeningAnswers(current => Object.keys(current).length ? current : previous.listeningAnswers || current);
+      }
       setPreviouslySubmitted(Boolean(submission));
       setTeacherReview(getCurrentSwahiliReview(submission?.data(), review));
     });
@@ -387,9 +399,14 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
           listeningAnswers={listeningAnswers} setListeningAnswers={(updater) => { setListeningAnswers(updater); setSubmissionResult(null); }}
           listeningChecked={listeningChecked} setListeningChecked={setListeningChecked}
           user={user} canSubmit={canSubmit} submitting={submitting} submissionResult={submissionResult}
-          submitWork={submitWork} previouslySubmitted={previouslySubmitted} teacherReview={teacherReview} />
+          submitWork={submitWork} draft={draft} previouslySubmitted={previouslySubmitted} teacherReview={teacherReview} />
       </div>
       <p className="swahili-book__muted swahili-book__spaced">Mazoezi haya ni ya kiwango cha mwanzo. {preview ? "Huu ni mfano wa kitabu cha kozi." : ""}</p>
+      {canSubmit && ["schreiben", "lesen", "hoeren"].includes(activeTab) && (
+        <button type="button" className="swahili-book__button" onClick={() => { draft.saveDraft(); setActiveTab("submit"); }}>
+          Save &amp; Review
+        </button>
+      )}
       <SwahiliWorkbookNavigation tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
     </main>
     </SwahiliWorkbookRadio>
