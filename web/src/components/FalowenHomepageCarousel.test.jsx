@@ -35,7 +35,7 @@ it.each([
 ])("features the music destination in the %s homepage carousel", (language, action) => {
   loadPublicClasses.mockResolvedValue([]);
   render(<Carousel language={language} />);
-  expect(screen.getAllByRole("button", { name:/^Show slide [0-9]+$/ })).toHaveLength(5);
+  expect(screen.getAllByRole("button", { name:/^Show slide [0-9]+$/ })).toHaveLength(6);
   fireEvent.click(screen.getByRole("button", { name:"Show slide 2" }));
   expect(screen.getByRole("link", { name:new RegExp(action) })).toHaveAttribute("href", "https://music.falowen.app/");
   expect(screen.getByText("Deutsch mit Musik")).toBeInTheDocument();
@@ -44,7 +44,7 @@ it.each([
   expect(screen.getByRole("link", { name:/test|Einstufungstest|test gratuit/i })).toBeInTheDocument();
 });
 
-it("keeps all five slides in a consistent viewport, including the compact mobile class preview", () => {
+it("keeps all six slides in a consistent viewport, including the compact mobile class preview", () => {
   loadPublicClasses.mockResolvedValue([]);
   render(<Carousel />);
   const carousel = screen.getByRole("region", { name: "Explore Falowen learning options" });
@@ -64,4 +64,14 @@ it("keeps all five slides in a consistent viewport, including the compact mobile
   expect(uniform).toContain(".falowen-carousel-courses .falowen-class-board-body dl > div:nth-child(n+3)");
   expect(uniform).toContain("height: 535px");
   expect(uniform).not.toContain("display: none; }\n  .falowen-carousel-courses .falowen-class-board-cta");
+});
+
+it("links the student ChatGPT learning guide from the sixth slide in all supported languages", () => {
+  loadPublicClasses.mockResolvedValue([]);
+  for (const language of ["en", "de", "fr"]) {
+    const view = render(<Carousel language={language} />);
+    fireEvent.click(screen.getAllByRole("button", { name: "Show slide 6" }).at(-1));
+    expect(screen.getByRole("link", { name: /ChatGPT/i })).toHaveAttribute("href", "/learn-german-with-chatgpt");
+    view.unmount();
+  }
 });
