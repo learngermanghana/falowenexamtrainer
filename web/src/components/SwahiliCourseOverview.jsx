@@ -95,7 +95,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
           <div data-a1-coursebook-hero-actions="true" className="course-book-hero-actions" style={book.heroActions}>
             {!preview && <Link style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }} to="/">← Back to Campus</Link>}
             <Link className="course-book-continue-button" style={primaryLink} to={lessonPath(next)}>{nextLabel}</Link>
-            <button className="course-book-submit-secondary" type="button" style={{ ...styles.secondaryButton, minHeight: 44 }} aria-haspopup="dialog" onClick={showSubmit}>Submit work</button>
+            <button className="course-book-submit-secondary" type="button" style={{ ...styles.secondaryButton, minHeight: 44 }} aria-haspopup="dialog" onClick={showSubmit}>Review &amp; Submit</button>
           </div>
         </div>
         <div className="course-book-quick-stats" style={book.statGrid}>
@@ -158,7 +158,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
                     <span style={book.chip}>{badge}</span>
                   </div>
                   <div className="course-book-included" style={book.includedRow}>
-                    {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", "Submit"].map((label) =>
+                    {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", "Review & Submit"].map((label) =>
                       <span key={label} style={book.includedChip}>{label}</span>)}
                   </div>
                   {record?.review === "needs_revision" && (
@@ -185,10 +185,6 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
         );
       })}
 
-      <nav className="course-book-mobile-actions swahili-course-actions" aria-label="Course Book actions">
-        <Link to={lessonPath(next)}>Continue</Link>
-        <button type="button" aria-haspopup="dialog" onClick={showSubmit}>Submit</button>
-      </nav>
       <dialog className="swahili-submit-dialog" ref={submitDialog} aria-labelledby="swahili-submit-title">
         <div style={book.submitPanelHeader}>
           <h3 id="swahili-submit-title">Submit your workbook answers</h3>
