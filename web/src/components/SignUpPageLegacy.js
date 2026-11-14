@@ -94,7 +94,7 @@ const staticClassOptions = (now) => Object.keys(classCatalog)
     source: "static",
   }));
 
-const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
+const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { i18n, t } = useTranslation();
   const fxQuote = useFalowenUsdGhsRate();
@@ -116,16 +116,22 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const requestedSignup = useMemo(() => signupQueryContext(), []);
-  const [selectedLevel, setSelectedLevel] = useState(
+  const [program, setProgram] = useState(initialProgram === "swahili" ? "swahili" : "german");
+  const isSwahili = program === "swahili";
+  const [germanLevel, setSelectedLevel] = useState(
     requestedSignup.level || "A1"
   );
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [address, setAddress] = useState("");
-  const [learningMode, setLearningMode] = useState("");
+  const [germanMode, setLearningMode] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
-  const [paymentOption, setPaymentOption] = useState("trial");
-  const [selectedClass, setSelectedClass] = useState(loadPreferredClass() || "");
+  const [germanPayment, setPaymentOption] = useState("trial");
+  const [germanClass, setSelectedClass] = useState(loadPreferredClass() || "");
+  const selectedLevel = isSwahili ? "A1" : germanLevel;
+  const learningMode = isSwahili ? "Online" : germanMode;
+  const selectedClass = isSwahili ? "" : germanClass;
+  const paymentOption = isSwahili ? "trial" : germanPayment;
   const [publicClasses, setPublicClasses] = useState([]);
   const [publicClassesLoaded, setPublicClassesLoaded] = useState(false);
   const [hasConsented, setHasConsented] = useState(false);
@@ -212,14 +218,14 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
   }, [filteredClassOptions, publicClassesLoaded, selectedClass]);
 
   useEffect(() => {
-    if (!publicClassesLoaded || selectedClass || typeof window === "undefined") return;
+    if (isSwahili || !publicClassesLoaded || selectedClass || typeof window === "undefined") return;
     const requested = new URLSearchParams(window.location.search).get("class");
     const requestedName = requested ? findPublicClassName(publicClasses, requested) : "";
     if (requestedName) setSelectedClass(requestedName);
-  }, [publicClasses, publicClassesLoaded, selectedClass]);
+  }, [isSwahili, publicClasses, publicClassesLoaded, selectedClass]);
 
   useEffect(() => {
-    if (!requestedSignup.enquiry || !requestedSignup.level) return;
+    if (isSwahili || !requestedSignup.enquiry || !requestedSignup.level) return;
     if (selectedLevel !== requestedSignup.level) {
       setSelectedLevel(requestedSignup.level);
       return;
@@ -238,6 +244,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
     if (preferred?.value) setSelectedClass(preferred.value);
   }, [
     filteredClassOptions,
+    isSwahili,
     requestedSignup,
     selectedClass,
     selectedLevel,
@@ -297,7 +304,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
   const continueStep = () => {
     const issues = step === 1 ? accountIssues() : {
       ...(!learningMode ? { learningMode: "Choose how you plan to learn." } : {}),
-      ...(!selectedClass ? { selectedClass: "Choose a class that fits your schedule." } : {}),
+      ...(!isSwahili && !selectedClass ? { selectedClass: "Choose a class that fits your schedule." } : {}),
     };
     if (showStepError(issues)) return;
     setAuthError("");
@@ -397,7 +404,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
         "Use your full name (first and last). This will appear on certificates and transcripts.";
     }
 
-    if (!selectedClass) {
+    if (!isSwahili && !selectedClass) {
       validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
     }
 
@@ -447,18 +454,18 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
 
     setLoading(true);
     try {
-      const tuitionFee = tuitionSummary.tuitionFee;
+      const tuitionFee = isSwahili ? null : tuitionSummary.tuitionFee;
       // IMPORTANT: don't mark money as paid until the Paystack webhook confirms it.
       const intendedPaymentAmount = paymentOption === "trial"
         ? 0
         : Math.max(Number(numericInitialPayment) || 0, 0);
       const paidAmount = 0;
-      const balanceDue = Math.max(Number(tuitionFee) || 0, 0);
+      const balanceDue = isSwahili ? null : Math.max(Number(tuitionFee) || 0, 0);
       const paymentStatus = "pending";
       const studentCode = generateStudentCode({ name: cleanedName });
       // Store the base Paystack link, but create the actual checkout URL on-demand
       // via the backend so we can validate amounts and attach clear metadata.
-      const paystackLink = paystackLinkForLevel(selectedLevel);
+      const paystackLink = isSwahili ? "" : paystackLinkForLevel(selectedLevel);
       const immediateCheckoutLink =
         paymentOption !== "trial" && paymentsEnabled
           ? buildPaystackCheckoutLink({
@@ -486,7 +493,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
         address: cleanedAddress,
         learningMode,
         emergencyContactPhone: cleanedEmergencyPhone,
-        program: "german",
+        program,
         initialPaymentAmount: paidAmount,
         tuitionFee,
         balanceDue,
@@ -505,7 +512,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
         await onAccountCreated?.({
           studentCode: signupReceipt?.studentCode || studentCode,
           name: cleanedName, email: cleanedEmail, phone: cleanedPhone,
-          level: selectedLevel, className: selectedClass, learningMode,
+          level: selectedLevel, className: selectedClass, learningMode, program,
         });
       } catch (eventError) {
         console.warn("Completed signup lead could not be recorded", eventError);
@@ -524,7 +531,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
         paymentOption === "trial"
           ? "No payment was required to start your trial."
           : `You selected ${formatMoney(intendedPaymentAmount)} as your intended payment.`;
-      const paymentInstruction =
+      const paymentInstruction = isSwahili ? "Open Campus to start your Kiswahili workbook." :
         paymentOption === "trial"
           ? "You can pay at any time from Account & Billing."
           : paymentsEnabled
@@ -577,7 +584,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
           )}
         </div>
         <p style={{ ...styles.helperText, marginTop: -2 }}>
-          {t("signup.interfaceNote", { program: t("signup.programs.german") })}
+          {t("signup.interfaceNote", { program: t(`signup.programs.${program}`) })}
         </p>
         <div
           style={{
@@ -602,7 +609,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
             </p>
             <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>Start strong. Learn with confidence.</h3>
             <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
-              Three simple steps to get ready. Choose a 7-day trial or pay immediately, then start learning with Falowen.
+              {isSwahili ? t("signup.swahiliTrial") : "Three simple steps to get ready. Choose a 7-day trial or pay immediately, then start learning with Falowen."}
             </p>
           </div>
         </div>
@@ -728,6 +735,15 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
 
           </fieldset>
           <fieldset aria-label="Your learning" disabled={step !== 2 || loading} hidden={step !== 2} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 2 ? "grid" : "none", gap: 12 }}>
+          <label htmlFor="signup-program" style={styles.label}>{t("signup.courseLanguage")}</label>
+          <select id="signup-program" name="program" style={styles.select} value={program}
+            onChange={(event) => { setProgram(event.target.value); setFieldErrors({}); setAuthError(""); }}>
+            <option value="german">{t("signup.programs.german")}</option>
+            <option value="swahili">{t("signup.programs.swahili")}</option>
+          </select>
+          {isSwahili ? (
+            <p style={styles.helperText}>{t("signup.swahiliTrial")}</p>
+          ) : <>
           <label htmlFor="signup-selectedLevel" style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
           <select
             required
@@ -952,6 +968,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
             title="Tuition summary"
             description={`For ${selectedLevel} tuition is ${formatMoney(tuitionSummary.tuitionFee)}${approximateUsd(tuitionSummary.tuitionFee, fxQuote) ? ` (≈ ${approximateUsd(tuitionSummary.tuitionFee, fxQuote)} USD)` : ""}. You may begin with the 7-day trial or choose immediate Paystack payment above.`}
           />
+          </>}
 
           </fieldset>
           <fieldset aria-label="Contact details" disabled={step !== 3 || loading} hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 3 ? "grid" : "none", gap: 12 }}>
@@ -1120,7 +1137,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
             {loading ? t("signupPage.actions.creating") : "Create account & start 7-day trial"}
           </button>
           <p style={{ ...styles.helperText, margin: "-4px 0 0", textAlign: "center" }}>
-            Start your 7-day trial without payment, or pay immediately after signup if you prefer.
+            {isSwahili ? t("signup.swahiliTrial") : "Start your 7-day trial without payment, or pay immediately after signup if you prefer."}
           </p>
           </> : null}
         </form>

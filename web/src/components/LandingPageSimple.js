@@ -36,8 +36,8 @@ const COPY = {
     footerCourseLevels: "German courses by level", footerGoetheLevels: "Goethe-style preparation by level",
     contact: "Questions? Chat with us on WhatsApp",
     featureCopy: {},
-    metaTitle: "Falowen | German A1–C2, Live Classes, AI & Goethe-Style Mocks",
-    metaDescription: "Learn German from A1 to C2 with live classes or self-learning, recorded teacher lectures, AI-supported practice, tutor support and Goethe-style sample and mock exams on Falowen.",
+    metaTitle: "Falowen | Learn German and Swahili Online",
+    metaDescription: "Learn German A1–C2 with live classes and exam practice, or start Swahili with the online A1 Course Book. Choose your language when you sign up for Falowen.",
   },
   de: {
     language: "Sprache", login: "Anmelden", signup: "Registrieren", returning: "Schon registriert?",
@@ -71,8 +71,8 @@ const COPY = {
       class: ["Lerne im Live-Kurs", "Lerne mit Lehrkräften, erhalte Feedback und sieh dir aufgezeichnete Lektionen erneut an.", "Live-Kurse ansehen"],
       self: ["Lerne in deinem Tempo", "Lerne selbstständig mit Arbeitsheften, Unterrichtsaufzeichnungen, KI-Übungen und Unterstützung.", "Selbstständig starten"],
     },
-    metaTitle: "Falowen | Deutsch A1–C2 mit Live-Kursen und KI",
-    metaDescription: "Deutsch A1–C2 mit Falowen: Live-Kurse, Selbstlernen, aufgezeichnete Lektionen, KI-Übungen, Tutor-Feedback und Goethe-orientierte Probeprüfungen.",
+    metaTitle: "Falowen | Deutsch und Kiswahili online lernen",
+    metaDescription: "Lerne Deutsch von A1 bis C2 mit Live-Kursen und Prüfungstraining oder starte mit dem Online-Kursbuch Kiswahili A1.",
   },
   fr: {
     language: "Langue", login: "Se connecter", signup: "S'inscrire", returning: "Déjà inscrit ?",
@@ -106,8 +106,8 @@ const COPY = {
       class: ["Apprenez en classe", "Suivez des cours avec un enseignant, obtenez des corrections et revoyez les leçons enregistrées.", "Voir les cours"],
       self: ["Apprenez à votre rythme", "Étudiez en autonomie avec des cahiers, cours enregistrés, exercices avec IA et aide humaine.", "Étudier en autonomie"],
     },
-    metaTitle: "Falowen | Allemand A1–C2, cours en direct, IA et examens blancs",
-    metaDescription: "Apprenez l'allemand A1–C2 avec Falowen : cours en direct ou autonomes, vidéos enregistrées, exercices assistés par IA et préparation aux examens de type Goethe.",
+    metaTitle: "Falowen | Apprendre l’allemand et le swahili en ligne",
+    metaDescription: "Apprenez l’allemand du niveau A1 au C2 avec des cours en direct et des exercices d’examen, ou commencez le swahili avec le cahier A1 en ligne.",
   },
 };
 
@@ -161,8 +161,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
     }
   };
 
-  const resolvedProgram = "german";
-  const signup = () => onSignUp?.(resolvedProgram);
+  const signup = () => onSignUp?.();
   const login = () => onLogin?.();
 
   return (

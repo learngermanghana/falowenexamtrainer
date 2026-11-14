@@ -110,6 +110,24 @@ const SetupCheckpoint = () => {
       }).format(new Date(trialState.purgeAtMs))
     : "";
 
+  if (studentProfile?.program === "swahili" && !(studentProfile.tuitionFee > 0)) {
+    return (
+      <main style={styles.container}>
+        <section style={styles.card}>
+          <h2>Kiswahili workbook access</h2>
+          {trialWasUsed ? <p>Contact Falowen admissions for continued access to your Kiswahili workbook.</p> : (
+            <button style={styles.primaryButton} onClick={handleStartTrial} disabled={startingTrial}>
+              Start 7-day free trial
+            </button>
+          )}
+          <p>Student code: {studentProfile.studentCode}</p>
+          {status && <p role="status">{status}</p>}
+          <button style={styles.secondaryButton} onClick={logout}>Logout</button>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
       <div style={{ ...styles.card, width: "100%", maxWidth: 920, display: "grid", gap: 12 }}>

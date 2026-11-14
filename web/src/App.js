@@ -391,8 +391,8 @@ function App() {
   );
 
   const defaultCampusSection = useMemo(
-    () => getPreferredSection(allowedSections, savedSection, tabStructure),
-    [allowedSections, savedSection, tabStructure]
+    () => studentProfile?.program === "swahili" ? "course" : getPreferredSection(allowedSections, savedSection, tabStructure),
+    [allowedSections, savedSection, tabStructure, studentProfile?.program]
   );
 
   const paymentStatus = useMemo(
@@ -609,14 +609,7 @@ function App() {
     if (authMode === "landing") {
       return (
         <LandingPage
-          program={signupProgram}
-          onProgramSelect={() => setSignupProgram("german")}
-          onSignUp={(program) => {
-            const nextProgram = "german";
-            setSignupProgram(nextProgram);
-            setAuthMode("signup");
-            navigate(`/signup?program=${encodeURIComponent(nextProgram)}`);
-          }}
+          onSignUp={() => navigate("/signup")}
           onLogin={() => {
             setAuthMode("login");
             navigate("/login/");
@@ -792,6 +785,10 @@ const AppShell = ({
 
   if (requiresOnboarding && !isOnboarding) {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  if (studentProfile?.program === "swahili" && allowedSections.course && location.pathname === "/") {
+    return <Navigate to="/campus/course" replace />;
   }
 
   if (!requiresOnboarding && isOnboarding) {

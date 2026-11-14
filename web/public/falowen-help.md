@@ -58,7 +58,7 @@ Do **not** tell learners to look for **"My Library"**, **"Learning Hub"**, or **
 ## New learner journey
 
 1. If the learner does not know their German level, send them to the **Placement Test**.
-2. If they know their level, send them to the **German signup** page. Falowen currently offers German courses only.
+2. For German learners who know their level, use the signup page. Kiswahili learners use the same page and choose **Swahili (Kiswahili)** in the learning step to start the online A1 workbook trial.
 3. If they already registered, send them to **Log in**.
 4. After signup, a learner without active access reaches the setup checkpoint. They can start the one-time **7-day free trial** or complete tuition payment.
 5. Once access is active, a new student completes onboarding.

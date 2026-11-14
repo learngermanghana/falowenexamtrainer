@@ -231,8 +231,11 @@
     }
   },
   "signup": {
+    "courseLanguage": "Welche Sprache möchtest du lernen?",
+    "swahiliTrial": "Beginne deine siebentägige Testphase mit dem Kiswahili-Online-Arbeitsbuch für A1.",
     "interfaceNote": "Dieses Programm unterrichtet {{program}}. Die Benutzeroberfläche ist auf Englisch verfügbar.",
     "programs": {
+      "swahili": "Swahili (Kiswahili)",
       "german": "Deutsch",
       "french": "Französisch"
     }
