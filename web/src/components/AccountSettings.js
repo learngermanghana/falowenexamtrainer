@@ -33,6 +33,7 @@ const COURSE_COMPLETION_UPGRADE_LEVELS = new Set(["A1", "A2", "B1"]);
 const AccountSettings = () => {
   const { user, studentProfile, saveStudentProfile, refreshStudentProfile } = useAuth();
   const { i18n, t } = useTranslation();
+  const isSwahili = studentProfile?.program === "swahili";
   const fxQuote = useFalowenUsdGhsRate();
   const usdBelow = (value) => {
     const estimated = approximateUsd(value, fxQuote);
@@ -54,14 +55,14 @@ const AccountSettings = () => {
     error: courseCompletionError,
     refresh: refreshCourseCompletion,
   } = useCourseCompletionProgress({
-    studentProfile,
-    user,
-    level: studentProfile?.level,
+    studentProfile: isSwahili ? null : studentProfile,
+    user: isSwahili ? null : user,
+    level: isSwahili ? "" : studentProfile?.level,
   });
   const location = useLocation();
   const navigate = useNavigate();
   const requestedTab = new URLSearchParams(location.search).get("tab");
-  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab)
+  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab) && !(isSwahili && ["participation", "upgrade"].includes(requestedTab))
     ? requestedTab
     : "studentData";
 
@@ -686,7 +687,7 @@ const AccountSettings = () => {
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/results")}>Results</button>
             <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/attendance")}>Attendance</button>
-            <button type="button" style={styles.secondaryButton} onClick={() => selectAccountTab("participation")}>Class Participation</button>
+            {!isSwahili && <button type="button" style={styles.secondaryButton} onClick={() => selectAccountTab("participation")}>Class Participation</button>}
             <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course")}>Course Book</button>
           </div>
         </div>
@@ -701,7 +702,7 @@ const AccountSettings = () => {
           { key: "billing", label: t("accountSettings.tabs.billing") },
           { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
           { key: "deleteAccount", label: "Delete account" },
-        ].map((tab) => (
+        ].filter(tab => !isSwahili || tab.key !== "upgrade").map((tab) => (
           <button
             key={tab.key}
             type="button"

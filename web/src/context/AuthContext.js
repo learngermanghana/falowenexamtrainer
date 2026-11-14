@@ -1,3 +1,4 @@
+import { courseProfile, enrolledCourses } from "../utils/courseEnrollment";
 import { ReadingStudentContext } from "../services/savedReadingPhrases";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -1150,10 +1151,29 @@ export const AuthProvider = ({ children }) => {
     [studentProfile]
   );
 
+  const courseOptions = useMemo(() => enrolledCourses(studentProfile), [studentProfile]);
+  const courseKey = `falowen:course:${user?.uid}`;
+  const [selection, setSelection] = useState(null);
+  const linkedCourse = typeof window !== "undefined" && /^#swahili-day-/.test(window.location.hash)
+    && window.location.pathname === "/campus/results" && courseOptions.includes("swahili") ? "swahili" : null;
+  const preferred = linkedCourse || (selection?.key === courseKey ? selection.program :
+    typeof window !== "undefined" && window.sessionStorage.getItem(courseKey));
+  useEffect(() => {
+    if (linkedCourse && user?.uid) window.sessionStorage.setItem(courseKey, linkedCourse);
+  }, [linkedCourse, user?.uid, courseKey]);
+  const activeProfile = useMemo(() => courseProfile(studentProfile, preferred), [studentProfile, preferred]);
+  const selectCourse = useCallback(program => {
+    if (!courseOptions.includes(program)) return;
+    window.sessionStorage.setItem(courseKey, program);
+    setSelection({ key: courseKey, program });
+  }, [courseKey, courseOptions]);
+
   const value = useMemo(
     () => ({
       user,
-      studentProfile,
+      studentProfile: activeProfile,
+      courseOptions,
+      selectCourse,
       idToken,
       loading,
       authError,
@@ -1172,7 +1192,9 @@ export const AuthProvider = ({ children }) => {
     }),
     [
       user,
-      studentProfile,
+      activeProfile,
+      courseOptions,
+      selectCourse,
       idToken,
       loading,
       authError,
@@ -1191,7 +1213,7 @@ export const AuthProvider = ({ children }) => {
   );
 
   return <AuthContext.Provider value={value}>
-    <ReadingStudentContext.Provider value={user?.uid}>{children}</ReadingStudentContext.Provider>
+    <ReadingStudentContext.Provider key={activeProfile?.program || "german"} value={user?.uid}>{children}</ReadingStudentContext.Provider>
   </AuthContext.Provider>;
 };
 

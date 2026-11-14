@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import './index.css';
 import './goetheFreeChatMobile.css';
 import './i18n';
@@ -39,7 +39,8 @@ import A1SpeakingExamIntroEntryRoute, {
 import A2Day27DigitaleKommunikationGrammarPage from './components/A2Day27DigitaleKommunikationGrammarPage';
 import { A1_CANONICAL_LESSON_CATALOG } from './data/a1CanonicalLessonCatalog';
 import reportWebVitals from './reportWebVitals';
-import { AuthProvider } from './context/AuthContext';
+import { getProgramCourseRedirect } from './utils/campusProgram';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 
 const normalizedPublicPath = window.location.pathname.replace(/\/+$/, '') || '/';
@@ -59,12 +60,26 @@ const AppMountedSignal = () => {
   return null;
 };
 
+// Some German workbook routes mount directly, outside App's normal route guard.
+function CourseRouteBoundary({ children }) {
+  const { studentProfile, loading } = useAuth();
+  const { pathname } = useLocation();
+  if (!pathname.startsWith('/campus/course/')) return children;
+  if (loading) return null;
+  if (!studentProfile) return children;
+  const role = String(studentProfile?.role || '').toLowerCase();
+  const redirect = getProgramCourseRedirect({ pathname, studentProfile,
+    isStaff: ['admin', 'tutor'].includes(role) || studentProfile?.isTutor === true });
+  return redirect ? <Navigate to={redirect} replace /> : children;
+}
+
 const AuthenticatedAppRoutes = () => (
   <>
     <PublicAuthRouteBridge />
     <PublicAuthMobileRecovery />
     <A1Day13RevisionNumberCleanup />
     <AuthProvider>
+      <CourseRouteBoundary>
       <ToastProvider>
         <A1ChapterSpecificLessonRouteBoundary>
           <RouteScopedAppServices />
@@ -114,6 +129,7 @@ const AuthenticatedAppRoutes = () => (
           </Routes></MockOnlyRouteBoundary>
         </A1ChapterSpecificLessonRouteBoundary>
       </ToastProvider>
+      </CourseRouteBoundary>
     </AuthProvider>
   </>
 );

@@ -86,3 +86,7 @@ Kiswahili Days 1 and 6 use Review & Submit to show the learner’s actual writin
 German Campus Results loads the learner-owned reference snapshot when the learner opens result details. Legacy results continue to support their existing links.
 
 Kiswahili Campus Results shows the reference snapshot attached by Admin to the current published tutor review. The result email links to the relevant Day 1 or Day 6 result.
+
+### German and Swahili enrollment
+
+Admin keeps the primary programme and placement in the existing student fields. An active second course is identified by `secondaryProgram` and uses its own level and class in `coursePlacements[secondaryProgram]`. Retained placements do not grant access. Campus selects an enrolled course for the current browser tab. German results and Swahili tutor reviews keep their existing identifiers, stores and publication workflows. Deploy the learner Firestore rules and Campus switch, then the Admin profile API, Swahili result worker and Admin editor before assigning dual enrollment.

@@ -1,3 +1,4 @@
+import { courseProfile } from "../utils/courseEnrollment";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { collection, db, getDocs, isFirebaseConfigured, query, where } from "../firebase";
@@ -51,11 +52,20 @@ const ClassMembersTab = () => {
         where("className", "==", studentProfile.className),
         ...(program === "swahili" ? [where("program", "==", "swahili")] : [])
       );
-      const snapshot = await getDocs(q);
-      const nextMembers = snapshot.docs.filter(entry => getCampusProgram(entry.data()) === program).map((docSnapshot) => {
-        const data = docSnapshot.data();
+      const [primary, secondary] = await Promise.all([
+        getDocs(q),
+        getDocs(query(studentsRef, where(`coursePlacements.${program}.className`, "==", studentProfile.className))),
+      ]);
+      const roster = new Map(primary.docs.filter(entry => getCampusProgram(entry.data()) === program).map(entry => [entry.id, entry.data()]));
+      for (const entry of secondary.docs) {
+        const raw = entry.data();
+        if (raw.secondaryProgram !== program) continue;
+        const member = courseProfile(raw, program);
+        if (member.level === studentProfile.level) roster.set(entry.id, member);
+      }
+      const nextMembers = Array.from(roster, ([id, data]) => {
         return {
-          id: docSnapshot.id,
+          id,
           name: data.name || data.email || "Student",
           email: data.email || "",
           biography: data.biography || "",
