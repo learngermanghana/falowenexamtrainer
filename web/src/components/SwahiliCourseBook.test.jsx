@@ -78,7 +78,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(tabs[6]).toContain("Submit");
     expect(document.querySelector("[data-workbook-tab-navigation]")).toBeTruthy();
     openTab("Music");
-    expect(screen.getByText(/Rekodi ya muziki bado haijapakiwa/)).toBeTruthy();
+    expect(document.querySelector('[data-music-level="SWAHILI"][data-music-day="1"]')).toBeTruthy();
     expect(document.querySelector("audio")).toBeNull();
     openTab("Grammar");
     expect(screen.getByText(/Grammar · Sarufi na matamshi/)).toBeTruthy();

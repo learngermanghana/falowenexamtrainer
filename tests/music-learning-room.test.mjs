@@ -124,7 +124,7 @@ test('existing static share pages and dynamic songs retain common learning playe
 test('level shelves show available songs and new uploads require no site build', () => {
   const js=file('web/public/music/app.js');
   assert.match(js,/songs.slice\(0, 4\)/);
-  assert.match(js,/const available = \["A1","A2","B1","B2","C1","C2"\]/);
+  assert.match(js,/const available = \["A1","A2","B1","B2","C1","C2","SWAHILI"\]/);
   assert.doesNotMatch(js,/No song yet/);
   assert.match(js,/\/api\/music-library/);
   assert.match(js,/byId\("refresh-music"\)/);

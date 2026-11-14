@@ -8,7 +8,7 @@ import { matchingEnglishTranslation, matchingTranscriptEnglishTranslation } from
 // Uploads to music/<level>/day-XX/ are discovered through the existing
 // bounded server-side R2 music-list endpoint, not direct browser R2 access.
 const SONG_ID = /^[a-zA-Z0-9_-]{1,245}$/;
-const LEVELS = new Set(["A1", "A2", "B1"]);
+const LEVELS = new Set(["A1", "A2", "B1", "SWAHILI"]);
 
 export const normalizeWorkbookSong = (track, level, day) => {
   if (!track || !SONG_ID.test(String(track.id || ""))) return null;
@@ -17,7 +17,7 @@ export const normalizeWorkbookSong = (track, level, day) => {
   const objectKey = String(track.objectKey || "");
   // A course Hören recording must never be mistaken for optional public music.
   const prefix = `music/${level.toLowerCase()}/day-${String(day).padStart(2, "0")}/`;
-  if (!objectKey.startsWith(prefix) || !/^[^/]+\.mp3$/.test(objectKey.slice(prefix.length))) return null;
+  if (!objectKey.startsWith(prefix) || !/^[^/]+\.mp3$/i.test(objectKey.slice(prefix.length))) return null;
   const url = new URL("https://www.falowen.app/api/music?track=" + encodeURIComponent(track.id));
   if (track.audioUrl !== url.href) return null;
   return {
@@ -148,13 +148,13 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
           Music · {courseLevel} Day {lessonDay}
         </h2>
         <p style={{ color: "#475569", lineHeight: 1.7, margin: 0 }}>
-          Enjoy the song for this lesson and follow the German lyrics when available.
+          Enjoy the song for this lesson and follow the {courseLevel === "SWAHILI" ? "Swahili" : "German"} lyrics when available.
           No answers, submission, AI marking, score or music-specific deadline are required.
           {courseLevel === "A1"
             ? (learningMode === "self"
               ? " Self-learning exercises and Radio are separate from Music."
               : " Tutor-marked assignments and their submission remain separate from Music.")
-            : " Assessed Teil 4 · Hören remains separate."}
+            : courseLevel === "SWAHILI" ? "" : " Assessed Teil 4 · Hören remains separate."}
         </p>
       </div>
 
@@ -196,7 +196,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
           {approvedLyrics ? (
             <details data-music-lyrics="true">
               <summary style={{ cursor: "pointer", fontWeight: 800, color: "#164e36" }}>
-                German lyrics · Mitlesen
+                {courseLevel === "SWAHILI" ? "Swahili lyrics" : "German lyrics · Mitlesen"}
               </summary>
               <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
                 <label style={{ display: "inline-flex", alignItems: "center", gap: 9, color: "#245745",

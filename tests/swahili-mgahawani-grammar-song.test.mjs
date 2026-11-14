@@ -36,7 +36,7 @@ test("Music tab contains the complete supplied lyrics, without a fake audio play
   assert.equal(MGAHAWANI_SONG.sections.reduce((n, section) => n + section.lines.length, 0), 48);
   assert.equal(MGAHAWANI_SONG.sections[0].lines[0], "Habari yako?");
   assert.equal(MGAHAWANI_SONG.sections.at(-1).lines.at(-1), "Asante sana, kwa heri!");
-  assert.match(song, /no song recording or synced lyric timings/);
+  assert.match(song, /WorkbookDayMusic level="SWAHILI" day=\{6\}/);
   assert.doesNotMatch(song, /<audio|<video|new Audio/);
 });
 
