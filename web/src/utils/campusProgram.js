@@ -23,12 +23,14 @@ export const getProgramAllowedSections = (sections, studentProfile) => {
 export const getProgramCourseRedirect = ({ pathname = "", studentProfile, isStaff = false } = {}) => {
   // Staff keep their existing cross-programme review and admin access.
   if (isStaff) return null;
-  const path = String(pathname).replace(/\/+$/, "");
+  const path = String(pathname).replace(/\/+$/, "").toLowerCase();
   if (getCampusProgram(studentProfile) === "swahili") {
-    if (path === "/exams" || path.startsWith("/exams/")) return "/campus/course";
-    if (path.startsWith("/campus/course/") &&
-        !/^\/campus\/course\/swahili\/day-(?:1|6)$/.test(path)) return "/campus/course";
-  } else if (path.startsWith("/campus/course/swahili/")) {
+    if (/^\/(exams|attendance|tutor-marking)(?:\/|$)/.test(path)) return "/campus/course";
+    if (path.startsWith("/campus/") &&
+        !/^\/campus\/(?:course(?:\/swahili\/day-(?:1|6))?|account)$/.test(path)) {
+      return "/campus/course";
+    }
+  } else if (/^\/campus\/course\/swahili(?:\/|$)/.test(path)) {
     return "/campus/course";
   }
   return null;
