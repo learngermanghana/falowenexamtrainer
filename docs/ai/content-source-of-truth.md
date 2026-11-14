@@ -71,4 +71,6 @@ Falowen Admin Marking → Swahili reads the existing Day 1 and Day 6 submissions
 
 ## Kiswahili A1 Day 5
 
-Kiswahili A1 Day 5 is a practice workbook at `/swahili/day-5` and `/campus/course/swahili/day-5`. Its registered recording is `swahili/A1/day-05/day-05.mp3`. Published lyric timing comes from the matching R2 sidecar. Day 5 has a lecture slot and is excluded from assignment progress until its assignment is published.
+Kiswahili A1 Day 5 is a practice workbook at `/swahili/day-5` and `/campus/course/swahili/day-5`. Its registered recording is `swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3`. Published lyric timing comes from the matching R2 sidecar. Day 5 has a lecture slot and is excluded from assignment progress until its assignment is published.
+
+The separate `swahili/A1/day-05/` prefix is reserved for future Hören recordings.
