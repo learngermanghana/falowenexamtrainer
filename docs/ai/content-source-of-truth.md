@@ -35,6 +35,8 @@ Run `node scripts/checkAiDocumentation.mjs`. It validates required sources, inte
 
 ## Kiswahili Course Book layout
 
+Kiswahili students signed into a profile with `program: "swahili"` who open `/swahili`, `/swahili/day-1` or `/swahili/day-6` are redirected to their corresponding **Campus** Course Book route. This deliberately reuses the same Falowen learner header, Campus navigation, account controls and logout as the German course rather than maintaining a separate Kiswahili site chrome. Direct lesson URLs retain query parameters (including the selected Submit tab). Public Kiswahili previews continue to work for visitors and for logged-in accounts in other programmes; these previews do not show personal progress or signed-in Campus controls. The redirect is performed only after the authentication session has resolved. No assignment IDs, submission records, lessons or German programme navigation are changed.
+
 The public Kiswahili preview and Campus Course Book use the German Course Book's shared styles, lesson search and filters, and mobile Continue/Submit controls. The Campus overview calculates progress from the signed-in learner's existing Day 1 and Day 6 submission documents and displays tutor review status from the corresponding teacher review records. A submission contributes to progress when saved. Reviews are qualitative, so the mastery slot displays the number reviewed. The public preview shows the published assignment count, first lesson and learning mode. Submit opens the selected workbook section through `?view=submit` and preserves the lesson's Radio opening. Both workbooks provide previous and next section controls.
 
 ## Kiswahili A1 Lesson 6 interactive grammar study — 13 November 2026

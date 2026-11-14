@@ -1,5 +1,6 @@
 import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import SwahiliDaySixWorkbook from "./components/SwahiliDaySixWorkbook";
+import { getSwahiliCampusRoute } from "./utils/swahiliCourseRoute";
 import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
@@ -436,9 +437,28 @@ function App() {
     !isStaff &&
     !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
 
-  // Public Day 1 preview is independent of German enrollment and Firebase sign-in.
+  // Visitors keep the public preview; authenticated Kiswahili learners enter
+  // the existing Campus shell (navigation, account settings and logout).
   const swahiliPreview = location.pathname.match(/^\/swahili(?:\/(day-(?:1|6)))?\/?$/);
   if (swahiliPreview) {
+    // Wait for Firebase to resolve the session so signed-in students never
+    // briefly see the public preview or lose their personal course progress.
+    if (isFirebaseConfigured && authLoading) {
+      return (
+        <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
+          <div style={styles.card}>{t("appStatus.authLoading")}</div>
+        </div>
+      );
+    }
+
+    const campusRoute = getSwahiliCampusRoute({
+      pathname: location.pathname,
+      search: location.search,
+      user,
+      studentProfile,
+    });
+    if (campusRoute) return <Navigate to={campusRoute} replace />;
+
     if (swahiliPreview[1] === "day-6") return <SwahiliDaySixWorkbook basePath="/swahili" preview />;
     return <SwahiliCourseBook day={swahiliPreview[1] === "day-1" ? 1 : null} basePath="/swahili" preview />;
   }
