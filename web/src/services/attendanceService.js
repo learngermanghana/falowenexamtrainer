@@ -36,7 +36,7 @@ const classStatusRank = (klass = {}) => {
   return 0;
 };
 
-const resolveAttendanceRoots = async (className = "") => {
+const resolveAttendanceRoots = async (className = "", program) => {
   const requested = normalizeValue(className);
   if (!requested || !db) return requested ? [requested] : [];
 
@@ -50,7 +50,7 @@ const resolveAttendanceRoots = async (className = "") => {
       .map((klass) => {
         const identities = classFields(klass).map(normalizeClassIdentity).filter(Boolean);
         const exact = identities.includes(target);
-        const score = (exact ? 100 : 0) + classStatusRank(klass);
+        const score = program === "swahili" ? (exact ? 100 + classStatusRank(klass) : 0) : (exact ? 100 : 0) + classStatusRank(klass);
         return { klass, score };
       })
       .filter((entry) => entry.score > 0)
@@ -197,7 +197,7 @@ export const fetchAttendanceRecords = async (options = {}) => {
   // or during the brief period before Firebase restores the signed-in user.
   if (auth && !auth.currentUser) return emptyAttendanceResult();
 
-  const roots = await resolveAttendanceRoots(options.className);
+  const roots = await resolveAttendanceRoots(options.className, options.program);
   if (!roots.length) return emptyAttendanceResult();
 
   const results = [];
