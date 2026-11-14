@@ -472,6 +472,19 @@ function featuredLegacyCourseBookSection(level, day) {
 async function callTool(name, args, student, admin) {
   const view = studentView(student);
 
+  // Kiswahili lessons use a separate teacher-approved source and must not
+  // silently fall through to a German A1/A2 course snapshot.
+  const isSwahiliStudent = ["swahili", "kiswahili"].includes(
+    normalize(student.data.program || student.data.languageProgram || "").toLowerCase());
+  if (isSwahiliStudent && (name === "get_my_falowen_study_plan" ||
+      name === "get_my_falowen_vocabulary_practice" ||
+      name === "get_my_falowen_grammar_writing_coach" ||
+      name === "get_my_falowen_speaking_partner" ||
+      name === "get_my_falowen_music_guide")) {
+    return { available: false, program: "swahili",
+      campusUrl: SITE + "/campus/course",
+      clarification: "Kiswahili lessons have a separate course book. Its approved content is not yet in this MCP export; open Falowen Campus. German practice material will not be substituted." };
+  }
   // New student coaching tools reuse the same student-level-scoped, answer-safe
   // snapshot and existing score summaries. No AI API calls or tracking writes.
   if (["get_my_falowen_vocabulary_practice", "get_my_falowen_grammar_writing_coach",
