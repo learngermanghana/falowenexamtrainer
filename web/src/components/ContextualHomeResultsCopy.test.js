@@ -5,9 +5,11 @@ const read = (name) => fs.readFileSync(path.join(__dirname, name), "utf8");
 
 test("home guidance directs learners toward real course and exam destinations", () => {
   const source = read("GeneralHome.js");
-  expect(source).toContain("Continue your current lesson, submit finished workbook answers, or open your results.");
+  expect(source).toContain("Open Course Book to see your current lesson and next step");
   expect(source).toContain("Choose an available mock or practise one exam skill");
-  expect(source).toContain("Continue in Campus");
+  expect(source).toContain("Open Campus");
+  expect(source).toContain("Connect ChatGPT as a study partner");
+  expect(source).toContain("https://chatgpt.com/plugins/plugin_asdk_app_6ae7660094648191b3f39f11008ade2a");
 });
 
 test("results copy distinguishes an empty record from an actual loading failure", () => {

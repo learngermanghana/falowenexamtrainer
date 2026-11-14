@@ -130,6 +130,23 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
         </button>
       </PrimaryActionBar>
     </section>
+
+    <section style={{ ...styles.card, gridColumn: "1 / -1", display: "grid", gap: 10 }}>
+      <SectionHeader
+        title="Falowen Learning Companion"
+        subtitle="Connect Falowen in ChatGPT to ask questions about your German lessons and get guided practice."
+      />
+      <PrimaryActionBar align="start">
+        <a
+          href="https://chatgpt.com/plugins/plugin_asdk_app_6ae7660094648191b3f39f11008ade2a"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ ...styles.primaryButton, textDecoration: "none" }}
+        >
+          Connect ChatGPT as a study partner
+        </a>
+      </PrimaryActionBar>
+    </section>
   </div>
 );
 

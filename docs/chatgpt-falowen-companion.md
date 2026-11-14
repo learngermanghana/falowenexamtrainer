@@ -6,6 +6,10 @@
 
 **Publisher action remains required.** For a published Falowen plugin, OpenAI keeps a reviewed tool snapshot: build a new version of the **existing** Falowen Learning Companion submission, rescan the unchanged MCP endpoint, submit for review and publish the approved version. Do not create a different plugin identity or say that nine tools are installed until the updated version is visible in a fresh ChatGPT conversation.
 
+### Open the companion from Falowen
+
+On the signed-in home page, select **Connect ChatGPT as a study partner** below Course Book and Exams Room. The link opens the Falowen Learning Companion listing in a new tab, where learners can connect it in ChatGPT.
+
 ### Production integration
 
 - Endpoint: https://www.falowen.app/api/chatgpt/mcp
