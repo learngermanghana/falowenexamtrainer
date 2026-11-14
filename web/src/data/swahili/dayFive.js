@@ -4,7 +4,7 @@ export const SWAHILI_DAY_FIVE = {
   title: "Familia yangu",
   objective: "Introduce your family using simple Kiswahili sentences.",
   practiceOnly: true,
-  audioKey: "swahili/A1/day-05/day-05.mp3",
+  audioKey: "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
   trackId: "swahili-a1-day-05",
   aiLecture: null,
 };
