@@ -51,6 +51,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const [artwork, setArtwork] = useState(null);
   const [stories, setStories] = useState(null);
   const [translations, setTranslations] = useState({recordings:[]});
+  const [activeLine, setActiveLine] = useState(-1);
   const [showEnglish, setShowEnglish] = useState(courseLevel === "A1");
   useEffect(() => { setShowEnglish(courseLevel === "A1"); }, [courseLevel]);
 
@@ -192,7 +193,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
           <WorkbookMusicPlayer song={chosen} level={courseLevel} day={lessonDay} lyrics={approvedLyrics} recording={recordingLyrics}
             artwork={'/music/covers/photos/' + (/^[a-z-]+$/.test(artwork?.byObjectKey?.[chosen.objectKey] || '') ? artwork.byObjectKey[chosen.objectKey] : 'music') + '.jpg'}
             story={stories?.byObjectKey?.[chosen.objectKey] || stories?.byTrackId?.[chosen.id]}
-            english={englishPack} showEnglish={showEnglish} />
+            english={englishPack} showEnglish={showEnglish} onActiveLine={isSwahili ? setActiveLine : undefined} />
           <a href={listenLinkFor(chosen)} target="_blank" rel="noopener noreferrer"
             style={{ color: "#166534", fontWeight: 700, fontSize: 13 }}>
             Open this song on Falowen Music ↗
@@ -224,9 +225,10 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
                     const sourceLines = String(approvedLyrics).replace(/\\n/g, "\n")
                       .split(/\r?\n/).slice(0,rawIndex).filter(item => item.trim() && !/^\[.*\]$/.test(item.trim()));
                     const translation = englishPack?.lines?.[sourceLines.length]?.en;
-                    return <div key={rawIndex} data-lyric-pair="true" style={{
+                    const current = isSwahili && sourceLines.length === activeLine;
+                    return <div key={rawIndex} data-lyric-pair="true" aria-current={current ? "true" : undefined} style={{
                         padding: "8px 10px", borderBottom: "1px solid #e2efe5",
-                        borderRadius: 7, background: rawIndex % 2 ? "#fbfdfb" : "transparent",
+                        borderRadius: 7, background: current ? "#daf1bb" : rawIndex % 2 ? "#fbfdfb" : "transparent",
                       }}>
                       <div lang={isSwahili ? "sw" : "de"} style={{ fontSize: 16, lineHeight: 1.6, color: "#203c31", fontWeight: 650 }}>{de}</div>
                       {showEnglish && translation ? <div data-english-line="true" lang="en"
