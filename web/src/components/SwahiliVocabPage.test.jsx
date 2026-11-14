@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import VocabExamPage from "./VocabExamPage";
 import SwahiliDictionary from "./SwahiliDictionary";
@@ -88,6 +88,21 @@ describe("Kiswahili Campus vocabulary reuses the existing Falowen vocabulary rou
     fireEvent.click(screen.getByRole("button", { name: "Hide meaning" }));
     expect(screen.queryByText("mother")).toBeNull();
     expect(fetchVocabularyFromSheet).not.toHaveBeenCalled();
+  });
+
+  test("keeps the original German Campus vocabulary sheet and interface unchanged", async () => {
+    currentProfile = { program: "german", level: "A1" };
+    renderVocab();
+    expect(screen.getByRole("heading", { name: "Vocabulary Practice" })).toBeTruthy();
+    await waitFor(() => expect(fetchVocabularyFromSheet).toHaveBeenCalledTimes(1));
+    expect(screen.queryByRole("heading", { name: "Msamiati · Vocabulary Practice" })).toBeNull();
+  });
+
+  test("keeps the unauthenticated public lesson dictionary read-only", () => {
+    render(<MemoryRouter><SwahiliDictionary /></MemoryRouter>);
+    expect(screen.getByText("mama")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Save mama" })).toBeNull();
+    expect(readSavedSwahiliWordIds(currentUser.uid)).toEqual([]);
   });
 
   test("does not show another student's saved words after switching accounts", () => {
