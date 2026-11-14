@@ -36,10 +36,10 @@ describe("Falowen ChatGPT authorization", () => {
     expect(oauthParameters({ ...validRequest, ...change })).toBeNull();
   });
 
-  test("never allows admin, exam-only or expired trial accounts", () => {
+  test("blocks non-student and exam-only accounts but permits Campus-eligible expired trials", () => {
     expect(safeStudentAccess({ role: "admin", level: "A2" })).toBe(false);
     expect(safeStudentAccess({ role: "student", accountType: "exam_only" })).toBe(false);
-    expect(safeStudentAccess({ role: "student", trialStatus: "expired", paymentStatus: "pending" })).toBe(false);
+    expect(safeStudentAccess({ role: "student", trialStatus: "expired", paymentStatus: "pending" })).toBe(true);
     expect(safeStudentAccess({ role: "student", trialStatus: "active" })).toBe(true);
   });
 });
