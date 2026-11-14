@@ -1,7 +1,7 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import SwahiliCourseBook, { scoreListeningAnswers, scoreReadingAnswers, getMissingSwahiliDayOneWork } from "./SwahiliCourseBook";
+import SwahiliCourseBook, { getMissingSwahiliDayOneWork } from "./SwahiliCourseBook";
 import SwahiliDaySixWorkbook from "./SwahiliDaySixWorkbook";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import { setDoc, getDoc } from "../firebase";
@@ -98,15 +98,12 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
   });
 
   it("keeps teacher-led listening honest without claiming uploaded music/audio", () => {
-    expect(scoreListeningAnswers({0:"A",1:"E",2:"I",3:"O",4:"U"})).toBe(5);
-    expect(scoreListeningAnswers({0:"U"})).toBe(0);
-    expect(scoreReadingAnswers({mother:"mama",child:"mtoto",chair:"kiti",u:"kuku"})).toBe(4);
     expect(SWAHILI_DAY_ONE.listening).toHaveLength(5);
     renderLesson();
     openTab("Teil 4");
     expect(screen.getByText(/Sauti iliyorekodiwa bado haijapatikana/)).toBeTruthy();
     expect(document.querySelector("audio")).toBeNull();
-    expect(screen.getByRole("button", { name: "Kagua majibu" }).disabled).toBe(true);
+    expect(screen.queryByRole("button", { name: "Kagua majibu" })).toBeNull();
   });
 
   it("requires writing and reading, not unrecorded listening, before Submit", () => {

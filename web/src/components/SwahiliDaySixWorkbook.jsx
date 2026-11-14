@@ -36,7 +36,7 @@ function Dialogue({ lines, label }) {
   </div>;
 }
 
-function QuestionSet({ items, answers, onChange, checked, namePrefix }) {
+function QuestionSet({ items, answers, onChange, namePrefix }) {
   return <div className="swahili-book__quiz">
     {items.map((item, i) => (
       <div className="swahili-book__exercise" key={item.id}>
@@ -49,7 +49,6 @@ function QuestionSet({ items, answers, onChange, checked, namePrefix }) {
             </label>)}
           </div>
         </fieldset>
-        {checked && <span className="swahili-book__small">{answers[item.id] === item.answer ? "Sahihi ✓" : "Jaribu tena"}</span>}
       </div>
     ))}
   </div>;
@@ -67,8 +66,6 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
   const [writing, setWriting] = useState(INITIAL_WRITING);
   const [readingAnswers, setReadingAnswers] = useState({});
   const [listeningAnswers, setListeningAnswers] = useState({});
-  const [readingChecked, setReadingChecked] = useState(false);
-  const [listeningChecked, setListeningChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState(null);
   const [previouslySubmitted, setPreviouslySubmitted] = useState(false);
@@ -105,9 +102,8 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
     return () => { active = false; };
   }, [activeTab, user?.uid, canSubmit, submissionVersion]);
 
-  const setAnswer = (setter, id, value, setChecked) => {
+  const setAnswer = (setter, id, value) => {
     setter(old => ({ ...old, [id]: value }));
-    setChecked(false);
     setSubmissionResult(null);
   };
   const changeWriting = (key, value) => {
@@ -115,9 +111,6 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
     setSubmissionResult(null);
   };
   const missing = getMissingSwahiliDaySixWork({ writing, readingAnswers });
-  const readingCount = lesson.reading.filter(item => readingAnswers[item.id]).length;
-  const listeningCount = lesson.listening.filter(item => listeningAnswers[item.id]).length;
-  const checkScore = (items, answers) => items.filter(item => answers[item.id] === item.answer).length;
 
   async function submitWork() {
     if (!canSubmit || !db || submitting || missing.length) return;
@@ -188,20 +181,14 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         <div><h4>Vinywaji</h4>{lesson.drinks.map(item => <p key={item.sw}>{item.sw}</p>)}</div></div>
       </div>
       <Dialogue lines={lesson.restaurantDialogue} label="Restaurant reading dialogue" />
-      <QuestionSet items={lesson.reading} answers={readingAnswers} checked={readingChecked}
-        namePrefix="swahili-six-reading" onChange={(id,v) => setAnswer(setReadingAnswers,id,v,setReadingChecked)} />
-      <div className="swahili-book__row"><button type="button" className="swahili-book__button"
-        disabled={readingCount < lesson.reading.length} onClick={() => setReadingChecked(true)}>Kagua majibu</button>
-        {readingChecked && <p role="status" className="swahili-book__result">{checkScore(lesson.reading,readingAnswers)} / {lesson.reading.length} sahihi · mazoezi tu</p>}</div>
+      <QuestionSet items={lesson.reading} answers={readingAnswers}
+        namePrefix="swahili-six-reading" onChange={(id,v) => setAnswer(setReadingAnswers,id,v)} />
     </section>;
     if (activeTab === "hoeren") return <section className="swahili-book__card swahili-book__activity" aria-label="Teil 4">
       <div className="mgahawani-workbook__section-header"><span>04 · LISTEN</span><h2>Teil 4 · Kusikiliza (Listening)</h2><p>Teacher-led listening while recorded audio is pending.</p></div>
       <p className="swahili-book__note">No approved recording yet. The teacher reads the original restaurant dialogue; hide the text while listening. This is optional classroom practice until audio is uploaded.</p>
-      <QuestionSet items={lesson.listening} answers={listeningAnswers} checked={listeningChecked}
-        namePrefix="swahili-six-listening" onChange={(id,v) => setAnswer(setListeningAnswers,id,v,setListeningChecked)} />
-      <div className="swahili-book__row"><button type="button" className="swahili-book__button"
-        disabled={listeningCount < lesson.listening.length} onClick={() => setListeningChecked(true)}>Kagua majibu</button>
-        {listeningChecked && <p role="status" className="swahili-book__result">{checkScore(lesson.listening,listeningAnswers)} / {lesson.listening.length} sahihi · mazoezi tu</p>}</div>
+      <QuestionSet items={lesson.listening} answers={listeningAnswers}
+        namePrefix="swahili-six-listening" onChange={(id,v) => setAnswer(setListeningAnswers,id,v)} />
       <details><summary>Kwa mwalimu · Read the original dialogue aloud</summary><Dialogue lines={lesson.restaurantDialogue} label="Teacher listening script" /></details>
     </section>;
     return <section className="swahili-book__card swahili-book__activity" aria-label="Review & Submit">
