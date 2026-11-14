@@ -82,3 +82,13 @@ The available developer permissions/portal review actions are external to GitHub
 ### Cost and access
 
 The lesson snapshot is regenerated during the existing Falowen web build. Firestore and Sheets are queried only when a student invokes the relevant tool. No new OpenAI API integration, background tracking, scheduler or paid datastore was added for this pilot. Existing hosting and Firestore traffic still incur normal service costs. The OAuth collections store SHA-256–hashed opaque tokens and expire them; configure Firestore TTL for `chatgptOauthCodes`, `chatgptOauthAccessTokens` and `chatgptOauthRefreshTokens` if not already configured.
+
+## Student coach extension (14 November 2026 — release candidate)
+
+Five additional student-scoped read-only endpoints have been proposed: `get_my_falowen_study_plan`, `get_my_falowen_vocabulary_practice`, `get_my_falowen_grammar_writing_coach`, `get_my_falowen_speaking_partner`, and `get_my_falowen_music_guide`.
+
+The first four use the existing course snapshot and tutoring protocol (with one score fetch only where needed for A1–B1 study-plan recommendations). The Music guide opens the public Music library, but does not pretend that any specific track has a verified link to the requested course day. All five are read-only; real homework submissions and official grades stay in Campus.
+
+Kiswahili has not yet been exported to the companion's canonical lesson snapshot. New student coach tools return a clear unavailable response for Kiswahili rather than serving German lesson material.
+
+**Publication is a separate step:** Once backend changes are reviewed, tested and deployed, update the existing published Falowen app in the plugin management portal, rescan the endpoint, review tool permissions and submit/publish the revised version. The older installed plugin may still expose only five tools. Do not assert that these additions are live before checking them in a fresh authenticated ChatGPT connection.
