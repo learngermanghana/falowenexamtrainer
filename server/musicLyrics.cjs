@@ -1,4 +1,5 @@
 'use strict';
+const { isSwahiliMusicKey, swahiliMusicKey } = require('./swahiliMusic.cjs');
 const { musicTrackFromKey, musicKeyFromAutoId } = require('./musicDiscovery.cjs');
 const { signObject } = require('./courseMusic.cjs');
 const catalog = require('../web/public/music/catalog.json');
@@ -107,8 +108,8 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
     const id=typeof req.query?.track==='string'?req.query.track:'';
     const key=typeof req.query?.key==='string'?req.query.key:'';
     const pinned=catalog.tracks.find(t=>t.id===id && t.approved===true);
-    const objectKey=key || pinned?.objectKey || musicKeyFromAutoId(id);
-    if(!musicTrackFromKey(objectKey)) return res.status(404).json({error:'Lyrics not published'});
+    const objectKey=key || pinned?.objectKey || musicKeyFromAutoId(id) || swahiliMusicKey(id);
+    if(!musicTrackFromKey(objectKey) && !isSwahiliMusicKey(objectKey)) return res.status(404).json({error:'Lyrics not published'});
     const recorded = timings.recordings?.find(pack => pack.objectKey === objectKey);
     const checkedRecording = validateLyrics(recorded, objectKey);
     // R2 owner-reviewed sidecars override bundled cues. Bundled packs and

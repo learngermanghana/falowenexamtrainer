@@ -1,3 +1,4 @@
+import SwahiliDayFiveWorkbook from "./components/SwahiliDayFiveWorkbook";
 import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import SwahiliDaySixWorkbook from "./components/SwahiliDaySixWorkbook";
 import { getSwahiliCampusRoute } from "./utils/swahiliCourseRoute";
@@ -440,7 +441,7 @@ function App() {
     !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
 
   // Visitors can preview Kiswahili; signed-in learners follow their Campus programme.
-  const swahiliPreview = location.pathname.match(/^\/swahili(?:\/(day-(?:1|6)))?\/?$/);
+  const swahiliPreview = location.pathname.match(/^\/swahili(?:\/(day-(?:1|5|6)))?\/?$/);
   if (swahiliPreview) {
     // Wait for Firebase to resolve the session so signed-in students never
     // briefly see the public preview or lose their personal course progress.
@@ -462,6 +463,7 @@ function App() {
 
     if (user && studentProfile && !isStaff) return <Navigate to="/campus/course" replace />;
 
+    if (swahiliPreview[1] === "day-5") return <SwahiliDayFiveWorkbook preview />;
     if (swahiliPreview[1] === "day-6") return <SwahiliDaySixWorkbook basePath="/swahili" preview />;
     return <SwahiliCourseBook day={swahiliPreview[1] === "day-1" ? 1 : null} basePath="/swahili" preview />;
   }
@@ -921,6 +923,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/preview/:level" element={<NextLevelPreviewPage />} />
           <Route path="/campus/course/swahili/day-1" element={<SwahiliCourseBook day={1} basePath="/campus/course/swahili" />} />
+          <Route path="/campus/course/swahili/day-5" element={<SwahiliDayFiveWorkbook />} />
           <Route path="/campus/course/swahili/day-6" element={<SwahiliDaySixWorkbook basePath="/campus/course/swahili" />} />
           <Route path="/campus/course/lesson/:level/:day" element={<CourseLessonPage />} />
           <Route path="/campus/course/speaking-exams-intro-4-7" element={<SpeakingExamIntroPage />} />

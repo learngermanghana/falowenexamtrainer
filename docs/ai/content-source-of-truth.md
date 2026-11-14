@@ -68,3 +68,7 @@ The first Kiswahili course-book pilot reuses Falowen's learning layout and A2/B1
 Campus → Results shows only the signed-in Kiswahili learner’s Day 1 and Day 6 submissions, review status, tutor score and feedback from the current Firestore review. A revision link opens the workbook’s Submit tab. Admin publishes the manual score to the existing score Sheet queue and emails a link to Campus Results. The workbooks do not enter automated AI marking.
 
 Falowen Admin Marking → Swahili reads the existing Day 1 and Day 6 submissions from `users/{uid}/swahiliLessons/day-{day}`. These records do not enter German assignment or score collections. The tutor's decision and feedback use the existing per-lesson review documents. Students see feedback in their workbook's Submit tab after the latest saved submission is reviewed. A new submission waits for a fresh review. The learner repository owns the production Firestore rules and composite index for this queue.
+
+## Kiswahili A1 Day 5
+
+Kiswahili A1 Day 5 is a practice workbook at `/swahili/day-5` and `/campus/course/swahili/day-5`. Its registered recording is `swahili/A1/day-05/day-05.mp3`. Published lyric timing comes from the matching R2 sidecar. Day 5 has a lecture slot and is excluded from assignment progress until its assignment is published.

@@ -8,7 +8,7 @@ export const getSwahiliCampusRoute = ({ pathname = "", search = "", user, studen
     return null;
   }
 
-  const preview = String(pathname).match(/^\/swahili(?:\/(day-(?:1|6)))?\/?$/);
+  const preview = String(pathname).match(/^\/swahili(?:\/(day-(?:1|5|6)))?\/?$/);
   if (!preview) return null;
 
   return preview[1]

@@ -27,7 +27,7 @@ export const getProgramCourseRedirect = ({ pathname = "", studentProfile, isStaf
   if (getCampusProgram(studentProfile) === "swahili") {
     if (/^\/(exams|attendance|tutor-marking)(?:\/|$)/.test(path)) return "/campus/course";
     if (path.startsWith("/campus/") &&
-        !/^\/campus\/(?:course(?:\/swahili\/day-(?:1|6))?|results|account)$/.test(path)) {
+        !/^\/campus\/(?:course(?:\/swahili\/day-(?:1|5|6))?|results|account)$/.test(path)) {
       return "/campus/course";
     }
   } else if (/^\/campus\/course\/swahili(?:\/|$)/.test(path)) {

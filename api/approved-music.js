@@ -6,6 +6,7 @@ const { pipeline } = require('node:stream/promises');
 const { signedStudioUrl } = require('../functions/functionz/courseHoerenPublishing');
 const { signTrack, signObject } = require('../server/courseMusic.cjs');
 const { musicKeyFromAutoId } = require('../server/musicDiscovery.cjs');
+const { swahiliMusicKey } = require('../server/swahiliMusic.cjs');
 const catalog = require('../web/public/music/catalog.json');
 
 // Deliberately restrict keys to the music/ namespace, not Hören resources.
@@ -47,14 +48,15 @@ async function approvedMusicHandler(req, res) {
   // The dedicated music/ folder is a public-release namespace. IDs map
   // deterministically to a strictly validated music-only R2 path.
   const autoKey = musicKeyFromAutoId(trackId);
-  const objectKey = catalogKey || autoKey;
+  const swahiliKey = swahiliMusicKey(trackId);
+  const objectKey = catalogKey || autoKey || swahiliKey;
   if (!objectKey) return res.status(404).json({ error: 'Music track not published' });
   try {
     // Special legacy signers continue to work; new approved lesson tracks
     // use the same bounded 15-minute signed R2 URL as the other songs.
     const location = ['a1-day-04-numbers', 'a2-day-18-bank'].includes(trackId)
       ? signTrack(trackId).url
-      : autoKey ? signObject({ id: trackId, key: autoKey }).url
+      : (autoKey || swahiliKey) ? signObject({ id: trackId, key: objectKey }).url
       : signedStudioUrl({ method: 'GET', key: objectKey, expires: 900 });
     // Export needs readable bytes, whereas ordinary <audio> can follow an R2
     // redirect without CORS access. Stream only this already validated music key.
