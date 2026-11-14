@@ -48,7 +48,8 @@ describe("Falowen programme-aware Campus", () => {
   });
 
   test("keeps Kiswahili on published course routes and outside German exams", () => {
-    for (const route of ["/exams/overview", "/campus/course/lesson/A1/1", "/campus/course/preview/A2"]) {
+    for (const route of ["/EXAMS/overview", "/campus/course/lesson/A1/1", "/campus/course/preview/A2",
+      "/campus/live-speak", "/campus/examFile", "/campus/music", "/attendance/class", "/tutor-marking"]) {
       expect(getProgramCourseRedirect({ pathname: route, studentProfile: swahili }))
         .toBe("/campus/course");
     }
@@ -60,9 +61,9 @@ describe("Falowen programme-aware Campus", () => {
     })).toBeNull();
   });
 
-  test("blocks cross-programme Campus workbook routes without blocking public preview", () => {
+  test("blocks cross-programme Campus workbook routes and passes public routes to the app", () => {
     expect(getProgramCourseRedirect({
-      pathname: "/campus/course/swahili/day-1", studentProfile: german,
+      pathname: "/Campus/Course/Swahili/day-1", studentProfile: german,
     })).toBe("/campus/course");
     expect(getProgramCourseRedirect({
       pathname: "/swahili/day-1", studentProfile: german,
