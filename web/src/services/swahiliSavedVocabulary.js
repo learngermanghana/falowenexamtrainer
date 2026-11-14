@@ -1,4 +1,4 @@
-import { SWAHILI_DICTIONARY_WORDS } from "../components/SwahiliDictionary";
+import { SWAHILI_DICTIONARY_WORDS } from "../data/swahili/vocabulary";
 
 // Store stable IDs, never duplicate a translated curriculum or student records.
 // German reading-phrase storage uses a distinct key and is never read or written.
