@@ -80,3 +80,5 @@ Falowen Music uses the same player for its German and Swahili tabs. Swahili trac
 Swahili Day 5 uses the shared German-layout workbook music player and exact-key English translations. The bundled Swahili timing comes from recording-based word alignment and is labeled estimated until playback review. Campus Music opens the Swahili library for Swahili learners. Books, Vocabulary, Attendance, Class Members and Discussion use Swahili placeholders until their content is adapted.
 
 Kiswahili Days 1 and 6 use Review & Submit to show the learner’s actual writing and reading answers. Save & Review keeps a device-local draft keyed by learner and lesson. Final submission writes to the existing Swahili tutor queue; Day 5 stays practice-only until its assignment is supplied. Workbook navigation remains in the page on mobile.
+
+German Campus Results loads the owner-scoped published reference snapshot when the learner opens result details. Legacy results continue to support their existing links. Swahili results use their existing tutor-published reference snapshot.

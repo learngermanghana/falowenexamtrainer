@@ -1,3 +1,4 @@
+import { db, doc, getDoc } from "../firebase";
 import { isAuthoritativeScore } from "../utils/mergeAutomaticResults";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +9,28 @@ import { getConfiguredInAppWorkbookResourceRoute, normalizeFalowenCourseRoute } 
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { EmptyState, InfoBox, PillBadge, SectionHeader, SkeletonRow } from "./ui";
+
+function PublishedAnswerReference({ referenceId }) {
+  const [state, setState] = useState(null);
+  useEffect(() => {
+    if (!db || !referenceId) return;
+    let active = true;
+    getDoc(doc(db, "publishedAnswerReferences", referenceId))
+      .then(result => { if (active) setState(result.data()?.parts || []); })
+      .catch(() => { if (active) setState([]); });
+    return () => { active = false; };
+  }, [referenceId]);
+  if (!state) return <p role="status">Loading reference answers…</p>;
+  if (!state.length) return <p>Reference answers could not be loaded.</p>;
+  return <details>
+    <summary>Reference answers</summary>
+    {state.map(part => <section key={part.id}>
+      <h4>{part.id === "main" ? "Answers" : part.id.replace(/^teil(\d+)$/i, "Teil $1")}</h4>
+      <ol>{part.answers.map((entry, index) =>
+        <li key={index}><strong>{entry.question}</strong> · {entry.answer}</li>)}</ol>
+    </section>)}
+  </details>;
+}
 
 const PASS_MARK = 60;
 
@@ -683,7 +706,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
           numericScore !== null &&
           Math.round(storedNumericScore) !== Math.round(numericScore),
         comments: entry.comments || entry.feedback || entry.aiFeedback || "",
-        link: entry.link || "",
+        link: entry.answerReferenceId ? "" : entry.link || "",
+        answerReferenceId: entry.answerReferenceId || "",
         dateRaw,
         createdLabel: formatDate(dateRaw),
         createdMs: Number.isNaN(createdMs) ? 0 : createdMs,
@@ -1023,6 +1047,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
               {isExpanded ? (
                 <div id={detailsId}>
+              {item.answerReferenceId && <PublishedAnswerReference key={item.answerReferenceId} referenceId={item.answerReferenceId} />}
               {item.link && !Number(item.objectiveTotal || 0) ? (
                 <div
                   style={{
