@@ -29,6 +29,7 @@ function DayFiveMusic() {
     <h2>Muziki · Music</h2>
     <audio controls preload="none" src={"/api/music?track=" + lesson.trackId}
       onTimeUpdate={(event) => setTime(event.currentTarget.currentTime)} />
+    {pack?.lyrics && !pack.cues.length && <p style={{ whiteSpace: "pre-wrap" }}>{pack.lyrics}</p>}
     {pack?.cues?.length > 0 && pack.cues.map((cue, index) => (
       <p key={index} style={time >= cue.start && time < Math.min(cue.end ?? Infinity, pack.cues[index + 1]?.start ?? Infinity)
         ? { fontWeight: "bold", color: "#1d4ed8" } : undefined}>{cue.text}</p>

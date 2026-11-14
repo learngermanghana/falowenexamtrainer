@@ -2,6 +2,15 @@
   "version": 1,
   "recordings": [
     {
+      "trackId": "swahili-a1-day-05",
+      "objectKey": "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
+      "title": "Karibu Kufahamu Familia Yangu",
+      "lyrics": "Karibu, karibu nyumbani kwetu!\nMimi ni Jason, karibu kwetu!\nHii ni familia yangu,\nKaribu kuifahamu!\n[Chorus]\nHuyu ni nani? Anaitwa nani?\nAnafanya kazi gani?\nHuyu ni nani? Anaitwa nani?\nKaribu kufahamu familia yangu!\n[Baba]\nHuyu ni baba yangu.\nBaba yako anaitwa nani?\nBaba yangu anaitwa Daniel.\nAnafanya kazi gani?\nBaba yangu ni mhandisi.\nAnapenda kufanya nini?\nAnapenda kusoma vitabu.\nHuyu ni baba yangu!\n[Mama]\nHuyu ni mama yangu.\nMama yako anaitwa nani?\nMama yangu anaitwa Maria.\nAnafanya kazi gani?\nMama yangu ni mhadhiri.\nAnapenda kufanya nini?\nAnapenda kupika.\nHuyu ni mama yangu!\n[Chorus]\nHuyu ni nani? Anaitwa nani?\nAnafanya kazi gani?\nHuyu ni nani? Anaitwa nani?\nKaribu kufahamu familia yangu!\n[Kaka na dada]\nKaka yako anaitwa nani?\nKaka yangu anaitwa David.\nAna watoto wangapi?\nAna watoto wawili!\nDada yako anaitwa nani?\nDada yangu anaitwa Neema.\nDada yako anasoma nini?\nAnasoma sheria!\n[END]\nBaba na mama — wazazi wangu!\nKaka na dada — ndugu zangu!\nNinaipenda familia yangu,\nTunaishi kwa amani na upendo!\nFamilia yako ina watu wangapi?\nSasa ni zamu yako, tuambie!\nAsanteni kwa kuimba pamoja,\nTuonane tena, kwa herini!",
+      "cues": [],
+      "duration": 177.984,
+      "source": "Embedded lyrics from the supplied MP3; timing pending"
+    },
+    {
       "trackId": "r2-a1-day-02-b64_SWNoIGhlacOfZSBCaW5hLm1wMw",
       "objectKey": "music/a1/day-02/Ich heiße Bina.mp3",
       "assignmentKey": "A1-0.2",
