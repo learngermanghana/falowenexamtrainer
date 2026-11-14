@@ -293,6 +293,10 @@ service cloud.firestore {
     match /paystackWebhookEvents/{document=**} { allow read, write: if courseUser(); }
     match /presentationSessions/{document=**} { allow read, write: if courseUser(); }
     match /qa_posts/{document=**} { allow read, write: if courseUser(); }
+    match /publishedAnswerReferences/{referenceId} {
+      allow get: if isStaff() || (courseUser() && resource.data.studentId == request.auth.uid);
+      allow create: if isStaff();
+    }
     match /scores/{document=**} { allow read: if courseUser(); allow write: if isStaff(); }
     match /sessions/{document=**} { allow read, write: if courseUser(); }
     match /studentActivityEvents/{document=**} { allow read, write: if courseUser(); }
