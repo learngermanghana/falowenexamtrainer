@@ -125,7 +125,7 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
       : refinedEstimate || (ownerFallback?.cues.length ? ownerFallback : estimate || checkedRecording || ownerFallback);
     const sendFallback = () => res.status(200).json(withEnglishTranslation({...fallback,
       source:fallback===estimate ? 'acoustic-estimate' : checkedRecording ? 'bundled' : 'owner-supplied',
-      timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? 'published' : approved?.timingStatus || 'missing'}));
+      timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? (recorded.timingStatus === 'estimated' ? 'estimated' : 'published') : approved?.timingStatus || 'missing'}));
     try {
       const timingKey=objectKey.replace(/\.mp3$/i,'.lyrics.json');
       const signed=signObject({key:timingKey},env);

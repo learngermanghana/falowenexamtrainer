@@ -7,8 +7,8 @@
 export const getCampusProgram = (studentProfile) =>
   String(studentProfile?.program || "").trim().toLowerCase() === "swahili" ? "swahili" : "german";
 
-const SWAHILI_CAMPUS_SECTIONS = new Set(["course", "results", "account"]);
-const GERMAN_ONLY_SECTIONS = ["music", "books", "vocab", "attendance", "discussion", "classMembers"];
+export const SWAHILI_RESOURCE_SECTIONS = ["music", "books", "vocab", "attendance", "discussion", "classMembers"];
+const SWAHILI_CAMPUS_SECTIONS = new Set(["course", "results", "account", ...SWAHILI_RESOURCE_SECTIONS]);
 
 export const getProgramCampusTabs = (tabs, studentProfile) =>
   getCampusProgram(studentProfile) === "swahili"
@@ -17,7 +17,7 @@ export const getProgramCampusTabs = (tabs, studentProfile) =>
 
 export const getProgramAllowedSections = (sections, studentProfile) => {
   if (getCampusProgram(studentProfile) !== "swahili") return sections;
-  return { ...sections, ...Object.fromEntries(GERMAN_ONLY_SECTIONS.map((section) => [section, false])) };
+  return { ...sections, ...Object.fromEntries(SWAHILI_RESOURCE_SECTIONS.map((section) => [section, true])) };
 };
 
 export const getProgramCourseRedirect = ({ pathname = "", studentProfile, isStaff = false } = {}) => {
@@ -26,8 +26,9 @@ export const getProgramCourseRedirect = ({ pathname = "", studentProfile, isStaf
   const path = String(pathname).replace(/\/+$/, "").toLowerCase();
   if (getCampusProgram(studentProfile) === "swahili") {
     if (/^\/(exams|attendance|tutor-marking)(?:\/|$)/.test(path)) return "/campus/course";
-    if (path.startsWith("/campus/") &&
-        !/^\/campus\/(?:course(?:\/swahili\/day-(?:1|5|6))?|results|account)$/.test(path)) {
+    const section = path.slice("/campus/".length);
+    const enabled = [...SWAHILI_CAMPUS_SECTIONS].some(key => key.toLowerCase() === section);
+    if (path.startsWith("/campus/") && !enabled && !/^\/campus\/course\/swahili\/day-(?:1|5|6)$/.test(path)) {
       return "/campus/course";
     }
   } else if (/^\/campus\/course\/swahili(?:\/|$)/.test(path)) {

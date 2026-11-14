@@ -2,7 +2,7 @@ import SwahiliDayFiveWorkbook from "./components/SwahiliDayFiveWorkbook";
 import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import SwahiliDaySixWorkbook from "./components/SwahiliDaySixWorkbook";
 import { getSwahiliCampusRoute } from "./utils/swahiliCourseRoute";
-import { getCampusProgram, getProgramCampusTabs, getProgramAllowedSections, getProgramCourseRedirect } from "./utils/campusProgram";
+import { SWAHILI_RESOURCE_SECTIONS, getCampusProgram, getProgramCampusTabs, getProgramAllowedSections, getProgramCourseRedirect } from "./utils/campusProgram";
 import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
@@ -1607,8 +1607,12 @@ const CampusArea = ({
         </section>
       ) : null}
 
-      {resolvedSection === "music" && allowedSections.music ? <CampusMusicPage /> : null}
-      {resolvedSection === "books" && allowedSections.books ? <CampusBooksPage /> : null}
+      {resolvedSection === "music" && allowedSections.music ? <CampusMusicPage program={getCampusProgram(campusStudentProfile)} /> : null}
+      {getCampusProgram(campusStudentProfile) === "swahili" && resolvedSection !== "music" &&
+        SWAHILI_RESOURCE_SECTIONS.includes(resolvedSection) ? (
+          <section style={styles.card}><p>Swahili content for this section is coming soon.</p></section>
+        ) : null}
+      {resolvedSection === "books" && allowedSections.books && getCampusProgram(campusStudentProfile) !== "swahili" ? <CampusBooksPage /> : null}
       {resolvedSection === "course" && allowedSections.course ? (
         String(campusStudentProfile?.program || "").toLowerCase() === "swahili" ? (
           <SwahiliCourseBook basePath="/campus/course/swahili" />
@@ -1620,17 +1624,17 @@ const CampusArea = ({
           />
         )
       ) : null}
-      {resolvedSection === "vocab" && allowedSections.vocab ? <VocabExamPage context="campus" /> : null}
-      {resolvedSection === "attendance" && allowedSections.attendance ? <AttendanceTab /> : null}
-      {resolvedSection === "classMembers" && allowedSections.classMembers ? <ClassMembersTab /> : null}
+      {resolvedSection === "vocab" && allowedSections.vocab && getCampusProgram(campusStudentProfile) !== "swahili" ? <VocabExamPage context="campus" /> : null}
+      {resolvedSection === "attendance" && allowedSections.attendance && getCampusProgram(campusStudentProfile) !== "swahili" ? <AttendanceTab /> : null}
+      {resolvedSection === "classMembers" && allowedSections.classMembers && getCampusProgram(campusStudentProfile) !== "swahili" ? <ClassMembersTab /> : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "speech" && allowedSections.speech ? <SpeechTrainerPage /> : null}
       {resolvedSection === "submit" && allowedSections.submit ? <AssignmentSubmissionPage /> : null}
       {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
-      {resolvedSection === "discussion" && allowedSections.discussion ? <ClassDiscussionPage /> : null}
+      {resolvedSection === "discussion" && allowedSections.discussion && getCampusProgram(campusStudentProfile) !== "swahili" ? <ClassDiscussionPage /> : null}
       {resolvedSection === "account" && allowedSections.account ? <AccountSettings /> : null}
-      <AttendanceCheckinCard />
+      {getCampusProgram(campusStudentProfile) !== "swahili" && <AttendanceCheckinCard />}
       {resolvedSection === "tutor-marking" && allowedSections["tutor-marking"] ? <TutorMarkingPage /> : null}
     </>
   );

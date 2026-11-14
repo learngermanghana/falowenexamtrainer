@@ -3,6 +3,187 @@
   "description": "Editor-authored English for exact recording keys and matching German lines. Course-draft translations are separately bound to draft identity and remain explicitly unverified against the audio.",
   "recordings": [
     {
+      "objectKey": "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
+      "lines": [
+        {
+          "de": "Karibu, karibu nyumbani kwetu!",
+          "en": "Welcome, welcome to our home!"
+        },
+        {
+          "de": "Mimi ni Jason, karibu kwetu!",
+          "en": "I'm Jason. Welcome to our home!"
+        },
+        {
+          "de": "Hii ni familia yangu,",
+          "en": "This is my family."
+        },
+        {
+          "de": "Karibu kuifahamu!",
+          "en": "Come and get to know them!"
+        },
+        {
+          "de": "Huyu ni nani? Anaitwa nani?",
+          "en": "Who is this? What is their name?"
+        },
+        {
+          "de": "Anafanya kazi gani?",
+          "en": "What do they do for work?"
+        },
+        {
+          "de": "Huyu ni nani? Anaitwa nani?",
+          "en": "Who is this? What is their name?"
+        },
+        {
+          "de": "Karibu kufahamu familia yangu!",
+          "en": "Come and get to know my family!"
+        },
+        {
+          "de": "Huyu ni baba yangu.",
+          "en": "This is my father."
+        },
+        {
+          "de": "Baba yako anaitwa nani?",
+          "en": "What is your father's name?"
+        },
+        {
+          "de": "Baba yangu anaitwa Daniel.",
+          "en": "My father's name is Daniel."
+        },
+        {
+          "de": "Anafanya kazi gani?",
+          "en": "What does he do for work?"
+        },
+        {
+          "de": "Baba yangu ni mhandisi.",
+          "en": "My father is an engineer."
+        },
+        {
+          "de": "Anapenda kufanya nini?",
+          "en": "What does he like to do?"
+        },
+        {
+          "de": "Anapenda kusoma vitabu.",
+          "en": "He likes reading books."
+        },
+        {
+          "de": "Huyu ni baba yangu!",
+          "en": "This is my father!"
+        },
+        {
+          "de": "Huyu ni mama yangu.",
+          "en": "This is my mother."
+        },
+        {
+          "de": "Mama yako anaitwa nani?",
+          "en": "What is your mother's name?"
+        },
+        {
+          "de": "Mama yangu anaitwa Maria.",
+          "en": "My mother's name is Maria."
+        },
+        {
+          "de": "Anafanya kazi gani?",
+          "en": "What does she do for work?"
+        },
+        {
+          "de": "Mama yangu ni mhadhiri.",
+          "en": "My mother is a lecturer."
+        },
+        {
+          "de": "Anapenda kufanya nini?",
+          "en": "What does she like to do?"
+        },
+        {
+          "de": "Anapenda kupika.",
+          "en": "She likes cooking."
+        },
+        {
+          "de": "Huyu ni mama yangu!",
+          "en": "This is my mother!"
+        },
+        {
+          "de": "Huyu ni nani? Anaitwa nani?",
+          "en": "Who is this? What is their name?"
+        },
+        {
+          "de": "Anafanya kazi gani?",
+          "en": "What do they do for work?"
+        },
+        {
+          "de": "Huyu ni nani? Anaitwa nani?",
+          "en": "Who is this? What is their name?"
+        },
+        {
+          "de": "Karibu kufahamu familia yangu!",
+          "en": "Come and get to know my family!"
+        },
+        {
+          "de": "Kaka yako anaitwa nani?",
+          "en": "What is your brother's name?"
+        },
+        {
+          "de": "Kaka yangu anaitwa David.",
+          "en": "My brother's name is David."
+        },
+        {
+          "de": "Ana watoto wangapi?",
+          "en": "How many children does he have?"
+        },
+        {
+          "de": "Ana watoto wawili!",
+          "en": "He has two children!"
+        },
+        {
+          "de": "Dada yako anaitwa nani?",
+          "en": "What is your sister's name?"
+        },
+        {
+          "de": "Dada yangu anaitwa Neema.",
+          "en": "My sister's name is Neema."
+        },
+        {
+          "de": "Dada yako anasoma nini?",
+          "en": "What does your sister study?"
+        },
+        {
+          "de": "Anasoma sheria!",
+          "en": "She studies law!"
+        },
+        {
+          "de": "Baba na mama — wazazi wangu!",
+          "en": "Dad and Mum are my parents!"
+        },
+        {
+          "de": "Kaka na dada — ndugu zangu!",
+          "en": "My brother and sister are my siblings!"
+        },
+        {
+          "de": "Ninaipenda familia yangu,",
+          "en": "I love my family."
+        },
+        {
+          "de": "Tunaishi kwa amani na upendo!",
+          "en": "We live in peace and love!"
+        },
+        {
+          "de": "Familia yako ina watu wangapi?",
+          "en": "How many people are in your family?"
+        },
+        {
+          "de": "Sasa ni zamu yako, tuambie!",
+          "en": "Now it's your turn. Tell us!"
+        },
+        {
+          "de": "Asanteni kwa kuimba pamoja,",
+          "en": "Thank you for singing along."
+        },
+        {
+          "de": "Tuonane tena, kwa herini!",
+          "en": "See you again. Goodbye, everyone!"
+        }
+      ]
+    },
+    {
       "objectKey": "music/a1/day-02/Ich heiße Bina.mp3",
       "lines": [
         {

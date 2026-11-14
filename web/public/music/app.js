@@ -617,7 +617,7 @@ function renderLyrics(lesson) {
     : activeEnglishPack?.source === "course-draft"
     ? "COURSE DRAFT TRANSLATION — English explains the displayed German draft, not a verified transcription of this recording."
     : activeEnglishPack
-      ? "English is a learning aid; German remains the main lyric."
+      ? "English is a learning aid; " + (selected?.musicLanguage === "swahili" ? "Swahili" : "German") + " remains the main lyric."
       : lesson.referenceOnly
         ? "English translation of this unverified course draft is not available yet."
         : "English translation has not been published for this recording yet.";
@@ -646,7 +646,7 @@ function renderLyrics(lesson) {
     if (/^\[.*\]$/.test(text)) { root.append(el("h4", "lyric-heading", text.slice(1,-1))); continue; }
     const line = el("button", "lyric-line", text);
     line.type = "button";
-    line.lang = "de";
+    line.lang = selected?.musicLanguage === "swahili" ? "sw" : "de";
     line.dataset.line = String(index);
     const cue = renderedCues[index++];
     line.disabled = !cue;

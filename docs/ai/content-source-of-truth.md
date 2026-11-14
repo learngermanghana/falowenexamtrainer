@@ -76,3 +76,5 @@ Kiswahili A1 Day 5 is a practice workbook at `/swahili/day-5` and `/campus/cours
 The separate `swahili/A1/day-05/` prefix is reserved for future Hören recordings.
 
 Falowen Music uses the same player for its German and Swahili tabs. Swahili tracks are registered in `web/public/music/swahili-catalog.json` and the exact public R2 music allowlist. The lyrics API supplies the existing recording lyrics and any later published timings.
+
+Swahili Day 5 uses the shared German-layout workbook music player and exact-key English translations. The bundled Swahili timing comes from recording-based word alignment and is labeled estimated until playback review. Campus Music opens the Swahili library for Swahili learners. Books, Vocabulary, Attendance, Class Members and Discussion use Swahili placeholders until their content is adapted.
