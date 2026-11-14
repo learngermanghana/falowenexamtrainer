@@ -28,18 +28,6 @@ const TAB_DESCRIPTIONS = {
 };
 const EMPTY_WRITING = { vowels: "", syllables: "", words: "" };
 
-export const scoreListeningAnswers = (answers) =>
-  SWAHILI_DAY_ONE.listening.reduce(
-    (total, item, index) => total + (answers[index] === item.answer ? 1 : 0),
-    0
-  );
-
-export const scoreReadingAnswers = (answers) =>
-  SWAHILI_DAY_ONE.reading.reduce(
-    (total, item) => total + (answers[item.id] === item.answer ? 1 : 0),
-    0
-  );
-
 export const getMissingSwahiliDayOneWork = ({ writing, readingAnswers }) => {
   const missing = [];
   if (!String(writing?.vowels || "").trim()) missing.push("Teil 2 · Vokali");
@@ -58,12 +46,8 @@ function DayOneContent({
   setWriting,
   readingAnswers,
   setReadingAnswers,
-  readingChecked,
-  setReadingChecked,
   listeningAnswers,
   setListeningAnswers,
-  listeningChecked,
-  setListeningChecked,
   user,
   canSubmit,
   submitting,
@@ -194,21 +178,14 @@ function DayOneContent({
                   <label className="swahili-book__choice" key={choice}>
                     <input type="radio" name={"swahili-reading-" + item.id}
                       checked={readingAnswers[item.id] === choice}
-                      onChange={() => { setReadingAnswers((prior) => ({ ...prior, [item.id]: choice })); setReadingChecked(false); }} />
+                      onChange={() => { setReadingAnswers((prior) => ({ ...prior, [item.id]: choice })); }} />
                     {choice}
                   </label>
                 ))}
               </div>
             </fieldset>
-            {readingChecked ? <span className="swahili-book__small">{readingAnswers[item.id] === item.answer ? "Sahihi ✓" : "Jaribu tena"}</span> : null}
           </div>
         ))}
-      </div>
-      <div className="swahili-book__row">
-        <button type="button" className="swahili-book__button"
-          disabled={lesson.reading.some((item) => !readingAnswers[item.id])}
-          onClick={() => setReadingChecked(true)}>Kagua majibu</button>
-        {readingChecked ? <p className="swahili-book__result" role="status">{scoreReadingAnswers(readingAnswers)} / {lesson.reading.length} sahihi</p> : null}
       </div>
     </section>
   );
@@ -216,26 +193,19 @@ function DayOneContent({
   if (activeTab === "hoeren") return (
     <section className="swahili-book__card swahili-book__activity" aria-label="Teil 4">
       <h2>Teil 4 · Kusikiliza (Listening)</h2>
-      <p>Mwalimu aseme neno moja moja. Chagua vokali inayojirudia katika kila neno; kisha kagua majibu yako.</p>
+      <p>Mwalimu aseme neno moja moja. Chagua vokali inayojirudia katika kila neno.</p>
       <p className="swahili-book__note">Sauti iliyorekodiwa bado haijapatikana. Kwa sasa mwalimu atasoma maneno. Hii ni sehemu ya mazoezi ya hiari mpaka sauti itakapopakiwa.</p>
       <div className="swahili-book__quiz">
         {lesson.listening.map((item, index) => (
           <div className="swahili-book__quizItem" key={item.word}>
             <label htmlFor={"swahili-listen-" + index}>Neno la {index + 1}</label>
             <select id={"swahili-listen-" + index} value={listeningAnswers[index] || ""}
-              onChange={(event) => { setListeningAnswers((prior) => ({ ...prior, [index]: event.target.value })); setListeningChecked(false); }}>
+              onChange={(event) => { setListeningAnswers((prior) => ({ ...prior, [index]: event.target.value })); }}>
               <option value="">Chagua vokali</option>
               {LETTERS.map((vowel) => <option key={vowel} value={vowel}>{vowel}</option>)}
             </select>
-            {listeningChecked ? <span className="swahili-book__small">{listeningAnswers[index] === item.answer ? "Sahihi ✓" : "Jaribu tena"}</span> : null}
           </div>
         ))}
-      </div>
-      <div className="swahili-book__row">
-        <button type="button" className="swahili-book__button"
-          disabled={lesson.listening.some((item, index) => !listeningAnswers[index])}
-          onClick={() => setListeningChecked(true)}>Kagua majibu</button>
-        {listeningChecked ? <p className="swahili-book__result" role="status">{scoreListeningAnswers(listeningAnswers)} / {lesson.listening.length} sahihi · mazoezi tu</p> : null}
       </div>
       <details>
         <summary>Kwa mwalimu: maneno ya kusoma</summary>
@@ -286,9 +256,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
   const [activeTab, setActiveTab] = useSwahiliWorkbookTab(TABS);
   const [writing, setWriting] = useState(EMPTY_WRITING);
   const [readingAnswers, setReadingAnswers] = useState({});
-  const [readingChecked, setReadingChecked] = useState(false);
   const [listeningAnswers, setListeningAnswers] = useState({});
-  const [listeningChecked, setListeningChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState(null);
   const [previouslySubmitted, setPreviouslySubmitted] = useState(false);
@@ -395,9 +363,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
         <DayOneContent
           activeTab={activeTab} writing={writing} setWriting={(updater) => { setWriting(updater); setSubmissionResult(null); }}
           readingAnswers={readingAnswers} setReadingAnswers={(updater) => { setReadingAnswers(updater); setSubmissionResult(null); }}
-          readingChecked={readingChecked} setReadingChecked={setReadingChecked}
           listeningAnswers={listeningAnswers} setListeningAnswers={(updater) => { setListeningAnswers(updater); setSubmissionResult(null); }}
-          listeningChecked={listeningChecked} setListeningChecked={setListeningChecked}
           user={user} canSubmit={canSubmit} submitting={submitting} submissionResult={submissionResult}
           submitWork={submitWork} draft={draft} previouslySubmitted={previouslySubmitted} teacherReview={teacherReview} />
       </div>
