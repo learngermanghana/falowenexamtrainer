@@ -15,7 +15,7 @@ export function workbookLyricCues(pack, lyrics) {
   }
   return cues;
 }
-export default function WorkbookMusicPlayer({ song, artwork, story, recording, lyrics, english, showEnglish, level = 'ALL', day = null }) {
+export default function WorkbookMusicPlayer({ song, artwork, story, recording, lyrics, english, showEnglish, level = 'ALL', day = null, onActiveLine }) {
   const audio=useRef(null);
   const practice = useWorkbookMusicPractice({ trackId: song.id, title: song.title, level, day });
   const [playing,setPlaying]=useState(false),[video,setVideo]=useState(false),[time,setTime]=useState(0),[error,setError]=useState('');
@@ -26,6 +26,7 @@ export default function WorkbookMusicPlayer({ song, artwork, story, recording, l
   for(let i=cues.length-1;i>=0;i--) {
     if(time>=cues[i].start) {if(cues[i].end===undefined || time<cues[i].end)active=i;break;}
   }
+  useEffect(() => { onActiveLine?.(active); }, [active, onActiveLine]);
   async function togglePlay() {
     if(!audio.current)return;
     if(!audio.current.paused){audio.current.pause();return;}
