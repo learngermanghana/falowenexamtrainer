@@ -31,7 +31,7 @@ describe("Falowen programme-aware Campus", () => {
   });
 
   test("reuses the shared tab definitions, filtering German-only destinations for Kiswahili", () => {
-    expect(getProgramCampusTabs(tabs, swahili).map((tab) => tab.section)).toEqual(["course", "account"]);
+    expect(getProgramCampusTabs(tabs, swahili).map((tab) => tab.section)).toEqual(["course", "vocab", "account"]);
     expect(getProgramCampusTabs(tabs, german)).toBe(tabs);
     expect(tabs).toHaveLength(6);
   });
@@ -41,7 +41,7 @@ describe("Falowen programme-aware Campus", () => {
     const allowed = getProgramAllowedSections(sections, swahili);
     expect(allowed).toEqual(expect.objectContaining({
       course: true, account: true,
-      music: false, books: false, vocab: false,
+      music: false, books: false, vocab: true,
       results: false, attendance: false, classMembers: false, discussion: false,
     }));
     expect(sections.music).toBe(true);
