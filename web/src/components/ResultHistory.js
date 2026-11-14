@@ -22,9 +22,13 @@ function PublishedAnswerReference({ referenceId }) {
   }, [referenceId]);
   if (!state) return <p role="status">Loading reference answers…</p>;
   if (!state.length) return <p>Reference answers could not be loaded.</p>;
-  return <details>
+  return <ReferenceAnswers parts={state} />;
+}
+
+function ReferenceAnswers({ parts, open }) {
+  return <details open={open}>
     <summary>Reference answers</summary>
-    {state.map(part => <section key={part.id}>
+    {parts.map(part => <section key={part.id}>
       <h4>{part.id === "main" ? "Answers" : part.id.replace(/^teil(\d+)$/i, "Teil $1")}</h4>
       <ol>{part.answers.map((entry, index) =>
         <li key={index}><strong>{entry.question}</strong> · {entry.answer}</li>)}</ol>
@@ -70,6 +74,9 @@ const appendSubmissionParams = (route, { level, assignmentKey }) => {
 };
 
 export const buildResultResubmitTarget = (item = {}) => {
+  if (/^swahili-day-(1|6)$/.test(item.assignmentId || "")) {
+    return `/campus/course/swahili/day-${item.assignmentId.split("-").at(-1)}?view=submit`;
+  }
   const level = String(item.level || "").trim().toUpperCase();
   if (["B2", "C1"].includes(level)) return "/campus/writing";
   if (!["A1", "A2", "B1"].includes(level)) return GENERAL_RESUBMIT_TARGET;
@@ -615,10 +622,10 @@ const FeedbackDetailCard = ({ item }) => {
         </div>
       ) : null}
 
-      {!passed ? (
+      {!passed || item.revisionRequested ? (
         <div style={{ border: "1px solid #fde68a", borderRadius: 12, background: "#fffbeb", padding: 12, display: "grid", gap: 8 }}>
           <h4 style={{ ...styles.resultHeading, margin: 0 }}>Next step</h4>
-          <p style={{ ...styles.resultText, margin: 0 }}>{getNextStep(item)}</p>
+          <p style={{ ...styles.resultText, margin: 0 }}>{item.revisionRequested ? "Your tutor requested a revision. Review the feedback before resubmitting." : getNextStep(item)}</p>
           <button
             type="button"
             style={{ ...styles.primaryButton, width: "fit-content" }}
@@ -640,7 +647,7 @@ const FeedbackDetailCard = ({ item }) => {
  * If you pass `sheetCsvUrl`, this component will fetch results from that published sheet.
  * Otherwise, it will use the `results` prop (old behaviour).
  */
-const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
+const ResultHistory = ({ results = [], sheetCsvUrl = "", focusedResultId = "" }) => {
   const { t } = useTranslation();
   const [sheetResults, setSheetResults] = useState([]);
   const [sheetLoading, setSheetLoading] = useState(false);
@@ -708,6 +715,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         comments: entry.comments || entry.feedback || entry.aiFeedback || "",
         link: entry.answerReferenceId ? "" : entry.link || "",
         answerReferenceId: entry.answerReferenceId || "",
+        referenceParts: entry.referenceParts,
+        revisionRequested: entry.revisionRequested === true,
         dateRaw,
         createdLabel: formatDate(dateRaw),
         createdMs: Number.isNaN(createdMs) ? 0 : createdMs,
@@ -784,7 +793,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     );
   }, [activeResults, t]);
 
-  const newestResultKey = normalized[0]?.key || "";
+  const newestResultKey = normalized.find(item => item.key === focusedResultId)?.key || normalized[0]?.key || "";
   useEffect(() => {
     if (!newestResultKey) {
       setExpandedResultKeys(new Set());
@@ -989,7 +998,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
               : item.score || "–";
 
           return (
-            <article key={item.key} style={{ ...styles.resultCard, marginTop: 0 }}>
+            <article id={item.key === focusedResultId ? focusedResultId : undefined} key={item.key} style={{ ...styles.resultCard, marginTop: 0 }}>
               <div
                 style={{
                   display: "grid",
@@ -1047,6 +1056,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
               {isExpanded ? (
                 <div id={detailsId}>
+              {item.referenceParts?.length > 0 && <ReferenceAnswers parts={item.referenceParts} open={item.key === focusedResultId} />}
               {item.answerReferenceId && <PublishedAnswerReference key={item.answerReferenceId} referenceId={item.answerReferenceId} />}
               {item.link && !Number(item.objectiveTotal || 0) ? (
                 <div
