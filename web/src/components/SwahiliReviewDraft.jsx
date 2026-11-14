@@ -45,3 +45,28 @@ export default function SwahiliReviewDraft({ writing, questions, reading, listen
     </div>}
   </>;
 }
+
+export function SwahiliFinalSubmit({ disabled, onSubmit, children }) {
+  const [checked, setChecked] = React.useState([false, false, false]);
+  const labels = [
+    "I checked that this is the correct lesson.",
+    "I included my final answers for Teil 2 · Writing.",
+    "I included all answers for Teil 3 · Reading.",
+  ];
+  const ready = checked.every(Boolean);
+  return <>
+    <fieldset disabled={disabled}>
+      <legend>Confirm your submission</legend>
+      {labels.map((label, index) => (
+        <label key={label} style={{ display: "block", marginBlock: 8 }}>
+          <input type="checkbox" checked={checked[index]} onChange={event => {
+            const value = event.target.checked;
+            setChecked(previous => previous.map((item, i) => i === index ? value : item));
+          }} /> {label}
+        </label>
+      ))}
+    </fieldset>
+    <button type="button" className="swahili-book__button" disabled={disabled || !ready}
+      onClick={() => { if (!disabled && ready) onSubmit(); }}>{children}</button>
+  </>;
+}

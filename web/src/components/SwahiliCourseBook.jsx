@@ -9,7 +9,7 @@ import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import SwahiliCourseOverview from "./SwahiliCourseOverview";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
-import SwahiliReviewDraft, { useSwahiliReviewDraft } from "./SwahiliReviewDraft";
+import SwahiliReviewDraft, { SwahiliFinalSubmit, useSwahiliReviewDraft } from "./SwahiliReviewDraft";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import "./SwahiliCourseBook.css";
@@ -227,10 +227,9 @@ function DayOneContent({
         <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ya Kiswahili na ufungue Campus ili kuwasilisha. This public preview cannot submit work. <Link to="/login">Ingia</Link></p>
       ) : (
         <>
-          <button className="swahili-book__button" type="button"
-            onClick={submitWork} disabled={!isReady || submitting || !db || submissionResult?.type === "success"}>
+          <SwahiliFinalSubmit disabled={!isReady || submitting || !db || submissionResult?.type === "success"} onSubmit={submitWork}>
             {submitting ? "Inahifadhi..." : previouslySubmitted ? "Wasilisha tena" : "Wasilisha kazi"}
-          </button>
+          </SwahiliFinalSubmit>
           {submissionResult?.type === "success" ? (
             <p className="swahili-book__feedback" role="status">Kazi imehifadhiwa kwenye akaunti yako ya Falowen. Imetumwa kwa mwalimu kwa ukaguzi.</p>
           ) : null}

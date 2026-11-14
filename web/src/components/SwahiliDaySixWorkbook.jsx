@@ -9,7 +9,7 @@ import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
 import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
-import SwahiliReviewDraft, { useSwahiliReviewDraft } from "./SwahiliReviewDraft";
+import SwahiliReviewDraft, { SwahiliFinalSubmit, useSwahiliReviewDraft } from "./SwahiliReviewDraft";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import "./SwahiliCourseBook.css";
@@ -198,9 +198,9 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         listening={listeningAnswers} draft={canSubmit ? draft : null} />
       {missing.length > 0 && <p className="swahili-book__note" role="status">Kamilisha kwanza: {missing.join(" · ")}</p>}
       {!canSubmit ? <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ya Kiswahili kupitia Campus ili kuwasilisha. This preview cannot submit work. <Link to="/login">Ingia</Link></p> :
-        <><button type="button" className="swahili-book__button" disabled={!!missing.length || submitting || !db || submissionResult?.type === "success"} onClick={submitWork}>
+        <><SwahiliFinalSubmit disabled={!!missing.length || submitting || !db || submissionResult?.type === "success"} onSubmit={submitWork}>
           {submitting ? "Inahifadhi..." : previouslySubmitted ? "Wasilisha tena" : "Wasilisha kazi"}
-        </button>
+        </SwahiliFinalSubmit>
         {submissionResult?.type === "success" && <p className="swahili-book__feedback" role="status">Kazi ya Somo la 6 imehifadhiwa kwenye akaunti yako. Imetumwa kwa mwalimu kwa ukaguzi.</p>}
         {submissionResult?.type === "error" && <p className="swahili-book__error" role="alert">{submissionResult.message}</p>}
         {teacherReview && <div className="swahili-book__tile" role="status">

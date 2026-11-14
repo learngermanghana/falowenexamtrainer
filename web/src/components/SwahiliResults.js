@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import { PASS_MARK } from "../utils/assignmentProgress";
 import { styles } from "../styles";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 
@@ -41,9 +42,9 @@ export default function SwahiliResults({ uid }) {
         <article key={day} style={styles.card}>
           <h3>Day {day} · {title}</h3>
           <p>{!review ? "Awaiting tutor review" : review.status === "needs_revision" ? "Revision needed" : "Reviewed"}</p>
-          {Number.isInteger(review?.score) && <p>Score: {review.score}/100</p>}
+          {Number.isInteger(review?.score) && <p>Score: {review.score}/100 · {review.score >= PASS_MARK ? "Passed" : "Failed"} (pass mark: {PASS_MARK}%)</p>}
           {review?.feedback && <p style={{ whiteSpace: "pre-wrap" }}>{review.feedback}</p>}
-          {review?.status === "needs_revision" && (
+          {(review?.status === "needs_revision" || (Number.isInteger(review?.score) && review.score < PASS_MARK)) && (
             <Link to={`/campus/course/swahili/day-${day}?view=submit`}>Revise submission</Link>
           )}
         </article>
