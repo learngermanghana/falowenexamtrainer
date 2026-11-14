@@ -257,7 +257,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
     });
   });
 
-  test("isolates connections for two students and blocks expired trials", async () => {
+  test("isolates student connections and permits Campus-eligible limited trials", async () => {
     await withServer(async (origin) => {
       const [first, second] = await Promise.all([
         connectStudent(origin, "student-1", "one"),
@@ -293,7 +293,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const expired = await postJson(origin + "/api/chatgpt/approve", {
         ...requestParams("expired"), idToken: "inactive",
       });
-      expect(expired.status).toBe(403);
+      expect(expired.status).toBe(200);
     });
   });
   test("B2 authenticated student can read self-study lessons and progress without score sheet access", async () => {
