@@ -101,12 +101,12 @@ it("does not navigate or claim setup succeeded if saving fails", async () => {
   spy.mockRestore();
 });
 
-it("opens the signed-in course book for a Kiswahili trial", async () => {
+it("opens Day 1 directly for a Kiswahili trial", async () => {
   render(<OnboardingChecklist studentProfile={{ ...profile, program: "swahili", tuitionFee: null, balanceDue: null }}
     onSaveOnboarding={mockSave} />);
   expect(screen.getByText(/Karibu/)).toBeVisible();
   expect(screen.queryByTestId("onboarding-pay-now")).toBeNull();
-  fireEvent.click(screen.getByRole("button", { name: "Start 7-day trial" }));
-  await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("/campus/course", { replace: true }));
+  fireEvent.click(screen.getByRole("button", { name: "Start Day 1" }));
+  await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("/campus/course/swahili/day-1", { replace: true }));
   expect(mockSave).toHaveBeenCalledTimes(1);
 });
