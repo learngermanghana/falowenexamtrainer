@@ -14,11 +14,12 @@ test.each(["/swahili", "/campus/course/swahili"])("%s Day 6 starts with the rest
     <SwahiliDaySixWorkbook basePath={basePath} preview={basePath === "/swahili"} />
   </MemoryRouter>);
   const start = renderDay(pathname);
-  expect(screen.getByTitle(/Falowen Radio: Mgahawani/).src).toContain("/embed/oErMpRojTkg");
+  expect(screen.getByTitle(/Falowen Radio: Mgahawani/).src).toContain("/embed/ZesonfipX4I");
   expect(screen.getByRole("button", { name: /Continue to workbook/ })).toBeVisible();
   expect(screen.queryAllByRole("tab")).toHaveLength(0);
   start.unmount();
   renderDay(buildCompletedRadioHref({ pathname }));
+  expect(screen.getByTitle("Mgahawani · AI lecture").src).toContain("/embed/Tlc0mbxxkd8");
   expect(screen.getAllByRole("tab")).toHaveLength(7);
   expect(screen.queryByTitle(/Falowen Radio: Mgahawani/)).toBeNull();
 });

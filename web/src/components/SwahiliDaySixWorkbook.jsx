@@ -227,6 +227,13 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
       <p className="mgahawani-workbook__hero-goal">{lesson.objective}</p>
       <div className="swahili-book__meta"><span>Topic 4 · Mgahawani</span><span>Lesson 6</span><span>Music · Grammar · Teil 1–4 · Submit</span></div>
     </header>
+    <section className="swahili-book__tile" aria-labelledby="day-six-ai-lecture">
+      <h2 id="day-six-ai-lecture">{lesson.aiLecture.title}</h2>
+      <iframe title={lesson.aiLecture.title} loading="lazy" allowFullScreen
+        style={{ width: "100%", aspectRatio: "16 / 9", border: 0 }}
+        src={`https://www.youtube-nocookie.com/embed/${lesson.aiLecture.youtubeId}`} />
+      <a href={`https://youtu.be/${lesson.aiLecture.youtubeId}`} target="_blank" rel="noreferrer">Tazama kwenye YouTube</a>
+    </section>
     {isTeacher && <p className="swahili-book__spaced"><Link className="swahili-book__button swahili-book__button--soft" to={basePath + "/day-6?teacher=1"}>Teacher review · Somo la 6</Link></p>}
     <div className="mgahawani-workbook__intro" aria-label="Lesson pathway">
       <div><strong>Learn</strong><span>Polite requests, prices, numbers and -ni</span></div>
