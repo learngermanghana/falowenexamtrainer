@@ -10,6 +10,7 @@ import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
 import SwahiliCourseOverview from "./SwahiliCourseOverview";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
+import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import "./SwahiliCourseBook.css";
 
 const LETTERS = ["A", "E", "I", "O", "U"];
@@ -62,6 +63,7 @@ function DayOneContent({
   listeningChecked,
   setListeningChecked,
   user,
+  canSubmit,
   submitting,
   submissionResult,
   submitWork,
@@ -253,8 +255,8 @@ function DayOneContent({
         <li>Teil 4 · Kusikiliza: <strong>{Object.values(listeningAnswers).filter(Boolean).length} / {lesson.listening.length} majibu (hiari)</strong></li>
       </ul>
       {missing.length ? <p className="swahili-book__note" role="status">Kamilisha kwanza: {missing.join(" · ")}</p> : null}
-      {!user ? (
-        <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ili kuwasilisha. <Link to="/login">Ingia</Link></p>
+      {!canSubmit ? (
+        <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ya Kiswahili na ufungue Campus ili kuwasilisha. This public preview cannot submit work. <Link to="/login">Ingia</Link></p>
       ) : (
         <>
           <button className="swahili-book__button" type="button"
@@ -295,10 +297,11 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
   const [teacherReview, setTeacherReview] = useState(null);
   const [submissionVersion, setSubmissionVersion] = useState(0);
   const lesson = SWAHILI_DAY_ONE;
+  const canSubmit = canSubmitSwahiliWorkbook({ user, studentProfile, preview });
 
   useEffect(() => {
     setTeacherReview(null);
-    if (day !== 1 || activeTab !== "submit" || !user?.uid || !db) return undefined;
+    if (day !== 1 || activeTab !== "submit" || !canSubmit || !db) return undefined;
     let active = true;
     Promise.allSettled([
       getDoc(doc(db, "users", user.uid, "swahiliLessons", "day-1")),
@@ -311,10 +314,10 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
       setTeacherReview(getCurrentSwahiliReview(submission?.data(), review));
     });
     return () => { active = false; };
-  }, [activeTab, day, user?.uid, submissionVersion]);
+  }, [activeTab, day, user?.uid, canSubmit, submissionVersion]);
 
   const submitWork = async () => {
-    if (!user?.uid || !db || submitting) return;
+    if (!canSubmit || !db || submitting) return;
     if (getMissingSwahiliDayOneWork({ writing, readingAnswers }).length) return;
     setSubmitting(true);
     setSubmissionResult(null);
@@ -383,7 +386,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
           readingChecked={readingChecked} setReadingChecked={setReadingChecked}
           listeningAnswers={listeningAnswers} setListeningAnswers={(updater) => { setListeningAnswers(updater); setSubmissionResult(null); }}
           listeningChecked={listeningChecked} setListeningChecked={setListeningChecked}
-          user={user} submitting={submitting} submissionResult={submissionResult}
+          user={user} canSubmit={canSubmit} submitting={submitting} submissionResult={submissionResult}
           submitWork={submitWork} previouslySubmitted={previouslySubmitted} teacherReview={teacherReview} />
       </div>
       <p className="swahili-book__muted swahili-book__spaced">Mazoezi haya ni ya kiwango cha mwanzo. {preview ? "Huu ni mfano wa kitabu cha kozi." : ""}</p>
