@@ -30,14 +30,14 @@ export default function SwahiliResults({ uid }) {
     }).catch(() => {
       if (active) setFailed(true);
     });
-    useEffect(() => {
+    return () => { active = false; };
+  }, [uid]);
+
+  useEffect(() => {
     if (/^#swahili-day-(1|6)$/.test(hash) && rows) {
       document.getElementById(hash.slice(1))?.scrollIntoView?.({ block: "start" });
     }
   }, [hash, rows]);
-
-  return () => { active = false; };
-  }, [uid]);
 
   return (
     <section style={{ display: "grid", gap: 12 }}>
