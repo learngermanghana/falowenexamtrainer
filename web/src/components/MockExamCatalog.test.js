@@ -14,7 +14,15 @@ describe("mock exam catalog", () => {
   });
 
   test("filters Exams Room mocks by level without reusing course questions", () => {
-    expect(getMockExamsForLevel("A1").map((exam) => exam.id)).toContain("a1-final-01");
+    expect(getMockExamsForLevel("A1").map((exam) => exam.id)).not.toContain("a1-final-01");
+    expect(getMockExamsForLevel("A1", { includeCourse: true }).map((exam) => exam.id)).not.toContain("a1-final-01");
+    expect(getMockExam("a1-final-01")).toMatchObject({
+      level: "A1",
+      route: "/campus/course/a1-final-mock-exam",
+      status: "ready",
+      showInMockLibrary: false,
+    });
+    expect(getMockExamsForLevel("A1").map((exam) => exam.id)).toContain("a1-final-02");
     expect(getMockExamsForLevel("A2").map((exam) => exam.id)).not.toContain("a2-course-preview-01");
     expect(getMockExamsForLevel("A2", { includeCourse: true }).map((exam) => exam.id)).toContain(
       "a2-course-preview-01",
