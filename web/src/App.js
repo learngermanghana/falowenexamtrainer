@@ -1609,10 +1609,10 @@ const CampusArea = ({
 
       {resolvedSection === "music" && allowedSections.music ? <CampusMusicPage program={getCampusProgram(campusStudentProfile)} /> : null}
       {getCampusProgram(campusStudentProfile) === "swahili" && resolvedSection !== "music" &&
-        SWAHILI_RESOURCE_SECTIONS.includes(resolvedSection) ? (
+        SWAHILI_RESOURCE_SECTIONS.includes(resolvedSection) && ["vocab", "discussion"].includes(resolvedSection) ? (
           <section style={styles.card}><p>Swahili content for this section is coming soon.</p></section>
         ) : null}
-      {resolvedSection === "books" && allowedSections.books && getCampusProgram(campusStudentProfile) !== "swahili" ? <CampusBooksPage /> : null}
+      {resolvedSection === "books" && allowedSections.books ? <CampusBooksPage program={getCampusProgram(campusStudentProfile)} /> : null}
       {resolvedSection === "course" && allowedSections.course ? (
         String(campusStudentProfile?.program || "").toLowerCase() === "swahili" ? (
           <SwahiliCourseBook basePath="/campus/course/swahili" />
@@ -1625,8 +1625,8 @@ const CampusArea = ({
         )
       ) : null}
       {resolvedSection === "vocab" && allowedSections.vocab && getCampusProgram(campusStudentProfile) !== "swahili" ? <VocabExamPage context="campus" /> : null}
-      {resolvedSection === "attendance" && allowedSections.attendance && getCampusProgram(campusStudentProfile) !== "swahili" ? <AttendanceTab /> : null}
-      {resolvedSection === "classMembers" && allowedSections.classMembers && getCampusProgram(campusStudentProfile) !== "swahili" ? <ClassMembersTab /> : null}
+      {resolvedSection === "attendance" && allowedSections.attendance ? <AttendanceTab /> : null}
+      {resolvedSection === "classMembers" && allowedSections.classMembers ? <ClassMembersTab /> : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "speech" && allowedSections.speech ? <SpeechTrainerPage /> : null}
