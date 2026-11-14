@@ -329,6 +329,7 @@ function summarizeStudentAssignments(student, rows) {
 }
 
 const toolDefinitions = [
+
   {
     name: "get_my_falowen_profile",
     description: "Identify my connected Falowen student profile and course level without exposing student numbers or private records.",
@@ -342,6 +343,31 @@ const toolDefinitions = [
       required: ["id"], additionalProperties: false,
     },
     _meta: { "openai/profile": true },
+  },
+  {
+    name: "get_my_falowen_study_plan",
+    description: "Suggest a short daily study plan using my own recorded course assignments and learner-safe lesson content. Missing marks are not proof of non-submission; self-study completion cannot be verified.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_my_falowen_vocabulary_practice",
+    description: "Retrieve verified vocabulary from a day in my enrolled German Course Book and provide one-question-at-a-time flashcard instructions. Does not save practice results or invent missing words.",
+    inputSchema: { type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50 } }, required: ["day"], additionalProperties: false },
+  },
+  {
+    name: "get_my_falowen_grammar_writing_coach",
+    description: "Coach grammar or writing from my real Falowen lesson with feedback on my own answers, without giving official grades or submitting work.",
+    inputSchema: { type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50 }, skill: { type: "string", enum: ["grammar", "writing"] }, language: { type: "string", enum: ["de", "en"] } }, required: ["day", "skill"], additionalProperties: false },
+  },
+  {
+    name: "get_my_falowen_speaking_partner",
+    description: "Guide speaking practice using the authentic prompt from my enrolled Falowen lesson. Ask one question at a time; only assess pronunciation when the learner supplies audio.",
+    inputSchema: { type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50 }, language: { type: "string", enum: ["de", "en"] } }, required: ["day"], additionalProperties: false },
+  },
+  {
+    name: "get_my_falowen_music_guide",
+    description: "Help me study with Falowen Music and my course lesson. Never claim a specific track is linked to the day unless verified in the course export. Music is optional and ungraded.",
+    inputSchema: { type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50 } }, required: ["day"], additionalProperties: false },
   },
   {
     name: "get_my_falowen_assignments",
@@ -445,6 +471,89 @@ function featuredLegacyCourseBookSection(level, day) {
 
 async function callTool(name, args, student, admin) {
   const view = studentView(student);
+
+  // Kiswahili lessons use a separate teacher-approved source and must not
+  // silently fall through to a German A1/A2 course snapshot.
+  const isSwahiliStudent = ["swahili", "kiswahili"].includes(
+    normalize(student.data.program || student.data.languageProgram || "").toLowerCase());
+  if (isSwahiliStudent && (name === "get_my_falowen_study_plan" ||
+      name === "get_my_falowen_vocabulary_practice" ||
+      name === "get_my_falowen_grammar_writing_coach" ||
+      name === "get_my_falowen_speaking_partner" ||
+      name === "get_my_falowen_music_guide")) {
+    return { available: false, program: "swahili",
+      campusUrl: SITE + "/campus/course",
+      clarification: "Kiswahili lessons have a separate course book. Its approved content is not yet in this MCP export; open Falowen Campus. German practice material will not be substituted." };
+  }
+  // New student coaching tools reuse the same student-level-scoped, answer-safe
+  // snapshot and existing score summaries. No AI API calls or tracking writes.
+  if (["get_my_falowen_vocabulary_practice", "get_my_falowen_grammar_writing_coach",
+       "get_my_falowen_speaking_partner", "get_my_falowen_music_guide"].includes(name)) {
+    if (!Number.isInteger(args?.day) || args.day < 1 || args.day > 50) {
+      throw new Error("day must be an integer between 1 and 50");
+    }
+    if (!view.level) return { available: false, error: "No supported course level assigned." };
+    if (name === "get_my_falowen_vocabulary_practice") {
+      const result = lessonContentResponse(view.level, args.day, "vocabulary");
+      return { ...result, interaction: result.available ? {
+        method: "one_question_at_a_time",
+        instructions: "Use only the returned vocabulary. Test one term at a time, wait for the learner's answer, then correct and explain. Rotate German-to-English, English-to-German and an original sentence. Never invent an official score.",
+        recordsPractice: false, officialGrade: false,
+      } : undefined };
+    }
+    if (name === "get_my_falowen_grammar_writing_coach") {
+      if (!["grammar", "writing"].includes(args?.skill)) throw new Error("skill must be grammar or writing");
+      return practiceGuideResponse(view.level, args.day, args.skill, "study", args?.language || "de");
+    }
+    if (name === "get_my_falowen_speaking_partner") {
+      return practiceGuideResponse(view.level, args.day, "speaking", "study", args?.language || "de");
+    }
+    const overview = lessonContentResponse(view.level, args.day, "overview");
+    return {
+      level: view.level, day: args.day, available: overview.available,
+      lessonUrl: overview.lessonUrl,
+      musicLibraryUrl: "https://music.falowen.app",
+      lessonTopic: overview.available ? overview.topic : null,
+      linkedRecordingVerified: false,
+      instructions: "Music listening is optional, ungraded practice. Let the student choose a published song from Falowen Music, then ask them to provide its words or title if needed. Discuss only words actually supplied; do not invent lyrics, recording links, timings or a day-to-song mapping.",
+    };
+  }
+  if (name === "get_my_falowen_study_plan") {
+    if (!view.level) return { available: false, error: "No supported course level assigned." };
+    let summary;
+    if (SELF_STUDY_LEVELS.has(view.level)) {
+      summary = summarizeStudentAssignments(student, []);
+    } else {
+      const studentCode = normalize(student.data.studentCode || student.data.studentcode || student.id);
+      let scoreRows;
+      try { scoreRows = await getScoresForStudent(studentCode); }
+      catch (_error) {
+        return { available: false, level: view.level, campusUrl: SITE + "/campus",
+          clarification: "Recorded results cannot be checked right now. No lesson completion or submission status is assumed." };
+      }
+      summary = summarizeStudentAssignments(student, scoreRows);
+    }
+    const items = summary.assignments || [];
+    const review = items.find((item) => item.status === "needs_review");
+    const next = items.find((item) => item.status === "no_grade_recorded") || items[0];
+    const suggested = review || next;
+    const day = Number(suggested?.day);
+    const overview = Number.isInteger(day) ? lessonContentResponse(view.level, day, "overview") : null;
+    return {
+      level: view.level, available: Boolean(suggested), courseMode: summary.courseMode || "tutor_marked",
+      recommendedDay: Number.isInteger(day) ? day : null,
+      recommendationReason: review ? "A recorded score suggests this assignment needs revision."
+        : SELF_STUDY_LEVELS.has(view.level) ? "This is a catalogue starting point, NOT a verified next unfinished lesson."
+        : "No grade is recorded for this assignment; it may already have been submitted.",
+      lessonUrl: suggested?.lessonUrl || suggested?.submissionUrl || SITE + "/campus/course",
+      lesson: overview?.available ? { title: overview.title, topic: overview.topic,
+        grammarFocus: overview.grammarFocus, availableSections: overview.availableSections } : null,
+      plan: ["5 minutes: review available vocabulary or grammar in Campus.",
+        "10 minutes: practise one actual lesson exercise, one question at a time.",
+        "5 minutes: write or say three original sentences; review tutor corrections when available."],
+      clarification: "This plan is advice, not verified completion, a deadline, a submission or an official result. Continue or submit official work in Falowen Campus.",
+    };
+  }
   if (name === "get_my_falowen_profile") return {
     id: "flw_" + sha256(student.id).slice(0, 32),
     name: view.name,
@@ -673,7 +782,7 @@ function makeRouter(admin) {
     if (message.method === "initialize") {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "Falowen Learning Companion", version: "1.0.0" },
+        serverInfo: { name: "Falowen Learning Companion", version: "1.2.0" },
         instructions: "Tutoring protocol: prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
