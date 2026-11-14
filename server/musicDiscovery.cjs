@@ -5,48 +5,44 @@
 const crypto = require('node:crypto');
 const approvedRecordingLyrics = require('../web/public/music/approved-recording-lyrics.json');
 const { getR2AudioConfig } = require('../functions/functionz/r2CourseAudio');
-const LEVELS = new Set(['A1','A2','B1','B2','C1','C2']);
+const LEVELS = new Set(['A1','A2','B1','B2','C1','C2','SWAHILI']);
 // A2 Day 14 recording was replaced by owner-approved Mein Traumberuf.mp3.
 // Keep a stale R2 MP3 out of discovery and prevent matching new lyrics to it.
 const RETIRED_MUSIC_KEYS = new Set(['music/a2/day-14/Pläne für mein Leben.mp3']);
-const OBJECT_KEY = /^music\/(a1|a2|b1|b2|c1|c2)\/day-(0[1-9]|1[0-9]|2[0-8])\/([^/\\\u0000-\u001f\u007f]{1,150})\.(mp3)$/i;
-const AUTO_ID = /^r2-(a1|a2|b1|b2|c1|c2)-day-(0[1-9]|1[0-9]|2[0-8])-([a-z0-9]+(?:-[a-z0-9]+)*)$/;
+const OBJECT_KEY = /^music\/(a1|a2|b1|b2|c1|c2|swahili)\/(library|day-(?:0[1-9]|1[0-9]|2[0-8]))\/([^/\\\u0000-\u001f\u007f]{1,150})\.(mp3)$/i;
 const enc = value => encodeURIComponent(String(value)).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase());
 const hmac = (key,msg) => crypto.createHmac('sha256',key).update(msg).digest();
 function musicKeyFromAutoId(id) {
-  const encoded=String(id || '').match(/^r2-(a1|a2|b1|b2|c1|c2)-day-(0[1-9]|1[0-9]|2[0-8])-b64_([a-zA-Z0-9_-]{4,220})$/);
-  if (encoded) {
-    try {
-      const name=Buffer.from(encoded[3],'base64url').toString('utf8');
-      const match=musicTrackFromKey('music/'+encoded[1]+'/day-'+encoded[2]+'/'+name);
-      if(match && match.id === id) return match.objectKey;
-    } catch {}
-    return '';
-  }
-  const match = String(id || '').match(AUTO_ID);
-  return match ? 'music/' + match[1] + '/day-' + match[2] + '/' + match[3] + '.mp3' : '';
+  const match = /^r2-(a1|a2|b1|b2|c1|c2|swahili)-(library|day-(?:0[1-9]|1[0-9]|2[0-8]))-([a-z0-9]+(?:-[a-z0-9]+)*|b64_[A-Za-z0-9_-]{4,220})$/.exec(String(id || ''));
+  if (!match) return '';
+  const [, program, folder, suffix] = match;
+  const filename = suffix.startsWith('b64_') ? Buffer.from(suffix.slice(4), 'base64url').toString('utf8') : suffix + '.mp3';
+  const key = 'music/' + program + '/' + folder + '/' + filename;
+  return musicTrackFromKey(key)?.id === id ? key : '';
 }
 function musicTrackFromKey(key) {
   if (RETIRED_MUSIC_KEYS.has(String(key || ''))) return null;
   const match = String(key || '').match(OBJECT_KEY);
   if (!match || !match[3].trim() || match[3] !== match[3].trim()) return null;
   const level = match[1].toUpperCase();
-  if (!LEVELS.has(level)) return null;
+  const folder = match[2];
+  if (!LEVELS.has(level) || (folder === 'library' && level !== 'SWAHILI')) return null;
+  const day = folder === 'library' ? null : Number(folder.slice(4));
   // Preserve the *exact* original filename for reversible playback IDs,
   // including spaces, umlauts, punctuation and upper-case .MP3 extensions.
   const filename=match[3]+'.'+match[4];
   const isSlug=/^[a-z0-9]+(?:-[a-z0-9]+)*\.mp3$/.test(filename);
   const suffix=isSlug?match[3]:'b64_'+Buffer.from(filename,'utf8').toString('base64url');
   if(suffix.length>225) return null;
-  const id = 'r2-' + match[1].toLowerCase() + '-day-' + match[2] + '-' + suffix;
+  const id = 'r2-' + match[1].toLowerCase() + '-' + folder + '-' + suffix;
   const name=match[3].replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
   const approved = approvedRecordingLyrics.recordings.find(recording => recording.objectKey === key);
   return {
-    id, title:approved?.title || name.charAt(0).toUpperCase()+name.slice(1), level, day:Number(match[2]),
-    topic:'Day '+Number(match[2])+' · German music',
-    type:'Learning story', genre:approved?.genre || '', language:'German',
+    id, title:approved?.title || name.charAt(0).toUpperCase()+name.slice(1), level, day,
+    topic:day ? 'Day '+day+(level === 'SWAHILI' ? ' · Swahili music' : ' · German music') : 'Swahili music',
+    type:'Learning story', genre:approved?.genre || '', language:level === 'SWAHILI' ? 'Swahili' : 'German',
     audioUrl:'https://www.falowen.app/api/music?track='+id,
-    assignmentKey:approved?.assignmentKey || '', coursebook:true, autoDiscovered:true,
+    assignmentKey:approved?.assignmentKey || '', coursebook:day !== null, autoDiscovered:true,
     objectKey:key,
   };
 }

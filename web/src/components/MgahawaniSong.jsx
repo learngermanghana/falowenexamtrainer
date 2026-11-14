@@ -1,3 +1,4 @@
+import WorkbookDayMusic from './WorkbookDayMusic';
 import React from "react";
 import { MGAHAWANI_SONG } from "../data/swahili/mgahawaniGrammarAndSong";
 
@@ -11,7 +12,7 @@ export default function MgahawaniSong() {
         <p>Song lyrics · Learn to order food politely, ask prices and pay.</p>
       </div>
     </div>
-    <p className="swahili-book__note">The teacher has supplied the lyrics, but no song recording or synced lyric timings have been uploaded. Read or sing these words with your teacher for now.</p>
+    <WorkbookDayMusic level="SWAHILI" day={6} compact />
     <nav className="mgahawani-song__index" aria-label="Song sections">
       {MGAHAWANI_SONG.sections.map((section,i)=><a key={i} href={"#mgahawani-song-" + i}>{i+1}. {section.title}</a>)}
     </nav>

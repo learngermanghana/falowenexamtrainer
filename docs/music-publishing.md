@@ -4,6 +4,9 @@
 
 **Important privacy rule:** Uploading a file under `music/<level>/day-XX/` now counts as **approving it for public listening**. Never upload private Hören conversations, unreviewed audio, copyrighted content without rights, or student recordings into `music/`. The separate private course audio areas (`a1/`, `a2/`, `b1/`, etc.) remain inaccessible to public music discovery.
 
+## Swahili music
+In the same bucket, use `music/swahili/library/<song>.mp3` for standalone songs, or `music/swahili/day-XX/<song>.mp3` for an assigned lesson (01–28). For example, upload the family song as `music/swahili/library/karibu-kufahamu-familia-yangu.mp3`. Select Swahili on the music site and refresh songs. The Day 1 and Day 6 workbook Music tabs find recordings in their own day folders. The library folder has no lesson association. Discovery and playback use the same cached list and on-demand playback endpoint as German songs.
+
 ## Automatic upload-to-website flow
 
 1. In the private Cloudflare R2 bucket **falowen-course-audio**, upload a reviewed MP3 to a music-only folder with this exact convention: `music/a2/day-19/lieber-online-oder-im-laden.mp3` (replace level/day and filename appropriately). Use the exact lowercase level/day folders and an `.mp3` file. Song filenames may contain letters, digits, spaces, underscores, hyphens or parentheses; the server handles these safely.

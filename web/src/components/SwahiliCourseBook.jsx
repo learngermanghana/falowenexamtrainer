@@ -1,3 +1,4 @@
+import WorkbookDayMusic from './WorkbookDayMusic';
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -76,8 +77,7 @@ function DayOneContent({
   if (activeTab === "references") return (
     <section className="swahili-book__card swahili-book__activity" aria-label="Music">
       <h2>Music · Muziki wa Somo la 1</h2>
-      <p>Wimbo wa alfabeti na matamshi utaongezwa hapa mara tu utakapopakiwa. Sehemu hii ni ya hiari.</p>
-      <p className="swahili-book__note">Rekodi ya muziki bado haijapakiwa. Hakuna wimbo wa kubuni au kicheza sauti kisichofanya kazi.</p>
+      <WorkbookDayMusic level="SWAHILI" day={1} compact />
     </section>
   );
 

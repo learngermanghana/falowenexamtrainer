@@ -198,7 +198,7 @@ function safeTrack(row) {
   const day = Number(row.day);
   return {
     id: row.id, title: String(row.title).slice(0, 150),
-    level: ["ALL", "A1", "A2", "B1", "B2", "C1", "C2"].includes(level) ? level : "ALL",
+    level: ["ALL", "A1", "A2", "B1", "B2", "C1", "C2", "SWAHILI"].includes(level) ? level : "ALL",
     day: Number.isInteger(day) && day >= 1 && day <= 99 ? day : null,
     topic: String(row.topic || "German learning").slice(0, 100),
     type: String(row.type || "Lesson song").slice(0, 100),
@@ -208,7 +208,7 @@ function safeTrack(row) {
     featured: row.featured === true,
     autoDiscovered: row.autoDiscovered === true,
     objectKey: String(row.objectKey || ""),
-    category: row.coursebook === true ? "lesson" : "motivation",
+    category: level === "SWAHILI" && !day ? "music" : row.coursebook === true ? "lesson" : "motivation",
   };
 }
 function el(tag, className, content) {
@@ -376,10 +376,10 @@ function populateFeatured() {
   } catch {}
 }
 function populateFilters() {
-  const available = ["A1","A2","B1","B2","C1","C2"];
+  const available = ["A1","A2","B1","B2","C1","C2","SWAHILI"];
   const oldLevel = levelInput.value, oldDay = dayInput.value, oldGenre = genreInput.value;
   levelInput.replaceChildren(new Option("All levels", ""));
-  available.forEach(level => levelInput.add(new Option(level, level)));
+  available.forEach(level => levelInput.add(new Option(level === "SWAHILI" ? "Swahili" : level, level)));
   const queryLevel=(initialParams.get("level") || "").toUpperCase();
   levelInput.value = available.includes(oldLevel) ? oldLevel : available.includes(queryLevel) ? queryLevel : "";
   dayInput.replaceChildren(new Option("Available days", ""));
@@ -396,7 +396,7 @@ function populateFilters() {
 function card(track) {
   const article = el("article", "track-card");
   const art = el("div", "track-art " + (track.category === "lesson" ? "art-lesson" : "art-motivation"));
-  const badge = el("span", "track-badge", track.level === "ALL" ? "CLASS MUSIC" : track.level + " · DAY " + track.day);
+  const badge = el("span", "track-badge", track.level === "ALL" ? "CLASS MUSIC" : track.level + (track.day ? " · DAY " + track.day : ""));
   const circle = el("span", "art-circle", track.category === "lesson" ? "♫" : "♪");
   circle.setAttribute("aria-hidden", "true");
   const cover=coverForTrack(track);
@@ -451,13 +451,13 @@ function renderCatalog() {
   if (category === "recent") visibleTracks.sort((a,b) => listeningHistory.indexOf(a.id) - listeningHistory.indexOf(b.id));
   if (category === "favorites") visibleTracks.sort((a,b) => favorites.indexOf(a.id) - favorites.indexOf(b.id));
   tracksRoot.replaceChildren();
-  for (const groupLevel of ["A1", "A2", "B1", "B2", "C1", "C2", "ALL"]) {
+  for (const groupLevel of ["A1", "A2", "B1", "B2", "C1", "C2", "SWAHILI", "ALL"]) {
     const songs = visibleTracks.filter(track => track.level === groupLevel);
     if (!songs.length) continue;
     const section = el("section", "level-section");
     section.dataset.level = groupLevel.toLowerCase();
     const heading = el("div", "level-heading");
-    const title = groupLevel === "ALL" ? "Classroom motivation" : groupLevel + " · German songs";
+    const title = groupLevel === "ALL" ? "Classroom motivation" : groupLevel === "SWAHILI" ? "Swahili songs" : groupLevel + " · German songs";
     heading.append(el("h3", "", title));
     const view = el("button", "clear-button", level ? "All levels ←" : "View all " + songs.length + " →");
     view.type = "button";
@@ -518,7 +518,7 @@ function updateMediaSession(track) {
       session.metadata = new MediaMetadata({
         title: track.title,
         artist: "Falowen Music",
-        album: track.level === "ALL" ? "German learning music" : track.level + " German learning songs",
+        album: track.level === "ALL" ? "German learning music" : track.language + " learning songs",
       });
     }
     session.playbackState = audio.paused ? "paused" : "playing";
@@ -764,7 +764,7 @@ function renderDetail(track) {
   const lyricPack = publishedLyrics.get(track.id) || (lesson?.assignmentKey === track.assignmentKey ? lesson : null) || referenceLyricsFor(track);
   const hasLyrics = Boolean(lyricPack?.lyrics);
   const hasLesson = Boolean(lesson && Array.isArray(lesson.questions) && (!lyricPack || JSON.stringify(lyricLines(lyricPack.lyrics)) === JSON.stringify(lyricLines(lesson.lyrics))));
-  byId("detail-eyebrow").textContent = track.level === "ALL" ? "FALOWEN · CLASSROOM MUSIC" : "FALOWEN · " + track.level + " · DAY " + track.day;
+  byId("detail-eyebrow").textContent = track.level === "ALL" ? "FALOWEN · CLASSROOM MUSIC" : "FALOWEN · " + track.level + (track.day ? " · DAY " + track.day : "");
   byId("detail-title").textContent = track.title;
   const detailCover=byId("detail-cover");
   if(detailCover){const url=coverForTrack(track);detailCover.hidden=!url;
