@@ -58,3 +58,19 @@ For release verification, regenerate the snapshot, run unit and authenticated HT
 - **Grammar**: `language=en` requests English *explanation* of existing German content; it does not change the underlying course text or require a translation API call.
 - **Practice summaries** are conversation-only until student-approved cross-device sync is implemented with a separate consent and data-retention design. Never persist private model conversations, auto-generate official scores, or infer self-study completion.
 - Maintain the no-answer-index export check and OAuth level-scope tests; rebuilding the canonical snapshot is part of existing Vercel prebuild. No additional scheduled job or paid background model calls have been added.
+
+## Student study coaching expansion — 14 November 2026 (proposed)
+
+Five new **read-only** MCP tools in the learner backend (not necessarily exposed by the currently approved ChatGPT plugin snapshot):
+
+| Tool | Source and behavior |
+| --- | --- |
+| `get_my_falowen_study_plan` | Summarises own A1–B1 recorded assignments once on request, or offers a *catalogue starting point* for B2–C2; does not claim an unmarked submission is missing or that self-study is incomplete |
+| `get_my_falowen_vocabulary_practice(day)` | Retrieves only exported source vocabulary for the OAuth-linked German level; one question at a time, no score saved |
+| `get_my_falowen_grammar_writing_coach(day,skill,language?)` | Reuses the existing grammar/writing practice guide and authentic lesson content |
+| `get_my_falowen_speaking_partner(day,language?)` | Reuses speaking lesson prompts; pronunciation may be discussed only with learner-provided audio |
+| `get_my_falowen_music_guide(day)` | Provides an optional public Music library link and lesson context but explicitly does **not** claim a verified day-to-song relationship, playable audio, or synced lyrics |
+
+These tools reuse the OAuth student's course scope, generated read-only lesson snapshot, and existing score lookup. No AI API, background tracking, new Firestore writes, grading or submission endpoint was added. Kiswahili enrolments return an explicit unavailable response for the new tools until an approved programme-specific export is ready; do not substitute German material.
+
+Before release: run existing MCP authentication / student isolation tests plus build checks, verify the resulting Vercel revision, and request an update to the **existing** published ChatGPT plugin tool snapshot. Its five-tool installation will not automatically gain the new tools from a backend merge.
