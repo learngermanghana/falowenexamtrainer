@@ -10,14 +10,16 @@ const WORDING = {
     { kicker:"GOETHE-STYLE EXAM PRACTICE",title:"Prepare for",accent:"your German exam.",desc:"Practise sample tests and full mocks in Lesen, Hören, Schreiben and Sprechen, with AI-supported feedback.",action:"Explore exam practice",href:"/exam-practice",kind:"exams" },
     { kicker:"FALOWEN BOOKSTORE",title:"Learn more with",accent:"German books.",desc:"Explore Falowen German workbooks. Choose an available digital edition or order a printed book.",action:"Browse German books",href:"/books",kind:"books" },
     { kicker:"FALOWEN IN CHATGPT",title:"Learn German",accent:"with ChatGPT.",desc:"Connect your Falowen account to ask about assignments, review recorded feedback and prepare for your next class. Your learning stays linked to Falowen Campus.",action:"How to use Falowen with ChatGPT",href:"/learn-german-with-chatgpt",kind:"chatgpt" },
-  ]  de: [
+  ],
+  de: [
     { kicker:"SPRACHEN ONLINE LERNEN",title:"Lerne Deutsch und Kiswahili",accent:"mit Falowen.",desc:"Besuche einen Deutschkurs oder starte mit dem Online-Kursbuch Kiswahili A1. Wähle deine Sprache bei der Registrierung.",action:"Registrieren",support:"Deutschkurse ansehen",href:"/signup",kind:"courses" },
     { kicker:"DEUTSCH LERNEN MIT MUSIK",title:"Deutsch üben",accent:"mit Musik.",desc:"Entdecke Lernlieder für A1, A2 und B1. Höre zu, lies den Liedtext mit und trainiere Aussprache und Wortschatz.",action:"Deutsche Lieder entdecken",href:"https://music.falowen.app/",kind:"music" },
     { kicker:"KOSTENLOSER EINSTUFUNGSTEST",title:"Finde dein",accent:"Deutschniveau.",desc:"Du weißt nicht, wo du anfangen sollst? Mit dem kostenlosen A1–B1-Test findest du deinen Einstieg.",action:"Einstufungstest starten",href:"/placement-test",kind:"placement" },
     { kicker:"GOETHE-ORIENTIERTE PRÜFUNGSÜBUNGEN",title:"Bereite dich auf",accent:"deine Prüfung vor.",desc:"Übe Lesen, Hören, Schreiben und Sprechen mit Beispieltests, Probeprüfungen und KI-Feedback.",action:"Prüfungsübungen ansehen",href:"/exam-practice",kind:"exams" },
     { kicker:"FALOWEN BÜCHER",title:"Deutsch lernen",accent:"mit Arbeitsbüchern.",desc:"Entdecke Falowen Arbeitsbücher als verfügbare digitale oder gedruckte Ausgabe.",action:"Bücher ansehen",href:"/books",kind:"books" },
     { kicker:"FALOWEN IN CHATGPT",title:"Deutsch lernen",accent:"mit ChatGPT.",desc:"Verbinde dein Falowen-Konto, prüfe deine Aufgaben, sieh dir gespeichertes Feedback an und bereite dich auf den nächsten Unterricht vor.",action:"Falowen mit ChatGPT nutzen",href:"/learn-german-with-chatgpt",kind:"chatgpt" },
-  ]  fr: [
+  ],
+  fr: [
     { kicker:"APPRENDRE LES LANGUES EN LIGNE",title:"Apprenez l’allemand et le swahili",accent:"avec Falowen.",desc:"Suivez un cours d’allemand ou commencez le swahili avec le cahier A1 en ligne. Choisissez votre langue à l’inscription.",action:"S’inscrire",support:"Voir les cours d’allemand",href:"/signup",kind:"courses" },
     { kicker:"APPRENDRE L'ALLEMAND EN MUSIQUE",title:"Apprenez l'allemand",accent:"avec la musique.",desc:"Écoutez des chansons pédagogiques pour les niveaux A1, A2 et B1. Suivez les paroles et entraînez votre prononciation et votre vocabulaire.",action:"Découvrir les chansons",href:"https://music.falowen.app/",kind:"music" },
     { kicker:"TEST DE NIVEAU GRATUIT",title:"Découvrez votre",accent:"niveau d'allemand.",desc:"Vous hésitez sur votre niveau? Faites notre test gratuit A1–B1 et trouvez où commencer.",action:"Faire le test gratuit",href:"/placement-test",kind:"placement" },
