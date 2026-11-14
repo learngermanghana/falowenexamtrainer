@@ -7,8 +7,8 @@
 export const getCampusProgram = (studentProfile) =>
   String(studentProfile?.program || "").trim().toLowerCase() === "swahili" ? "swahili" : "german";
 
-const SWAHILI_CAMPUS_SECTIONS = new Set(["course", "account"]);
-const GERMAN_ONLY_SECTIONS = ["music", "books", "vocab", "attendance", "results", "discussion", "classMembers"];
+const SWAHILI_CAMPUS_SECTIONS = new Set(["course", "vocab", "account"]);
+const GERMAN_ONLY_SECTIONS = ["music", "books", "attendance", "results", "discussion", "classMembers"];
 
 export const getProgramCampusTabs = (tabs, studentProfile) =>
   getCampusProgram(studentProfile) === "swahili"
