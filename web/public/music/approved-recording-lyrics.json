@@ -2,6 +2,16 @@
   "version": 1,
   "recordings": [
     {
+      "trackId": "swahili-a1-day-06",
+      "objectKey": "swahili/music/A1/day-06/Chakula Kizuri Mgahawani.mp3",
+      "title": "Chakula Kizuri Mgahawani",
+      "lyrics": "[Verse 1]\nHabari yako? Habari yako?\nNzuri, asante! Karibu!\nNikuhudumie nini?\nNaomba orodha ya vyakula.\nNinapenda wali na samaki,\nSipendi soda, napenda maji.\nNaomba wali na kuku,\nNa juisi ya embe, tafadhali.\n\n[Chorus]\nNaomba, naomba, tafadhali,\nChakula kizuri mgahawani.\nAsante sana, karibu tena,\nTunakula pamoja, furaha tele!\n\n[Verse 2]\nMaji ni maji, twafahamu,\nJuisi ya embe, tamu sana.\nJuisi ya chungwa pia ipo,\nNaomba vikombe viwili vya chai.\nNinapenda wali na samaki,\nSipendi soda, napenda maji.\nKaribu, karibu, kaa hapa,\nChakula kitamu, twafurahia!\n\n[Chorus]\nNaomba, naomba, tafadhali,\nChakula kizuri mgahawani.\nAsante sana, karibu tena,\nTunakula pamoja, furaha tele!\n\n[Verse 3]\nNaomba bili, tafadhali,\nJumla ni shilingi ngapi?\nShilingi elfu tano,\nHizi hapa pesa zako.\nAsante sana, asante sana,\nKaribu tena mgahawani.\nChakula kizuri, huduma nzuri,\nTutaonana tena siku nyingine!\n\n[Final Chorus]\nNaomba, naomba, tafadhali,\nChakula kizuri mgahawani.\nAsante sana, karibu tena,\nTunakula pamoja, furaha tele!\n\nNaomba, naomba, tafadhali,\nChakula kizuri mgahawani.\nAsante sana, karibu tena,\nTunakula pamoja, furaha tele!\n\n[Outro]\nAsante sana!\nKaribu tena!\nKwa heri, kwa heri!\nTutaonana tena!",
+      "cues": [],
+      "duration": 197.64,
+      "recordingSha256": "c4beb8e2a9fa4e71b6cc59f9d94bf8ee54aa5c11d04a810fd2996b5fa378b8ee",
+      "source": "Owner-supplied lyrics for this recording; timing pending"
+    },
+    {
       "trackId": "swahili-a1-day-05",
       "objectKey": "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
       "title": "Karibu Kufahamu Familia Yangu",
