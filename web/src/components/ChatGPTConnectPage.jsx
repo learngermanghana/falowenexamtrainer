@@ -23,6 +23,7 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
   }, []);
   const name = String(studentProfile?.name || studentProfile?.fullName || user?.displayName || user?.email || "Student");
   const hasRequest = AUTH_FIELDS.every((field) => Boolean(params[field]));
+  const wantsPracticeWrite = params.scope.split(/\s+/).includes("falowen:practice:write");
 
   const authorize = async () => {
     setLoading(true);
@@ -73,6 +74,18 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
           ChatGPT cannot submit assignments, change grades, access payment records, or start timed exams.
           Official work stays on Falowen Campus.
         </p>
+        {wantsPracticeWrite && (
+          <div style={{ padding: "12px 18px", background: "#fff5e8", border: "1px solid #f3d7a8", borderRadius: 12, marginTop: 16 }}>
+            <strong>Additional permission requested: Save personal practice notes</strong>
+            <p style={{ marginBottom: 0, lineHeight: 1.6 }}>
+              With your permission, ChatGPT may save a short learning note to your own Falowen account
+              when you explicitly ask it to do so. Notes are stored separately from official exams,
+              grades and submissions, and may be retained for up to 90 days. You can decline by
+              cancelling and reconnecting with read-only access. This permission does not allow
+              ChatGPT to submit or mark exams, change tutor scores or access other students.
+            </p>
+          </div>
+        )}
         <p style={styles.subtle}>
           Connecting sends relevant learning information to ChatGPT when you ask for it. Review the{" "}
           <a href="/chatgpt-privacy.html" target="_blank" rel="noreferrer" style={styles.link}>Falowen ChatGPT privacy notice</a>{" "}
@@ -85,7 +98,7 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
           <p role="alert" style={{ color: "#b21d2d" }}>The ChatGPT connection request is incomplete. Start again from ChatGPT.</p>
         ) : (
           <button style={{ ...styles.button, opacity: loading ? .65 : 1 }} type="button" onClick={authorize} disabled={loading || !user}>
-            {loading ? "Connecting…" : "Allow read-only access"}
+            {loading ? "Connecting…" : wantsPracticeWrite ? "Allow reading and optional practice-note saving" : "Allow read-only access"}
           </button>
         )}
         <p style={{ textAlign: "center", marginTop: 20 }}>
