@@ -10,9 +10,13 @@ export const SWAHILI_DAY_SIX = Object.freeze({
   topic: "Mgahawani",
   radio: {
     resourceRole: "falowenRadio",
-    youtubeId: "oErMpRojTkg",
+    youtubeId: "ZesonfipX4I",
     title: "Mgahawani · Ordering food at a restaurant",
     instruction: "Sikiliza mazungumzo. Listen for how the customer orders food and a drink.",
+  },
+  aiLecture: {
+    youtubeId: "Tlc0mbxxkd8",
+    title: "Mgahawani · AI lecture",
   },
   objective: "Read a menu, say which foods and drinks you like or dislike, and order food and a drink at an East African restaurant.",
   food: [
