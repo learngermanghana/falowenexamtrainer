@@ -7,11 +7,11 @@ import { readSavedSwahiliWordIds, getSwahiliWordId } from "../services/swahiliSa
 import { SWAHILI_DICTIONARY_WORDS } from "../data/swahili/vocabulary";
 import { fetchVocabularyFromSheet } from "../services/vocabService";
 
-let currentUser = { uid: "swahili-test-user" };
-let currentProfile = { program: "swahili" };
+let mockUser = { uid: "swahili-test-user" };
+let mockProfile = { program: "swahili" };
 
 jest.mock("../context/AuthContext", () => ({
-  useAuth: () => ({ user: currentUser, studentProfile: currentProfile }),
+  useAuth: () => ({ user: mockUser, studentProfile: mockProfile }),
 }));
 jest.mock("../context/ExamContext", () => ({
   ALLOWED_LEVELS: ["A1", "A2", "B1", "B2", "C1", "C2"],
@@ -25,8 +25,8 @@ const renderVocab = () => render(<MemoryRouter><VocabExamPage context="campus" /
 
 describe("Kiswahili Campus vocabulary reuses the existing Falowen vocabulary route", () => {
   beforeEach(() => {
-    currentUser = { uid: "swahili-test-user" };
-    currentProfile = { program: "swahili" };
+    mockUser = { uid: "swahili-test-user" };
+    mockProfile = { program: "swahili" };
     window.localStorage.clear();
     jest.clearAllMocks();
   });
@@ -58,18 +58,18 @@ describe("Kiswahili Campus vocabulary reuses the existing Falowen vocabulary rou
   });
 
   test("saves words in the workbook dictionary and reviews them in Campus", () => {
-    const page = render(<MemoryRouter><SwahiliDictionary uid={currentUser.uid} allowSave /></MemoryRouter>);
+    const page = render(<MemoryRouter><SwahiliDictionary uid={mockUser.uid} allowSave /></MemoryRouter>);
     fireEvent.change(screen.getByLabelText("Tafuta neno · Search"), { target: { value: "mama" } });
     fireEvent.click(screen.getByRole("button", { name: "Save mama" }));
     const mama = SWAHILI_DICTIONARY_WORDS.find((word) => word.sw === "mama");
-    expect(readSavedSwahiliWordIds(currentUser.uid)).toContain(getSwahiliWordId(mama));
+    expect(readSavedSwahiliWordIds(mockUser.uid)).toContain(getSwahiliWordId(mama));
     page.unmount();
     renderVocab();
     fireEvent.click(screen.getByRole("checkbox", { name: "Saved words only" }));
     expect(screen.getByText("mama")).toBeTruthy();
     expect(screen.queryByText("wali samaki")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Remove mama" }));
-    expect(readSavedSwahiliWordIds(currentUser.uid)).toEqual([]);
+    expect(readSavedSwahiliWordIds(mockUser.uid)).toEqual([]);
     expect(screen.getByText(/No saved words match these filters/)).toBeTruthy();
   });
 
@@ -91,7 +91,7 @@ describe("Kiswahili Campus vocabulary reuses the existing Falowen vocabulary rou
   });
 
   test("keeps the original German Campus vocabulary sheet and interface unchanged", async () => {
-    currentProfile = { program: "german", level: "A1" };
+    mockProfile = { program: "german", level: "A1" };
     renderVocab();
     expect(screen.getByRole("heading", { name: "Vocabulary Practice" })).toBeTruthy();
     await waitFor(() => expect(fetchVocabularyFromSheet).toHaveBeenCalledTimes(1));
@@ -102,7 +102,7 @@ describe("Kiswahili Campus vocabulary reuses the existing Falowen vocabulary rou
     render(<MemoryRouter><SwahiliDictionary /></MemoryRouter>);
     expect(screen.getByText("mama")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Save mama" })).toBeNull();
-    expect(readSavedSwahiliWordIds(currentUser.uid)).toEqual([]);
+    expect(readSavedSwahiliWordIds(mockUser.uid)).toEqual([]);
   });
 
   test("does not show another student's saved words after switching accounts", () => {
@@ -113,7 +113,7 @@ describe("Kiswahili Campus vocabulary reuses the existing Falowen vocabulary rou
     const page = renderVocab();
     fireEvent.click(screen.getByRole("button", { name: "Save mama" }));
     page.unmount();
-    currentUser = { uid: "other-learner" };
+    mockUser = { uid: "other-learner" };
     renderVocab();
     expect(screen.getByText(/0 saved on this device/)).toBeTruthy();
     expect(readSavedSwahiliWordIds("other-learner")).toEqual([]);
