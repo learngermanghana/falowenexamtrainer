@@ -27,6 +27,16 @@ const COPY = {
     supportEyebrow: "YOUR SUPPORT SYSTEM",
     supportTitle: "Practise with AI. Improve with a tutor.",
     supportText: "Replay lectures, practise as often as you need and receive practical learning feedback — with teacher guidance when you need it.",
+    hybridEyebrow: "FLEXIBLE GERMAN LEARNING",
+    hybridTitle: "Learn German your way.",
+    hybridIntro: "Choose how you learn with Learn Language Education Academy and Falowen.",
+    hybridInPersonTitle: "In person",
+    hybridInPersonText: "Attend teacher-led classes in Accra.",
+    hybridOnlineTitle: "Live online",
+    hybridOnlineText: "Join interactive lessons from wherever you are.",
+    hybridRecordedTitle: "Recorded lectures",
+    hybridRecordedText: "Replay lessons and practise at your own pace on Falowen.",
+    hybridAction: "Explore learning options",
     supportLink: "See how Falowen works",
     reviewsIntro: "Hear it from our students",
     finalEyebrow: "YOUR NEXT STEP",
@@ -57,6 +67,16 @@ const COPY = {
     supportEyebrow: "DEINE LERNUNTERSTÜTZUNG",
     supportTitle: "Mit KI üben. Mit Lehrkräften besser werden.",
     supportText: "Schau dir Lektionen erneut an, übe so oft du möchtest und erhalte hilfreiches Feedback und Unterstützung.",
+    hybridEyebrow: "FLEXIBEL DEUTSCH LERNEN",
+    hybridTitle: "Lerne Deutsch auf deine Weise.",
+    hybridIntro: "Entscheide selbst, wie du mit der Learn Language Education Academy und Falowen lernst.",
+    hybridInPersonTitle: "Vor Ort",
+    hybridInPersonText: "Besuche Deutschunterricht mit Lehrkräften in Accra.",
+    hybridOnlineTitle: "Live online",
+    hybridOnlineText: "Nimm von überall am interaktiven Unterricht teil.",
+    hybridRecordedTitle: "Aufgezeichnete Lektionen",
+    hybridRecordedText: "Sieh dir Lektionen erneut an und übe in deinem Tempo auf Falowen.",
+    hybridAction: "Lernmöglichkeiten entdecken",
     supportLink: "Falowen kennenlernen",
     reviewsIntro: "Das sagen unsere Lernenden",
     finalEyebrow: "DEIN NÄCHSTER SCHRITT",
@@ -92,6 +112,16 @@ const COPY = {
     supportEyebrow: "VOTRE ACCOMPAGNEMENT",
     supportTitle: "Pratiquez avec l'IA. Progressez avec un enseignant.",
     supportText: "Revoyez les cours, exercez-vous autant que nécessaire et profitez de conseils d'enseignants.",
+    hybridEyebrow: "APPRENEZ L'ALLEMAND À VOTRE FAÇON",
+    hybridTitle: "Apprenez l'allemand à votre rythme.",
+    hybridIntro: "Choisissez comment apprendre avec Learn Language Education Academy et Falowen.",
+    hybridInPersonTitle: "En présentiel",
+    hybridInPersonText: "Participez aux cours avec un enseignant à Accra.",
+    hybridOnlineTitle: "En direct",
+    hybridOnlineText: "Suivez des cours interactifs où que vous soyez.",
+    hybridRecordedTitle: "Cours enregistrés",
+    hybridRecordedText: "Revoyez les leçons et entraînez-vous à votre rythme sur Falowen.",
+    hybridAction: "Découvrir les formules",
     supportLink: "Découvrir Falowen",
     reviewsIntro: "L'avis de nos élèves",
     finalEyebrow: "VOTRE PROCHAINE ÉTAPE",
@@ -171,7 +201,10 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
         <nav className="falowen-home-nav" aria-label="Falowen">
           <a href="/" className="falowen-home-brand" aria-label="Falowen home">
             <img src="/logo192.png" alt="" width="38" height="38" />
-            <span>falowen<span className="falowen-home-brand-dot">.</span></span>
+            <span className="falowen-home-brand-copy">
+              <span className="falowen-home-brand-name">falowen<span className="falowen-home-brand-dot">.</span></span>
+              <span className="falowen-home-brand-subtitle">by Learn Language Education Academy</span>
+            </span>
           </a>
           <div className="falowen-home-nav-links">
             <a href="/classes">{copy.navClasses}</a>
@@ -194,6 +227,31 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
         </nav>
 
         <FalowenHomepageCarousel language={language} classroomImage={academyProfile.classroomImage} onSignUp={signup} />
+
+        <section className="falowen-home-hybrid" aria-labelledby="falowen-hybrid-heading">
+          <div className="falowen-home-hybrid-heading">
+            <div>
+              <span className="falowen-home-section-kicker">{copy.hybridEyebrow}</span>
+              <h2 id="falowen-hybrid-heading">{copy.hybridTitle}</h2>
+              <p>{copy.hybridIntro}</p>
+            </div>
+            <a href="/classes" className="falowen-home-hybrid-action">{copy.hybridAction} →</a>
+          </div>
+          <div className="falowen-home-hybrid-options">
+            <article className="falowen-home-hybrid-option">
+              <span className="falowen-home-hybrid-icon" aria-hidden="true">⌖</span>
+              <div><h3>{copy.hybridInPersonTitle}</h3><p>{copy.hybridInPersonText}</p></div>
+            </article>
+            <article className="falowen-home-hybrid-option">
+              <span className="falowen-home-hybrid-icon" aria-hidden="true">▣</span>
+              <div><h3>{copy.hybridOnlineTitle}</h3><p>{copy.hybridOnlineText}</p></div>
+            </article>
+            <article className="falowen-home-hybrid-option">
+              <span className="falowen-home-hybrid-icon" aria-hidden="true">▶</span>
+              <div><h3>{copy.hybridRecordedTitle}</h3><p>{copy.hybridRecordedText}</p></div>
+            </article>
+          </div>
+        </section>
 
         <HomepageMusicPlayer language={language} />
 
