@@ -74,17 +74,17 @@ describe("A2 late submission compatibility safety", () => {
 
     const panel = document.querySelector('[data-a2-late-native-submission="25"]');
     expect(panel).toBeTruthy();
-    expect(panel.textContent).toMatch(/Teil 4 · Hören is part of the submitted workbook/i);
+    expect(panel.textContent).toMatch(/There is no Teil 4 for this lesson\./i);
     expect(panel.textContent).not.toMatch(/Teil 4 · Lesen/i);
   });
 
-  test.each([24, 26])("Day %i compatibility copy keeps Hören self-check only", (day) => {
+  test.each([24, 26])("Day %i compatibility copy includes graded Hören in submission", (day) => {
     const routeCase = compatibilityCases.find((item) => item.day === day);
     renderCompatibilityPanel(routeCase);
 
     const panel = document.querySelector(`[data-a2-late-native-submission="${day}"]`);
     expect(panel).toBeTruthy();
-    expect(panel.textContent).toMatch(/Teil 4 · Hören is self-check practice and is not submitted/i);
+    expect(panel.textContent).toMatch(/Teil 4 · Hören is part of the submitted workbook/i);
   });
 
   test("legacy fallback resolver stays in parity for its compatibility routes", () => {
