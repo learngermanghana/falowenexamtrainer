@@ -68,7 +68,7 @@ describe("A2 late submission compatibility safety", () => {
     },
   );
 
-  test("Day 25 compatibility copy now identifies Hören as submitted", () => {
+  test("Day 25 compatibility copy correctly reports no Teil 4", () => {
     const day25 = compatibilityCases.find(({ day }) => day === 25);
     renderCompatibilityPanel(day25);
 
