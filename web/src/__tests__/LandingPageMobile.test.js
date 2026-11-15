@@ -66,11 +66,11 @@ describe("Falowen current six-slide public homepage and iPhone navigation", () =
     fireEvent.change(screen.getByRole("combobox",{name:"Language"}),{target:{value:"de"}});
     await waitFor(()=>expect(nav.getByRole("link",{name:"Kommende Kurse"})).toHaveAttribute("href","/classes"));
     expect(nav.getByRole("link",{name:"Musik"})).toHaveAttribute("href","https://music.falowen.app/");
-    expect(screen.getByRole("link",{name:"Bücher"})).toHaveAttribute("href","/books");
+    expect(nav.getByRole("link",{name:"Bücher"})).toHaveAttribute("href","/books");
     fireEvent.change(screen.getByRole("combobox",{name:"Sprache"}),{target:{value:"fr"}});
     await waitFor(()=>expect(nav.getByRole("link",{name:"Prochains cours"})).toHaveAttribute("href","/classes"));
     expect(nav.getByRole("link",{name:"Musique"})).toHaveAttribute("href","https://music.falowen.app/");
-    expect(screen.getByRole("link",{name:"Livres"})).toHaveAttribute("href","/books");
+    expect(nav.getByRole("link",{name:"Livres"})).toHaveAttribute("href","/books");
   });
 
   it("keeps iPhone-safe CSS, upcoming class card, support and review area",()=>{
