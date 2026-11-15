@@ -155,6 +155,12 @@ jobs:
           CI: true
         run: npx jest --runInBand --runTestsByPath src/components/OnboardingChecklist.test.js src/components/FirstLoginOnboarding.test.js src/lib/onboardingPaystackCheckout.test.js
 
+      - name: Test brochure-first class landing and opt-in enquiry behavior
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/components/ClassBrochurePublicExperience.test.js
+
       - name: Test public A1 bookstore, preview and Paystack receipt checkout
         working-directory: web
         env:

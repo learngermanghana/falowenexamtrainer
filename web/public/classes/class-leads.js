@@ -544,7 +544,10 @@
       }
 
       if (!consentInput.checked) {
-        consentError.textContent = "You can continue, but tick this box if you want us to contact you about the class.";
+        consentError.textContent = document.body.classList.contains("figma-classes-landing")
+          ? "Please agree to be contacted before requesting a follow-up."
+          : "You can continue, but tick this box if you want us to contact you about the class.";
+        if (document.body.classList.contains("figma-classes-landing")) valid = false;
       }
 
       phoneInput.value = phone;
@@ -568,6 +571,10 @@
       }
 
       const isValid = validateLeadForm();
+      if (!isValid && document.body.classList.contains("figma-classes-landing")) {
+        setStatus(status, "Complete the required fields and consent box to request a follow-up. You can view the brochure without submitting anything.", true);
+        return;
+      }
       submitButton.disabled = true;
       submitButton.textContent = isValid ? "Saving..." : "Opening class...";
 

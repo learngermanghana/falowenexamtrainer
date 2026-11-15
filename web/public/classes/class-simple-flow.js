@@ -109,20 +109,6 @@
     if (tag.textContent !== cssText) tag.textContent = cssText;
   }
 
-  function ensureSteps() {
-    var hero = document.querySelector(".hero");
-    if (!hero || hero.querySelector(".simple-class-steps")) return;
-    var steps = document.createElement("div");
-    steps.className = "simple-class-steps";
-    steps.setAttribute("aria-label", "Four steps to choose or enquire about a class");
-    steps.innerHTML =
-      '<div class="simple-class-step"><span class="simple-class-step-number">1</span><span>Choose your German class</span></div>' +
-      '<div class="simple-class-step"><span class="simple-class-step-number">2</span><span>Open the brochure without signing up</span></div>' +
-      '<div class="simple-class-step"><span class="simple-class-step-number">3</span><span>Check the fee, timetable and FAQs</span></div>' +
-      '<div class="simple-class-step"><span class="simple-class-step-number">4</span><span>Register or ask a specific question</span></div>';
-    hero.appendChild(steps);
-  }
-
   function removeDuplicateRegisterButtons() {
     ["leadRegisterNow", "leadRegisterDirect"].forEach(function (id) {
       var node = document.getElementById(id);
@@ -158,13 +144,17 @@
     if (!isFormPage()) return;
     document.body.classList.remove("post-lead-class-detail");
     document.body.classList.add("simple-classes-form");
+    if (document.body.classList.contains("figma-classes-landing")) {
+      removeDuplicateRegisterButtons();
+      return;
+    }
     var eyebrow = document.querySelector(".hero .eyebrow");
     var title = document.querySelector(".hero h1");
     var text = document.querySelector(".hero p");
     setText(eyebrow, "FALOWEN GERMAN CLASSES");
-    setText(title, "Choose your German class");
-    setText(text, "Choose a class and read its brochure before you register or contact us.");
-    ensureSteps();
+    setText(title, "Choose your class");
+    setText(text, "Select a class to open its brochure without signing in. Request a follow-up only if you need one.");
+    // No repeated four-step instructions: the brochure-first layout explains the flow.
 
     var cardTitle = document.querySelector("#leadCaptureCard h2");
     var cardText = document.querySelector("#leadCaptureCard p");

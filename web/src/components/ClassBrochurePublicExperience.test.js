@@ -236,4 +236,39 @@ describe("public class brochure experience", () => {
     expect(download).toContain("High exam pass rate");
     expect(download).not.toContain("Includes six months of Falowen access");
   });
+
+  test("Figma-inspired class chooser replaces the four-step gate without changing brochure or enquiry handlers", () => {
+    const page = publicClassFile("index.html");
+    const flow = publicClassFile("class-simple-flow.js");
+    const design = publicClassFile("class-figma-landing.js");
+    const styles = publicClassFile("class-figma-landing.css");
+
+    expect(page).toContain('/classes/class-figma-landing.css');
+    expect(page).toContain('/classes/class-figma-landing.js');
+    expect(page.indexOf('class-figma-landing.js')).toBeGreaterThan(page.indexOf('class-leads.js'));
+    expect(page.indexOf('class-figma-landing.js')).toBeGreaterThan(page.indexOf('class-simple-flow.js'));
+    expect(flow).not.toContain("function ensureSteps()");
+    expect(flow).not.toContain("Open the brochure without signing up");
+    expect(flow).not.toContain("Register or ask a specific question");
+    expect(design).toContain('isDetail = params.get("open") === "1"');
+    expect(design).toContain("var card = document.getElementById(\"leadCaptureCard\")");
+    expect(design).toContain('form.appendChild(selectorPanel)');
+    expect(design).toContain('form.appendChild(followUpPanel)');
+    expect(design).toContain('select.addEventListener("change", syncMeta)');
+    expect(design).toContain('var classes = Array.isArray(data.classes) ? data.classes : []');
+    expect(design).toContain('Open full class brochure & FAQs');
+    expect(design).toContain('Want a follow-up?');
+    expect(design).toContain('Your next ');
+    expect(design).not.toContain("fetch(");
+    expect(styles).toContain('/classes/llea-classroom.jpg');
+    expect(styles).toContain('@media (max-width: 700px)');
+    expect(styles).toContain('.figma-class-landing');
+    const leadCapture = publicClassFile("class-leads.js");
+    const heroRedirect = publicClassFile("class-hero-banner.js");
+    const funnel = publicClassFile("funnel-journey.js");
+    expect(leadCapture).toContain('if (!isValid && document.body.classList.contains("figma-classes-landing"))');
+    expect(leadCapture).toContain('Please agree to be contacted before requesting a follow-up.');
+    expect(heroRedirect).toContain('if (document.body.classList.contains("figma-classes-landing")) return;');
+    expect(funnel).toContain("single opt-in submission path");
+  });
 });

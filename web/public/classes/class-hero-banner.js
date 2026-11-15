@@ -130,6 +130,8 @@
     document.addEventListener("submit", function (event) {
       var form = event.target;
       if (!form || form.id !== "leadCaptureForm" || !isFormPage()) return;
+      // The Figma brochure-first form handles validation and navigation itself.
+      if (document.body.classList.contains("figma-classes-landing")) return;
       var select = form.querySelector("#leadClass");
       var slug = select && select.value ? select.value : selectedSlug();
       var status = document.getElementById("leadStatus");
