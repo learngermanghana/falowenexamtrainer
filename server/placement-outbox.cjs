@@ -13,10 +13,14 @@ async function queuePlacementResult({id, contact, score, at}, sheets, token, fet
     "?fields=capabilities(canEdit),permissions(type)&supportsAllDrives=true",{
     headers:{Authorization:"Bearer "+await token()}
   });
-  if (!access.ok) throw Error("Could not verify placement workbook access");
   const file = await access.json();
-  if (!file.capabilities?.canEdit || !file.permissions?.length ||
-      file.permissions.some(permission=>!["user","group"].includes(permission.type))) {
+  // Some Sheets-only projects have no Drive API. Restrict the fallback to the
+  // exact workbook whose owner and editor grants were verified at setup.
+  if (!access.ok && (access.status !== 403 || book !== process.env.PLACEMENT_VERIFIED_PRIVATE_SHEET_ID)) {
+    throw Error("Could not verify placement workbook access (HTTP "+access.status+")");
+  }
+  if (access.ok && (!file.capabilities?.canEdit || !file.permissions?.length ||
+      file.permissions.some(permission=>!["user","group"].includes(permission.type)))) {
     throw Error("Placement workbook requires restricted sharing and editor access");
   }
   const call = (path, options) => sheets(path, options, book);
