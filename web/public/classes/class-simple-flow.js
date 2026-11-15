@@ -188,7 +188,10 @@
       if (!window.__falowenPostLeadScrolled) {
         window.__falowenPostLeadScrolled = true;
         window.setTimeout(function () {
-          classCard.scrollIntoView({ behavior: "auto", block: "start" });
+          // Keep Figma brochure visitors at the top hero rather than auto-scrolling.
+          if (!document.body.classList.contains("figma-brochure-detail")) {
+            classCard.scrollIntoView({ behavior: "auto", block: "start" });
+          }
         }, 80);
       }
     }
