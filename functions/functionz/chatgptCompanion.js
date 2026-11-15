@@ -399,7 +399,7 @@ const toolDefinitions = [
     name: "get_my_falowen_exam_practice",
     description: "Retrieve one learner-visible original Schreiben/Sprechen task or A1 Mock 02/03 Lesen/Hören question from published Falowen mock exams. Hören supplies a protected Exams Room listening page link, NOT private audio or a transcript. No official timed attempt, answer key, or score.",
     inputSchema: { type: "object", properties: {
-      mockId: { type: "string", enum: ["a1-mock-02", "a1-mock-03", "a2-mock-02"] },
+      mockId: { type: "string", pattern: "^[a-z][a-z0-9-]{2,79}$", maxLength: 80, description: "Published mock ID shown by get_my_falowen_exam_mocks; unsupported question sets return unavailable rather than invented tasks." },
       skill: { type: "string", enum: ["writing", "speaking", "reading", "listening"] },
       part: { type: "string", maxLength: 24 },
       questionNumber: { type: "integer", minimum: 1, maximum: 35 },
