@@ -8,12 +8,13 @@ describe("Falowen public landing calls to action", () => {
   const app = read("../App.js");
   const features = read("../data/publicMarketingFeatures.js");
 
-  test("promotes the 7-day free trial but keeps login for registered students", () => {
+  test("keeps sign-up and login actions available to visitors", () => {
     expect(landing).toContain('start: "Start 7 days free trial"');
     expect(landing).toContain('start: "7 Tage kostenlos testen"');
     expect(landing).toContain('start: "Essayer gratuitement pendant 7 jours"');
-    expect(landing).toContain('onClick={signup}>{copy.start}');
-    expect(landing).toContain('onClick={login}>{copy.returning} {copy.login}');
+    expect(landing).toContain('onClick={signup}>{copy.signup} ↗');
+    expect(landing).toContain('onClick={login}>{copy.login}');
+    expect(landing).toContain('onSignUp={signup}');
   });
 
   test("sends all View live classes actions to the upcoming classes page", () => {
