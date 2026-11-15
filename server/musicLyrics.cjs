@@ -8,10 +8,11 @@ const approvedRecordingLyrics = require('../web/public/music/approved-recording-
 const acousticTimings = require('../web/public/music/estimated-timings.json');
 const day4NumberTiming = require('../web/public/music/a1-day-04-number-timing.json');
 const b1InterviewTiming = require('../web/public/music/b1-day-19-interview-timing.json');
-const estimatedTimings = { recordings:[...acousticTimings.recordings,day4NumberTiming,b1InterviewTiming] };
+const screenBreakTiming = require('../web/public/music/b1-day-10-screen-break-timing.json');
+const estimatedTimings = { recordings:[...acousticTimings.recordings,day4NumberTiming,b1InterviewTiming,screenBreakTiming] };
 const englishRegistry = require('../web/public/music/english-translations.json');
 const englishTranslations = {...englishRegistry,transcripts:[...(englishRegistry.transcripts || []),
-  day4NumberTiming.englishTranslation],drafts:[...(englishRegistry.drafts || []),b1InterviewTiming.englishTranslation]};
+  day4NumberTiming.englishTranslation],drafts:[...(englishRegistry.drafts || []),b1InterviewTiming.englishTranslation,screenBreakTiming.englishTranslation]};
 const studioDrafts = require('../web/public/music/studio-drafts.json');
 function validateLyrics(data, objectKey) {
   if (!data || data.objectKey !== objectKey) return null;

@@ -67,7 +67,8 @@ const artwork={
     "music/b1/day-26/Richtig fragen.mp3": "dream",
     "music/b1/day-27/Vor unserer Tür.mp3": "dream",
     "music/b1/day-28/Ein kleiner Weg.mp3": "dream",
-    "music/b1/day-19/Nicht Perfekt klingen.mp3": "city"
+    "music/b1/day-19/Nicht Perfekt klingen.mp3": "city",
+    "music/b1/day-10/Einen Moment Weg.mp3": "coffee"
   },
   "byTrackId": {
     "gemeinsam-schaffen-wir-das": "friendship",

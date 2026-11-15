@@ -1,0 +1,179 @@
+{
+  "cues": [
+    {
+      "start": 13.36,
+      "end": 16.88,
+      "text": "Am Sonntag greife ich wieder zum Handy."
+    },
+    {
+      "start": 19.88,
+      "end": 24.66,
+      "text": "Ich wollte nur kurz die Nachrichten lesen."
+    },
+    {
+      "start": 26.1,
+      "end": 30.5,
+      "text": "Eine Stunde später merke ich,"
+    },
+    {
+      "start": 30.5,
+      "end": 36.68,
+      "text": "dass der Morgen schon fast vorbei ist."
+    },
+    {
+      "start": 37.56,
+      "end": 39.76,
+      "text": "Leg das Handy einen Moment weg,"
+    },
+    {
+      "start": 39.76,
+      "end": 46.46,
+      "text": "die Welt ist auch vor deinem Fenster."
+    },
+    {
+      "start": 48.42,
+      "end": 52.24,
+      "text": "Ein freier Tag gehört auch dir."
+    },
+    {
+      "start": 56.94,
+      "end": 60.68,
+      "text": "Ich gehe hinaus und treffe meine Freundin."
+    },
+    {
+      "start": 60.68,
+      "end": 63.76,
+      "text": "Wir sprechen, ohne ständig aufs Display zu schauen."
+    },
+    {
+      "start": 64.14,
+      "end": 66.76,
+      "text": "Später koche ich etwas und lese ein Buch."
+    },
+    {
+      "start": 66.76,
+      "end": 70.22,
+      "text": "Am Abend habe ich viele neue Gedanken."
+    },
+    {
+      "start": 73.4,
+      "end": 75.54,
+      "text": "Leg das Handy einen Moment weg,"
+    },
+    {
+      "start": 75.54,
+      "end": 82.06,
+      "text": "die Welt ist auch vor deinem Fenster."
+    },
+    {
+      "start": 83.72,
+      "end": 87.88,
+      "text": "Ein freier Tag gehört auch dir."
+    },
+    {
+      "start": 89.8,
+      "end": 94.5,
+      "text": "Die Nachrichten sind morgen noch da."
+    },
+    {
+      "start": 96.04,
+      "end": 101.12,
+      "text": "Diesen Sonntag habe ich wirklich erlebt."
+    },
+    {
+      "start": 103.7,
+      "end": 114.0,
+      "text": "Bei Falowen lerne ich, über Gewohnheiten nachzudenken."
+    }
+  ],
+  "matchCoverage": 0.956,
+  "weakestLineCoverage": 0.667,
+  "objectKey": "music/b1/day-10/Einen Moment Weg.mp3",
+  "trackId": "r2-b1-day-10-b64_RWluZW4gTW9tZW50IFdlZy5tcDM",
+  "assignmentKey": "B1-4.10",
+  "draftTitle": "Einen Moment weg",
+  "duration": 127.2,
+  "recordingSha256": "38ffca289b3e68ef8766af4802f3c7101cde43f7b0d4c5fb404d8db32e2d0b47",
+  "timingStatus": "estimated",
+  "timingMethod": "Whisper small acoustic alignment against the course draft; listening review required",
+  "referenceOnly": true,
+  "lyrics": "[Verse 1]\nAm Sonntag greife ich wieder zum Handy.\nIch wollte nur kurz die Nachrichten lesen.\nEine Stunde später merke ich,\ndass der Morgen schon fast vorbei ist.\n\n[Chorus]\nLeg das Handy einen Moment weg,\ndie Welt ist auch vor deinem Fenster.\nEin freier Tag gehört auch dir.\n\n[Verse 2]\nIch gehe hinaus und treffe meine Freundin.\nWir sprechen, ohne ständig aufs Display zu schauen.\nSpäter koche ich etwas und lese ein Buch.\nAm Abend habe ich viele neue Gedanken.\n\n[Chorus]\nLeg das Handy einen Moment weg,\ndie Welt ist auch vor deinem Fenster.\nEin freier Tag gehört auch dir.\n\n[Outro]\nDie Nachrichten sind morgen noch da.\nDiesen Sonntag habe ich wirklich erlebt.\nBei Falowen lerne ich, über Gewohnheiten nachzudenken.",
+  "englishTranslation": {
+    "source": "course-draft",
+    "objectKey": "music/b1/day-10/Einen Moment Weg.mp3",
+    "level": "B1",
+    "day": 10,
+    "assignmentKey": "B1-4.10",
+    "draftTitle": "Einen Moment weg",
+    "lines": [
+      {
+        "de": "Am Sonntag greife ich wieder zum Handy.",
+        "en": "On Sunday I reach for my phone again."
+      },
+      {
+        "de": "Ich wollte nur kurz die Nachrichten lesen.",
+        "en": "I only wanted to read the news briefly."
+      },
+      {
+        "de": "Eine Stunde später merke ich,",
+        "en": "An hour later I realise"
+      },
+      {
+        "de": "dass der Morgen schon fast vorbei ist.",
+        "en": "that the morning is already nearly over."
+      },
+      {
+        "de": "Leg das Handy einen Moment weg,",
+        "en": "Put your phone away for a moment,"
+      },
+      {
+        "de": "die Welt ist auch vor deinem Fenster.",
+        "en": "there is a world right outside your window."
+      },
+      {
+        "de": "Ein freier Tag gehört auch dir.",
+        "en": "A day off is yours to enjoy too."
+      },
+      {
+        "de": "Ich gehe hinaus und treffe meine Freundin.",
+        "en": "I go outside and meet my friend."
+      },
+      {
+        "de": "Wir sprechen, ohne ständig aufs Display zu schauen.",
+        "en": "We talk without constantly looking at the screen."
+      },
+      {
+        "de": "Später koche ich etwas und lese ein Buch.",
+        "en": "Later I cook something and read a book."
+      },
+      {
+        "de": "Am Abend habe ich viele neue Gedanken.",
+        "en": "In the evening I have lots of new thoughts."
+      },
+      {
+        "de": "Leg das Handy einen Moment weg,",
+        "en": "Put your phone away for a moment,"
+      },
+      {
+        "de": "die Welt ist auch vor deinem Fenster.",
+        "en": "there is a world right outside your window."
+      },
+      {
+        "de": "Ein freier Tag gehört auch dir.",
+        "en": "A day off is yours to enjoy too."
+      },
+      {
+        "de": "Die Nachrichten sind morgen noch da.",
+        "en": "The news will still be there tomorrow."
+      },
+      {
+        "de": "Diesen Sonntag habe ich wirklich erlebt.",
+        "en": "I really experienced this Sunday."
+      },
+      {
+        "de": "Bei Falowen lerne ich, über Gewohnheiten nachzudenken.",
+        "en": "With Falowen, I’m learning to reflect on habits."
+      }
+    ]
+  }
+}

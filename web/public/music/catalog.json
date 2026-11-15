@@ -408,6 +408,24 @@
       "slides": true,
       "objectKey": "music/b1/day-19/Nicht Perfekt klingen.mp3",
       "approved": true
+    },
+    {
+      "id": "r2-b1-day-10-b64_RWluZW4gTW9tZW50IFdlZy5tcDM",
+      "title": "Einen Moment weg",
+      "level": "B1",
+      "day": 10,
+      "assignmentKey": "B1-4.10",
+      "topic": "Day 10 · Medien und Gewohnheiten",
+      "type": "Learning story",
+      "genre": "Flute Chill",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-b1-day-10-b64_RWluZW4gTW9tZW50IFdlZy5tcDM",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/b1/day-10/Einen Moment Weg.mp3",
+      "approved": true
     }
   ]
 }
