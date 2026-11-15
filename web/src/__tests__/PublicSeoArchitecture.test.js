@@ -27,7 +27,7 @@ describe("public SEO architecture", () => {
   });
 
   test("uses A1-C2 in the homepage and country SEO copy", () => {
-    expect(indexHtml).toContain("Learn German A1–C2 Online");
+    expect(indexHtml).toContain("Learn German A1–C2 with live classes and exam practice");
     expect(indexHtml).toContain('"educationalLevel": ["A1", "A2", "B1", "B2", "C1", "C2"]');
     expect(home).toContain("German A1–C2");
     expect(marketPage).toContain("A1 to C2");
