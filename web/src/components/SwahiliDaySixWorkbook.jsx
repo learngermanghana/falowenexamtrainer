@@ -37,16 +37,16 @@ function Dialogue({ lines, label }) {
   </div>;
 }
 
-function QuestionSet({ items, answers, onChange, namePrefix }) {
+function QuestionSet({ items, answers, onChange, namePrefix, showChoiceLetters = false }) {
   return <div className="swahili-book__quiz">
     {items.map((item, i) => (
       <div className="swahili-book__exercise" key={item.id}>
         <fieldset>
           <legend>{i + 1}. {item.question}</legend>
           <div className="swahili-book__choices">
-            {item.choices.map(choice => <label className="swahili-book__choice" key={choice}>
+            {item.choices.map((choice, choiceIndex) => <label className="swahili-book__choice" key={choice}>
               <input type="radio" name={namePrefix + "-" + item.id}
-                checked={answers[item.id] === choice} onChange={() => onChange(item.id, choice)} />{choice}
+                checked={answers[item.id] === choice} onChange={() => onChange(item.id, choice)} />{showChoiceLetters ? `${String.fromCharCode(65 + choiceIndex)}) ` : ""}{choice}
             </label>)}
           </div>
         </fieldset>
@@ -195,15 +195,13 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
       <p className="swahili-book__note">The prompts are workbook adaptations of the supplied PDFs. Answers stay in this page until Submit; no automatic grading.</p>
     </section>;
     if (activeTab === "lesen") return <section className="swahili-book__card swahili-book__activity" aria-label="Teil 3">
-      <div className="mgahawani-workbook__section-header"><span>03 · READ AND UNDERSTAND</span><h2>Teil 3 · Kusoma (Reading)</h2><p>Read a menu and find information in a restaurant dialogue.</p></div>
-      <p>Read the restaurant menu and the original Mhudumu/Mteja dialogue. Answer the questions using the text.</p>
-      <div className="swahili-book__menu">
-        <h3>Menyu · Mgahawani</h3><p className="swahili-book__small">Practice menu assembled from the items in the Ordering Food PDF; no prices were supplied.</p>
-        <div className="swahili-book__menu-cols"><div><h4>Chakula</h4>{lesson.food.map(item => <p key={item.sw}>{item.sw}</p>)}</div>
-        <div><h4>Vinywaji</h4>{lesson.drinks.map(item => <p key={item.sw}>{item.sw}</p>)}</div></div>
-      </div>
-      <Dialogue lines={lesson.restaurantDialogue} label="Restaurant reading dialogue" />
-      <QuestionSet items={lesson.reading} answers={readingAnswers}
+      <div className="mgahawani-workbook__section-header"><span>03 · READ AND UNDERSTAND</span><h2>Teil 3 · Kusoma (Reading)</h2><p>Soma hadithi ya Amina na ujibu maswali matano. Read Amina's story and answer the five questions.</p></div>
+      <article className="swahili-book__tile" aria-label="Hadithi ya Amina" lang="sw">
+        <h3>Amina Mgahawani</h3>
+        {lesson.readingPassage.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+      </article>
+      <h3>Maswali ya Ufahamu · Comprehension Questions</h3>
+      <QuestionSet items={lesson.reading} answers={readingAnswers} showChoiceLetters
         namePrefix="swahili-six-reading" onChange={(id,v) => setAnswer(setReadingAnswers,id,v)} />
     </section>;
     if (activeTab === "hoeren") return <section className="swahili-book__card swahili-book__activity" aria-label="Teil 4">
