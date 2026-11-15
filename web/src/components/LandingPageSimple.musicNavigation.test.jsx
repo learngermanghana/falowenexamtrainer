@@ -54,7 +54,7 @@ test("keeps the navigation visible and horizontally reachable on small screens",
 test("shows German hybrid learning below the carousel without a language chooser or embedded playback", () => {
   const { container } = render(<LandingPageSimple />);
   const carousel = screen.getByTestId("homepage-carousel");
-  const hybrid = screen.getByRole("region", { name: "Learn German your way." });
+  const hybrid = screen.getByRole("region", { name: "Learn German or Swahili your way." });
   expect(screen.queryByRole("region", { name: "Choose a language" })).not.toBeInTheDocument();
   expect(screen.queryByTestId("homepage-music")).not.toBeInTheDocument();
   const support = container.querySelector(".falowen-home-support");
@@ -63,7 +63,7 @@ test("shows German hybrid learning below the carousel without a language chooser
   expect(within(hybrid).getByRole("heading", { name: "In person" })).toBeInTheDocument();
   expect(within(hybrid).getByRole("heading", { name: "Live online" })).toBeInTheDocument();
   expect(within(hybrid).getByRole("heading", { name: "Recorded lectures" })).toBeInTheDocument();
-  expect(within(hybrid).getByRole("link", { name: /Explore learning options/ })).toHaveAttribute("href", "/classes");
+  expect(within(hybrid).getByRole("link", { name: /Explore German classes/ })).toHaveAttribute("href", "/classes");
 });
 
 test("connects the Falowen brand to Learn Language Education Academy", () => {
@@ -77,8 +77,8 @@ test("connects the Falowen brand to Learn Language Education Academy", () => {
 });
 
 test.each([
-  ["de", "Lerne Deutsch auf deine Weise.", "Aufgezeichnete Lektionen"],
-  ["fr", "Apprenez l'allemand à votre rythme.", "Cours enregistrés"],
+  ["de", "Lerne Deutsch oder Kiswahili auf deine Weise.", "Aufgezeichnete Lektionen"],
+  ["fr", "Apprenez l’allemand ou le swahili à votre rythme.", "Cours enregistrés"],
 ])("translates hybrid learning choices in %s", (language, heading, lectureLabel) => {
   render(<LandingPageSimple />);
   fireEvent.change(screen.getByRole("combobox", { name: "Language" }), { target: { value: language } });
