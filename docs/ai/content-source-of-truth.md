@@ -97,3 +97,7 @@ Admin keeps the primary programme and placement in the existing student fields. 
 ## ChatGPT Exams Room content (15 November 2026)
 
 The Sprechen prompt dictionary is `web/src/data/speakingDictionary.js`, the Schreiben practice source is `web/src/data/examWritingWorkspace.js`, the list of actually published mock routes is `web/src/data/mockExamCatalog.js`, and reviewed A1 Mock 02/03 Lesen/Hören come from `web/src/data/a1FinalMock2Data.js` and `web/src/data/a1FinalMock3Data.js`. `scripts/generateChatgptExamContent.mjs` selects only public learner-visible fields into the server's generated ChatGPT snapshot. Do not maintain a second manually copied mock bank or expose hidden answers/audio object keys.
+
+## Public upcoming classes
+
+Admin Live Classes owns the scheduled German and Swahili cohorts in Firestore. The public classes endpoint returns Swahili A1 listings in `swahiliClasses` and keeps the existing `classes` array for German brochure, registration, and placement consumers. [Upcoming Classes](https://www.falowen.app/classes/) shows published Swahili class dates, timetable and confirmed tuition when present, with a WhatsApp enquiry link. Swahili listing visibility requires an open, publicly visible class with successful session generation. Swahili listings use no German placement, course agreement, or Paystack flow.

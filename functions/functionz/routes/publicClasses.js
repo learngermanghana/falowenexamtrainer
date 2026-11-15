@@ -84,6 +84,7 @@ function scheduleUrl(data, level, startDate, meetings) {
 
 function publicClass(snapshot) {
   const data = snapshot.data() || {};
+  const swahili = data.language === "Swahili";
   const level = String(data.levelId || data.level || "A1").toUpperCase();
   const title = String(data.name || data.className || data.classId || data.title || `${level} Klasse`).trim();
   const slug = String(data.slug || slugify(title));
@@ -94,25 +95,26 @@ function publicClass(snapshot) {
   return {
     id: snapshot.id,
     slug,
-    classUrl: String(data.classUrl || `/classes/${slug}`),
+    classUrl: swahili ? `/classes/#${slug}` : String(data.classUrl || `/classes/${slug}`),
     title,
     language: data.language || "German",
     level,
-    city: String(data.city || cityFromName(title)),
+    city: String(data.city || (swahili ? "" : cityFromName(title))),
     location: String(data.location || ""),
     mapsUrl: String(data.mapsUrl || ""),
     format: String(data.format || ""),
+    timezone: String(data.timezone || "Africa/Accra"),
     startDate,
     orientationDate: dateOnly(data.orientationDate || startDate),
     endDate,
-    totalSessions: Number(data.generatedSessionCount || data.totalSessions || SESSIONS[level] || 24),
+    totalSessions: Number(data.generatedSessionCount || data.totalSessions || (swahili ? 0 : SESSIONS[level] || 24)),
     sessionMinutes: Number(data.sessionMinutes || firstRuleDuration || MINUTES[level] || 60),
-    tuitionGhs: Number(TUITION[level] || data.tuitionGhs || 3000),
+    tuitionGhs: Number(swahili ? data.tuitionGhs || 0 : TUITION[level] || data.tuitionGhs || 3000),
     meetingDays: meetings,
-    scheduleUrl: scheduleUrl(data, level, startDate, meetings),
-    highlights: Array.isArray(data.highlights) && data.highlights.length ? data.highlights : HIGHLIGHTS[level] || [],
+    scheduleUrl: swahili ? "" : scheduleUrl(data, level, startDate, meetings),
+    highlights: Array.isArray(data.highlights) && data.highlights.length ? data.highlights : swahili ? [] : HIGHLIGHTS[level] || [],
     status: publicStatus(data, startDate, endDate),
-    publicVisible: data.publicVisible !== false,
+    publicVisible: data.publicVisible !== false && (!swahili || data.generationStatus === "complete"),
     registrationOpen: data.registrationOpen !== false,
   };
 }
@@ -125,6 +127,7 @@ async function publicClassesHandler(req, res) {
     const classes = snapshot.docs
       .map(publicClass)
       .filter((course) => course.publicVisible && course.registrationOpen)
+      .filter((course) => course.language !== "Swahili" || course.level === "A1")
       .filter((course) => !CLOSED_STATUSES.has(course.status))
       .filter((course) => {
         if (!course.startDate) return false;
@@ -141,7 +144,12 @@ async function publicClassesHandler(req, res) {
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
 
-    return res.status(200).json({ classes, source: "firestore", generatedAt: new Date().toISOString() });
+    return res.status(200).json({
+      classes: classes.filter((course) => course.language !== "Swahili"),
+      swahiliClasses: classes.filter((course) => course.language === "Swahili"),
+      source: "firestore",
+      generatedAt: new Date().toISOString(),
+    });
   } catch (error) {
     console.error("public classes error", error);
     return res.status(500).json({ error: "Could not load public classes" });

@@ -23,9 +23,10 @@ const COPY = {
     featuresEyebrow: "WHY LEARN WITH FALOWEN",
     featuresTitle: "Four ways to move forward in German.",
     featuresIntro: "Whether you're beginning, improving your skills or preparing for an exam, Falowen helps you take the next step.",
-    supportEyebrow: "YOUR SUPPORT SYSTEM",
-    supportTitle: "Practise with AI. Improve with a tutor.",
-    supportText: "Replay lectures, practise as often as you need and receive practical learning feedback — with teacher guidance when you need it.",
+    supportEyebrow: "LEARN WITH FALOWEN",
+    supportTitle: "Follow a structured course at your own pace",
+    supportText: "Join a live class or study independently from home. When life gets busy, use recorded lessons to catch up on your own schedule.",
+    supportPractice: "Get tutor feedback on your work, and practise between lessons with music, books and the Falowen Study Buddy. You can also connect your Falowen account to ChatGPT to review what you’ve learned and prepare for your next lesson.",
     hybridEyebrow: "FLEXIBLE GERMAN LEARNING",
     hybridTitle: "Learn German your way.",
     hybridIntro: "Choose how you learn with Learn Language Education Academy and Falowen.",
@@ -257,6 +258,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
             <span className="falowen-home-section-kicker">{copy.supportEyebrow}</span>
             <h2 id="falowen-support-heading">{copy.supportTitle}</h2>
             <p>{copy.supportText}</p>
+            {copy.supportPractice && <p>{copy.supportPractice}</p>}
           </div>
           <a className="falowen-home-support-link" href="/visitor-guide">{copy.supportLink} →</a>
         </section>

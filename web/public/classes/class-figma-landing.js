@@ -67,26 +67,18 @@
     promo.appendChild(brand);
 
     var promoCopy = element("div", "figma-class-promo-copy");
-    addText(promoCopy, "p", "figma-class-promo-kicker", "GERMAN CLASSES IN GHANA");
-    var heroTitle = element("h1", "");
-    heroTitle.appendChild(document.createTextNode("Your next "));
-    addText(heroTitle, "em", "", "chapter");
-    heroTitle.appendChild(document.createTextNode(" starts in German."));
+    addText(promoCopy, "p", "figma-class-promo-kicker", "UPCOMING CLASSES");
+    var heroTitle = element("h1", "", "Learn German or Swahili");
     promoCopy.appendChild(heroTitle);
     addText(promoCopy, "p", "figma-class-promo-description",
-      "Choose your class and get every detail you need — fees, timetable, location, and answers — all in one place.");
+      "Compare German class brochures and see when the next Swahili classes start.");
     promo.appendChild(promoCopy);
-    var trust = element("div", "figma-class-trust");
-    ["Established 2022", "German A1–C2", "Tutor-supported learning"].forEach(function (label) {
-      addText(trust, "span", "", label);
-    });
-    promo.appendChild(trust);
 
     var content = element("div", "figma-class-main");
     var header = element("header", "figma-class-heading");
     var headerText = element("div", "");
     addText(headerText, "p", "figma-class-eyebrow", "CLASS BROCHURE");
-    addText(headerText, "h2", "", "Choose your class");
+    addText(headerText, "h2", "", "Choose a German class");
     addText(headerText, "p", "figma-class-description",
       "Select a class to view its brochure. No login or personal details required.");
     header.appendChild(headerText);
@@ -188,10 +180,44 @@
     placement.href = "/placement-test";
     after.appendChild(placement);
     content.appendChild(after);
+
+    var swahili = element("section", "figma-class-select-panel");
+    swahili.setAttribute("aria-labelledby", "swahiliClassesHeading");
+    addText(swahili, "h2", "", "Upcoming Swahili classes").id = "swahiliClassesHeading";
+    var swahiliList = element("div", "");
+    swahili.appendChild(swahiliList);
+    content.appendChild(swahili);
+
+    // The shared catalogue keeps Swahili out of the German checkout selector.
+    var catalog = window.FalowenClassBrochureData;
+    var swahiliClasses = catalog?.swahiliClasses || [];
+    if (!swahiliClasses.length) {
+      addText(swahiliList, "p", "", catalog?.catalogSource === "firestore"
+        ? "No Swahili classes are currently listed."
+        : "Swahili class dates are currently unavailable.");
+    }
+    swahiliClasses.forEach(function (course) {
+      var listing = element("article", "figma-class-follow-panel");
+      listing.id = course.slug;
+      addText(listing, "h3", "", course.title);
+      addText(listing, "p", "", [course.level, courseDetails(course).dates, course.format, course.location || course.city].filter(Boolean).join(" · "));
+      var meetings = (course.meetingDays || []).map(function (slot) {
+        return [slot.day, slot.startTime + "–" + slot.endTime].join(" ");
+      });
+      if (meetings.length) addText(listing, "p", "", meetings.join(", ") + " (" + course.timezone + ")");
+      if (Number(course.tuitionGhs) > 0) {
+        addText(listing, "p", "", "GHS " + Number(course.tuitionGhs).toLocaleString("en-GH"));
+      }
+      var enquiry = addText(listing, "a", "", "Enquire about " + course.title + " on WhatsApp");
+      enquiry.href = "https://wa.me/233241113054?text=" + encodeURIComponent("Hello Falowen, I would like to enquire about the Swahili class " + course.title + ".");
+      swahiliList.appendChild(listing);
+    });
     stage.appendChild(promo);
     stage.appendChild(content);
     page.insertBefore(stage, page.firstChild);
     document.body.classList.add("figma-classes-landing");
+    var anchoredClass = document.getElementById(window.location.hash.slice(1));
+    if (anchoredClass && swahiliList.contains(anchoredClass)) anchoredClass.scrollIntoView();
     document.querySelectorAll(".simple-class-steps").forEach(function (node) { node.remove(); });
     return true;
   }
