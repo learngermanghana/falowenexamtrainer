@@ -1,8 +1,8 @@
 // A1 Lesson 6 classroom material supplied by Ruth:
 // "FOOD&DRINKS=LIKE&DISLIKES.pdf" and "Odering Food.pdf".
 // Original syllabus heading: Mgahawani (topic 4), course placement: Lesson 6.
-// All language examples below occur in those two supplied slide decks.
-// Question formats and English glosses are workbook adaptations, not quotations.
+// The restaurant vocabulary and speaking models draw on those decks.
+// The Teil 3 reading passage and multiple-choice questions were supplied separately by the teacher.
 export const SWAHILI_DAY_SIX = Object.freeze({
   day: 6,
   chapter: "Somo la 6",
@@ -72,11 +72,19 @@ export const SWAHILI_DAY_SIX = Object.freeze({
     {speaker:"Mhudumu",text:"Sawa. Karibu."},
     {speaker:"Mteja",text:"Asante."},
   ],
+  // Amina reading passage and its five comprehension questions supplied by the teacher.
+  readingPassage: [
+    "Siku ya Jumamosi, Amina alienda mgahawani kula chakula cha mchana. Alipoingia, alimwambia mhudumu, “Habari!” Mhudumu akajibu, “Salama, karibu!”",
+    "Amina aliuliza, “Mna chakula gani leo?” Mhudumu akajibu, “Tuna wali, samaki na kuku.” Amina akasema, “Naomba wali na kuku, tafadhali. Sitaki nyama.”",
+    "Mhudumu akauliza, “Unapenda kunywa nini?” Amina akajibu, “Naomba juisi ya embe, tafadhali.”",
+    "Mhudumu akamletea chakula na kinywaji chake. Amina alikula na kunywa. Baada ya kula, alimwambia mhudumu, “Naomba bili. Jumla ni shilingi ngapi?” Mhudumu akasema, “Jumla ni shilingi elfu kumi.” Amina akalipa shilingi elfu kumi na kumwambia mhudumu, “Asante sana!”",
+  ],
   reading:[
-    {id:"food",question:"Mteja anapenda kula nini?",choices:["wali na kuku","ugali samaki","pilau nyama"],answer:"wali na kuku"},
-    {id:"drink",question:"Mteja anapenda kunywa nini?",choices:["maji","juisi ya embe","soda"],answer:"juisi ya embe"},
-    {id:"server",question:"Nani anauliza ‘Wewe unapenda kula nini?’",choices:["Mhudumu","Mteja","Furaha"],answer:"Mhudumu"},
-    {id:"menu",question:"Ni chakula gani kina samaki?",choices:["ugali samaki","ndizi nyama","pilau nyama"],answer:"ugali samaki"},
+    {id:"read-day",question:"Amina alienda mgahawani siku gani? (On which day did Amina go to the restaurant?)",choices:["Siku ya Jumanne","Siku ya Jumamosi","Siku ya Alhamisi","Siku ya Jumapili"],answer:"Siku ya Jumamosi"},
+    {id:"read-order",question:"Amina aliomba (aliagiza) chakula gani? (What food did Amina order?)",choices:["Wali na samaki","Nyama na chipsi","Wali na kuku","Samaki na kuku"],answer:"Wali na kuku"},
+    {id:"read-drink",question:"Amina alinywa kinywaji gani? (What drink did Amina have?)",choices:["Juisi ya embe","Chai","Maji","Kahawa"],answer:"Juisi ya embe"},
+    {id:"read-bill",question:"Jumla ya bili ilikuwa shilingi ngapi? (How much was the total bill?)",choices:["Shilingi elfu tano (5,000)","Shilingi elfu mbili (2,000)","Shilingi elfu ishirini (20,000)","Shilingi elfu kumi (10,000)"],answer:"Shilingi elfu kumi (10,000)"},
+    {id:"read-thanks",question:"Amina alimwambia mhudumu nini alipomaliza kula na kulipa? (What did Amina say to the waiter after finishing and paying?)",choices:["Sitaki nyama","Asante sana!","Habari!","Mna chakula gani?"],answer:"Asante sana!"},
   ],
   listeningAudio: {
     objectKey: "swahili/A1/day-06/day-06.mp3",
