@@ -76,14 +76,14 @@ const PublicAdmissionsVisitorGuidePage = () => {
   useEffect(() => {
     const description = "Learn about Learn Language Education Academy, how Falowen supports students, and the class selected for your German-learning enquiry.";
     updatePageMeta({
-      title: "About the School & How Falowen Works | Falowen",
+      title: "About Us | Learn Language Education Academy & Falowen",
       description,
-      canonicalPath: "/visitor-guide",
+      canonicalPath: "/about-us",
       structuredData: {
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
         name: academyProfile.academyName,
-        url: "https://www.falowen.app/visitor-guide",
+        url: "https://www.falowen.app/about-us",
         description,
       },
     });
@@ -127,7 +127,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
     <main className="visitor-guide-page" style={{ ...styles.container, maxWidth: 1040, display: "grid", gap: 16, paddingBottom: 48 }}>
       <section className="visitor-guide-hero" style={{ ...card, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
         <div style={{ color: "#1d4ed8", fontWeight: 900, letterSpacing: ".04em", textTransform: "uppercase", fontSize: 12 }}>
-          Admissions · School background
+          About us · School background
         </div>
         <h1 style={{ margin: 0 }}>{academyProfile.academyName}</h1>
         <p style={{ margin: 0, lineHeight: 1.75, color: "#334155" }}>

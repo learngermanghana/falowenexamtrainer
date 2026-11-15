@@ -13,6 +13,7 @@ on:
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.js'
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.css'
       - 'web/src/components/PublicMarketingLanding.test.js'
+      - 'web/src/components/LandingPageTrialNavigation.test.js'
       - 'web/src/components/PublicUpcomingClassesPage.js'
       - 'web/src/components/PublicUpcomingClassesPage.css'
       - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
@@ -36,6 +37,7 @@ on:
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.js'
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.css'
       - 'web/src/components/PublicMarketingLanding.test.js'
+      - 'web/src/components/LandingPageTrialNavigation.test.js'
       - 'web/src/components/PublicUpcomingClassesPage.js'
       - 'web/src/components/PublicUpcomingClassesPage.css'
       - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
@@ -64,7 +66,7 @@ jobs:
         run: npm ci
       - name: Marketing and mobile homepage regression
         working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/__tests__/LandingPageMobile.test.js src/__tests__/PublicSeoArchitecture.test.js src/components/PublicMarketingLanding.test.js src/components/PublicUpcomingClassesPage.test.jsx src/components/SignedInHomeClassSchedule.test.jsx src/components/LiveClassCardRedesign.test.js src/components/GeneralHomeClassIdentity.test.js
+        run: npx jest --runInBand --runTestsByPath src/__tests__/LandingPageMobile.test.js src/__tests__/PublicSeoArchitecture.test.js src/components/PublicMarketingLanding.test.js src/components/LandingPageTrialNavigation.test.js src/components/PublicUpcomingClassesPage.test.jsx src/components/SignedInHomeClassSchedule.test.jsx src/components/LiveClassCardRedesign.test.js src/components/GeneralHomeClassIdentity.test.js
       - name: Compile website
         working-directory: web
         run: npx vite build

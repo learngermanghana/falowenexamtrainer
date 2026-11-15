@@ -55,8 +55,8 @@
     var link = document.createElement("a");
     link.id = "brochureVisitorGuideLink";
     link.className = "button";
-    link.textContent = "About the school & how Falowen works";
-    link.href = "/visitor-guide";
+    link.textContent = "About us";
+    link.href = "/about-us";
     preserveContext(link, "class-brochure");
     host.appendChild(link);
   }

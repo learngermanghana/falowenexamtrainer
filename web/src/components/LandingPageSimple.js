@@ -10,7 +10,7 @@ import "./LandingPageMarketing.css";
 const COPY = {
   en: {
     language: "Language", login: "Log in", signup: "Sign up", returning: "Already signed up?",
-    navPartnerships: "Partnerships", navClasses: "Upcoming Classes", navMusic: "Music", navExams: "Exam practice", navBooks: "Books", navHelp: "How Falowen works",
+    navPartnerships: "Partnerships", navClasses: "Upcoming Classes", navMusic: "Music", navExams: "Exam practice", navBooks: "Books", navHelp: "About us",
     classScheduleAction: "View full class schedule",
     eyebrow: "GERMAN LEARNING THAT FITS YOUR LIFE",
     title: "Learn German your way.",
@@ -37,12 +37,12 @@ const COPY = {
     hybridRecordedTitle: "Recorded lectures",
     hybridRecordedText: "Replay lessons and practise at your own pace on Falowen.",
     hybridAction: "Explore learning options",
-    supportLink: "See how Falowen works",
+    supportLink: "About our academy",
     reviewsIntro: "Hear it from our students",
     finalEyebrow: "YOUR NEXT STEP",
     finalTitle: "Your German journey starts here.",
     finalText: "Choose a class or learn at your own pace. We bring your lessons, practice and support together.",
-    footerCourses: "German courses A1–C2", footerMusic: "Music", footerBooks: "German A1 coursebook", footerExam: "Free Goethe exam practice", footerReviews: "Student reviews", footerHelp: "Help", footerChatgpt: "Falowen in ChatGPT",
+    footerCourses: "German courses A1–C2", footerMusic: "Music", footerBooks: "German A1 coursebook", footerExam: "Free Goethe exam practice", footerReviews: "Student reviews", footerHelp: "About us", footerChatgpt: "Falowen in ChatGPT",
     footerCourseLevels: "German courses by level", footerGoetheLevels: "Goethe-style preparation by level",
     contact: "Questions? Chat with us on WhatsApp",
     featureCopy: {},
@@ -51,7 +51,7 @@ const COPY = {
   },
   de: {
     language: "Sprache", login: "Anmelden", signup: "Registrieren", returning: "Schon registriert?",
-    navPartnerships: "Partnerschaften", navClasses: "Kommende Kurse", navMusic: "Musik", navExams: "Prüfungsvorbereitung", navBooks: "Bücher", navHelp: "So funktioniert Falowen",
+    navPartnerships: "Partnerschaften", navClasses: "Kommende Kurse", navMusic: "Musik", navExams: "Prüfungsvorbereitung", navBooks: "Bücher", navHelp: "Über uns",
     classScheduleAction: "Vollständigen Kursplan ansehen",
     eyebrow: "DEUTSCH LERNEN, WIE ES ZU DIR PASST",
     title: "Lerne Deutsch auf deine Weise.",
@@ -77,12 +77,12 @@ const COPY = {
     hybridRecordedTitle: "Aufgezeichnete Lektionen",
     hybridRecordedText: "Sieh dir Lektionen erneut an und übe in deinem Tempo auf Falowen.",
     hybridAction: "Lernmöglichkeiten entdecken",
-    supportLink: "Falowen kennenlernen",
+    supportLink: "Über unsere Akademie",
     reviewsIntro: "Das sagen unsere Lernenden",
     finalEyebrow: "DEIN NÄCHSTER SCHRITT",
     finalTitle: "Dein Deutschweg beginnt hier.",
     finalText: "Wähle einen Live-Kurs oder lerne selbstständig. Falowen verbindet Unterricht, Übungen und Unterstützung.",
-    footerCourses: "Deutschkurse A1–C2", footerMusic: "Musik", footerBooks: "A1 Kursbuch", footerExam: "Goethe-Prüfungsübungen", footerReviews: "Bewertungen", footerHelp: "Hilfe", footerChatgpt: "Falowen mit ChatGPT",
+    footerCourses: "Deutschkurse A1–C2", footerMusic: "Musik", footerBooks: "A1 Kursbuch", footerExam: "Goethe-Prüfungsübungen", footerReviews: "Bewertungen", footerHelp: "Über uns", footerChatgpt: "Falowen mit ChatGPT",
     footerCourseLevels: "Deutschkurse nach Niveau", footerGoetheLevels: "Goethe-Prüfungsvorbereitung nach Niveau",
     contact: "Fragen? Schreib uns auf WhatsApp",
     featureCopy: {
@@ -96,7 +96,7 @@ const COPY = {
   },
   fr: {
     language: "Langue", login: "Se connecter", signup: "S'inscrire", returning: "Déjà inscrit ?",
-    navPartnerships: "Partenariats", navClasses: "Prochains cours", navMusic: "Musique", navExams: "Examens blancs", navBooks: "Livres", navHelp: "Comment fonctionne Falowen",
+    navPartnerships: "Partenariats", navClasses: "Prochains cours", navMusic: "Musique", navExams: "Examens blancs", navBooks: "Livres", navHelp: "À propos",
     classScheduleAction: "Voir le calendrier complet des cours",
     eyebrow: "APPRENDRE L'ALLEMAND À VOTRE RYTHME",
     title: "Apprenez l'allemand à votre façon.",
@@ -122,12 +122,12 @@ const COPY = {
     hybridRecordedTitle: "Cours enregistrés",
     hybridRecordedText: "Revoyez les leçons et entraînez-vous à votre rythme sur Falowen.",
     hybridAction: "Découvrir les formules",
-    supportLink: "Découvrir Falowen",
+    supportLink: "À propos de notre école",
     reviewsIntro: "L'avis de nos élèves",
     finalEyebrow: "VOTRE PROCHAINE ÉTAPE",
     finalTitle: "Votre apprentissage commence ici.",
     finalText: "Choisissez un cours en direct ou apprenez à votre rythme. Falowen réunit les cours, exercices et aides.",
-    footerCourses: "Cours A1–C2", footerMusic: "Musique", footerBooks: "Livre d’allemand A1", footerExam: "Examens de type Goethe", footerReviews: "Avis des élèves", footerHelp: "Aide", footerChatgpt: "Falowen dans ChatGPT",
+    footerCourses: "Cours A1–C2", footerMusic: "Musique", footerBooks: "Livre d’allemand A1", footerExam: "Examens de type Goethe", footerReviews: "Avis des élèves", footerHelp: "À propos", footerChatgpt: "Falowen dans ChatGPT",
     footerCourseLevels: "Cours d’allemand par niveau", footerGoetheLevels: "Préparation Goethe par niveau",
     contact: "Des questions ? Contactez-nous sur WhatsApp",
     featureCopy: {
@@ -149,7 +149,7 @@ const FOOTER_LINKS = [
   { href: "/reviews/", labelKey: "footerReviews" },
   { href: "/learn-german-with-chatgpt", labelKey: "footerChatgpt" },
   { href: "/partnerships", labelKey: "navPartnerships" },
-  { href: "/visitor-guide", labelKey: "footerHelp" },
+  { href: "/about-us", labelKey: "footerHelp" },
 ];
 
 const COURSE_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -212,7 +212,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
             <a href="https://exams.falowen.app/">{copy.navExams}</a>
             <a href="/books">{copy.navBooks}</a>
             <a href="/partnerships">{copy.navPartnerships}</a>
-            <a href="/visitor-guide">{copy.navHelp}</a>
+            <a href="/about-us">{copy.navHelp}</a>
           </div>
           <div className="falowen-home-nav-actions">
             <label className="falowen-home-language-wrap">
@@ -260,7 +260,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
             <p>{copy.supportText}</p>
             {copy.supportPractice && <p>{copy.supportPractice}</p>}
           </div>
-          <a className="falowen-home-support-link" href="/visitor-guide">{copy.supportLink} →</a>
+          <a className="falowen-home-support-link" href="/about-us">{copy.supportLink} →</a>
         </section>
 
         <div className="falowen-home-reviews-intro"><p>{copy.reviewsIntro}</p></div>

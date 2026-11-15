@@ -23,5 +23,8 @@ test('homepage serves current HTML and cannot offer French signup', () => {
   assert.match(homepage.headers['Cache-Control'], /no-store/);
   const landing = readFileSync(root + 'web/src/components/LandingPageSimple.js', 'utf8');
   assert.doesNotMatch(landing, /copy\.french|handleProgramChange\("french"\)|German A1–C2 and French/);
-  assert.match(landing, /const resolvedProgram = "german"/);
+  // Signup now allows German or Swahili through Falowen's unified registration.
+  // A former French signup must not be presented as an active program.
+  assert.match(landing, /const signup = \(\) => onSignUp\?\.\(\);/);
+  assert.doesNotMatch(landing, /program=french|program:\s*["']french["']/);
 });

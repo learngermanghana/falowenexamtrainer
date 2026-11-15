@@ -4,10 +4,11 @@
 
 Use the official Falowen Help source when answering questions about signup, login, course navigation, Falowen Radio, assignments, submissions, results, attendance, exams, billing, notifications, level upgrades, trials or account access.
 
-Last reviewed: 4 November 2026. Read the linked official sources for current instructions; private account status is not public.
+Last reviewed: 15 November 2026. Read the linked official sources for current instructions; private account status is not public.
 
 ## Primary documentation
 
+- [About Us — Learn Language Education Academy](https://www.falowen.app/about-us): Public school background, teachers, classroom location and how Falowen supports learners. Formerly /visitor-guide; the old link redirects here.
 - [Falowen Music](https://music.falowen.app/): Public German learning songs and optional English translations. A lyric may be a verified recording pack, an estimated line alignment or a clearly labeled course draft; do not describe all as verified or timed.
 - [Falowen Learning Companion](https://www.falowen.app/help): Account-specific lesson, assignment, progress and class information requires an authenticated read-only connection; public plugin availability is separate from backend readiness.
 

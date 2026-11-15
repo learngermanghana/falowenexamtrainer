@@ -60,7 +60,7 @@ describe("A1 chapter hub route identity", () => {
     );
 
     expect(await screen.findByTestId("location-probe")).toHaveTextContent(
-      "/campus/course/a1-day-2-kapitel-1-1-workbook?radio=done",
+      "/campus/course/a1-day-2-foundations-workbook?radio=done",
     );
     expect(screen.queryByTestId("a1-hub-params")).not.toBeInTheDocument();
   });

@@ -16,7 +16,7 @@ jest.mock("../lib/pageMeta", () => ({ updatePageMeta: jest.fn() }));
 
 const renderHome = (props={}) => render(<LandingPage program="german" onSignUp={jest.fn()} onLogin={jest.fn()} {...props} />);
 
-describe("Falowen current five-slide public homepage and iPhone navigation", () => {
+describe("Falowen current six-slide public homepage and iPhone navigation", () => {
   beforeEach(async()=>{ await i18n.changeLanguage("en"); });
   afterEach(()=>{ cleanup(); jest.clearAllMocks(); });
 
@@ -24,24 +24,26 @@ describe("Falowen current five-slide public homepage and iPhone navigation", () 
     const onSignUp=jest.fn();
     renderHome({program:"french",onSignUp});
     expect(screen.getByRole("navigation",{name:"Falowen"})).toBeInTheDocument();
-    expect(screen.getByRole("heading",{name:/Your next chapter/i})).toBeInTheDocument();
-    expect(screen.getByRole("link",{name:/View upcoming classes/i})).toHaveAttribute("href","/classes");
+    expect(screen.getByRole("heading",{name:/Learn German and Swahili/i})).toBeInTheDocument();
+    expect(screen.getByRole("link",{name:/View German classes/i})).toHaveAttribute("href","/classes");
     expect(screen.queryByRole("button",{name:"French"})).not.toBeInTheDocument();
     expect(screen.queryByText(/Goethe pass rate/i)).not.toBeInTheDocument();
   });
 
-  it("rotates five focused slides with classes, music, placement, exams and books",()=>{
+  it("rotates six focused slides with classes, music, placement, exams, books and ChatGPT",()=>{
     renderHome();
     const slides=within(screen.getByRole("group",{name:"Select carousel slide"}));
-    expect(slides.getAllByRole("button")).toHaveLength(5);
+    expect(slides.getAllByRole("button")).toHaveLength(6);
     fireEvent.click(slides.getByRole("button",{name:"Show slide 2"}));
-    expect(screen.getByRole("link",{name:/Explore German songs/i})).toHaveAttribute("href","https://music.falowen.app/");
+    expect(screen.getByRole("link",{name:/German songs/i})).toHaveAttribute("href","https://music.falowen.app/");
     fireEvent.click(slides.getByRole("button",{name:"Show slide 3"}));
     expect(screen.getByRole("link",{name:/Take free placement test/i})).toHaveAttribute("href","/placement-test");
     fireEvent.click(slides.getByRole("button",{name:"Show slide 4"}));
     expect(screen.getByRole("link",{name:/Explore exam practice/i})).toHaveAttribute("href","/exam-practice");
     fireEvent.click(slides.getByRole("button",{name:"Show slide 5"}));
     expect(screen.getByRole("link",{name:/Browse German books/i})).toHaveAttribute("href","/books");
+    fireEvent.click(slides.getByRole("button",{name:"Show slide 6"}));
+    expect(screen.getByRole("link",{name:/How to use Falowen with ChatGPT/i})).toHaveAttribute("href","/learn-german-with-chatgpt");
     expect(screen.queryByRole("heading",{name:"Start in three simple steps"})).not.toBeInTheDocument();
   });
 
@@ -60,15 +62,15 @@ describe("Falowen current five-slide public homepage and iPhone navigation", () 
   it("provides German Music links and usable English, German and French navigation",async()=>{
     renderHome();
     const nav=within(screen.getByRole("navigation",{name:"Falowen"}));
-    expect(nav.getByRole("link",{name:"German Music"})).toHaveAttribute("href","https://music.falowen.app/");
+    expect(nav.getByRole("link",{name:"Music"})).toHaveAttribute("href","https://music.falowen.app/");
     fireEvent.change(screen.getByRole("combobox",{name:"Language"}),{target:{value:"de"}});
-    await waitFor(()=>expect(nav.getByRole("link",{name:"Live-Kurse"})).toHaveAttribute("href","/classes"));
-    expect(nav.getByRole("link",{name:"Deutsch mit Musik"})).toHaveAttribute("href","https://music.falowen.app/");
-    expect(screen.getByRole("link",{name:"Bücher"})).toHaveAttribute("href","/books");
+    await waitFor(()=>expect(nav.getByRole("link",{name:"Kommende Kurse"})).toHaveAttribute("href","/classes"));
+    expect(nav.getByRole("link",{name:"Musik"})).toHaveAttribute("href","https://music.falowen.app/");
+    expect(nav.getByRole("link",{name:"Bücher"})).toHaveAttribute("href","/books");
     fireEvent.change(screen.getByRole("combobox",{name:"Sprache"}),{target:{value:"fr"}});
-    await waitFor(()=>expect(nav.getByRole("link",{name:"Cours en direct"})).toHaveAttribute("href","/classes"));
-    expect(nav.getByRole("link",{name:"Musique allemande"})).toHaveAttribute("href","https://music.falowen.app/");
-    expect(screen.getByRole("link",{name:"Livres"})).toHaveAttribute("href","/books");
+    await waitFor(()=>expect(nav.getByRole("link",{name:"Prochains cours"})).toHaveAttribute("href","/classes"));
+    expect(nav.getByRole("link",{name:"Musique"})).toHaveAttribute("href","https://music.falowen.app/");
+    expect(nav.getByRole("link",{name:"Livres"})).toHaveAttribute("href","/books");
   });
 
   it("keeps iPhone-safe CSS, upcoming class card, support and review area",()=>{

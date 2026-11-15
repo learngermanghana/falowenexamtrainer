@@ -469,6 +469,9 @@ function App() {
   }
 
   if (location.pathname === "/visitor-guide" || location.pathname === "/visitor-guide/") {
+    return <Navigate to={`/about-us${location.search}${location.hash}`} replace />;
+  }
+  if (location.pathname === "/about-us" || location.pathname === "/about-us/") {
     return <PublicAdmissionsVisitorGuidePage />;
   }
 

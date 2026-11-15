@@ -323,6 +323,13 @@
       }
     },
     {
+      "src": "/visitor-guide/?",
+      "status": 308,
+      "headers": {
+        "Location": "/about-us"
+      }
+    },
+    {
       "src": "/book/?",
       "status": 308,
       "headers": {

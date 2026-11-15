@@ -4,13 +4,13 @@ import path from "path";
 const source = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
 describe("GeneralHome live-class identity", () => {
-  test("passes the student's resolved record ID to both calendar mounts", () => {
+  test("passes the student's resolved record ID to the calendar mount", () => {
     const home = source("./GeneralHome.js");
 
     expect(home).toContain(
       'studentProfile?.classId || studentProfile?.classRecordId || studentProfile?.assignedClassId || ""'
     );
-    expect(home.match(/initialClassId=\{preferredClassId\}/g)).toHaveLength(2);
+    expect(home.match(/initialClassId=\{preferredClassId\}/g)).toHaveLength(1);
   });
 
   test("the home card carries its resolved canonical record into the full timetable", () => {

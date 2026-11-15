@@ -25,6 +25,17 @@
 
 A contract change involving both learner assignment submission and Admin marking needs separate PRs plus shared payload/version tests. The two repos deploy independently; confirm each side's release status. See [source-of-truth map](content-source-of-truth.md).
 
+## Public school profile and navigation
+
+The public homepage's **About us** link points to `/about-us` and renders the
+existing school/academy profile component in `web/src/components/PublicAdmissionsVisitorGuidePage.js`.
+`/visitor-guide` is a permanent Vercel redirect to `/about-us`, with a matching
+client-side fallback, preserving prior class and admissions links. The About Us
+page's canonical URL, structured-data URL, public sitemap and navigation point to
+`/about-us`. The existing `visitor_guide_open` admissions event/source identifier
+is intentionally retained for historical analytics continuity. The separate
+`/help` support guide is unchanged.
+
 ## Public landing-page questions
 
 `VisitorQuestionHelper` adds a floating, browser-local enquiry panel to public marketing,

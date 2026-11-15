@@ -10,7 +10,7 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), "u
 test("public admissions visitor guide is available before auth loading", () => {
   const app = read("web/src/App.js");
   assert.match(app, /PublicAdmissionsVisitorGuidePage/);
-  const routeIndex = app.indexOf('location.pathname === "\/visitor-guide"'.replace("\\/", "/"));
+  const routeIndex = app.indexOf('location.pathname === "/about-us"');
   const authLoadingIndex = app.indexOf("if (authLoading)");
   assert.ok(routeIndex >= 0);
   assert.ok(authLoadingIndex >= 0);
@@ -69,7 +69,8 @@ test("class brochure preserves admissions reference and records engagement", () 
   assert.match(tracker, /brochure_open/);
   assert.match(tracker, /registration_click/);
   assert.match(tracker, /brochureVisitorGuideLink/);
-  assert.match(tracker, /About the school & how Falowen works/);
+  assert.match(tracker, /About us/);
+  assert.match(tracker, /link\.href = "\/about-us"/);
   assert.match(tracker, /url\.searchParams\.set\("ref", ref\)/);
 });
 
@@ -98,7 +99,8 @@ test("shared visitor-guide links preserve class and lead context without authent
   const page = read("web/src/components/PublicAdmissionsVisitorGuidePage.js");
   const engagement = read("web/src/services/admissionsEngagementService.js");
 
-  assert.match(app, /location\.pathname === "\/visitor-guide"/);
+  assert.match(app, /location\.pathname === "\/about-us"/);
+  assert.match(app, /location\.pathname === "\/visitor-guide"/); // Legacy path still redirects.
   assert.match(page, /params\.get\("class"\)/);
   assert.match(page, /resolveAdmissionsRef\(search\)/);
   assert.match(page, /selectedClass.*requestedSlug/s);

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastReviewed": "2026-11-04",
+  "lastReviewed": "2026-11-15",
   "canonicalBaseUrl": "https://www.falowen.app",
   "sourceOfTruth": {
     "humanHelp": "https://www.falowen.app/help",
@@ -24,6 +24,14 @@
     "The Learning Companion reads only the authenticated learner's own supported data; it cannot officially submit work, change grades or infer missing class sessions."
   ],
   "navigation": [
+    {
+      "id": "about-us",
+      "label": "About us",
+      "route": "/about-us",
+      "purpose": "Meet Learn Language Education Academy, its teachers, classroom and Falowen learning platform",
+      "requiresLogin": false,
+      "aliases": ["about the school", "how Falowen works", "visitor guide", "/visitor-guide"]
+    },
     {
       "id": "partnerships",
       "label": "Partnership & Referral Programme",

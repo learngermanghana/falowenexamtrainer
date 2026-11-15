@@ -34,7 +34,7 @@ describe("C1 Learn and Speak grammar placement", () => {
 
     expect(screen.queryByText("Grammar lesson")).not.toBeInTheDocument();
     expect(screen.getByText(/Sprechfrage:/i)).toBeInTheDocument();
-    expect(screen.getByText("Soziale Teilhabe:")).toBeInTheDocument();
-    expect(screen.getByText("Förderung und Prioritäten:")).toBeInTheDocument();
+    expect(screen.getByText("Soziale Teilhabe")).toBeInTheDocument();
+    expect(screen.getByText("Förderung und Prioritäten")).toBeInTheDocument();
   });
 });

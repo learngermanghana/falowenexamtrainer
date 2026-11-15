@@ -171,10 +171,9 @@ describe("Falowen public help and AI discovery", () => {
     });
     expect(sitemap).toContain("https://www.falowen.app/course-catalogue.json");
     expect(robots).toContain("https://www.falowen.app/sitemap-courses.xml");
-    // Both /help and /visitor-guide are supported public guidance paths.
-    const helpUrl = landing.includes('{ href: "/help", labelKey: "footerHelp" }')
-      ? "/help"
-      : "/visitor-guide";
+    // About Us is the academy profile; /help remains the independent support guide.
+    expect(sitemap).toContain("https://www.falowen.app/about-us");
+    const helpUrl = "/about-us";
     expect(landing).toContain(`{ href: "${helpUrl}", labelKey: "footerHelp" }`);
     expect(landing).toContain(`<a href="${helpUrl}">{copy.navHelp}</a>`);
     expect(catalogueSource).toContain('["A1", "A2", "B1", "B2", "C1", "C2"]');
