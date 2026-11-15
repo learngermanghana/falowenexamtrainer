@@ -622,7 +622,7 @@ async function callTool(name, args, student, admin) {
     return {
       id: "flw_" + sha256(student.id).slice(0, 32),
       name: view.name,
-      nickname: view.level ? "Falowen German " + view.level + " student"
+      nickname: view.level ? "Falowen " + view.level + " student"
         : enrollment.primaryProgram === "swahili" ? "Falowen Swahili student" : "Falowen student",
       program: enrollment.primaryProgram,
       germanLevel: enrollment.enrolledInGerman ? enrollment.germanLevel : "",
