@@ -176,6 +176,11 @@ describe("ChatGPT practice permission and exam export", () => {
         requestId: "writing_day4_once_2026" };
       const denied = await call(readonly.tokens.access_token, "save_my_falowen_practice_note", args);
       expect(denied.data.result.isError).toBe(true);
+      const deniedOfficial = await call(readonly.tokens.access_token, "submit_my_falowen_assignment", {
+        assignmentId: "A2-1.1", answerText: "Ein vollständiger Beispieltext für eine Übung.", requestId: "testreadonly001", confirmed: true,
+      });
+      expect(deniedOfficial.data.result.isError).toBe(true);
+      expect(deniedOfficial.data.result.structuredContent.submitted).toBe(false);
 
       const scoped = await connectStudent(origin, "student-1", "scope-write",
         constants.SCOPE + " " + constants.PRACTICE_WRITE_SCOPE);
@@ -205,12 +210,18 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(16);
+      expect(list.data.result.tools).toHaveLength(18);
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
       expect(list.data.result.tools[0].securitySchemes[0].type).toBe("oauth2");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_study_plan");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_vocabulary_practice");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_practice");
+      expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_mocks");
+      expect(list.data.result.tools.map((tool) => tool.name)).toContain("submit_my_falowen_assignment");
+      const officialWrite = list.data.result.tools.find((tool) => tool.name === "submit_my_falowen_assignment");
+      expect(officialWrite.annotations.readOnlyHint).toBe(false);
+      expect(officialWrite.annotations.destructiveHint).toBe(true);
+      expect(officialWrite.securitySchemes[0].scopes).toContain("falowen:assignments:write");
       const writeTool = list.data.result.tools.find((tool) => tool.name === "save_my_falowen_practice_note");
       expect(writeTool.annotations.readOnlyHint).toBe(false);
       expect(writeTool.securitySchemes[0].scopes).toContain("falowen:practice:write");
