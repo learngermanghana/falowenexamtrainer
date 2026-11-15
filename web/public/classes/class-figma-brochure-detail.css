@@ -303,3 +303,71 @@ body.figma-brochure-detail button:focus-visible {
   .figma-brochure-copy h1 { font-size: 43px; }
   .figma-brochure-summary { margin-top: 25px; }
 }
+/* Concise brochure: the green hero is the single class-at-a-glance summary. */
+body.figma-brochure-detail #classDecisionSummary,
+body.figma-brochure-detail #academyTrackRecordCard,
+body.figma-brochure-detail #afterSignupCard,
+body.figma-brochure-detail #whoForCard {
+  display: none !important;
+}
+/* When the published full schedule is linked directly from the hero, do not repeat
+   a three-row copy of exactly the same weekly meeting times below. */
+body.figma-brochure-detail.figma-brochure-has-full-schedule #meeting-times-section {
+  display: none !important;
+}
+body.figma-brochure-detail #courseDetailsDisclosure {
+  scroll-margin-top: 40px;
+}
+body.figma-brochure-detail #courseDetailsDisclosure > summary {
+  color: #163b2c;
+  font-size: clamp(18px, 2vw, 23px);
+  padding: 19px 22px;
+}
+body.figma-brochure-detail #courseDetailsDisclosure .course-details-content {
+  padding: 0 22px 22px;
+}
+body.figma-brochure-detail #courseDetailsDisclosure #paymentGuidanceCard {
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+body.figma-brochure-detail #courseDetailsDisclosure #paymentGuidanceCard > h3 {
+  display: none;
+}
+body.figma-brochure-detail .course-benefits-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+body.figma-brochure-detail .course-benefits-card > div:first-child > p {
+  display: none;
+}
+.figma-brochure-start {
+  color: #fff4d2;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .02em;
+}
+.figma-brochure-start[hidden] { display: none; }
+body.figma-brochure-detail .figma-brochure-hero-actions #downloadBrochureButton {
+  width: auto;
+  min-height: 48px;
+  grid-column: auto;
+  display: inline-flex;
+  padding: 12px 18px;
+  border-radius: 99px;
+  font-size: 14px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.45);
+  color: #fff;
+  font-weight: 850;
+  cursor: pointer;
+}
+body.figma-brochure-detail .figma-brochure-hero-actions #downloadBrochureButton:hover {
+  background: rgba(255,255,255,.13);
+}
+@media (max-width: 900px) {
+  body.figma-brochure-detail .course-benefits-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 450px) {
+  body.figma-brochure-detail .course-benefits-grid { grid-template-columns: minmax(0,1fr); }
+  body.figma-brochure-detail .figma-brochure-hero-actions #downloadBrochureButton { flex: 1 1 138px; }
+}
