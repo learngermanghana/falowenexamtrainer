@@ -128,8 +128,8 @@ describe("C1 Day 1-15 Learn and Speak coverage", () => {
     expect(middleSource).toContain("<C1SpeakGrammarGuide lesson={lesson}");
     expect(day12To14Source).toContain("<C1KnowledgeChoicePractice lesson={lesson}");
     expect(day12To14Source).toContain("<C1SpeakGrammarGuide lesson={lesson} />");
-    expect(day15To17Source).toContain("day === 15 ? <C1KnowledgeChoicePractice lesson={lesson}");
-    expect(day15To17Source).toContain("day === 15 ? <C1SpeakGrammarGuide lesson={lesson} />");
+    expect(day15To17Source).toContain("day <= 16 ? <C1KnowledgeChoicePractice lesson={lesson}");
+    expect(day15To17Source).toContain("<C1SpeakGrammarGuide lesson={lesson} branchesOverride={branches.length ? branches : null} />");
   });
 
   test("C1 Day 12 keeps the intended Freizeit und Kultur grammar", () => {
