@@ -45,6 +45,16 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.queryByRole("link", { name: "Fungua Somo la 1" })).toBeNull();
   });
 
+  it("opens the assigned Swahili level and offers the published A1 book separately", async () => {
+    mockUser = { uid: "swahili-student-1" };
+    mockStudentProfile.level = "C2";
+    render(<MemoryRouter><SwahiliCourseBook /></MemoryRouter>);
+    expect(screen.getByText("Swahili C2 lessons have not been published yet.")).toBeTruthy();
+    expect(getDoc).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Open the A1 Course Book" }));
+    expect(await screen.findByText(/0 of 2 required assignments submitted/)).toBeTruthy();
+  });
+
   it("uses the learner's submissions and tutor decisions to show progress and resume", async () => {
     mockUser = { uid: "swahili-student-1" };
     getDoc.mockImplementation(async (path) => ({

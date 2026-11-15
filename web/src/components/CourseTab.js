@@ -583,11 +583,11 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     });
   }, [resolvedDefaultLevel, schedules]);
 
-  const [selectedCourseLevel, setSelectedCourseLevel] = useState(() => {
-    const normalizedDefault = resolvedDefaultLevel;
-    if (normalizedDefault && levels.includes(normalizedDefault)) return normalizedDefault;
-    return levels[0] || "";
-  });
+  const [levelChoice, setLevelChoice] = useState(null);
+  const assignedLevel = levels.includes(resolvedDefaultLevel) ? resolvedDefaultLevel : levels[0] || "";
+  const selectedCourseLevel = levelChoice?.assignedLevel === assignedLevel && levels.includes(levelChoice.level)
+    ? levelChoice.level : assignedLevel;
+  const setSelectedCourseLevel = level => setLevelChoice({ assignedLevel, level });
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
   const [courseSubmitOpen, setCourseSubmitOpen] = useState(false);
 
@@ -617,10 +617,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [practiceProgress, setPracticeProgress] = useState({});
-
-  useEffect(() => {
-    if (!selectedCourseLevel && levels[0]) setSelectedCourseLevel(levels[0]);
-  }, [levels, selectedCourseLevel]);
 
   const practiceStorageKey = useMemo(
     () => getPracticeStorageKey({ studentCode, level: selectedCourseLevel }),
