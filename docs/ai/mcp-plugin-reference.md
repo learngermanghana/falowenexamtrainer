@@ -20,7 +20,7 @@ The current learner-scoped tools are documented in [the release guide](../chatgp
 | `get_my_falowen_lesson_content` | Available learner-facing content |
 | `get_my_falowen_practice_guide` | Source-grounded one-question-at-a-time reading, Hören, Sprechen, Schreiben and grammar tutoring; English explanations optional, no score writes |
 
-The current connector does not submit assignments or mutate grades, payments or student records. Schema and permission changes require server tests and a new plugin review as applicable.
+The connection is read-only by default. The proposed A1 write pilot (not a released capability) adds `submit_my_falowen_assignment` with an explicitly granted `falowen:assignments:write` scope, confirmed full answer, canonical A1 assignment ID, transaction-bound one-time lock and a server activation flag. It never changes tutor grades, payments or exam attempts. The reviewed Exams Room practice API adds `get_my_falowen_exam_mocks`, which lists source-approved mock IDs without private answers. Schema and permission changes require server tests and a new plugin review as applicable.
 
 Use [the privacy guide](student-data-and-privacy.md) for student data boundaries. Never assert that a plugin is publicly installed solely because the MCP backend is deployed.
 
