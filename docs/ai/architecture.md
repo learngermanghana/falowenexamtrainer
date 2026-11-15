@@ -27,7 +27,7 @@ A contract change involving both learner assignment submission and Admin marking
 
 ## Public landing-page questions
 
-`VisitorQuestionHelper` adds a floating, browser-local enquiry panel to public marketing,
+`VisitorQuestionHelper` adds a movable enquiry panel to public marketing,
 placement, books, class, review, music and exam-practice pages. The route
 allowlist in `publicVisitorPaths.js` excludes learner campus and protected exams.
 Static public HTML (including the Exams subdomain and class brochures) receives
@@ -37,8 +37,11 @@ Exam/book price questions link to their respective pricing pages instead of
 returning course tuition.
 `web/src/data/visitorQuestions.js` owns its question patterns and approved answers;
 fees reuse `levelFees.js`, location reuses `publicAcademyProfile.json`, and class
-questions load the existing public class catalog on demand. No AI request,
-background polling, database write or persistent chat history is introduced.
+questions load the existing public class catalog on demand. The helper matches approved answers in the browser and keeps no persistent chat history.
+
+The shared launcher can be dragged with a pointer or moved with the arrow keys. Its position is remembered for the browser tab session. Before asking a question, visitors can request an admissions reply by submitting an email or phone number, or continue without sharing.
+
+`/api/public/visitor-enquiries` records anonymous open and question events and stores contact details only for explicit follow-up requests. The private workbook receives timestamps, event types and source surfaces. Contact rows also include the submitted details and an enquiry ID for retry deduplication. The API stores no question text and sends no automated messages. See [workbook setup and verification](../placement-result-emails.md#public-visitor-enquiries).
 Unknown questions and unconfirmed class/fee details offer the existing admissions
 WhatsApp contact with the visitor's question prefilled; the visitor chooses to send.
 
