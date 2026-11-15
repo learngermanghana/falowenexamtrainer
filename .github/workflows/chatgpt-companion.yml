@@ -4,6 +4,12 @@ on:
   pull_request:
     paths:
       - "functions/functionz/chatgptCompanion.js"
+      - "functions/functionz/chatgptAssignmentSubmission.js"
+      - "functions/functionz/chatgptA1SubmissionSafety.js"
+      - "functions/data/chatgptA1SubmissionRules.generated.json"
+      - "scripts/generateChatgptA1SubmissionRules.mjs"
+      - "web/src/data/timedAssignmentConfig.js"
+      - "web/src/components/A1CanonicalSubmissionPanel.jsx"
       - "functions/functionz/chatgptClassTimetable.js"
       - "functions/functionz/chatgptClassPreparation.js"
       - "functions/functionz/__tests__/chatgptClassPreparation.test.js"
@@ -55,6 +61,8 @@ jobs:
           cache: npm
       - run: npm install --no-package-lock --ignore-scripts
       - run: npm --prefix functions install --no-package-lock --ignore-scripts
+      - name: Verify fail-closed A1 submission safety snapshot is current
+        run: node scripts/generateChatgptA1SubmissionRules.mjs --check
       - name: Generate student-facing curriculum from canonical A1–C2 sources
         run: node scripts/generateChatgptLessonContent.mjs && node scripts/generateChatgptExamContent.mjs
       - name: Verify OAuth constraints and student data scope
@@ -63,6 +71,8 @@ jobs:
         run: |
           node --check scripts/generateChatgptLessonContent.mjs
           node --check scripts/generateChatgptExamContent.mjs
+          node --check scripts/generateChatgptA1SubmissionRules.mjs
+          node --check functions/functionz/chatgptA1SubmissionSafety.js
           node --check scripts/extractFalowenGrammar.mjs
           node --check scripts/extractFalowenWorkbook.mjs
           node --check functions/functionz/chatgptCompanion.js

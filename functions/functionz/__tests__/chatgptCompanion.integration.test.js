@@ -3,6 +3,8 @@
 const express = require("express");
 const crypto = require("crypto");
 const { makeRouter, constants } = require("../chatgptCompanion");
+const { getAssignmentSummary } = require("../routes/scoresSummaryCoursePlan");
+const rules = require("../../data/chatgptA1SubmissionRules.generated.json");
 
 const hash = (value) => crypto.createHash("sha256").update(value).digest("hex");
 const verifier = "a".repeat(43);
@@ -163,6 +165,50 @@ async function connectStudent(origin, uid, state, scope = constants.SCOPE) {
   });
   return { code, response, tokens: await response.json() };
 }
+
+describe("Official assignment-write OAuth scope regression", () => {
+  test("read-only tokens are rejected, but valid whitespace-delimited write scope reaches the disabled pilot", async () => {
+    const previous = process.env.FALOWEN_CHATGPT_OFFICIAL_SUBMIT_ENABLED;
+    delete process.env.FALOWEN_CHATGPT_OFFICIAL_SUBMIT_ENABLED;
+    try {
+      await withServer(async origin => {
+        const assignment = getAssignmentSummary("A1").lessons.find(item =>
+          item.submissionRequired && rules.supportedTextAssignments[item.assignmentId] &&
+          Number(item.dayNumber) < rules.timedStartDay);
+        expect(assignment).toBeTruthy();
+        const answerText = Object.entries(rules.supportedTextAssignments[assignment.assignmentId])
+          .map(([part, rule]) => [
+            "Teil " + part.split("-")[1],
+            ...(rule.kind === "numbered"
+              ? rule.numbers.map(n => n + ". Antwort")
+              : ["Ich lerne Deutsch. Meine Familie wohnt in Accra. Heute schreibe ich eine Antwort in der Schule."]),
+          ].join("\n")).join("\n\n");
+        const args = {
+          assignmentId: assignment.assignmentId, answerText,
+          requestId: "scope_regression_2026", confirmed: true,
+        };
+        const call = (token) => postJson(origin + "/api/chatgpt/mcp", {
+          jsonrpc: "2.0", id: 321, method: "tools/call",
+          params: { name: "submit_my_falowen_assignment", arguments: args },
+        }, token);
+        const readonly = await connectStudent(origin, "student-class", "a1-scope-readonly");
+        const noPermission = await call(readonly.tokens.access_token);
+        expect(noPermission.data.result.structuredContent.submitted).toBe(false);
+        expect(noPermission.data.result.structuredContent.error).toMatch(/read-only/);
+        const authorized = await connectStudent(origin, "student-class", "a1-scope-write",
+          constants.SCOPE + " " + constants.ASSIGNMENT_WRITE_SCOPE);
+        expect(authorized.tokens.scope).toContain(constants.ASSIGNMENT_WRITE_SCOPE);
+        const blockedByFlag = await call(authorized.tokens.access_token);
+        expect(blockedByFlag.data.result.structuredContent.submitted).toBe(false);
+        expect(blockedByFlag.data.result.structuredContent.error).toMatch(/not yet enabled/);
+        expect(blockedByFlag.data.result.structuredContent.error).not.toMatch(/read-only/);
+      });
+    } finally {
+      if (previous === undefined) delete process.env.FALOWEN_CHATGPT_OFFICIAL_SUBMIT_ENABLED;
+      else process.env.FALOWEN_CHATGPT_OFFICIAL_SUBMIT_ENABLED = previous;
+    }
+  });
+});
 
 describe("ChatGPT practice permission and exam export", () => {
   test("read-only tokens refuse practice notes; explicit extra-scope tokens can write a private note", async () => {

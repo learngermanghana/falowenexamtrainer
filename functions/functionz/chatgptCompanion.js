@@ -926,7 +926,7 @@ function makeRouter(admin) {
           content: [{ type: "text", text: JSON.stringify(saved) }], structuredContent: saved } });
       }
       if (name === "submit_my_falowen_assignment") {
-        if (!session.scope.split(/\\s+/).includes(ASSIGNMENT_WRITE_SCOPE)) {
+        if (!session.scope.split(/\s+/).includes(ASSIGNMENT_WRITE_SCOPE)) {
           const denied = { submitted: false, error: "This Falowen connection is read-only for official assignments. Reconnect and explicitly approve the assignment-write permission; no work was submitted." };
           return res.json({ jsonrpc: "2.0", id, result: {
             isError: true, content: [{ type: "text", text: JSON.stringify(denied) }], structuredContent: denied,

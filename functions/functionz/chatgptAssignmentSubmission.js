@@ -5,6 +5,7 @@
 // It never marks answers, bypasses a lock, or handles timed mock exams.
 const crypto = require("crypto");
 const { getAssignmentSummary } = require("./routes/scoresSummaryCoursePlan");
+const { isA1TimedAssignment, validateA1ChatgptSubmissionCompleteness } = require("./chatgptA1SubmissionSafety");
 
 const LEVELS = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
 const A1_OBJECTIVE = new Set(["0.1", "0.2", "5", "7", "8", "12.1", "12.2"]);
@@ -62,6 +63,15 @@ function planA1Submission({ student, uid, email, assignmentId, answerText, reque
   if (!Number.isInteger(day) || day < 1 || day > 22) {
     return { ok: false, error: "Only active A1 tutor days 1–22 are eligible; orientation and final exams remain in Campus." };
   }
+  // Timed checkpoints and every tutor task from the A1 timed phase stay in
+  // Campus, where the attempt clock and auto-submit state are authoritative.
+  if (isA1TimedAssignment(normalizedId, day)) {
+    return { ok: false, error: "Timed A1 tutor assignments must be submitted in Campus with their real timed-attempt state. Nothing was submitted or locked." };
+  }
+  // Canonical student-visible section rules are mandatory even when the text
+  // satisfies a global word count. Unsupported tasks fail closed.
+  const completeness = validateA1ChatgptSubmissionCompleteness({ assignmentId: normalizedId, answerText: submittedText });
+  if (!completeness.ok) return { ok: false, error: completeness.error };
   const minWords = A1_LONG.has(chapter) ? 50 : A1_OBJECTIVE.has(chapter) ? 0 : 10;
   const count = submittedText.split(/\s+/u).filter(Boolean).length;
   if (count < minWords) return { ok: false, error: `This A1 task requires at least ${minWords} words; ${count} were supplied.` };

@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": [
+    "web/src/data/a1TutorDraftProfiles.js",
+    "web/src/data/timedAssignmentConfig.js",
+    "web/src/components/A1CanonicalSubmissionPanel.jsx"
+  ],
+  "timedStartDay": 16,
+  "timedAssignmentIds": [
+    "A1-10",
+    "A1-11",
+    "A1-12.1",
+    "A1-12.2",
+    "A1-12.3",
+    "A1-13",
+    "A1-14.1",
+    "A1-5.9",
+    "A1-9"
+  ],
+  "supportedTextAssignments": {
+    "A1-0.1": {
+      "teil-2": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      }
+    },
+    "A1-0.2": {
+      "teil-1": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "teil-2": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    "A1-0.2_1.1": {
+      "teil-1": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "teil-2": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "teil-3": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "teil-4": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "teil-5": {
+        "kind": "text"
+      }
+    },
+    "A1-1.1": {
+      "teil-1": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "teil-2": {
+        "kind": "text"
+      }
+    },
+    "A1-1.2": {
+      "teil-1": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      "teil-2": {
+        "kind": "text"
+      },
+      "teil-3": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    "A1-3": {
+      "teil-1": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "teil-2": {
+        "kind": "text"
+      },
+      "teil-3": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      }
+    },
+    "A1-5": {
+      "teil-1": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "teil-2": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "teil-3": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      }
+    },
+    "A1-6": {
+      "teil-1": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "teil-2": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    "A1-7": {
+      "teil-1": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "teil-2": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    "A1-8": {
+      "teil-1": {
+        "kind": "numbered",
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "teil-2": {
+        "kind": "numbered",
+        "numbers": [
+          6,
+          7,
+          8
+        ]
+      }
+    }
+  }
+}
