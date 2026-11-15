@@ -10,6 +10,11 @@ import A2Day26GefuehleInVerschiedenenSituationenWorkbookPage from "./A2Day26Gefu
 import A2Day27DigitaleKommunikationWorkbookPage from "./A2Day27DigitaleKommunikationWorkbookPage";
 import A2Day28UeberDieZukunftSprechenWorkbookPage from "./A2Day28UeberDieZukunftSprechenWorkbookPage";
 
+// The real app wraps these workbooks in AuthProvider; this navigation test
+// supplies a non-privileged learner identity rather than depending on Firebase.
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({ user: null, studentProfile: null, idToken: null }),
+}));
 jest.mock("./SharedTimedAssignment", () => ({
   __esModule: true,
   default: ({ children }) => typeof children === "function"
