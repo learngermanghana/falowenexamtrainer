@@ -196,6 +196,10 @@ describe("ChatGPT practice permission and exam export", () => {
       expect(exam.data.result.structuredContent.task.situation).toMatch(/Julia/);
       expect(JSON.stringify(exam.data.result.structuredContent)).not.toMatch(/readingAnswerKey|rubric/);
 
+      const dictionary = await call(scoped.tokens.access_token, "get_my_falowen_exam_dictionary",
+        {category:"writing",taskId:"a2-existing-letter-1"});
+      expect(dictionary.data.result.structuredContent.level).toBe("A2");
+      expect(dictionary.data.result.structuredContent.officialResult).toBe(false);
       const other = await connectStudent(origin, "student-2", "scope-other");
       const inaccessible = await call(other.tokens.access_token, "get_my_falowen_exam_practice",
         { mockId: "a2-mock-02", skill: "writing" });
@@ -210,13 +214,14 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(18);
+      expect(list.data.result.tools).toHaveLength(19);
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
       expect(list.data.result.tools[0].securitySchemes[0].type).toBe("oauth2");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_study_plan");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_vocabulary_practice");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_practice");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_mocks");
+      expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_dictionary");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("submit_my_falowen_assignment");
       const officialWrite = list.data.result.tools.find((tool) => tool.name === "submit_my_falowen_assignment");
       expect(officialWrite.annotations.readOnlyHint).toBe(false);
