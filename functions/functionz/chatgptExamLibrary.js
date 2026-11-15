@@ -45,7 +45,7 @@ function getMyExamDictionary(level, category, args = {}) {
       format: section.format, targetWords: section.targetWords,
     })));
   // The exact task ID is the stable source-owned selector. Search is bounded.
-  const filtered = all.filter(item => (!part || item.teilId === part) &&
+  const filtered = all.filter(item => (!part || normalizePart(item.teilId) === part) &&
     (!taskId || item.id === taskId) &&
     (!query || [item.id, item.title, item.situation, item.topicPrompt,
       item.keywordSubtopic, item.text].some(value => text(value).toLocaleLowerCase("de").includes(query))));
