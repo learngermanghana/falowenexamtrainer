@@ -8,6 +8,18 @@ import A2Day26GefuehleInVerschiedenenSituationenWorkbookPage from "./A2Day26Gefu
 import A2Day27DigitaleKommunikationWorkbookPage from "./A2Day27DigitaleKommunikationWorkbookPage";
 import A2Day28UeberDieZukunftSprechenWorkbookPage from "./A2Day28UeberDieZukunftSprechenWorkbookPage";
 
+// Exercise the React-owned tabs and cleanup, not Firebase authentication or
+// the timed-assignment session lifecycle.
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({ user: null, studentProfile: null, idToken: null }),
+}));
+jest.mock("./SharedTimedAssignment", () => ({
+  __esModule: true,
+  default: ({ children }) => typeof children === "function"
+    ? children({ isTabLocked: () => false }) : children,
+  TimedAssignmentPanel: () => null,
+  useTimedAssignment: () => ({ enabled: false, isTabLocked: () => false }),
+}));
 jest.mock("./navigation/AppBackButton", () => () => <div>Back</div>);
 jest.mock("./AssignmentSubmissionPage", () => () => <div>Submission form</div>);
 jest.mock("./ContextualAssignmentSubmissionPage", () => () => <div>Submission form</div>);
