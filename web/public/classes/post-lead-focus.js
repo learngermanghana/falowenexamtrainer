@@ -108,7 +108,11 @@
   }
 
   function keepOneRegisterButton() {
-    var signupLinks = Array.from(document.querySelectorAll("a[href^='/signup']"));
+    var signupLinks = Array.from(document.querySelectorAll("a[href^='/signup']"))
+      .filter(function (link) {
+        return !link.classList.contains("figma-brochure-primary") &&
+          !link.classList.contains("figma-brochure-nav-register");
+      });
     if (!signupLinks.length) return;
 
     var primary = document.getElementById("mainSignupCta")
