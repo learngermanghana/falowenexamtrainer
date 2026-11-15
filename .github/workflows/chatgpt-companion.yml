@@ -12,6 +12,13 @@ on:
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
       - "functions/functionz/__tests__/chatgptClassTimetable.test.js"
       - "scripts/generateChatgptLessonContent.mjs"
+      - "scripts/generateChatgptExamContent.mjs"
+      - "web/src/data/mockExamCatalog.js"
+      - "web/src/data/speakingDictionary.js"
+      - "web/src/data/examWritingWorkspace.js"
+      - "web/src/data/a1FinalMock2Data.js"
+      - "web/src/data/a1FinalMock3Data.js"
+      - "functions/functionz/chatgptExamLibrary.js"
       - "scripts/extractFalowenGrammar.mjs"
       - "scripts/extractFalowenWorkbook.mjs"
       - "web/src/components/A2B1WorkbookGrammarNotesContent.js"
@@ -46,12 +53,13 @@ jobs:
       - run: npm install --no-package-lock --ignore-scripts
       - run: npm --prefix functions install --no-package-lock --ignore-scripts
       - name: Generate student-facing curriculum from canonical A1–C2 sources
-        run: node scripts/generateChatgptLessonContent.mjs
+        run: node scripts/generateChatgptLessonContent.mjs && node scripts/generateChatgptExamContent.mjs
       - name: Verify OAuth constraints and student data scope
         run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js
       - name: Verify JavaScript syntax
         run: |
           node --check scripts/generateChatgptLessonContent.mjs
+          node --check scripts/generateChatgptExamContent.mjs
           node --check scripts/extractFalowenGrammar.mjs
           node --check scripts/extractFalowenWorkbook.mjs
           node --check functions/functionz/chatgptCompanion.js
