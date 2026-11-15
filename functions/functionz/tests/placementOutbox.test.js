@@ -20,3 +20,9 @@ test("one atomic write queues the result and separate follow-up preference",asyn
   expect(outbox.appendCells.rows[0].values[2].userEnteredValue.stringValue).toBe(event.contact.email);
   expect(results.appendCells.rows[0].values[6].userEnteredValue.boolValue).toBe(false);
 });
+
+test("a 403 without an explicitly verified workbook stops before queueing",async()=>{
+  const sheets=jest.fn();
+  await expect(queuePlacementResult(event,sheets,token,async()=>({ok:false,status:403,json:async()=>({})}))).rejects.toThrow(/HTTP 403/);
+  expect(sheets).not.toHaveBeenCalled();
+});
