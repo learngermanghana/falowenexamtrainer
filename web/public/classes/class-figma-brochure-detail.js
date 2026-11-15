@@ -281,6 +281,14 @@
         var href = safeRegistrationLink();
         register.href = href;
         registerNav.href = href;
+        // Legacy brochure cleanup scripts hide other signup links. These two are
+        // intentionally the only visible Figma registration entry points.
+        [register, registerNav].forEach(function (button) {
+          button.hidden = false;
+          button.style.removeProperty("display");
+          button.removeAttribute("aria-hidden");
+          button.removeAttribute("tabindex");
+        });
         if (statusLabel.indexOf("ENQUIRE") >= 0) {
           register.textContent = "Enquire about next class →";
           registerNav.textContent = "Enquire now →";
