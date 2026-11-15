@@ -17,7 +17,7 @@ test("public admissions visitor guide is available before auth loading", () => {
   assert.ok(routeIndex < authLoadingIndex);
 });
 
-test("About Us presents the school, teaching team, and selected-class context without duplicate language selector", () => {
+test("visitor guide explains school, team and selected-class context without duplicate language selector", () => {
   const page = read("web/src/components/PublicAdmissionsVisitorGuidePage.js");
   assert.match(page, /Learn Language Education Academy/);
   assert.match(page, /Your selected class/);
