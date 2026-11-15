@@ -437,10 +437,15 @@ export default function SignUpPage(props) {
     }).catch(() => {});
   };
 
+  // Respect explicit links from the German and Kiswahili About Us pathways.
+  // A saved application draft is the fallback only when no language was requested.
+  const programQuery = typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("program");
+  const initialProgram = ["german", "swahili"].includes(programQuery) ? programQuery : draft?.program;
+
   return (
     <div ref={rootRef} className="signup-page-mobile-safe">
       <style>{MOBILE_INPUT_CSS}</style>
-      <SignUpPageLegacy {...props} initialProgram={draft?.program} onAccountCreated={handleAccountCreated} />
+      <SignUpPageLegacy {...props} initialProgram={initialProgram} onAccountCreated={handleAccountCreated} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} rootRef={rootRef} />, mount) : null}
       <LegalFooter />
     </div>
