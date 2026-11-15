@@ -1,4 +1,4 @@
-import { assertFullMockReady } from "./mockFactoryContract";
+import { assertFullMockReady } from "./mockFactoryContract.js";
 const A2_SECTION_CARDS = Object.freeze([
   {
     key: "lesen",
