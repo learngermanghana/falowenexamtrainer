@@ -17,7 +17,7 @@
   function getFaqs() {
     const policy = getPolicy();
     const modes = (policy.learningModes || DEFAULT_POLICY.learningModes).join(", ");
-    return [
+    const allFaqs = [
       {
         question: "How do I enroll and get access to Falowen?",
         answer:
@@ -68,6 +68,19 @@
           "Please check your email, including spam or junk, and your Falowen account. If the issue continues, contact info@falowen.app or use the WhatsApp link on this page.",
       },
     ];
+    if (!document.body.classList.contains("figma-brochure-detail")) return allFaqs;
+
+    // These are the decision-making questions visitors need most. Combine the
+    // two certificate answers and omit FAQs that repeat brochure details.
+    return allFaqs.filter((_, i) => [0, 1, 3, 5, 7, 9].includes(i)).map((faq) =>
+      faq.question === "Do I receive a certificate upon completion?"
+        ? {
+            ...faq,
+            question: "Will I receive a certificate? Is it an official Goethe certificate?",
+            answer: faq.answer + " " + policy.officialCertificateNote,
+          }
+        : faq,
+    );
   }
 
   function injectStyles() {
