@@ -142,7 +142,7 @@ export default function PlacementFunnelNextStep({ result }) {
         <a href={`https://wa.me/233205706589?text=${whatsappText}`} target="_blank" rel="noopener noreferrer" onClick={() => trackPublicFunnelEvent("placement_whatsapp_click", { level: result.level })} style={button("#16a34a")}>Ask on WhatsApp</a>
       </div>
 
-      <form onSubmit={saveReminder} style={{ display: "grid", gap: 8, maxWidth: 560 }}>
+      {!result.registered && <form onSubmit={saveReminder} style={{ display: "grid", gap: 8, maxWidth: 560 }}>
         <strong>Save my result and get class guidance</strong>
         <p style={{margin:0,color:"#475569",fontSize:13}}>Optional: leave your contact details so our admissions team can help you enrol at the right level. If you provide an email address, Falowen can also send you your recommended level and score. You can register without this form.</p>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
@@ -158,7 +158,7 @@ export default function PlacementFunnelNextStep({ result }) {
           I agree that Falowen may contact me about German classes and registration. My test result will be used to recommend a starting level.
         </label>
         {status ? <div role="status" style={{ color: status.startsWith("We could") || status.startsWith("Enter") ? "#b91c1c" : "#166534", fontSize: 13 }}>{status}</div> : null}
-      </form>
+      </form>}
     </section>
   );
 }

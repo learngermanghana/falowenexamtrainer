@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { makePlacementAttemptId, sendPlacementEventOnce, answersToIndices } from "../lib/placementMonitoring";
+import { makePlacementAttemptId, postPlacementEvent, sendPlacementEventOnce, answersToIndices } from "../lib/placementMonitoring";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
 import {
@@ -33,6 +33,7 @@ const readSession = () => {
     const wasCompleted = Number.isFinite(saved.completedAt);
     return {
       id: /^pt_[a-zA-Z0-9-]{12,90}$/.test(String(saved.id||"")) ? saved.id : makePlacementAttemptId(),
+      ticket: saved.ticket || null,
       startedAt,
       completedAt: wasCompleted ? saved.completedAt : timedOut ? startedAt + PLACEMENT_DURATION_MS : null,
       completionReason: wasCompleted ? saved.completionReason || "submitted" : timedOut ? "time" : null,
@@ -73,6 +74,10 @@ export default function PlacementTestPage2026() {
   const [session, setSession] = useState(readSession);
   const [now, setNow] = useState(() => Date.now());
   const trackedCompletion = useRef(Boolean(session.completedAt));
+  const [starting,setStarting] = useState(false);
+  const [startError,setStartError] = useState("");
+  const [delivery,setDelivery] = useState("");
+  const [retry,setRetry] = useState(0);
   const started = Boolean(session.startedAt);
   const finished = Boolean(session.completedAt);
   const remaining = finished ? 0 : getRemainingMs(session.startedAt, now);
@@ -140,21 +145,27 @@ export default function PlacementTestPage2026() {
   }, [started, finished]);
 
   useEffect(() => {
-    if (!session.id || !session.startedAt) return undefined;
-    const send = () => void sendPlacementEventOnce({id:session.id,action:"start"}).catch(()=>{});
-    send();
-    window.addEventListener("online",send);
-    return () => window.removeEventListener("online",send);
-  }, [session.id,session.startedAt]);
+    if (!started) recordEvent("contact_prompt_view");
+  }, [started]);
 
   useEffect(() => {
     if (!session.id || !session.completedAt) return undefined;
-    const payload={id:session.id,action:"complete",answers:answersToIndices(session.answers,placementQuestions)};
-    const send=()=>void sendPlacementEventOnce(payload).catch(()=>{});
+    let active = true;
+    const payload = {id:session.id, action:"complete", ticket:session.ticket,
+      answers:answersToIndices(session.answers,placementQuestions)};
+    const send = async () => {
+      if (active) setDelivery("saving");
+      try {
+        await sendPlacementEventOnce(payload);
+        if (active) setDelivery("queued");
+      } catch (_) {
+        if (active) setDelivery("failed");
+      }
+    };
     send();
     window.addEventListener("online",send);
-    return () => window.removeEventListener("online",send);
-  }, [session.id,session.completedAt,session.answers]);
+    return () => { active = false; window.removeEventListener("online",send); };
+  }, [session.id,session.completedAt,session.answers,session.ticket,retry]);
 
   useEffect(() => {
     if (!finished || trackedCompletion.current) return;
@@ -168,11 +179,26 @@ export default function PlacementTestPage2026() {
     recordEvent("level_assigned", { level: suggestedLevel });
   }, [finished, correct, suggestedLevel, session.completionReason]);
 
-  const begin = () => {
+  const begin = async (event) => {
+    event.preventDefault();
+    if (starting) return;
+    const data = new FormData(event.currentTarget);
+    setStarting(true);
+    setStartError("");
+    let result;
+    try {
+      result = await postPlacementEvent({action:"start",id:makePlacementAttemptId(),
+        email:data.get("email"),name:data.get("name"),classEmails:data.has("classEmails")});
+      if (!result.ticket) throw new Error("Please refresh and try again.");
+    } catch (error) {
+      setStartError(error.message || "Could not save your email. Please try again.");
+      return;
+    } finally { setStarting(false); }
+    setDelivery("");
     const current = Date.now();
     setNow(current);
     trackedCompletion.current = false;
-    setSession({ ...initialSession(), id:makePlacementAttemptId(), startedAt: current });
+    setSession({ ...initialSession(), id:result.id, ticket:result.ticket, startedAt: current });
     recordEvent("start", { questionCount: placementQuestions.length, durationMinutes: 20 });
   };
 
@@ -236,7 +262,15 @@ export default function PlacementTestPage2026() {
               The timer keeps running if you refresh or leave the page. At 00:00 your responses submit automatically.
             </p>
           </div>
-          <button type="button" style={{ ...primaryButton, justifySelf: "start" }} onClick={begin}>Start test →</button>
+          <form onSubmit={begin} style={{display:"grid",gap:12,maxWidth:480}}>
+            <strong>Where should we send your German placement result?</strong>
+            <span>We’ll email your score and recommended starting level. No account is required.</span>
+            <label>Email address <input name="email" type="email" required maxLength={180} autoComplete="email" /></label>
+            <label>First name (optional) <input name="name" maxLength={120} autoComplete="given-name" /></label>
+            <label><input name="classEmails" type="checkbox" /> Also email me about upcoming German classes at my level.</label>
+            {startError && <span role="alert">{startError}</span>}
+            <button type="submit" disabled={starting} style={{...primaryButton,justifySelf:"start"}}>{starting ? "Starting…" : "Start test →"}</button>
+          </form>
         </section>
       ) : (
         <>
@@ -351,13 +385,16 @@ export default function PlacementTestPage2026() {
               </div>
             </section>
           ) : (
-            <section data-placement-attempt-id={session.id||""} data-placement-a1={levelStats.A1.correct} data-placement-a2={levelStats.A2.correct} data-placement-b1={levelStats.B1.correct} style={{ ...styles.card, display: "grid", gap: 15, border: "1px solid #bfdbfe" }}>
+            <section data-placement-registered={Boolean(session.ticket)} data-placement-attempt-id={session.id||""} data-placement-a1={levelStats.A1.correct} data-placement-a2={levelStats.A2.correct} data-placement-b1={levelStats.B1.correct} style={{ ...styles.card, display: "grid", gap: 15, border: "1px solid #bfdbfe" }}>
               <div style={{ padding: 14, background: "#eff6ff", borderRadius: 12 }}>
                 <p style={{ ...subtleText, margin: 0, fontWeight: 800 }}>{session.completionReason === "time" ? "Time is up · answers submitted automatically" : "Assessment complete"}</p>
                 <h2 style={{ fontSize: 27, margin: "7px 0", color: "#0f172a" }}>Your suggested starting level: {suggestedLevel}</h2>
                 <div style={{ fontSize: 17 }}>Suggested level: <strong>{suggestedLevel}</strong> · Score: {correct}/30</div>
                 <p style={{ ...subtleText, marginBottom: 0 }}>Based on 30 grammar and vocabulary questions. Confirm with a speaking or writing check before final class placement.</p>
               </div>
+              {session.ticket && <div role="status">{delivery === "queued" ? "Your result is queued for email." :
+                delivery === "failed" ? <>We couldn’t queue your result email. <button type="button" onClick={()=>setRetry(n=>n+1)}>Retry email</button></> :
+                "Saving your result for email…"}</div>}
               <h3 style={{ margin: 0 }}>Your results by level</h3>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
                 {placementTest.sections.map((section) => {
@@ -380,7 +417,7 @@ export default function PlacementTestPage2026() {
                   "You showed strong performance across all three sections. B1 is a suggested starting point."}
               </p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <a href={"/classes/?level=" + encodeURIComponent(suggestedLevel)} style={{ ...primaryButton, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>View {suggestedLevel} classes</a>
+                <a onClick={()=>recordEvent("recommended_class_click",{level:suggestedLevel})} href={"/classes/?level=" + encodeURIComponent(suggestedLevel)} style={{ ...primaryButton, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>View {suggestedLevel} classes</a>
                 <button type="button" style={buttonBase} onClick={() => setSession(initialSession())}>Retake test</button>
               </div>
               <details style={{ padding: 12, border: "1px solid #e2e8f0", borderRadius: 12 }}>
