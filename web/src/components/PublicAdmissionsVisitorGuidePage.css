@@ -236,3 +236,138 @@
   .visitor-guide-marketing-grid { grid-template-columns: 1fr; gap: 9px; }
   .visitor-guide-marketing-card { padding: 14px; }
 }
+
+
+/* Balanced academy introduction: equal visual weight, equal actions. */
+.visitor-guide-language-section {
+  display: grid;
+  gap: 18px;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid #dce4ec;
+  border-radius: 20px;
+  background: #fff;
+}
+.visitor-guide-language-heading { display: grid; gap: 8px; }
+.visitor-guide-language-heading > span {
+  color: #365f69;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+.visitor-guide-language-heading h2 {
+  margin: 0;
+  color: #14253a;
+  font-size: clamp(23px, 3vw, 30px);
+  line-height: 1.2;
+}
+.visitor-guide-language-heading p {
+  margin: 0;
+  color: #52617a;
+  line-height: 1.6;
+  font-size: 14px;
+}
+.visitor-guide-language-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+.visitor-guide-language-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: clamp(17px, 2.6vw, 26px);
+  border-radius: 18px;
+  border: 1px solid #d9e3ed;
+  background: #f5f8ff;
+}
+.visitor-guide-language-swahili {
+  border-color: #cee2da;
+  background: #f3faf6;
+}
+.visitor-guide-language-tag {
+  color: #2254ad;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+.visitor-guide-language-swahili .visitor-guide-language-tag { color: #207053; }
+.visitor-guide-language-card h3 {
+  margin: 0;
+  font-size: clamp(23px, 2.8vw, 29px);
+  line-height: 1.15;
+  color: #162e45;
+}
+.visitor-guide-language-card p {
+  margin: 0;
+  line-height: 1.65;
+  font-size: 14px;
+  color: #46596c;
+}
+.visitor-guide-language-actions {
+  margin-top: auto;
+  padding-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+.visitor-guide-language-actions a,
+.visitor-guide-language-final-actions a {
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.4;
+  min-height: 45px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #174f97;
+  background: #fff;
+  border: 1px solid #cbdaf0;
+}
+.visitor-guide-language-actions a.visitor-guide-language-primary,
+.visitor-guide-language-final-actions a:first-child {
+  color: #fff;
+  background: #1e4cac;
+  border-color: #1e4cac;
+}
+.visitor-guide-language-swahili .visitor-guide-language-actions a { color: #176a4b; border-color: #bfdace; }
+.visitor-guide-language-swahili .visitor-guide-language-actions a.visitor-guide-language-primary,
+.visitor-guide-language-final-actions a:last-child {
+  color: #fff;
+  background: #176648;
+  border-color: #176648;
+}
+.visitor-guide-language-final-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.visitor-guide-marketing-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #53657a;
+}
+.visitor-guide-marketing-grid.visitor-guide-marketing-grid-shared {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.visitor-guide-language-actions a:focus-visible,
+.visitor-guide-language-final-actions a:focus-visible {
+  outline: 3px solid #e8ab35;
+  outline-offset: 3px;
+}
+@media (max-width: 740px) {
+  .visitor-guide-language-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .visitor-guide-language-section { padding: 16px 14px; gap: 14px; }
+  .visitor-guide-language-card { padding: 17px; }
+  .visitor-guide-language-final-actions { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .visitor-guide-marketing-grid.visitor-guide-marketing-grid-shared { grid-template-columns: minmax(0, 1fr); }
+}
