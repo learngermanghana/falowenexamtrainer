@@ -18,6 +18,7 @@
 
   function getPreferredAnchor() {
     return (
+      document.querySelector("body.figma-brochure-detail .figma-brochure-hero-actions") ||
       document.querySelector(".decision-summary-actions") ||
       document.getElementById("classScheduleCta") ||
       document.getElementById("mainSignupCta") ||

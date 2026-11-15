@@ -56,6 +56,12 @@
     }
   }
 
+  function formatBrochureDate(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return "";
+    const date = new Date(value + "T00:00:00Z");
+    return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(date);
+  }
+
   function formatTime(value) {
     var parts = String(value || "").split(":").map(Number);
     if (parts.length < 2 || !Number.isInteger(parts[0]) || !Number.isInteger(parts[1])) {
@@ -130,7 +136,7 @@
     [
       ["Overview", "#figmaBrochureHero"],
       ["Schedule", "#meeting-times-section"],
-      ["Fees", "#classDecisionSummary"],
+      ["Fees", "#courseDetailsDisclosure"],
       ["Reviews", "#studentReviewsCard"],
       ["FAQs", "#faq-section"]
     ].forEach(function (item) {
@@ -155,6 +161,8 @@
     status.id = "figmaBrochureStatus";
     var levelPill = appendText(tags, "span", "figma-brochure-level", "GERMAN");
     levelPill.id = "figmaBrochureLevel";
+    var datePill = appendText(tags, "span", "figma-brochure-start", "");
+    datePill.id = "figmaBrochureStart";
     copy.appendChild(tags);
 
     var kicker = appendText(copy, "p", "figma-brochure-course", "GERMAN CLASS");
@@ -169,6 +177,7 @@
     register.href = "/signup/";
     var schedule = make("a", "figma-brochure-secondary", "View schedule");
     schedule.href = "#meeting-times-section";
+    schedule.id = "figmaBrochureScheduleLink";
     actions.appendChild(register);
     actions.appendChild(schedule);
     copy.appendChild(actions);
@@ -218,6 +227,10 @@
         levelPill.textContent = (course.language || "German").toUpperCase() + " · " +
           (isSelf ? "SELF-LEARNING" : (levelNames[level] || level));
         kicker.textContent = String(course.title || level + " German class").toUpperCase();
+        const start = formatBrochureDate(course.startDate);
+        const isFuture = start && course.startDate > new Date().toISOString().slice(0, 10);
+        datePill.textContent = start ? (isFuture ? "Starts " : "Started ") + start : "";
+        datePill.hidden = !start;
         heading.textContent = isSelf
           ? "Learn German on your schedule."
           : (titles[level] || "Learn German with confidence.");
@@ -249,9 +262,33 @@
         factElements[2].caption.textContent = /record/i.test(String(course.format || ""))
           ? "Review lesson material in Falowen"
           : "Study and practise with course resources";
+        const scheduleUrl = !isSelf && typeof course.scheduleUrl === "string" &&
+          /^https:\/\//i.test(course.scheduleUrl) ? course.scheduleUrl : "";
+        const hasSchedule = Boolean(scheduleUrl);
+        document.body.classList.toggle("figma-brochure-has-full-schedule", hasSchedule);
+        const scheduleNav = links.querySelector('a[href="#meeting-times-section"], a[data-brochure-schedule]');
+        if (scheduleNav) {
+          scheduleNav.dataset.brochureSchedule = "true";
+          scheduleNav.href = scheduleUrl || "#meeting-times-section";
+          scheduleNav.target = hasSchedule ? "_blank" : "";
+          scheduleNav.rel = hasSchedule ? "noopener noreferrer" : "";
+          scheduleNav.hidden = isSelf;
+        }
+        schedule.href = scheduleUrl || "#meeting-times-section";
+        schedule.target = hasSchedule ? "_blank" : "";
+        schedule.rel = hasSchedule ? "noopener noreferrer" : "";
+        schedule.hidden = isSelf;
         var href = safeRegistrationLink();
         register.href = href;
         registerNav.href = href;
+        // Legacy brochure cleanup scripts hide other signup links. These two are
+        // intentionally the only visible Figma registration entry points.
+        [register, registerNav].forEach(function (button) {
+          button.hidden = false;
+          button.style.removeProperty("display");
+          button.removeAttribute("aria-hidden");
+          button.removeAttribute("tabindex");
+        });
         if (statusLabel.indexOf("ENQUIRE") >= 0) {
           register.textContent = "Enquire about next class →";
           registerNav.textContent = "Enquire now →";

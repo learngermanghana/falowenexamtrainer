@@ -217,6 +217,9 @@
     });
     document.querySelectorAll("a[href^='/signup']").forEach(function (link) {
       if (link === primaryRegister) return;
+      // These Figma hero/nav CTAs are the visible registration entry points.
+      if (link.classList.contains("figma-brochure-primary") ||
+          link.classList.contains("figma-brochure-nav-register")) return;
       if (link.closest && link.closest("#brochureMobileCta")) return;
       link.style.display = "none";
       link.setAttribute("aria-hidden", "true");
