@@ -17,24 +17,22 @@ test("public admissions visitor guide is available before auth loading", () => {
   assert.ok(routeIndex < authLoadingIndex);
 });
 
-test("About Us presents both language pathways, selected German classes and school information", () => {
+test("visitor guide explains school, team and selected-class context without duplicate language selector", () => {
   const page = read("web/src/components/PublicAdmissionsVisitorGuidePage.js");
   assert.match(page, /Learn Language Education Academy/);
   assert.match(page, /Your selected class/);
-  assert.match(page, /Choose the language you want to learn/);
-  assert.match(page, /Learn German/);
-  assert.match(page, /Learn Kiswahili/);
+  assert.doesNotMatch(page, /TWO LANGUAGES · ONE LEARNING ACADEMY|Choose the language you want to learn/);
+  assert.doesNotMatch(page, /visitor-guide-language-grid|Register for Kiswahili/);
   assert.match(page, /How we support language learners/);
   assert.match(page, /Goethe-style exam preparation/);
-  assert.match(page, /online Kiswahili course book/);
+  assert.match(page, /Kiswahili course currently focuses on foundational language learning/);
   assert.doesNotMatch(page, /Why students study with us|How your course works/);
-  assert.match(page, /The people behind the school/);
+  assert.match(page, /Meet our German and Kiswahili team/);
   assert.match(page, /Visit LLEA/);
   assert.match(page, /Open exact location in Google Maps/);
   assert.match(page, /LLEA classroom · Awoshie, Accra/);
   assert.match(page, /In person in Awoshie, live online, or recorded lesson catch-up/);
   assert.match(page, /publicAcademyProfile\.json/);
-  assert.ok(page.indexOf("Choose the language you want to learn") < page.indexOf("Visit LLEA"));
   assert.ok(page.indexOf("Visit LLEA") < page.indexOf("How we support language learners"));
   assert.match(page, /View class brochure/);
   assert.match(page, /Register now/);
@@ -49,32 +47,23 @@ test("About Us presents both language pathways, selected German classes and scho
   assert.match(page, /registration_click/);
 });
 
-test("both languages have equal visibility and valid next-step links without inventing Kiswahili timetable or Goethe exams", () => {
+test("About Us keeps the teacher profiles, shared approach, and footer language links", () => {
   const page = read("web/src/components/PublicAdmissionsVisitorGuidePage.js");
-  const app = read("web/src/App.js");
-  const signup = read("web/src/components/SignUpPage.js");
   const css = read("web/src/components/PublicAdmissionsVisitorGuidePage.css");
+  const app = read("web/src/App.js");
 
-  assert.match(page, /visitor-guide-language-grid/);
-  assert.match(page, /GERMAN · DEUTSCH/);
-  assert.match(page, /KISWAHILI · SWAHILI/);
+  assert.match(page, /We teach German and Kiswahili/);
+  assert.match(page, /academyProfile\.team/);
+  assert.match(page, /How we support language learners/);
+  assert.match(page, /kiswahiliTeacher\.image/);
   assert.match(page, /href="\/classes\/">Explore German classes/);
   assert.match(page, /href="\/swahili">Explore Kiswahili course/);
-  assert.match(page, /Register for German/);
-  assert.match(page, /Register for Kiswahili/);
-  assert.match(page, /signup\?program=swahili&ref=/);
   assert.match(page, /\{requestedSlug \? \(/);
-  assert.match(page, /Goethe-style exam preparation is part of the German pathway/);
-  assert.match(page, /Kiswahili instructor/);
-  assert.match(page, /kiswahiliTeacher\.image/);
-  assert.doesNotMatch(page, /PUBLIC_MARKETING_FEATURES\.map/);
-
+  assert.doesNotMatch(page, /visitor-guide-language-section|visitor-guide-language-card|swahiliSignupHref/);
+  assert.doesNotMatch(page, /GERMAN · DEUTSCH|KISWAHILI · SWAHILI/);
+  assert.match(css, /\.visitor-guide-language-final-actions/);
+  assert.doesNotMatch(css, /\.visitor-guide-language-grid|\.visitor-guide-language-card/);
   assert.match(app, /swahiliPreview = location\.pathname\.match/);
-  assert.match(signup, /const programQuery = .*params|get\("program"\)/);
-  assert.match(signup, /initialProgram=\{initialProgram\}/);
-  assert.match(css, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
-  assert.match(css, /@media \(max-width: 740px\)/);
-  assert.match(css, /visitor-guide-marketing-grid-shared/);
 });
 
 test("visitor guide class actions are responsive on phone and desktop", () => {
