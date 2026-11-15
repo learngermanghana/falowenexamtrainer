@@ -5,10 +5,13 @@
 const crypto = require('node:crypto');
 const approvedRecordingLyrics = require('../web/public/music/approved-recording-lyrics.json');
 const { getR2AudioConfig } = require('../functions/functionz/r2CourseAudio');
+const day4NumberTiming = require('../web/public/music/a1-day-04-number-timing.json');
 const LEVELS = new Set(['A1','A2','B1','B2','C1','C2']);
-// A2 Day 14 recording was replaced by owner-approved Mein Traumberuf.mp3.
-// Keep a stale R2 MP3 out of discovery and prevent matching new lyrics to it.
-const RETIRED_MUSIC_KEYS = new Set(['music/a2/day-14/Pläne für mein Leben.mp3']);
+// Keep superseded MP3s out of discovery so the lesson uses the current recording.
+const RETIRED_MUSIC_KEYS = new Set([
+  'music/a2/day-14/Pläne für mein Leben.mp3',
+  'music/a1/day-04/Meine Nummer, meine Adresse.mp3',
+]);
 const OBJECT_KEY = /^music\/(a1|a2|b1|b2|c1|c2)\/day-(0[1-9]|1[0-9]|2[0-8])\/([^/\\\u0000-\u001f\u007f]{1,150})\.(mp3)$/i;
 const AUTO_ID = /^r2-(a1|a2|b1|b2|c1|c2)-day-(0[1-9]|1[0-9]|2[0-8])-([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const enc = value => encodeURIComponent(String(value)).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase());
@@ -46,7 +49,7 @@ function musicTrackFromKey(key) {
     topic:'Day '+Number(match[2])+' · German music',
     type:'Learning story', genre:approved?.genre || '', language:'German',
     audioUrl:'https://www.falowen.app/api/music?track='+id,
-    assignmentKey:approved?.assignmentKey || '', coursebook:true, autoDiscovered:true,
+    assignmentKey:approved?.assignmentKey || (key === day4NumberTiming.objectKey ? day4NumberTiming.assignmentKey : ''), coursebook:true, autoDiscovered:true,
     objectKey:key,
   };
 }

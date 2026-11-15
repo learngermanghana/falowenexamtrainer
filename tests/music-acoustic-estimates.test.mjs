@@ -59,7 +59,7 @@ test('the complete current library has timing coverage: 65 course recordings plu
  const manifest=require('../web/public/music/timing-coverage.json');
  const known=[...require('../web/public/music/timings.json').recordings,
   ...require('../web/public/music/approved-recording-lyrics.json').recordings,
-  ...estimates.recordings];
+  ...estimates.recordings,require('../web/public/music/a1-day-04-number-timing.json')];
  const drafts=require('../web/public/music/studio-drafts.json').tracks;
  const classes=require('../web/public/music/class-timings.json').recordings;
  assert.equal(manifest.courseRecordings.length,65);
@@ -70,4 +70,24 @@ test('the complete current library has timing coverage: 65 course recordings plu
  }
  assert.deepEqual(new Set(classes.map(p=>p.trackId)),new Set(manifest.classTrackIds));
  for(const pack of classes)assert.equal(validateCues(pack.cues,pack.lyrics).length,pack.cues.length);
+});
+
+test('replacement A1 Day 4 uses its own 20 acoustic lines and retires the earlier recording', async()=>{
+ const timing=require('../web/public/music/a1-day-04-number-timing.json');
+ const {musicTrackFromKey,musicKeyFromAutoId}=require('../server/musicDiscovery.cjs');
+ assert.equal(musicKeyFromAutoId(timing.trackId),timing.objectKey);
+ assert.equal(musicTrackFromKey(timing.objectKey).assignmentKey,'A1-2');
+ assert.equal(musicTrackFromKey('music/a1/day-04/Meine Nummer, meine Adresse.mp3'),null);
+ const handler=require('../server/musicLyrics.cjs').createLyricsHandler({env:{}});
+ let result;
+ await handler({method:'GET',query:{track:timing.trackId}},{
+  setHeader(){},status(code){assert.equal(code,200);return this;},
+  json(body){result=body;},
+ });
+ assert.equal(result.cues.length,20);
+ assert.equal(result.timingStatus,'estimated');
+ assert.equal(result.transcriptionStatus,'automatic');
+ assert.match(result.lyrics,/Mein Name ist Daniel/);
+ assert.doesNotMatch(result.lyrics,/Blumenstraße/);
+ assert.deepEqual(result.englishTranslation.lines.map(line=>line.de),result.cues.map(cue=>cue.text));
 });

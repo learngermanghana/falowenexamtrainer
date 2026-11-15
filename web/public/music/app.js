@@ -1,9 +1,9 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
-import { coverForTrack } from "./cover-art.js?v=20261103-photo-covers";
+import { coverForTrack } from "./cover-art.js?v=20261115-a1-day4";
 import { songStoryForTrack } from "./song-story.js?v=20261102-bilingual";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
-import { matchingEnglishTranslation, matchingDraftEnglishTranslation, matchingTranscriptEnglishTranslation } from "./english-translations.js?v=20261104-transcript";
+import { matchingEnglishTranslation, matchingDraftEnglishTranslation, matchingTranscriptEnglishTranslation } from "./english-translations.js?v=20261115-a1-day4";
 // Never autoplay on initial load; continue only after a listener starts a song.
 // Falowen Music's static listening room. No authentication, AI calls,
 // Firestore writes or generated media. Optional consented GA4 usage tracking is

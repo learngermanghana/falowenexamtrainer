@@ -17,7 +17,7 @@ test('public catalog lists latest approved classroom recordings without older A1
   expect(new Set(keys).size).toBe(keys.length);
   expect(keys).not.toContain('music/a1/day-04/welche-nummer-hast-du.mp3');
   expect(keys).not.toContain('music/a1/day-22/mein-kopf-tut-weh.mp3');
-  expect(pins.find(t=>t.assignmentKey==='A1-2').title).toBe('Meine Nummer, meine Adresse');
+  expect(pins.find(t=>t.assignmentKey==='A1-2').title).toBe('Das ist meine Nummer');
   expect(pins.find(t=>t.assignmentKey==='A1-14.1').title).toBe('Arzttermin');
   for(const t of pins){
     expect(t.audioUrl).toBe('https://www.falowen.app/api/music?track='+t.id);

@@ -3,7 +3,7 @@ export const PUBLIC_MUSIC_ORIGIN = "https://music.falowen.app";
 // Curated introductions to the existing public catalogue, not a second song list.
 const FEATURED_IDS = [
   "r2-a2-day-12-b64_VHLDpHVtZSDDpG5kZXJuIHNpY2gubXAz",
-  "r2-a1-day-04-b64_TWVpbmUgTnVtbWVyLCBtZWluZSBBZHJlc3NlLm1wMw",
+  "r2-a1-day-04-b64_RGFzIGlzdCBtZWluZSBOdW1tZXIubXAz",
   "r2-a2-day-23-b64_RmFocnJhZCB6dXIgU2NodWxlLm1wMw",
   "gemeinsam-schaffen-wir-das",
 ];
