@@ -2,9 +2,22 @@
 const { getAssignmentSummary } = require("../routes/scoresSummaryCoursePlan");
 const { germanEnrollment, planA1Submission, submitA1Assignment } = require("../chatgptAssignmentSubmission");
 
-const lesson = getAssignmentSummary("A1").lessons.find(x => x.submissionRequired && x.assignmentId);
+const rules = require("../../data/chatgptA1SubmissionRules.generated.json");
+const { isA1TimedAssignment, validateA1ChatgptSubmissionCompleteness } = require("../chatgptA1SubmissionSafety");
+
+const completeAnswerFor = (assignmentId) => Object.entries(rules.supportedTextAssignments[assignmentId])
+  .map(([part, rule]) => {
+    const title = "Teil " + part.split("-")[1];
+    return [title, ...(rule.kind === "numbered"
+      ? rule.numbers.map(number => number + ". Antwort für diese Aufgabe")
+      : ["Ich lerne Deutsch jeden Tag. Mein Name ist Anna und ich komme aus Ghana. Meine Familie hilft mir beim Lernen."])].join("\n");
+  }).join("\n\n");
+const lesson = getAssignmentSummary("A1").lessons.find(x =>
+  x.submissionRequired && rules.supportedTextAssignments[x.assignmentId] &&
+  !isA1TimedAssignment(x.assignmentId, Number(x.dayNumber)));
+if (!lesson) throw Error("No current text-only A1 tutor assignment matches the safety snapshot.");
 const user = { id: "student-record", data: { program: "german", level: "A1", studentCode: "A1-TEST", name: "Test Learner" } };
-const args = { assignmentId: lesson.assignmentId, answerText: "Teil 1\n1. Richtig\n2. Falsch\nTeil 2\nIch heiße Anna und ich komme aus Ghana. Ich lerne Deutsch in der Schule.", requestId: "subtest_001", confirmed: true };
+const args = { assignmentId: lesson.assignmentId, answerText: completeAnswerFor(lesson.assignmentId), requestId: "subtest_001", confirmed: true };
 const input = { student: user, uid: "uid-test", email: "student@example.test", ...args };
 
 describe("Falowen official A1 MCP submission boundaries", () => {
@@ -30,6 +43,51 @@ describe("Falowen official A1 MCP submission boundaries", () => {
     expect(planA1Submission({...input,student:{id:"s",data:{level:"C2",program:"german"}}}).ok).toBe(false);
     expect(planA1Submission({...input,requestId:"bad"}).ok).toBe(false);
     expect(planA1Submission({...input,answerText:"A short answer"}).ok).toBe(false);
+  });
+  test("rejects every canonical timed A1 checkpoint, including A1-5.9 and A1-9", () => {
+    expect(rules.timedStartDay).toBe(16);
+    for (const assignmentId of rules.timedAssignmentIds) {
+      expect(isA1TimedAssignment(assignmentId, 1)).toBe(true);
+      const attempted = planA1Submission({ ...input, assignmentId });
+      expect(attempted.ok).toBe(false);
+    }
+    expect(isA1TimedAssignment(lesson.assignmentId, 16)).toBe(true);
+    expect(isA1TimedAssignment(lesson.assignmentId, Number(lesson.dayNumber))).toBe(false);
+  });
+  test("requires every numbered section and writing response before any permanent lock", () => {
+    expect(validateA1ChatgptSubmissionCompleteness({
+      assignmentId: "A1-0.2", answerText: "Teil 1\n1. Richtig\n2. Falsch\nTeil 2\n1. Wort",
+    })).toMatchObject({ ok: false, error: expect.stringMatching(/Teil 1 answers 3/) });
+    expect(validateA1ChatgptSubmissionCompleteness({
+      assignmentId: "A1-3",
+      answerText: "Teil 1\n1. Anna\n2. Ben\n3. Carla\n4. David\nTeil 2\nMeine Familie ist sehr nett.",
+    })).toMatchObject({ ok: false, error: expect.stringMatching(/Teil 3 answers 1/) });
+    expect(validateA1ChatgptSubmissionCompleteness({
+      assignmentId: "A1-3", answerText: completeAnswerFor("A1-3"),
+    })).toMatchObject({ ok: true });
+    expect(validateA1ChatgptSubmissionCompleteness({
+      assignmentId: "A1-0.2", answerText: completeAnswerFor("A1-0.2"),
+    })).toMatchObject({ ok: true });
+    expect(validateA1ChatgptSubmissionCompleteness({
+      assignmentId: "A1-2", answerText: completeAnswerFor("A1-3"),
+    })).toMatchObject({ ok: false, error: expect.stringMatching(/Campus Review/) });
+  });
+  test("incomplete work never calls Firestore even when the write pilot is enabled", async () => {
+    const previous = process.env.FALOWEN_CHATGPT_OFFICIAL_SUBMIT_ENABLED;
+    process.env.FALOWEN_CHATGPT_OFFICIAL_SUBMIT_ENABLED = "true";
+    const firestore = jest.fn();
+    try {
+      const r = await submitA1Assignment({
+        admin: { firestore }, student: user, uid: input.uid, email: input.email,
+        args: { ...args, answerText: "Teil 1\n1. Richtig\n2. Falsch\nTeil 2\nIch heiße Anna. Meine Familie ist groß." },
+      });
+      expect(r.submitted).toBe(false);
+      expect(r.error).toMatch(/incomplete|Campus Review/);
+      expect(firestore).not.toHaveBeenCalled();
+    } finally {
+      if (previous === undefined) delete process.env.FALOWEN_CHATGPT_OFFICIAL_SUBMIT_ENABLED;
+      else process.env.FALOWEN_CHATGPT_OFFICIAL_SUBMIT_ENABLED = previous;
+    }
   });
   test("feature flag prevents all Firestore writes when disabled", async () => {
     const old=process.env.FALOWEN_CHATGPT_OFFICIAL_SUBMIT_ENABLED;
