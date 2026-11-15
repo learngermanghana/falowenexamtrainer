@@ -27,7 +27,7 @@ test("About Us presents the school, teaching team, and selected-class context wi
   assert.match(page, /Goethe-style exam preparation/);
   assert.match(page, /Kiswahili course currently focuses on foundational language learning/);
   assert.doesNotMatch(page, /Why students study with us|How your course works/);
-  assert.match(page, /The people behind the school/);
+  assert.match(page, /Meet our German and Kiswahili team/);
   assert.match(page, /Visit LLEA/);
   assert.match(page, /Open exact location in Google Maps/);
   assert.match(page, /LLEA classroom · Awoshie, Accra/);
