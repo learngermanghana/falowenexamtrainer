@@ -1,7 +1,7 @@
 # Falowen Help & Navigation Knowledge Base
 
 **Official Falowen source for learners, support staff, search engines and AI assistants.**  
-Last reviewed: **4 November 2026**.
+Last reviewed: **15 November 2026**.
 
 Falowen is a language-learning campus that combines structured lessons, Falowen Radio, workbooks, teacher-marked assignments, results, attendance, exam support, vocabulary practice, account management and an in-app Study Buddy.
 
@@ -15,6 +15,7 @@ Generated A1–C2 lesson/course map: https://www.falowen.app/falowen-course-map.
 
 | Learner need | Destination | Official route |
 | --- | --- | --- |
+| About the academy and its teachers | About us | https://www.falowen.app/about-us |
 | Not sure of German level | Placement Test | https://www.falowen.app/placement-test |
 | New German registration | Sign up | https://www.falowen.app/signup?program=german |
 | Existing account | Log in | https://www.falowen.app/login/ |
