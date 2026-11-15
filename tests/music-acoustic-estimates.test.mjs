@@ -55,14 +55,15 @@ test('all course timing drafts validate without promoting automatic transcripts 
  }
 });
 
-test('the complete current library has timing coverage: 65 course recordings plus two class songs',()=>{
+test('the complete current library has timing coverage: 66 course recordings plus two class songs',()=>{
  const manifest=require('../web/public/music/timing-coverage.json');
  const known=[...require('../web/public/music/timings.json').recordings,
   ...require('../web/public/music/approved-recording-lyrics.json').recordings,
-  ...estimates.recordings,require('../web/public/music/a1-day-04-number-timing.json')];
+  ...estimates.recordings,require('../web/public/music/a1-day-04-number-timing.json'),
+  require('../web/public/music/b1-day-19-interview-timing.json')];
  const drafts=require('../web/public/music/studio-drafts.json').tracks;
  const classes=require('../web/public/music/class-timings.json').recordings;
- assert.equal(manifest.courseRecordings.length,65);
+ assert.equal(manifest.courseRecordings.length,66);
  for(const track of manifest.courseRecordings){
   const pack=known.find(p=>p.objectKey===track.objectKey && validateCues(p.cues,p.lyrics).length)
     || drafts.find(p=>p.recordingObjectKey===track.objectKey && validateCues(p.cues,p.lyrics).length);
@@ -89,5 +90,21 @@ test('replacement A1 Day 4 uses its own 20 acoustic lines and retires the earlie
  assert.equal(result.transcriptionStatus,'automatic');
  assert.match(result.lyrics,/Mein Name ist Daniel/);
  assert.doesNotMatch(result.lyrics,/Blumenstraße/);
+ assert.deepEqual(result.englishTranslation.lines.map(line=>line.de),result.cues.map(cue=>cue.text));
+});
+
+test('B1 Day 19 has one exact recording identity and 17 estimated bilingual cues',async()=>{
+ const timing=require('../web/public/music/b1-day-19-interview-timing.json');
+ const {musicTrackFromKey,musicKeyFromAutoId}=require('../server/musicDiscovery.cjs');
+ assert.equal(musicKeyFromAutoId(timing.trackId),timing.objectKey);
+ assert.equal(musicTrackFromKey(timing.objectKey).assignmentKey,'B1-6.19');
+ let result;
+ await require('../server/musicLyrics.cjs').createLyricsHandler({env:{}})({method:'GET',query:{track:timing.trackId}},{
+  setHeader(){},status(code){assert.equal(code,200);return this;},json(body){result=body;},
+ });
+ assert.equal(result.timingStatus,'estimated');
+ assert.equal(result.referenceOnly,true);
+ assert.equal(result.cues.length,17);
+ assert.ok(result.cues[0].start>=11);
  assert.deepEqual(result.englishTranslation.lines.map(line=>line.de),result.cues.map(cue=>cue.text));
 });

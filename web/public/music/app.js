@@ -1,5 +1,5 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
-import { coverForTrack } from "./cover-art.js?v=20261115-a1-day4";
+import { coverForTrack } from "./cover-art.js?v=20261115-b1-day19";
 import { songStoryForTrack } from "./song-story.js?v=20261102-bilingual";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
@@ -607,7 +607,7 @@ function renderLyrics(lesson) {
   root.replaceChildren();
   renderedCues = validateCues(lesson.cues, lesson.lyrics);
   activeEnglishPack = lesson.transcriptionStatus === "automatic" ? matchingTranscriptEnglishTranslation(englishTranslations, selected, lesson) : lesson.referenceOnly
-    ? matchingDraftEnglishTranslation(englishTranslations, selected, lesson)
+    ? matchingDraftEnglishTranslation(englishTranslations, selected, lesson) || matchingEnglishTranslation({recordings:[{...lesson.englishTranslation,objectKey:lesson.objectKey}]},selected?.objectKey,lesson.lyrics)
     : matchingEnglishTranslation(englishTranslations, selected?.objectKey, lesson.lyrics);
   const translateControl = byId("show-english");
   translateControl.disabled = !activeEnglishPack;

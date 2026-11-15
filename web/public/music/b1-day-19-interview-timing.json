@@ -1,0 +1,179 @@
+{
+  "cues": [
+    {
+      "start": 11.08,
+      "end": 16.26,
+      "text": "Vor der Tür atme ich noch einmal tief durch."
+    },
+    {
+      "start": 16.28,
+      "end": 22.48,
+      "text": "Heute habe ich mein erstes Vorstellungsgespräch."
+    },
+    {
+      "start": 22.48,
+      "end": 28.82,
+      "text": "Die Chefin fragt nach meinen Stärken,"
+    },
+    {
+      "start": 28.82,
+      "end": 35.02,
+      "text": "und für einen Moment fehlen mir die Worte."
+    },
+    {
+      "start": 35.02,
+      "end": 37.44,
+      "text": "Ich muss nicht perfekt klingen,"
+    },
+    {
+      "start": 39.06,
+      "end": 44.08,
+      "text": "ich darf kurz überlegen und dann antworten."
+    },
+    {
+      "start": 45.42,
+      "end": 47.9,
+      "text": "Ein ehrlicher Satz kann viel sagen."
+    },
+    {
+      "start": 52.48,
+      "end": 57.24,
+      "text": "Ich erzähle von einem schwierigen Projekt,"
+    },
+    {
+      "start": 57.42,
+      "end": 63.74,
+      "text": "bei dem wir gemeinsam eine Lösung fanden."
+    },
+    {
+      "start": 65.48,
+      "end": 69.84,
+      "text": "Danach frage ich selbst nach dem Team,"
+    },
+    {
+      "start": 70.68,
+      "end": 76.04,
+      "text": "weil mir die Zusammenarbeit besonders wichtig ist."
+    },
+    {
+      "start": 76.04,
+      "end": 79.7,
+      "text": "Ich muss nicht perfekt klingen,"
+    },
+    {
+      "start": 79.7,
+      "end": 85.32,
+      "text": "ich darf kurz überlegen und dann antworten."
+    },
+    {
+      "start": 85.6,
+      "end": 89.12,
+      "text": "Ein ehrlicher Satz kann viel sagen."
+    },
+    {
+      "start": 90.2,
+      "end": 95.82,
+      "text": "Beim Abschied fühle ich mich erleichtert."
+    },
+    {
+      "start": 95.82,
+      "end": 101.24,
+      "text": "Ich habe mich von meiner besten Seite gezeigt."
+    },
+    {
+      "start": 101.24,
+      "end": 110.86,
+      "text": "Mit Falowen kann ich selbstbewusst über meine Stärken sprechen."
+    }
+  ],
+  "matchCoverage": 0.887,
+  "weakestLineCoverage": 0.6,
+  "objectKey": "music/b1/day-19/Nicht Perfekt klingen.mp3",
+  "trackId": "r2-b1-day-19-b64_TmljaHQgUGVyZmVrdCBrbGluZ2VuLm1wMw",
+  "assignmentKey": "B1-6.19",
+  "draftTitle": "Nicht perfekt klingen",
+  "duration": 123.12,
+  "recordingSha256": "d406851811fca8aa3ce64eef04a7e3e1c2e32c6201ca2f66208e01468d30e2aa",
+  "timingStatus": "estimated",
+  "timingMethod": "Whisper small acoustic alignment against the course draft; listening review required",
+  "referenceOnly": true,
+  "lyrics": "[Verse 1]\nVor der Tür atme ich noch einmal tief durch.\nHeute habe ich mein erstes Vorstellungsgespräch.\nDie Chefin fragt nach meinen Stärken,\nund für einen Moment fehlen mir die Worte.\n\n[Chorus]\nIch muss nicht perfekt klingen,\nich darf kurz überlegen und dann antworten.\nEin ehrlicher Satz kann viel sagen.\n\n[Verse 2]\nIch erzähle von einem schwierigen Projekt,\nbei dem wir gemeinsam eine Lösung fanden.\nDanach frage ich selbst nach dem Team,\nweil mir die Zusammenarbeit besonders wichtig ist.\n\n[Chorus]\nIch muss nicht perfekt klingen,\nich darf kurz überlegen und dann antworten.\nEin ehrlicher Satz kann viel sagen.\n\n[Outro]\nBeim Abschied fühle ich mich erleichtert.\nIch habe mich von meiner besten Seite gezeigt.\nMit Falowen kann ich selbstbewusst über meine Stärken sprechen.",
+  "englishTranslation": {
+    "source": "course-draft",
+    "objectKey": "music/b1/day-19/Nicht Perfekt klingen.mp3",
+    "level": "B1",
+    "day": 19,
+    "assignmentKey": "B1-6.19",
+    "draftTitle": "Nicht perfekt klingen",
+    "lines": [
+      {
+        "de": "Vor der Tür atme ich noch einmal tief durch.",
+        "en": "Outside the door, I take one more deep breath."
+      },
+      {
+        "de": "Heute habe ich mein erstes Vorstellungsgespräch.",
+        "en": "Today I have my first job interview."
+      },
+      {
+        "de": "Die Chefin fragt nach meinen Stärken,",
+        "en": "The manager asks me about my strengths,"
+      },
+      {
+        "de": "und für einen Moment fehlen mir die Worte.",
+        "en": "and for a moment I can’t find the words."
+      },
+      {
+        "de": "Ich muss nicht perfekt klingen,",
+        "en": "I don’t have to sound perfect,"
+      },
+      {
+        "de": "ich darf kurz überlegen und dann antworten.",
+        "en": "I can take a moment to think and then answer."
+      },
+      {
+        "de": "Ein ehrlicher Satz kann viel sagen.",
+        "en": "One honest sentence can say a lot."
+      },
+      {
+        "de": "Ich erzähle von einem schwierigen Projekt,",
+        "en": "I talk about a difficult project"
+      },
+      {
+        "de": "bei dem wir gemeinsam eine Lösung fanden.",
+        "en": "where we found a solution together."
+      },
+      {
+        "de": "Danach frage ich selbst nach dem Team,",
+        "en": "Then I ask about the team myself,"
+      },
+      {
+        "de": "weil mir die Zusammenarbeit besonders wichtig ist.",
+        "en": "because working together is especially important to me."
+      },
+      {
+        "de": "Ich muss nicht perfekt klingen,",
+        "en": "I don’t have to sound perfect,"
+      },
+      {
+        "de": "ich darf kurz überlegen und dann antworten.",
+        "en": "I can take a moment to think and then answer."
+      },
+      {
+        "de": "Ein ehrlicher Satz kann viel sagen.",
+        "en": "One honest sentence can say a lot."
+      },
+      {
+        "de": "Beim Abschied fühle ich mich erleichtert.",
+        "en": "As we say goodbye, I feel relieved."
+      },
+      {
+        "de": "Ich habe mich von meiner besten Seite gezeigt.",
+        "en": "I’ve shown myself at my best."
+      },
+      {
+        "de": "Mit Falowen kann ich selbstbewusst über meine Stärken sprechen.",
+        "en": "With Falowen I can talk confidently about my strengths."
+      }
+    ]
+  }
+}

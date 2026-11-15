@@ -134,7 +134,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
     recordingLyrics.id === chosen.id && recordingLyrics.objectKey === chosen.objectKey
     ? recordingLyrics.lyrics : legacyLyrics;
   const englishPack = chosen && approvedLyrics ? matchingTranscriptEnglishTranslation(translations, chosen, recordingLyrics) || matchingEnglishTranslation(
-    translations, chosen.objectKey, approvedLyrics) : null;
+    translations, chosen.objectKey, approvedLyrics) || matchingEnglishTranslation(
+    {recordings:[{...recordingLyrics?.englishTranslation,objectKey:recordingLyrics?.objectKey}]},chosen.objectKey,approvedLyrics) : null;
 
   if (!valid) return null;
 

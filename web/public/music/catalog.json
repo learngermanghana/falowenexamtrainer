@@ -390,6 +390,24 @@
       "slides": true,
       "objectKey": "music/a2/day-12/Träume ändern sich.mp3",
       "approved": true
+    },
+    {
+      "id": "r2-b1-day-19-b64_TmljaHQgUGVyZmVrdCBrbGluZ2VuLm1wMw",
+      "title": "Nicht perfekt klingen",
+      "level": "B1",
+      "day": 19,
+      "assignmentKey": "B1-6.19",
+      "topic": "Day 19 · Das Vorstellungsgespräch",
+      "type": "Learning story",
+      "genre": "German Pop",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-b1-day-19-b64_TmljaHQgUGVyZmVrdCBrbGluZ2VuLm1wMw",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/b1/day-19/Nicht Perfekt klingen.mp3",
+      "approved": true
     }
   ]
 }

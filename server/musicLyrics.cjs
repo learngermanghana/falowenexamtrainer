@@ -7,10 +7,11 @@ const builtInTimings = require('../web/public/music/timings.json');
 const approvedRecordingLyrics = require('../web/public/music/approved-recording-lyrics.json');
 const acousticTimings = require('../web/public/music/estimated-timings.json');
 const day4NumberTiming = require('../web/public/music/a1-day-04-number-timing.json');
-const estimatedTimings = { recordings:[...acousticTimings.recordings,day4NumberTiming] };
+const b1InterviewTiming = require('../web/public/music/b1-day-19-interview-timing.json');
+const estimatedTimings = { recordings:[...acousticTimings.recordings,day4NumberTiming,b1InterviewTiming] };
 const englishRegistry = require('../web/public/music/english-translations.json');
 const englishTranslations = {...englishRegistry,transcripts:[...(englishRegistry.transcripts || []),
-  day4NumberTiming.englishTranslation]};
+  day4NumberTiming.englishTranslation],drafts:[...(englishRegistry.drafts || []),b1InterviewTiming.englishTranslation]};
 const studioDrafts = require('../web/public/music/studio-drafts.json');
 function validateLyrics(data, objectKey) {
   if (!data || data.objectKey !== objectKey) return null;
