@@ -54,26 +54,13 @@ All 65 audited course recordings and the two motivation songs have themed local 
 
 Run `node scripts/generateMusicArtwork.mjs` after changing the artwork manifests; `--check` verifies the browser lookup matches the source. The social metadata handler and browser use those same assignments. Cover loading does not access R2, Firebase or paid AI services. Tests: `node --test tests/music-social-share.test.mjs tests/music-song-cover-art.test.mjs tests/music-follow-ui.test.mjs`.
 
-## Public homepage listening section — 4 November 2026
+## Homepage Music links
 
-The learner landing page places `HomepageMusicPlayer` between the hero carousel
-and the support section. It uses a small curated set of IDs from the public
-Music catalogue and resolves photos through the existing artwork and photo-source
-manifests, fetched from `music.falowen.app` when the section approaches the
-viewport. These are three static requests, with no library discovery scan,
-lyrics request, polling, sign-in or AI calls.
-
-One plain HTML audio element handles playback, seeking and volume. It has
-`preload="none"`, no autoplay, no crossOrigin attribute and no audio source until
-a visitor presses Play or chooses a song. Playback uses the existing catalogue
-URL and public music endpoint. The component pauses on unmount and exposes a
-retry message and full-library link on failure. The section follows the public
-homepage language (English, German or French); song titles stay in German.
-
-This preview does not collect listening analytics or load the standalone music
-app. The full song link opens the existing lyrics/listening page. Featured IDs
-are curated in `web/src/lib/homepageMusic.js`; audio titles, URLs and pictures
-remain owned by the canonical public Music manifests.
+The learner homepage links to the standalone Falowen Music site from its
+navigation and footer. The Music carousel slide links directly to the German
+library and to the Swahili library using `?language=swahili`. Playback and lyrics
+are available on Falowen Music. The homepage does not mount an audio player or
+load the Music catalogue.
 
 ### Artwork sizing — 4 November 2026
 

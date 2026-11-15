@@ -24,15 +24,16 @@ const MUSIC_URL = "https://music.falowen.app/";
 test("opens the public music site directly from homepage navigation and footer", () => {
   const { container } = render(<LandingPageSimple />);
   const nav = screen.getByRole("navigation", { name: "Falowen" });
-  expect(within(nav).getByRole("link", { name: "German Music" })).toHaveAttribute("href", MUSIC_URL);
-  expect(within(nav).getByRole("link", { name: "German Music" })).not.toHaveAttribute("target", "_blank");
-  expect(container.querySelector('.falowen-home-footer a[href="' + MUSIC_URL + '"]')).toHaveTextContent("German Music");
+  expect(within(nav).getByRole("link", { name: "Upcoming Classes" })).toHaveAttribute("href", "/classes");
+  expect(within(nav).getByRole("link", { name: "Music" })).toHaveAttribute("href", MUSIC_URL);
+  expect(within(nav).getByRole("link", { name: "Music" })).not.toHaveAttribute("target", "_blank");
+  expect(container.querySelector('.falowen-home-footer a[href="' + MUSIC_URL + '"]')).toHaveTextContent("Music");
 });
 
 test.each([
-  ["Deutsch", "Deutsch mit Musik"],
-  ["Français", "Musique allemande"],
-])("localizes the German Music navigation in %s", (language, label) => {
+  ["Deutsch", "Musik"],
+  ["Français", "Musique"],
+])("localizes the Music navigation in %s", (language, label) => {
   render(<LandingPageSimple />);
   fireEvent.change(screen.getByRole("combobox", { name: "Language" }), {
     target: { value: language === "Deutsch" ? "de" : "fr" },
@@ -50,15 +51,18 @@ test("keeps the navigation visible and horizontally reachable on small screens",
   expect(mobileNavStyles).not.toContain(".falowen-home-nav-links { display: none; }");
 });
 
-test("places hybrid learning between the carousel and music without moving tutor support", () => {
+test("gives both programmes a permanent link above German hybrid learning and omits embedded playback", () => {
   const { container } = render(<LandingPageSimple />);
   const carousel = screen.getByTestId("homepage-carousel");
   const hybrid = screen.getByRole("region", { name: "Learn German your way." });
-  const music = screen.getByTestId("homepage-music");
+  const programs = screen.getByRole("region", { name: "Choose a language" });
+  expect(within(programs).getByRole("link", { name: "Explore German courses" })).toHaveAttribute("href", "/courses/");
+  expect(within(programs).getByRole("link", { name: "Explore Swahili" })).toHaveAttribute("href", "/swahili");
+  expect(screen.queryByTestId("homepage-music")).not.toBeInTheDocument();
   const support = container.querySelector(".falowen-home-support");
-  expect(carousel.nextElementSibling).toBe(hybrid);
-  expect(hybrid.nextElementSibling).toBe(music);
-  expect(music.nextElementSibling).toBe(support);
+  expect(carousel.nextElementSibling).toBe(programs);
+  expect(programs.nextElementSibling).toBe(hybrid);
+  expect(hybrid.nextElementSibling).toBe(support);
   expect(within(hybrid).getByRole("heading", { name: "In person" })).toBeInTheDocument();
   expect(within(hybrid).getByRole("heading", { name: "Live online" })).toBeInTheDocument();
   expect(within(hybrid).getByRole("heading", { name: "Recorded lectures" })).toBeInTheDocument();
