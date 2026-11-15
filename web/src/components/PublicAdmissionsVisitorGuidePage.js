@@ -117,7 +117,6 @@ const PublicAdmissionsVisitorGuidePage = () => {
     ? `/classes/?class=${encodeURIComponent(classSlug)}&open=1&ref=${encodeURIComponent(engagementRef)}&source=visitor-guide`
     : "/classes/";
   const signupHref = `/signup?program=german${classSlug ? `&class=${encodeURIComponent(classSlug)}` : ""}&ref=${encodeURIComponent(engagementRef)}&source=visitor-guide`;
-  const swahiliSignupHref = `/signup?program=swahili&ref=${encodeURIComponent(engagementRef)}&source=visitor-guide`;
   const kiswahiliTeacher = academyProfile.team.find((member) => member.name === "Dr. Ruth Ndekiro Shao");
 
   const trackClick = (event) => {
@@ -150,36 +149,6 @@ const PublicAdmissionsVisitorGuidePage = () => {
             Fees and admissions information updated {formatAdmissionsUpdated(academyProfile.admissionsUpdatedAt)}.
           </div>
         ) : null}
-      </section>
-
-      <section className="visitor-guide-language-section" aria-labelledby="visitor-guide-languages-heading">
-        <div className="visitor-guide-language-heading">
-          <span>TWO LANGUAGES · ONE LEARNING ACADEMY</span>
-          <h2 id="visitor-guide-languages-heading">Choose the language you want to learn</h2>
-          <p>Explore the teaching approach and learning materials for each language. German and Kiswahili have separate course content.</p>
-        </div>
-        <div className="visitor-guide-language-grid">
-          <article className="visitor-guide-language-card visitor-guide-language-german" aria-label="Learn German">
-            <span className="visitor-guide-language-tag">GERMAN · DEUTSCH</span>
-            <h3>Learn German</h3>
-            <p>Study German from A1 to C2 with structured lessons, live classes and flexible practice on Falowen.</p>
-            <p>Goethe-style exam preparation, recorded teaching and German learning resources support your progress.</p>
-            <div className="visitor-guide-language-actions">
-              <a className="visitor-guide-language-primary" href="/classes/">Explore German classes →</a>
-              <a href={signupHref} onClick={() => trackClick("registration_click")}>Register for German →</a>
-            </div>
-          </article>
-          <article className="visitor-guide-language-card visitor-guide-language-swahili" aria-label="Learn Kiswahili">
-            <span className="visitor-guide-language-tag">KISWAHILI · SWAHILI</span>
-            <h3>Learn Kiswahili</h3>
-            <p>Begin with the online Kiswahili course book, including pronunciation, grammar, vocabulary and guided activities.</p>
-            <p>Learn with resources developed for Falowen and the expertise of Kiswahili instructor Dr. Ruth Ndekiro Shao.</p>
-            <div className="visitor-guide-language-actions">
-              <a className="visitor-guide-language-primary" href="/swahili">Explore Kiswahili course →</a>
-              <a href={swahiliSignupHref} onClick={() => trackClick("registration_click")}>Register for Kiswahili →</a>
-            </div>
-          </article>
-        </div>
       </section>
 
       {requestedSlug ? (
