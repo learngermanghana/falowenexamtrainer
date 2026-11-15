@@ -40,8 +40,8 @@
       "approved": true
     },
     {
-      "id": "r2-a1-day-04-b64_TWVpbmUgTnVtbWVyLCBtZWluZSBBZHJlc3NlLm1wMw",
-      "title": "Meine Nummer, meine Adresse",
+      "id": "r2-a1-day-04-b64_RGFzIGlzdCBtZWluZSBOdW1tZXIubXAz",
+      "title": "Das ist meine Nummer",
       "level": "A1",
       "day": 4,
       "assignmentKey": "A1-2",
@@ -49,12 +49,12 @@
       "type": "Learning story",
       "genre": "Warm German Afro-Pop",
       "language": "German",
-      "audioUrl": "https://www.falowen.app/api/music?track=r2-a1-day-04-b64_TWVpbmUgTnVtbWVyLCBtZWluZSBBZHJlc3NlLm1wMw",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a1-day-04-b64_RGFzIGlzdCBtZWluZSBOdW1tZXIubXAz",
       "featured": true,
       "attendance": true,
       "coursebook": true,
       "slides": true,
-      "objectKey": "music/a1/day-04/Meine Nummer, meine Adresse.mp3",
+      "objectKey": "music/a1/day-04/Das ist meine Nummer.mp3",
       "approved": true
     },
     {

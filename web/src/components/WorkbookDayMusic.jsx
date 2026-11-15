@@ -115,7 +115,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
     }).then(response => response.ok ? response.json() : null).then(data => {
       if (controller.signal.aborted) return;
       if (data?.objectKey === chosen.objectKey && typeof data.lyrics === "string" && data.lyrics.trim()) {
-        setRecordingLyrics({ id: chosen.id, objectKey: chosen.objectKey, lyrics: data.lyrics.trim(), cues: data.cues, timingStatus: data.timingStatus, transcriptionStatus: data.transcriptionStatus, referenceOnly: data.referenceOnly, recordingSha256: data.recordingSha256 });
+        setRecordingLyrics({ id: chosen.id, objectKey: chosen.objectKey, lyrics: data.lyrics.trim(), cues: data.cues, timingStatus: data.timingStatus, transcriptionStatus: data.transcriptionStatus, referenceOnly: data.referenceOnly, recordingSha256: data.recordingSha256, englishTranslation: data.englishTranslation });
       }
     }).catch(() => {
       // Missing lyric sidecars are normal for newly uploaded MP3s.

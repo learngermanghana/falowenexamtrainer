@@ -1,0 +1,853 @@
+{
+  "objectKey": "music/a1/day-04/Das ist meine Nummer.mp3",
+  "trackId": "r2-a1-day-04-b64_RGFzIGlzdCBtZWluZSBOdW1tZXIubXAz",
+  "assignmentKey": "A1-2",
+  "duration": 122.8,
+  "recordingSha256": "0eb19d66d90f95b34a341bf20ea8a2555ef1e40a631f1105b192129f77faa361",
+  "timingStatus": "estimated",
+  "timingMethod": "Whisper small German word timestamps; teacher listening review required",
+  "transcriptionStatus": "automatic",
+  "referenceOnly": true,
+  "lyrics": "Mein Name ist Daniel, mein Name ist Daniel\nMein Name ist Daniel, ich bin 21 Jahre alt\nGeboren am 3. Mai in meiner kleinen Stadt\nDas ist meine Nummer, das ist meine Nummer\nRuf mich einfach an, wenn so Zeit hast, irgendwann\nMein Zuhause ist in Berlin, in der Gartenstraße C\nDie Wohnung liegt im zweiten Stock, mit der Tür Nummer 4\nDie Postleitzahl ist 10153, mein Geburtstag ist in Mai\nMeine Handynummer ist 0176234567 macht\nDas ist meine Nummer\nDas ist meine Nummer\nRuf mich einfach an\nWenn du Zeit hast, immer, immer, immer, immer\nDas ist meine Adresse\nHier bin ich zu Hause\nKomm' ich mal besuchen\nWir trinken Tee zusammen\nMein Name ist Daniel, 21 Jahre alt\nMeine Nummer hast du jetzt, ruf mich an\nBis bald",
+  "cues": [
+    {
+      "start": 0.0,
+      "end": 5.76,
+      "text": "Mein Name ist Daniel, mein Name ist Daniel"
+    },
+    {
+      "start": 9.86,
+      "end": 16.1,
+      "text": "Mein Name ist Daniel, ich bin 21 Jahre alt"
+    },
+    {
+      "start": 17.0,
+      "end": 22.54,
+      "text": "Geboren am 3. Mai in meiner kleinen Stadt"
+    },
+    {
+      "start": 22.54,
+      "end": 28.68,
+      "text": "Das ist meine Nummer, das ist meine Nummer"
+    },
+    {
+      "start": 28.68,
+      "end": 34.4,
+      "text": "Ruf mich einfach an, wenn so Zeit hast, irgendwann"
+    },
+    {
+      "start": 36.68,
+      "end": 42.48,
+      "text": "Mein Zuhause ist in Berlin, in der Gartenstraße C"
+    },
+    {
+      "start": 42.48,
+      "end": 49.0,
+      "text": "Die Wohnung liegt im zweiten Stock, mit der Tür Nummer 4"
+    },
+    {
+      "start": 49.0,
+      "end": 55.14,
+      "text": "Die Postleitzahl ist 10153, mein Geburtstag ist in Mai"
+    },
+    {
+      "start": 55.14,
+      "end": 61.22,
+      "text": "Meine Handynummer ist 0176234567 macht"
+    },
+    {
+      "start": 61.22,
+      "end": 63.34,
+      "text": "Das ist meine Nummer"
+    },
+    {
+      "start": 64.14,
+      "end": 66.68,
+      "text": "Das ist meine Nummer"
+    },
+    {
+      "start": 66.68,
+      "end": 69.42,
+      "text": "Ruf mich einfach an"
+    },
+    {
+      "start": 70.06,
+      "end": 73.72,
+      "text": "Wenn du Zeit hast, immer, immer, immer, immer"
+    },
+    {
+      "start": 73.72,
+      "end": 75.74,
+      "text": "Das ist meine Adresse"
+    },
+    {
+      "start": 76.76,
+      "end": 79.1,
+      "text": "Hier bin ich zu Hause"
+    },
+    {
+      "start": 79.86,
+      "end": 82.26,
+      "text": "Komm' ich mal besuchen"
+    },
+    {
+      "start": 82.26,
+      "end": 84.84,
+      "text": "Wir trinken Tee zusammen"
+    },
+    {
+      "start": 86.72,
+      "end": 91.54,
+      "text": "Mein Name ist Daniel, 21 Jahre alt"
+    },
+    {
+      "start": 92.82,
+      "end": 96.18,
+      "text": "Meine Nummer hast du jetzt, ruf mich an"
+    },
+    {
+      "start": 96.72,
+      "end": 97.64,
+      "text": "Bis bald"
+    }
+  ],
+  "wordTimestamps": [
+    {
+      "text": "Mein",
+      "start": 0.0,
+      "end": 1.1
+    },
+    {
+      "text": "Name",
+      "start": 1.1,
+      "end": 1.4
+    },
+    {
+      "text": "ist",
+      "start": 1.4,
+      "end": 1.8
+    },
+    {
+      "text": "Daniel,",
+      "start": 1.8,
+      "end": 2.46
+    },
+    {
+      "text": "mein",
+      "start": 2.46,
+      "end": 4.12
+    },
+    {
+      "text": "Name",
+      "start": 4.12,
+      "end": 4.64
+    },
+    {
+      "text": "ist",
+      "start": 4.64,
+      "end": 4.94
+    },
+    {
+      "text": "Daniel",
+      "start": 4.94,
+      "end": 5.76
+    },
+    {
+      "text": "Mein",
+      "start": 9.86,
+      "end": 11.0
+    },
+    {
+      "text": "Name",
+      "start": 11.0,
+      "end": 12.14
+    },
+    {
+      "text": "ist",
+      "start": 12.14,
+      "end": 12.5
+    },
+    {
+      "text": "Daniel,",
+      "start": 12.5,
+      "end": 13.16
+    },
+    {
+      "text": "ich",
+      "start": 13.48,
+      "end": 14.02
+    },
+    {
+      "text": "bin",
+      "start": 14.02,
+      "end": 14.24
+    },
+    {
+      "text": "21",
+      "start": 14.24,
+      "end": 14.78
+    },
+    {
+      "text": "Jahre",
+      "start": 14.78,
+      "end": 15.5
+    },
+    {
+      "text": "alt",
+      "start": 15.5,
+      "end": 16.1
+    },
+    {
+      "text": "Geboren",
+      "start": 17.0,
+      "end": 18.1
+    },
+    {
+      "text": "am",
+      "start": 18.1,
+      "end": 18.4
+    },
+    {
+      "text": "3.",
+      "start": 18.4,
+      "end": 18.56
+    },
+    {
+      "text": "Mai",
+      "start": 18.82,
+      "end": 19.16
+    },
+    {
+      "text": "in",
+      "start": 19.16,
+      "end": 20.94
+    },
+    {
+      "text": "meiner",
+      "start": 20.94,
+      "end": 21.2
+    },
+    {
+      "text": "kleinen",
+      "start": 21.2,
+      "end": 21.66
+    },
+    {
+      "text": "Stadt",
+      "start": 21.66,
+      "end": 22.54
+    },
+    {
+      "text": "Das",
+      "start": 22.54,
+      "end": 23.88
+    },
+    {
+      "text": "ist",
+      "start": 23.88,
+      "end": 24.16
+    },
+    {
+      "text": "meine",
+      "start": 24.16,
+      "end": 24.88
+    },
+    {
+      "text": "Nummer,",
+      "start": 24.88,
+      "end": 25.54
+    },
+    {
+      "text": "das",
+      "start": 25.84,
+      "end": 27.06
+    },
+    {
+      "text": "ist",
+      "start": 27.06,
+      "end": 27.32
+    },
+    {
+      "text": "meine",
+      "start": 27.32,
+      "end": 28.0
+    },
+    {
+      "text": "Nummer",
+      "start": 28.0,
+      "end": 28.68
+    },
+    {
+      "text": "Ruf",
+      "start": 28.68,
+      "end": 30.18
+    },
+    {
+      "text": "mich",
+      "start": 30.18,
+      "end": 30.42
+    },
+    {
+      "text": "einfach",
+      "start": 30.42,
+      "end": 31.16
+    },
+    {
+      "text": "an,",
+      "start": 31.16,
+      "end": 31.76
+    },
+    {
+      "text": "wenn",
+      "start": 31.76,
+      "end": 32.82
+    },
+    {
+      "text": "so",
+      "start": 32.82,
+      "end": 33.02
+    },
+    {
+      "text": "Zeit",
+      "start": 33.02,
+      "end": 33.46
+    },
+    {
+      "text": "hast,",
+      "start": 33.46,
+      "end": 33.84
+    },
+    {
+      "text": "irgendwann",
+      "start": 34.0,
+      "end": 34.4
+    },
+    {
+      "text": "Mein",
+      "start": 36.68,
+      "end": 37.56
+    },
+    {
+      "text": "Zuhause",
+      "start": 37.56,
+      "end": 38.18
+    },
+    {
+      "text": "ist",
+      "start": 38.18,
+      "end": 38.6
+    },
+    {
+      "text": "in",
+      "start": 38.6,
+      "end": 38.82
+    },
+    {
+      "text": "Berlin,",
+      "start": 38.82,
+      "end": 39.22
+    },
+    {
+      "text": "in",
+      "start": 39.76,
+      "end": 40.76
+    },
+    {
+      "text": "der",
+      "start": 40.76,
+      "end": 40.92
+    },
+    {
+      "text": "Gartenstraße",
+      "start": 40.92,
+      "end": 42.06
+    },
+    {
+      "text": "C",
+      "start": 42.06,
+      "end": 42.48
+    },
+    {
+      "text": "Die",
+      "start": 42.48,
+      "end": 43.66
+    },
+    {
+      "text": "Wohnung",
+      "start": 43.66,
+      "end": 43.94
+    },
+    {
+      "text": "liegt",
+      "start": 43.94,
+      "end": 44.52
+    },
+    {
+      "text": "im",
+      "start": 44.52,
+      "end": 44.72
+    },
+    {
+      "text": "zweiten",
+      "start": 44.72,
+      "end": 45.16
+    },
+    {
+      "text": "Stock,",
+      "start": 45.16,
+      "end": 45.7
+    },
+    {
+      "text": "mit",
+      "start": 45.96,
+      "end": 47.02
+    },
+    {
+      "text": "der",
+      "start": 47.02,
+      "end": 47.18
+    },
+    {
+      "text": "Tür",
+      "start": 47.18,
+      "end": 47.54
+    },
+    {
+      "text": "Nummer",
+      "start": 47.54,
+      "end": 48.26
+    },
+    {
+      "text": "4",
+      "start": 48.26,
+      "end": 49.0
+    },
+    {
+      "text": "Die",
+      "start": 49.0,
+      "end": 49.52
+    },
+    {
+      "text": "Postleitzahl",
+      "start": 49.52,
+      "end": 50.2
+    },
+    {
+      "text": "ist",
+      "start": 50.2,
+      "end": 50.36
+    },
+    {
+      "text": "10153,",
+      "start": 50.36,
+      "end": 52.3
+    },
+    {
+      "text": "mein",
+      "start": 52.72,
+      "end": 53.3
+    },
+    {
+      "text": "Geburtstag",
+      "start": 53.3,
+      "end": 54.06
+    },
+    {
+      "text": "ist",
+      "start": 54.06,
+      "end": 54.5
+    },
+    {
+      "text": "in",
+      "start": 54.5,
+      "end": 54.78
+    },
+    {
+      "text": "Mai",
+      "start": 54.78,
+      "end": 55.14
+    },
+    {
+      "text": "Meine",
+      "start": 55.14,
+      "end": 55.78
+    },
+    {
+      "text": "Handynummer",
+      "start": 55.78,
+      "end": 56.52
+    },
+    {
+      "text": "ist",
+      "start": 56.52,
+      "end": 56.98
+    },
+    {
+      "text": "0176234567",
+      "start": 56.98,
+      "end": 60.54
+    },
+    {
+      "text": "macht",
+      "start": 60.54,
+      "end": 61.22
+    },
+    {
+      "text": "Das",
+      "start": 61.22,
+      "end": 61.56
+    },
+    {
+      "text": "ist",
+      "start": 61.56,
+      "end": 61.88
+    },
+    {
+      "text": "meine",
+      "start": 61.88,
+      "end": 62.34
+    },
+    {
+      "text": "Nummer",
+      "start": 62.34,
+      "end": 63.34
+    },
+    {
+      "text": "Das",
+      "start": 64.14,
+      "end": 64.66
+    },
+    {
+      "text": "ist",
+      "start": 64.66,
+      "end": 65.0
+    },
+    {
+      "text": "meine",
+      "start": 65.0,
+      "end": 65.5
+    },
+    {
+      "text": "Nummer",
+      "start": 65.5,
+      "end": 66.68
+    },
+    {
+      "text": "Ruf",
+      "start": 66.68,
+      "end": 67.8
+    },
+    {
+      "text": "mich",
+      "start": 67.8,
+      "end": 68.08
+    },
+    {
+      "text": "einfach",
+      "start": 68.08,
+      "end": 68.9
+    },
+    {
+      "text": "an",
+      "start": 68.9,
+      "end": 69.42
+    },
+    {
+      "text": "Wenn",
+      "start": 70.06,
+      "end": 70.52
+    },
+    {
+      "text": "du",
+      "start": 70.52,
+      "end": 70.68
+    },
+    {
+      "text": "Zeit",
+      "start": 70.68,
+      "end": 71.04
+    },
+    {
+      "text": "hast,",
+      "start": 71.04,
+      "end": 71.5
+    },
+    {
+      "text": "immer,",
+      "start": 71.66,
+      "end": 72.04
+    },
+    {
+      "text": "immer,",
+      "start": 72.3,
+      "end": 72.94
+    },
+    {
+      "text": "immer,",
+      "start": 72.94,
+      "end": 73.36
+    },
+    {
+      "text": "immer",
+      "start": 73.36,
+      "end": 73.72
+    },
+    {
+      "text": "Das",
+      "start": 73.72,
+      "end": 74.02
+    },
+    {
+      "text": "ist",
+      "start": 74.02,
+      "end": 74.44
+    },
+    {
+      "text": "meine",
+      "start": 74.44,
+      "end": 74.88
+    },
+    {
+      "text": "Adresse",
+      "start": 74.88,
+      "end": 75.74
+    },
+    {
+      "text": "Hier",
+      "start": 76.76,
+      "end": 77.22
+    },
+    {
+      "text": "bin",
+      "start": 77.22,
+      "end": 77.52
+    },
+    {
+      "text": "ich",
+      "start": 77.52,
+      "end": 77.88
+    },
+    {
+      "text": "zu",
+      "start": 77.88,
+      "end": 78.28
+    },
+    {
+      "text": "Hause",
+      "start": 78.28,
+      "end": 79.1
+    },
+    {
+      "text": "Komm'",
+      "start": 79.86,
+      "end": 80.32
+    },
+    {
+      "text": "ich",
+      "start": 80.44,
+      "end": 80.68
+    },
+    {
+      "text": "mal",
+      "start": 80.68,
+      "end": 81.02
+    },
+    {
+      "text": "besuchen",
+      "start": 81.02,
+      "end": 82.26
+    },
+    {
+      "text": "Wir",
+      "start": 82.26,
+      "end": 83.24
+    },
+    {
+      "text": "trinken",
+      "start": 83.24,
+      "end": 83.62
+    },
+    {
+      "text": "Tee",
+      "start": 83.62,
+      "end": 84.38
+    },
+    {
+      "text": "zusammen",
+      "start": 84.38,
+      "end": 84.84
+    },
+    {
+      "text": "Mein",
+      "start": 86.72,
+      "end": 87.18
+    },
+    {
+      "text": "Name",
+      "start": 87.18,
+      "end": 87.46
+    },
+    {
+      "text": "ist",
+      "start": 87.46,
+      "end": 87.8
+    },
+    {
+      "text": "Daniel,",
+      "start": 87.8,
+      "end": 88.52
+    },
+    {
+      "text": "21",
+      "start": 88.68,
+      "end": 89.76
+    },
+    {
+      "text": "Jahre",
+      "start": 89.76,
+      "end": 90.76
+    },
+    {
+      "text": "alt",
+      "start": 90.76,
+      "end": 91.54
+    },
+    {
+      "text": "Meine",
+      "start": 92.82,
+      "end": 93.36
+    },
+    {
+      "text": "Nummer",
+      "start": 93.36,
+      "end": 93.74
+    },
+    {
+      "text": "hast",
+      "start": 93.74,
+      "end": 94.08
+    },
+    {
+      "text": "du",
+      "start": 94.08,
+      "end": 94.28
+    },
+    {
+      "text": "jetzt,",
+      "start": 94.28,
+      "end": 94.64
+    },
+    {
+      "text": "ruf",
+      "start": 95.1,
+      "end": 95.6
+    },
+    {
+      "text": "mich",
+      "start": 95.6,
+      "end": 95.86
+    },
+    {
+      "text": "an",
+      "start": 95.86,
+      "end": 96.18
+    },
+    {
+      "text": "Bis",
+      "start": 96.72,
+      "end": 97.18
+    },
+    {
+      "text": "bald",
+      "start": 97.18,
+      "end": 97.64
+    }
+  ],
+  "englishTranslation": {
+    "source": "automatic-transcript",
+    "objectKey": "music/a1/day-04/Das ist meine Nummer.mp3",
+    "recordingSha256": "0eb19d66d90f95b34a341bf20ea8a2555ef1e40a631f1105b192129f77faa361",
+    "lines": [
+      {
+        "de": "Mein Name ist Daniel, mein Name ist Daniel",
+        "en": "My name is Daniel, my name is Daniel"
+      },
+      {
+        "de": "Mein Name ist Daniel, ich bin 21 Jahre alt",
+        "en": "My name is Daniel, I’m 21 years old"
+      },
+      {
+        "de": "Geboren am 3. Mai in meiner kleinen Stadt",
+        "en": "Born on 3 May in my small town"
+      },
+      {
+        "de": "Das ist meine Nummer, das ist meine Nummer",
+        "en": "This is my number, this is my number"
+      },
+      {
+        "de": "Ruf mich einfach an, wenn so Zeit hast, irgendwann",
+        "en": "Just give me a call when you have some time"
+      },
+      {
+        "de": "Mein Zuhause ist in Berlin, in der Gartenstraße C",
+        "en": "My home is in Berlin, on Gartenstraße (the final word is unclear)"
+      },
+      {
+        "de": "Die Wohnung liegt im zweiten Stock, mit der Tür Nummer 4",
+        "en": "The apartment is on the second floor, at door number four"
+      },
+      {
+        "de": "Die Postleitzahl ist 10153, mein Geburtstag ist in Mai",
+        "en": "The postcode is 10153, and my birthday is in May"
+      },
+      {
+        "de": "Meine Handynummer ist 0176234567 macht",
+        "en": "Here is my mobile number (the final part is unclear)"
+      },
+      {
+        "de": "Das ist meine Nummer",
+        "en": "This is my number"
+      },
+      {
+        "de": "Das ist meine Nummer",
+        "en": "This is my number"
+      },
+      {
+        "de": "Ruf mich einfach an",
+        "en": "Just give me a call"
+      },
+      {
+        "de": "Wenn du Zeit hast, immer, immer, immer, immer",
+        "en": "Whenever you have time"
+      },
+      {
+        "de": "Das ist meine Adresse",
+        "en": "This is my address"
+      },
+      {
+        "de": "Hier bin ich zu Hause",
+        "en": "This is where I live"
+      },
+      {
+        "de": "Komm' ich mal besuchen",
+        "en": "Come visit sometime (the German recognition here is unclear)"
+      },
+      {
+        "de": "Wir trinken Tee zusammen",
+        "en": "We’ll drink tea together"
+      },
+      {
+        "de": "Mein Name ist Daniel, 21 Jahre alt",
+        "en": "My name is Daniel, 21 years old"
+      },
+      {
+        "de": "Meine Nummer hast du jetzt, ruf mich an",
+        "en": "You have my number now, give me a call"
+      },
+      {
+        "de": "Bis bald",
+        "en": "See you soon"
+      }
+    ]
+  }
+}
