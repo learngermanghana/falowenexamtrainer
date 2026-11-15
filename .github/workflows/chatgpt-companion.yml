@@ -6,7 +6,10 @@ on:
       - "functions/functionz/chatgptCompanion.js"
       - "functions/functionz/chatgptClassTimetable.js"
       - "functions/functionz/chatgptClassPreparation.js"
-      - "functions/functionz/__tests__/chatgptClassPreparation.test.js functions/functionz/__tests__/chatgptExamLibrary.test.js functions/functionz/__tests__/chatgptExamPractice.test.js functions/functionz/__tests__/chatgptAssignmentSubmission.test.js"
+      - "functions/functionz/__tests__/chatgptClassPreparation.test.js"
+      - "functions/functionz/__tests__/chatgptExamLibrary.test.js"
+      - "functions/functionz/__tests__/chatgptExamPractice.test.js"
+      - "functions/functionz/__tests__/chatgptAssignmentSubmission.test.js"
       - "web/src/data/a1*.js"
       - "web/src/data/a2*.js"
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
@@ -55,7 +58,7 @@ jobs:
       - name: Generate student-facing curriculum from canonical A1–C2 sources
         run: node scripts/generateChatgptLessonContent.mjs && node scripts/generateChatgptExamContent.mjs
       - name: Verify OAuth constraints and student data scope
-        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js
+        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js functions/functionz/__tests__/chatgptExamLibrary.test.js functions/functionz/__tests__/chatgptExamPractice.test.js functions/functionz/__tests__/chatgptAssignmentSubmission.test.js
       - name: Verify JavaScript syntax
         run: |
           node --check scripts/generateChatgptLessonContent.mjs
