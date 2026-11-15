@@ -9,7 +9,8 @@ const { getCurriculumEntriesForLevel } = require("../data/curriculumManifest");
 const { getScoresForStudent } = require("./scoresSheet");
 const { getStudentTimetable } = require("./chatgptClassTimetable");
 const { prepareFromTimetable } = require("./chatgptClassPreparation");
-const { getExamPractice } = require("./chatgptExamPractice");
+const { getExamPractice, listExamPractice } = require("./chatgptExamPractice");
+const { germanEnrollment, submitA1Assignment } = require("./chatgptAssignmentSubmission");
 
 let GENERATED_COURSE_CONTENT = null;
 try {
@@ -124,7 +125,8 @@ const ISSUER = SITE + "/api/chatgpt";
 const RESOURCE = ISSUER + "/mcp";
 const SCOPE = "falowen:read";
 const PRACTICE_WRITE_SCOPE = "falowen:practice:write";
-const ALLOWED_SCOPES = [SCOPE, PRACTICE_WRITE_SCOPE];
+const ASSIGNMENT_WRITE_SCOPE = "falowen:assignments:write";
+const ALLOWED_SCOPES = [SCOPE, PRACTICE_WRITE_SCOPE, ASSIGNMENT_WRITE_SCOPE];
 const VALID_SKILLS = new Set(["reading","listening","speaking","writing","grammar","vocabulary"]);
 const CLIENT_ID = "https://chatgpt.com/oauth/client.json";
 const CALLBACK = "https://chatgpt.com/connector_platform_oauth_redirect";
@@ -342,6 +344,8 @@ const toolDefinitions = [
         id: { type: "string", minLength: 1, pattern: "\\S" },
         name: { type: "string" },
         nickname: { type: "string" },
+        program: { type: "string" },
+        germanLevel: { type: "string" },
       },
       required: ["id"], additionalProperties: false,
     },
@@ -373,6 +377,11 @@ const toolDefinitions = [
     inputSchema: { type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50 } }, required: ["day"], additionalProperties: false },
   },
   {
+    name: "get_my_falowen_exam_mocks",
+    description: "List approved German Exams Room mock sets available for my enrolled German level. Writing and speaking prompts are practice only; official exam results remain in Falowen.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
     name: "get_my_falowen_exam_practice",
     description: "Retrieve a safe single writing or speaking prompt from an approved published Falowen mock at my own course level. Not an official exam session or grade; other modules remain in Exams Room.",
     inputSchema: { type: "object", properties: {
@@ -392,6 +401,18 @@ const toolDefinitions = [
     }, required: ["day", "skill", "note", "requestId"], additionalProperties: false },
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false, idempotentHint: true },
     securitySchemes: [{ type: "oauth2", scopes: [SCOPE, PRACTICE_WRITE_SCOPE] }],
+  },
+  {
+    name: "submit_my_falowen_assignment",
+    description: "Submit a COMPLETE A1 tutor assignment as an official Falowen submission. Call only after showing the student the exact assignment, complete answers, and explaining the permanent submission lock, then obtaining explicit student confirmation. Do NOT use for mock exams, timed work, resubmission, A2/B1, or practice. Requires separate official assignment-write OAuth consent; never claim a grade.",
+    inputSchema: { type: "object", properties: {
+      assignmentId: { type: "string", minLength: 3, maxLength: 48, description: "Canonical A1 tutor assignment ID from get_my_falowen_assignments, not an exam ID." },
+      answerText: { type: "string", minLength: 20, maxLength: 2500, description: "Exactly the final full answer reviewed by the learner; do not invent missing sections." },
+      requestId: { type: "string", minLength: 8, maxLength: 80, pattern: "^[A-Za-z0-9_-]+$", description: "Unique retry-safe ID for this confirmed submission." },
+      confirmed: { type: "boolean", description: "True only AFTER explicit, separate student confirmation of the actual final answer and the irreversible lock." },
+    }, required: ["assignmentId", "answerText", "requestId", "confirmed"], additionalProperties: false },
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false, idempotentHint: true },
+    securitySchemes: [{ type: "oauth2", scopes: [SCOPE, ASSIGNMENT_WRITE_SCOPE] }],
   },
   {
     name: "get_my_falowen_assignments",
@@ -578,17 +599,26 @@ async function callTool(name, args, student, admin) {
       clarification: "This plan is advice, not verified completion, a deadline, a submission or an official result. Continue or submit official work in Falowen Campus.",
     };
   }
-  if (name === "get_my_falowen_exam_practice") {
-    const isSwahili = ["swahili","kiswahili"].includes(
-      normalize(student.data.program || student.data.languageProgram).toLowerCase());
-    if (isSwahili) return { available: false, message: "Kiswahili exams are not yet exported to ChatGPT." };
-    return getExamPractice(view.level, args?.mockId, args?.skill, args?.part);
+  if (name === "get_my_falowen_exam_mocks" || name === "get_my_falowen_exam_practice") {
+    const enrollment = germanEnrollment(student);
+    if (!enrollment.enrolledInGerman || !enrollment.germanLevel) return {
+      available: false, program: enrollment.primaryProgram, mocks: [],
+      message: "This student is not currently enrolled in a German course. Changing the A1 level alone does not change the course language. Select German or activate a German secondary enrollment in Falowen Admin.",
+    };
+    return name === "get_my_falowen_exam_mocks"
+      ? listExamPractice(enrollment.germanLevel)
+      : getExamPractice(enrollment.germanLevel, args?.mockId, args?.skill, args?.part);
   }
-  if (name === "get_my_falowen_profile") return {
-    id: "flw_" + sha256(student.id).slice(0, 32),
-    name: view.name,
-    nickname: view.level ? "Falowen " + view.level + " student" : "Falowen student",
-  };
+  if (name === "get_my_falowen_profile") {
+    const enrollment = germanEnrollment(student);
+    return {
+      id: "flw_" + sha256(student.id).slice(0, 32),
+      name: view.name,
+      nickname: view.level ? "Falowen " + view.level + " student" : "Falowen student",
+      program: enrollment.primaryProgram,
+      germanLevel: enrollment.enrolledInGerman ? enrollment.germanLevel : "",
+    };
+  }
   if (name === "get_my_falowen_class_preparation") {
     const timetable = await getStudentTimetable({ db: admin.firestore(), student, now: new Date() });
     return prepareFromTimetable({ timetable, level: view.level, courseContent: contentForLesson });
@@ -814,7 +844,7 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "Falowen Learning Companion", version: "1.2.0" },
-        instructions: "Tutoring protocol: prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
+        instructions: "Tutoring protocol: prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For Exams Room mocks, start with get_my_falowen_exam_mocks then get_my_falowen_exam_practice. Only help a learner practise their authorised German course and do not expose hidden solutions. For official A1 tutor submissions, show the exact full answer, request explicit separate confirmation, and use submit_my_falowen_assignment only if the student approved a permanent assignment lock and separately granted the assignment-write scope. A2/B1 and exam submissions remain in Campus. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
@@ -871,6 +901,21 @@ function makeRouter(admin) {
         return res.json({ jsonrpc: "2.0", id, result: {
           content: [{ type: "text", text: JSON.stringify(saved) }], structuredContent: saved } });
       }
+      if (name === "submit_my_falowen_assignment") {
+        if (!session.scope.split(/\\s+/).includes(ASSIGNMENT_WRITE_SCOPE)) {
+          const denied = { submitted: false, error: "This Falowen connection is read-only for official assignments. Reconnect and explicitly approve the assignment-write permission; no work was submitted." };
+          return res.json({ jsonrpc: "2.0", id, result: {
+            isError: true, content: [{ type: "text", text: JSON.stringify(denied) }], structuredContent: denied,
+          } });
+        }
+        const result = await submitA1Assignment({
+          admin, student, uid: session.uid, email: session.email,
+          args: message.params?.arguments || {},
+        });
+        return res.json({ jsonrpc: "2.0", id, result: {
+          isError: !result.submitted, content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result,
+        } });
+      }
       const result = await callTool(name, message.params?.arguments || {}, student, admin);
       return res.json({ jsonrpc: "2.0", id, result: {
         content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result,
@@ -891,5 +936,5 @@ function makeRouter(admin) {
 module.exports = {
   makeRouter, oauthParameters, safeStudentAccess, scoreRowsForStudent, summarizeStudentAssignments,
   lessonContentResponse, practiceGuideResponse,
-  constants: { ISSUER, RESOURCE, SCOPE, PRACTICE_WRITE_SCOPE, CLIENT_ID, CALLBACK },
+  constants: { ISSUER, RESOURCE, SCOPE, PRACTICE_WRITE_SCOPE, ASSIGNMENT_WRITE_SCOPE, CLIENT_ID, CALLBACK },
 };
