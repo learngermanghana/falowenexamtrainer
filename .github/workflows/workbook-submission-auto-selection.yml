@@ -6,6 +6,8 @@ on:
       - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
       - "web/package.json"
       - "web/src/components/AssignmentSubmissionPage.js"
+      - "web/src/components/A2LegacyPortalSafety.test.jsx"
+      - "web/src/components/A2LateWorkbookSubmissionPanel.jsx"
       - "web/src/utils/workbookSubmissionContext.js"
       - "web/src/utils/workbookSubmissionContext.test.js"
       - ".github/workflows/workbook-submission-auto-selection.yml"
