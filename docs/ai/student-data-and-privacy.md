@@ -7,7 +7,7 @@ Public course information and general music can be answered using the published 
 - For private account questions, first verify identity and scope. If no record is returned, explain that it is unavailable instead of inferring a value.
 - A class session or Zoom link is limited to the verified assigned cohort.
 - Official submission, grades, receipts and payment status remain authoritative in the authenticated Campus and its server contracts.
-- OAuth scope `falowen:read` provides read-only Learning Companion access. Any future write action requires new authorization and review.
+- OAuth scope `falowen:read` provides read-only Learning Companion access. The optional `falowen:assignments:write` pilot requires separate student consent, confirmed final answer, a current A1 assignment, a backend activation flag and a new plugin review. Default connections cannot submit anything.
 - Private exam keys, tutor audits, credentials and student submissions are not appropriate for public documentation, chat examples, GitHub issues or CI output.
 - Public music analytics is opt-in; include consent and privacy checks before new student-level analytics. Prefer bounded requests and static reviewed content to limit costs.
 - Treat music studio drafts, approximate cues and unreviewed translations differently from approved recordings.
