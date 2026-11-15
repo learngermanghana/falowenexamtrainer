@@ -6,7 +6,7 @@ on:
       - "functions/functionz/chatgptCompanion.js"
       - "functions/functionz/chatgptClassTimetable.js"
       - "functions/functionz/chatgptClassPreparation.js"
-      - "functions/functionz/__tests__/chatgptClassPreparation.test.js"
+      - "functions/functionz/__tests__/chatgptClassPreparation.test.js functions/functionz/__tests__/chatgptExamLibrary.test.js functions/functionz/__tests__/chatgptExamPractice.test.js functions/functionz/__tests__/chatgptAssignmentSubmission.test.js"
       - "web/src/data/a1*.js"
       - "web/src/data/a2*.js"
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
@@ -65,5 +65,8 @@ jobs:
           node --check functions/functionz/chatgptCompanion.js
           node --check functions/functionz/chatgptClassTimetable.js
           node --check functions/functionz/chatgptClassPreparation.js
+          node --check functions/functionz/chatgptExamLibrary.js
+          node --check functions/functionz/chatgptExamPractice.js
+          node --check functions/functionz/chatgptAssignmentSubmission.js
           node --check functions/functionz/paymentAwareApp.js
           node -e "JSON.parse(require('fs').readFileSync('vercel.json', 'utf8'))"
