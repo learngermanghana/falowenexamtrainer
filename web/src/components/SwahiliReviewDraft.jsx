@@ -27,7 +27,7 @@ export function useSwahiliReviewDraft(uid, day, answers, restore) {
   return { saveDraft, notice };
 }
 
-export default function SwahiliReviewDraft({ writing, questions, reading, listening, draft }) {
+export default function SwahiliReviewDraft({ writing, questions, reading, listening, listeningQuestions = [], draft }) {
   return <>
     <h3>Teil 2 · Writing</h3>
     <ol>{Object.entries(writing).map(([label, value]) => (
@@ -38,7 +38,13 @@ export default function SwahiliReviewDraft({ writing, questions, reading, listen
       <li key={question.id}><strong>{question.question || question.prompt || `Question ${index + 1}`}</strong>
         <p>{reading[question.id] || "Unanswered"}</p></li>
     ))}</ol>
-    {listening && <p>Optional listening answers saved in this draft: {Object.values(listening).filter(Boolean).length}.</p>}
+    {listeningQuestions.length > 0 ? <>
+      <h3>Teil 4 · Listening</h3>
+      <ol>{listeningQuestions.map((question, index) => (
+        <li key={question.id}><strong>{question.question || `Question ${index + 1}`}</strong>
+          <p>{listening?.[question.id] || "Unanswered"}</p></li>
+      ))}</ol>
+    </> : listening && <p>Optional listening answers saved in this draft: {Object.values(listening).filter(Boolean).length}.</p>}
     {draft && <div className="swahili-book__row">
       <button type="button" className="swahili-book__button swahili-book__button--soft" onClick={draft.saveDraft}>Save draft</button>
       {draft.notice && <p role="status">{draft.notice}</p>}
@@ -46,12 +52,13 @@ export default function SwahiliReviewDraft({ writing, questions, reading, listen
   </>;
 }
 
-export function SwahiliFinalSubmit({ disabled, onSubmit, children }) {
-  const [checked, setChecked] = React.useState([false, false, false]);
+export function SwahiliFinalSubmit({ disabled, onSubmit, children, requireListening = false }) {
+  const [checked, setChecked] = React.useState(() => requireListening ? [false, false, false, false] : [false, false, false]);
   const labels = [
     "I checked that this is the correct lesson.",
     "I included my final answers for Teil 2 · Writing.",
     "I included all answers for Teil 3 · Reading.",
+    ...(requireListening ? ["I included all answers for Teil 4 · Listening."] : []),
   ];
   const ready = checked.every(Boolean);
   return <>

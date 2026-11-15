@@ -78,8 +78,15 @@ export const SWAHILI_DAY_SIX = Object.freeze({
     {id:"server",question:"Nani anauliza ‘Wewe unapenda kula nini?’",choices:["Mhudumu","Mteja","Furaha"],answer:"Mhudumu"},
     {id:"menu",question:"Ni chakula gani kina samaki?",choices:["ugali samaki","ndizi nyama","pilau nyama"],answer:"ugali samaki"},
   ],
+  listeningAudio: {
+    objectKey: "swahili/A1/day-06/day-06.mp3",
+    title: "Mgahawani · Mazungumzo katika mgahawa",
+  },
   listening:[
-    {id:"listen-food",question:"Mteja anapenda kula nini?",choices:["wali na kuku","pilau nyama","ugali nyama"],answer:"wali na kuku"},
-    {id:"listen-drink",question:"Mteja anapenda kunywa nini?",choices:["juisi ya embe","soda","maji"],answer:"juisi ya embe"},
+    {id:"listen-greeting",question:"Mhudumu anasema nini mwanzoni?",choices:["Kwaheri","Karibu","Pole"],answer:"Karibu"},
+    {id:"listen-menu",question:"Mteja anaomba nini kwanza?",choices:["Menyu","Maji","Wali"],answer:"Menyu"},
+    {id:"listen-drinks",question:"Mteja anakunywa nini?",choices:["Chai na maziwa","Maji na juisi ya embe","Kahawa"],answer:"Maji na juisi ya embe"},
+    {id:"listen-meal",question:"Mteja anakula nini?",choices:["Samaki na ugali","Chapati na maharage","Wali na kuku"],answer:"Wali na kuku"},
+    {id:"listen-price",question:"Chakula kinagharimu shilingi ngapi?",choices:["Elfu nane","Elfu tano","Elfu kumi"],answer:"Elfu nane"},
   ],
 });

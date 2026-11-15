@@ -55,7 +55,12 @@ function prepareMusic(req, env) {
   const id = new URL(req.url, 'https://www.falowen.app').searchParams.get('track') || '';
   return signTrack(id, env);
 }
-function createMusicHandler({ env = process.env, fetchImpl = fetch, prepare = prepareMusic } = {}) {
+function createMusicHandler({
+  env = process.env, fetchImpl = fetch, prepare = prepareMusic,
+  isAuthorized = isMusicStaff,
+  authorizationError = 'Teacher or administrator access is required.',
+  signInError = 'Please sign in to Falowen Admin.',
+} = {}) {
   return async (req,res) => {
     const origin = req.headers.origin;
     if (['https://admin.falowen.app','https://www.falowen.app','https://music.falowen.app'].includes(origin)) {
@@ -68,7 +73,7 @@ function createMusicHandler({ env = process.env, fetchImpl = fetch, prepare = pr
     if (req.method !== 'GET') return res.status(405).json({error:'Method not allowed.'});
     try {
       const token = String(req.headers.authorization || '').match(/^Bearer (.+)$/i)?.[1];
-      if (!token) return res.status(401).json({error:'Please sign in to Falowen Admin.'});
+      if (!token) return res.status(401).json({error:signInError});
       const apiKey = env.FIREBASE_API_KEY || env.REACT_APP_FIREBASE_API_KEY;
       if (!apiKey) return res.status(503).json({error:'Music authentication is not configured.'});
       const response = await fetchImpl(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encode(apiKey)}`, {
@@ -77,13 +82,34 @@ function createMusicHandler({ env = process.env, fetchImpl = fetch, prepare = pr
       const data = await response.json();
       const account = data.users?.[0];
       if (!response.ok || !account?.localId || account.disabled) return res.status(401).json({error:'Your Falowen session has expired. Please sign in again.'});
-      if (!isMusicStaff(account,env)) return res.status(403).json({error:'Teacher or administrator access is required.'});
+      if (!isAuthorized(account,env)) return res.status(403).json({error:authorizationError});
       const signed = await prepare(req, env);
       return res.status(200).json({url:signed.url, expiresAt:signed.expiresAt, track:signed.id});
     } catch (error) {
       return res.status(error.status || 502).json({error:error.status ? error.message : 'Could not prepare classroom music. Please retry.'});
     }
   };
+}
+// Fixed learner-facing audio only. The key is not taken from the request and
+// signing still requires a valid Firebase ID token. The course R2 bucket stays private.
+const SWAHILI_DAY_SIX_LISTENING = Object.freeze({
+  id: 'swahili-a1-day06-listening',
+  key: 'swahili/A1/day-06/day-06.mp3',
+});
+function createSwahiliDaySixAudioHandler(options = {}) {
+  return createMusicHandler({
+    ...options,
+    isAuthorized: account => Boolean(account?.localId && !account.disabled),
+    authorizationError: 'A signed-in Falowen account is required.',
+    signInError: 'Please sign in to Falowen to play this recording.',
+    prepare: async (req, env) => {
+      const params = new URL(req.url, 'https://www.falowen.app').searchParams;
+      if ([...params.keys()].length) {
+        throw Object.assign(new Error('Unexpected listening audio parameters.'), { status: 400 });
+      }
+      return signObject(SWAHILI_DAY_SIX_LISTENING, env);
+    },
+  });
 }
 // These private classroom conversations are never added to the public music map.
 // Private course conversations, never exposed by the public music track map.
@@ -140,4 +166,4 @@ function createClassroomBankAudioHandler(options = {}) {
     return signObject(recording, env);
   } });
 }
-module.exports = { createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
+module.exports = { createSwahiliDaySixAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
