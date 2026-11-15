@@ -5,7 +5,7 @@ import { PUBLIC_MARKETING_FEATURES } from "../data/publicMarketingFeatures";
 const read = (relative) => fs.readFileSync(path.resolve(__dirname, relative), "utf8");
 
 describe("Falowen public marketing redesign", () => {
-  test("four public marketing promises remain in visitor guide and rotating landing slides", () => {
+  test("four German marketing promises remain intact for the homepage while About Us presents both languages", () => {
     expect(PUBLIC_MARKETING_FEATURES.map((feature) => feature.key)).toEqual([
       "placement", "exams", "class", "self",
     ]);
@@ -29,7 +29,11 @@ describe("Falowen public marketing redesign", () => {
     const carousel = read("./FalowenHomepageCarousel.js");
     for (const href of ["/signup", "/placement-test", "/exam-practice", "/books", "/learn-german-with-chatgpt"]) expect(carousel).toContain(`href:"${href}"`);
     expect(carousel).toContain('support:"View German classes"');
-    expect(visitor).toContain("PUBLIC_MARKETING_FEATURES.map");
+    expect(visitor).toContain("visitor-guide-language-grid");
+    expect(visitor).toContain("Learn German");
+    expect(visitor).toContain("Learn Kiswahili");
+    expect(visitor).toContain("How we support language learners");
+    expect(visitor).not.toContain("PUBLIC_MARKETING_FEATURES.map");
     expect(visitor).not.toContain("How your course works");
     expect(visitor).not.toContain("Why students study with us");
     expect(landing).not.toContain("Start in three simple steps");
@@ -59,7 +63,9 @@ describe("Falowen public marketing redesign", () => {
     expect(landing).toContain("FOOTER_LINKS");
     expect(landing).toContain("falowen-home-nav-links");
     expect(read("./FalowenHomepageCarousel.js")).toContain("View German classes");
-    expect(visitor).toContain("visitor-guide-marketing-schedule");
+    expect(visitor).toContain("visitor-guide-language-actions");
+    expect(visitor).toContain('href="/swahili"');
+    expect(visitor).toContain("swahiliSignupHref");
     expect(styles).toContain("@media (max-width: 600px)");
     expect(styles).toContain(".falowen-home-feature-actions");
     expect(read("./PublicUpcomingClassesPage.js")).toContain("Weekly class calendar");
