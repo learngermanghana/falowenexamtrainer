@@ -144,10 +144,6 @@
 .falowen-home-hybrid-option h3 { margin: 0 0 5px; font-size: 15px; line-height: 1.25; font-weight: 850; }
 .falowen-home-hybrid-option p { margin: 0; color: #4a5f7e; font-size: 12.5px; line-height: 1.5; }
 
-.falowen-home-program-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.falowen-home-program { display: grid; gap: 8px; grid-template-rows: auto 1fr auto; }
-.falowen-home-program h3 { margin: 0; font-size: 18px; }
-.falowen-home-program a { width: fit-content; color: #174bbb; font-size: 13px; font-weight: 800; }
 
 .falowen-home-support { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: clamp(24px, 4vw, 42px); border-radius: 23px; background: #ebf3ff; border: 1px solid #d9e6fc; }
 .falowen-home-support-copy { display: grid; gap: 11px; max-width: 690px; }
