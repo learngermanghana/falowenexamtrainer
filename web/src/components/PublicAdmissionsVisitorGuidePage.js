@@ -74,7 +74,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
   );
 
   useEffect(() => {
-    const description = "Learn about Learn Language Education Academy, how Falowen supports students, and the class selected for your German-learning enquiry.";
+    const description = "Meet the teachers behind Learn Language Education Academy and Falowen, offering German and Kiswahili learning with interactive digital support in Accra, Ghana.";
     updatePageMeta({
       title: "About Us | Learn Language Education Academy & Falowen",
       description,
@@ -131,8 +131,8 @@ const PublicAdmissionsVisitorGuidePage = () => {
         </div>
         <h1 style={{ margin: 0 }}>{academyProfile.academyName}</h1>
         <p style={{ margin: 0, lineHeight: 1.75, color: "#334155" }}>
-          {academyProfile.academyName} combines structured German teaching with Falowen, our digital learning platform.{" "}
-          Students receive guided lessons, tutor-marked work, progress tracking and preparation for German-language examinations.
+          {academyProfile.academyName} combines structured German instruction and Kiswahili teaching with Falowen, our digital learning platform.{" "}
+          Students benefit from guided lessons, interactive resources, tutor support and progress tracking, alongside dedicated German examination preparation.
         </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", color: "#334155", fontWeight: 700 }}>
           <span>Established {academyProfile.establishedYear}</span><span>·</span><span>German {academyProfile.germanLevels}</span><span>·</span><span>{academyProfile.examPassHeadline}</span>
@@ -271,7 +271,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
                   alt={`${member.name} · ${member.role}`}
                   loading="lazy"
                   decoding="async"
-                  style={{ width: "100%", aspectRatio: "4 / 3", objectFit: "cover", borderRadius: 10, background: "#f1f5f9" }}
+                  style={{ width: "100%", aspectRatio: "4 / 3", objectFit: "cover", objectPosition: member.imagePosition || "center center", borderRadius: 10, background: "#f1f5f9" }}
                 />
               ) : null}
               <div>

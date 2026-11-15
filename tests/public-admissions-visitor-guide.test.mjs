@@ -121,11 +121,20 @@ test("shared academy profile contains the current team, teaching media and publi
   assert.deepEqual(profile.team.map((member) => member.name), [
     "Felix Asadu",
     "Sabina Michel",
+    "Dr. Ruth Ndekiro Shao",
     "Catherine Agbleze Etornam",
     "Hana",
   ]);
-  assert.equal(profile.team.find((member) => member.name === "Catherine Agbleze Etornam")?.image, null);
+  assert.match(profile.team.find((member) => member.name === "Catherine Agbleze Etornam")?.image || "", /^https:\/\/raw\.githubusercontent\.com\//);
   assert.match(profile.team.find((member) => member.name === "Sabina Michel")?.role || "", /German Teacher/);
+  const ruth = profile.team.find((member) => member.name === "Dr. Ruth Ndekiro Shao");
+  assert.equal(ruth.role, "Kiswahili Language Instructor & Researcher");
+  assert.equal(ruth.image, "/classes/media/ruth-ndekiro-shao.webp");
+  assert.equal(ruth.imagePosition, "center 14%");
+  assert.match(ruth.bio, /over eight years of experience/);
+  assert.match(ruth.bio, /University of Ghana and the University of Hamburg/);
+  assert.match(ruth.bio, /PhD in Kiswahili from the University of Dar es Salaam/);
+  assert.match(ruth.bio, /second language acquisition, and curriculum development/);
   assert.match(profile.team.find((member) => member.name === "Hana")?.role || "", /Global Mobility Specialist/);
   assert.equal(profile.team.find((member) => member.name === "Hana")?.relationship, "Consulting agency partner");
   assert.equal(profile.teachingGallery.length, 2);
@@ -137,6 +146,7 @@ test("shared academy profile contains the current team, teaching media and publi
     "web/public/classes/media/felix-zoom.png",
     "web/public/classes/media/sabina-michel.png",
     "web/public/classes/media/sabina-teaching.png",
+    "web/public/classes/media/ruth-ndekiro-shao.webp",
     "web/public/classes/media/hana.webp",
   ].forEach((relativePath) => assert.ok(fs.existsSync(path.join(root, relativePath))));
 });
@@ -158,9 +168,18 @@ test("admissions public links and media references stay valid", () => {
   ];
 
   media.forEach((asset) => {
+    if (asset.startsWith("https://")) {
+      assert.equal(new URL(asset).protocol, "https:");
+      return; // Existing externally hosted staff portrait.
+    }
     assert.ok(asset.startsWith("/"), `${asset} should be a public-root path`);
     assert.ok(fs.existsSync(path.join(publicRoot, asset.replace(/^\//, ""))), `${asset} should exist`);
   });
+
+  const ruthPortrait = fs.readFileSync(path.join(publicRoot, "classes/media/ruth-ndekiro-shao.webp"));
+  assert.equal(ruthPortrait.toString("ascii", 0, 4), "RIFF");
+  assert.equal(ruthPortrait.toString("ascii", 8, 12), "WEBP");
+  assert.ok(ruthPortrait.byteLength < 50000, "profile image should be optimized for mobile");
 
   const lightClassroom = fs.statSync(path.join(publicRoot, "classes/llea-classroom.jpg")).size;
   const originalClassroom = fs.statSync(path.join(publicRoot, "classes/media/classroom.png")).size;
