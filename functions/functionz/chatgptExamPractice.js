@@ -3,6 +3,7 @@
 // The server registry includes private keys and rubrics. Export only the
 // student-facing writing/speaking fields below, never the source object.
 const registry = require("../data/assessmentTasks.json");
+const { listMyExamMocks, getMyMockObjectivePractice } = require("./chatgptExamLibrary");
 const RELEASED = new Set(["a1-mock-02", "a1-mock-03", "a2-mock-02"]);
 const text = (x, max = 1200) => typeof x === "string" ? x.slice(0, max) : "";
 const list = (x, max = 10) => Array.isArray(x)
@@ -23,7 +24,10 @@ const safeTask = (task) => {
   if (Number.isInteger(task.maxWords)) out.maxWords = task.maxWords;
   return Object.keys(out).length ? out : null;
 };
-function getExamPractice(level, mockId, skill, part) {
+function getExamPractice(level, mockId, skill, part, questionNumber) {
+  if (skill === "reading" || skill === "listening") {
+    return getMyMockObjectivePractice(level, mockId, skill, part, questionNumber);
+  }
   if (typeof mockId !== "string" || !RELEASED.has(mockId)) {
     return { available: false, message: "This mock is not in the approved ChatGPT practice export." };
   }
@@ -61,17 +65,6 @@ function getExamPractice(level, mockId, skill, part) {
   } : { available: false, message: "This section is not available for ChatGPT practice." };
 }
 function listExamPractice(level) {
-  const mocks = [...RELEASED].filter(mockId => registry.mockSets?.[mockId]?.level === level)
-    .sort().map(mockId => ({
-      mockId, level, skills: ["writing", "speaking"],
-      practiceOnly: true,
-      examRoomUrl: "https://www.falowen.app/exams",
-    }));
-  return {
-    available: mocks.length > 0, level, mocks,
-    clarification: mocks.length
-      ? "Choose one mock and request Schreiben or Sprechen for authentic learner-facing prompts. Antworten are reviewed in conversation only. Official timed exams and results remain in the Exams Room."
-      : "No reviewed mock question set is exported to ChatGPT for this course yet. Use Falowen Exams Room.",
-  };
+  return listMyExamMocks(level);
 }
 module.exports = { getExamPractice, listExamPractice, safeTask };
