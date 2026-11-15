@@ -5,7 +5,8 @@
   ],
   "scopes_supported": [
     "falowen:read",
-    "falowen:practice:write"
+    "falowen:practice:write",
+    "falowen:assignments:write"
   ],
   "resource_documentation": "https://www.falowen.app/help"
 }

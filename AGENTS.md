@@ -5,7 +5,7 @@ Read this file before editing this repository. This is a **public** repository: 
 ## First, find the right source
 - Start with [AI documentation index](docs/ai/README.md), [platform architecture](docs/ai/architecture.md), and [source-of-truth map](docs/ai/content-source-of-truth.md).
 - **Learner UI and courses:** `web/src/`; **public assets:** `web/public/`; **backend:** `functions/functionz/`; **hosting:** `api/`, `vercel.json`. Admin is a **different** repository: [learngermanghana/falowenadmin](https://github.com/learngermanghana/falowenadmin).
-- The [ChatGPT Learning Companion](docs/chatgpt-falowen-companion.md) currently exposes **read-only**, student-scoped tools. A repository deploy is *not* OpenAI Plugin Directory approval.
+- The [ChatGPT Learning Companion](docs/chatgpt-falowen-companion.md) is **read-only by default**. Its proposed A1 write pilot is scoped, consent-gated and disabled until production verification; a repository deploy is *not* OpenAI Plugin Directory approval.
 - Use the generated course map and official public help for navigation; do not invent grades, timetables, payment states, assessment rules or enabled features.
 
 ## Non-negotiable editing constraints

@@ -20,7 +20,7 @@ The current learner-scoped tools are documented in [the release guide](../chatgp
 | `get_my_falowen_lesson_content` | Available learner-facing content |
 | `get_my_falowen_practice_guide` | Source-grounded one-question-at-a-time reading, Hören, Sprechen, Schreiben and grammar tutoring; English explanations optional, no score writes |
 
-The current connector does not submit assignments or mutate grades, payments or student records. Schema and permission changes require server tests and a new plugin review as applicable.
+The connection is read-only by default. The proposed A1 write pilot (not a released capability) adds `submit_my_falowen_assignment` with an explicitly granted `falowen:assignments:write` scope, confirmed full answer, canonical A1 assignment ID, transaction-bound one-time lock and a server activation flag. It never changes tutor grades, payments or exam attempts. The reviewed Exams Room practice API adds `get_my_falowen_exam_mocks`, which lists source-approved mock IDs without private answers. Schema and permission changes require server tests and a new plugin review as applicable.
 
 Use [the privacy guide](student-data-and-privacy.md) for student data boundaries. Never assert that a plugin is publicly installed solely because the MCP backend is deployed.
 
@@ -81,3 +81,8 @@ Before release: run existing MCP authentication / student isolation tests plus b
 - `save_my_falowen_practice_note(day, skill, note, requestId)` is an **optional student-initiated write** requiring OAuth scope `falowen:practice:write` in addition to `falowen:read`. Existing read-only connections remain read-only. This records only a bounded self-reported practice note under token-derived identity; it never mutates grades, exams, assignments, answer keys, payments or attendance. A request ID makes retries idempotent. Records include 90-day expiry metadata; Firestore TTL policy must be enabled separately.
 - The publisher must request reapproval for newly exposed tools and write permission and verify fresh consent flow, revoke/reconnect behavior and student isolation. A ZIP upload does not activate a new scope; the OpenAI portal's plugin snapshot must also include/approve the new tool metadata.
 - **Do not claim official exam result upload.** Written or spoken student answers may be reviewed conversationally in ChatGPT; only an explicit save request writes the optional note.
+
+
+## Exams Room read-only exports (15 November 2026 review)
+
+The proposed `get_my_falowen_exam_mocks` returns only published/ready/visible German Exams Room entries. The proposed `get_my_falowen_exam_dictionary` uses the actual Falowen Sprechen dictionary and Schreiben practice workspace, not invented samples. `get_my_falowen_exam_practice` supports A1 Mock 02/03 Lesen and Hören, with protected playback remaining in Exams Room. Other mock IDs can appear as directory links but do not have exported ChatGPT questions. The build-time `chatgptExamContent.generated.json` is answer-safe and excludes solutions, rubrics, private audio identifiers and teacher fields. Programme and course-level checks are enforced using active German enrollment. See the companion release guide for activation steps.

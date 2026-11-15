@@ -3,6 +3,7 @@
 // The server registry includes private keys and rubrics. Export only the
 // student-facing writing/speaking fields below, never the source object.
 const registry = require("../data/assessmentTasks.json");
+const { listMyExamMocks, getMyMockObjectivePractice } = require("./chatgptExamLibrary");
 const RELEASED = new Set(["a1-mock-02", "a1-mock-03", "a2-mock-02"]);
 const text = (x, max = 1200) => typeof x === "string" ? x.slice(0, max) : "";
 const list = (x, max = 10) => Array.isArray(x)
@@ -23,7 +24,10 @@ const safeTask = (task) => {
   if (Number.isInteger(task.maxWords)) out.maxWords = task.maxWords;
   return Object.keys(out).length ? out : null;
 };
-function getExamPractice(level, mockId, skill, part) {
+function getExamPractice(level, mockId, skill, part, questionNumber) {
+  if (skill === "reading" || skill === "listening") {
+    return getMyMockObjectivePractice(level, mockId, skill, part, questionNumber);
+  }
   if (typeof mockId !== "string" || !RELEASED.has(mockId)) {
     return { available: false, message: "This mock is not in the approved ChatGPT practice export." };
   }
@@ -60,4 +64,7 @@ function getExamPractice(level, mockId, skill, part) {
     instructions: "Show one original learner-facing prompt at a time, await the student's response, then give helpful conversational feedback. Do not claim to know a hidden marking key. Never post an official exam answer or score.",
   } : { available: false, message: "This section is not available for ChatGPT practice." };
 }
-module.exports = { getExamPractice, safeTask };
+function listExamPractice(level) {
+  return listMyExamMocks(level);
+}
+module.exports = { getExamPractice, listExamPractice, safeTask };

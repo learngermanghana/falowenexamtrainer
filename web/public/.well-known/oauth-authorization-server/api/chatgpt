@@ -14,7 +14,8 @@
   ],
   "scopes_supported": [
     "falowen:read",
-    "falowen:practice:write"
+    "falowen:practice:write",
+    "falowen:assignments:write"
   ],
   "token_endpoint_auth_methods_supported": [
     "none"
