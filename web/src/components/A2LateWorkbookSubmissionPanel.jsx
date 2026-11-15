@@ -62,9 +62,11 @@ const A2LateWorkbookSubmissionPanel = ({ pathname = "" }) => {
 
   const part4Label = profile.part4 === "reading" ? "Teil 4 · Lesen" : "Teil 4 · Hören";
   const part4Copy =
-    profile.part4Submission === "self-check"
-      ? `${part4Label} is self-check practice and is not submitted.`
-      : `${part4Label} is part of the submitted workbook.`;
+    profile.part4Submission === "none"
+      ? "There is no Teil 4 for this lesson."
+      : profile.part4Submission === "self-check"
+        ? `${part4Label} is self-check practice and is not submitted.`
+        : `${part4Label} is part of the submitted workbook.`;
 
   return (
     <section
