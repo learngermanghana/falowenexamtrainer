@@ -121,9 +121,11 @@ describe("ChatGPT OAuth static discovery", () => {
     expect(server.token_endpoint).toBe(constants.ISSUER + "/token");
     expect(server.client_id_metadata_document_supported).toBe(true);
     expect(server.scopes_supported).toContain(constants.PRACTICE_WRITE_SCOPE);
+    expect(server.scopes_supported).toContain(constants.ASSIGNMENT_WRITE_SCOPE);
     expect(protectedResource.resource).toBe(constants.RESOURCE);
     expect(protectedResource.authorization_servers).toEqual([constants.ISSUER]);
     expect(protectedResource.scopes_supported).toContain(constants.PRACTICE_WRITE_SCOPE);
+    expect(protectedResource.scopes_supported).toContain(constants.ASSIGNMENT_WRITE_SCOPE);
   });
 });
 
