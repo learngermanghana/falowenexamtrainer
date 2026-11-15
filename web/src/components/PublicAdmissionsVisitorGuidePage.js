@@ -87,12 +87,18 @@ const PublicAdmissionsVisitorGuidePage = () => {
       },
     });
 
+    // The public About Us page does not need a catalogue request unless
+    // someone arrived from a specific German class brochure link.
+    if (!requestedSlug) {
+      setLoading(false);
+      return undefined;
+    }
     let active = true;
     loadPublicClasses()
       .then((rows) => { if (active) setClasses(rows || []); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, []);
+  }, [requestedSlug]);
 
   useEffect(() => {
     if (trackedOpen.current || loading) return;
