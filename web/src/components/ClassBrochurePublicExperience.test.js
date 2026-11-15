@@ -258,7 +258,11 @@ describe("public class brochure experience", () => {
     expect(design).toContain('var classes = Array.isArray(data.classes) ? data.classes : []');
     expect(design).toContain('Open full class brochure & FAQs');
     expect(design).toContain('Want a follow-up?');
-    expect(design).toContain('Your next ');
+    expect(design).toContain('Learn German or Swahili');
+    expect(design).toContain('Choose a German class');
+    expect(design).toContain('Upcoming Swahili classes');
+    expect(design).toContain('catalog?.swahiliClasses');
+    expect(design).toContain(' on WhatsApp');
     expect(design).not.toContain("fetch(");
     expect(styles).toContain('/classes/llea-classroom.jpg');
     expect(styles).toContain('@media (max-width: 700px)');

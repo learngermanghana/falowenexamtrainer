@@ -266,6 +266,7 @@ async function loadBrochureData() {
       ...staticData,
       catalogSource: "firestore",
       catalogGeneratedAt: liveData.generatedAt || "",
+      swahiliClasses: Array.isArray(liveData.swahiliClasses) ? liveData.swahiliClasses : [],
       classes: [
         ...liveClasses,
         ...missingLiveLevelChoices,
@@ -415,7 +416,7 @@ function renderTabs(courseList) {
 function updateHeroText() {
   const heroTitle = document.querySelector(".hero h1");
   const heroText = document.querySelector(".hero p");
-  if (heroTitle) heroTitle.textContent = "Choose your German class";
+  if (heroTitle) heroTitle.textContent = "Upcoming German and Swahili classes";
   if (heroText) {
     heroText.textContent = "Check the class fee, start date, meeting times and learning mode first. Register when the class fits your schedule, or take the placement test if you are unsure of your level.";
   }
