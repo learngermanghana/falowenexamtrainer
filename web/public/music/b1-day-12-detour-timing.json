@@ -1,0 +1,206 @@
+{
+  "cues": [
+    {
+      "start": 10.3,
+      "end": 15.32,
+      "text": "Wir wandern am Samstag durch den Wald."
+    },
+    {
+      "start": 15.32,
+      "end": 22.76,
+      "text": "Die Sonne scheint und alles sieht einfach aus."
+    },
+    {
+      "start": 22.76,
+      "end": 27.52,
+      "text": "Nach einer Stunde fehlt die Markierung,"
+    },
+    {
+      "start": 27.52,
+      "end": 33.6,
+      "text": "und plötzlich wissen wir nicht mehr weiter."
+    },
+    {
+      "start": 33.6,
+      "end": 39.56,
+      "text": "Manchmal führt ein Umweg zum Ziel,"
+    },
+    {
+      "start": 40.64,
+      "end": 45.74,
+      "text": "wenn wir ruhig bleiben und nachdenken."
+    },
+    {
+      "start": 45.74,
+      "end": 51.36,
+      "text": "Zusammen finden wir den richtigen Weg."
+    },
+    {
+      "start": 52.74,
+      "end": 58.06,
+      "text": "Zusammen, richtigen Weg."
+    },
+    {
+      "start": 70.7,
+      "end": 75.82,
+      "text": "Wir setzen uns hin und öffnen die Karte."
+    },
+    {
+      "start": 78.92,
+      "end": 81.3,
+      "text": "Ben entdeckt einen Weg entlang des Bachs."
+    },
+    {
+      "start": 83.0,
+      "end": 88.04,
+      "text": "Obwohl wir etwas später ankommen,"
+    },
+    {
+      "start": 88.54,
+      "end": 93.28,
+      "text": "sehen wir unterwegs einen schönen Wasserfall."
+    },
+    {
+      "start": 93.28,
+      "end": 99.28,
+      "text": "Manchmal führt ein Umweg zum Ziel,"
+    },
+    {
+      "start": 99.28,
+      "end": 105.82,
+      "text": "wenn wir ruhig bleiben und nachdenken."
+    },
+    {
+      "start": 106.6,
+      "end": 111.16,
+      "text": "Zusammen finden wir den richtigen Weg."
+    },
+    {
+      "start": 111.16,
+      "end": 118.08,
+      "text": "Zusammen finden wir den richtigen Weg."
+    },
+    {
+      "start": 118.08,
+      "end": 123.32,
+      "text": "Am Abend erzählen wir lachend davon."
+    },
+    {
+      "start": 125.1,
+      "end": 129.92,
+      "text": "Das Abenteuer vergessen wir nicht."
+    },
+    {
+      "start": 129.92,
+      "end": 136.4,
+      "text": "Bei Falowen kann ich sogar Abenteuer gut erzählen."
+    },
+    {
+      "start": 136.4,
+      "end": 141.58,
+      "text": "Zusammen, richtigen Weg."
+    }
+  ],
+  "matchCoverage": 0.926,
+  "weakestLineCoverage": 0.571,
+  "objectKey": "music/b1/day-12/Ein Umweg zum Ziel.mp3",
+  "trackId": "r2-b1-day-12-b64_RWluIFVtd2VnIHp1bSBaaWVsLm1wMw",
+  "assignmentKey": "B1-4.12",
+  "draftTitle": "Ein Umweg zum Ziel",
+  "duration": 157.04,
+  "recordingSha256": "0bb91b19f1eaeadcb856ae79358eaab840a41c887563a75b2b5ac0e967ab1e1e",
+  "timingStatus": "estimated",
+  "timingMethod": "Whisper small acoustic alignment against the course draft; listening review required",
+  "referenceOnly": true,
+  "lyrics": "[Verse 1]\nWir wandern am Samstag durch den Wald.\nDie Sonne scheint und alles sieht einfach aus.\nNach einer Stunde fehlt die Markierung,\nund plötzlich wissen wir nicht mehr weiter.\n\n[Chorus]\nManchmal führt ein Umweg zum Ziel,\nwenn wir ruhig bleiben und nachdenken.\nZusammen finden wir den richtigen Weg.\nZusammen, richtigen Weg.\n\n[Verse 2]\nWir setzen uns hin und öffnen die Karte.\nBen entdeckt einen Weg entlang des Bachs.\nObwohl wir etwas später ankommen,\nsehen wir unterwegs einen schönen Wasserfall.\n\n[Chorus]\nManchmal führt ein Umweg zum Ziel,\nwenn wir ruhig bleiben und nachdenken.\nZusammen finden wir den richtigen Weg.\nZusammen finden wir den richtigen Weg.\n\n[Outro]\nAm Abend erzählen wir lachend davon.\nDas Abenteuer vergessen wir nicht.\nBei Falowen kann ich sogar Abenteuer gut erzählen.\nZusammen, richtigen Weg.",
+  "englishTranslation": {
+    "source": "course-draft",
+    "objectKey": "music/b1/day-12/Ein Umweg zum Ziel.mp3",
+    "level": "B1",
+    "day": 12,
+    "assignmentKey": "B1-4.12",
+    "draftTitle": "Ein Umweg zum Ziel",
+    "lines": [
+      {
+        "de": "Wir wandern am Samstag durch den Wald.",
+        "en": "We go hiking through the forest on Saturday."
+      },
+      {
+        "de": "Die Sonne scheint und alles sieht einfach aus.",
+        "en": "The sun is shining and everything looks easy."
+      },
+      {
+        "de": "Nach einer Stunde fehlt die Markierung,",
+        "en": "After an hour the trail marker is missing,"
+      },
+      {
+        "de": "und plötzlich wissen wir nicht mehr weiter.",
+        "en": "and suddenly we don’t know where to go."
+      },
+      {
+        "de": "Manchmal führt ein Umweg zum Ziel,",
+        "en": "Sometimes a detour gets you there,"
+      },
+      {
+        "de": "wenn wir ruhig bleiben und nachdenken.",
+        "en": "if we stay calm and think."
+      },
+      {
+        "de": "Zusammen finden wir den richtigen Weg.",
+        "en": "Together we find the right way."
+      },
+      {
+        "de": "Zusammen, richtigen Weg.",
+        "en": "Together, the right way."
+      },
+      {
+        "de": "Wir setzen uns hin und öffnen die Karte.",
+        "en": "We sit down and open the map."
+      },
+      {
+        "de": "Ben entdeckt einen Weg entlang des Bachs.",
+        "en": "Ben spots a path along the stream."
+      },
+      {
+        "de": "Obwohl wir etwas später ankommen,",
+        "en": "Although we arrive a little later,"
+      },
+      {
+        "de": "sehen wir unterwegs einen schönen Wasserfall.",
+        "en": "we see a beautiful waterfall on the way."
+      },
+      {
+        "de": "Manchmal führt ein Umweg zum Ziel,",
+        "en": "Sometimes a detour gets you there,"
+      },
+      {
+        "de": "wenn wir ruhig bleiben und nachdenken.",
+        "en": "if we stay calm and think."
+      },
+      {
+        "de": "Zusammen finden wir den richtigen Weg.",
+        "en": "Together we find the right way."
+      },
+      {
+        "de": "Zusammen finden wir den richtigen Weg.",
+        "en": "Together we find the right way."
+      },
+      {
+        "de": "Am Abend erzählen wir lachend davon.",
+        "en": "In the evening we laugh as we tell the story."
+      },
+      {
+        "de": "Das Abenteuer vergessen wir nicht.",
+        "en": "We won’t forget this adventure."
+      },
+      {
+        "de": "Bei Falowen kann ich sogar Abenteuer gut erzählen.",
+        "en": "With Falowen I can even tell adventure stories well."
+      },
+      {
+        "de": "Zusammen, richtigen Weg.",
+        "en": "Together, the right way."
+      }
+    ]
+  }
+}

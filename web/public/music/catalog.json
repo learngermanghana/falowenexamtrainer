@@ -426,6 +426,24 @@
       "slides": true,
       "objectKey": "music/b1/day-10/Einen Moment Weg.mp3",
       "approved": true
+    },
+    {
+      "id": "r2-b1-day-12-b64_RWluIFVtd2VnIHp1bSBaaWVsLm1wMw",
+      "title": "Ein Umweg zum Ziel",
+      "level": "B1",
+      "day": 12,
+      "assignmentKey": "B1-4.12",
+      "topic": "Day 12 · Abenteuer in der Natur",
+      "type": "Learning story",
+      "genre": "Soft Pop-Rock",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-b1-day-12-b64_RWluIFVtd2VnIHp1bSBaaWVsLm1wMw",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/b1/day-12/Ein Umweg zum Ziel.mp3",
+      "approved": true
     }
   ]
 }
