@@ -60,4 +60,18 @@ function getExamPractice(level, mockId, skill, part) {
     instructions: "Show one original learner-facing prompt at a time, await the student's response, then give helpful conversational feedback. Do not claim to know a hidden marking key. Never post an official exam answer or score.",
   } : { available: false, message: "This section is not available for ChatGPT practice." };
 }
-module.exports = { getExamPractice, safeTask };
+function listExamPractice(level) {
+  const mocks = [...RELEASED].filter(mockId => registry.mockSets?.[mockId]?.level === level)
+    .sort().map(mockId => ({
+      mockId, level, skills: ["writing", "speaking"],
+      practiceOnly: true,
+      examRoomUrl: "https://www.falowen.app/exams",
+    }));
+  return {
+    available: mocks.length > 0, level, mocks,
+    clarification: mocks.length
+      ? "Choose one mock and request Schreiben or Sprechen for authentic learner-facing prompts. Antworten are reviewed in conversation only. Official timed exams and results remain in the Exams Room."
+      : "No reviewed mock question set is exported to ChatGPT for this course yet. Use Falowen Exams Room.",
+  };
+}
+module.exports = { getExamPractice, listExamPractice, safeTask };
