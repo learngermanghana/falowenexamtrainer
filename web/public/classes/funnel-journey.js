@@ -172,6 +172,8 @@
       form.addEventListener("input", function () { updateIncompleteWhatsApp(form); });
       form.addEventListener("change", function () { updateIncompleteWhatsApp(form); });
       form.addEventListener("submit", function () {
+        // New brochure-first landing uses class-leads.js as the single opt-in submission path.
+        if (document.body.classList.contains("figma-classes-landing")) return;
         var attribution = journeyBase();
         track("class_interest_submit", { video: attribution.video, source: attribution.source, classSlug: form.querySelector("#leadClass")?.value || "" });
         submitAttributedClassInterest(form);
