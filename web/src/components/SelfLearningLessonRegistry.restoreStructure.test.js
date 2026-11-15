@@ -20,7 +20,7 @@ describe("restored B2 and C1 self-learning structure", () => {
   });
 
   test("keeps B2 and C1 free of a generic supporting-materials gate", () => {
-    expect(registrySource).toContain("export const SelfLearningLessonFrame = ({ children }) => children");
+    expect(registrySource).toContain("export const SelfLearningLessonFrame = ({ children }) => <>{children}</>");
     expect(registrySource).not.toContain("SelfLearningJourneyGate");
     expect(registrySource).not.toContain("SelfLearningMaterialsSelector");
   });
