@@ -1,0 +1,305 @@
+/* Figma-inspired brochure detail: visual layer only, on selected-class pages. */
+body.figma-brochure-detail {
+  background: #f5f3ed;
+  color: #18352b;
+}
+body.figma-brochure-detail,
+body.figma-brochure-detail a,
+body.figma-brochure-detail button { -webkit-tap-highlight-color: transparent; }
+body.figma-brochure-detail .intro-video,
+body.figma-brochure-detail .page > .hero,
+body.figma-brochure-detail .page > #brochureToc,
+body.figma-brochure-detail #classTabs,
+body.figma-brochure-detail #classTabs + #selectionNotice,
+body.figma-brochure-detail .class-main-card,
+body.figma-brochure-detail #otherAvailableClasses {
+  display: none !important;
+}
+body.figma-brochure-detail .page {
+  max-width: 1190px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 56px) clamp(15px, 3vw, 25px) 60px !important;
+}
+body.figma-brochure-detail .page > .grid:has(> .class-main-card:only-child),
+body.figma-brochure-detail .page > .card:has(#classTabs) {
+  display: none !important;
+}
+.figma-brochure-nav {
+  position: relative;
+  z-index: 20;
+  background: #f8f6f0;
+  border-bottom: 1px solid rgba(20, 55, 44, .1);
+}
+.figma-brochure-nav-inner {
+  max-width: 1490px;
+  min-height: 85px;
+  margin: 0 auto;
+  padding: 12px clamp(18px, 5vw, 54px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(14px, 2.6vw, 35px);
+}
+.figma-brochure-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  color: #16362b;
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+.figma-brochure-logo:hover { color: #16362b; }
+.figma-brochure-logo-symbol {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffca4a;
+  background: #154137;
+  font-weight: 850;
+  font-size: 15px;
+}
+.figma-brochure-logo-copy { display: grid; gap: 2px; }
+.figma-brochure-logo-copy strong { font-size: 16px; line-height: 1.1; }
+.figma-brochure-logo-copy small {
+  color: #828982;
+  font-size: 10px;
+  letter-spacing: .16em;
+  font-weight: 850;
+}
+.figma-brochure-links { display: flex; align-items: center; flex-wrap: wrap; gap: clamp(12px, 2.25vw, 37px); }
+.figma-brochure-links a {
+  color: #525d55;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  transition: color .15s;
+}
+.figma-brochure-links a:hover { color: #b7772a; }
+.figma-brochure-nav-register {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  background: #facb4d;
+  color: #133b2d;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 850;
+  text-decoration: none;
+}
+.figma-brochure-nav-register:hover { background: #f4bb27; color: #133b2d; }
+.figma-brochure-hero {
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+  background: #143b30;
+  color: #fff;
+  padding: clamp(52px, 6.8vw, 113px) clamp(18px, 6vw, 80px);
+}
+.figma-brochure-hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 580px;
+  height: 580px;
+  border: 1px solid rgba(246,203,77,.18);
+  border-radius: 50%;
+  right: -220px;
+  top: -140px;
+  box-shadow: 0 0 0 140px rgba(246,203,77,.028), 0 0 0 290px rgba(246,203,77,.02);
+  pointer-events: none;
+}
+.figma-brochure-hero-inner {
+  max-width: 1490px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(310px, .85fr);
+  align-items: center;
+  gap: clamp(30px, 5vw, 100px);
+}
+.figma-brochure-copy { min-width: 0; }
+.figma-brochure-tags { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; margin-bottom: 42px; }
+.figma-brochure-status,
+.figma-brochure-level {
+  display: inline-flex;
+  align-items: center;
+  min-height: 35px;
+  padding: 8px 13px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+.figma-brochure-status { color: #103b2d; background: #facb4d; }
+.figma-brochure-status.is-enquiry { background: #e9d6b3; }
+.figma-brochure-level { color: #d1ded7; border: 1px solid rgba(255,255,255,.22); }
+.figma-brochure-course {
+  margin: 0 0 22px;
+  color: #facb4d;
+  font-size: 13px;
+  letter-spacing: .17em;
+  font-weight: 900;
+}
+.figma-brochure-copy h1 {
+  margin: 0;
+  max-width: 830px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(46px, 5.35vw, 96px);
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -.065em;
+  color: #fff;
+}
+.figma-brochure-intro {
+  max-width: 710px;
+  margin: 34px 0 0;
+  color: #b8d0c4;
+  font-size: clamp(15px, 1.25vw, 19px);
+  line-height: 1.75;
+}
+.figma-brochure-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 37px; }
+.figma-brochure-primary,
+.figma-brochure-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 99px;
+  text-decoration: none;
+  font-weight: 850;
+  font-size: 14px;
+}
+.figma-brochure-primary { background: #facb4d; color: #17392c; }
+.figma-brochure-primary:hover { background: #f5b92d; color: #17392c; }
+.figma-brochure-secondary { background: #fff; color: #16372b; }
+.figma-brochure-secondary:hover { color: #16372b; background: #e6e9e0; }
+.figma-brochure-summary {
+  min-width: 0;
+  background: #f9f7f2;
+  color: #17352b;
+  border-radius: 30px;
+  padding: clamp(22px, 3vw, 40px);
+  box-shadow: 0 20px 70px rgba(3,31,22,.14);
+}
+.figma-brochure-price-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 27px;
+  border-bottom: 1px solid #dcded4;
+}
+.figma-brochure-overline {
+  display: block;
+  color: #83887e;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .15em;
+  margin-bottom: 10px;
+}
+.figma-brochure-price {
+  display: block;
+  font-size: clamp(31px, 2.8vw, 44px);
+  font-weight: 800;
+  letter-spacing: -.045em;
+  line-height: 1.1;
+}
+.figma-brochure-mode {
+  flex: 0 0 auto;
+  display: inline-flex;
+  padding: 10px 13px;
+  color: #215947;
+  background: #dbece4;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 850;
+}
+.figma-brochure-facts { display: grid; gap: 24px; padding-top: 27px; }
+.figma-brochure-fact { display: flex; align-items: flex-start; gap: 15px; }
+.figma-brochure-fact-icon { display: inline-grid; place-items: center; width: 24px; color: #c26d33; font-size: 20px; flex: 0 0 24px; }
+.figma-brochure-fact > div { display: grid; gap: 6px; min-width: 0; }
+.figma-brochure-fact strong { font-size: 15px; line-height: 1.45; overflow-wrap: anywhere; }
+.figma-brochure-fact small { color: #777e75; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+.figma-brochure-fee-note { margin: 25px 0 0; color: #777e75; font-size: 11px; line-height: 1.65; }
+body.figma-brochure-detail .page > .card,
+body.figma-brochure-detail .page > section.card {
+  background: #fff;
+  border: 1px solid #e6e5db;
+  border-radius: 21px;
+  box-shadow: 0 6px 25px rgba(22,47,35,.035);
+  margin-top: 17px;
+}
+body.figma-brochure-detail .class-decision-summary,
+body.figma-brochure-detail .course-benefits-card,
+body.figma-brochure-detail #meeting-times-section,
+body.figma-brochure-detail #courseDetailsDisclosure,
+body.figma-brochure-detail #payment-agreement-section,
+body.figma-brochure-detail #studentReviewsCard,
+body.figma-brochure-detail #faq-section,
+body.figma-brochure-detail #academyTrackRecordCard {
+  scroll-margin-top: 95px;
+}
+body.figma-brochure-detail #classDecisionSummary {
+  border-color: #dedfd6;
+  background: #fbfaf7;
+}
+body.figma-brochure-detail .decision-summary-actions #mainSignupCta {
+  background: #184534;
+  color: #fff;
+  border-color: #184534;
+}
+body.figma-brochure-detail #studentReviewsCard .student-review,
+body.figma-brochure-detail .faq-item { background: #f8f9f5; }
+body.figma-brochure-detail a:focus-visible,
+body.figma-brochure-detail button:focus-visible {
+  outline: 3px solid #facb4d;
+  outline-offset: 3px;
+}
+@media (max-width: 1040px) {
+  .figma-brochure-nav-inner { gap: 15px; }
+  .figma-brochure-links { gap: 14px; }
+  .figma-brochure-hero-inner { grid-template-columns: minmax(0, 1.13fr) minmax(290px, .87fr); gap: 28px; }
+  .figma-brochure-copy h1 { font-size: clamp(42px, 5.5vw, 65px); }
+}
+@media (max-width: 790px) {
+  .figma-brochure-nav-inner { flex-wrap: wrap; min-height: 0; }
+  .figma-brochure-links {
+    order: 3;
+    flex: 1 1 100%;
+    min-width: 0;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    padding: 6px 0 2px;
+    gap: 21px;
+  }
+  .figma-brochure-links a { flex: 0 0 auto; padding: 7px 0; }
+  .figma-brochure-nav-register { margin-left: auto; min-height: 43px; padding: 9px 13px; }
+  .figma-brochure-hero { padding: 46px 22px; }
+  .figma-brochure-hero-inner { grid-template-columns: minmax(0, 1fr); }
+  .figma-brochure-tags { margin-bottom: 26px; }
+  .figma-brochure-copy h1 { font-size: clamp(43px, 7.5vw, 70px); max-width: 680px; }
+  .figma-brochure-summary { max-width: 680px; width: 100%; }
+}
+@media (max-width: 450px) {
+  .figma-brochure-logo-symbol { width: 37px; height: 37px; }
+  .figma-brochure-logo-copy strong { font-size: 14px; }
+  .figma-brochure-logo-copy small { font-size: 8px; letter-spacing: .12em; }
+  .figma-brochure-copy h1 { font-size: clamp(38px, 10.5vw, 53px); }
+  .figma-brochure-tags { gap: 6px; }
+  .figma-brochure-status,.figma-brochure-level { min-height: 31px; font-size: 9px; padding: 7px 10px; }
+  .figma-brochure-summary { padding: 22px; border-radius: 22px; }
+  .figma-brochure-primary,.figma-brochure-secondary { flex: 1 1 138px; }
+}
+@media print {
+  body.figma-brochure-detail .figma-brochure-nav { display: none !important; }
+  .figma-brochure-hero { background: #143b30 !important; print-color-adjust: exact; }
+  .figma-brochure-hero-inner { display: block; }
+  .figma-brochure-copy h1 { font-size: 43px; }
+  .figma-brochure-summary { margin-top: 25px; }
+}
