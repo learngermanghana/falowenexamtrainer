@@ -263,5 +263,12 @@ describe("public class brochure experience", () => {
     expect(styles).toContain('/classes/llea-classroom.jpg');
     expect(styles).toContain('@media (max-width: 700px)');
     expect(styles).toContain('.figma-class-landing');
+    const leadCapture = publicClassFile("class-leads.js");
+    const heroRedirect = publicClassFile("class-hero-banner.js");
+    const funnel = publicClassFile("funnel-journey.js");
+    expect(leadCapture).toContain('if (!isValid && document.body.classList.contains("figma-classes-landing"))');
+    expect(leadCapture).toContain('Please agree to be contacted before requesting a follow-up.');
+    expect(heroRedirect).toContain('if (document.body.classList.contains("figma-classes-landing")) return;');
+    expect(funnel).toContain("single opt-in submission path");
   });
 });
