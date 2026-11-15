@@ -21,12 +21,13 @@ const TAB_DESCRIPTIONS = {
   schreiben: "Kuandika", lesen: "Kusoma", hoeren: "Kusikiliza", submit: "Wasilisha",
 };
 const INITIAL_WRITING = { likes: "", dislikes: "", order: "" };
-export function getMissingSwahiliDaySixWork({ writing, readingAnswers }) {
+export function getMissingSwahiliDaySixWork({ writing, readingAnswers, listeningAnswers }) {
   const missing = [];
   if (!String(writing?.likes || "").trim()) missing.push("Teil 2 · Ninapenda");
   if (!String(writing?.dislikes || "").trim()) missing.push("Teil 2 · Sipendi");
   if (!String(writing?.order || "").trim()) missing.push("Teil 2 · Agizo");
   if (!SWAHILI_DAY_SIX.reading.every(({ id }) => readingAnswers?.[id])) missing.push("Teil 3 · Kusoma");
+  if (!SWAHILI_DAY_SIX.listening.every(({ id }) => listeningAnswers?.[id])) missing.push("Teil 4 · Kusikiliza");
   return missing;
 }
 
@@ -66,6 +67,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
   const [writing, setWriting] = useState(INITIAL_WRITING);
   const [readingAnswers, setReadingAnswers] = useState({});
   const [listeningAnswers, setListeningAnswers] = useState({});
+  const [listeningAudio, setListeningAudio] = useState({ url: "", loading: false, error: "" });
   const [submitting, setSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState(null);
   const [previouslySubmitted, setPreviouslySubmitted] = useState(false);
@@ -110,7 +112,27 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
     setWriting(old => ({ ...old, [key]: value }));
     setSubmissionResult(null);
   };
-  const missing = getMissingSwahiliDaySixWork({ writing, readingAnswers });
+  const missing = getMissingSwahiliDaySixWork({ writing, readingAnswers, listeningAnswers });
+
+  async function loadListeningAudio() {
+    if (listeningAudio.loading) return;
+    if (!user?.getIdToken) {
+      setListeningAudio({ url: "", loading: false, error: "Ingia kwenye akaunti yako ili kusikiliza sauti. Sign in to play the recording." });
+      return;
+    }
+    setListeningAudio(current => ({ ...current, loading: true, error: "" }));
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch("/api/course-media/swahili/a1/day-6/audio-url", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const result = await response.json();
+      if (!response.ok || !result?.url) throw new Error(result?.error || "Could not load the listening recording.");
+      setListeningAudio({ url: result.url, loading: false, error: "" });
+    } catch (error) {
+      setListeningAudio({ url: "", loading: false, error: error.message || "Could not load the listening recording." });
+    }
+  }
 
   async function submitWork() {
     if (!canSubmit || !db || submitting || missing.length) return;
@@ -129,7 +151,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         writing: { ...writing },
         readingAnswers: { ...readingAnswers },
         listeningAnswers: { ...listeningAnswers },
-        listeningTeacherLed: true,
+        listeningTeacherLed: false,
         studentName: studentProfile?.name || studentProfile?.displayName || user.displayName || "",
         studentEmail: user.email || "",
         submittedAt: serverTimestamp(),
@@ -185,20 +207,27 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         namePrefix="swahili-six-reading" onChange={(id,v) => setAnswer(setReadingAnswers,id,v)} />
     </section>;
     if (activeTab === "hoeren") return <section className="swahili-book__card swahili-book__activity" aria-label="Teil 4">
-      <div className="mgahawani-workbook__section-header"><span>04 · LISTEN</span><h2>Teil 4 · Kusikiliza (Listening)</h2><p>Teacher-led listening while recorded audio is pending.</p></div>
-      <p className="swahili-book__note">No approved recording yet. The teacher reads the original restaurant dialogue; hide the text while listening. This is optional classroom practice until audio is uploaded.</p>
+      <div className="mgahawani-workbook__section-header"><span>04 · LISTEN</span><h2>Teil 4 · Kusikiliza (Listening)</h2><p>Listen to the restaurant conversation and answer all five questions.</p></div>
+      <p className="swahili-book__note">Sikiliza sauti mara mbili, kisha ujibu maswali. Listen twice before selecting your answers.</p>
+      <div className="swahili-book__tile">
+        <strong>{lesson.listeningAudio.title}</strong>
+        <p><button type="button" className="swahili-book__button swahili-book__button--soft" onClick={loadListeningAudio} disabled={listeningAudio.loading}>
+          {listeningAudio.loading ? "Inapakia sauti..." : listeningAudio.url ? "Pakia sauti tena · Refresh audio" : "▶ Sikiliza sauti · Load audio"}
+        </button></p>
+        {listeningAudio.url && <audio aria-label="Mgahawani Day 6 listening recording" controls preload="none" src={listeningAudio.url} style={{ width: "100%", maxWidth: 640 }} />}
+        {listeningAudio.error && <p className="swahili-book__error" role="alert">{listeningAudio.error}</p>}
+      </div>
       <QuestionSet items={lesson.listening} answers={listeningAnswers}
         namePrefix="swahili-six-listening" onChange={(id,v) => setAnswer(setListeningAnswers,id,v)} />
-      <details><summary>Kwa mwalimu · Read the original dialogue aloud</summary><Dialogue lines={lesson.restaurantDialogue} label="Teacher listening script" /></details>
     </section>;
     return <section className="swahili-book__card swahili-book__activity" aria-label="Review & Submit">
-      <div className="mgahawani-workbook__section-header"><span>05 · REVIEW YOUR WORK</span><h2>Review &amp; Submit · Somo la 6</h2><p>Check your writing and reading answers before submission.</p></div>
-      <p>Teil 1 is spoken classroom practice; Teil 4 is optional until an audio recording is supplied. Only writing and reading are required for this submission.</p>
+      <div className="mgahawani-workbook__section-header"><span>05 · REVIEW YOUR WORK</span><h2>Review &amp; Submit · Somo la 6</h2><p>Check your writing, reading and listening answers before submission.</p></div>
+      <p>Teil 1 is spoken classroom practice. Complete Parts 2, 3 and the new recorded listening exercise in Teil 4 before submission.</p>
       <SwahiliReviewDraft writing={{ Ninapenda: writing.likes, Sipendi: writing.dislikes, Agizo: writing.order }} questions={lesson.reading} reading={readingAnswers}
-        listening={listeningAnswers} draft={canSubmit ? draft : null} />
+        listening={listeningAnswers} listeningQuestions={lesson.listening} draft={canSubmit ? draft : null} />
       {missing.length > 0 && <p className="swahili-book__note" role="status">Kamilisha kwanza: {missing.join(" · ")}</p>}
       {!canSubmit ? <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ya Kiswahili kupitia Campus ili kuwasilisha. This preview cannot submit work. <Link to="/login">Ingia</Link></p> :
-        <><SwahiliFinalSubmit disabled={!!missing.length || submitting || !db || submissionResult?.type === "success"} onSubmit={submitWork}>
+        <><SwahiliFinalSubmit requireListening disabled={!!missing.length || submitting || !db || submissionResult?.type === "success"} onSubmit={submitWork}>
           {submitting ? "Inahifadhi..." : previouslySubmitted ? "Wasilisha tena" : "Wasilisha kazi"}
         </SwahiliFinalSubmit>
         {submissionResult?.type === "success" && <p className="swahili-book__feedback" role="status">Kazi ya Somo la 6 imehifadhiwa kwenye akaunti yako. Imetumwa kwa mwalimu kwa ukaguzi.</p>}
