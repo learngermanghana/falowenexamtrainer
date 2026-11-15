@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { loadPublicClasses } from '../services/publicClassCatalogService';
 import { QUICK_QUESTIONS, questionTopic, visitorAnswer, visitorWhatsAppLink } from '../data/visitorQuestions';
 import './VisitorQuestionHelper.css';
+import MovableQuestionButton from './MovableQuestionButton';
+import VisitorContactPrompt from './VisitorContactPrompt';
+import { sendVisitorEvent } from '../services/visitorEnquiries';
 
 export default function VisitorQuestionHelper() {
   const [open, setOpen] = useState(false);
@@ -9,18 +12,26 @@ export default function VisitorQuestionHelper() {
   const [messages, setMessages] = useState([]);
   const [busy, setBusy] = useState(false);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [contactDone,setContactDone] = useState(false);
+  const surface = /^(music|exams)\.falowen\.app$/.test(window.location.hostname)
+    ? window.location.hostname.split('.')[0] : window.location.pathname.startsWith('/music') ? 'music'
+    : window.location.pathname === '/' ? 'landing' : 'public';
+  function count(event) {
+    void sendVisitorEvent(event,surface).catch(()=>{});
+  }
   const input = useRef(null);
   const trigger = useRef(null);
   const log = useRef(null);
   const catalog = useRef(null);
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
-  useEffect(() => { if (open) input.current?.focus(); }, [open]);
+  useEffect(() => { if (open && contactDone) input.current?.focus(); }, [open, contactDone]);
   useEffect(() => { if (log.current) log.current.scrollTop = log.current.scrollHeight; }, [messages, busy, open]);
   function close() { setOpen(false); setSuggestionsOpen(false); trigger.current?.focus(); }
   async function ask(value) {
     const text = String(value).trim().slice(0,500);
     if (!text || busy) return;
+    count('question_asked');
     setQuestion(''); setSuggestionsOpen(false); setBusy(true);
     setMessages(previous => [...previous.slice(-18), {question:text}]);
     let classes = [];
@@ -41,6 +52,9 @@ export default function VisitorQuestionHelper() {
   return <aside className="visitor-helper" aria-label="Falowen questions">
     {open && <section id="visitor-question-panel" className="visitor-helper-panel" role="dialog" aria-modal="false" aria-labelledby="visitor-helper-title" onKeyDown={event => {if(event.key === 'Escape') close();}}>
       <header><div><strong id="visitor-helper-title">Ask Falowen</strong><p>Quick answers for new learners</p></div><button type="button" onClick={close} aria-label="Close questions">×</button></header>
+      {!contactDone ? <VisitorContactPrompt surface={surface} onContinue={()=>{
+        setContactDone(true);
+      }}/> : <>
       <div className="visitor-helper-log" ref={log} role="log" aria-live="polite" aria-relevant="additions">
         <p className="visitor-helper-answer">Hi! Ask about classes, fees, registration or learning options. I use saved answers; our team can help on WhatsApp if you need more.</p>
         {messages.map((message,index) => message.question ? <p key={index} className="visitor-helper-question">{message.question}</p> : <div key={index} className="visitor-helper-answer"><p>{message.answer.text}</p>
@@ -53,8 +67,11 @@ export default function VisitorQuestionHelper() {
       <div className="visitor-helper-suggestion-toggle"><button type="button" aria-controls="visitor-helper-suggestions" aria-expanded={suggestionsOpen} onClick={() => setSuggestionsOpen(value => !value)}>{suggestionsOpen ? 'Hide common questions' : 'Common questions'}</button></div>
       {suggestionsOpen && <div id="visitor-helper-suggestions" className="visitor-helper-suggestions" aria-label="Common questions">{QUICK_QUESTIONS.map(text=><button key={text} type="button" disabled={busy} onClick={()=>ask(text)}>{text}</button>)}</div>}
       <form onSubmit={event=>{event.preventDefault();ask(question);}}><label className="visitor-helper-input-label" htmlFor="visitor-question">Your question</label><div><input ref={input} id="visitor-question" value={question} onChange={event=>setQuestion(event.target.value)} onFocus={()=>setSuggestionsOpen(false)} maxLength={500} placeholder="Ask about classes or fees…" autoComplete="off"/><button type="submit" disabled={busy || !question.trim()}>Ask</button></div></form>
-      <footer><a href="/help#admissions-faq">Read all FAQs →</a><br /><a href={visitorWhatsAppLink(question)} target="_blank" rel="noopener noreferrer">Prefer a person? WhatsApp us ↗</a><small>Keep personal and payment details out of chat.</small></footer>
+      <footer><a href="/help#admissions-faq">Read all FAQs →</a><br /><a href={visitorWhatsAppLink(question)} target="_blank" rel="noopener noreferrer">Prefer a person? WhatsApp us ↗</a><small>Keep personal and payment details out of chat.</small></footer></>}
     </section>}
-    <button ref={trigger} className="visitor-helper-trigger" type="button" aria-expanded={open} aria-controls="visitor-question-panel" onClick={()=>open ? close() : setOpen(true)}>💬 {open ? 'Close' : 'Questions? Ask us'}</button>
+    <MovableQuestionButton buttonRef={trigger} open={open} onToggle={()=>{
+      if (open) close();
+      else { count('helper_opened'); setOpen(true); }
+    }}/>
   </aside>;
 }
