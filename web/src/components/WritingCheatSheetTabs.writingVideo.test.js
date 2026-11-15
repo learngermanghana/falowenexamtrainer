@@ -8,9 +8,6 @@ const WritingEditor = () => <div data-testid="writing-editor">Writing editor</di
 describe("WritingCheatSheetTabs writing videos", () => {
   test.each([
     ["B1", 1, "B1 Day 1 · Traumwelt · Writing explanation", "https://www.youtube.com/embed/nG1PUrvrS_s"],
-    ["B2", 1, "B2 Day 1 · Persönliche Identität · Writing explanation", "https://www.youtube.com/embed/w8TaNHk-a0U"],
-    ["B2", 2, "B2 Day 2 · Beziehungen und Kommunikation · Schreiben explanation", "https://www.youtube.com/embed/eozUFkeHBYc"],
-    ["B2", 6, "B2 Day 6 · Migration und Integration · Schreiben explanation", "https://www.youtube.com/embed/19WaMcKL8v4"],
     ["C1", 8, "C1 Day 8 · Wohnen und Stadtentwicklung · Writing explanation", "https://www.youtube.com/embed/VdczhJS9ClY"],
     ["C1", 9, "C1 Day 9 · Chapter 2.4 · Writing explanation", "https://www.youtube.com/embed/tpj8TV8DaH8"],
     ["C1", 11, "C1 Day 11 · Engagement und Ehrenamt · Schreiben explanation", "https://www.youtube.com/embed/Ww6gq3lmmpk"],
@@ -34,6 +31,16 @@ describe("WritingCheatSheetTabs writing videos", () => {
     expect(directChildren[0]).toHaveAttribute("data-testid", "writing-question");
     expect(directChildren[1]).toHaveAttribute("data-writing-video-support", "true");
     expect(directChildren[2]).toHaveAttribute("data-testid", "writing-editor");
+  });
+
+  test.each([1, 2, 6, 8])("does not invent unpublished B2 Day %i writing videos", (day) => {
+    render(
+      <WritingCheatSheetTabs level="B2" day={day}>
+        <WritingQuestion />
+        <WritingEditor />
+      </WritingCheatSheetTabs>,
+    );
+    expect(screen.queryByLabelText("Writing video and essay ideas")).not.toBeInTheDocument();
   });
 
   test("does not show a writing video for an unmapped assignment", () => {
