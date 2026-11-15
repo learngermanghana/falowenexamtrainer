@@ -27,7 +27,8 @@ describe("Falowen public marketing redesign", () => {
     const visitor = read("./PublicAdmissionsVisitorGuidePage.js");
     expect(landing).toContain("<FalowenHomepageCarousel");
     const carousel = read("./FalowenHomepageCarousel.js");
-    for (const href of ["/classes", "/placement-test", "/exam-practice", "/books"]) expect(carousel).toContain(`href:"${href}"`);
+    for (const href of ["/signup", "/placement-test", "/exam-practice", "/books", "/learn-german-with-chatgpt"]) expect(carousel).toContain(`href:"${href}"`);
+    expect(carousel).toContain('support:"View German classes"');
     expect(visitor).toContain("PUBLIC_MARKETING_FEATURES.map");
     expect(visitor).not.toContain("How your course works");
     expect(visitor).not.toContain("Why students study with us");
@@ -57,7 +58,7 @@ describe("Falowen public marketing redesign", () => {
     expect(landing).toContain("academyProfile.classroomImage");
     expect(landing).toContain("FOOTER_LINKS");
     expect(landing).toContain("falowen-home-nav-links");
-    expect(read("./FalowenHomepageCarousel.js")).toContain("View upcoming classes");
+    expect(read("./FalowenHomepageCarousel.js")).toContain("View German classes");
     expect(visitor).toContain("visitor-guide-marketing-schedule");
     expect(styles).toContain("@media (max-width: 600px)");
     expect(styles).toContain(".falowen-home-feature-actions");
