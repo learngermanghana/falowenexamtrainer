@@ -152,8 +152,8 @@
     var title = document.querySelector(".hero h1");
     var text = document.querySelector(".hero p");
     setText(eyebrow, "FALOWEN GERMAN CLASSES");
-    setText(title, "Choose your German class");
-    setText(text, "Choose a class and read its brochure before you register or contact us.");
+    setText(title, "Choose your class");
+    setText(text, "Select a class to open its brochure without signing in. Request a follow-up only if you need one.");
     // No repeated four-step instructions: the brochure-first layout explains the flow.
 
     var cardTitle = document.querySelector("#leadCaptureCard h2");
