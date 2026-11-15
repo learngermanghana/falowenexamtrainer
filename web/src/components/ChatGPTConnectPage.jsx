@@ -23,7 +23,8 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
   }, []);
   const name = String(studentProfile?.name || studentProfile?.fullName || user?.displayName || user?.email || "Student");
   const hasRequest = AUTH_FIELDS.every((field) => Boolean(params[field]));
-  const wantsPracticeWrite = params.scope.split(/\s+/).includes("falowen:practice:write");
+  const wantsPracticeWrite = params.scope.split(/\\s+/).includes("falowen:practice:write");
+  const wantsAssignmentWrite = params.scope.split(/\\s+/).includes("falowen:assignments:write");
 
   const authorize = async () => {
     setLoading(true);
@@ -71,8 +72,9 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
           ChatGPT can guide you through reading, listening, speaking, writing and grammar practice one question
           at a time using available course material. English explanations are optional. Practice answers
           and feedback in ChatGPT are not saved as official Falowen marks or completion records.
-          ChatGPT cannot submit assignments, change grades, access payment records, or start timed exams.
-          Official work stays on Falowen Campus.
+          Without a separate assignment-write permission, ChatGPT cannot submit assignments. It cannot
+          change grades, access payment records, or start timed exams. Official Exams Room attempts and
+          all A2/B1 tutor submissions stay in Falowen Campus.
         </p>
         {wantsPracticeWrite && (
           <div style={{ padding: "12px 18px", background: "#fff5e8", border: "1px solid #f3d7a8", borderRadius: 12, marginTop: 16 }}>
@@ -83,6 +85,20 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
               grades and submissions, and have a 90-day expiry marker. You can request deletion through Falowen Help. You can decline by
               cancelling and reconnecting with read-only access. This permission does not allow
               ChatGPT to submit or mark exams, change tutor scores or access other students.
+            </p>
+          </div>
+        )}
+        {wantsAssignmentWrite && (
+          <div style={{ padding: "12px 18px", background: "#fff5e8", border: "1px solid #c98930", borderRadius: 12, marginTop: 16 }}>
+            <strong>Additional permission requested: Submit my A1 tutor assignments</strong>
+            <p style={{ marginBottom: 0, lineHeight: 1.6 }}>
+              If you grant the separate <code>falowen:assignments:write</code> permission, ChatGPT may
+              submit a full A1 assignment under your own account only after showing you the final answer
+              and obtaining your explicit confirmation. Your first confirmed submission is locked, just
+              as it is in Falowen Campus. The tutor-marking process remains authoritative; ChatGPT does
+              not assign grades. Timed mocks, official Exams Room attempts and resubmissions are excluded.
+              This pilot requires separate Falowen activation, and you can decline by reconnecting with
+              read-only access.
             </p>
           </div>
         )}
@@ -98,7 +114,7 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
           <p role="alert" style={{ color: "#b21d2d" }}>The ChatGPT connection request is incomplete. Start again from ChatGPT.</p>
         ) : (
           <button style={{ ...styles.button, opacity: loading ? .65 : 1 }} type="button" onClick={authorize} disabled={loading || !user}>
-            {loading ? "Connecting…" : wantsPracticeWrite ? "Allow reading and optional practice-note saving" : "Allow read-only access"}
+            {loading ? "Connecting…" : wantsAssignmentWrite ? "Allow reading and confirmed A1 assignment submission" : wantsPracticeWrite ? "Allow reading and optional practice-note saving" : "Allow read-only access"}
           </button>
         )}
         <p style={{ textAlign: "center", marginTop: 20 }}>
