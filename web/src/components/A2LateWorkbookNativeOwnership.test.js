@@ -15,12 +15,14 @@ const cleanedLateWorkbooks = [
 
 describe("A2 Days 22-28 native workbook ownership", () => {
   test("late A2 submission rules follow the canonical lesson profile", () => {
+    // Days 22–23 have no listening submission according to the canonical
+    // A2 listening-task catalogue (Day 22 is the speaking-mock day).
     for (const day of [22, 23]) {
       const profile = getA2B1WorkbookSectionProfile("A2", day);
       expect(profile).toMatchObject({
-        listening: true,
-        part4: "listening",
-        part4Submission: "self-check",
+        listening: false,
+        part4: null,
+        part4Submission: "none",
       });
     }
 
