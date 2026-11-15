@@ -103,7 +103,7 @@
     const params = new URLSearchParams();
     if (classSlug) params.set("class", classSlug);
     params.set("source", "class-brochure");
-    return `/visitor-guide?${params.toString()}`;
+    return `/about-us?${params.toString()}`;
   }
 
   function formatDecisionDate(value) {
