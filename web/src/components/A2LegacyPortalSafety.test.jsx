@@ -1,6 +1,7 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
 import A2LegacyStandardWorkbookNavigation from "./A2LegacyStandardWorkbookNavigation";
 import { insertA2LegacyPortalMountBefore } from "./A2LegacyStandardWorkbookNavigationImpl";
 import A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage from "./A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage";
@@ -25,6 +26,8 @@ jest.mock("./SharedTimedAssignment", () => ({
 jest.mock("./AssignmentSubmissionPage", () => () => <div>Submission</div>);
 jest.mock("./ContextualAssignmentSubmissionPage", () => () => <div>Submission</div>);
 jest.mock("./WorkbookReferenceAnswers", () => () => <div>References</div>);
+// Music fetches are unrelated to verifying native workbook tab ownership.
+jest.mock("./WorkbookDayMusic", () => () => <div>Music preview</div>);
 jest.mock("./A2B1WorkbookGrammarNotes", () => ({
   A2B1GrammarNotesTab: () => <div>Grammar notes</div>,
 }));
@@ -93,13 +96,19 @@ describe("A2 legacy portal safety", () => {
       expect(document.querySelector("[data-a2-standard-legacy-nav-root]")).toBeNull();
       expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
 
-      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }))).not.toThrow();
-      expect(screen.getByRole("heading", { name: /Teil 2 · Schreiben/i })).toBeVisible();
+      const profile = getA2B1WorkbookSectionProfile("A2", day);
+      const schreibenTab = screen.queryByRole("tab", { name: /^Teil 2 · Schreiben/i });
+      expect(Boolean(schreibenTab)).toBe(profile.writing);
+      if (schreibenTab) {
+        fireEvent.click(schreibenTab);
+        expect(screen.getByRole("heading", { name: /Teil 2 · Schreiben/i })).toBeVisible();
+      }
 
-      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 3" }))).not.toThrow();
+      fireEvent.click(screen.getByRole("tab", { name: /^Teil 3 · Lesen/i }));
       expect(screen.getByRole("heading", { name: /Teil 3 · Lesen/i })).toBeVisible();
+      expect(Boolean(screen.queryByRole("tab", { name: /^Teil 4 · Hören/i }))).toBe(profile.listening);
 
-      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Submit" }))).not.toThrow();
+      fireEvent.click(screen.getByRole("tab", { name: /^Submit/i }));
       expect(screen.getByText("Submission")).toBeVisible();
     },
   );
