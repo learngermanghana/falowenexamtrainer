@@ -219,9 +219,11 @@ async function studentForIdentity(admin, identity, boundId) {
 
 function studentView(student) {
   const data = student.data;
+  const german = germanEnrollment(student);
   return {
     name: normalize(data.name || data.fullName || data.displayName) || "Student",
-    level: normalizeLevel(data.level || data.course),
+    // German exercises must never be derived from a Swahili A1 root level.
+    level: german.enrolledInGerman ? german.germanLevel : "",
     campusUrl: SITE + "/campus",
   };
 }
@@ -516,6 +518,12 @@ function featuredLegacyCourseBookSection(level, day) {
 
 async function callTool(name, args, student, admin) {
   const view = studentView(student);
+  const enrollment = germanEnrollment(student);
+  if (!enrollment.enrolledInGerman && name !== "get_my_falowen_profile") {
+    return { available: false, program: enrollment.primaryProgram,
+      campusUrl: SITE + "/campus/course",
+      clarification: "This account is currently enrolled in Kiswahili rather than German. The Falowen German Course Book, tutor assignments, mock exams and scores are unavailable in ChatGPT until German enrollment is activated." };
+  }
 
   // Kiswahili lessons use a separate teacher-approved source and must not
   // silently fall through to a German A1/A2 course snapshot.
@@ -614,7 +622,8 @@ async function callTool(name, args, student, admin) {
     return {
       id: "flw_" + sha256(student.id).slice(0, 32),
       name: view.name,
-      nickname: view.level ? "Falowen " + view.level + " student" : "Falowen student",
+      nickname: view.level ? "Falowen German " + view.level + " student"
+        : enrollment.primaryProgram === "swahili" ? "Falowen Swahili student" : "Falowen student",
       program: enrollment.primaryProgram,
       germanLevel: enrollment.enrolledInGerman ? enrollment.germanLevel : "",
     };
