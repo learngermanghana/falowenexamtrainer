@@ -5,7 +5,7 @@
 const crypto = require('node:crypto');
 const approvedRecordingLyrics = require('../web/public/music/approved-recording-lyrics.json');
 const { getR2AudioConfig } = require('../functions/functionz/r2CourseAudio');
-const day4NumberTiming = require('../web/public/music/a1-day-04-number-timing.json');
+const catalog = require('../web/public/music/catalog.json');
 const LEVELS = new Set(['A1','A2','B1','B2','C1','C2']);
 // Keep superseded MP3s out of discovery so the lesson uses the current recording.
 const RETIRED_MUSIC_KEYS = new Set([
@@ -44,12 +44,13 @@ function musicTrackFromKey(key) {
   const id = 'r2-' + match[1].toLowerCase() + '-day-' + match[2] + '-' + suffix;
   const name=match[3].replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
   const approved = approvedRecordingLyrics.recordings.find(recording => recording.objectKey === key);
+  const pinned = catalog.tracks.find(track => track.approved === true && track.objectKey === key);
   return {
     id, title:approved?.title || name.charAt(0).toUpperCase()+name.slice(1), level, day:Number(match[2]),
     topic:'Day '+Number(match[2])+' · German music',
     type:'Learning story', genre:approved?.genre || '', language:'German',
     audioUrl:'https://www.falowen.app/api/music?track='+id,
-    assignmentKey:approved?.assignmentKey || (key === day4NumberTiming.objectKey ? day4NumberTiming.assignmentKey : ''), coursebook:true, autoDiscovered:true,
+    assignmentKey:approved?.assignmentKey || pinned?.assignmentKey || '', coursebook:true, autoDiscovered:true,
     objectKey:key,
   };
 }
