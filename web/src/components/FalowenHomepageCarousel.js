@@ -5,7 +5,7 @@ import { loadPublicClasses } from "../services/publicClassCatalogService";
 const WORDING = {
   en: [
     { kicker:"LANGUAGE LEARNING ONLINE",title:"Learn German and Swahili",accent:"with Falowen.",desc:"Join a German class or start Swahili with the online A1 Course Book. Choose your language when you sign up.",action:"Sign up",support:"View German classes",href:"/signup",kind:"courses" },
-    { kicker:"LEARN GERMAN WITH MUSIC",title:"Make German practice",accent:"sound better.",desc:"Listen to original German-learning songs for A1, A2 and B1. Follow the lyrics, practise pronunciation and learn vocabulary through music.",action:"Explore German songs",href:"https://music.falowen.app/",kind:"music" },
+    { kicker:"FALOWEN MUSIC",title:"Learn with",accent:"music.",desc:"Listen to songs in German and Swahili. Follow the lyrics and practise pronunciation as you listen.",action:"German songs",support:"Swahili songs",supportHref:"https://music.falowen.app/?language=swahili",href:"https://music.falowen.app/",kind:"music",art:"German · Swahili" },
     { kicker:"FREE PLACEMENT TEST",title:"Find your",accent:"German level.",desc:"New to German, or unsure where to begin? Take a free A1–B1 placement test to discover your starting point.",action:"Take free placement test",href:"/placement-test",kind:"placement" },
     { kicker:"GOETHE-STYLE EXAM PRACTICE",title:"Prepare for",accent:"your German exam.",desc:"Practise sample tests and full mocks in Lesen, Hören, Schreiben and Sprechen, with AI-supported feedback.",action:"Explore exam practice",href:"/exam-practice",kind:"exams" },
     { kicker:"FALOWEN BOOKSTORE",title:"Learn more with",accent:"German books.",desc:"Explore Falowen German workbooks. Choose an available digital edition or order a printed book.",action:"Browse German books",href:"/books",kind:"books" },
@@ -13,7 +13,7 @@ const WORDING = {
   ],
   de: [
     { kicker:"SPRACHEN ONLINE LERNEN",title:"Lerne Deutsch und Kiswahili",accent:"mit Falowen.",desc:"Besuche einen Deutschkurs oder starte mit dem Online-Kursbuch Kiswahili A1. Wähle deine Sprache bei der Registrierung.",action:"Registrieren",support:"Deutschkurse ansehen",href:"/signup",kind:"courses" },
-    { kicker:"DEUTSCH LERNEN MIT MUSIK",title:"Deutsch üben",accent:"mit Musik.",desc:"Entdecke Lernlieder für A1, A2 und B1. Höre zu, lies den Liedtext mit und trainiere Aussprache und Wortschatz.",action:"Deutsche Lieder entdecken",href:"https://music.falowen.app/",kind:"music" },
+    { kicker:"FALOWEN MUSIK",title:"Lerne mit",accent:"Musik.",desc:"Höre Lieder auf Deutsch und Kiswahili. Lies die Liedtexte mit und übe die Aussprache.",action:"Deutsche Lieder",support:"Lieder auf Kiswahili",supportHref:"https://music.falowen.app/?language=swahili",href:"https://music.falowen.app/",kind:"music",art:"Deutsch · Kiswahili" },
     { kicker:"KOSTENLOSER EINSTUFUNGSTEST",title:"Finde dein",accent:"Deutschniveau.",desc:"Du weißt nicht, wo du anfangen sollst? Mit dem kostenlosen A1–B1-Test findest du deinen Einstieg.",action:"Einstufungstest starten",href:"/placement-test",kind:"placement" },
     { kicker:"GOETHE-ORIENTIERTE PRÜFUNGSÜBUNGEN",title:"Bereite dich auf",accent:"deine Prüfung vor.",desc:"Übe Lesen, Hören, Schreiben und Sprechen mit Beispieltests, Probeprüfungen und KI-Feedback.",action:"Prüfungsübungen ansehen",href:"/exam-practice",kind:"exams" },
     { kicker:"FALOWEN BÜCHER",title:"Deutsch lernen",accent:"mit Arbeitsbüchern.",desc:"Entdecke Falowen Arbeitsbücher als verfügbare digitale oder gedruckte Ausgabe.",action:"Bücher ansehen",href:"/books",kind:"books" },
@@ -21,7 +21,7 @@ const WORDING = {
   ],
   fr: [
     { kicker:"APPRENDRE LES LANGUES EN LIGNE",title:"Apprenez l’allemand et le swahili",accent:"avec Falowen.",desc:"Suivez un cours d’allemand ou commencez le swahili avec le cahier A1 en ligne. Choisissez votre langue à l’inscription.",action:"S’inscrire",support:"Voir les cours d’allemand",href:"/signup",kind:"courses" },
-    { kicker:"APPRENDRE L'ALLEMAND EN MUSIQUE",title:"Apprenez l'allemand",accent:"avec la musique.",desc:"Écoutez des chansons pédagogiques pour les niveaux A1, A2 et B1. Suivez les paroles et entraînez votre prononciation et votre vocabulaire.",action:"Découvrir les chansons",href:"https://music.falowen.app/",kind:"music" },
+    { kicker:"FALOWEN MUSIQUE",title:"Apprenez en",accent:"musique.",desc:"Écoutez des chansons en allemand et en swahili. Suivez les paroles et entraînez votre prononciation.",action:"Chansons en allemand",support:"Chansons en swahili",supportHref:"https://music.falowen.app/?language=swahili",href:"https://music.falowen.app/",kind:"music",art:"Allemand · Swahili" },
     { kicker:"TEST DE NIVEAU GRATUIT",title:"Découvrez votre",accent:"niveau d'allemand.",desc:"Vous hésitez sur votre niveau? Faites notre test gratuit A1–B1 et trouvez où commencer.",action:"Faire le test gratuit",href:"/placement-test",kind:"placement" },
     { kicker:"PRÉPARATION AUX EXAMENS TYPE GOETHE",title:"Préparez votre",accent:"examen d'allemand.",desc:"Entraînez-vous en lecture, écoute, expression écrite et orale avec des examens blancs et des retours IA.",action:"Explorer les examens",href:"/exam-practice",kind:"exams" },
     { kicker:"LIVRES FALOWEN",title:"Progressez avec",accent:"nos livres d'allemand.",desc:"Découvrez les cahiers Falowen disponibles en version numérique ou imprimée.",action:"Voir les livres",href:"/books",kind:"books" },
@@ -62,15 +62,14 @@ function UpcomingClassCard({ language }) {
   </div>;
 }
 
-function SlideIllustration({kind,language}) {
+function SlideIllustration({kind,language,art}) {
   if (kind === "courses") return <UpcomingClassCard language={language} />;
   if(kind==="music") return (
     <div className="falowen-slide-illustration falowen-slide-music" aria-hidden="true">
       <div className="falowen-slide-music-player">
         <div className="falowen-slide-music-top"><span className="falowen-slide-music-mark">♫</span> FALOWEN MUSIC</div>
         <div className="falowen-slide-music-art"><img src="/music/covers/photos/friendship.jpg" alt="" loading="lazy" decoding="async" /></div>
-        <strong>Deutsch mit Musik</strong>
-        <small>A1 · A2 · B1</small>
+        <strong>{art}</strong>
         <div className="falowen-slide-music-wave">
           {[12, 22, 35, 25, 43, 29, 18, 36, 45, 30, 16, 32, 40, 25, 14, 27, 36, 19].map((height, index) => <span key={index} style={{ height }} />)}
         </div>
@@ -169,11 +168,11 @@ export default function FalowenHomepageCarousel({ language="en", classroomImage,
                 event.preventDefault();
                 onSignUp();
               } : undefined}>{item.action} <span aria-hidden="true">→</span></a>
-              {item.support ? <a className="falowen-carousel-secondary" href="/classes">{item.support} →</a> : null}
+              {item.support ? <a className="falowen-carousel-secondary" href={item.supportHref || "/classes"}>{item.support} <span aria-hidden="true">→</span></a> : null}
             </div>
             {item.kind === "courses" && <div className="falowen-class-benefits">{(CLASS_COPY[language] || CLASS_COPY.en).benefits.map(text => <span key={text}>✓ {text}</span>)}</div>}
           </div>
-          <SlideIllustration kind={item.kind} language={language} />
+          <SlideIllustration kind={item.kind} language={language} art={item.art} />
         </div>
         <div className="falowen-carousel-controls">
           <button type="button" onClick={()=>go(active-1)} aria-label="Previous slide">‹</button>

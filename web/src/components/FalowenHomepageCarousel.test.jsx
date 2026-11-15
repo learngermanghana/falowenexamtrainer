@@ -25,21 +25,20 @@ it("keeps the class route available if the catalogue fails without inventing dat
   render(<Carousel />);
   expect(await screen.findByText("A clear foundation. A tutor to guide you.")).toBeInTheDocument();
   expect(screen.getByRole("link", {name:/View class details & register/})).toHaveAttribute("href", "/classes");
-  expect(screen.getByRole("link", {name:/Find my level/})).toHaveAttribute("href", "/placement-test");
+  expect(screen.getByRole("link", {name:/View German classes/})).toHaveAttribute("href", "/classes");
 });
 
 it.each([
-  ["en", "Explore German songs"],
-  ["de", "Deutsche Lieder entdecken"],
-  ["fr", "Découvrir les chansons"],
-])("features the music destination in the %s homepage carousel", (language, action) => {
+  ["en", "German songs", "Swahili songs"],
+  ["de", "Deutsche Lieder", "Lieder auf Kiswahili"],
+  ["fr", "Chansons en allemand", "Chansons en swahili"],
+])("features the music destination in the %s homepage carousel", (language, action, swahiliAction) => {
   loadPublicClasses.mockResolvedValue([]);
   render(<Carousel language={language} />);
   expect(screen.getAllByRole("button", { name:/^Show slide [0-9]+$/ })).toHaveLength(6);
   fireEvent.click(screen.getByRole("button", { name:"Show slide 2" }));
   expect(screen.getByRole("link", { name:new RegExp(action) })).toHaveAttribute("href", "https://music.falowen.app/");
-  expect(screen.getByText("Deutsch mit Musik")).toBeInTheDocument();
-  expect(screen.getByText("A1 · A2 · B1")).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: swahiliAction })).toHaveAttribute("href", "https://music.falowen.app/?language=swahili");
   fireEvent.click(screen.getByRole("button", { name:"Next slide" }));
   expect(screen.getByRole("link", { name:/test|Einstufungstest|test gratuit/i })).toBeInTheDocument();
 });
@@ -53,7 +52,7 @@ it("keeps all six slides in a consistent viewport, including the compact mobile 
   expect(screen.getByText("Class schedule")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Show slide 2" }));
   expect(carousel).toHaveClass("falowen-carousel-music");
-  expect(screen.getByRole("link", { name: /Explore German songs/ })).toHaveAttribute("href", "https://music.falowen.app/");
+  expect(screen.getByRole("link", { name: /German songs/ })).toHaveAttribute("href", "https://music.falowen.app/");
 
   const css = fs.readFileSync(path.join(__dirname, "FalowenHomepageCarousel.css"), "utf8");
   const uniform = css.slice(css.indexOf("/* Consistent carousel footprint:"));
