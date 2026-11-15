@@ -1,5 +1,6 @@
 const classroomBankAudioHandler = require('../server/courseMusic.cjs').createClassroomBankAudioHandler();
 const classroomAudioHandler = require('../server/courseMusic.cjs').createClassroomAudioHandler();
+const swahiliDaySixAudioHandler = require('../server/courseMusic.cjs').createSwahiliDaySixAudioHandler();
 const app = require("../functions/functionz/paymentAwareApp");
 const { publicClassesHandler } = require("../functions/functionz/routes/publicClasses");
 const { classParticipationMeHandler } = require("../functions/functionz/routes/classParticipation");
@@ -131,6 +132,10 @@ module.exports = (req, res) => {
 
   if (req.url === "/course-media/a2/classroom-audio-url" || req.url?.startsWith("/course-media/a2/classroom-audio-url?")) {
     return classroomBankAudioHandler(req, res);
+  }
+
+  if (req.url === "/course-media/swahili/a1/day-6/audio-url" || req.url?.startsWith("/course-media/swahili/a1/day-6/audio-url?")) {
+    return swahiliDaySixAudioHandler(req, res);
   }
 
   if (req.url === "/course-media/classroom/audio-url" || req.url?.startsWith("/course-media/classroom/audio-url?")) {
