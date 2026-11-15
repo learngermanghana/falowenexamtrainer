@@ -153,7 +153,7 @@ describe("Sheet result feedback presentation", () => {
   test("newest result is expanded by default while older result details are collapsible", () => {
     const source = fs.readFileSync(path.resolve(__dirname, "ResultHistory.js"), "utf8");
 
-    expect(source).toContain("const newestResultKey = normalized[0]?.key ||");
+    expect(source).toContain("const newestResultKey = normalized.find(item => item.key === focusedResultId)?.key || normalized[0]?.key ||");
     expect(source).toContain("setExpandedResultKeys(new Set([newestResultKey]))");
     expect(source).toContain("aria-expanded={isExpanded}");
     expect(source).toContain('t("resultHistory.showDetails")');
