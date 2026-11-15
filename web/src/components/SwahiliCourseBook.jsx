@@ -329,7 +329,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
     }
   };
 
-  if (!day) return <SwahiliCourseOverview basePath={basePath} preview={preview} uid={user?.uid} />;
+  if (!day) return <SwahiliCourseOverview basePath={basePath} preview={preview} uid={user?.uid} assignedLevel={studentProfile?.program === "swahili" ? studentProfile.level : undefined} />;
 
   if (teacherView) {
     return isTeacher

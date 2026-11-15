@@ -20,14 +20,17 @@ const FILTERS = [
   { key: "needsRevision", label: "Needs revision" },
 ];
 
-export default function SwahiliCourseOverview({ basePath, preview, uid }) {
+export default function SwahiliCourseOverview({ basePath, preview, uid, assignedLevel }) {
+  const level = preview ? "A1" : String(assignedLevel || "A1").trim().toUpperCase();
+  const [browseA1, setBrowseA1] = useState(false);
+  const showA1 = level === "A1" || browseA1;
   const [progress, setProgress] = useState(null);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const submitDialog = useRef(null);
 
   useEffect(() => {
-    if (preview || !uid || !db) return undefined;
+    if (!showA1 || preview || !uid || !db) return undefined;
     let active = true;
     Promise.all(ASSIGNMENTS.map(async ({ day }) => {
       const [submission, review] = await Promise.allSettled([
@@ -48,7 +51,17 @@ export default function SwahiliCourseOverview({ basePath, preview, uid }) {
       if (active) setProgress({ uid, records });
     });
     return () => { active = false; };
-  }, [preview, uid]);
+  }, [showA1, preview, uid]);
+
+  if (!showA1) return (
+    <section style={book.hero}>
+      <p style={book.heroEyebrow}>Kiswahili {level}</p>
+      <h2 style={book.heroTitle}>Kitabu cha Kozi ya Kiswahili</h2>
+      <p>Swahili {level} lessons have not been published yet.</p>
+      <button type="button" style={styles.primaryButton} onClick={() => setBrowseA1(true)}>Open the A1 Course Book</button>
+      <Link to="/">Back to Campus</Link>
+    </section>
+  );
 
   const personal = Boolean(!preview && uid && db);
   const records = personal && progress?.uid === uid ? progress.records : null;
