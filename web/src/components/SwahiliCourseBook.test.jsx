@@ -45,6 +45,21 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.queryByRole("link", { name: "Fungua Somo la 1" })).toBeNull();
   });
 
+  it("shows all 20 A1 units without exposing unfinished workbook routes", () => {
+    render(<MemoryRouter><SwahiliCourseBook preview /></MemoryRouter>);
+    expect(screen.getByText(/20 planned A1 units · 3 available/)).toBeTruthy();
+    expect(screen.getAllByText("Coming soon")).toHaveLength(17);
+    expect(screen.getByText("Salamu")).toBeTruthy();
+    expect(screen.getByText("Familia yangu")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Fungua Somo la 5" }).getAttribute("href")).toBe("/swahili/day-5");
+    expect(screen.queryByRole("link", { name: "Fungua Somo la 2" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Fungua Somo la 20" })).toBeNull();
+    expect(getDoc).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByRole("textbox", { name: "Search lessons" }), { target: { value: "hospitalini" } });
+    expect(screen.getByText("Hospitalini")).toBeTruthy();
+    expect(screen.queryByText("Salamu")).toBeNull();
+  });
+
   it("opens the assigned Swahili level and offers the published A1 book separately", async () => {
     mockUser = { uid: "swahili-student-1" };
     mockStudentProfile.level = "C2";
