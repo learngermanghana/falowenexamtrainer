@@ -241,3 +241,6 @@ module.exports.validId=validId;
 module.exports.normaliseContact=normaliseContact;
 module.exports.seal=seal;
 module.exports.unseal=unseal;
+
+module.exports.sheetApi = sheetApi;
+module.exports.rateLimit = rateLimit;

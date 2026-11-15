@@ -153,6 +153,10 @@ module.exports = (req, res) => {
     return classParticipationMeHandler(req, res);
   }
 
+  if (req.url?.split("?")[0] === "/public/visitor-enquiries") {
+    return require("../server/visitorEnquiries.cjs").visitorEnquiriesHandler(req,res);
+  }
+
   if (req.url === "/public/admissions-engagement" || req.url?.startsWith("/public/admissions-engagement?")) {
     return admissionsEngagementHandler(req, res);
   }
