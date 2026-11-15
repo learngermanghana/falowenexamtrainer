@@ -514,7 +514,8 @@
   }
 
   function ensureDownloadButton() {
-    const actions = document.querySelector(".hero-actions");
+    const actions = document.querySelector("body.figma-brochure-detail .figma-brochure-hero-actions") ||
+      document.querySelector(".hero-actions");
     if (!actions) return;
     let button = document.getElementById("downloadBrochureButton");
     if (!button) {
