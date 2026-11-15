@@ -1,5 +1,5 @@
 "use strict";
-const { getExamPractice, safeTask } = require("../chatgptExamPractice");
+const { getExamPractice, listExamPractice, safeTask } = require("../chatgptExamPractice");
 
 describe("answer-safe Falowen ChatGPT exam practice", () => {
   test("returns authentic A2 writing prompt without rubric or grading keys", () => {
@@ -21,5 +21,18 @@ describe("answer-safe Falowen ChatGPT exam practice", () => {
     const result = safeTask({ title: "Aufgabe", prompt: "Schreiben Sie", answer: "secret",
       correctOption: 2, rubric: { hidden: "secret" }, form: { answer: "secret" } });
     expect(result).toEqual({ title: "Aufgabe", prompt: "Schreiben Sie" });
+  });
+});
+
+
+describe("approved Exams Room mock discovery", () => {
+  test("returns A1 and A2 source-approved writing/speaking mocks without private questions or keys", () => {
+    const a1 = listExamPractice("A1");
+    expect(a1.available).toBe(true);
+    expect(a1.mocks.map(mock => mock.mockId)).toEqual(["a1-mock-02", "a1-mock-03"]);
+    expect(a1.mocks.every(mock => mock.skills.includes("writing") && mock.practiceOnly)).toBe(true);
+    expect(listExamPractice("A2").mocks.map(mock => mock.mockId)).toEqual(["a2-mock-02"]);
+    expect(listExamPractice("C2").available).toBe(false);
+    expect(JSON.stringify(a1)).not.toMatch(/correctOption|answerKey|rubric|sampleAnswer|transcript/);
   });
 });
