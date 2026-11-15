@@ -51,17 +51,14 @@ test("keeps the navigation visible and horizontally reachable on small screens",
   expect(mobileNavStyles).not.toContain(".falowen-home-nav-links { display: none; }");
 });
 
-test("gives both programmes a permanent link above German hybrid learning and omits embedded playback", () => {
+test("shows German hybrid learning below the carousel without a language chooser or embedded playback", () => {
   const { container } = render(<LandingPageSimple />);
   const carousel = screen.getByTestId("homepage-carousel");
   const hybrid = screen.getByRole("region", { name: "Learn German your way." });
-  const programs = screen.getByRole("region", { name: "Choose a language" });
-  expect(within(programs).getByRole("link", { name: "Explore German courses" })).toHaveAttribute("href", "/courses/");
-  expect(within(programs).getByRole("link", { name: "Explore Swahili" })).toHaveAttribute("href", "/swahili");
+  expect(screen.queryByRole("region", { name: "Choose a language" })).not.toBeInTheDocument();
   expect(screen.queryByTestId("homepage-music")).not.toBeInTheDocument();
   const support = container.querySelector(".falowen-home-support");
-  expect(carousel.nextElementSibling).toBe(programs);
-  expect(programs.nextElementSibling).toBe(hybrid);
+  expect(carousel.nextElementSibling).toBe(hybrid);
   expect(hybrid.nextElementSibling).toBe(support);
   expect(within(hybrid).getByRole("heading", { name: "In person" })).toBeInTheDocument();
   expect(within(hybrid).getByRole("heading", { name: "Live online" })).toBeInTheDocument();

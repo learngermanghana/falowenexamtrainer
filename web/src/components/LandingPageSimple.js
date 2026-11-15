@@ -26,13 +26,6 @@ const COPY = {
     supportEyebrow: "YOUR SUPPORT SYSTEM",
     supportTitle: "Practise with AI. Improve with a tutor.",
     supportText: "Replay lectures, practise as often as you need and receive practical learning feedback — with teacher guidance when you need it.",
-    programsTitle: "Choose a language",
-    germanTitle: "German",
-    germanIntro: "A1–C2 classes and Goethe exam practice.",
-    germanAction: "Explore German courses",
-    swahiliTitle: "Swahili (Kiswahili)",
-    swahiliIntro: "Start with the online A1 Course Book.",
-    swahiliAction: "Explore Swahili",
     hybridEyebrow: "FLEXIBLE GERMAN LEARNING",
     hybridTitle: "Learn German your way.",
     hybridIntro: "Choose how you learn with Learn Language Education Academy and Falowen.",
@@ -73,13 +66,6 @@ const COPY = {
     supportEyebrow: "DEINE LERNUNTERSTÜTZUNG",
     supportTitle: "Mit KI üben. Mit Lehrkräften besser werden.",
     supportText: "Schau dir Lektionen erneut an, übe so oft du möchtest und erhalte hilfreiches Feedback und Unterstützung.",
-    programsTitle: "Wähle eine Sprache",
-    germanTitle: "Deutsch",
-    germanIntro: "Kurse von A1 bis C2 und Vorbereitung auf Goethe-Prüfungen.",
-    germanAction: "Deutschkurse entdecken",
-    swahiliTitle: "Kiswahili",
-    swahiliIntro: "Starte mit dem Online-Kursbuch A1.",
-    swahiliAction: "Kiswahili entdecken",
     hybridEyebrow: "FLEXIBEL DEUTSCH LERNEN",
     hybridTitle: "Lerne Deutsch auf deine Weise.",
     hybridIntro: "Entscheide selbst, wie du mit der Learn Language Education Academy und Falowen lernst.",
@@ -125,13 +111,6 @@ const COPY = {
     supportEyebrow: "VOTRE ACCOMPAGNEMENT",
     supportTitle: "Pratiquez avec l'IA. Progressez avec un enseignant.",
     supportText: "Revoyez les cours, exercez-vous autant que nécessaire et profitez de conseils d'enseignants.",
-    programsTitle: "Choisissez une langue",
-    germanTitle: "Allemand",
-    germanIntro: "Cours du niveau A1 à C2 et préparation aux examens Goethe.",
-    germanAction: "Découvrir les cours d’allemand",
-    swahiliTitle: "Swahili",
-    swahiliIntro: "Commencez avec le cahier A1 en ligne.",
-    swahiliAction: "Découvrir le swahili",
     hybridEyebrow: "APPRENEZ L'ALLEMAND À VOTRE FAÇON",
     hybridTitle: "Apprenez l'allemand à votre rythme.",
     hybridIntro: "Choisissez comment apprendre avec Learn Language Education Academy et Falowen.",
@@ -247,22 +226,6 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
         </nav>
 
         <FalowenHomepageCarousel language={language} classroomImage={academyProfile.classroomImage} onSignUp={signup} />
-
-        <section className="falowen-home-hybrid" aria-labelledby="falowen-programs-heading">
-          <h2 id="falowen-programs-heading">{copy.programsTitle}</h2>
-          <div className="falowen-home-hybrid-options falowen-home-program-options">
-            <article className="falowen-home-hybrid-option falowen-home-program">
-              <h3>{copy.germanTitle}</h3>
-              <p>{copy.germanIntro}</p>
-              <a href="/courses/">{copy.germanAction} <span aria-hidden="true">→</span></a>
-            </article>
-            <article className="falowen-home-hybrid-option falowen-home-program">
-              <h3>{copy.swahiliTitle}</h3>
-              <p>{copy.swahiliIntro}</p>
-              <a href="/swahili">{copy.swahiliAction} <span aria-hidden="true">→</span></a>
-            </article>
-          </div>
-        </section>
 
         <section className="falowen-home-hybrid" aria-labelledby="falowen-hybrid-heading">
           <div className="falowen-home-hybrid-heading">
