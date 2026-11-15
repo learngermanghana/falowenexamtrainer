@@ -5,7 +5,6 @@ import { updatePageMeta } from "../lib/pageMeta";
 import { loadPublicClasses, slugifyPublicClass } from "../services/publicClassCatalogService";
 import { resolveAdmissionsRef, trackAdmissionsEngagement } from "../services/admissionsEngagementService";
 import academyProfile from "../data/publicAcademyProfile.json";
-import { PUBLIC_MARKETING_FEATURES } from "../data/publicMarketingFeatures";
 
 const card = { ...styles.card, display: "grid", gap: 12, borderRadius: 16 };
 const action = {
@@ -112,6 +111,8 @@ const PublicAdmissionsVisitorGuidePage = () => {
     ? `/classes/?class=${encodeURIComponent(classSlug)}&open=1&ref=${encodeURIComponent(engagementRef)}&source=visitor-guide`
     : "/classes/";
   const signupHref = `/signup?program=german${classSlug ? `&class=${encodeURIComponent(classSlug)}` : ""}&ref=${encodeURIComponent(engagementRef)}&source=visitor-guide`;
+  const swahiliSignupHref = `/signup?program=swahili&ref=${encodeURIComponent(engagementRef)}&source=visitor-guide`;
+  const kiswahiliTeacher = academyProfile.team.find((member) => member.name === "Dr. Ruth Ndekiro Shao");
 
   const trackClick = (event) => {
     trackAdmissionsEngagement({
@@ -131,11 +132,12 @@ const PublicAdmissionsVisitorGuidePage = () => {
         </div>
         <h1 style={{ margin: 0 }}>{academyProfile.academyName}</h1>
         <p style={{ margin: 0, lineHeight: 1.75, color: "#334155" }}>
-          {academyProfile.academyName} combines structured German instruction and Kiswahili teaching with Falowen, our digital learning platform.{" "}
-          Students benefit from guided lessons, interactive resources, tutor support and progress tracking, alongside dedicated German examination preparation.
+          We teach German and Kiswahili through Learn Language Education Academy and Falowen. Both pathways
+          bring together structured learning materials, interactive practice and educator support, while each has
+          its own course content and learning goals.
         </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", color: "#334155", fontWeight: 700 }}>
-          <span>Established {academyProfile.establishedYear}</span><span>·</span><span>German {academyProfile.germanLevels}</span><span>·</span><span>{academyProfile.examPassHeadline}</span>
+          <span>Established {academyProfile.establishedYear}</span><span>·</span><span>German A1–C2</span><span>·</span><span>Kiswahili beginner course</span>
         </div>
         {academyProfile.admissionsUpdatedAt ? (
           <div style={{ color: "#64748b", fontSize: 12 }}>
@@ -144,6 +146,37 @@ const PublicAdmissionsVisitorGuidePage = () => {
         ) : null}
       </section>
 
+      <section className="visitor-guide-language-section" aria-labelledby="visitor-guide-languages-heading">
+        <div className="visitor-guide-language-heading">
+          <span>TWO LANGUAGES · ONE LEARNING ACADEMY</span>
+          <h2 id="visitor-guide-languages-heading">Choose the language you want to learn</h2>
+          <p>Explore the teaching approach and learning materials for each language. German and Kiswahili have separate course content.</p>
+        </div>
+        <div className="visitor-guide-language-grid">
+          <article className="visitor-guide-language-card visitor-guide-language-german" aria-label="Learn German">
+            <span className="visitor-guide-language-tag">GERMAN · DEUTSCH</span>
+            <h3>Learn German</h3>
+            <p>Study German from A1 to C2 with structured lessons, live classes and flexible practice on Falowen.</p>
+            <p>Goethe-style exam preparation, recorded teaching and German learning resources support your progress.</p>
+            <div className="visitor-guide-language-actions">
+              <a className="visitor-guide-language-primary" href="/classes/">Explore German classes →</a>
+              <a href={signupHref} onClick={() => trackClick("registration_click")}>Register for German →</a>
+            </div>
+          </article>
+          <article className="visitor-guide-language-card visitor-guide-language-swahili" aria-label="Learn Kiswahili">
+            <span className="visitor-guide-language-tag">KISWAHILI · SWAHILI</span>
+            <h3>Learn Kiswahili</h3>
+            <p>Begin with the online Kiswahili course book, including pronunciation, grammar, vocabulary and guided activities.</p>
+            <p>Learn with resources developed for Falowen and the expertise of Kiswahili instructor Dr. Ruth Ndekiro Shao.</p>
+            <div className="visitor-guide-language-actions">
+              <a className="visitor-guide-language-primary" href="/swahili">Explore Kiswahili course →</a>
+              <a href={swahiliSignupHref} onClick={() => trackClick("registration_click")}>Register for Kiswahili →</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      {requestedSlug ? (
       <section className="visitor-guide-class-card" style={{ ...card, border: "1px solid #bbf7d0", background: "#f0fdf4" }}>
         <div style={{ color: "#166534", fontWeight: 900, fontSize: 12, textTransform: "uppercase", letterSpacing: ".04em" }}>
           {selectedClass ? "Your selected class" : requestedSlug ? "Class information" : "Choose your next step"}
@@ -198,6 +231,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
           View all classes
         </a>
       </section>
+      ) : null}
 
       <section style={{ ...card, overflow: "hidden" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, alignItems: "stretch" }}>
@@ -230,35 +264,32 @@ const PublicAdmissionsVisitorGuidePage = () => {
 
       <section className="visitor-guide-marketing" aria-labelledby="visitor-guide-marketing-title">
         <div className="visitor-guide-marketing-heading">
-          <span>GERMAN LEARNING THAT FITS YOUR LIFE</span>
-          <h2 id="visitor-guide-marketing-title">Four ways to get started with Falowen</h2>
-          <p>Find your level, prepare for Goethe-style exams, join a live class or learn at your own pace — with AI and tutor support.</p>
+          <span>OUR LEARNING APPROACH</span>
+          <h2 id="visitor-guide-marketing-title">How we support language learners</h2>
+          <p>Our approach combines clear explanations, language practice and teacher guidance. Available materials and assessment activities differ by language.</p>
         </div>
-        <div className="visitor-guide-marketing-grid">
-          {PUBLIC_MARKETING_FEATURES.map((feature) => (
-            <article key={feature.key} className="visitor-guide-marketing-card">
-              <span className="visitor-guide-marketing-icon" aria-hidden="true">{feature.icon}</span>
-              <h3>{feature.title}</h3>
-              <p>{feature.description}</p>
-              <div className="visitor-guide-marketing-actions">
-                <a href={feature.key === "self"
-                  ? "/signup?program=german&ref=" + encodeURIComponent(engagementRef) + "&source=visitor-guide"
-                  : feature.href}
-                  onClick={feature.key === "self" ? () => trackClick("registration_click") : undefined}
-                >{feature.action} →</a>
-                {feature.scheduleHref ? (
-                  <a className="visitor-guide-marketing-schedule" href={feature.scheduleHref}>
-                    <span aria-hidden="true">🗓</span> {feature.scheduleAction} →
-                  </a>
-                ) : null}
-              </div>
-            </article>
-          ))}
+        <div className="visitor-guide-marketing-grid visitor-guide-marketing-grid-shared">
+          <article className="visitor-guide-marketing-card">
+            <span className="visitor-guide-marketing-icon" aria-hidden="true">📖</span>
+            <h3>Structured learning</h3>
+            <p>Course materials give learners a clear place to begin and activities to practise what they study.</p>
+          </article>
+          <article className="visitor-guide-marketing-card">
+            <span className="visitor-guide-marketing-icon" aria-hidden="true">🗣️</span>
+            <h3>Communication and culture</h3>
+            <p>Vocabulary, pronunciation and realistic language situations connect learning with everyday communication.</p>
+          </article>
+          <article className="visitor-guide-marketing-card">
+            <span className="visitor-guide-marketing-icon" aria-hidden="true">👩🏽‍🏫</span>
+            <h3>Teacher expertise</h3>
+            <p>German and Kiswahili instructors contribute language teaching experience and learner-focused support.</p>
+          </article>
         </div>
+        <p className="visitor-guide-marketing-note">Goethe-style exam preparation is part of the German pathway; the published Kiswahili course currently focuses on foundational language learning.</p>
       </section>
 
       <section style={card}>
-        <h2 style={{ margin: 0 }}>The people behind the school</h2>
+        <h2 style={{ margin: 0 }}>Meet our German and Kiswahili team</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
           {(academyProfile.team || []).map((member) => (
             <article
@@ -292,10 +323,10 @@ const PublicAdmissionsVisitorGuidePage = () => {
       <section style={card}>
         <h2 style={{ margin: 0 }}>Teaching in practice</h2>
         <p style={{ margin: 0, lineHeight: 1.65, color: "#475569" }}>
-          A look at live online teaching and guided German instruction at LLEA.
+          Meet the people and teaching spaces behind our German and Kiswahili programmes.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
-          {(academyProfile.teachingGallery || []).map((item) => (
+          {[academyProfile.teachingGallery?.[0], kiswahiliTeacher && { title: "Kiswahili instructor", image: kiswahiliTeacher.image, caption: "Dr. Ruth Ndekiro Shao brings Kiswahili teaching and research expertise to Falowen." }].filter(Boolean).map((item) => (
             <figure key={item.title} style={{ margin: 0, display: "grid", gap: 7 }}>
               <img
                 src={item.image}
@@ -335,16 +366,19 @@ const PublicAdmissionsVisitorGuidePage = () => {
       </section>
 
       <section className="visitor-guide-final-card" style={{ ...card, background: "#f8fafc" }}>
-        <h2 style={{ margin: 0 }}>Ready for the next step?</h2>
-        <p style={{ margin: 0, lineHeight: 1.65 }}>You can review the class details again or continue directly to registration.</p>
-        <div className="visitor-guide-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <a href={brochureHref} onClick={() => trackClick("brochure_open")} style={{ ...action, background: "#fff", color: "#1d4ed8" }}>
-            View class brochure
-          </a>
-          <a href={signupHref} onClick={() => trackClick("registration_click")} style={{ ...action, background: "#1d4ed8", color: "#fff" }}>
-            Register for this class
-          </a>
-        </div>
+        <h2 style={{ margin: 0 }}>Ready to learn a language?</h2>
+        <p style={{ margin: 0, lineHeight: 1.65 }}>Choose German or Kiswahili, or explore a class you previously selected.</p>
+        {requestedSlug ? (
+          <div className="visitor-guide-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <a href={brochureHref} onClick={() => trackClick("brochure_open")} style={{ ...action, background: "#fff", color: "#1d4ed8" }}>View class brochure</a>
+            <a href={signupHref} onClick={() => trackClick("registration_click")} style={{ ...action, background: "#1d4ed8", color: "#fff" }}>Register for this class</a>
+          </div>
+        ) : (
+          <div className="visitor-guide-language-final-actions">
+            <a href="/classes/">Explore German classes →</a>
+            <a href="/swahili">Explore Kiswahili course →</a>
+          </div>
+        )}
       </section>
     </main>
   );
