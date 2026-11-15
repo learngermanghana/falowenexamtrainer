@@ -28,10 +28,10 @@ describe("Swahili A1 Day 6 Teil 3 reading", () => {
     expect(start).toBeGreaterThan(-1);
     const line = data.slice(start, data.indexOf("\n", start));
     expect(line).toContain(`answer:"${expected}"`);
-    const choices = line.match(/choices:\\[(.*?)\\],answer:/);
-    expect(choices).not.toBeNull();
-    expect((choices[1].match(/","/g) || []).length + 1).toBe(count);
-    expect(choices[1]).toContain(`"${expected}"`);
+    const choices = line.split("choices:[")[1]?.split("],answer:")[0];
+    expect(choices).toBeDefined();
+    expect(choices.split('","').length).toBe(count);
+    expect(choices).toContain(`"${expected}"`);
   });
 
   test("does not change Teil 4 private audio or the five listening questions", () => {
