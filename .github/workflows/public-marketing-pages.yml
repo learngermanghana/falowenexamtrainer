@@ -18,6 +18,8 @@ on:
       - 'web/src/components/PublicUpcomingClassesPage.css'
       - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
       - 'web/src/data/publicMarketingFeatures.js'
+      - 'web/src/data/publicAcademyProfile.json'
+      - 'web/public/classes/media/ruth-ndekiro-shao.webp'
       - 'web/src/__tests__/LandingPageMobile.test.js'
       - 'web/src/__tests__/PublicSeoArchitecture.test.js'
       - 'web/public/homepage-reviews.js'
@@ -42,6 +44,8 @@ on:
       - 'web/src/components/PublicUpcomingClassesPage.css'
       - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
       - 'web/src/data/publicMarketingFeatures.js'
+      - 'web/src/data/publicAcademyProfile.json'
+      - 'web/public/classes/media/ruth-ndekiro-shao.webp'
       - 'web/src/__tests__/LandingPageMobile.test.js'
       - 'web/src/__tests__/PublicSeoArchitecture.test.js'
       - 'web/public/homepage-reviews.js'
@@ -60,7 +64,7 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - name: Verify visitor guide marketing and class links
-        run: node --test --test-name-pattern="visitor guide explains school|visitor guide class actions" tests/public-admissions-visitor-guide.test.mjs
+        run: node --test --test-name-pattern="visitor guide explains school|visitor guide class actions|shared academy profile|admissions public links" tests/public-admissions-visitor-guide.test.mjs
       - name: Install website dependencies
         working-directory: web
         run: npm ci
