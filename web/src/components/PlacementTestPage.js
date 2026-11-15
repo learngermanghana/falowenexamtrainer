@@ -20,6 +20,7 @@ const readResult = (root) => {
   const score = text.match(/Score:\s*(\d+)\s*\/\s*(\d+)/i);
   return {
     section,
+    registered: section.dataset.placementRegistered === "true",
     level,
     attemptId: section.dataset.placementAttemptId || "",
     a1: Number(section.dataset.placementA1 || 0),
@@ -49,7 +50,12 @@ export default function PlacementTestPage() {
 
     const sync = () => {
       const parsed = readResult(root);
-      if (!parsed) return;
+      if (!parsed) {
+        document.getElementById(MOUNT_ID)?.remove();
+        setMount(null);
+        setResult(null);
+        return;
+      }
 
       let target = document.getElementById(MOUNT_ID);
       if (!target) {
@@ -65,10 +71,10 @@ export default function PlacementTestPage() {
         current?.total === parsed.total &&
         current?.attemptId === parsed.attemptId
           ? current
-          : { level: parsed.level, correct: parsed.correct, total: parsed.total, attemptId: parsed.attemptId, a1:parsed.a1, a2:parsed.a2, b1:parsed.b1 }
+          : { registered:parsed.registered, level: parsed.level, correct: parsed.correct, total: parsed.total, attemptId: parsed.attemptId, a1:parsed.a1, a2:parsed.a2, b1:parsed.b1 }
       );
 
-      const key = `${parsed.level}:${parsed.correct}:${parsed.total}`;
+      const key = parsed.attemptId;
       if (trackedRef.current !== key) {
         trackedRef.current = key;
         rememberPublicFunnelContext({ level: parsed.level, lastStage: "placement_complete" });

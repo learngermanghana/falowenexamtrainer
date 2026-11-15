@@ -13,10 +13,15 @@ import {
   formatRemaining,
 } from "./placementTest2026Data";
 
+const startTest = async () => {
+  fireEvent.change(screen.getByLabelText(/Email address/), {target:{value:"learner@example.com"}});
+  await act(async () => { fireEvent.click(screen.getByRole("button", {name:/start test/i})); });
+};
 const allCorrect = () => Object.fromEntries(placementQuestions.map((question) => [question.id, question.correct]));
 
 describe("public 30-question placement test", () => {
   beforeEach(() => {
+    global.fetch = jest.fn(async () => ({ok:true,json:async()=>({ok:true,id:"pt_12345678-12345678",ticket:"opaque-ticket"})}));
     window.localStorage.clear();
     jest.useFakeTimers();
     jest.setSystemTime(new Date("2026-10-13T12:00:00Z"));
@@ -56,11 +61,12 @@ describe("public 30-question placement test", () => {
     expect(formatRemaining(getRemainingMs(start, start + 20 * 60000))).toBe("00:00");
   });
 
-  test("starts on user action and auto-submits unanswered items at timeout", () => {
+  test("starts on user action and auto-submits unanswered items at timeout", async () => {
     render(<PlacementTestPage2026 />);
     expect(screen.getByRole("button", { name: /start test/i })).toBeInTheDocument();
     expect(screen.queryByText("20:00")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /start test/i }));
+    expect(screen.getByLabelText(/Email address/)).toBeRequired();
+    await startTest();
     expect(screen.getByText("20:00")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: "A. heiße" }));
     act(() => { jest.advanceTimersByTime(20 * 60 * 1000); });
@@ -69,9 +75,9 @@ describe("public 30-question placement test", () => {
     expect(screen.getByRole("link", { name: /view A1 classes/i })).toHaveAttribute("href", "/classes/?level=A1");
   });
 
-  test("refresh cannot reset or extend the timer", () => {
+  test("refresh cannot reset or extend the timer", async () => {
     const { unmount } = render(<PlacementTestPage2026 />);
-    fireEvent.click(screen.getByRole("button", { name: /start test/i }));
+    await startTest();
     const originallyStartedAt = JSON.parse(window.localStorage.getItem(PLACEMENT_STORAGE_KEY)).startedAt;
     unmount();
     act(() => { jest.advanceTimersByTime(2 * 60000); });
@@ -80,9 +86,9 @@ describe("public 30-question placement test", () => {
     expect(JSON.parse(window.localStorage.getItem(PLACEMENT_STORAGE_KEY)).startedAt).toBe(originallyStartedAt);
   });
 
-  test("reloading after the deadline displays the timed-out result", () => {
+  test("reloading after the deadline displays the timed-out result", async () => {
     const { unmount } = render(<PlacementTestPage2026 />);
-    fireEvent.click(screen.getByRole("button", { name: /start test/i }));
+    await startTest();
     unmount();
     act(() => { jest.advanceTimersByTime(21 * 60000); });
     render(<PlacementTestPage2026 />);

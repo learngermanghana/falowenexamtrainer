@@ -3,6 +3,8 @@
 const crypto = require("node:crypto");
 const { sendPlacementResultEmail } = require("./placement-result-email");
 
+const { queuePlacementResult } = require("../server/placement-outbox.cjs");
+
 const SHEET_TAB = "PlacementAttempts";
 const ANSWERS = [0,1,1,1,1,1,1,1,0,0,1,1,0,0,2,1,0,2,0,0,0,1,0,1,0,1,0,0,1,1];
 const ADMIN_EMAILS = new Set(String(process.env.FALOWEN_ADMIN_EMAILS || "moxflex@gmail.com")
@@ -31,7 +33,7 @@ function sheetId() {
 function jwtToken(creds) {
   const now=Math.floor(Date.now()/1000);
   const b64=(x)=>Buffer.from(JSON.stringify(x)).toString("base64url");
-  const value=b64({alg:"RS256",typ:"JWT"})+"."+b64({iss:creds.client_email,scope:"https://www.googleapis.com/auth/spreadsheets",aud:"https://oauth2.googleapis.com/token",iat:now,exp:now+3500});
+  const value=b64({alg:"RS256",typ:"JWT"})+"."+b64({iss:creds.client_email,scope:"https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.metadata.readonly",aud:"https://oauth2.googleapis.com/token",iat:now,exp:now+3500});
   return value+"."+crypto.sign("RSA-SHA256",Buffer.from(value),creds.private_key).toString("base64url");
 }
 async function googleToken() {
@@ -42,8 +44,8 @@ async function googleToken() {
   cache.token=data.access_token;cache.expires=Date.now()+Math.max(60,(Number(data.expires_in)||3600)-180)*1000;
   return cache.token;
 }
-async function sheetApi(path,{method="GET",body}={}) {
-  const response=await fetch("https://sheets.googleapis.com/v4/spreadsheets/"+sheetId()+path,{
+async function sheetApi(path,{method="GET",body}={},book=sheetId()) {
+  const response=await fetch("https://sheets.googleapis.com/v4/spreadsheets/"+book+path,{
     method,headers:{Authorization:"Bearer "+await googleToken(),"Content-Type":"application/json"},
     ...(body?{body:JSON.stringify(body)}:{})
   });
@@ -121,6 +123,13 @@ async function readRecords() {
       const event=unseal(row[2]);if(!validId(event.id)||!["start","complete","contact","email_sent"].includes(event.type))continue;
       const previous=byId.get(event.id)||{id:event.id,status:"started",startedAt:null,completedAt:null,contactedAt:null};
       if(event.type==="start"){previous.startedAt=event.at;previous.status=previous.completedAt?"completed":"in_progress";}
+      if(event.type==="start" && event.contact) {
+        previous.contactedAt=event.at;
+        previous.name=event.contact.name;
+        previous.email=event.contact.email;
+        previous.consent=event.contact.classEmails;
+        previous.classEmails=event.contact.classEmails;
+      }
       if(event.type==="complete"){previous.completedAt=event.at;previous.status="completed";previous.score=event.score||null;previous.source=event.source||"placement-test";}
       if(event.type==="contact"){previous.contactedAt=event.at;previous.name=event.contact.name;previous.email=event.contact.email;previous.phone=event.contact.phone;previous.consent=true;previous.leadId=event.id;}
       if(event.type==="email_sent"){previous.emailSentAt=event.at;}
@@ -171,9 +180,27 @@ async function handler(req,res){
     if(!validId(body.id)||!["start","complete","contact"].includes(body.action))
       throw Object.assign(new Error("Invalid placement attempt"),{status:400});
     const event={id:body.id,type:body.action,at:new Date().toISOString()};
+    if(body.action==="start"){
+      const email=String(body.email||"").trim().toLowerCase();
+      if(email.length>180 || !validEmail(email) || /[,;<>]/.test(email))
+        throw Object.assign(new Error("Enter a valid email address for your result"),{status:400});
+      event.id="pt_"+crypto.randomUUID();
+      event.contact={email,name:String(body.name||"").trim().slice(0,120),classEmails:body.classEmails===true};
+      await appendEvent(event);
+      return res.status(200).json({ok:true,id:event.id,ticket:seal(event)});
+    }
     if(body.action==="complete"){
       event.score=grade(body.answers);
       event.source="placement-test";
+      if(body.ticket){
+        let start;
+        try { start=unseal(body.ticket); } catch (_) {}
+        if(start?.type!=="start" || start.id!==event.id || !start.contact)
+          throw Object.assign(new Error("Invalid placement session"),{status:400});
+        await appendEvent(event);
+        await queuePlacementResult({...event,contact:start.contact},sheetApi,googleToken);
+        return res.status(200).json({ok:true,id:event.id,emailStatus:"queued"});
+      }
     }
     if(body.action==="contact"){
       event.contact=normaliseContact(body);
@@ -182,6 +209,7 @@ async function handler(req,res){
       const record=(await readRecords()).find(x=>x.id===body.id);
       if(!record?.completedAt||!record.score)
         throw Object.assign(new Error("Your result is still saving. Please wait a moment and try again."),{status:409});
+      if(typeof record.classEmails==="boolean") throw Object.assign(new Error("This attempt already has a result address"),{status:409});
       if(record.emailSentAt) {
         if(record.email && event.contact.email!==record.email)
           throw Object.assign(new Error("Your result was already emailed. Contact Falowen to change the address."),{status:409});
