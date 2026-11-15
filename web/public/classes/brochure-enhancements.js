@@ -189,19 +189,27 @@
     if (anchor.nextElementSibling !== card) {
       anchor.insertAdjacentElement("afterend", card);
     }
+    const compact = document.body.classList.contains("figma-brochure-detail");
     card.innerHTML = `
       <div>
         <span class="course-benefits-eyebrow">What students receive</span>
-        <h2>One structured learning system</h2>
+        <h2>${compact ? "Everything you need to learn" : "One structured learning system"}</h2>
         <p>Class teaching and Falowen work together, so students know what to learn, practise and improve next.</p>
       </div>
       <div class="course-benefits-grid">
+${compact ? `
+        <article><strong>Live lessons & recordings</strong><span>Learn with a tutor and replay recorded explanations.</span></article>
+        <article><strong>Course book & workbooks</strong><span>Practise grammar, vocabulary, listening and writing on Falowen.</span></article>
+        <article><strong>Tutor feedback</strong><span>Get guidance on submitted assignments.</span></article>
+        <article><strong>Exam preparation</strong><span>Practise exam-style tasks and track your learning.</span></article>
+      ` : `
         <article><strong>Advanced teaching slides</strong><span>Clear teacher-led explanations and examples for each lesson.</span></article>
         <article><strong>Recorded teacher explanations</strong><span>Review key lessons again when you need more time.</span></article>
         <article><strong>Course book & workbooks</strong><span>Grammar, vocabulary, reading, listening, writing and speaking practice.</span></article>
         <article><strong>Tutor-marked assignments</strong><span>Receive scores and feedback on selected course work.</span></article>
         <article><strong>Progress tracking</strong><span>Attendance, results and learning progress stay visible in one place.</span></article>
         <article><strong>Exam preparation</strong><span>Practise the skills and task types used in German-language examinations.</span></article>
+      `}
       </div>
     `;
   }
@@ -224,12 +232,17 @@
       anchor.insertAdjacentElement("afterend", details);
     }
 
-    if (details.dataset.responsiveInitialised !== "true") {
+    const concise = document.body.classList.contains("figma-brochure-detail");
+    if (concise) {
+      details.open = true;
+      const heading = details.querySelector("summary");
+      if (heading) heading.textContent = "Payment options";
+    } else if (details.dataset.responsiveInitialised !== "true") {
       details.open = window.matchMedia("(min-width: 761px)").matches;
-      details.dataset.responsiveInitialised = "true";
     }
+    details.dataset.responsiveInitialised = "true";
     const content = details.querySelector(".course-details-content");
-    ["paymentGuidanceCard", "afterSignupCard", "whoForCard"].forEach((id) => {
+    (concise ? ["paymentGuidanceCard"] : ["paymentGuidanceCard", "afterSignupCard", "whoForCard"]).forEach((id) => {
       const node = document.getElementById(id);
       if (node && node.parentElement !== content) content.appendChild(node);
     });
@@ -556,6 +569,11 @@
   }
 
   function addTrackRecordCard() {
+    // The compact brochure uses the academy footer for school links; avoid a repeated about-school card.
+    if (document.body.classList.contains("figma-brochure-detail")) {
+      document.getElementById("academyTrackRecordCard")?.remove();
+      return;
+    }
     const profile = getAcademyProfile();
     let card = document.getElementById("academyTrackRecordCard");
     if (!card) {
@@ -591,6 +609,11 @@
   }
 
   function addAfterSignupCard() {
+    // Sign-up steps already live in the FAQ, so omit this duplicate explanation on the compact brochure.
+    if (document.body.classList.contains("figma-brochure-detail")) {
+      document.getElementById("afterSignupCard")?.remove();
+      return;
+    }
     const anchor = document.getElementById("paymentGuidanceCard") || document.getElementById("stats");
     if (!anchor || document.getElementById("afterSignupCard")) return;
     const policy = getCoursePolicy();
@@ -622,6 +645,11 @@
   }
 
   function enhanceWhoFor() {
+    // The class level and description in the hero already explain suitability.
+    if (document.body.classList.contains("figma-brochure-detail")) {
+      document.getElementById("whoForCard")?.remove();
+      return;
+    }
     const anchor = document.getElementById("afterSignupCard") || document.getElementById("classModeCard") || document.getElementById("mainSignupCta");
     if (!anchor) return;
 
