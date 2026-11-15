@@ -159,7 +159,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/components/ClassBrochurePublicExperience.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/ClassBrochurePublicExperience.test.js src/components/FigmaBrochureDetail.test.js
 
       - name: Test public A1 bookstore, preview and Paystack receipt checkout
         working-directory: web
