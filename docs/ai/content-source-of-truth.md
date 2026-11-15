@@ -92,3 +92,8 @@ Kiswahili Campus Results shows the reference snapshot attached by Admin to the c
 The Admin Class tab labels each level by language. Campus opens the selected language at its assigned level. Swahili currently has published course books at A1 only.
 
 Admin keeps the primary programme and placement in the existing student fields. An active second course is identified by `secondaryProgram` and uses its own level and class in `coursePlacements[secondaryProgram]`. Retained placements do not grant access. Campus selects an enrolled course for the current browser tab. German results and Swahili tutor reviews keep their existing identifiers, stores and publication workflows. Deploy the learner Firestore rules and Campus switch, then the Admin profile API, Swahili result worker and Admin editor before assigning dual enrollment.
+
+
+## ChatGPT Exams Room content (15 November 2026)
+
+The Sprechen prompt dictionary is `web/src/data/speakingDictionary.js`, the Schreiben practice source is `web/src/data/examWritingWorkspace.js`, the list of actually published mock routes is `web/src/data/mockExamCatalog.js`, and reviewed A1 Mock 02/03 Lesen/Hören come from `web/src/data/a1FinalMock2Data.js` and `web/src/data/a1FinalMock3Data.js`. `scripts/generateChatgptExamContent.mjs` selects only public learner-visible fields into the server's generated ChatGPT snapshot. Do not maintain a second manually copied mock bank or expose hidden answers/audio object keys.
