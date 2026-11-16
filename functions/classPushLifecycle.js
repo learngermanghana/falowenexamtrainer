@@ -1,8 +1,6 @@
 const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
 const admin = require("firebase-admin");
 const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
-const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { loadCandidateClassSessions } = require("./classSessionReminderQueries");
 
 const REGION = "europe-west1";
 const TIME_ZONE = "Africa/Accra";
@@ -283,28 +281,6 @@ const reminderKindDue = ({ session, nowMs }) => {
   return due;
 };
 
-const runClassReminderScan = async () => {
-  const nowMs = Date.now();
-  const candidateDocs = await loadCandidateClassSessions({
-    collection: db().collection("classSessions"),
-    Timestamp: getAdmin().firestore.Timestamp,
-    nowMs,
-  });
-  let considered = 0;
-  let sent = 0;
-  for (const docSnap of candidateDocs) {
-    const session = docSnap.data() || {};
-    const startMs = getSessionStartMs(session);
-    if (!startMs || startMs < nowMs - 3 * 60 * 60_000 || startMs > nowMs + 25 * 60 * 60_000 || !isSessionActive(session, nowMs)) continue;
-    considered += 1;
-    for (const kind of reminderKindDue({ session, nowMs })) {
-      const result = await sendClassLifecycleNotification({ sessionId: docSnap.id, session, kind });
-      if (result?.sent) sent += result.sent;
-    }
-  }
-  console.log("Class push lifecycle scan complete", { candidates: candidateDocs.length, considered, sent });
-};
-
 const didStartChange = (before = {}, after = {}) => {
   const left = getSessionStartMs(before);
   const right = getSessionStartMs(after);
@@ -318,9 +294,6 @@ const becameCancelled = (before = {}, after = {}) => {
 const becameCheckinOpen = (before = {}, after = {}) => !isCheckinOpen(before) && isCheckinOpen(after) && isSessionActive(after);
 
 module.exports = {
-  sendClassPushLifecycleReminders: onSchedule({ region: REGION, schedule: "every 5 minutes", timeZone: TIME_ZONE }, async () => {
-    await runClassReminderScan();
-  }),
   onClassSessionPushLifecycleUpdated: onDocumentUpdated({ region: REGION, document: "classSessions/{sessionId}" }, async (event) => {
     const before = event.data?.before?.data() || {};
     const after = event.data?.after?.data() || {};
@@ -331,9 +304,6 @@ module.exports = {
     }
     if (didStartChange(before, after) && isSessionActive(after)) {
       await sendImmediateClassChange({ sessionId, session: after, oldSession: before, kind: "rescheduled" });
-    }
-    if (becameCheckinOpen(before, after)) {
-      await sendClassLifecycleNotification({ sessionId, session: after, kind: "checkin-open" });
     }
     return null;
   }),
