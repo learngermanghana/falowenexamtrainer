@@ -10,6 +10,7 @@ import { computeExamReadiness } from "../lib/examReadiness";
 
 const emptyReadinessState = {
   loading: false,
+  loaded: false,
   error: "",
   attendanceSessions: 0,
   completedAssignments: [],
@@ -235,6 +236,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
       setState({
         loading: false,
+        loaded: true,
         error: "",
         attendanceSessions: attendance?.sessions || 0,
         completedAssignments,
@@ -324,7 +326,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
   // Compact homepage view: the same authenticated readiness calculation, not a mock percentage.
   if (variant === "homepage") {
-    const hasReadiness = !state.loading && !state.error && Boolean(className && studentCode);
+    const hasReadiness = state.loaded && !state.loading && !state.error && Boolean(className && studentCode);
     return (
       <section className="falowen-home-readiness" aria-label="Your exam journey">
         <span className="falowen-home-readiness__eyebrow">YOUR EXAM JOURNEY</span>
@@ -344,9 +346,9 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
         </div>
         <div className="falowen-home-readiness__status">
           {hasReadiness && (
-            <span className="falowen-home-readiness__pill">{readiness.statusLabel || readiness.text}</span>
+            <span className="falowen-home-readiness__pill" style={{ background: readiness.statusPillBg, color: readiness.statusPillText, border: "1px solid " + readiness.statusPillBorder }}>{readiness.statusLabel || readiness.text}</span>
           )}
-          <p>{state.loading
+          <p>{state.loading || (!state.loaded && !state.error)
             ? "Checking your latest progress…"
             : state.error
               ? state.error
