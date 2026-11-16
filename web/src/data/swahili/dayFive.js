@@ -71,3 +71,57 @@ export const FAMILY_READING = {
 };
 
 export const FAMILY_WRITING_MODEL = "Huyu ni mama yangu. Anaitwa Rehema. Huyu ni kaka yangu. Anaitwa Salim. Huyu ni dada yangu. Anaitwa Neema. Neema anapenda kupika.";
+
+// Comprehension questions from the Day 5 recorded conversation.
+export const FAMILY_LISTENING = [
+  {
+    "id": "children",
+    "question": "Mzungumzaji B ana watoto wangapi?",
+    "choices": [
+      "Mmoja",
+      "Wawili",
+      "Watatu"
+    ],
+    "answer": "Wawili"
+  },
+  {
+    "id": "siblings",
+    "question": "Mzungumzaji B ana kaka na dada wangapi?",
+    "choices": [
+      "Kaka wawili na dada mmoja",
+      "Kaka wawili na dada wawili",
+      "Kaka mmoja na dada wawili"
+    ],
+    "answer": "Kaka mmoja na dada wawili"
+  },
+  {
+    "id": "parents",
+    "question": "Wazazi wa mzungumzaji B wanaishi wapi?",
+    "choices": [
+      "Arusha",
+      "Dar es Salaam",
+      "Dodoma"
+    ],
+    "answer": "Arusha"
+  },
+  {
+    "id": "wife",
+    "question": "Mzungumzaji B anasema nini kuhusu mke wake?",
+    "choices": [
+      "Anasoma shule",
+      "Anampenda sana",
+      "Anaishi Arusha"
+    ],
+    "answer": "Anampenda sana"
+  },
+  {
+    "id": "school",
+    "question": "Watoto wa mzungumzaji B wanasoma shule gani?",
+    "choices": [
+      "Shule ya sekondari",
+      "Shule ya awali",
+      "Shule ya msingi"
+    ],
+    "answer": "Shule ya msingi"
+  }
+];
