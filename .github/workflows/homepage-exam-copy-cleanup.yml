@@ -4,6 +4,11 @@ on:
   pull_request:
     paths:
       - 'web/src/components/GeneralHome.js'
+      - 'web/src/components/FullClassCalendarPage.js'
+      - 'web/src/components/FullClassCalendarPage.css'
+      - 'web/src/components/FullClassCalendarPage.test.jsx'
+      - 'web/src/utils/fullClassTimetableView.js'
+      - 'web/src/utils/fullClassTimetableView.test.js'
       - 'web/src/components/GeneralHome.css'
       - 'web/src/components/GeneralHomeFigmaLayout.test.js'
       - 'web/src/utils/homeClassSchedule.js'
@@ -32,6 +37,11 @@ on:
       - main
     paths:
       - 'web/src/components/GeneralHome.js'
+      - 'web/src/components/FullClassCalendarPage.js'
+      - 'web/src/components/FullClassCalendarPage.css'
+      - 'web/src/components/FullClassCalendarPage.test.jsx'
+      - 'web/src/utils/fullClassTimetableView.js'
+      - 'web/src/utils/fullClassTimetableView.test.js'
       - 'web/src/components/GeneralHome.css'
       - 'web/src/components/GeneralHomeFigmaLayout.test.js'
       - 'web/src/utils/homeClassSchedule.js'
@@ -71,6 +81,6 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - name: Homepage and exam copy regression
-        run: npx jest --runInBand --runTestsByPath src/components/HomeAndExamCopyCleanup.test.js src/components/GeneralHomeResources.test.js src/components/HomepageHighlights.test.jsx src/components/GeneralHomeFigmaLayout.test.js src/utils/homeClassSchedule.test.js src/components/ExamReadinessAutoLoad.test.jsx src/components/GeneralHomeFigmaLayout.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/HomeAndExamCopyCleanup.test.js src/components/GeneralHomeResources.test.js src/components/HomepageHighlights.test.jsx src/components/GeneralHomeFigmaLayout.test.js src/utils/homeClassSchedule.test.js src/components/FullClassCalendarPage.test.jsx src/utils/fullClassTimetableView.test.js src/components/ExamReadinessAutoLoad.test.jsx src/components/GeneralHomeFigmaLayout.test.js
       - name: Direct web compile
         run: npx vite build
