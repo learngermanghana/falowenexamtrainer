@@ -83,6 +83,10 @@ Swahili Day 5 uses the shared German-layout workbook music player and exact-key 
 
 Kiswahili Days 1 and 6 use Review & Submit to show the learner’s actual writing and reading answers. Save & Review keeps a device-local draft keyed by learner and lesson. Final submission writes to the existing Swahili tutor queue; Day 5 stays practice-only until its assignment is supplied. Workbook navigation remains in the page on mobile.
 
+## Kiswahili A1 Day 1 and Day 5 workbook practice
+
+Day 1 and Day 5 reuse the Day 6 grammar self-check component for local practice. Day 1 keeps its writing fields and reading question IDs, with a new reading passage and aligned Day 1 tutor references in Admin. Day 5 provides workshop practice with family vocabulary, model writing, and a reading answer sheet in its workbook. It remains outside the submission queue.
+
 ## Published reference answers
 
 German Campus Results loads the learner-owned reference snapshot when the learner opens result details. Legacy results continue to support their existing links.

@@ -29,10 +29,10 @@ export const SWAHILI_DAY_ONE = Object.freeze({
   stress: ["MA-ma", "ra-FI-ki", "mwa-LI-mu", "cha-KU-la", "Ki-swa-HI-li"],
   // Small reading checks extend the vocabulary from the supplied Day 1 teaching material.
   reading: [
-    { id: "mother", question: "Ni neno gani lina maana ya mother?", choices: ["kiti", "mama", "kuku"], answer: "mama" },
-    { id: "child", question: "Ni neno gani lina maana ya child?", choices: ["mtoto", "wewe", "kiti"], answer: "mtoto" },
-    { id: "chair", question: "Ni neno gani lina maana ya chair?", choices: ["kuku", "mama", "kiti"], answer: "kiti" },
-    { id: "u", question: "Ni neno gani lina vokali U mara mbili?", choices: ["wewe", "kuku", "kiti"], answer: "kuku" },
+    { id: "mother", question: "Katika kifungu, ni neno gani lina maana ya “mother”?", choices: ["kiti", "mama", "kuku"], answer: "mama" },
+    { id: "child", question: "Katika kifungu, ni neno gani lina maana ya “child”?", choices: ["mtoto", "wewe", "kiti"], answer: "mtoto" },
+    { id: "chair", question: "Katika kifungu, ni neno gani lina maana ya “chair”?", choices: ["kuku", "mama", "kiti"], answer: "kiti" },
+    { id: "u", question: "Katika kifungu, ni neno gani lina vokali U mara mbili?", choices: ["wewe", "kuku", "kiti"], answer: "kuku" },
   ],
   // The teacher reads these words; there is no approved recorded audio for this pilot.
   listening: [
