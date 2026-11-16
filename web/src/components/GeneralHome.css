@@ -135,16 +135,17 @@
 
 /* Signed-in learner homepage — Figma-inspired, without changing course data or routes. */
 .falowen-home-dashboard {
-  --fh-ink: #262434;
-  --fh-muted: #77748a;
-  --fh-purple: #7153df;
+  --fh-ink: #172b4e;
+  --fh-muted: #566c87;
+  --fh-purple: #245cce;
   --fh-green: #26735c;
   display: grid;
   gap: 24px;
   min-width: 0;
   padding: clamp(18px, 3vw, 38px);
   border-radius: 18px;
-  background: #faf9f7;
+  background: #edf3fc;
+  border: 1px solid #d9e6f8;
   color: var(--fh-ink);
 }
 
@@ -154,13 +155,15 @@
 
 .falowen-learner-hero {
   display: grid;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  color: var(--fh-ink);
   grid-template-columns: minmax(0, 1.75fr) minmax(290px, 0.94fr);
-  gap: clamp(24px, 5vw, 64px);
+  gap: clamp(24px, 4vw, 56px);
   align-items: stretch;
+  padding: clamp(22px, 3.1vw, 38px);
+  background: linear-gradient(120deg, #e1edff 0%, #f7faff 64%, #eaf3ff 100%);
+  border: 1px solid #cbdcf7;
+  border-radius: 20px;
+  box-shadow: 0 9px 24px rgba(17, 63, 148, .06);
+  color: var(--fh-ink);
 }
 
 .falowen-learner-hero--single { grid-template-columns: minmax(0, 1fr); }
@@ -250,7 +253,7 @@
   background: var(--fh-purple);
   color: #fff;
 }
-.falowen-learner-hero__primary:hover { background: #5e41c8; }
+.falowen-learner-hero__primary:hover { background: #1d4ea9; }
 .falowen-learner-hero__primary span { font-size: 21px; line-height: 1; }
 .falowen-learner-hero__secondary {
   border: 1px solid #dedce6;
@@ -270,7 +273,7 @@
 .falowen-learner-hero__zoom svg { width: 19px; height: 19px; color: var(--fh-muted); }
 .falowen-home-dashboard button:focus-visible,
 .falowen-home-dashboard a:focus-visible {
-  outline: 3px solid #8b73ea;
+  outline: 3px solid #3577eb;
   outline-offset: 3px;
 }
 
@@ -418,7 +421,7 @@
   border-radius: 14px;
 }
 .falowen-home-space-card__icon svg { width: 25px; height: 25px; }
-.falowen-home-space-card__icon--campus { background: #f0eafb; color: #6d4cdf; }
+.falowen-home-space-card__icon--campus { background: #e4eeff; color: #245cce; }
 .falowen-home-space-card__icon--exams { background: #e8f2eb; color: #2b8061; }
 .falowen-home-space-card__heading { min-width: 0; flex: 1; }
 .falowen-home-space-card__eyebrow {
@@ -438,7 +441,7 @@
   max-width: 40%;
   padding: 8px 12px;
   border-radius: 8px;
-  background: #f6f2fc;
+  background: #edf4ff;
   color: var(--fh-purple);
   font-size: 11px;
   font-weight: 700;
@@ -523,4 +526,154 @@
 @media (prefers-reduced-motion: reduce) {
   .falowen-learner-hero__actions button,
   .falowen-home-readiness__track div { transition: none; }
+}
+
+
+/* Blue-led learner dashboard: the public marketing hero is deliberately untouched. */
+.falowen-home-spaces {
+  padding-top: 25px;
+  border-top: 1px solid #c4d7f1;
+}
+.falowen-home-spaces__heading {
+  padding-bottom: 13px;
+  border-bottom: 1px solid #d0def2;
+}
+.falowen-home-spaces__grid {
+  position: relative;
+  column-gap: 28px;
+}
+.falowen-home-spaces__grid:not(.falowen-home-spaces__grid--single)::before {
+  content: "";
+  position: absolute;
+  width: 1px;
+  top: 12px;
+  bottom: 12px;
+  left: 50%;
+  background: #bfD3f0;
+  pointer-events: none;
+}
+.falowen-home-space-card {
+  border-color: #c9d9ef;
+  border-top: 4px solid #245cce;
+  box-shadow: 0 3px 12px rgba(16, 57, 120, .05);
+}
+.falowen-home-space-card:nth-child(2) {
+  border-top-color: #257964;
+  background: #f9fcff;
+}
+.falowen-home-space-card__bottom {
+  border-top-color: #d9e5f5;
+}
+.falowen-home-companion {
+  background: #f5f9ff;
+  border: 1px solid #cbdcf5;
+  border-left: 4px solid #245cce;
+}
+.falowen-home-section-break {
+  padding-top: 26px;
+  border-top: 1px solid #c4d7f1;
+}
+.falowen-home-section-break .fh-highlights {
+  border-color: #cadcf5;
+  box-shadow: 0 5px 16px rgba(16, 59, 126, .04);
+}
+.falowen-home-section-break--metrics {
+  padding-top: 24px;
+}
+.falowen-home-section-break--metrics > section {
+  border: 1px solid #cbdcf5;
+  border-left: 4px solid #245cce;
+  box-shadow: 0 6px 18px rgba(16, 59, 126, .05);
+}
+.falowen-home-class-schedule {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: clamp(21px, 2.3vw, 30px);
+  border: 1px solid #1243a4;
+  border-radius: 19px;
+  background: linear-gradient(145deg, #1d4eae, #174190 70%, #123879);
+  box-shadow: 0 8px 24px rgba(16, 54, 122, .13);
+  color: #fff;
+}
+.falowen-home-class-schedule__eyebrow {
+  color: #c5dcff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .07em;
+}
+.falowen-home-class-schedule__identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 18px 0 12px;
+}
+.falowen-home-class-schedule__icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, .16);
+}
+.falowen-home-class-schedule__icon svg { width: 23px; height: 23px; }
+.falowen-home-class-schedule__identity h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  margin: 3px 0 0;
+  font-size: clamp(20px, 1.8vw, 25px);
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  color: #fff;
+}
+.falowen-home-class-schedule p {
+  margin: 0 0 14px;
+  color: #e0ebff;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.falowen-home-class-schedule__level {
+  width: fit-content;
+  margin: 0 0 22px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255,255,255,.26);
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 750;
+}
+.falowen-home-class-schedule__action {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding: 17px 0 0;
+  border: 0;
+  border-top: 1px solid rgba(255,255,255,.28);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 750;
+  text-align: left;
+  cursor: pointer;
+}
+.falowen-home-class-schedule__action:hover { color: #d1e5ff; }
+.falowen-home-class-schedule__action span:last-child { font-size: 23px; line-height: 1; }
+@media (max-width: 900px) {
+  .falowen-home-spaces__grid:not(.falowen-home-spaces__grid--single)::before {
+    display: none;
+  }
+}
+@media (max-width: 680px) {
+  .falowen-learner-hero { padding: 17px; border-radius: 15px; }
+  .falowen-home-spaces { padding-top: 18px; }
+  .falowen-home-spaces__grid { row-gap: 15px; }
+  .falowen-home-section-break { padding-top: 19px; }
+  .falowen-home-class-schedule { padding: 20px; }
 }
