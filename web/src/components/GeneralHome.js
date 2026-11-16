@@ -33,23 +33,23 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
   const courseBadge = isSwahili ? "KISWAHILI A1 · COURSE READY" : levelKey ? levelKey + " COURSE · READY" : "YOUR CAMPUS";
 
   return (
-    <div className={"falowen-home-hero" + (isSwahili ? " falowen-home-hero--single" : "")}>
-      <section className="falowen-home-hero__welcome" aria-label="Welcome to Falowen">
-        <span className="falowen-home-hero__badge"><span aria-hidden="true" />{courseBadge}</span>
-        <h1>{t("generalHome.welcome.title", { studentName })}</h1>
-        <p className="falowen-home-hero__lead">Your campus is ready. Let’s make progress.</p>
-        <p className="falowen-home-hero__description">
+    <div className={"falowen-learner-hero" + (isSwahili ? " falowen-learner-hero--single" : "")}>
+      <section className="falowen-learner-hero__welcome" aria-label="Welcome to Falowen">
+        <span className="falowen-learner-hero__badge"><span aria-hidden="true" />{courseBadge}</span>
+        <h1>Welcome back, {studentName}.</h1>
+        <p className="falowen-learner-hero__lead">Your campus is ready. Let’s make progress.</p>
+        <p className="falowen-learner-hero__description">
           {isSwahili
             ? "Your Kiswahili course is ready. Continue published lessons in Campus and submit work for tutor review."
             : "Your " + courseLabel + " is ready. Use Campus for daily learning, and use Exams Room for exam practice."}
         </p>
-        <div className="falowen-home-hero__actions">
-          <button type="button" className="falowen-home-hero__primary" onClick={onContinueLearning}>
+        <div className="falowen-learner-hero__actions">
+          <button type="button" className="falowen-learner-hero__primary" onClick={onContinueLearning}>
             Open Campus <span aria-hidden="true">→</span>
           </button>
-          <button type="button" className="falowen-home-hero__secondary" onClick={onOpenAccount}>Account</button>
+          <button type="button" className="falowen-learner-hero__secondary" onClick={onOpenAccount}>Account</button>
           {!isSwahili && (
-            <button type="button" className="falowen-home-hero__zoom" onClick={onJoinZoom}>
+            <button type="button" className="falowen-learner-hero__zoom" onClick={onJoinZoom}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                 <rect x="3" y="6" width="13" height="12" rx="2" />
                 <path d="m16 10 5-3v10l-5-3" />
@@ -109,7 +109,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) =>
             </span>
             <div className="falowen-home-space-card__heading">
               <span className="falowen-home-space-card__eyebrow falowen-home-space-card__eyebrow--exams">EXAM MODE</span>
-              <h3>{t("generalHome.exams.title")}</h3>
+              <h3>Exams Room</h3>
             </div>
           </div>
           <div className="falowen-home-space-card__body">

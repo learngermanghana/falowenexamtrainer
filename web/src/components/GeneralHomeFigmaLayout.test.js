@@ -9,9 +9,11 @@ describe("Figma-inspired signed-in learner homepage", () => {
   const readiness = read("ExamReadinessBadge.js");
 
   test("has accessible welcome, exam journey and two learning cards", () => {
-    expect(home).toContain('className="falowen-home-hero__welcome"');
+    expect(home).toContain('className="falowen-learner-hero__welcome"');
     expect(home).toContain('variant="homepage"');
     expect(home).toContain("Your learning spaces");
+    expect(home).toContain("Welcome back, {studentName}.");
+    expect(home).toContain("<h3>Exams Room</h3>");
     expect(home).toContain("Open Course Book");
     expect(home).toContain("Open Exams Room");
     expect(home).toContain("onJoinZoom={joinZoom}");
@@ -26,9 +28,19 @@ describe("Figma-inspired signed-in learner homepage", () => {
   });
 
   test("preserves Kiswahili without showing German exam preparation", () => {
-    expect(home).toContain('isSwahili ? " falowen-home-hero--single"');
+    expect(home).toContain('isSwahili ? " falowen-learner-hero--single"');
     expect(home).toContain('{!isSwahili && (');
     expect(home).toContain('isSwahili ? " falowen-home-spaces__grid--single"');
+  });
+
+  test("does not reuse the public landing page hero selector", () => {
+    const marketing = read("LandingPageMarketing.css");
+    expect(marketing).toContain(".falowen-home-hero {");
+    expect(home).toContain('className={"falowen-learner-hero"');
+    expect(home).not.toContain("falowen-home-hero");
+    expect(styles).toContain(".falowen-learner-hero {");
+    expect(styles).not.toContain(".falowen-home-hero {");
+    expect(styles).toContain("background: transparent;");
   });
 
   test("responds to mobile widths and keyboard focus", () => {
