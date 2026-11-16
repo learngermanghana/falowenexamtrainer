@@ -6,6 +6,7 @@ import { styles } from "../styles";
 import { TimedAssignmentPanel } from "./SharedTimedAssignment";
 import { normalizeA1SectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
 import A1CourseBookOffer from "./A1CourseBookOffer";
+import A1Day1Dictionary from "./A1Day1Dictionary";
 import "./a1TutorMusicTabs.css";
 import { useA1TimedMockExam } from "./A1TimedMockExam";
 
@@ -57,18 +58,19 @@ export const validateWorkbookSections = (assignment, sectionElements) => {
   });
 };
 
-export const getAllowedWorkbookTabs = (sections, hasGrammar = false, hasMusic = false, groupAssignmentSections = false) => [
+export const getAllowedWorkbookTabs = (sections, hasGrammar = false, hasMusic = false, groupAssignmentSections = false, hasDictionary = false) => [
   sections.length ? "overview" : "assignment",
   ...(hasMusic ? ["music"] : []),
   ...(hasGrammar ? ["grammar"] : []),
+  ...(hasDictionary ? ["dictionary"] : []),
   ...(groupAssignmentSections ? ["assignment"] : sections.map(({ key }) => key)),
   "submit",
 ];
 
-export const useA1WorkbookTabState = ({ assignment, sections = assignment.sections, hasGrammar = false, hasMusic = false, groupAssignmentSections = false }) => {
+export const useA1WorkbookTabState = ({ assignment, sections = assignment.sections, hasGrammar = false, hasMusic = false, groupAssignmentSections = false, hasDictionary = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections, hasGrammar, hasMusic, groupAssignmentSections), [hasGrammar, hasMusic, sections, groupAssignmentSections]);
+  const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections, hasGrammar, hasMusic, groupAssignmentSections, hasDictionary), [hasGrammar, hasMusic, hasDictionary, sections, groupAssignmentSections]);
   const fallbackTab = sections.length ? "overview" : "assignment";
   const rawSearch = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const requestedTab = rawSearch.get("workbookTab");
@@ -163,12 +165,13 @@ const tabButtonStyle = (selected, submit = false) => ({
   whiteSpace: "normal",
 });
 
-export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false, hasMusic = false, groupAssignmentSections = false } = {}) =>
+export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false, hasMusic = false, groupAssignmentSections = false, hasDictionary = false } = {}) =>
   sections.length
     ? [
       { key: "overview", label: "Overview" },
       ...(hasMusic ? [{ key: "music", label: "♫ Music", optional: true }] : []),
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
+      ...(hasDictionary ? [{ key: "dictionary", label: "Dictionary", optional: true }] : []),
       ...(groupAssignmentSections ? [{ key: "assignment", label: "Assignment" }] : sections),
       { key: "submit", label: "Review & Submit", submit: true },
     ]
@@ -176,6 +179,7 @@ export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false,
       { key: "assignment", label: "Assignment" },
       ...(hasMusic ? [{ key: "music", label: "♫ Music", optional: true }] : []),
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
+      ...(hasDictionary ? [{ key: "dictionary", label: "Dictionary", optional: true }] : []),
       { key: "submit", label: "Review & Submit", submit: true },
     ];
 
@@ -225,8 +229,8 @@ export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect })
   );
 };
 
-export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false, hasMusic = false, assignmentLocked = false, isTabLocked = null, groupAssignmentSections = false }) => {
-  const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar, hasMusic, groupAssignmentSections });
+export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false, hasMusic = false, hasDictionary = false, assignmentLocked = false, isTabLocked = null, groupAssignmentSections = false }) => {
+  const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar, hasMusic, hasDictionary, groupAssignmentSections });
   const requiredTabs = tabs.filter((tab) => !tab.optional);
   const activeIndex = Math.max(0, requiredTabs.findIndex((tab) => tab.key === activeTab));
   const activeTabDefinition = tabs.find((tab) => tab.key === activeTab) || null;
@@ -271,7 +275,7 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
             </button>
           );
         })}
-        <TimedAssignmentPanel studyMode={activeTab === "grammar" || activeTab === "music"} />
+        <TimedAssignmentPanel studyMode={activeTab === "grammar" || activeTab === "music" || activeTab === "dictionary"} />
       </nav>
 
       <A1CourseBookOffer />
@@ -281,13 +285,13 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
         style={{ ...styles.card, padding: "10px 12px", display: "grid", gap: 7 }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", color: "#475569", fontSize: 13, fontWeight: 800 }}>
-          <span>{activeTab === "music" ? "♫ Optional listening · ungraded" : `Section ${activeIndex + 1} of ${requiredTabs.length}`}</span>
+          <span>{activeTab === "music" ? "♫ Optional listening · ungraded" : activeTab === "dictionary" ? "Dictionary · optional study" : `Section ${activeIndex + 1} of ${requiredTabs.length}`}</span>
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <span>{activeTab === "music" ? "No submission required" : `${progressPercent}%`}</span>
+            <span>{activeTab === "music" || activeTab === "dictionary" ? "No submission required" : `${progressPercent}%`}</span>
 
           </div>
         </div>
-        {activeTab !== "music" ? <div
+        {activeTab !== "music" && activeTab !== "dictionary" ? <div
           role="progressbar"
           aria-label="A1 workbook section progress"
           aria-valuemin={0}
@@ -353,10 +357,11 @@ export default function A1SharedAssignmentWorkbookLayout({
     : assignment.sections.filter(({ key }) => renderedKeys.has(key));
   const hasGrammar = Boolean(grammar);
   const hasMusic = Boolean(music);
-  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar, hasMusic, groupAssignmentSections });
+  const hasDictionary = isCombinedDay1;
+  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar, hasMusic, hasDictionary, groupAssignmentSections });
   const { assignmentLocked, isTabLocked } = useA1TimedMockExam();
   const overviewTab = availableSections.length ? "overview" : "assignment";
-  const activeTabAllowedWhileLocked = ["overview", "grammar", "music"].includes(activeTab) || (!groupAssignmentSections && activeTab === "assignment");
+  const activeTabAllowedWhileLocked = ["overview", "grammar", "music", "dictionary"].includes(activeTab) || (!groupAssignmentSections && activeTab === "assignment");
   const visibleActiveTab = !activeTabAllowedWhileLocked && isTabLocked(activeTab)
     ? (hasGrammar ? "grammar" : overviewTab)
     : activeTab;
@@ -389,6 +394,7 @@ export default function A1SharedAssignmentWorkbookLayout({
         onSelect={openTab}
         hasGrammar={hasGrammar}
         hasMusic={hasMusic}
+        hasDictionary={hasDictionary}
         groupAssignmentSections={groupAssignmentSections}
         assignmentLocked={assignmentLocked}
         isTabLocked={isTabLocked}
@@ -399,6 +405,11 @@ export default function A1SharedAssignmentWorkbookLayout({
         {hasGrammar ? (
           <div data-workbook-panel="grammar" hidden={visibleActiveTab !== "grammar"} data-workbook-grammar={assignment.assignmentKey}>
             {grammar}
+          </div>
+        ) : null}
+        {hasDictionary ? (
+          <div data-workbook-panel="dictionary" hidden={visibleActiveTab !== "dictionary"}>
+            <A1Day1Dictionary />
           </div>
         ) : null}
         {groupAssignmentSections ? (
