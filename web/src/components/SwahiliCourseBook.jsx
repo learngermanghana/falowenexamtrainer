@@ -15,7 +15,6 @@ import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import "./SwahiliCourseBook.css";
 
-const LETTERS = ["A", "E", "I", "O", "U"];
 const TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.map((tab) =>
   tab.key === "submit" ? { ...tab, label: "Review & Submit" } : tab);
 const TAB_DESCRIPTIONS = {
@@ -37,7 +36,7 @@ export const getMissingSwahiliDayOneWork = ({ writing, readingAnswers }) => {
   if (!SWAHILI_DAY_ONE.reading.every((question) => Boolean(readingAnswers?.[question.id]))) {
     missing.push("Teil 3 · Kusoma");
   }
-  // Teil 1 is teacher-led; Teil 4 is optional until the instructor provides listening audio.
+  // Teil 1 is teacher-led; the recorded Teil 4 remains optional.
   return missing;
 };
 
@@ -59,6 +58,28 @@ function DayOneContent({
   teacherReview,
 }) {
   const lesson = SWAHILI_DAY_ONE;
+  const [audio, setAudio] = useState({ url: "", loading: false, error: "" });
+
+  async function loadListeningAudio() {
+    if (audio.loading) return;
+    if (!user?.getIdToken) {
+      setAudio({ url: "", loading: false, error: "Sign in to play the recording." });
+      return;
+    }
+    setAudio(current => ({ ...current, loading: true, error: "" }));
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch("/api/course-media/swahili/a1/day-1/audio-url", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const result = await response.json();
+      if (!response.ok || !result?.url) throw new Error(result?.error || "Could not load the listening recording.");
+      setAudio({ url: result.url, loading: false, error: "" });
+    } catch (error) {
+      setAudio(current => ({ ...current, loading: false, error: error.message || "Could not load the listening recording." }));
+    }
+  }
+
   const changeWriting = (field, value) => setWriting((prior) => ({ ...prior, [field]: value }));
 
   if (activeTab === "references") return (
@@ -213,24 +234,30 @@ function DayOneContent({
   if (activeTab === "hoeren") return (
     <section className="swahili-book__card swahili-book__activity" aria-label="Teil 4">
       <h2>Teil 4 · Kusikiliza (Listening)</h2>
-      <p>Mwalimu aseme neno moja moja. Chagua vokali inayojirudia katika kila neno.</p>
-      <p className="swahili-book__note">Sauti iliyorekodiwa bado haijapatikana. Kwa sasa mwalimu atasoma maneno. Hii ni sehemu ya mazoezi ya hiari mpaka sauti itakapopakiwa.</p>
-      <div className="swahili-book__quiz">
-        {lesson.listening.map((item, index) => (
-          <div className="swahili-book__quizItem" key={item.word}>
-            <label htmlFor={"swahili-listen-" + index}>Neno la {index + 1}</label>
-            <select id={"swahili-listen-" + index} value={listeningAnswers[index] || ""}
-              onChange={(event) => { setListeningAnswers((prior) => ({ ...prior, [index]: event.target.value })); }}>
-              <option value="">Chagua vokali</option>
-              {LETTERS.map((vowel) => <option key={vowel} value={vowel}>{vowel}</option>)}
-            </select>
-          </div>
+      <p>Sikiliza mazungumzo mara mbili, kisha chagua jibu sahihi kwa kila swali.</p>
+      <p className="swahili-book__note">Listen twice and select one answer per question. This activity is optional.</p>
+      <button type="button" className="swahili-book__button swahili-book__button--soft"
+        onClick={loadListeningAudio} disabled={audio.loading}>
+        {audio.loading ? "Inapakia sauti…" : audio.url ? "Pakia sauti tena · Refresh audio" : "Sikiliza sauti · Load audio"}
+      </button>
+      {audio.url && <audio controls preload="none" src={audio.url} aria-label="Day 1 Swahili listening recording" />}
+      {audio.error && <p className="swahili-book__error" role="alert">{audio.error}</p>}
+      <div className="swahili-book__quiz" lang="sw">
+        {lesson.listening.map(({ id, question, choices }, index) => (
+          <fieldset className="swahili-book__exercise" key={id}>
+            <legend>{index + 1}. {question}</legend>
+            <div className="swahili-book__choices">
+              {choices.map(choice => (
+                <label className="swahili-book__choice" key={choice}>
+                  <input type="radio" name={`day-one-listening-${id}`} checked={listeningAnswers[id] === choice}
+                    onChange={() => setListeningAnswers(current => ({ ...current, [id]: choice }))} />
+                  {choice}
+                </label>
+              ))}
+            </div>
+          </fieldset>
         ))}
       </div>
-      <details>
-        <summary>Kwa mwalimu: maneno ya kusoma</summary>
-        <p>{lesson.listening.map((item) => item.word).join(" · ")}</p>
-      </details>
     </section>
   );
 
@@ -239,9 +266,9 @@ function DayOneContent({
   return (
     <section className="swahili-book__card swahili-book__activity" aria-label="Review & Submit">
       <h2>Review &amp; Submit · Somo la 1</h2>
-      <p>Kagua majibu yako kabla ya kuwasilisha. Teil 1 ni mazoezi ya darasani. Teil 4 ni ya hiari mpaka rekodi itakapopakiwa.</p>
+      <p>Kagua majibu yako kabla ya kuwasilisha. Teil 1 ni mazoezi ya darasani. Teil 4 ni ya hiari.</p>
       <SwahiliReviewDraft writing={{ Vokali: writing.vowels, Silabi: writing.syllables, Maneno: writing.words }} questions={lesson.reading} reading={readingAnswers}
-        listening={listeningAnswers} draft={canSubmit ? draft : null} />
+        listening={listeningAnswers} listeningQuestions={lesson.listening} draft={canSubmit ? draft : null} />
       {missing.length ? <p className="swahili-book__note" role="status">Kamilisha kwanza: {missing.join(" · ")}</p> : null}
       {!canSubmit ? (
         <p className="swahili-book__note">Ingia kwenye akaunti yako ya Falowen ya Kiswahili na ufungue Campus ili kuwasilisha. This public preview cannot submit work. <Link to="/login">Ingia</Link></p>
@@ -333,7 +360,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
         writing: { ...writing },
         readingAnswers: { ...readingAnswers },
         listeningAnswers: { ...listeningAnswers },
-        listeningTeacherLed: true,
+        listeningTeacherLed: false,
         studentName: studentProfile?.name || studentProfile?.displayName || user?.displayName || "",
         studentEmail: user?.email || "",
         submittedAt: serverTimestamp(),

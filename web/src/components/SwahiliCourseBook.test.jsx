@@ -148,16 +148,19 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.getByLabelText(/Vokali tano/).value).toBe("A, E, I, O, U");
   });
 
-  it("keeps teacher-led listening honest without claiming uploaded music/audio", () => {
+  it("shows five recorded listening questions and loads the audio on demand", () => {
     expect(SWAHILI_DAY_ONE.listening).toHaveLength(5);
     renderLesson();
     openTab("Teil 4");
-    expect(screen.getByText(/Sauti iliyorekodiwa bado haijapatikana/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Load audio/ })).toBeTruthy();
+    expect(screen.getAllByRole("radio")).toHaveLength(15);
+    fireEvent.click(screen.getByRole("radio", { name: "Kesho" }));
+    expect(screen.getByRole("radio", { name: "Kesho" }).checked).toBe(true);
     expect(document.querySelector("audio")).toBeNull();
     expect(screen.queryByRole("button", { name: "Kagua majibu" })).toBeNull();
   });
 
-  it("requires writing and reading, not unrecorded listening, before Submit", () => {
+  it("requires writing and reading while keeping recorded listening optional", () => {
     expect(getMissingSwahiliDayOneWork({ writing: { vowels:"A E I O U", syllables:"ba be bi bo bu", words:"mama kiti kuku" }, readingAnswers: {mother:"mama",child:"mtoto",chair:"kiti",u:"kuku"} })).toEqual([]);
     expect(getMissingSwahiliDayOneWork({ writing: {}, readingAnswers: {} })).toEqual(expect.arrayContaining(["Teil 2 · Vokali", "Teil 3 · Kusoma"]));
     renderLesson();
