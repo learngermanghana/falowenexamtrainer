@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
+import "./FullClassCalendarPage.css";
+import { groupTimetableSessionsByMonth, selectFeaturedTimetableSession } from "../utils/fullClassTimetableView";
 import { styles } from "../styles";
 import { classCatalog } from "../data/classCatalog";
 import { courseSchedulesByName } from "../data/courseSchedules";
@@ -59,25 +61,22 @@ const isActiveSessionRecord = (session = {}) => {
   return !INACTIVE_SESSION_STATUSES.has(status) && session.superseded !== true && session.isSuperseded !== true;
 };
 
-const timetableActionStyle = {
-  ...styles.secondaryButton,
-  minHeight: 40,
-  width: "fit-content",
-  borderRadius: 11,
-  padding: "9px 13px",
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 6,
-  fontWeight: 800,
-  textDecoration: "none",
+const formatSpotlightDate = value => {
+  const date = asLiveClassDate(value);
+  if (!date) return "DATE TO BE CONFIRMED";
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: GHANA_TIMEZONE,
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  }).format(date).toUpperCase();
 };
 
-const statusBadgeStyle = (status) => {
-  if (status === "Live now") return { ...styles.badge, background: "#dcfce7", color: "#166534" };
-  if (status === "Today") return { ...styles.badge, background: "#fef3c7", color: "#92400e" };
-  if (status === "Completed") return { ...styles.badge, background: "#f1f5f9", color: "#475569" };
-  return { ...styles.badge, background: "#dbeafe", color: "#1e40af" };
+const statusTone = status => {
+  if (status === "Live now" || status === "Today") return "current";
+  if (status === "Completed") return "completed";
+  if (status === "Awaiting completion") return "pending";
+  return "upcoming";
 };
 
 const FullClassCalendarPage = () => {
@@ -146,101 +145,155 @@ const FullClassCalendarPage = () => {
   const level = liveClassLevel(summary, canonicalSessions[0] || {});
   const firstSession = canonicalSessions[0] || null;
   const lastSession = canonicalSessions[canonicalSessions.length - 1] || null;
+  const featured = selectFeaturedTimetableSession(canonicalSessions, now);
+  const featuredSession = featured?.session || null;
+  const featuredStatus = featuredSession ? liveClassSessionStatus(featuredSession, now) : "";
+  const featuredLabel = featured?.isLatest
+    ? "LATEST CLASS"
+    : featuredStatus === "Live now"
+      ? "LIVE NOW"
+      : featuredStatus === "Today"
+        ? "TODAY"
+        : "NEXT CLASS";
+  const groupedSessions = useMemo(() => groupTimetableSessionsByMonth(canonicalSessions), [canonicalSessions]);
+  const timeRanges = [...new Set(canonicalSessions.map(session =>
+    formatTime(session.startsAt) + "–" + formatTime(session.endsAt)
+  ))];
+  const overviewTime = timeRanges.length === 1
+    ? timeRanges[0] + " Ghana time"
+    : "Session times vary · Ghana time";
   const useStaticFallback = !summary && ["unavailable", "error"].includes(currentResolution.status);
   const classMeta = useStaticFallback ? classCatalog[className] || null : null;
   const fallbackSchedule = useStaticFallback ? courseSchedulesByName[className] || null : null;
 
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+    <div className="fct-page">
+      <header className="fct-heading">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
-          <div style={{ display: "grid", gap: 4 }}>
-            <h1 style={{ ...styles.title, margin: 0 }}>Full class timetable</h1>
-            <p style={{ ...styles.subtitle, margin: 0 }}>{resolvedClassName || "Class not found"}</p>
-          </div>
+        <div className="fct-heading__title-row">
+          <h1>Full class timetable</h1>
           {summary ? (
-            <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>Live timetable</span>
+            <span className="fct-live-badge"><span aria-hidden="true" />Live timetable</span>
           ) : currentResolution.status === "loading" ? (
-            <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>Checking latest timetable…</span>
+            <span className="fct-state-badge">Checking latest timetable…</span>
           ) : useStaticFallback ? (
-            <span style={{ ...styles.badge, background: "#fef3c7", color: "#92400e" }}>Offline timetable fallback</span>
+            <span className="fct-state-badge fct-state-badge--offline">Offline timetable fallback</span>
           ) : null}
         </div>
-        <p style={{ ...styles.helperText, margin: 0, fontSize: 13 }}>
-          {summary
-            ? "This timetable uses the same current class-session records as the Home next-class card, including rescheduled sessions."
-            : currentResolution.status === "loading"
-              ? "Loading the current class record…"
-              : "The live timetable is temporarily unavailable."}
-        </p>
-      </div>
+        <p>Your learning journey, one class at a time.</p>
+      </header>
 
       {summary ? (
-        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Class overview</h2>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {firstSession ? formatDate(firstSession.startsAt) : formatDate(summary?.klass?.startDate)}
-            {" → "}
-            {lastSession ? formatDate(lastSession.endsAt || lastSession.startsAt) : formatDate(summary?.klass?.endDate)}
-          </p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {level ? <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{level}</span> : null}
-            <span style={{ ...styles.badge, background: "#f1f5f9", color: "#334155" }}>
-              {canonicalSessions.length} current session{canonicalSessions.length === 1 ? "" : "s"}
-            </span>
-          </div>
-        </section>
+        <div className="fct-summary-grid">
+          {featuredSession ? (
+            <section className="fct-feature" aria-label="Featured class session">
+              <div className="fct-feature__eyebrow">
+                <span>{featuredLabel} · {formatSpotlightDate(featuredSession.startsAt)}</span>
+                <span className="fct-feature__day">{liveClassLessonLabel(featuredSession, level)}</span>
+              </div>
+              <h2>{liveClassCleanTitle(featuredSession)}</h2>
+              <p>{formatTime(featuredSession.startsAt)}–{formatTime(featuredSession.endsAt)} Ghana time
+                {liveClassAssignmentLabel(featuredSession) ? " · " + liveClassAssignmentLabel(featuredSession) : ""}
+              </p>
+              <a className="fct-feature__action" href={liveClassLessonLink(summary, featuredSession)}>
+                Open lesson <span aria-hidden="true">→</span>
+              </a>
+            </section>
+          ) : (
+            <section className="fct-feature fct-feature--empty">
+              <span className="fct-feature__eyebrow">YOUR CLASS</span>
+              <h2>No current lessons scheduled</h2>
+              <p>New lesson dates will appear here when they are published.</p>
+            </section>
+          )}
+
+          <section className="fct-overview" aria-label="Class overview">
+            <div className="fct-overview__name">
+              <h2>{resolvedClassName || "Your class"}</h2>
+              {level ? <span className="fct-overview__level">{level}</span> : null}
+            </div>
+            <span className="fct-overview__eyebrow">CLASS OVERVIEW</span>
+            <p className="fct-overview__dates">
+              {firstSession ? formatDate(firstSession.startsAt) : formatDate(summary?.klass?.startDate)}
+              {" → "}
+              {lastSession ? formatDate(lastSession.endsAt || lastSession.startsAt) : formatDate(summary?.klass?.endDate)}
+            </p>
+            <div className="fct-overview__meta">
+              <strong>{canonicalSessions.length} current session{canonicalSessions.length === 1 ? "" : "s"}</strong>
+              <span>{canonicalSessions.length ? overviewTime : "No published session times"}</span>
+            </div>
+          </section>
+        </div>
       ) : null}
 
       {summary && canonicalSessions.length ? (
-        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Session plan</h2>
-          <div style={{ display: "grid", gap: 9 }}>
-            {canonicalSessions.map((session) => {
-              const status = liveClassSessionStatus(session, now);
-              const assignment = liveClassAssignmentLabel(session);
-              const lessonLabel = liveClassLessonLabel(session, level);
-              return (
-                <article
-                  key={session.id || `${sessionTimestamp(session)}-${lessonLabel}`}
-                  style={{
-                    border: "1px solid #e2e8f0",
-                    borderRadius: 13,
-                    padding: 12,
-                    display: "grid",
-                    gap: 7,
-                    background: status === "Live now" ? "#f0fdf4" : "#ffffff",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ color: "#2563eb", fontSize: 12, fontWeight: 900 }}>{lessonLabel}</div>
-                      <div style={{ marginTop: 2, fontWeight: 800, color: "#0f172a" }}>{liveClassCleanTitle(session)}</div>
-                    </div>
-                    <span style={statusBadgeStyle(status)}>{status}</span>
-                  </div>
-                  <div style={{ color: "#475569", fontSize: 14 }}>
-                    <strong>{formatDate(session.startsAt)}</strong>
-                    {" · "}{formatTime(session.startsAt)}–{formatTime(session.endsAt)} Ghana time
-                    {assignment ? ` · ${assignment}` : ""}
-                  </div>
-                  <a href={liveClassLessonLink(summary, session)} style={timetableActionStyle}>
-                    Open lesson <span aria-hidden="true">→</span>
-                  </a>
-                </article>
-              );
-            })}
+        <section className="fct-plan" aria-label="Class session plan">
+          <div className="fct-plan__heading">
+            <div className="fct-plan__title">
+              <h2>Session plan</h2>
+              <span>{canonicalSessions.length} session{canonicalSessions.length === 1 ? "" : "s"}</span>
+            </div>
+            <p>All times in Ghana time (GMT)</p>
+          </div>
+          <p className="fct-plan__description">
+            This timetable uses current class-session records, including rescheduled sessions.
+          </p>
+          <div className="fct-plan__table-wrap" role="region" aria-label="Scrollable session timetable" tabIndex={0}>
+            <table className="fct-table">
+              <thead>
+                <tr>
+                  <th scope="col">Day</th>
+                  <th scope="col">Date &amp; time</th>
+                  <th scope="col">Lesson</th>
+                  <th scope="col">Status</th>
+                  <th scope="col"><span className="fct-visually-hidden">Lesson link</span></th>
+                </tr>
+              </thead>
+              {groupedSessions.map(group => (
+                <tbody key={group.month}>
+                  <tr className="fct-table__month">
+                    <th scope="rowgroup" colSpan={5}>{group.month}</th>
+                  </tr>
+                  {group.sessions.map((session, index) => {
+                    const status = liveClassSessionStatus(session, now);
+                    const assignment = liveClassAssignmentLabel(session);
+                    const label = liveClassLessonLabel(session, level);
+                    const highlighted = featuredSession === session && !featured?.isLatest;
+                    return (
+                      <tr className={"fct-table__session" + (highlighted ? " fct-table__session--featured" : "")}
+                          key={session.id || String(sessionTimestamp(session)) + "-" + index}>
+                        <td className="fct-table__day">{label}</td>
+                        <td className="fct-table__date">
+                          <strong>{formatDate(session.startsAt)}</strong>
+                          <small>{formatTime(session.startsAt)}–{formatTime(session.endsAt)} Ghana time</small>
+                        </td>
+                        <td className="fct-table__lesson">
+                          <strong>{liveClassCleanTitle(session)}</strong>
+                          {assignment ? <small>{assignment}</small> : null}
+                        </td>
+                        <td><span className={"fct-table__status fct-table__status--" + statusTone(status)}>
+                          {status === "Today" || status === "Live now" ? <span className="fct-table__status-dot" aria-hidden="true" /> : null}
+                          {status}
+                        </span></td>
+                        <td className="fct-table__action-cell">
+                          <a href={liveClassLessonLink(summary, session)}>Open lesson <span aria-hidden="true">→</span></a>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              ))}
+            </table>
           </div>
         </section>
       ) : summary ? (
-        <section style={styles.card}>
-          <p style={{ margin: 0 }}>No current sessions were found for this class.</p>
+        <section className="fct-empty" role="status">
+          No current sessions were found for this class.
         </section>
       ) : currentResolution.status === "loading" ? (
-        <section style={{ ...styles.card, display: "grid", gap: 5 }}>
+        <section className="fct-empty" role="status">
           <strong>Loading current sessions…</strong>
-          <p style={{ ...styles.helperText, margin: 0 }}>The old generated timetable is not shown while the current class record is loading.</p>
+          <p>The old generated timetable is not shown while the current class record is loading.</p>
         </section>
       ) : null}
 
