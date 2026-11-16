@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import WorkbookDayMusic from "./WorkbookDayMusic";
+import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GrammarSelfCheck } from "./MgahawaniGrammarPractice";
@@ -36,6 +37,7 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
   }
 
   return (
+    <SwahiliWorkbookRadio lesson={lesson} preview={preview}>
     <main className="swahili-book swahili-book--workbook">
       <div className="swahili-book__top">
         <span className="swahili-book__brand">Falowen · Kiswahili</span>
@@ -147,5 +149,6 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
       </section>
       <SwahiliWorkbookNavigation tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
     </main>
+    </SwahiliWorkbookRadio>
   );
 }
