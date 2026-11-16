@@ -152,16 +152,20 @@
   box-sizing: border-box;
 }
 
-.falowen-home-hero {
+.falowen-learner-hero {
   display: grid;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--fh-ink);
   grid-template-columns: minmax(0, 1.75fr) minmax(290px, 0.94fr);
   gap: clamp(24px, 5vw, 64px);
   align-items: stretch;
 }
 
-.falowen-home-hero--single { grid-template-columns: minmax(0, 1fr); }
+.falowen-learner-hero--single { grid-template-columns: minmax(0, 1fr); }
 
-.falowen-home-hero__welcome {
+.falowen-learner-hero__welcome {
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -170,7 +174,7 @@
   padding: 4px 0;
 }
 
-.falowen-home-hero__badge {
+.falowen-learner-hero__badge {
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -185,7 +189,7 @@
   line-height: 1.3;
 }
 
-.falowen-home-hero__badge span {
+.falowen-learner-hero__badge span {
   width: 7px;
   height: 7px;
   flex: 0 0 7px;
@@ -193,7 +197,7 @@
   background: #287459;
 }
 
-.falowen-home-hero__welcome h1 {
+.falowen-learner-hero__welcome h1 {
   margin: 0 0 10px;
   font-size: clamp(27px, 3.3vw, 44px);
   font-weight: 760;
@@ -202,14 +206,14 @@
   color: var(--fh-ink);
 }
 
-.falowen-home-hero__lead {
+.falowen-learner-hero__lead {
   margin: 0 0 12px;
   font-size: clamp(17px, 1.8vw, 22px);
   line-height: 1.45;
   color: var(--fh-ink);
 }
 
-.falowen-home-hero__description {
+.falowen-learner-hero__description {
   margin: 0;
   max-width: 510px;
   color: var(--fh-muted);
@@ -217,7 +221,7 @@
   line-height: 1.65;
 }
 
-.falowen-home-hero__actions {
+.falowen-learner-hero__actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -225,7 +229,7 @@
   margin-top: 28px;
 }
 
-.falowen-home-hero__actions button {
+.falowen-learner-hero__actions button {
   min-height: 49px;
   border-radius: 11px;
   padding: 12px 18px;
@@ -235,8 +239,8 @@
   cursor: pointer;
   transition: background-color .16s ease, border-color .16s ease, transform .16s ease;
 }
-.falowen-home-hero__actions button:hover { transform: translateY(-1px); }
-.falowen-home-hero__primary {
+.falowen-learner-hero__actions button:hover { transform: translateY(-1px); }
+.falowen-learner-hero__primary {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
@@ -246,15 +250,15 @@
   background: var(--fh-purple);
   color: #fff;
 }
-.falowen-home-hero__primary:hover { background: #5e41c8; }
-.falowen-home-hero__primary span { font-size: 21px; line-height: 1; }
-.falowen-home-hero__secondary {
+.falowen-learner-hero__primary:hover { background: #5e41c8; }
+.falowen-learner-hero__primary span { font-size: 21px; line-height: 1; }
+.falowen-learner-hero__secondary {
   border: 1px solid #dedce6;
   background: #fff;
   color: var(--fh-ink);
 }
-.falowen-home-hero__secondary:hover { background: #f1eff9; }
-.falowen-home-hero__zoom {
+.falowen-learner-hero__secondary:hover { background: #f1eff9; }
+.falowen-learner-hero__zoom {
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -262,8 +266,8 @@
   color: var(--fh-ink);
   background: transparent;
 }
-.falowen-home-hero__zoom:hover { background: #efedf9; }
-.falowen-home-hero__zoom svg { width: 19px; height: 19px; color: var(--fh-muted); }
+.falowen-learner-hero__zoom:hover { background: #efedf9; }
+.falowen-learner-hero__zoom svg { width: 19px; height: 19px; color: var(--fh-muted); }
 .falowen-home-dashboard button:focus-visible,
 .falowen-home-dashboard a:focus-visible {
   outline: 3px solid #8b73ea;
@@ -503,20 +507,20 @@
 .falowen-home-companion a:hover { text-decoration: underline; }
 
 @media (max-width: 900px) {
-  .falowen-home-hero { grid-template-columns: 1fr; gap: 22px; }
-  .falowen-home-hero__welcome { padding: 8px 0; }
+  .falowen-learner-hero { grid-template-columns: 1fr; gap: 22px; }
+  .falowen-learner-hero__welcome { padding: 8px 0; }
 }
 @media (max-width: 680px) {
   .falowen-home-dashboard { padding: 16px; gap: 18px; border-radius: 12px; }
-  .falowen-home-hero__badge { margin-bottom: 16px; }
-  .falowen-home-hero__actions { margin-top: 20px; }
-  .falowen-home-hero__actions button { min-height: 44px; }
+  .falowen-learner-hero__badge { margin-bottom: 16px; }
+  .falowen-learner-hero__actions { margin-top: 20px; }
+  .falowen-learner-hero__actions button { min-height: 44px; }
   .falowen-home-spaces__grid { grid-template-columns: 1fr; gap: 13px; }
   .falowen-home-readiness { padding: 20px; }
   .falowen-home-space-card__level { max-width: 36%; }
   .falowen-home-companion { padding: 17px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .falowen-home-hero__actions button,
+  .falowen-learner-hero__actions button,
   .falowen-home-readiness__track div { transition: none; }
 }
