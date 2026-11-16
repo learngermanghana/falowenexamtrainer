@@ -39,7 +39,8 @@ import {
 } from "../utils/devicePushTokens";
 import { getBackendUrl } from "../services/backendUrl";
 import { createOrResumeSignupAccount } from "../lib/signupAuthRecovery";
-import { resolveUniversityInvitation } from "../lib/universityInvitations";
+import { isUniversityInvitationOpen, resolveUniversityInvitation } from "../lib/universityInvitations";
+import { getDocFromServer } from "firebase/firestore";
 
 const AuthContext = createContext();
 
@@ -595,6 +596,18 @@ export const AuthProvider = ({ children }) => {
       }
       setAuthError("");
 
+      if (universityInvitation) {
+        let invitation;
+        try {
+          invitation = await getDocFromServer(doc(db, "universityInvitations", universityInvitation.code));
+        } catch {
+          throw new Error("We could not check this university invitation. Please try again before creating your account.");
+        }
+        if (!isUniversityInvitationOpen(invitation.data())) {
+          throw new Error("This university invitation is closed or has expired. Ask your course coordinator for an active link.");
+        }
+      }
+
       const normalizedEmail = email.trim().toLowerCase();
       // A previous attempt may have created Firebase Auth successfully but failed
       // before writing students/{studentCode}. Only the correct existing password
@@ -671,9 +684,11 @@ export const AuthProvider = ({ children }) => {
         paymentStatus: universityInvitation ? "exempt_pending" : (profile.paymentStatus || "pending"),
         paystackLink: profile.paystackLink || "",
         paymentIntentAmount: profile.paymentIntentAmount ?? null,
-        contractStart: profile.contractStart || "",
-        contractEnd: profile.contractEnd || "",
-        contractTermMonths: profile.contractTermMonths ?? null,
+        ...(!universityInvitation ? {
+          contractStart: profile.contractStart || "",
+          contractEnd: profile.contractEnd || "",
+          contractTermMonths: profile.contractTermMonths ?? null,
+        } : {}),
         joined_at: trialStartedDate.toISOString(),
         updated_at: serverTimestamp(),
         syncedToSheets: false,

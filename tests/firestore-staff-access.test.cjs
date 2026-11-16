@@ -90,3 +90,32 @@ test('deployed canonical rules give real staff Mock Builder access without stude
     }));
   }
 });
+
+test('Hamburg signup requires an administrator-configured, unexpired invitation', async () => {
+  const path = 'universityInvitations/UH-KISWAHILI-A1';
+  const adminDb = env.authenticatedContext('invite-admin', {admin: true}).firestore();
+  const staffDb = env.authenticatedContext('invite-tutor', {staff: true}).firestore();
+  const studentDb = env.authenticatedContext('university-learner').firestore();
+  const visitorDb = env.unauthenticatedContext().firestore();
+  const expiry = new Date(Date.now() + 600000);
+  const profile = {
+    uid: 'university-learner', program: 'swahili', registrationSource: 'university-invite',
+    institutionId: 'university-hamburg', cohortId: 'university-hamburg-kiswahili-a1',
+    universityInvitationCode: 'UH-KISWAHILI-A1', status: 'registered',
+    institutionVerification: 'pending', accessType: 'invitation_pending',
+    paymentStatus: 'exempt_pending', trialStatus: 'not_applicable',
+  };
+  await assertFails(setDoc(doc(studentDb, 'students/invite-missing'), profile));
+  await assertFails(setDoc(doc(staffDb, path), {expiresAt: expiry}));
+  await assertFails(setDoc(doc(studentDb, path), {expiresAt: expiry}));
+  await assertFails(setDoc(doc(adminDb, path), {expiresAt: new Date(0)}));
+  await assertSucceeds(setDoc(doc(adminDb, path), {expiresAt: expiry}));
+  await assertSucceeds(getDoc(doc(visitorDb, path)));
+  await assertFails(getDocs(collection(visitorDb, 'universityInvitations')));
+  await assertFails(setDoc(doc(studentDb, 'students/invite-bad-code'), {...profile, universityInvitationCode: 'wrong'}));
+  await assertFails(setDoc(doc(studentDb, 'students/invite-contract'), {...profile, contractEnd: ''}));
+  await assertSucceeds(setDoc(doc(studentDb, 'students/invite-valid'), profile));
+  await env.withSecurityRulesDisabled(context =>
+    setDoc(doc(context.firestore(), path), {expiresAt: new Date(0)}));
+  await assertFails(setDoc(doc(studentDb, 'students/invite-expired'), profile));
+});

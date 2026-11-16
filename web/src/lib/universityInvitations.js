@@ -34,3 +34,8 @@ export function isPendingUniversityStudent(profile = {}) {
   return isHamburgUniversityStudent(profile) &&
     !isApprovedUniversityStudent(profile);
 }
+
+export function isUniversityInvitationOpen(invitation, now = Date.now()) {
+  const expiry = invitation?.expiresAt?.toMillis?.();
+  return Number.isFinite(expiry) && now < expiry;
+}
