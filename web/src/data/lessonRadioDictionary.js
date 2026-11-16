@@ -270,7 +270,16 @@ export const LESSON_RADIO_DICTIONARY = {
         "Höre aufmerksam zu und stimme dich auf klimafreundliches Leben im Alltag ein. Danach gehst du weiter zum Workbook.",
     },
   },
-  B2: {},
+  B2: {
+    1: {
+      key: "b2-day1-muell-vermeiden-falowen-radio",
+      title: "Umweltschutz im Alltag – Müll vermeiden",
+      youtubeId: "tkWdHUjBPxg",
+      duration: "",
+      instruction:
+        "Höre den Podcast über Müllvermeidung aufmerksam an. Achte auf konkrete Maßnahmen, ihre Begründungen und ihre Folgen. Danach gehst du weiter zum Lernteil.",
+    },
+  },
   C1: {
     1: {
       key: "c1-day1-ziele-lernweg-falowen-radio",
