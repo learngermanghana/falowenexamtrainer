@@ -14,8 +14,15 @@ import b2Day5 from "./selfLearningLessons/b2/day5GesundheitUndWohlbefinden";
 import b2Day6 from "./selfLearningLessons/b2/day6MigrationUndIntegration";
 
 describe("B2 media reset after the topic redesign", () => {
-  test("removes all retired B2 Falowen Radio mappings", () => {
-    expect(LESSON_RADIO_DICTIONARY.B2).toEqual({});
+  test("keeps only the approved new-topic B2 Day 1 Radio and removes retired B2 mappings", () => {
+    expect(Object.keys(LESSON_RADIO_DICTIONARY.B2)).toEqual(["1"]);
+    expect(LESSON_RADIO_DICTIONARY.B2[1]).toEqual(
+      expect.objectContaining({
+        key: "b2-day1-muell-vermeiden-falowen-radio",
+        title: "Umweltschutz im Alltag – Müll vermeiden",
+        youtubeId: "tkWdHUjBPxg",
+      }),
+    );
     expect(B2_C1_LESSON_RADIO_OVERRIDES.B2).toEqual({});
   });
 
