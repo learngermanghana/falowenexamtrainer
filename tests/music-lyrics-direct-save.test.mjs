@@ -24,11 +24,16 @@ function fakeRes(){
 function request(body=payload,token='good-token'){
   return {method:'POST',headers:{origin:'https://admin.falowen.app',authorization:'Bearer '+token},body};
 }
-function fakeFetch(calls,{uid='owner-uid',missing=false,storageFailure=false}={}){
+function fakeFetch(calls,{uid='owner-uid',missing=false,storageFailure=false,allowedLanguage=''}={}){
   return async(url,options)=>{
     calls.push({url,options});
     if(url.startsWith('https://identitytoolkit.googleapis.com/'))
       return new Response(JSON.stringify({users:[{localId:uid}]}),{status:200,headers:{'content-type':'application/json'}});
+    if(url.endsWith('/music-studio/timing-access')){
+      assert.equal(options.headers.Authorization,'Bearer good-token');
+      const ok=JSON.parse(options.body).language===allowedLanguage;
+      return new Response(JSON.stringify({ok}),{status:ok?200:403});
+    }
     if(options.method==='GET')
       return new Response(null,{status:missing?404:206});
     if(options.method==='PUT')
@@ -48,7 +53,7 @@ test('direct save validates exact published song, every timestamp and same lyric
   assert.equal(ownerAllowed('owner-uid',env),true);
   assert.equal(ownerAllowed('student-uid',env),false);
 });
-test('owner-only POST stores validated R2 .lyrics.json next to the exact MP3',async()=>{
+test('owner POST stores validated R2 .lyrics.json next to the exact MP3',async()=>{
   const calls=[];
   const handler=createSaveHandler({env,fetchImpl:fakeFetch(calls)});
   const res=fakeRes();await handler(request(),res);
@@ -79,4 +84,19 @@ test('untrusted callers, invalid timings and missing audio never write to R2',as
     if(expected!==503)assert.equal(calls.some(call=>call.options.method==='PUT'),false);
     assert.equal(res.body.saved,undefined);
   }
+});
+
+test('staff can save Swahili timings but cannot save German timings with Swahili permission',async()=>{
+  const calls=[];
+  const handler=createSaveHandler({env,fetchImpl:fakeFetch(calls,{uid:'swahili-staff',allowedLanguage:'swahili'})});
+  const swahili={...payload,objectKey:'swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3'};
+  const approved=fakeRes();
+  await handler(request(swahili),approved);
+  assert.equal(approved.statusCode,200);
+  assert.match(calls.find(call=>call.options.method==='PUT').url,/swahili\/music\/A1\/day-05/);
+  calls.length=0;
+  const denied=fakeRes();
+  await handler(request(payload),denied);
+  assert.equal(denied.statusCode,403);
+  assert.equal(calls.some(call=>call.options.method==='PUT'),false);
 });

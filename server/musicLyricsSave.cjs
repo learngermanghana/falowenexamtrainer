@@ -1,5 +1,5 @@
 'use strict';
-// Owner-only publication of a reviewed lyric sidecar alongside the exact R2 MP3.
+// Language-scoped publication of a reviewed lyric sidecar alongside the exact R2 MP3.
 // The Firebase token and R2 credentials never reach the browser or video export.
 const crypto = require('node:crypto');
 const { isSwahiliMusicKey } = require('./swahiliMusic.cjs');
@@ -14,6 +14,16 @@ function ownerAllowed(uid,env=process.env) {
   if (configured) return uid===configured;
   const hash=crypto.createHash('sha256').update(String(uid||'')).digest();
   return crypto.timingSafeEqual(hash,Buffer.from(DEFAULT_OWNER_UID_SHA256,'hex'));
+}
+async function verifyStaffTimingAccess(token, objectKey, fetchImpl) {
+  const language = isSwahiliMusicKey(objectKey) ? 'swahili' : 'german';
+  const response = await fetchImpl('https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/music-studio/timing-access', {
+    method: 'POST', headers: {Authorization: 'Bearer '+token, 'Content-Type': 'application/json'},
+    body: JSON.stringify({language}), signal: AbortSignal.timeout(10000),
+  });
+  if (response.status === 401 || response.status === 403) return false;
+  if (!response.ok) throw Object.assign(new Error('Music Studio permissions are temporarily unavailable.'), {status: 503});
+  return (await response.json()).ok === true;
 }
 function validateTimingUpload(body) {
   const key=body?.objectKey;
@@ -53,8 +63,8 @@ function createSaveHandler({env=process.env,fetchImpl=fetch}={}) {
       });
       const account=identity.ok?(await identity.json()).users?.[0]:null;
       if(!account?.localId || account.disabled)return res.status(401).json({ok:false,error:'Your Falowen session has expired.'});
-      if(!ownerAllowed(account.localId,env))return res.status(403).json({ok:false,error:'Only the Music Studio owner can publish shared timing.'});
       const payload=validateTimingUpload(req.body);
+      if(!ownerAllowed(account.localId,env) && !await verifyStaffTimingAccess(token,payload.objectKey,fetchImpl))return res.status(403).json({ok:false,error:'Music Studio access for this recording’s language is required.'});
       const mp3=signObject({key:payload.objectKey},env);
       const existence=await fetchImpl(mp3.url,{method:'GET',headers:{Range:'bytes=0-0'},signal:AbortSignal.timeout(10000)});
       try{await existence.body?.cancel?.();}catch{}

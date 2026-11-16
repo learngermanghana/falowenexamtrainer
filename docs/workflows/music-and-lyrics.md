@@ -225,3 +225,10 @@ requires approximately 80% of song duration to have been listened to, rather
 than merely skipping near the end. Admin reads its existing bounded query on
 owner tab open or explicit refresh. Deploy the Admin practice API with
 `source=workbook` support before deploying the learner player.
+
+### Staff Music Studio timing
+
+For staff, publishing reviewed lyric timing checks the assigned Music Studio
+page and the catalog language of the exact recording through Falowen Admin.
+The timing sidecar still sits beside the published MP3. Deploy the Admin
+Firebase authorization route before rolling out staff timing saves.
