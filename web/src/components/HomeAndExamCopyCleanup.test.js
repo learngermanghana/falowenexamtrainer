@@ -27,13 +27,15 @@ describe("homepage and Exams Room student-facing cleanup", () => {
   });
 
 
-  test("Course Book and Exams Room are equally prominent blue homepage buttons", () => {
+  test("Course Book and Exams Room keep their routes in the new learning cards", () => {
     const quickAccessStart = homeSource.indexOf("const QuickMainAccess");
     const quickAccessEnd = homeSource.indexOf("const GeneralHome", quickAccessStart);
     const access = homeSource.slice(quickAccessStart, quickAccessEnd);
     expect(access).toContain('<button style={styles.primaryButton} onClick={openCampus}>');
     expect(access).toContain('<button type="button" style={styles.primaryButton} onClick={openExamsRoom}>');
     expect(access).not.toContain('<button style={styles.secondaryButton} onClick={openExamsRoom}>');
+    expect(access).toContain('className="falowen-home-space-card"');
+    expect(access).toContain("Your learning spaces");
   });
 
   test("signed-in homepage omits duplicate course access and navigation guide", () => {

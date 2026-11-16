@@ -11,7 +11,8 @@ import ExamReadinessBadge from "./ExamReadinessBadge";
 import HomeMetrics from "./HomeMetrics";
 import TrialCountdownBanner from "./TrialCountdownBanner";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
-import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
+import { PrimaryActionBar, SectionHeader } from "./ui";
+import "./GeneralHome.css";
 import { formatCurrency } from "../lib/formatters";
 import LegalFooter from "./LegalFooter";
 import HomepageHighlights from "./HomepageHighlights";
@@ -28,131 +29,113 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
   const studentName =
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
   const levelKey = detectLevelKey(studentProfile);
-  const courseLabel = isSwahili ? "Kiswahili A1 course" : levelKey ? `${levelKey} course` : "your course";
+  const courseLabel = isSwahili ? "Kiswahili A1 course" : levelKey ? levelKey + " course" : "course";
+  const courseBadge = isSwahili ? "KISWAHILI A1 · COURSE READY" : levelKey ? levelKey + " COURSE · READY" : "YOUR CAMPUS";
 
   return (
-    <section
-      style={{
-        ...styles.card,
-        background: "linear-gradient(135deg, #312e81, #2563eb)",
-        color: "#eef2ff",
-        border: "none",
-        boxShadow: "0 20px 45px rgba(37, 99, 235, 0.25)",
-        display: "grid",
-        gap: 10,
-      }}
-    >
-      <p style={{ ...styles.helperText, color: "#c7d2fe", margin: 0 }}>{t("generalHome.welcome.eyebrow")}</p>
-      <h2 style={{ margin: 0, fontSize: 24, letterSpacing: -0.3 }}>
-        {t("generalHome.welcome.title", { studentName })}
-      </h2>
-      <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0 }}>
-        {isSwahili
-          ? "Your Kiswahili course is ready. Continue published lessons in Campus and submit work for tutor review."
-          : `Your ${courseLabel} is ready. Use Campus for daily learning, and use Exams Room for exam practice.`}
-      </p>
-
-      <PrimaryActionBar align="start" wrap>
-        <button
-          type="button"
-          style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d", borderColor: "#bbf7d0" }}
-          onClick={onContinueLearning}
-        >
-          Open Campus
-        </button>
-        <button
-          type="button"
-          style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
-          onClick={onOpenAccount}
-        >
-          Account
-        </button>
-        {!isSwahili && <button
-          type="button"
-          style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
-          onClick={onJoinZoom}
-        >
-          {t("generalHome.welcome.joinZoom")}
-        </button>}
-        {!isSwahili && <ExamReadinessBadge variant="button" studentProfile={studentProfile} onOpenExamFile={onOpenExamFile} />}
-      </PrimaryActionBar>
-    </section>
+    <div className={"falowen-home-hero" + (isSwahili ? " falowen-home-hero--single" : "")}>
+      <section className="falowen-home-hero__welcome" aria-label="Welcome to Falowen">
+        <span className="falowen-home-hero__badge"><span aria-hidden="true" />{courseBadge}</span>
+        <h1>{t("generalHome.welcome.title", { studentName })}</h1>
+        <p className="falowen-home-hero__lead">Your campus is ready. Let’s make progress.</p>
+        <p className="falowen-home-hero__description">
+          {isSwahili
+            ? "Your Kiswahili course is ready. Continue published lessons in Campus and submit work for tutor review."
+            : "Your " + courseLabel + " is ready. Use Campus for daily learning, and use Exams Room for exam practice."}
+        </p>
+        <div className="falowen-home-hero__actions">
+          <button type="button" className="falowen-home-hero__primary" onClick={onContinueLearning}>
+            Open Campus <span aria-hidden="true">→</span>
+          </button>
+          <button type="button" className="falowen-home-hero__secondary" onClick={onOpenAccount}>Account</button>
+          {!isSwahili && (
+            <button type="button" className="falowen-home-hero__zoom" onClick={onJoinZoom}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <rect x="3" y="6" width="13" height="12" rx="2" />
+                <path d="m16 10 5-3v10l-5-3" />
+              </svg>
+              {t("generalHome.welcome.joinZoom")}
+            </button>
+          )}
+        </div>
+      </section>
+      {!isSwahili && (
+        <ExamReadinessBadge variant="homepage" studentProfile={studentProfile} onOpenExamFile={onOpenExamFile} />
+      )}
+    </div>
   );
 };
 
 const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) => (
-  <div style={isSwahili ? { ...styles.gridTwo, gridTemplateColumns: "minmax(0, 1fr)" } : styles.gridTwo}>
-    <section
-      style={{
-        ...styles.card,
-        display: "grid",
-        gap: 10,
-        background: "linear-gradient(130deg, rgba(238, 242, 255, 0.9), rgba(255, 255, 255, 0.96))",
-        borderColor: "#c7d2fe",
-      }}
-    >
-      <SectionHeader
-        eyebrow={t("generalHome.campus.eyebrow")}
-        title="Continue learning"
-        subtitle={isSwahili
-          ? "Open your Kiswahili Course Book for published lessons, writing and reading tasks, and tutor feedback."
-          : "Open Course Book to see your current lesson and next step, practise, or submit finished workbook answers."}
-        actions={
-          <PrimaryActionBar align="flex-end">
-            <PillBadge tone="success">Daily work</PillBadge>
-          </PrimaryActionBar>
-        }
-      />
-      <PrimaryActionBar align="start">
-        <button style={styles.primaryButton} onClick={openCampus}>
-          Open Course Book
-        </button>
-      </PrimaryActionBar>
-    </section>
+  <section className="falowen-home-spaces" aria-label="Your learning spaces">
+    <div className="falowen-home-spaces__heading">
+      <h2>Your learning spaces</h2>
+      <p>{isSwahili ? "Your learning space, ready when you are." : "Two spaces. One step closer to fluent."}</p>
+    </div>
+    <div className={"falowen-home-spaces__grid" + (isSwahili ? " falowen-home-spaces__grid--single" : "")}>
+      <section className="falowen-home-space-card">
+        <div className="falowen-home-space-card__top">
+          <span className="falowen-home-space-card__icon falowen-home-space-card__icon--campus">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 6.7C9.7 5 6.4 4.7 3 5.5V19c3.7-1 6.7-.5 9 1.2 2.3-1.7 5.3-2.2 9-1.2V5.5c-3.4-.8-6.7-.5-9 1.2Z" />
+              <path d="M12 6.7v13.5" />
+            </svg>
+          </span>
+          <div className="falowen-home-space-card__heading">
+            <span className="falowen-home-space-card__eyebrow">DAILY WORK</span>
+            <h3>Campus</h3>
+          </div>
+          <span className="falowen-home-space-card__level">{isSwahili ? "Kiswahili A1" : "Course Book"}</span>
+        </div>
+        <div className="falowen-home-space-card__body">
+          <h4>Continue learning</h4>
+          <p>{isSwahili
+            ? "Open your Kiswahili Course Book for published lessons, writing and reading tasks, and tutor feedback."
+            : "Open Course Book to see your current lesson and next step, practise, or submit finished workbook answers."}</p>
+        </div>
+        <div className="falowen-home-space-card__bottom">
+          <button style={styles.primaryButton} onClick={openCampus}>Open Course Book <span aria-hidden="true">→</span></button>
+        </div>
+      </section>
 
-    {!isSwahili && <section
-      style={{
-        ...styles.card,
-        display: "grid",
-        gap: 10,
-        background: "linear-gradient(130deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.97))",
-        borderColor: "#bfdbfe",
-      }}
-    >
-      <SectionHeader
-        eyebrow={t("generalHome.exams.eyebrow")}
-        title={t("generalHome.exams.title")}
-        subtitle="Choose an available mock or practise one exam skill; review your results in the Exam Room."
-        actions={
-          <PrimaryActionBar align="flex-end">
-            <PillBadge tone="info">Exam mode</PillBadge>
-          </PrimaryActionBar>
-        }
-      />
-      <PrimaryActionBar align="start">
-        <button type="button" style={styles.primaryButton} onClick={openExamsRoom}>
-          Open Exams Room
-        </button>
-      </PrimaryActionBar>
-    </section>}
-
-    {!isSwahili && <section style={{ ...styles.card, gridColumn: "1 / -1", display: "grid", gap: 10 }}>
-      <SectionHeader
-        title="Falowen Learning Companion"
-        subtitle="Connect Falowen in ChatGPT to ask questions about your German lessons and get guided practice."
-      />
-      <PrimaryActionBar align="start">
-        <a
-          href="https://chatgpt.com/plugins/plugin_asdk_app_6ae7660094648191b3f39f11008ade2a"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ ...styles.primaryButton, textDecoration: "none" }}
-        >
-          Connect ChatGPT as a study partner
+      {!isSwahili && (
+        <section className="falowen-home-space-card">
+          <div className="falowen-home-space-card__top">
+            <span className="falowen-home-space-card__icon falowen-home-space-card__icon--exams">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="5" y="3" width="14" height="18" rx="2" />
+                <path d="M9 8h6M9 12h6M9 16h4" />
+              </svg>
+            </span>
+            <div className="falowen-home-space-card__heading">
+              <span className="falowen-home-space-card__eyebrow falowen-home-space-card__eyebrow--exams">EXAM MODE</span>
+              <h3>{t("generalHome.exams.title")}</h3>
+            </div>
+          </div>
+          <div className="falowen-home-space-card__body">
+            <h4>Sprechen, Schreiben trainer & resources</h4>
+            <p>Choose an available mock or practise one exam skill; review your results in the Exam Room.</p>
+          </div>
+          <div className="falowen-home-space-card__bottom falowen-home-space-card__bottom--exams">
+            <button type="button" style={styles.primaryButton} onClick={openExamsRoom}>Open Exams Room <span aria-hidden="true">→</span></button>
+          </div>
+        </section>
+      )}
+    </div>
+    {!isSwahili && (
+      <section className="falowen-home-companion">
+        <div>
+          <span className="falowen-home-companion__eyebrow">STUDY WITH AI</span>
+          <h3>Falowen Learning Companion</h3>
+          <p>Connect Falowen in ChatGPT to ask questions about your German lessons and get guided practice.</p>
+        </div>
+        <a href="https://chatgpt.com/plugins/plugin_asdk_app_6ae7660094648191b3f39f11008ade2a"
+           target="_blank" rel="noopener noreferrer">
+          Connect ChatGPT as a study partner <span aria-hidden="true">→</span>
         </a>
-      </PrimaryActionBar>
-    </section>}
-  </div>
+      </section>
+    )}
+  </section>
 );
 
 const GeneralHome = ({
@@ -343,7 +326,7 @@ const GeneralHome = ({
   }
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
+    <div className="falowen-home-dashboard">
       {new URLSearchParams(location.search).get("welcome") === "1" ? (
         <OnboardingStudyBuddyStart firstLessonPath={firstLessonPath} />
       ) : null}

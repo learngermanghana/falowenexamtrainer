@@ -10,6 +10,7 @@ import { computeExamReadiness } from "../lib/examReadiness";
 
 const emptyReadinessState = {
   loading: false,
+  loaded: false,
   error: "",
   attendanceSessions: 0,
   completedAssignments: [],
@@ -235,6 +236,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
       setState({
         loading: false,
+        loaded: true,
         error: "",
         attendanceSessions: attendance?.sessions || 0,
         completedAssignments,
@@ -321,6 +323,51 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
   const statusText = `${readiness.scoreLabel ? `${readiness.scoreLabel} · ` : ""}${
     readiness.statusLabel || t("examReadiness.statusFallback", "Status")
   }`;
+
+  // Compact homepage view: the same authenticated readiness calculation, not a mock percentage.
+  if (variant === "homepage") {
+    const hasReadiness = state.loaded && !state.loading && !state.error && Boolean(className && studentCode);
+    return (
+      <section className="falowen-home-readiness" aria-label="Your exam journey">
+        <span className="falowen-home-readiness__eyebrow">YOUR EXAM JOURNEY</span>
+        <h2>A little practice, every day.</h2>
+        <div className="falowen-home-readiness__score">
+          <span>Exams</span>
+          <strong>{hasReadiness ? readiness.scoreLabel : "—"}</strong>
+        </div>
+        <div className="falowen-home-readiness__track"
+             role="progressbar"
+             aria-label="Exam readiness"
+             aria-valuemin={0}
+             aria-valuemax={100}
+             aria-valuenow={hasReadiness ? readiness.score : undefined}
+             aria-valuetext={hasReadiness ? readiness.scoreLabel : "Unavailable"}>
+          <div style={{ width: (hasReadiness ? readiness.score : 0) + "%" }} />
+        </div>
+        <div className="falowen-home-readiness__status">
+          {hasReadiness && (
+            <span className="falowen-home-readiness__pill" style={{ background: readiness.statusPillBg, color: readiness.statusPillText, border: "1px solid " + readiness.statusPillBorder }}>{readiness.statusLabel || readiness.text}</span>
+          )}
+          <p>{state.loading || (!state.loaded && !state.error)
+            ? "Checking your latest progress…"
+            : state.error
+              ? state.error
+              : "Keep going. You’re building momentum."}</p>
+        </div>
+        <button type="button" className="falowen-home-readiness__action" onClick={handleOpenExamFile}>
+          <span className="falowen-home-readiness__action-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="16" rx="2" />
+              <path d="M7 3v4M17 3v4M3 10h18" />
+            </svg>
+            Open Exam File and Date
+          </span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </section>
+    );
+  }
 
   // ✅ Compact button (for hero row)
   if (variant === "button") {
