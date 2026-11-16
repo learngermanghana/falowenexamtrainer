@@ -78,7 +78,8 @@ const fillContact = async () => {
 };
 
 describe("three-step signup", () => {
-  beforeEach(() => { jest.clearAllMocks(); mockSignup.mockResolvedValue({}); window.localStorage.clear(); });
+  beforeEach(() => { jest.clearAllMocks(); mockSignup.mockResolvedValue({}); window.localStorage.clear(); window.history.replaceState({}, "", "/"); });
+  afterEach(() => window.history.replaceState({}, "", "/"));
   it("shows only the account step first and validates before continuing", async () => {
     render(<SignUpPage />);
     expect(screen.getByText(/Step 1 of 3/)).toBeVisible();
