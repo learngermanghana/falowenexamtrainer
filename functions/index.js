@@ -337,7 +337,14 @@ const getTrialPurgeMillis = (student = {}) => {
     : Number.NaN;
 };
 
+const isInstitutionalKiswahiliStudent = (student = {}) =>
+  student.program === "swahili" &&
+  student.registrationSource === "university-invite" &&
+  student.institutionId === "university-hamburg" &&
+  student.cohortId === "university-hamburg-kiswahili-a1";
+
 const getTrialLifecycleState = (student = {}, nowMs = Date.now()) => {
+  if (isInstitutionalKiswahiliStudent(student)) return { state: "not_trial" };
   const trialEndMs = getTrialEndMillis(student);
   if (!Number.isFinite(trialEndMs)) return { state: "not_trial" };
   if (hasStudentMadePayment(student)) {
@@ -353,7 +360,7 @@ const getTrialLifecycleState = (student = {}, nowMs = Date.now()) => {
 };
 
 const isStaleUnpaidSignup = (student = {}, cutoffMs) => {
-  if (!student || hasStudentMadePayment(student)) return false;
+  if (!student || isInstitutionalKiswahiliStudent(student) || hasStudentMadePayment(student)) return false;
 
   // Trial accounts have their own lifecycle: 7 days of access plus a 30-day
   // recovery window. Never let the generic 7-day unpaid-signup cleanup remove them.
@@ -1387,6 +1394,7 @@ exports.cleanupExpiredStudentContracts = onSchedule(
       lastDoc = snapshot.docs[snapshot.docs.length - 1];
 
       for (const docSnap of snapshot.docs) {
+        if (isInstitutionalKiswahiliStudent(docSnap.data() || {})) continue;
         scanned += 1;
         const student = docSnap.data() || {};
       const deletionUid = String(student.uid || docSnap.id);
