@@ -12,7 +12,7 @@ const emptyReadinessState = {
   loading: false,
   loaded: false,
   error: "",
-  attendanceSessions: 0,
+  attendanceSessions: null,
   completedAssignments: [],
   failedAssignments: [],
   missedAssignments: [],
@@ -190,8 +190,12 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
   const [state, setState] = useState(emptyReadinessState);
 
-  const className = studentProfile?.className || "";
-  const studentCode = studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
+  // A student can work independently without an assigned live class.
+  // The authenticated student document ID is the score-summary lookup key.
+  const className = studentProfile?.className || studentProfile?.classname || studentProfile?.class || "";
+  const studentCode = String(
+    studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || ""
+  ).trim();
   const levelKey = normalizeLevel(studentProfile?.level || studentProfile?.course || "");
 
   const handleOpenExamFile = () => {
@@ -200,17 +204,25 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
   };
 
   const loadReadiness = useCallback(async () => {
-    if (!className || !studentCode) {
+    if (!studentCode) {
       setState({
         ...emptyReadinessState,
-        error: t("examReadiness.errorMissingProfile"),
+        error: "Your student record could not be identified automatically. Please contact Falowen support if this continues.",
       });
       return;
     }
 
-    // NOTE: if isFirebaseConfigured is a function in your project, change to:
-    // if (!isFirebaseConfigured()) { ... }
-    if (!isFirebaseConfigured) {
+    // Authentication normally restores after the profile. Do not report
+    // missing student data or call a protected API before the token is ready.
+    if (!idToken) {
+      setState({ ...emptyReadinessState, loading: true });
+      return;
+    }
+
+    const firebaseReady = typeof isFirebaseConfigured === "function"
+      ? isFirebaseConfigured()
+      : isFirebaseConfigured;
+    if (!firebaseReady) {
       setState({
         ...emptyReadinessState,
         error: t("examReadiness.errorFirebase"),
@@ -220,38 +232,47 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
     setState((prev) => ({ ...prev, loading: true, error: "" }));
 
-    try {
-      const [attendance, score] = await Promise.all([
-        fetchAttendanceSummary({ className, studentCode, studentUid: user?.uid, level: levelKey }),
-        fetchScoreSummary({ idToken, studentCode }),
-      ]);
+    // Exam scores are associated with the signed-in student, not with a live
+    // class. Attendance is optional for B2/C1 self-study learners.
+    const [scoreResult, attendanceResult] = await Promise.allSettled([
+      fetchScoreSummary({ idToken, studentCode }),
+      className
+        ? fetchAttendanceSummary({ className, studentCode, studentUid: user?.uid, level: levelKey })
+        : Promise.resolve(null),
+    ]);
 
-      const student = score?.student || {};
-      const completedAssignments = student.completedAssignments || [];
-      const failedAssignments = student.failedAssignments || [];
-      const missedAssignments = student.jumpedAssignments || student.missedAssignments || [];
-      const nextRecommendation = student.nextRecommendation || null;
-      const retriesThisWeek = student.retriesThisWeek || 0;
-      const totalAssignments = student.totalAssignments ?? null;
-
-      setState({
-        loading: false,
-        loaded: true,
-        error: "",
-        attendanceSessions: attendance?.sessions || 0,
-        completedAssignments,
-        failedAssignments,
-        missedAssignments,
-        nextRecommendation,
-        retriesThisWeek,
-        totalAssignments,
-      });
-    } catch (_e) {
+    if (scoreResult.status !== "fulfilled") {
       setState({
         ...emptyReadinessState,
         error: t("examReadiness.errorLoad"),
       });
+      return;
     }
+
+    const student = scoreResult.value?.student;
+    if (!student) {
+      setState({
+        ...emptyReadinessState,
+        error: "No marked results yet. Complete an assignment to start your readiness tracking.",
+      });
+      return;
+    }
+
+    const attendance = attendanceResult.status === "fulfilled" ? attendanceResult.value : null;
+    setState({
+      loading: false,
+      loaded: true,
+      error: "",
+      // Null means unavailable / no live class; it must not be presented as
+      // verified zero attendance.
+      attendanceSessions: attendance ? Number(attendance.sessions || 0) : null,
+      completedAssignments: student.completedAssignments || [],
+      failedAssignments: student.failedAssignments || [],
+      missedAssignments: student.jumpedAssignments || student.missedAssignments || [],
+      nextRecommendation: student.nextRecommendation || null,
+      retriesThisWeek: student.retriesThisWeek || 0,
+      totalAssignments: student.totalAssignments ?? null,
+    });
   }, [className, idToken, levelKey, studentCode, t, user?.uid]);
 
   useEffect(() => {
@@ -326,7 +347,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
   // Compact homepage view: the same authenticated readiness calculation, not a mock percentage.
   if (variant === "homepage") {
-    const hasReadiness = state.loaded && !state.loading && !state.error && Boolean(className && studentCode);
+    const hasReadiness = state.loaded && !state.loading && !state.error && Boolean(studentCode);
     return (
       <section className="falowen-home-readiness" aria-label="Your exam journey">
         <span className="falowen-home-readiness__eyebrow">YOUR EXAM JOURNEY</span>
