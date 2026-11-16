@@ -39,6 +39,7 @@ import {
 } from "../utils/devicePushTokens";
 import { getBackendUrl } from "../services/backendUrl";
 import { createOrResumeSignupAccount } from "../lib/signupAuthRecovery";
+import { resolveUniversityInvitation } from "../lib/universityInvitations";
 
 const AuthContext = createContext();
 
@@ -584,7 +585,8 @@ export const AuthProvider = ({ children }) => {
   // ✅ UPDATED signup: now includes address
   const signup = useCallback(
     async (email, password, profile = {}) => {
-      const program = profile.program || "german";
+      const universityInvitation = resolveUniversityInvitation(profile.universityInvitationCode);
+      const program = universityInvitation ? "swahili" : profile.program || "german";
       if (!["german", "swahili"].includes(program)) {
         throw new Error("Please choose German or Swahili to register.");
       }
@@ -646,16 +648,27 @@ export const AuthProvider = ({ children }) => {
         address: profile.address || "",            // ✅ NEW FIELD
 
         emergencyContactPhone: profile.emergencyContactPhone || "",
-        status: profile.status || "pending",
-        trialStatus: profile.trialStatus || "active",
-        trialStartedAt: Timestamp.fromDate(trialStartedDate),
-        trialUsedAt: Timestamp.fromDate(trialStartedDate),
-        trialEndsAt: Timestamp.fromDate(trialEndsDate),
-        trialPurgeAt: Timestamp.fromDate(trialPurgeDate),
+        status: universityInvitation ? "registered" : (profile.status || "pending"),
+        trialStatus: universityInvitation ? "not_applicable" : (profile.trialStatus || "active"),
+        ...(!universityInvitation ? {
+          trialStartedAt: Timestamp.fromDate(trialStartedDate),
+          trialUsedAt: Timestamp.fromDate(trialStartedDate),
+          trialEndsAt: Timestamp.fromDate(trialEndsDate),
+          trialPurgeAt: Timestamp.fromDate(trialPurgeDate),
+        } : {
+          institutionId: universityInvitation.institutionId,
+          institutionName: universityInvitation.institutionName,
+          cohortId: universityInvitation.cohortId,
+          instructorName: universityInvitation.instructorName,
+          registrationSource: universityInvitation.registrationSource,
+          universityInvitationCode: universityInvitation.code,
+          institutionVerification: "pending",
+          accessType: "invitation_pending",
+        }),
         initialPaymentAmount: profile.initialPaymentAmount ?? 0,
         tuitionFee: profile.tuitionFee ?? null,
         balanceDue: profile.balanceDue ?? null,
-        paymentStatus: profile.paymentStatus || "pending",
+        paymentStatus: universityInvitation ? "exempt_pending" : (profile.paymentStatus || "pending"),
         paystackLink: profile.paystackLink || "",
         paymentIntentAmount: profile.paymentIntentAmount ?? null,
         contractStart: profile.contractStart || "",

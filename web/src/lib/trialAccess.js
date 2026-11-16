@@ -1,5 +1,6 @@
 import { toDateMs } from "./dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "./paymentStatus";
+import { isApprovedUniversityStudent, isPendingUniversityStudent } from "./universityInvitations";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -57,6 +58,19 @@ const hasConfirmedPayment = (studentProfile = {}) => {
 };
 
 export const getTrialLifecycleState = (studentProfile = {}, nowMs = Date.now()) => {
+  if (isApprovedUniversityStudent(studentProfile) || isPendingUniversityStudent(studentProfile)) {
+    const approved = isApprovedUniversityStudent(studentProfile);
+    return {
+      key: approved ? "complimentary" : "verification_pending",
+      paid: approved,
+      active: false,
+      daysRemaining: 0,
+      retentionDaysRemaining: 0,
+      endsAtMs: Number.NaN,
+      purgeAtMs: Number.NaN,
+      source: approved ? "institution_approved" : "institution_pending",
+    };
+  }
   if (hasConfirmedPayment(studentProfile)) {
     return {
       key: "converted",

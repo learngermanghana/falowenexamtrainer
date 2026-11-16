@@ -18,6 +18,7 @@ import PasswordGuidance from "./PasswordGuidance";
 import { formatCurrency } from "../lib/formatters";
 import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import { resolveUniversityInvitation } from "../lib/universityInvitations";
 import {
   isFullName,
   isLikelyPhoneNumber,
@@ -94,7 +95,7 @@ const staticClassOptions = (now) => Object.keys(classCatalog)
     source: "static",
   }));
 
-const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram }) => {
+const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitationCode = "" }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { i18n, t } = useTranslation();
   const fxQuote = useFalowenUsdGhsRate();
@@ -116,7 +117,8 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const requestedSignup = useMemo(() => signupQueryContext(), []);
-  const [program, setProgram] = useState(initialProgram === "swahili" ? "swahili" : "german");
+  const universityInvitation = useMemo(() => resolveUniversityInvitation(invitationCode), [invitationCode]);
+  const [program, setProgram] = useState(universityInvitation || initialProgram === "swahili" ? "swahili" : "german");
   const isSwahili = program === "swahili";
   const [germanLevel, setSelectedLevel] = useState(
     requestedSignup.level || "A1"
@@ -500,8 +502,9 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram }) => {
         paymentStatus,
         paystackLink,
         paymentIntentAmount: intendedPaymentAmount || null,
-        status: "pending",
-        trialStatus: "active",
+        status: universityInvitation ? "registered" : "pending",
+        trialStatus: universityInvitation ? "not_applicable" : "active",
+        universityInvitationCode: universityInvitation?.code || "",
         contractStart: "",
         contractEnd: "",
         contractTermMonths: 0,
@@ -513,6 +516,10 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram }) => {
           studentCode: signupReceipt?.studentCode || studentCode,
           name: cleanedName, email: cleanedEmail, phone: cleanedPhone,
           level: selectedLevel, className: selectedClass, learningMode, program,
+          universityInvitation: Boolean(universityInvitation),
+          registrationSource: universityInvitation?.registrationSource || "",
+          institutionId: universityInvitation?.institutionId || "",
+          cohortId: universityInvitation?.cohortId || "",
         });
       } catch (eventError) {
         console.warn("Completed signup lead could not be recorded", eventError);
@@ -537,9 +544,11 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram }) => {
           : paymentsEnabled
             ? "Open Account & Billing to complete Paystack payment."
             : "Sign in on the web app and open Account & Billing to complete payment.";
-      const successMessage = `Account created! Your 7-day Falowen trial is active now. Your student code is ${studentCode}. ${amountCopy} ${paymentInstruction}${balanceText}`;
+      const successMessage = universityInvitation
+        ? `Account created! Your student code is ${studentCode}. Your University of Hamburg Kiswahili A1 registration is awaiting instructor verification. No payment is required.`
+        : `Account created! Your 7-day Falowen trial is active now. Your student code is ${studentCode}. ${amountCopy} ${paymentInstruction}${balanceText}`;
       setMessage(successMessage);
-      showToast(`Your 7-day trial is active. Start learning now.`, "success");
+      showToast(universityInvitation ? "Registration received. Instructor verification is pending." : "Your 7-day trial is active. Start learning now.", "success");
       triggerInteractionFeedback({ sound: "success", vibratePattern: [60, 30, 80] });
     } catch (error) {
       console.error(error);
@@ -609,7 +618,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram }) => {
             </p>
             <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>Start strong. Learn with confidence.</h3>
             <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
-              {isSwahili ? t("signup.swahiliTrial") : "Three simple steps to get ready. Choose a 7-day trial or pay immediately, then start learning with Falowen."}
+              {universityInvitation ? "Complimentary Kiswahili A1 access for eligible University of Hamburg course students. No fee or trial required; instructor approval is needed." : isSwahili ? t("signup.swahiliTrial") : "Three simple steps to get ready. Choose a 7-day trial or pay immediately, then start learning with Falowen."}
             </p>
           </div>
         </div>
@@ -735,14 +744,21 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram }) => {
 
           </fieldset>
           <fieldset aria-label="Your learning" disabled={step !== 2 || loading} hidden={step !== 2} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 2 ? "grid" : "none", gap: 12 }}>
+          {universityInvitation ? (
+            <div data-university-invitation style={{ padding: 14, border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 12, display: "grid", gap: 5 }}>
+              <strong>University of Hamburg · Kiswahili A1</strong>
+              <span>Instructor: Ruth · Complimentary course access</span>
+              <small>Registration is linked automatically to your university cohort. Ruth will verify eligibility before learning access is approved. No payment details needed.</small>
+            </div>
+          ) : null}
           <label htmlFor="signup-program" style={styles.label}>{t("signup.courseLanguage")}</label>
-          <select id="signup-program" name="program" style={styles.select} value={program}
+          <select id="signup-program" name="program" style={styles.select} value={program} disabled={Boolean(universityInvitation)}
             onChange={(event) => { setProgram(event.target.value); setFieldErrors({}); setAuthError(""); }}>
             <option value="german">{t("signup.programs.german")}</option>
             <option value="swahili">{t("signup.programs.swahili")}</option>
           </select>
           {isSwahili ? (
-            <p style={styles.helperText}>{t("signup.swahiliTrial")}</p>
+            universityInvitation ? null : <p style={styles.helperText}>{t("signup.swahiliTrial")}</p>
           ) : <>
           <label htmlFor="signup-selectedLevel" style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
           <select
@@ -1134,10 +1150,10 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram }) => {
           </div>
           {step === 3 ? <>
           <button style={styles.primaryButton} type="submit" disabled={loading}>
-            {loading ? t("signupPage.actions.creating") : "Create account & start 7-day trial"}
+            {loading ? t("signupPage.actions.creating") : universityInvitation ? "Register for complimentary course access" : "Create account & start 7-day trial"}
           </button>
           <p style={{ ...styles.helperText, margin: "-4px 0 0", textAlign: "center" }}>
-            {isSwahili ? t("signup.swahiliTrial") : "Start your 7-day trial without payment, or pay immediately after signup if you prefer."}
+            {universityInvitation ? "No payment or trial. Course access is subject to verification by your instructor." : isSwahili ? t("signup.swahiliTrial") : "Start your 7-day trial without payment, or pay immediately after signup if you prefer."}
           </p>
           </> : null}
         </form>

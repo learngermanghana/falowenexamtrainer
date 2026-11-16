@@ -81,14 +81,18 @@ describe("student sync integrity", () => {
       "initialPaymentAmount: profile.initialPaymentAmount",
       "tuitionFee: profile.tuitionFee",
       "balanceDue: profile.balanceDue",
-      "paymentStatus: profile.paymentStatus",
+      'paymentStatus: universityInvitation ? "exempt_pending" : (profile.paymentStatus',
       "paymentIntentAmount: profile.paymentIntentAmount",
-      "trialStatus: profile.trialStatus",
+      'trialStatus: universityInvitation ? "not_applicable" : (profile.trialStatus',
       "trialStartedAt: Timestamp.fromDate(trialStartedDate)",
       "trialUsedAt: Timestamp.fromDate(trialStartedDate)",
       "trialEndsAt: Timestamp.fromDate(trialEndsDate)",
       "trialPurgeAt: Timestamp.fromDate(trialPurgeDate)",
     ].forEach((contract) => expect(auth).toContain(contract));
+    // Instructor-verified university registrations never receive expiry timestamps.
+    expect(auth).toContain("...(!universityInvitation ? {");
+    expect(auth).toContain('institutionVerification: "pending"');
+    expect(auth).toContain('accessType: "invitation_pending"');
   });
 
   test("backend derives and protects legacy active trials before stale-signup cleanup", () => {

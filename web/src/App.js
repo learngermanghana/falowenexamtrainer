@@ -238,6 +238,7 @@ import TutorMarkingPage from "./pages/TutorMarkingPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { getTrialLifecycleState } from "./lib/trialAccess";
+import { isApprovedUniversityStudent, isPendingUniversityStudent } from "./lib/universityInvitations";
 import { getPartialPaymentAccessEndMs, hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
 import { persistInterfaceLanguage } from "./i18n";
 import { trackAdmissionsEngagement } from "./services/admissionsEngagementService";
@@ -431,6 +432,7 @@ function App() {
     Number.isFinite(partialPaymentAccessEndMs) &&
     partialPaymentAccessEndMs > Date.now();
   const hasActiveTrial = trialLifecycle.active;
+  const hasComplimentaryUniversityAccess = isApprovedUniversityStudent(studentProfile);
   const hasQueuedUpgradeAccess =
     String(studentProfile?.contractMergeMode || "").toLowerCase() === "append_after_active_contract" &&
     Number.isFinite(upgradeCarryoverMs) &&
@@ -440,7 +442,7 @@ function App() {
   const awaitingPayment =
     Boolean(studentProfile) &&
     !isStaff &&
-    !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
+    !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared || hasComplimentaryUniversityAccess);
 
   // Visitors can preview Kiswahili; signed-in learners follow their Campus programme.
   const swahiliPreview = matchSwahiliPreview(location.pathname);
@@ -648,6 +650,19 @@ function App() {
   }
 
   if (awaitingPayment) {
+    if (isPendingUniversityStudent(studentProfile)) {
+      return (
+        <div style={{ ...styles.container, display: "grid", placeItems: "center", minHeight: "65vh" }}>
+          <section style={{ ...styles.card, maxWidth: 560, width: "100%", display: "grid", gap: 12 }}>
+            <h2 style={{ margin: 0 }}>University of Hamburg · Kiswahili A1</h2>
+            <strong>Registration received · Awaiting instructor verification</strong>
+            <p style={{ margin: 0 }}>Your account is linked to Ruth's course. Once your enrolment is verified, you can use Falowen with complimentary access. No payment is required.</p>
+            <p style={{ margin: 0 }}>Student code: {studentProfile?.studentCode || studentProfile?.studentcode || "—"}</p>
+            <button type="button" style={styles.secondaryButton} onClick={() => window.location.reload()}>Check access again</button>
+          </section>
+        </div>
+      );
+    }
     return <SetupCheckpoint />;
   }
 

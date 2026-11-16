@@ -15,6 +15,7 @@ import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { getNextLevel, getTuitionFeeForLevel } from "../data/levelFees";
 import { clearPaymentAttempt, getPaymentAttempt } from "../lib/paymentAttempt";
 import { getTrialLifecycleState } from "../lib/trialAccess";
+import { isApprovedUniversityStudent, isHamburgUniversityStudent } from "../lib/universityInvitations";
 import useCourseCompletionProgress from "../hooks/useCourseCompletionProgress";
 
 const formatDate = (value) => {
@@ -34,6 +35,8 @@ const AccountSettings = () => {
   const { user, studentProfile, saveStudentProfile, refreshStudentProfile } = useAuth();
   const { i18n, t } = useTranslation();
   const isSwahili = studentProfile?.program === "swahili";
+  const isUniversityRegistration = isHamburgUniversityStudent(studentProfile);
+  const hasComplimentaryAccess = isApprovedUniversityStudent(studentProfile);
   const fxQuote = useFalowenUsdGhsRate();
   const usdBelow = (value) => {
     const estimated = approximateUsd(value, fxQuote);
@@ -103,6 +106,17 @@ const AccountSettings = () => {
   const paymentCleared = normalizedPaymentStatus === "paid" || hasClearedBalance(balanceDue);
 
   const billingState = useMemo(() => {
+    if (isUniversityRegistration) {
+      return {
+        key: hasComplimentaryAccess ? "complimentary" : "verification-pending",
+        label: hasComplimentaryAccess ? "Complimentary access" : "Awaiting verification",
+        title: hasComplimentaryAccess ? "University course access approved" : "University course verification pending",
+        body: hasComplimentaryAccess
+          ? "Your Kiswahili A1 course access is complimentary. No tuition payment is due."
+          : "Ruth will verify your University of Hamburg course enrolment. No payment is required.",
+        tone: "#1e40af", background: "#eff6ff", border: "#93c5fd",
+      };
+    }
     if (paymentCleared) {
       return {
         key: "paid",
@@ -191,9 +205,17 @@ const AccountSettings = () => {
       background: "#fff7ed",
       border: "#fdba74",
     };
-  }, [balanceDue, formatMoney, normalizedPaymentStatus, paidAmount, paymentAttempt, paymentCleared, trialLifecycle.key, trialLifecycle.daysRemaining, trialLifecycle.retentionDaysRemaining]);
+  }, [balanceDue, formatMoney, normalizedPaymentStatus, paidAmount, paymentAttempt, paymentCleared, trialLifecycle.key, trialLifecycle.daysRemaining, trialLifecycle.retentionDaysRemaining, isUniversityRegistration, hasComplimentaryAccess]);
 
   const accountAccess = useMemo(() => {
+    if (isUniversityRegistration) {
+      return {
+        label: hasComplimentaryAccess ? "Active" : "Verification pending",
+        detail: hasComplimentaryAccess ? "Complimentary University of Hamburg Kiswahili A1 access" : "Awaiting instructor verification · no payment needed",
+        daysRemaining: null,
+        tone: "#1e40af", background: "#eff6ff", border: "#93c5fd",
+      };
+    }
     const now = Date.now();
     const contractEnd = toDate(studentProfile?.contractEnd);
     const contractEndMs = contractEnd?.getTime?.();
@@ -263,6 +285,8 @@ const AccountSettings = () => {
     billingState.border,
     billingState.tone,
     paymentCleared,
+    isUniversityRegistration,
+    hasComplimentaryAccess,
     studentProfile?.contractEnd,
     trialLifecycle.daysRemaining,
     trialLifecycle.key,
@@ -752,7 +776,16 @@ const AccountSettings = () => {
 
       {activeTab === "notifications" ? <NotificationSettingsCard /> : null}
 
-      {activeTab === "billing" ? (
+      {activeTab === "billing" && isUniversityRegistration ? (
+      <section data-university-course-billing style={{ ...styles.card, display: "grid", gap: 12, padding: 16 }}>
+        <h2 style={{ ...styles.sectionTitle, marginBottom: 3 }}>University course access</h2>
+        <strong>{hasComplimentaryAccess ? "Complimentary access · Approved" : "Registration awaiting verification"}</strong>
+        <p style={{ margin: 0 }}>University of Hamburg · Kiswahili A1 · Instructor: Ruth</p>
+        <p style={{ margin: 0 }}>{hasComplimentaryAccess
+          ? "Your course access has been approved. There is no tuition payment or seven-day trial for this cohort."
+          : "Your instructor will verify your eligibility. No payment details or tuition amount are required."}</p>
+      </section>
+      ) : activeTab === "billing" ? (
       <section style={{ ...styles.card, display: "grid", gap: 12, padding: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
           <div style={{ minWidth: 0 }}>
