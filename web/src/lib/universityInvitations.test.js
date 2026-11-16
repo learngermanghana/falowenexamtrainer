@@ -3,6 +3,7 @@ import {
   resolveUniversityInvitation,
   isApprovedUniversityStudent,
   isPendingUniversityStudent,
+  isUniversityInvitationOpen,
 } from "./universityInvitations";
 import { getTrialLifecycleState } from "./trialAccess";
 
@@ -38,4 +39,12 @@ describe("University of Hamburg invitation access", () => {
     expect(isApprovedUniversityStudent({ ...approved, cohortId: "outsider" })).toBe(false);
     expect(isApprovedUniversityStudent({ ...pending, institutionVerification: "approved" })).toBe(false);
   });
+});
+
+it("requires an expiry and closes the invitation at the exact deadline", () => {
+  const invitation = { expiresAt: { toMillis: () => 2000 } };
+  expect(isUniversityInvitationOpen(invitation, 1999)).toBe(true);
+  expect(isUniversityInvitationOpen(invitation, 2000)).toBe(false);
+  expect(isUniversityInvitationOpen(invitation, 2001)).toBe(false);
+  expect(isUniversityInvitationOpen(undefined, 1999)).toBe(false);
 });
