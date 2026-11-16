@@ -8,9 +8,12 @@ describe("Figma-inspired signed-in learner homepage", () => {
   const styles = read("GeneralHome.css");
   const readiness = read("ExamReadinessBadge.js");
 
-  test("has accessible welcome, exam journey and two learning cards", () => {
+  test("has accessible welcome, class timetable card and two learning cards", () => {
     expect(home).toContain('className="falowen-learner-hero__welcome"');
-    expect(home).toContain('variant="homepage"');
+    expect(home).toContain("YOUR LIVE CLASS");
+    expect(home).toContain("View full class schedule");
+    expect(home).toContain("Manage class in Account");
+    expect(home).not.toContain("<ExamReadinessBadge");
     expect(home).toContain("Your learning spaces");
     expect(home).toContain("Welcome back, {studentName}.");
     expect(home).toContain("<h3>Exams Room</h3>");
@@ -19,12 +22,12 @@ describe("Figma-inspired signed-in learner homepage", () => {
     expect(home).toContain("onJoinZoom={joinZoom}");
   });
 
-  test("uses existing authenticated readiness rather than a sample percentage", () => {
-    expect(readiness).toContain('if (variant === "homepage")');
-    expect(readiness).toContain("state.loaded && !state.loading && !state.error");
-    expect(readiness).toContain("hasReadiness ? readiness.scoreLabel");
-    expect(readiness).toContain("hasReadiness ? readiness.score : undefined");
-    expect(readiness).toContain("onClick={handleOpenExamFile}");
+  test("links the assigned class to the existing full timetable route", () => {
+    expect(home).toContain("getHomeClassIdentity(studentProfile)");
+    expect(home).toContain("buildFullClassScheduleUrl({ className: preferredClass, classId: preferredClassId })");
+    expect(home).toContain('navigate("/campus/account")');
+    expect(home).toContain("onViewClassSchedule={openFullClassSchedule}");
+    expect(readiness).toContain('if (variant === "homepage")'); // Legacy reusable component remains intact.
   });
 
   test("preserves Kiswahili without showing German exam preparation", () => {
@@ -47,6 +50,9 @@ describe("Figma-inspired signed-in learner homepage", () => {
     expect(styles).toContain("@media (max-width: 900px)");
     expect(styles).toContain("@media (max-width: 680px)");
     expect(styles).toContain(".falowen-home-dashboard button:focus-visible");
+    expect(styles).toContain(".falowen-home-class-schedule {");
+    expect(styles).toContain(".falowen-home-section-break {");
+    expect(styles).toContain(".falowen-home-spaces__grid:not(.falowen-home-spaces__grid--single)::before");
     expect(styles).toContain("@media (prefers-reduced-motion: reduce)");
   });
 });
