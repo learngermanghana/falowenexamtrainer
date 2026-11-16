@@ -74,7 +74,17 @@ test("B1 Day 28 Klimafreundlich leben radio uses the requested course video", ()
   ),
 );
 
-test.each([1, 2, 3, 4, 27])(
+test("B2 Day 1 uses the approved Müll vermeiden Falowen Radio podcast", () =>
+  expect(getLessonRadioResource("B2", 1)).toEqual(
+    expect.objectContaining({
+      key: "b2-day1-muell-vermeiden-falowen-radio",
+      title: "Umweltschutz im Alltag – Müll vermeiden",
+      youtubeId: "tkWdHUjBPxg",
+    }),
+  ),
+);
+
+test.each([2, 3, 4, 27])(
   "B2 Day %i no longer exposes a retired Falowen Radio slot",
   (day) => expect(getLessonRadioResource("B2", day)).toBeNull(),
 );
