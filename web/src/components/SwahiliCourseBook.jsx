@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
+import { GrammarSelfCheck } from "./MgahawaniGrammarPractice";
 import SwahiliDictionary from "./SwahiliDictionary";
 import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import SwahiliTeacherDayOne from "./SwahiliTeacherDayOne";
@@ -64,7 +65,7 @@ function DayOneContent({
     <section className="swahili-book__card swahili-book__activity" aria-label="Music">
       <h2>Music · Muziki wa Somo la 1</h2>
       <p>Wimbo wa alfabeti na matamshi utaongezwa hapa mara tu utakapopakiwa. Sehemu hii ni ya hiari.</p>
-      <p className="swahili-book__note">Rekodi ya muziki bado haijapakiwa. Hakuna wimbo wa kubuni au kicheza sauti kisichofanya kazi.</p>
+      <p className="swahili-book__note">While you wait for the song, try clapping once per syllable in <strong>ma-ma</strong>, <strong>ki-ti</strong> and <strong>cha-ku-la</strong>.</p>
     </section>
   );
 
@@ -76,7 +77,7 @@ function DayOneContent({
       </div>
       <div>
         <h2>Vokali tano · A E I O U</h2>
-        <p>Sikiliza, rudia, na linganisha vokali na maneno.</p>
+        <p>Sikiliza, rudia, na linganisha vokali na maneno. Give each vowel its own clear sound. Keep the vowel in kiti short and steady.</p>
         <div className="swahili-book__grid">
           {lesson.vowels.map((item) => (
             <div className="swahili-book__tile" key={item.letter}>
@@ -88,7 +89,12 @@ function DayOneContent({
         </div>
       </div>
       <div>
+        <GrammarSelfCheck questionId="day-one-vowels" item={{
+          question: "Which vowel do you hear in both syllables of kiti?", options: ["A", "I", "U"], answer: 1,
+          why: "Ki-ti contains i in both syllables.",
+        }} />
         <h2>Silabi · Kuunganisha konsonanti na vokali</h2>
+        <p>Join a consonant and a vowel to make a syllable. Change the vowel to make a new syllable: b + a gives ba, and b + e gives be. Say each syllable in one beat.</p>
         <div className="swahili-book__grid">
           {lesson.syllables.map((item) => (
             <div className="swahili-book__tile" key={item.stem}>
@@ -100,6 +106,11 @@ function DayOneContent({
       </div>
       <div>
         <h2>Miunganiko ya herufi</h2>
+        <p>Read ch in chai, sh in shule and ny in nyanya together as single sounds. In ng’ombe the apostrophe marks ng’ as the sound at the end of English “sing”.</p>
+        <GrammarSelfCheck questionId="day-one-combination" item={{
+          question: "Which two letters work together at the start of shule?", options: ["ch", "ny", "sh"], answer: 2,
+          why: "Shule begins with sh. Say shu-le in two beats.",
+        }} />
         <div className="swahili-book__grid">
           {lesson.combinations.map((item) => (
             <div className="swahili-book__tile" key={item.letters}>
@@ -113,6 +124,10 @@ function DayOneContent({
         <h2>Mkazo wa neno</h2>
         <p>Kwa kawaida, mkazo huwa kwenye silabi ya pili kutoka mwisho. Silabi yenye herufi kubwa ina mkazo.</p>
         <p><strong>{lesson.stress.join(" · ")}</strong></p>
+        <GrammarSelfCheck questionId="day-one-stress" item={{
+          question: "Which syllable takes the stress in chakula?", options: ["cha", "ku", "la"], answer: 1,
+          why: "Ku is the second-to-last syllable in cha-ku-la.",
+        }} />
       </div>
       <p className="swahili-book__note">Mwalimu asome tofauti za sauti: ng / ng’ · s / sh · t / th.</p>
       <details>
@@ -133,33 +148,38 @@ function DayOneContent({
         <li>MA-ma · ra-FI-ki · mwa-LI-mu.</li>
         <li>chai · shule · nyanya · ng’ombe.</li>
       </ol>
-      <p className="swahili-book__note">Katika jozi, mwanafunzi mmoja asome, mwenzake arudie. Mwalimu arekebishe matamshi. Sehemu hii ni mazoezi ya darasani, si kazi ya kuandika.</p>
+      <h3>Mazoezi ya jozi · Partner practice</h3>
+      <p>Choose a word from the list and say it aloud. Your partner repeats it, claps once per syllable and says which syllable is stressed. Switch roles after three words.</p>
+      <p><strong>Example:</strong> A says <em>shule</em>. B repeats <em>SHU-le</em> and claps twice.</p>
     </section>
   );
 
   if (activeTab === "schreiben") return (
     <section className="swahili-book__card swahili-book__activity" aria-label="Teil 2">
       <h2>Teil 2 · Kuandika (Writing)</h2>
-      <p>Andika vokali tano, silabi tano za B na maneno matatu kutoka somo. Majibu haya yataonekana kwenye Submit.</p>
+      <p>Write the five vowels in order, form one syllable with B and each vowel, then write any three whole Kiswahili words from this lesson. Separate each answer with a comma.</p>
       <div className="swahili-book__form">
         <label htmlFor="swahili-vowels">1. Vokali tano
-          <input id="swahili-vowels" value={writing.vowels} onChange={(e) => changeWriting("vowels", e.target.value)} placeholder="A, E, I, O, U" />
+          <input id="swahili-vowels" value={writing.vowels} onChange={(e) => changeWriting("vowels", e.target.value)} placeholder="Five vowels" />
         </label>
         <label htmlFor="swahili-syllables">2. Silabi za B
-          <input id="swahili-syllables" value={writing.syllables} onChange={(e) => changeWriting("syllables", e.target.value)} placeholder="ba, be, bi, bo, bu" />
+          <input id="swahili-syllables" value={writing.syllables} onChange={(e) => changeWriting("syllables", e.target.value)} placeholder="Five B syllables" />
         </label>
         <label htmlFor="swahili-words">3. Maneno matatu
-          <textarea id="swahili-words" rows={3} value={writing.words} onChange={(e) => changeWriting("words", e.target.value)} placeholder="mama, kiti, kuku" />
+          <textarea id="swahili-words" rows={3} value={writing.words} onChange={(e) => changeWriting("words", e.target.value)} placeholder="Three words from this lesson" />
         </label>
       </div>
-      <p className="swahili-book__note">Andika mwenyewe. Majibu yanabaki kwenye ukurasa huu mpaka uwasilishe; usifunge ukurasa kabla ya kuwasilisha.</p>
+      <p className="swahili-book__note">Open Review & Submit to check your answers and save a draft before submitting.</p>
     </section>
   );
 
   if (activeTab === "lesen") return (
     <section className="swahili-book__card swahili-book__activity" aria-label="Teil 3">
       <h2>Teil 3 · Kusoma (Reading)</h2>
-      <p>Soma na tambua maneno. Kisha jibu maswali manne mafupi.</p>
+      <p>Read the two short sentences and the word cards. Then answer the four questions.</p>
+      <blockquote className="swahili-book__tile">
+        Mama ana mtoto. Mtoto anaona kiti na kuku.
+      </blockquote>
       <div className="swahili-book__grid">
         {lesson.vowels.map((item) => (
           <div className="swahili-book__tile" key={item.word}>
