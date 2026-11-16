@@ -10,11 +10,10 @@ let mockUser = { uid: "learner-auth-uid" };
 jest.mock("react-router-dom", () => ({
   useNavigate: () => jest.fn(),
 }));
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key, fallback) => typeof fallback === "string" ? fallback : key,
-  }),
-}));
+jest.mock("react-i18next", () => {
+  const stableTranslate = (key, fallback) => typeof fallback === "string" ? fallback : key;
+  return { useTranslation: () => ({ t: stableTranslate }) };
+});
 jest.mock("../context/AuthContext", () => ({
   useAuth: () => ({ idToken: mockIdToken, user: mockUser }),
 }));
