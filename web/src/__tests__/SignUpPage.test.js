@@ -111,6 +111,32 @@ describe("three-step signup", () => {
     await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
     await waitFor(() => expect(mockSignup).toHaveBeenCalledWith("learner@example.com", "password123", expect.objectContaining({ program: "german", className: "A1 Test Class", phone: "+233241234567", address: "12 Test Street", location: "Accra", learningMode: "Online", emergencyContactPhone: "+233209876543", paymentStatus: "pending", initialPaymentAmount: 0, trialStatus: "active" })));
   });
+  it("recognizes Hamburg invitation and registers without trial, payment or a manual code", async () => {
+    window.history.replaceState({}, "", "/signup?invite=UH-KISWAHILI-A1&program=german");
+    render(<SignUpPage />);
+    await fillAccount();
+    await userEvent.click(screen.getByRole("button", { name: /Continue to your learning/ }));
+    expect(screen.getByText(/University of Hamburg · Kiswahili A1/)).toBeVisible();
+    expect(screen.getByRole("combobox", { name: /Which language/ })).toHaveValue("swahili");
+    expect(screen.getByRole("combobox", { name: /Which language/ })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: /Pay full fee now/ })).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: /Continue to contact details/ }));
+    await fillContact();
+    await userEvent.type(screen.getByLabelText("Emergency contact phone"), "+233209876543");
+    await userEvent.click(screen.getByRole("checkbox"));
+    await userEvent.click(screen.getByRole("button", { name: /Register for complimentary course access/ }));
+    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith(
+      "learner@example.com", "password123",
+      expect.objectContaining({
+        program: "swahili", universityInvitationCode: "UH-KISWAHILI-A1",
+        status: "registered", trialStatus: "not_applicable",
+        tuitionFee: null, balanceDue: null, paystackLink: "", paymentIntentAmount: null,
+      }),
+    ));
+    expect(await screen.findByText(/awaiting instructor verification/i)).toBeVisible();
+    window.history.replaceState({}, "", "/");
+  });
+
   it("starts the Kiswahili workbook trial without assigning German tuition or a cohort", async () => {
     render(<SignUpPage />);
     await fillAccount();
