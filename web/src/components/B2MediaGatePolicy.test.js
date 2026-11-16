@@ -9,16 +9,30 @@ import {
 import { resolveCanonicalLessonForPage } from "./StandardLessonWritingCoachPage";
 
 describe("B2 redesigned media gate policy", () => {
-  test("requires a real Radio link and currently shows no B2 Radio gate", () => {
+  test("requires a real Radio link and enables only the approved B2 Day 1 Radio gate", () => {
     expect(hasPlayableRadioResource(null)).toBe(false);
     expect(hasPlayableRadioResource({ youtubeId: "" })).toBe(false);
     expect(hasPlayableRadioResource({ url: "   " })).toBe(false);
     expect(hasPlayableRadioResource({ youtubeId: "abc123" })).toBe(true);
     expect(hasPlayableRadioResource({ url: "https://youtu.be/abc123" })).toBe(true);
 
-    [1, 2, 6, 28].forEach((day) => {
+    expect(shouldShowRadioFirst("B2", 1)).toBe(true);
+    [2, 6, 28].forEach((day) => {
       expect(shouldShowRadioFirst("B2", day)).toBe(false);
     });
+  });
+
+  test("the canonical B2 Day 1 lesson keeps the approved Müll vermeiden Radio", () => {
+    const canonical = normalizeB2C1Lesson({ level: "B2", day: 1 }, "B2");
+    expect(canonical.resources.falowenRadio).toEqual(
+      expect.objectContaining({
+        youtubeId: "tkWdHUjBPxg",
+        title: "Umweltschutz im Alltag – Müll vermeiden",
+      }),
+    );
+    const displayed = resolveCanonicalLessonForPage({ level: "B2", day: 1 }, canonical);
+    expect(displayed.resources.falowenRadio.youtubeId).toBe("tkWdHUjBPxg");
+    expect(displayed.resources.grammarBook).toBeNull();
   });
 
   test("shared lesson model rejects stale B2 grammar links and videos", () => {
