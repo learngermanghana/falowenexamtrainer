@@ -103,7 +103,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
           <div className="course-book-hero-copy">
             <p style={book.heroEyebrow}>Kiswahili A1 · Tutor guided</p>
             <h2 style={book.heroTitle}>Kitabu cha Kozi ya Kiswahili</h2>
-            <p style={book.heroText}>{nextLabel === "Review lessons" ? "All published workbooks submitted." : <>Next: <strong>Somo la {next.day} · {next.title}</strong></>}</p>
+            <p style={book.heroText}>{nextLabel === "Review lessons" ? "All tutor assignments submitted." : <>Next: <strong>Somo la {next.day} · {next.title}</strong></>}</p>
           </div>
           <div data-a1-coursebook-hero-actions="true" className="course-book-hero-actions" style={book.heroActions}>
             {!preview && <Link style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }} to="/">← Back to Campus</Link>}
@@ -134,11 +134,11 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
       </section>
 
       <section className="course-book-toolbar" style={book.toolbar}>
-        <p style={{ ...styles.helperText, margin: 0 }}>A1 course outline: 20 units, including the three existing lessons. Unpublished units are previews only and do not affect assignments or progress. Final revision and assessment will follow Unit 20.</p>
+        <p style={{ ...styles.helperText, margin: 0 }}>Swahili A1 has 20 workbooks. Days 1 and 6 are tutor-marked. The other chapters are for self-study.</p>
         <div style={book.toolbarTop}>
           <div>
             <h3 style={{ margin: 0, fontSize: 18 }}>Lessons</h3>
-            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{visible.length} shown from {LESSONS.length} planned A1 units · {PUBLISHED.length} available</p>
+            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{visible.length} shown from {LESSONS.length} A1 units · {PUBLISHED.length} available</p>
           </div>
           <div className="course-book-filter-row" role="group" aria-label="Course Book lesson filters" style={book.filterRow}>
             {FILTERS.map(({ key, label }) => (
@@ -174,7 +174,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
                     <span style={book.chip}>{badge}</span>
                   </div>
                   {published && <div className="course-book-included" style={book.includedRow}>
-                    {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", "Review & Submit"].map((label) =>
+                    {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", lesson.day === 5 ? "Model Answers" : lesson.practiceOnly ? "Answer Sheet" : "Review & Submit"].map((label) =>
                       <span key={label} style={book.includedChip}>{label}</span>)}
                   </div>}
                   {record?.review === "needs_revision" && (

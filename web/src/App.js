@@ -1,7 +1,9 @@
 import SwahiliDayFiveWorkbook from "./components/SwahiliDayFiveWorkbook";
 import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import SwahiliDaySixWorkbook from "./components/SwahiliDaySixWorkbook";
-import { getSwahiliCampusRoute } from "./utils/swahiliCourseRoute";
+import SwahiliA1PracticeWorkbook from "./components/SwahiliA1PracticeWorkbook";
+import { SWAHILI_A1_PRACTICE_UNITS } from "./data/swahili/a1PracticeUnits";
+import { getSwahiliCampusRoute, matchSwahiliPreview } from "./utils/swahiliCourseRoute";
 import { SWAHILI_RESOURCE_SECTIONS, getCampusProgram, getProgramCampusTabs, getProgramAllowedSections, getProgramCourseRedirect } from "./utils/campusProgram";
 import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
@@ -441,7 +443,7 @@ function App() {
     !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
 
   // Visitors can preview Kiswahili; signed-in learners follow their Campus programme.
-  const swahiliPreview = location.pathname.match(/^\/swahili(?:\/(day-(?:1|5|6)))?\/?$/);
+  const swahiliPreview = matchSwahiliPreview(location.pathname);
   if (swahiliPreview) {
     // Wait for Firebase to resolve the session so signed-in students never
     // briefly see the public preview or lose their personal course progress.
@@ -465,6 +467,8 @@ function App() {
 
     if (swahiliPreview[1] === "day-5") return <SwahiliDayFiveWorkbook preview />;
     if (swahiliPreview[1] === "day-6") return <SwahiliDaySixWorkbook basePath="/swahili" preview />;
+    const practiceLesson = SWAHILI_A1_PRACTICE_UNITS[swahiliPreview[1]?.slice(4)];
+    if (practiceLesson) return <SwahiliA1PracticeWorkbook key={practiceLesson.day} lesson={practiceLesson} preview />;
     return <SwahiliCourseBook day={swahiliPreview[1] === "day-1" ? 1 : null} basePath="/swahili" preview />;
   }
 
@@ -941,6 +945,10 @@ const AppShell = ({
           <Route path="/campus/course/swahili/day-1" element={<SwahiliCourseBook day={1} basePath="/campus/course/swahili" />} />
           <Route path="/campus/course/swahili/day-5" element={<SwahiliDayFiveWorkbook />} />
           <Route path="/campus/course/swahili/day-6" element={<SwahiliDaySixWorkbook basePath="/campus/course/swahili" />} />
+          {Object.values(SWAHILI_A1_PRACTICE_UNITS).map((lesson) => (
+            <Route key={lesson.day} path={`/campus/course/swahili/day-${lesson.day}`}
+              element={<SwahiliA1PracticeWorkbook key={lesson.day} lesson={lesson} />} />
+          ))}
           <Route path="/campus/course/lesson/:level/:day" element={<CourseLessonPage />} />
           <Route path="/campus/course/speaking-exams-intro-4-7" element={<SpeakingExamIntroPage />} />
           <Route

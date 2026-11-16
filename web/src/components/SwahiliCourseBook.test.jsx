@@ -2,6 +2,8 @@ import React from "react";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import SwahiliCourseBook, { getMissingSwahiliDayOneWork } from "./SwahiliCourseBook";
+import SwahiliA1PracticeWorkbook from "./SwahiliA1PracticeWorkbook";
+import { SWAHILI_A1_PRACTICE_UNITS } from "../data/swahili/a1PracticeUnits";
 import SwahiliDaySixWorkbook from "./SwahiliDaySixWorkbook";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import { setDoc, getDoc } from "../firebase";
@@ -45,15 +47,39 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.queryByRole("link", { name: "Fungua Somo la 1" })).toBeNull();
   });
 
-  it("shows all 20 A1 units without exposing unfinished workbook routes", () => {
+  it("keeps new practice answers across tabs and shows matched models without submitting", () => {
+    const lesson = SWAHILI_A1_PRACTICE_UNITS[20];
+    render(<MemoryRouter initialEntries={["/swahili/day-20?view=schreiben"]}>
+      <SwahiliA1PracticeWorkbook lesson={lesson} preview />
+    </MemoryRouter>);
+    fireEvent.change(screen.getByRole("textbox", { name: "Your practice answer" }), {
+      target: { value: "Ninaumwa." },
+    });
+    openTab("Teil 3");
+    fireEvent.change(screen.getByRole("textbox", { name: /Asha yuko wapi/ }), {
+      target: { value: "Hospitali." },
+    });
+    openTab("Teil 4");
+    expect(screen.getByText(/after upload/)).toBeTruthy();
+    expect(screen.queryByRole("radio")).toBeNull();
+    openTab("Answer Sheet");
+    fireEvent.click(screen.getByText("Teil 2 · Model writing"));
+    fireEvent.click(screen.getByText("Teil 3 · Reading answers"));
+    expect(screen.getByText("Ninaumwa.")).toBeTruthy();
+    expect(screen.getByText("Your answer: Hospitali.")).toBeTruthy();
+    expect(screen.getByText("Model answer: Hospitalini.")).toBeTruthy();
+    expect(setDoc).not.toHaveBeenCalled();
+  });
+
+  it("links to all 20 A1 workbooks", () => {
     render(<MemoryRouter><SwahiliCourseBook preview /></MemoryRouter>);
-    expect(screen.getByText(/20 planned A1 units · 3 available/)).toBeTruthy();
-    expect(screen.getAllByText("Coming soon")).toHaveLength(17);
+    expect(screen.getByText(/20 A1 units · 20 available/)).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: /Fungua Somo la/ })).toHaveLength(20);
     expect(screen.getByText("Salamu")).toBeTruthy();
     expect(screen.getByText("Familia yangu")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Fungua Somo la 5" }).getAttribute("href")).toBe("/swahili/day-5");
-    expect(screen.queryByRole("link", { name: "Fungua Somo la 2" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Fungua Somo la 20" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Fungua Somo la 2" }).getAttribute("href")).toBe("/swahili/day-2");
+    expect(screen.getByRole("link", { name: "Fungua Somo la 20" }).getAttribute("href")).toBe("/swahili/day-20");
     expect(getDoc).not.toHaveBeenCalled();
     fireEvent.change(screen.getByRole("textbox", { name: "Search lessons" }), { target: { value: "hospitalini" } });
     expect(screen.getByText("Hospitalini")).toBeTruthy();
@@ -103,7 +129,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(tabs[6]).toContain("Submit");
     expect(document.querySelector("[data-workbook-tab-navigation]")).toBeTruthy();
     openTab("Music");
-    expect(screen.getByText(/Rekodi ya muziki bado haijapakiwa/)).toBeTruthy();
+    expect(screen.getByText(/While you wait for the song/)).toBeTruthy();
     expect(document.querySelector("audio")).toBeNull();
     openTab("Grammar");
     expect(screen.getByText(/Grammar · Sarufi na matamshi/)).toBeTruthy();
@@ -227,6 +253,10 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     for (const group of screen.getAllByRole("group")) {
       fireEvent.click(within(group).getAllByRole("radio")[0]);
     }
+    openTab("Teil 4");
+    for (const group of screen.getAllByRole("group")) {
+      fireEvent.click(within(group).getAllByRole("radio")[0]);
+    }
     fireEvent.click(screen.getByRole("button", { name: "Save & Review" }));
     expect(setDoc).not.toHaveBeenCalled();
     screen.getAllByRole("checkbox").forEach(box => fireEvent.click(box));
@@ -283,7 +313,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     const feedback = screen.getByRole("link", { name: "View feedback and resubmit" });
     expect(feedback.getAttribute("href")).toBe("/campus/course/swahili/day-1?view=submit");
     fireEvent.click(screen.getByRole("button", { name: "Needs revision" }));
-    expect(screen.getByText("1 shown from 3")).toBeTruthy();
+    expect(screen.getByText("1 shown from 20 A1 units · 20 available")).toBeTruthy();
     expect(screen.queryByRole("link", { name: "Fungua Somo la 6" })).toBeNull();
     const paths = getDoc.mock.calls.map((call) => call[0]);
     expect(paths).toEqual(expect.arrayContaining([

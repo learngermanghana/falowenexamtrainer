@@ -37,8 +37,12 @@ describe("Kiswahili uses the existing Falowen Campus shell", () => {
     })).toBeNull();
   });
 
-  test("does not intercept other programme routes or unpublished lessons", () => {
+  test("opens both ends of the added range and rejects out-of-range lessons", () => {
     expect(getSwahiliCampusRoute({ pathname: "/swahili/day-2", ...swahiliStudent }))
+      .toBe("/campus/course/swahili/day-2");
+    expect(getSwahiliCampusRoute({ pathname: "/swahili/day-20", search: "?view=submit", ...swahiliStudent }))
+      .toBe("/campus/course/swahili/day-20?view=submit");
+    expect(getSwahiliCampusRoute({ pathname: "/swahili/day-21", ...swahiliStudent }))
       .toBeNull();
     expect(getSwahiliCampusRoute({ pathname: "/campus/course/swahili/day-6", ...swahiliStudent }))
       .toBeNull();

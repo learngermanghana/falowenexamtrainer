@@ -1,3 +1,5 @@
+import { isSwahiliCampusLesson } from "./swahiliCourseRoute";
+
 /**
  * The Falowen learner shell is shared by programmes, but German-only learning
  * services must not appear as Kiswahili features or read German records.
@@ -28,7 +30,7 @@ export const getProgramCourseRedirect = ({ pathname = "", studentProfile, isStaf
     if (/^\/(exams|attendance|tutor-marking)(?:\/|$)/.test(path)) return "/campus/course";
     const section = path.slice("/campus/".length);
     const enabled = [...SWAHILI_CAMPUS_SECTIONS].some(key => key.toLowerCase() === section);
-    if (path.startsWith("/campus/") && !enabled && !/^\/campus\/course\/swahili\/day-(?:1|5|6)$/.test(path)) {
+    if (path.startsWith("/campus/") && !enabled && !isSwahiliCampusLesson(path)) {
       return "/campus/course";
     }
   } else if (/^\/campus\/course\/swahili(?:\/|$)/.test(path)) {
