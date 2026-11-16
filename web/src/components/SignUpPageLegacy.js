@@ -757,8 +757,8 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             <option value="german">{t("signup.programs.german")}</option>
             <option value="swahili">{t("signup.programs.swahili")}</option>
           </select>
-          {isSwahili && !universityInvitation ? (
-            <p style={styles.helperText}>{t("signup.swahiliTrial")}</p>
+          {isSwahili ? (
+            universityInvitation ? null : <p style={styles.helperText}>{t("signup.swahiliTrial")}</p>
           ) : <>
           <label htmlFor="signup-selectedLevel" style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
           <select
