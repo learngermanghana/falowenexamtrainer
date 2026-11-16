@@ -4,6 +4,12 @@ export const SWAHILI_DAY_FIVE = {
   title: "Familia yangu",
   objective: "Introduce your family using simple Kiswahili sentences.",
   practiceOnly: true,
+  radio: {
+    resourceRole: "falowenRadio",
+    youtubeId: "SKVEqbLqjSY",
+    title: "Familia yangu · Falowen Radio",
+    instruction: "Sikiliza mazungumzo. Listen for words and phrases about family.",
+  },
   audioKey: "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
   trackId: "swahili-a1-day-05",
   aiLecture: null,
