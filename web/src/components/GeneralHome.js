@@ -7,7 +7,7 @@ import { ZOOM_DETAILS } from "../data/classCatalog";
 import ClassCalendarCard from "./ClassCalendarCard";
 import OnboardingChecklist from "./OnboardingChecklist";
 import OnboardingStudyBuddyStart from "./OnboardingStudyBuddyStart";
-import ExamReadinessBadge from "./ExamReadinessBadge";
+import { buildFullClassScheduleUrl, getHomeClassIdentity } from "../utils/homeClassSchedule";
 import HomeMetrics from "./HomeMetrics";
 import TrialCountdownBanner from "./TrialCountdownBanner";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
@@ -24,13 +24,14 @@ const classLevelFromName = (className = "") => {
   return match?.[1] || "";
 };
 
-const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLearning, onOpenAccount, isSwahili = false }) => {
+const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClassSchedule, onJoinZoom, onContinueLearning, onOpenAccount, isSwahili = false }) => {
   const { t } = useTranslation();
   const studentName =
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
   const levelKey = detectLevelKey(studentProfile);
   const courseLabel = isSwahili ? "Kiswahili A1 course" : levelKey ? levelKey + " course" : "course";
   const courseBadge = isSwahili ? "KISWAHILI A1 · COURSE READY" : levelKey ? levelKey + " COURSE · READY" : "YOUR CAMPUS";
+  const hasAssignedClass = Boolean(className || classId);
 
   return (
     <div className={"falowen-learner-hero" + (isSwahili ? " falowen-learner-hero--single" : "")}>
@@ -60,7 +61,28 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
         </div>
       </section>
       {!isSwahili && (
-        <ExamReadinessBadge variant="homepage" studentProfile={studentProfile} onOpenExamFile={onOpenExamFile} />
+        <section className="falowen-home-class-schedule" aria-label="Your class schedule">
+          <span className="falowen-home-class-schedule__eyebrow">YOUR LIVE CLASS</span>
+          <div className="falowen-home-class-schedule__identity">
+            <span className="falowen-home-class-schedule__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                   strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="16" rx="2" />
+                <path d="M7 3v4M17 3v4M3 10h18" />
+              </svg>
+            </span>
+            <h2>{hasAssignedClass ? (className || "Your assigned class") : "No live class assigned"}</h2>
+          </div>
+          <p>{hasAssignedClass
+            ? "Your full timetable includes upcoming lessons, dates and any schedule changes."
+            : "You can continue studying in Campus. Your class schedule will appear after a class is assigned."}</p>
+          {levelKey && <span className="falowen-home-class-schedule__level">{levelKey} German</span>}
+          <button type="button" className="falowen-home-class-schedule__action"
+                  onClick={hasAssignedClass ? onViewClassSchedule : onOpenAccount}>
+            <span>{hasAssignedClass ? "View full class schedule" : "Manage class in Account"}</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </section>
       )}
     </div>
   );
@@ -158,10 +180,7 @@ const GeneralHome = ({
   const playOpenFeedback = useCallback(() => {
     triggerInteractionFeedback({ sound: "open" });
   }, []);
-  const preferredClass = studentProfile?.className;
-  const preferredClassId = String(
-    studentProfile?.classId || studentProfile?.classRecordId || studentProfile?.assignedClassId || ""
-  ).trim();
+  const { className: preferredClass, classId: preferredClassId } = getHomeClassIdentity(studentProfile);
   const classCalendarId = "class-calendar-card";
   const levelKey = detectLevelKey(studentProfile);
   const isSwahiliCampus = getCampusProgram(studentProfile) === "swahili";
@@ -180,10 +199,15 @@ const GeneralHome = ({
     navigate("/campus/course");
   }, [navigate, playOpenFeedback]);
 
-  const openExamFile = useCallback(() => {
+  const openFullClassSchedule = useCallback(() => {
+    const scheduleUrl = buildFullClassScheduleUrl({ className: preferredClass, classId: preferredClassId });
+    if (!scheduleUrl) {
+      navigate("/campus/account");
+      return;
+    }
     playOpenFeedback();
-    navigate("/campus/examFile");
-  }, [navigate, playOpenFeedback]);
+    navigate(scheduleUrl);
+  }, [navigate, playOpenFeedback, preferredClass, preferredClassId]);
 
   const openAccount = useCallback(() => {
     playOpenFeedback();
@@ -332,7 +356,9 @@ const GeneralHome = ({
       ) : null}
       <WelcomeHero
         studentProfile={studentProfile}
-        onOpenExamFile={openExamFile}
+        className={preferredClass}
+        classId={preferredClassId}
+        onViewClassSchedule={openFullClassSchedule}
         onJoinZoom={joinZoom}
         onContinueLearning={openCampus}
         onOpenAccount={openAccount}
