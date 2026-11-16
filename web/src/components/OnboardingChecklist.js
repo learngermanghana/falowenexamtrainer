@@ -11,6 +11,7 @@ import {
 } from "../lib/onboardingPaystackCheckout";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
+import { getCampusProgram } from "../utils/campusProgram";
 import { useAuth } from "../context/AuthContext";
 
 const SELF_LEARNING_LEVELS = new Set(["B2", "C1", "C2"]);
@@ -25,14 +26,14 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const proposedTuitionAmount = getRecommendedTuitionAmount(studentProfile);
 
   const level = detectLevelKey(studentProfile);
-  const isSwahili = studentProfile?.program === "swahili";
+  const isSwahili = getCampusProgram(studentProfile) === "swahili";
   const isSelfLearning = isSwahili || SELF_LEARNING_LEVELS.has(level);
   const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
   const balanceDue = studentProfile?.balanceDue ?? studentProfile?.balance;
   const paymentComplete = paymentStatus === "paid" || hasClearedBalance(balanceDue);
-  const offerPayment = !paymentComplete && (!isSwahili || studentProfile?.tuitionFee > 0);
   const trialLifecycle = getTrialLifecycleState(studentProfile);
   const hasTrialAccess = trialLifecycle.active;
+  const offerPayment = !paymentComplete && (!isSwahili || (!hasTrialAccess && Number(studentProfile?.tuitionFee) > 0));
   const learnerFirstName = String(
     studentProfile?.firstName || studentProfile?.name || studentProfile?.fullName || ""
   ).trim().split(/\s+/)[0];
@@ -55,7 +56,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   };
 
   const handlePayNow = async () => {
-    if (savingAction) return;
+    if (savingAction || !offerPayment) return;
     setPaymentError("");
     setSavingAction("payment");
     try {

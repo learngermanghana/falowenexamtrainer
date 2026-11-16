@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getCampusProgram } from "../utils/campusProgram";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
@@ -110,7 +111,7 @@ const SetupCheckpoint = () => {
       }).format(new Date(trialState.purgeAtMs))
     : "";
 
-  if (studentProfile?.program === "swahili" && !(studentProfile.tuitionFee > 0)) {
+  if (getCampusProgram(studentProfile) === "swahili" && !(studentProfile.tuitionFee > 0)) {
     return (
       <main style={styles.container}>
         <section style={styles.card}>

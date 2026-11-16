@@ -1,9 +1,13 @@
 import { computeTuitionStatus, MIN_INSTALLMENT_GHS } from "../data/levelFees";
+import { getCampusProgram } from "../utils/campusProgram";
+import { getTrialLifecycleState } from "./trialAccess";
 import { savePaymentAttempt } from "./paymentAttempt";
 
 // Mirrors the authenticated /api/paystack/initialize contract used by Account & Billing.
 // Never mark tuition paid here: only the server's Paystack confirmation can do so.
 export const getRecommendedTuitionAmount = (studentProfile = {}) => {
+  if (getCampusProgram(studentProfile) === "swahili" &&
+      (getTrialLifecycleState(studentProfile).active || !(Number(studentProfile.tuitionFee) > 0))) return 0;
   const paidAmount = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);
   const rawBalance = studentProfile?.balanceDue ?? studentProfile?.balance;
   const balanceDue = rawBalance === undefined || rawBalance === null
