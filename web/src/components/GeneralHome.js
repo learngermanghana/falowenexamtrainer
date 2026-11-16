@@ -288,7 +288,7 @@ const GeneralHome = ({
   // ChatGPT companion for a Kiswahili student.
   if (isSwahiliCampus) {
     return (
-      <div style={{ display: "grid", gap: 12 }}>
+      <div className="falowen-home-dashboard falowen-home-dashboard--swahili">
         <WelcomeHero
           studentProfile={studentProfile}
           isSwahili
@@ -363,14 +363,18 @@ const GeneralHome = ({
       ) : null}
 
       <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
-      <HomepageHighlights
-        className={preferredClass}
-        classId={preferredClassId}
-        level={assignedClassLevel || levelKey}
-        program={studentProfile?.program}
-      />
+      <div className="falowen-home-section-break falowen-home-section-break--highlights">
+        <HomepageHighlights
+          className={preferredClass}
+          classId={preferredClassId}
+          level={assignedClassLevel || levelKey}
+          program={studentProfile?.program}
+        />
+      </div>
 
-      <HomeMetrics studentProfile={metricsStudentProfile} />
+      <div className="falowen-home-section-break falowen-home-section-break--metrics">
+        <HomeMetrics studentProfile={metricsStudentProfile} />
+      </div>
 
       <LegalFooter />
     </div>
