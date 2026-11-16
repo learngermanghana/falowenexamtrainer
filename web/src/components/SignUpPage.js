@@ -2,6 +2,7 @@ import { buildApplicationSupportMessage } from "../lib/applicationSupportMessage
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import SignUpPageLegacy from "./SignUpPageLegacy";
+import { resolveUniversityInvitation } from "../lib/universityInvitations";
 import LegalFooter from "./LegalFooter";
 import { classCatalog } from "../data/classCatalog";
 import {
@@ -430,7 +431,10 @@ export default function SignUpPage(props) {
       className: details.className,
       classSlug: slugify(details.className),
       learningMode: details.learningMode,
-      paymentStatus: "pending",
+      paymentStatus: details.universityInvitation ? "exempt_pending" : "pending",
+      registrationSource: details.registrationSource || "public-application",
+      institutionId: details.institutionId || "",
+      cohortId: details.cohortId || "",
       followUpCount: 0,
       nextFollowUpAt: "",
       attribution: getPublicFunnelContext(),
@@ -440,12 +444,14 @@ export default function SignUpPage(props) {
   // Respect explicit links from the German and Kiswahili About Us pathways.
   // A saved application draft is the fallback only when no language was requested.
   const programQuery = typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("program");
-  const initialProgram = ["german", "swahili"].includes(programQuery) ? programQuery : draft?.program;
+  const invitationCode = typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("invite");
+  const universityInvitation = resolveUniversityInvitation(invitationCode);
+  const initialProgram = universityInvitation ? "swahili" : (["german", "swahili"].includes(programQuery) ? programQuery : draft?.program);
 
   return (
     <div ref={rootRef} className="signup-page-mobile-safe">
       <style>{MOBILE_INPUT_CSS}</style>
-      <SignUpPageLegacy {...props} initialProgram={initialProgram} onAccountCreated={handleAccountCreated} />
+      <SignUpPageLegacy {...props} initialProgram={initialProgram} invitationCode={universityInvitation?.code || ""} onAccountCreated={handleAccountCreated} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} rootRef={rootRef} />, mount) : null}
       <LegalFooter />
     </div>
