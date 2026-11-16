@@ -3,7 +3,7 @@ import WorkbookDayMusic from "./WorkbookDayMusic";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GrammarSelfCheck } from "./MgahawaniGrammarPractice";
-import { SWAHILI_DAY_FIVE as lesson, FAMILY_GRAMMAR, FAMILY_READING, FAMILY_WRITING_MODEL } from "../data/swahili/dayFive";
+import { SWAHILI_DAY_FIVE as lesson, FAMILY_GRAMMAR, FAMILY_LISTENING, FAMILY_READING, FAMILY_WRITING_MODEL } from "../data/swahili/dayFive";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR as tabs, WorkbookTabNav } from "./StandardWorkbookComponents";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import "./SwahiliCourseBook.css";
@@ -12,6 +12,7 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useSwahiliWorkbookTab(tabs);
   const [writing, setWriting] = useState("");
+  const [listeningAnswers, setListeningAnswers] = useState({});
   const [audio, setAudio] = useState({ url: "", loading: false, error: "" });
 
   async function loadListeningAudio() {
@@ -101,21 +102,47 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
         </>}
         {activeTab === "submit" && <>
           <h2>Wasilisha · Submit</h2>
-          <p>Day 5 is practice only. Compare your work with the model answers in Teil 2 and Teil 3.</p>
+          <p>Day 5 is practice only. Compare your work with the model answers in Teil 2, Teil 3 and Teil 4.</p>
           <div className="swahili-book__row">
             <button type="button" className="swahili-book__button" onClick={() => setActiveTab("schreiben")}>Review writing</button>
             <button type="button" className="swahili-book__button" onClick={() => setActiveTab("lesen")}>Review reading</button>
+            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("hoeren")}>Review listening</button>
           </div>
         </>}
         {activeTab === "hoeren" && <>
           <h2>Teil 4 · Kusikiliza (Listening)</h2>
-          <p>Sikiliza sauti mara mbili. Listen to the recording twice.</p>
+          <p>Sikiliza sauti mara mbili, kisha chagua jibu sahihi. Listen twice, then choose one answer per question.</p>
           <button type="button" className="swahili-book__button swahili-book__button--soft"
             onClick={loadListeningAudio} disabled={audio.loading}>
             {audio.loading ? "Inapakia sauti…" : audio.url ? "Pakia sauti tena · Refresh audio" : "Sikiliza sauti · Load audio"}
           </button>
           {audio.url && <audio controls preload="none" src={audio.url} aria-label="Familia yangu Day 5 listening recording" />}
           {audio.error && <p className="swahili-book__error" role="alert">{audio.error}</p>}
+          <div className="swahili-book__quiz" lang="sw">
+            {FAMILY_LISTENING.map(({ id, question, choices }, index) => (
+              <fieldset className="swahili-book__exercise" key={id}>
+                <legend>{index + 1}. {question}</legend>
+                <div className="swahili-book__choices">
+                  {choices.map(choice => (
+                    <label className="swahili-book__choice" key={choice}>
+                      <input type="radio" name={`day-five-listening-${id}`} value={choice}
+                        checked={listeningAnswers[id] === choice}
+                        onChange={() => setListeningAnswers(current => ({ ...current, [id]: choice }))} />
+                      {choice}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))}
+          </div>
+          <details className="swahili-book__tile">
+            <summary>Show listening answer sheet</summary>
+            <ol lang="sw">
+              {FAMILY_LISTENING.map(({ id, answer }) => (
+                <li key={id}>{answer}</li>
+              ))}
+            </ol>
+          </details>
         </>}
       </section>
       <SwahiliWorkbookNavigation tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
