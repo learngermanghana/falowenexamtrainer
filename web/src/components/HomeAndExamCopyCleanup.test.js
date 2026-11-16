@@ -51,7 +51,7 @@ describe("homepage and Exams Room student-facing cleanup", () => {
     expect(homeSource).toContain("<HomeMetrics");
     expect(homeSource).toContain("<ClassCalendarCard");
     expect(homeSource).toContain("onOpenAccount={openAccount}");
-    expect(homeSource).toContain("onOpenExamFile={openExamFile}");
+    expect(homeSource).toContain("onViewClassSchedule={openFullClassSchedule}");
     expect(homeSource).toContain("initialClassName={preferredClass}");
     expect(homeSource).not.toContain("homepageCompact");
   });
