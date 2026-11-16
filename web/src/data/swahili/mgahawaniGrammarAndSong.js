@@ -11,7 +11,7 @@ export const MGAHAWANI_GRAMMAR = Object.freeze({
       rows:[
         ["Naomba + item","Naomba wali na samaki.","Rice and fish, please."],
         ["Ninaomba + item","Ninaomba maji.","I would like some water."],
-        ["Naomba + quantity + item","Naomba vikombe viwili vya chai.","Two cups of tea, please."],
+        ["Naomba + noun + agreeing numeral","Naomba vikombe viwili vya chai.","Two cups of tea, please."],
         ["Requesting the bill","Naomba bili, tafadhali.","The bill, please."]
       ],
       note:"Ninataka means “I want”. Naomba and ninaomba make the request more courteous: Ninataka maji states what I want; Naomba maji politely asks for it."
