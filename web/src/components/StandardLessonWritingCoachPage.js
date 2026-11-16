@@ -12,6 +12,7 @@ import C1ExtraGuidedLessonPage from "./C1Day24To26GuidedLessonPage";
 import C1LastGuidedLessonPage from "./C1Day27To28GuidedLessonPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
 import { C1_DAY3_RADIO_OVERRIDE } from "../data/c1Day3RadioOverride";
+import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 
 export const shouldMountMarkMyLetter = () => false;
 
@@ -39,7 +40,7 @@ export const resolveCanonicalLessonForPage = (lesson, canonicalLesson) => {
       ...(canonicalLesson || {}),
       resources: {
         ...resources,
-        falowenRadio: null,
+        falowenRadio: day === 1 ? getLessonRadioResource("B2", 1) : null,
         grammarBook: null,
         teacherVideo: null,
         aiVideo: null,
