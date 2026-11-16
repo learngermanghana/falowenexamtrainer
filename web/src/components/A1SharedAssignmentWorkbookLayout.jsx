@@ -269,7 +269,7 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
               aria-label={locked ? `${tab.label} (locked until timed mock starts)` : tab.label}
               disabled={locked}
               onClick={() => onSelect(tab.key)}
-              style={{ ...tabButtonStyle(activeTab === tab.key, tab.submit), ...(tab.optional ? { background: activeTab === "music" ? "#16604a" : "#e7f9ee", borderColor: "#86cba6", color: activeTab === "music" ? "#ffffff" : "#16543d" } : {}), cursor: locked ? "not-allowed" : "pointer", opacity: locked ? 0.52 : 1 }}
+              style={{ ...tabButtonStyle(activeTab === tab.key, tab.submit), ...(tab.key === "music" ? { background: activeTab === "music" ? "#16604a" : "#e7f9ee", borderColor: "#86cba6", color: activeTab === "music" ? "#ffffff" : "#16543d" } : {}), cursor: locked ? "not-allowed" : "pointer", opacity: locked ? 0.52 : 1 }}
             >
               {locked ? `🔒 ${tab.label}` : tab.label}
             </button>
