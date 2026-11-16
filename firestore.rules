@@ -309,10 +309,19 @@ service cloud.firestore {
       // Recovery may look up a missing UID document before querying the legacy
       // student-code profile. Only the root profile is readable while paused.
       allow read: if courseUser() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
-      allow create: if signedIn() && (isStaff() || (request.auth.token.get('examOnly', false) != true && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements'])));
+      allow create: if signedIn() && (isStaff() || (request.auth.token.get('examOnly', false) != true && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements'])
+        && request.resource.data.get('institutionVerification', 'pending') == 'pending'
+        && request.resource.data.get('accessType', 'invitation_pending') == 'invitation_pending'));
       allow update: if signedIn() && (isStaff() || (
         (request.auth.token.get('examOnly', false) != true || resource.data.uid == request.auth.uid)
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements'])
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements',
+          'institutionId', 'institutionName', 'cohortId', 'instructorName', 'registrationSource', 'universityInvitationCode', 'institutionVerification', 'accessType'])
+        && (resource.data.get('registrationSource', '') != 'university-invite' ||
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'status', 'paymentStatus', 'paid', 'balanceDue', 'tuitionFee',
+            'trialStatus', 'trialStartedAt', 'trialEndsAt', 'trialPurgeAt',
+            'contractStart', 'contractEnd'
+          ]))
         && (resource.data.get('secondaryProgram', null) == null || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['program']))
         && (resource.data.get('accountType', '') != 'exam_only' || (
           resource.data.uid == request.auth.uid
