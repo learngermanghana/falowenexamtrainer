@@ -34,12 +34,12 @@ export const SWAHILI_DAY_ONE = Object.freeze({
     { id: "chair", question: "Katika kifungu, ni neno gani lina maana ya “chair”?", choices: ["kuku", "mama", "kiti"], answer: "kiti" },
     { id: "u", question: "Katika kifungu, ni neno gani lina vokali U mara mbili?", choices: ["wewe", "kuku", "kiti"], answer: "kuku" },
   ],
-  // The teacher reads these words; there is no approved recorded audio for this pilot.
+  // Comprehension questions from the recorded Day 1 conversation.
   listening: [
-    { word: "mama", answer: "A" },
-    { word: "wewe", answer: "E" },
-    { word: "kiti", answer: "I" },
-    { word: "moto", answer: "O" },
-    { word: "kuku", answer: "U" },
+    {"id":"listen-topic","question":"Leo wanajifunza nini?","choices":["Salamu na majina","Alfabeti na sauti za Kiswahili","Namba na siku"],"answer":"Alfabeti na sauti za Kiswahili"},
+    {"id":"listen-count","question":"Kiswahili kina irabu ngapi?","choices":["Tano","Nne","Sita"],"answer":"Tano"},
+    {"id":"listen-vowels","question":"Mwalimu anataja irabu zipi?","choices":["a, e, i, o, t","a, e, b, o, u","a, e, i, o, u"],"answer":"a, e, i, o, u"},
+    {"id":"listen-practice","question":"Mwalimu anamwambia mwanafunzi aseme neno gani?","choices":["Tata","Baba","Mama"],"answer":"Baba"},
+    {"id":"listen-next","question":"Mwalimu anasema watakutana lini?","choices":["Kesho","Leo jioni","Wiki ijayo"],"answer":"Kesho"},
   ],
 });
