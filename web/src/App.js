@@ -670,6 +670,7 @@ function App() {
         allowedSections={allowedSections}
         availableTabs={availableTabs}
         defaultCampusSection={defaultCampusSection}
+        hasActiveTrial={hasActiveTrial}
         enableNotifications={enableNotifications}
         saveStudentProfile={saveStudentProfile}
         logout={logout}
@@ -689,6 +690,7 @@ const AppShell = ({
   allowedSections,
   availableTabs,
   defaultCampusSection,
+  hasActiveTrial = false,
   enableNotifications,
   saveStudentProfile,
   logout,
@@ -708,7 +710,9 @@ const AppShell = ({
   const isOnboarding = location.pathname === "/onboarding";
   const mockAssessment = isMockAssessmentRoute(location.pathname);
   const onboardingRole = String(studentProfile?.role || "student").toLowerCase();
+  const directSwahiliTrial = isSwahiliCampus && hasActiveTrial;
   const requiresOnboarding =
+    !directSwahiliTrial &&
     !["admin", "tutor"].includes(onboardingRole) &&
     !Boolean(studentProfile?.isTutor) &&
     !Boolean(studentProfile?.onboardingCompleted);
@@ -793,6 +797,10 @@ const AppShell = ({
       }
     };
   }, [showToast, studentProfile, user]);
+
+  if (directSwahiliTrial && (isOnboarding || /^\/signup(?:\/|$)/.test(location.pathname))) {
+    return <Navigate to="/campus/course/swahili/day-1" replace />;
+  }
 
   if (requiresOnboarding && !isOnboarding) {
     return <Navigate to="/onboarding" replace />;

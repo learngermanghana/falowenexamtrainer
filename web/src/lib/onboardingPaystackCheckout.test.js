@@ -100,3 +100,23 @@ it.each([
     studentProfile: profile, idToken: "token", fetchImpl,
   })).rejects.toThrow(/checkout link|checkout address/);
 });
+
+it("does not open checkout for an active Swahili trial with a tuition quote", async () => {
+  const fetchImpl = jest.fn();
+  await expect(initializeOnboardingPaystackCheckout({
+    studentProfile: {
+      ...profile,
+      program: " Swahili ",
+      trialStatus: "active",
+      trialEndsAt: new Date(Date.now() + 86400000).toISOString(),
+    },
+    idToken: "token",
+    fetchImpl,
+  })).rejects.toThrow(/balance is unavailable/);
+  expect(fetchImpl).not.toHaveBeenCalled();
+});
+
+it("does not use the German A1 fee for an unpriced Swahili account", () => {
+  expect(getRecommendedTuitionAmount({ program: "swahili", level: "A1" })).toBe(0);
+  expect(getRecommendedTuitionAmount({ ...profile, program: "swahili", tuitionFee: null })).toBe(0);
+});

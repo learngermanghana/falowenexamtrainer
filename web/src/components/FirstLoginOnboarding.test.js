@@ -67,3 +67,11 @@ describe("lean first-login onboarding", () => {
     expect(app).toContain("getTrialLifecycleState(studentProfile)");
   });
 });
+
+test("an active Swahili trial bypasses the first-login save and checkout gate", () => {
+  const app = read("../App.js");
+  expect(app).toContain("hasActiveTrial={hasActiveTrial}");
+  expect(app).toMatch(/const directSwahiliTrial = isSwahiliCampus && hasActiveTrial/);
+  expect(app).toMatch(/const requiresOnboarding =\s*!directSwahiliTrial/);
+  expect(app).toMatch(/if \(directSwahiliTrial && .*location\.pathname.*\) \{\s*return <Navigate to="\/campus\/course\/swahili\/day-1" replace/);
+});
