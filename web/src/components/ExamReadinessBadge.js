@@ -347,7 +347,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
   // Compact homepage view: the same authenticated readiness calculation, not a mock percentage.
   if (variant === "homepage") {
-    const hasReadiness = state.loaded && !state.loading && !state.error && Boolean(className && studentCode);
+    const hasReadiness = state.loaded && !state.loading && !state.error && Boolean(studentCode);
     return (
       <section className="falowen-home-readiness" aria-label="Your exam journey">
         <span className="falowen-home-readiness__eyebrow">YOUR EXAM JOURNEY</span>
