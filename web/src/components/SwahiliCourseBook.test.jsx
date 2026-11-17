@@ -63,12 +63,12 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     openTab("Teil 4");
     expect(screen.getByText(/after upload/)).toBeTruthy();
     expect(screen.queryByRole("radio")).toBeNull();
-    openTab("Answer Sheet");
-    fireEvent.click(screen.getByText("Teil 2 · Model writing"));
-    fireEvent.click(screen.getByText("Teil 3 · Reading answers"));
+    openTab("Receive & Submit");
+    fireEvent.click(screen.getByText("Teil 2 · Review your writing"));
+    fireEvent.click(screen.getByText("Teil 3 · Review your reading"));
     expect(screen.getByText("Ninaumwa.")).toBeTruthy();
     expect(screen.getByText("Your answer: Hospitali.")).toBeTruthy();
-    expect(screen.getByText("Model answer: Hospitalini.")).toBeTruthy();
+    expect(screen.getByText("Suggested answer: Hospitalini.")).toBeTruthy();
     expect(setDoc).not.toHaveBeenCalled();
   });
 
