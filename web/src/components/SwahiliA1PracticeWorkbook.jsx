@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import { GrammarSelfCheck } from "./MgahawaniGrammarPractice";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
@@ -9,10 +10,35 @@ const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.map((tab) =>
   tab.key === "submit" ? { ...tab, label: "Answer Sheet", description: "Model answers" } : tab);
 
 export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
+  const { user } = useAuth();
   const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
   const [writing, setWriting] = useState("");
   const [reading, setReading] = useState({});
+  const [listeningAnswers, setListeningAnswers] = useState({});
+  const [audio, setAudio] = useState({ url: "", loading: false, error: "" });
+  const listening = lesson.listening;
+  const grammarSections = lesson.grammarSections || [{ rule: lesson.rule, examples: lesson.examples }];
   const writingId = "swahili-writing-" + lesson.day;
+
+  async function loadListeningAudio() {
+    if (!listening || audio.loading) return;
+    if (!user?.getIdToken) {
+      setAudio({ url: "", loading: false, error: "Sign in to play the recording." });
+      return;
+    }
+    setAudio(current => ({ ...current, loading: true, error: "" }));
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch(listening.audioUrlEndpoint, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const result = await response.json();
+      if (!response.ok || !result?.url) throw new Error(result?.error || "Could not load the listening recording.");
+      setAudio({ url: result.url, loading: false, error: "" });
+    } catch (error) {
+      setAudio(current => ({ ...current, loading: false, error: error.message || "Could not load the listening recording." }));
+    }
+  }
 
   return (
     <main className="swahili-book swahili-book--workbook">
@@ -34,15 +60,20 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
         </>}
         {activeTab === "grammar" && <>
           <h2>Sarufi · {lesson.grammar}</h2>
-          <p>{lesson.rule}</p>
-          <div className="swahili-book__grid">
-            {lesson.examples.map(({ swahili, english }) => (
-              <div className="swahili-book__tile" key={swahili}>
-                <strong lang="sw">{swahili}</strong>
-                <div className="swahili-book__small">{english}</div>
+          {grammarSections.map(({ title, rule, examples }) => (
+            <section key={title || rule} className="swahili-book__activity">
+              {title && <h3>{title}</h3>}
+              <p>{rule}</p>
+              <div className="swahili-book__grid">
+                {examples.map(({ swahili, english }) => (
+                  <div className="swahili-book__tile" key={swahili}>
+                    <strong lang="sw">{swahili}</strong>
+                    <div className="swahili-book__small">{english}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </section>
+          ))}
           <GrammarSelfCheck questionId={"swahili-grammar-" + lesson.day} item={lesson.check} />
         </>}
         {activeTab === "sprechen" && <>
@@ -71,7 +102,35 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
         </>}
         {activeTab === "hoeren" && <>
           <h2>Teil 4 · Kusikiliza (Listening)</h2>
-          <p>The listening recording and questions will appear here after upload.</p>
+          {listening ? <>
+            <p>Sikiliza mazungumzo mara mbili. Chagua jibu moja kwa kila swali.</p>
+            <button type="button" className="swahili-book__button swahili-book__button--soft"
+              onClick={loadListeningAudio} disabled={audio.loading}>
+              {audio.loading ? "Inapakia sauti…" : audio.url ? "Pakia sauti tena · Refresh audio" : "Sikiliza sauti · Load audio"}
+            </button>
+            {audio.url && <audio controls preload="none" src={audio.url} aria-label={lesson.title + " listening recording"} />}
+            {audio.error && <p className="swahili-book__error" role="alert">{audio.error}</p>}
+            <div className="swahili-book__quiz" lang="sw">
+              {listening.questions.map(({ id, question, choices }, index) => (
+                <fieldset className="swahili-book__exercise" key={id}>
+                  <legend>{index + 1}. {question}</legend>
+                  <div className="swahili-book__choices">
+                    {choices.map(choice => (
+                      <label className="swahili-book__choice" key={choice}>
+                        <input type="radio" name={`swahili-${lesson.day}-listening-${id}`}
+                          checked={listeningAnswers[id] === choice}
+                          onChange={() => setListeningAnswers(current => ({ ...current, [id]: choice }))} />
+                        {choice}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              ))}
+            </div>
+            <button type="button" className="swahili-book__button swahili-book__button--soft" onClick={() => selectTab("submit")}>
+              Open answer sheet
+            </button>
+          </> : <p>The listening recording and questions will appear here after upload.</p>}
         </>}
         {activeTab === "submit" && <>
           <h2>Answer Sheet · Majibu</h2>
@@ -92,6 +151,16 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
               </li>
             ))}</ol>
           </details>
+          {listening && <details className="swahili-book__tile">
+            <summary>Teil 4 · Listening answers</summary>
+            <ol lang="sw">{listening.questions.map(({ id, question, answer }) => (
+              <li key={id}>
+                <strong>{question}</strong>
+                {listeningAnswers[id] && <div>Your answer: {listeningAnswers[id]}</div>}
+                <div>Model answer: {answer}</div>
+              </li>
+            ))}</ol>
+          </details>}
         </>}
       </section>
       <SwahiliWorkbookNavigation tabs={tabs} activeTab={activeTab} onChange={selectTab} />

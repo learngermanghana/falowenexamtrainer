@@ -35,6 +35,8 @@ Run `node scripts/checkAiDocumentation.mjs`. It validates required sources, inte
 
 ## Kiswahili Course Book layout
 
+Kiswahili A1 Day 7 uses the private R2 recording `swahili/A1/day-07/day-07.mp3` via the existing signed-audio flow. Its five listening questions and matching answers are local workbook practice. The Grammar tab covers present-tense preferences, polite requests, hunger and thirst, and food and drink vocabulary.
+
 Campus uses the shared German Course Book **Level** selector and the same enrolled-level ceiling for Kiswahili. A B1 learner can browse A1, A2 or B1, and an A2 learner can browse A1 or A2. A2 and B1 display titles from `a2B1TitleDictionary.json` in the existing lesson-card layout. Workbooks and tutor progress are available from the A1 selection. Switching the visible level does not update enrollment.
 
 The Kiswahili **A1 Course Book has 20 workbooks** in `web/src/data/swahili/a1Curriculum.js`. The original Day 1, Day 5 and Day 6 workbooks retain their routes. Days 2–4 and 7–20 use `a1PracticeUnits.js` and the shared practice workbook, with grammar self-checks, speaking, writing, reading and model answer sheets. Teil 4 is reserved for the teacher's audio and questions. Only Days 1 and 6 enter the tutor queue and count toward assignment progress. Public previews show the practice content and never read personal progress.

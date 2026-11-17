@@ -1,4 +1,4 @@
-const { createSwahiliDayOneAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createMusicHandler } = require("../server/courseMusic.cjs");
+const { createSwahiliDayOneAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createMusicHandler } = require("../server/courseMusic.cjs");
 
 const env = {
   FIREBASE_API_KEY: "test-key",
@@ -79,6 +79,21 @@ test("Day 1 signs its own private recording and rejects anonymous access", async
   await handler(request(route), valid);
   expect(valid.statusCode).toBe(200);
   expect(valid.body.url).toContain("/swahili/A1/day-01/day-01.mp3?");
+  const anonymous = response();
+  await handler(request(route, ""), anonymous);
+  expect(anonymous.statusCode).toBe(401);
+  const override = response();
+  await handler(request(route + "?key=swahili/A1/day-05/day-05.mp3"), override);
+  expect(override.statusCode).toBe(400);
+});
+
+test("Day 7 only signs the uploaded private recording for a signed-in account", async () => {
+  const handler = createSwahiliDaySevenAudioHandler({ env, fetchImpl: validAccountLookup });
+  const route = "/course-media/swahili/a1/day-7/audio-url";
+  const valid = response();
+  await handler(request(route), valid);
+  expect(valid.statusCode).toBe(200);
+  expect(valid.body.url).toContain("/swahili/A1/day-07/day-07.mp3?");
   const anonymous = response();
   await handler(request(route, ""), anonymous);
   expect(anonymous.statusCode).toBe(401);
