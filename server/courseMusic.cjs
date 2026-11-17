@@ -106,6 +106,11 @@ const SWAHILI_DAY_ONE_LISTENING = Object.freeze({
   key: 'swahili/A1/day-01/day-01.mp3',
 });
 
+const SWAHILI_DAY_SEVEN_LISTENING = Object.freeze({
+  id: 'swahili-a1-day07-listening',
+  key: 'swahili/A1/day-07/day-07.mp3',
+});
+
 function createSwahiliListeningHandler(recording, options = {}) {
   return createMusicHandler({
     ...options,
@@ -129,6 +134,9 @@ function createSwahiliDayFiveAudioHandler(options) {
 }
 function createSwahiliDaySixAudioHandler(options) {
   return createSwahiliListeningHandler(SWAHILI_DAY_SIX_LISTENING, options);
+}
+function createSwahiliDaySevenAudioHandler(options) {
+  return createSwahiliListeningHandler(SWAHILI_DAY_SEVEN_LISTENING, options);
 }
 // These private classroom conversations are never added to the public music map.
 // Private course conversations, never exposed by the public music track map.
@@ -186,4 +194,4 @@ function createClassroomBankAudioHandler(options = {}) {
     return signObject(recording, env);
   } });
 }
-module.exports = { createSwahiliDayOneAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
+module.exports = { createSwahiliDayOneAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };

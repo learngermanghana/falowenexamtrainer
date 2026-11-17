@@ -170,23 +170,8 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "chapter": "Somo la 7",
     "title": "Chakula na Vinywaji",
     "objective": "Name foods and drinks and express simple preferences.",
-    "grammar": "Ninapenda, sipendi, nataka; simple negation",
+    "grammar": "Vitenzi, mapendeleo na kuomba kwa adabu",
     "practiceOnly": true,
-    "rule": "Use ninapenda to say what you like and sipendi for what you dislike. Both can take a noun or a ku- verb. Use nataka for a choice you want now.",
-    "examples": [
-      {
-        "swahili": "Ninapenda matunda.",
-        "english": "I like fruit."
-      },
-      {
-        "swahili": "Sipendi kunywa soda.",
-        "english": "I do not like drinking soda."
-      },
-      {
-        "swahili": "Nataka chai.",
-        "english": "I want tea."
-      }
-    ],
     "check": {
       "question": "Which phrase means “I don’t like milk”?",
       "options": [
@@ -216,6 +201,163 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
         {
           "question": "Leo anataka kunywa nini?",
           "answer": "Maji."
+        }
+      ]
+    },
+    "grammarSections": [
+      {
+        "title": "Wakati uliopo · Preferences and wants",
+        "rule": "For affirmative present forms, use a subject prefix + -na- + a verb stem. For the negative forms of -penda and -taka, use the negative prefix, drop -na-, and change the final -a to -i.",
+        "examples": [
+          {
+            "swahili": "Mimi ninapenda chai. / Sipendi chai.",
+            "english": "I like tea. / I do not like tea."
+          },
+          {
+            "swahili": "Wewe unapenda chai. / Hupendi chai.",
+            "english": "You like tea. / You do not like tea. (one person)"
+          },
+          {
+            "swahili": "Yeye anapenda chai. / Hapendi chai.",
+            "english": "He or she likes tea. / He or she does not like tea."
+          },
+          {
+            "swahili": "Sisi tunapenda chai. / Hatupendi chai.",
+            "english": "We like tea. / We do not like tea."
+          },
+          {
+            "swahili": "Ninyi mnapenda chai. / Hampendi chai.",
+            "english": "You like tea. / You do not like tea. (more than one person)"
+          },
+          {
+            "swahili": "Wao wanapenda chai. / Hawapendi chai.",
+            "english": "They like tea. / They do not like tea."
+          },
+          {
+            "swahili": "Ninataka maji. / Sitaki kahawa.",
+            "english": "I want water. / I do not want coffee."
+          },
+          {
+            "swahili": "Ninapenda kunywa chai.",
+            "english": "I like drinking tea."
+          }
+        ]
+      },
+      {
+        "title": "Kuomba kwa adabu · Polite ordering",
+        "rule": "Nataka and ninataka express what you want. Use naomba or ninaomba to make a request. Add tafadhali for ‘please’ and asante for ‘thank you’.",
+        "examples": [
+          {
+            "swahili": "Naomba wali na kuku, tafadhali.",
+            "english": "Rice and chicken, please."
+          },
+          {
+            "swahili": "Ninaomba maji baridi.",
+            "english": "I would like some cold water."
+          },
+          {
+            "swahili": "Naomba menyu, tafadhali.",
+            "english": "The menu, please."
+          },
+          {
+            "swahili": "Naomba bili. Bili ni kiasi gani?",
+            "english": "The bill, please. How much is it?"
+          },
+          {
+            "swahili": "Hapana, asante.",
+            "english": "No, thank you."
+          }
+        ]
+      },
+      {
+        "title": "Njaa, kiu na kushiba · Hunger, thirst and fullness",
+        "rule": "Use nina with njaa (hunger) and kiu (thirst). Use nimeshiba after you have eaten enough.",
+        "examples": [
+          {
+            "swahili": "Nina njaa. Naomba chakula.",
+            "english": "I am hungry. I would like some food."
+          },
+          {
+            "swahili": "Nina kiu. Naomba maji.",
+            "english": "I am thirsty. I would like some water."
+          },
+          {
+            "swahili": "Nimeshiba, asante.",
+            "english": "I am full, thank you."
+          }
+        ]
+      },
+      {
+        "title": "Msamiati · Food, drinks and meals",
+        "rule": "Ask Unataka chakula gani? to ask what food someone wants. Unapenda kunywa nini? asks what someone likes to drink. Unataka kunywa nini? asks what they want to drink.",
+        "examples": [
+          {
+            "swahili": "Chakula: wali, kuku, samaki, chapati, matunda.",
+            "english": "Food: rice, chicken, fish, flatbread, fruit."
+          },
+          {
+            "swahili": "Vinywaji: maji, chai, kahawa, maziwa, juisi.",
+            "english": "Drinks: water, tea, coffee, milk, juice."
+          },
+          {
+            "swahili": "Kifungua kinywa · chakula cha mchana · chakula cha jioni",
+            "english": "Breakfast · lunch · dinner."
+          }
+        ]
+      }
+    ],
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-7/audio-url",
+      "questions": [
+        {
+          "id": "meal",
+          "question": "Mteja anaagiza chakula gani?",
+          "choices": [
+            "Wali na samaki",
+            "Wali na kuku",
+            "Chapati na kuku"
+          ],
+          "answer": "Wali na kuku"
+        },
+        {
+          "id": "drink",
+          "question": "Mteja anataka kunywa nini?",
+          "choices": [
+            "Chai",
+            "Kahawa",
+            "Maji baridi"
+          ],
+          "answer": "Maji baridi"
+        },
+        {
+          "id": "offer",
+          "question": "Mhudumu anampa mteja chaguo gani lingine la kinywaji?",
+          "choices": [
+            "Chai au kahawa",
+            "Juisi au maziwa",
+            "Maji au soda"
+          ],
+          "answer": "Chai au kahawa"
+        },
+        {
+          "id": "accept",
+          "question": "Je, mteja anakubali chai au kahawa?",
+          "choices": [
+            "Ndiyo, anakubali chai",
+            "Hapana, maji yanatosha",
+            "Ndiyo, anakubali kahawa"
+          ],
+          "answer": "Hapana, maji yanatosha"
+        },
+        {
+          "id": "bill",
+          "question": "Bili ni shilingi ngapi?",
+          "choices": [
+            "Shilingi elfu tatu",
+            "Shilingi elfu nne",
+            "Shilingi elfu tano"
+          ],
+          "answer": "Shilingi elfu tano"
         }
       ]
     }
