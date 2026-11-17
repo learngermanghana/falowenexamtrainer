@@ -476,53 +476,108 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 10,
     "chapter": "Somo la 10",
     "title": "Sokoni",
-    "objective": "Ask prices, quantities and buy food at a market.",
-    "grammar": "Numbers, Ji-/Ma- nouns and polite requests",
+    "objective": "Buy produce by weight, bargain politely and confirm the total at a market stall.",
+    "grammar": "Prices per kilo, quantity agreement and bargaining",
     "practiceOnly": true,
-    "rule": "Use bei gani? to ask a price and naomba to request an item. In many Ji-/Ma- plural phrases, a number takes ma-: mayai matatu. Some forms differ: mayai mawili and mayai manne.",
-    "examples": [
+    "grammarSections": [
       {
-        "swahili": "Naomba mayai matatu.",
-        "english": "I would like three eggs."
+        "title": "Bei kwa kilo · Price per kilo",
+        "rule": "Use Kilo moja ya … ni bei gani? to ask the price per kilo. Use nusu kilo ya … to request half a kilo.",
+        "examples": [
+          {
+            "swahili": "Kilo moja ya nyanya ni bei gani?",
+            "english": "How much is one kilo of tomatoes?"
+          },
+          {
+            "swahili": "Naomba nusu kilo ya nyanya.",
+            "english": "I'd like half a kilo of tomatoes."
+          }
+        ]
       },
       {
-        "swahili": "Mayai haya ni bei gani?",
-        "english": "How much are these eggs?"
+        "title": "Idadi · Counting produce",
+        "rule": "Countable ma-class plurals use forms such as mawili and matatu. Ndizi uses mbili or tatu. The question word also agrees: mayai mangapi? and ndizi ngapi?",
+        "examples": [
+          {
+            "swahili": "Naomba mayai mawili na ndizi tatu.",
+            "english": "I'd like two eggs and three bananas."
+          }
+        ]
       },
       {
-        "swahili": "shilingi elfu nne",
-        "english": "four thousand shillings."
+        "title": "Kupatana bei · Agreeing on a price",
+        "rule": "Use unaweza kupunguza bei? to ask politely for a lower price. Use jumla ni shilingi ngapi? to confirm the total.",
+        "examples": [
+          {
+            "swahili": "Unaweza kupunguza bei kidogo, tafadhali?",
+            "english": "Could you lower the price a little, please?"
+          },
+          {
+            "swahili": "Jumla ni shilingi ngapi?",
+            "english": "How much is the total?"
+          }
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "sw": "soko",
+        "en": "market"
+      },
+      {
+        "sw": "nyanya",
+        "en": "tomatoes"
+      },
+      {
+        "sw": "vitunguu",
+        "en": "onions"
+      },
+      {
+        "sw": "mayai",
+        "en": "eggs"
+      },
+      {
+        "sw": "ndizi",
+        "en": "bananas"
+      },
+      {
+        "sw": "nusu kilo",
+        "en": "half a kilo"
+      },
+      {
+        "sw": "punguzo",
+        "en": "discount"
       }
     ],
     "check": {
-      "question": "Which phrase means “two eggs”?",
+      "question": "How do you ask the seller to lower the price?",
       "options": [
-        "mayai wawili",
-        "mayai mbili",
-        "mayai mawili"
+        "Jumla ni shilingi ngapi?",
+        "Unaweza kupunguza bei?",
+        "Unataka mayai mangapi?"
       ],
-      "answer": 2,
-      "why": "Mawili agrees with the ma- plural mayai."
+      "answer": 1,
+      "why": "Kupunguza bei means to lower the price."
     },
-    "speaking": "Role-play buying eggs and bananas. Ask the prices, request a quantity and confirm the total.",
+    "speaking": "At a market stall, tomatoes are 4,000 shillings per kilo and bananas are 500 shillings each. The buyer asks for half a kilo of tomatoes and two bananas, asks for a better price and confirms the total. Swap roles and change the produce.",
     "writing": {
-      "prompt": "Write a short market dialogue asking for three eggs and checking the total.",
-      "model": "Naomba mayai matatu. — Karibu. — Jumla ni shilingi ngapi? — Shilingi elfu tatu."
+      "prompt": "Write a dialogue asking the price per kilo of tomatoes, ordering half a kilo and two bananas, and asking the seller for a discount.",
+      "model": "Mteja: Kilo moja ya nyanya ni bei gani? Muuzaji: Shilingi elfu nne. Mteja: Naomba nusu kilo ya nyanya na ndizi mbili. Unaweza kupunguza bei kidogo? Muuzaji: Sawa, jumla ni shilingi elfu mbili na mia tano."
     },
     "reading": {
-      "text": "Sokoni, Sara anaomba mayai mawili na ndizi tatu. Mayai ni shilingi elfu mbili. Ndizi ni shilingi elfu moja. Jumla ni shilingi elfu tatu.",
+      "text": "Asha ananunua nyanya na ndizi sokoni. Kilo moja ya nyanya ni shilingi elfu nne. Asha anaomba nusu kilo ya nyanya na ndizi mbili. Ndizi mbili ni shilingi elfu moja. Muuzaji anasema jumla ni shilingi elfu tatu. Asha anaomba punguzo. Muuzaji anasema, “Sawa, ni shilingi elfu mbili na mia tano.”",
       "questions": [
         {
-          "question": "Sara anaomba mayai mangapi?",
-          "answer": "Mawili."
+          "question": "Asha anaomba nyanya kiasi gani?",
+          "answer": "Nusu kilo."
         },
         {
-          "question": "Ndizi zinagharimu kiasi gani?",
-          "answer": "Shilingi elfu moja."
+          "question": "Asha ananunua ndizi ngapi?",
+          "answer": "Ndizi mbili."
         },
         {
-          "question": "Jumla ni shilingi ngapi?",
-          "answer": "Shilingi elfu tatu."
+          "question": "Asha analipa shilingi ngapi baada ya punguzo?",
+          "answer": "Shilingi elfu mbili na mia tano."
         }
       ]
     }
@@ -531,53 +586,116 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 11,
     "chapter": "Somo la 11",
     "title": "Dukani",
-    "objective": "Ask about common products, prices and quantities in a shop.",
-    "grammar": "Ki-/Vi- and N-/N- noun classes",
+    "objective": "Ask what is in stock, choose a product and pay at a shop counter.",
+    "grammar": "Stock questions, Ki-/Vi- agreement and paying",
     "practiceOnly": true,
-    "rule": "Some nouns change ki- to vi- in the plural: kitabu → vitabu. Their demonstratives also change: hiki → hivi. Some others, such as kalamu, keep the same noun form, so read the number or demonstrative for the quantity.",
-    "examples": [
+    "grammarSections": [
       {
-        "swahili": "kitabu hiki",
-        "english": "this book"
+        "title": "Bidhaa zilizopo · Stock",
+        "rule": "Use Mna …? to ask what the shop has. The shopkeeper can answer with Tuna … or Hatuna ….",
+        "examples": [
+          {
+            "swahili": "Mna madaftari makubwa?",
+            "english": "Do you have large notebooks?"
+          },
+          {
+            "swahili": "Hatuna madaftari makubwa. Tuna madaftari madogo.",
+            "english": "We don't have large notebooks. We have small notebooks."
+          }
+        ]
       },
       {
-        "swahili": "vitabu hivi",
-        "english": "these books"
+        "title": "Hiki na hivi · This and these",
+        "rule": "A ki-class noun such as kitabu takes hiki. Its vi-class plural vitabu takes hivi. The number also agrees: kitabu kimoja, vitabu viwili.",
+        "examples": [
+          {
+            "swahili": "Kitabu hiki ni bei gani?",
+            "english": "How much is this book?"
+          },
+          {
+            "swahili": "Naomba vitabu viwili.",
+            "english": "I'd like two books."
+          }
+        ]
       },
       {
-        "swahili": "kalamu mbili",
-        "english": "two pens."
+        "title": "Kulipa · Paying",
+        "rule": "Use Nitachukua … when you've chosen what to buy. Ask Naweza kulipa …? to check a payment method.",
+        "examples": [
+          {
+            "swahili": "Nitachukua kalamu mbili.",
+            "english": "I'll take two pens."
+          },
+          {
+            "swahili": "Naweza kulipa kwa simu?",
+            "english": "Can I pay by mobile phone?"
+          },
+          {
+            "swahili": "Risiti, tafadhali.",
+            "english": "A receipt, please."
+          }
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "sw": "duka",
+        "en": "shop"
+      },
+      {
+        "sw": "bidhaa",
+        "en": "product / goods"
+      },
+      {
+        "sw": "daftari",
+        "en": "notebook"
+      },
+      {
+        "sw": "kitabu",
+        "en": "book"
+      },
+      {
+        "sw": "kalamu",
+        "en": "pen"
+      },
+      {
+        "sw": "risiti",
+        "en": "receipt"
+      },
+      {
+        "sw": "pesa taslimu",
+        "en": "cash"
       }
     ],
     "check": {
-      "question": "Which phrase means “these books”?",
+      "question": "What does the shopkeeper say when there are no large notebooks?",
       "options": [
-        "kitabu hiki",
-        "vitabu hivi",
-        "vitabu hiki"
+        "Tuna madaftari makubwa.",
+        "Hatuna madaftari makubwa.",
+        "Naomba madaftari makubwa."
       ],
       "answer": 1,
-      "why": "Hivi goes with the plural vitabu."
+      "why": "Hatuna means we don't have."
     },
-    "speaking": "One person sells school supplies and the other buys them. Ask if books and pens are available, then confirm how many.",
+    "speaking": "Role-play buying school supplies. Ask for a large notebook, choose an alternative when it is out of stock, add two pens and ask how you can pay. Request a receipt.",
     "writing": {
-      "prompt": "Write a shop request for two books and one pen and ask for the total.",
-      "model": "Naomba vitabu viwili na kalamu moja, tafadhali. Jumla ni shilingi ngapi?"
+      "prompt": "Write a shop dialogue. Ask if large notebooks are in stock. Choose a small notebook and two pens. Ask to pay by phone and request a receipt.",
+      "model": "Mteja: Mna madaftari makubwa? Muuzaji: Hatuna, lakini tuna madaftari madogo. Mteja: Nitachukua daftari dogo moja na kalamu mbili. Naweza kulipa kwa simu? Muuzaji: Ndiyo. Mteja: Risiti, tafadhali."
     },
     "reading": {
-      "text": "Dukani kuna vitabu vitatu na kalamu tano. Nuru anachukua kitabu kimoja na kalamu mbili. Anampa muuzaji shilingi elfu sita.",
+      "text": "Nuru anaenda dukani kununua daftari kubwa. Muuzaji anasema, “Hatuna madaftari makubwa. Tuna madaftari madogo.” Nuru anachukua daftari dogo moja na kalamu mbili. Jumla ni shilingi elfu nne. Nuru analipa kwa simu na anaomba risiti.",
       "questions": [
         {
-          "question": "Nuru anachukua vitabu vingapi?",
-          "answer": "Kitabu kimoja."
+          "question": "Muuzaji ana madaftari ya aina gani?",
+          "answer": "Madaftari madogo."
         },
         {
-          "question": "Anachukua kalamu ngapi?",
-          "answer": "Mbili."
+          "question": "Nuru ananunua kalamu ngapi?",
+          "answer": "Kalamu mbili."
         },
         {
-          "question": "Anampa muuzaji kiasi gani?",
-          "answer": "Shilingi elfu sita."
+          "question": "Nuru analipa kwa njia gani?",
+          "answer": "Analipa kwa simu."
         }
       ]
     }

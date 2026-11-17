@@ -18,6 +18,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
   const [audio, setAudio] = useState({ url: "", loading: false, error: "" });
   const listening = lesson.listening;
   const grammarSections = lesson.grammarSections || [{ rule: lesson.rule, examples: lesson.examples }];
+  const vocabulary = lesson.vocabulary;
   const writingId = "swahili-writing-" + lesson.day;
 
   async function loadListeningAudio() {
@@ -74,6 +75,19 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
               </div>
             </section>
           ))}
+          {vocabulary?.length > 0 && (
+            <section className="swahili-book__activity">
+              <h3>Msamiati · Vocabulary</h3>
+              <dl className="swahili-book__grid">
+                {vocabulary.map(({ sw, en }) => (
+                  <div className="swahili-book__tile" key={sw}>
+                    <dt lang="sw"><strong>{sw}</strong></dt>
+                    <dd className="swahili-book__small" lang="en">{en}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
           <GrammarSelfCheck questionId={"swahili-grammar-" + lesson.day} item={lesson.check} />
         </>}
         {activeTab === "sprechen" && <>
