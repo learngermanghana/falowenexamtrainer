@@ -328,7 +328,7 @@ service cloud.firestore {
       // Recovery may look up a missing UID document before querying the legacy
       // student-code profile. Only the root profile is readable while paused.
       allow read: if courseUser() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
-      allow create: if signedIn() && (isStaff() || (request.auth.token.get('examOnly', false) != true && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements'])
+      allow create: if signedIn() && (isStaff() || (request.auth.token.get('examOnly', false) != true && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements', 'courseDiscount', 'courseCheckoutStartedAt'])
         && request.resource.data.get('institutionVerification', 'pending') == 'pending'
         && request.resource.data.get('accessType', 'invitation_pending') == 'invitation_pending'
         && (request.resource.data.get('registrationSource', '') != 'university-invite' || (
@@ -348,7 +348,12 @@ service cloud.firestore {
       allow update: if signedIn() && (isStaff() || (
         (request.auth.token.get('examOnly', false) != true || resource.data.uid == request.auth.uid)
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements',
-          'institutionId', 'institutionName', 'cohortId', 'instructorName', 'registrationSource', 'universityInvitationCode', 'institutionVerification', 'accessType'])
+          'institutionId', 'institutionName', 'cohortId', 'instructorName', 'registrationSource', 'universityInvitationCode', 'institutionVerification', 'accessType', 'courseDiscount', 'courseCheckoutStartedAt'])
+        && (resource.data.get('courseDiscount', null) == null || resource.data.get('paymentStatus', '') == 'paid' ||
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'tuitionFee', 'tuitionCurrency', 'balanceDue', 'balance', 'paid', 'paidAmount', 'initialPaymentAmount',
+          'paymentStatus', 'contractStart', 'contractEnd', 'contractTermMonths', 'program', 'level', 'levelId'
+        ]))
         && (resource.data.get('registrationSource', '') != 'university-invite' ||
           !request.resource.data.diff(resource.data).affectedKeys().hasAny([
             'status', 'paymentStatus', 'paid', 'balanceDue', 'tuitionFee',

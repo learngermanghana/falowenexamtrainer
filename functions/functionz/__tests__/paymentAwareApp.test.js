@@ -38,8 +38,8 @@ jest.mock("firebase-admin", () => ({
         return { doc: () => ({ set: jest.fn(), get: jest.fn() }) };
       },
       runTransaction: async (callback) => callback({
-        get: mockEventGet,
-        set: (ref, data) => ref.set(data),
+        get: ref => ref.id === "student-doc-id" ? mockStudentGet() : mockEventGet(),
+        set: (ref, data, options) => ref.set(data, options),
       }),
     }),
     { FieldValue: { serverTimestamp: () => "SERVER_TIMESTAMP", delete: () => "DELETE_FIELD" } }
@@ -143,6 +143,17 @@ describe("Paystack billing normalization", () => {
 
   afterEach(() => {
     delete process.env.PAYSTACK_SECRET;
+  });
+
+  it("records the first checkout start before opening Paystack for an owned profile", async () => {
+    mockStudent({ uid: "uid-1", tuitionFee: 3000, paid: 0, balanceDue: 3000 });
+    const result = await request(loadApp(), "/paystack/initialize", {
+      headers: { Authorization: "Bearer learner" },
+      body: { studentCode: "STU123", amount: 3000 },
+    });
+    expect(result.status).toBe(200);
+    expect(mockStudentSet).toHaveBeenCalledWith({ courseCheckoutStartedAt: "SERVER_TIMESTAMP" }, { merge: true });
+    expect(mockStudentSet.mock.invocationCallOrder[0]).toBeLessThan(global.fetch.mock.invocationCallOrder[0]);
   });
 
   it("accepts GH₵200 as final payment when paid is current and initialPaymentAmount is stale", async () => {

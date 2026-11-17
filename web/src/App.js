@@ -239,6 +239,7 @@ import { buildPushNotification, persistPushNotification } from "./services/notif
 import { toDateMs } from "./lib/dateUtils";
 import { getTrialLifecycleState } from "./lib/trialAccess";
 import { isApprovedUniversityStudent, isPendingUniversityStudent } from "./lib/universityInvitations";
+import CourseDiscountPage from "./components/CourseDiscountPage";
 import { getPartialPaymentAccessEndMs, hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
 import { persistInterfaceLanguage } from "./i18n";
 import { trackAdmissionsEngagement } from "./services/admissionsEngagementService";
@@ -513,6 +514,15 @@ function App() {
         <div style={styles.card}>{t("appStatus.authLoading")}</div>
       </div>
     );
+  }
+
+  const signupParams = new URLSearchParams(location.search);
+  const discountCode = signupParams.get("discount") || "";
+  if (!signupParams.has("invite") && /^\/(signup|login)\/?$/.test(location.pathname) && /^[a-f0-9]{24}$/.test(discountCode)) {
+    return <CourseDiscountPage key={discountCode} code={discountCode} user={user} student={studentProfile}
+      renderSignup={(quote, onLogin, onBack) => <SignUpPage courseDiscount={quote} onLogin={onLogin} onBack={onBack} />}
+      renderLogin={(onSignup, onBack) => <AuthGate initialMode="login" onBack={onBack} onSwitchToSignup={onSignup} />}
+      onExit={() => { setAuthMode("landing"); navigate("/", { replace: true }); }} />;
   }
 
   if (/^\/chatgpt\/connect\/?$/.test(location.pathname)) {
