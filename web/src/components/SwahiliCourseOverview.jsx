@@ -180,7 +180,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
       </section>
 
       <section className="course-book-toolbar" style={book.toolbar}>
-        <p style={{ ...styles.helperText, margin: 0 }}>Swahili A1 has 20 workbooks. Days 1 and 6 are tutor-marked. The other chapters are for self-study.</p>
+        <p style={{ ...styles.helperText, margin: 0 }}>Days 1 and 6 are tutor-marked. The other listed lessons are for self-study.</p>
         <div style={book.toolbarTop}>
           <div>
             <h3 style={{ margin: 0, fontSize: 18 }}>Lessons</h3>

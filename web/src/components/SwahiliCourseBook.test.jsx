@@ -2,6 +2,7 @@ import React from "react";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import SwahiliCourseBook, { getMissingSwahiliDayOneWork } from "./SwahiliCourseBook";
+import SwahiliDictionary from "./SwahiliDictionary";
 import SwahiliA1PracticeWorkbook from "./SwahiliA1PracticeWorkbook";
 import { SWAHILI_A1_PRACTICE_UNITS } from "../data/swahili/a1PracticeUnits";
 import SwahiliDaySixWorkbook from "./SwahiliDaySixWorkbook";
@@ -71,10 +72,14 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(setDoc).not.toHaveBeenCalled();
   });
 
-  it("links to all 20 A1 workbooks", () => {
+  it("lists all 20 lessons in order, including the updated practice lessons", () => {
     render(<MemoryRouter><SwahiliCourseBook preview /></MemoryRouter>);
-    expect(screen.getByText(/20 A1 units · 20 available/)).toBeTruthy();
-    expect(screen.getAllByRole("link", { name: /Fungua Somo la/ })).toHaveLength(20);
+    const links = screen.getAllByRole("link", { name: /Fungua Somo la/ });
+    expect(links).toHaveLength(20);
+    const paths = links.map(link => link.getAttribute("href"));
+    expect(paths.slice(5, 11)).toEqual([6, 7, 8, 9, 10, 11].map(day => `/swahili/day-${day}`));
+    expect(screen.getByRole("heading", { name: "Sokoni" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Dukani" })).toBeTruthy();
     expect(screen.getByText("Salamu")).toBeTruthy();
     expect(screen.getByText("Familia yangu")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Fungua Somo la 5" }).getAttribute("href")).toBe("/swahili/day-5");
@@ -84,6 +89,18 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "Search lessons" }), { target: { value: "hospitalini" } });
     expect(screen.getByText("Hospitalini")).toBeTruthy();
     expect(screen.queryByText("Salamu")).toBeNull();
+  });
+
+  it("finds market and shop vocabulary under their own dictionary sources", () => {
+    render(<SwahiliDictionary />);
+    const source = screen.getByRole("combobox", { name: /Source/ });
+    fireEvent.change(source, { target: { value: "day-10" } });
+    expect(screen.getByText("nusu kilo")).toBeTruthy();
+    expect(screen.queryByText("risiti")).toBeNull();
+    fireEvent.change(source, { target: { value: "day-11" } });
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "receipt" } });
+    expect(screen.getByText("risiti")).toBeTruthy();
+    expect(screen.queryByText("nusu kilo")).toBeNull();
   });
 
   it("uses the German-style selector to switch a B1 learner between Swahili titles and A1 workbooks", async () => {

@@ -173,7 +173,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "youtubeId": "F35LGftA93I",
       "title": "Chakula na Vinywaji · AI lecture"
     },
-    "objective": "Name foods and drinks and express simple preferences.",
+    "objective": "Share food and drink preferences, then agree what to bring to a class picnic. Apply polite ordering in the listening exercise.",
     "grammar": "Vitenzi, mapendeleo na kuomba kwa adabu",
     "practiceOnly": true,
     "check": {
@@ -186,25 +186,25 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "answer": 2,
       "why": "Sipendi expresses dislike."
     },
-    "speaking": "Plan a snack together. Ask about one food and one drink, then agree on what to bring.",
+    "speaking": "Plan a class picnic. Ask your partner what they like to eat and drink, offer two choices, and agree who will bring each item. Change one choice if your partner dislikes it.",
     "writing": {
-      "prompt": "Write two things you like, one you dislike and what you want for a snack.",
-      "model": "Ninapenda ndizi na mkate. Ninapenda kunywa chai. Sipendi soda. Nataka ndizi na maji."
+      "prompt": "Write a short picnic message. Say what you like, decline one drink politely, and say what you will bring.",
+      "model": "Ninapenda chapati na matunda. Sitaki soda, asante. Nitaleta chapati na maji."
     },
     "reading": {
-      "text": "Hassan anapenda chapati na chai. Hapendi maziwa. Leo anataka chapati na maji.",
+      "text": "Hassan na Amina wanapanga kula pamoja baada ya darasa. Hassan anapenda chapati na chai. Amina hapendi chai. Anapenda juisi ya embe. Hassan ataleta chapati na Amina ataleta juisi.",
       "questions": [
         {
           "question": "Hassan anapenda kinywaji gani?",
           "answer": "Chai."
         },
         {
-          "question": "Hapendi nini?",
-          "answer": "Maziwa."
+          "question": "Amina anapenda juisi gani?",
+          "answer": "Juisi ya embe."
         },
         {
-          "question": "Leo anataka kunywa nini?",
-          "answer": "Maji."
+          "question": "Nani ataleta chapati?",
+          "answer": "Hassan."
         }
       ]
     },
@@ -370,22 +370,26 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 8,
     "chapter": "Somo la 8",
     "title": "Namba na Umri",
-    "objective": "Give your age, phone number and other basic personal details.",
-    "grammar": "Numbers and kuwa na; age questions",
+    "objective": "Confirm a phone number and classroom number, and use age as a short review.",
+    "grammar": "Compound numbers, digit-by-digit confirmation and age review",
     "practiceOnly": true,
-    "rule": "Use nina miaka followed by the age in years. In compound numbers, put na between tens and units: ishirini na moja. For phone numbers, say each digit separately.",
+    "rule": "Use na to join tens and units in numbers such as ishirini na moja. Read a phone number one digit at a time, including the opening zero. For age, use nina miaka followed by the number of years.",
     "examples": [
       {
-        "swahili": "Una miaka mingapi?",
-        "english": "How old are you?"
+        "swahili": "Darasa letu ni namba ishirini na moja.",
+        "english": "Our classroom is number twenty-one."
       },
       {
-        "swahili": "Nina miaka ishirini na moja.",
-        "english": "I am twenty-one."
+        "swahili": "0725: sifuri, saba, mbili, tano.",
+        "english": "0725: zero, seven, two, five."
       },
       {
-        "swahili": "sifuri, saba, mbili",
-        "english": "zero, seven, two."
+        "swahili": "Tafadhali, rudia namba ya simu.",
+        "english": "Please repeat the phone number."
+      },
+      {
+        "swahili": "Nina miaka ishirini na tatu.",
+        "english": "I am twenty-three years old."
       }
     ],
     "check": {
@@ -398,25 +402,25 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "answer": 1,
       "why": "Ishirini is twenty and tatu adds three."
     },
-    "speaking": "Ask a partner their age and have them read a made-up phone number. Repeat the digits back to check.",
+    "speaking": "One learner reads a fictional phone number and a classroom number. Their partner writes both down, asks for a repeat, and reads them back to confirm. Swap roles.",
     "writing": {
-      "prompt": "Write your age in words, then write any four fictional phone digits in both figures and words.",
-      "model": "Nina miaka ishirini na mbili. 0725: sifuri, saba, mbili, tano."
+      "prompt": "Write a short message giving a classroom number in words and a four-digit fictional contact code in digits and in words.",
+      "model": "Darasa letu ni namba ishirini na moja. Msimbo ni 0725: sifuri, saba, mbili, tano."
     },
     "reading": {
-      "text": "Amina ana miaka ishirini na tatu. Juma ana miaka thelathini. Msimbo wa Amina ni 0725.",
+      "text": "Amina anasoma Kiswahili katika darasa namba ishirini na moja. Msimbo wa kuingia ni 0725. Juma anauliza, “Tafadhali, rudia msimbo.” Amina anasema, “Sifuri, saba, mbili, tano.”",
       "questions": [
         {
-          "question": "Amina ana miaka mingapi?",
-          "answer": "Ishirini na tatu."
+          "question": "Darasa lina namba gani?",
+          "answer": "Ishirini na moja."
         },
         {
-          "question": "Juma ana miaka mingapi?",
-          "answer": "Thelathini."
-        },
-        {
-          "question": "Msimbo wa Amina ni upi?",
+          "question": "Msimbo wa kuingia ni upi?",
           "answer": "0725."
+        },
+        {
+          "question": "Msimbo unaanza na namba gani?",
+          "answer": "Sifuri."
         }
       ]
     }
@@ -425,22 +429,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 9,
     "chapter": "Somo la 9",
     "title": "Marafiki",
-    "objective": "Introduce friends and describe people in simple terms.",
-    "grammar": "Adjectives and basic M-/Wa- agreement",
+    "objective": "Describe friends and make a simple plan to meet.",
+    "grammar": "M-/Wa- adjective agreement and invitations with Je, ungependa …?",
     "practiceOnly": true,
-    "rule": "For people, a describing adjective often changes from m- with one person to wa- with several. Compare mrefu and warefu. The adjective usually follows the noun.",
+    "rule": "Adjectives usually follow the noun. With many adjectives for people, use m- for one person and wa- for several: rafiki mrefu → marafiki warefu. Use Je, ungependa …? to invite a friend and Tukutane … to suggest where or when to meet.",
     "examples": [
       {
-        "swahili": "rafiki mrefu",
-        "english": "a tall friend"
+        "swahili": "rafiki mrefu / marafiki warefu",
+        "english": "a tall friend / tall friends"
       },
       {
-        "swahili": "marafiki warefu",
-        "english": "tall friends"
+        "swahili": "Je, ungependa kucheza mpira Jumamosi?",
+        "english": "Would you like to play football on Saturday?"
       },
       {
-        "swahili": "mtoto mdogo",
-        "english": "a small child."
+        "swahili": "Tukutane uwanjani.",
+        "english": "Let's meet at the playing field."
       }
     ],
     "check": {
@@ -453,25 +457,25 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "answer": 0,
       "why": "Warefu agrees with people in the plural."
     },
-    "speaking": "Describe one friend and then two friends. Your partner says which description is singular or plural and asks one question.",
+    "speaking": "Describe one friend and invite your partner to an activity. Your partner suggests a day or place. Agree on both, then swap roles.",
     "writing": {
-      "prompt": "Introduce a friend by name, give a description, then write one sentence about two friends.",
-      "model": "Rafiki yangu anaitwa Ali. Yeye ni mrefu. Ali na Juma ni marafiki warefu."
+      "prompt": "Write a short message to a friend. Invite them to an activity and suggest a day and meeting place.",
+      "model": "Habari, Neema! Je, ungependa kucheza mpira Jumamosi? Tukutane uwanjani."
     },
     "reading": {
-      "text": "Rafiki yangu anaitwa Pili. Yeye ni mrefu. Pili na Neema ni wanafunzi. Wote wanapenda mpira.",
+      "text": "Pili na Neema ni marafiki. Wote wanapenda mpira. Pili anamwalika Neema kucheza mpira Jumamosi. Neema anakubali. Wanapanga kukutana uwanjani.",
       "questions": [
-        {
-          "question": "Rafiki anaitwa nani?",
-          "answer": "Pili."
-        },
-        {
-          "question": "Pili ana sifa gani?",
-          "answer": "Ni mrefu."
-        },
         {
           "question": "Pili na Neema wanapenda nini?",
           "answer": "Mpira."
+        },
+        {
+          "question": "Watacheza mpira siku gani?",
+          "answer": "Jumamosi."
+        },
+        {
+          "question": "Watakutana wapi?",
+          "answer": "Uwanjani."
         }
       ]
     }
@@ -480,53 +484,108 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 10,
     "chapter": "Somo la 10",
     "title": "Sokoni",
-    "objective": "Ask prices, quantities and buy food at a market.",
-    "grammar": "Numbers, Ji-/Ma- nouns and polite requests",
+    "objective": "Buy produce by weight, bargain politely and confirm the total at a market stall.",
+    "grammar": "Prices per kilo, quantity agreement and bargaining",
     "practiceOnly": true,
-    "rule": "Use bei gani? to ask a price and naomba to request an item. In many Ji-/Ma- plural phrases, a number takes ma-: mayai matatu. Some forms differ: mayai mawili and mayai manne.",
-    "examples": [
+    "grammarSections": [
       {
-        "swahili": "Naomba mayai matatu.",
-        "english": "I would like three eggs."
+        "title": "Bei kwa kilo · Price per kilo",
+        "rule": "Use Kilo moja ya … ni bei gani? to ask the price per kilo. Use nusu kilo ya … to request half a kilo.",
+        "examples": [
+          {
+            "swahili": "Kilo moja ya nyanya ni bei gani?",
+            "english": "How much is one kilo of tomatoes?"
+          },
+          {
+            "swahili": "Naomba nusu kilo ya nyanya.",
+            "english": "I'd like half a kilo of tomatoes."
+          }
+        ]
       },
       {
-        "swahili": "Mayai haya ni bei gani?",
-        "english": "How much are these eggs?"
+        "title": "Idadi · Counting produce",
+        "rule": "Countable ma-class plurals use forms such as mawili and matatu. Ndizi uses mbili or tatu. The question word also agrees: mayai mangapi? and ndizi ngapi?",
+        "examples": [
+          {
+            "swahili": "Naomba mayai mawili na ndizi tatu.",
+            "english": "I'd like two eggs and three bananas."
+          }
+        ]
       },
       {
-        "swahili": "shilingi elfu nne",
-        "english": "four thousand shillings."
+        "title": "Kupatana bei · Agreeing on a price",
+        "rule": "Use unaweza kupunguza bei? to ask politely for a lower price. Use jumla ni shilingi ngapi? to confirm the total.",
+        "examples": [
+          {
+            "swahili": "Unaweza kupunguza bei kidogo, tafadhali?",
+            "english": "Could you lower the price a little, please?"
+          },
+          {
+            "swahili": "Jumla ni shilingi ngapi?",
+            "english": "How much is the total?"
+          }
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "sw": "soko",
+        "en": "market"
+      },
+      {
+        "sw": "nyanya",
+        "en": "tomatoes"
+      },
+      {
+        "sw": "vitunguu",
+        "en": "onions"
+      },
+      {
+        "sw": "mayai",
+        "en": "eggs"
+      },
+      {
+        "sw": "ndizi",
+        "en": "bananas"
+      },
+      {
+        "sw": "nusu kilo",
+        "en": "half a kilo"
+      },
+      {
+        "sw": "punguzo",
+        "en": "discount"
       }
     ],
     "check": {
-      "question": "Which phrase means “two eggs”?",
+      "question": "How do you ask the seller to lower the price?",
       "options": [
-        "mayai wawili",
-        "mayai mbili",
-        "mayai mawili"
+        "Jumla ni shilingi ngapi?",
+        "Unaweza kupunguza bei?",
+        "Unataka mayai mangapi?"
       ],
-      "answer": 2,
-      "why": "Mawili agrees with the ma- plural mayai."
+      "answer": 1,
+      "why": "Kupunguza bei means to lower the price."
     },
-    "speaking": "Role-play buying eggs and bananas. Ask the prices, request a quantity and confirm the total.",
+    "speaking": "At a market stall, tomatoes are 4,000 shillings per kilo and bananas are 500 shillings each. The buyer asks for half a kilo of tomatoes and two bananas, asks for a better price and confirms the total. Swap roles and change the produce.",
     "writing": {
-      "prompt": "Write a short market dialogue asking for three eggs and checking the total.",
-      "model": "Naomba mayai matatu. — Karibu. — Jumla ni shilingi ngapi? — Shilingi elfu tatu."
+      "prompt": "Write a dialogue asking the price per kilo of tomatoes, ordering half a kilo and two bananas, and asking the seller for a discount.",
+      "model": "Mteja: Kilo moja ya nyanya ni bei gani? Muuzaji: Shilingi elfu nne. Mteja: Naomba nusu kilo ya nyanya na ndizi mbili. Unaweza kupunguza bei kidogo? Muuzaji: Sawa, jumla ni shilingi elfu mbili na mia tano."
     },
     "reading": {
-      "text": "Sokoni, Sara anaomba mayai mawili na ndizi tatu. Mayai ni shilingi elfu mbili. Ndizi ni shilingi elfu moja. Jumla ni shilingi elfu tatu.",
+      "text": "Asha ananunua nyanya na ndizi sokoni. Kilo moja ya nyanya ni shilingi elfu nne. Asha anaomba nusu kilo ya nyanya na ndizi mbili. Ndizi mbili ni shilingi elfu moja. Muuzaji anasema jumla ni shilingi elfu tatu. Asha anaomba punguzo. Muuzaji anasema, “Sawa, ni shilingi elfu mbili na mia tano.”",
       "questions": [
         {
-          "question": "Sara anaomba mayai mangapi?",
-          "answer": "Mawili."
+          "question": "Asha anaomba nyanya kiasi gani?",
+          "answer": "Nusu kilo."
         },
         {
-          "question": "Ndizi zinagharimu kiasi gani?",
-          "answer": "Shilingi elfu moja."
+          "question": "Asha ananunua ndizi ngapi?",
+          "answer": "Ndizi mbili."
         },
         {
-          "question": "Jumla ni shilingi ngapi?",
-          "answer": "Shilingi elfu tatu."
+          "question": "Asha analipa shilingi ngapi baada ya punguzo?",
+          "answer": "Shilingi elfu mbili na mia tano."
         }
       ]
     }
@@ -535,53 +594,116 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 11,
     "chapter": "Somo la 11",
     "title": "Dukani",
-    "objective": "Ask about common products, prices and quantities in a shop.",
-    "grammar": "Ki-/Vi- and N-/N- noun classes",
+    "objective": "Ask what is in stock, choose a product and pay at a shop counter.",
+    "grammar": "Stock questions, Ki-/Vi- agreement and paying",
     "practiceOnly": true,
-    "rule": "Some nouns change ki- to vi- in the plural: kitabu → vitabu. Their demonstratives also change: hiki → hivi. Some others, such as kalamu, keep the same noun form, so read the number or demonstrative for the quantity.",
-    "examples": [
+    "grammarSections": [
       {
-        "swahili": "kitabu hiki",
-        "english": "this book"
+        "title": "Bidhaa zilizopo · Stock",
+        "rule": "Use Mna …? to ask what the shop has. The shopkeeper can answer with Tuna … or Hatuna ….",
+        "examples": [
+          {
+            "swahili": "Mna madaftari makubwa?",
+            "english": "Do you have large notebooks?"
+          },
+          {
+            "swahili": "Hatuna madaftari makubwa. Tuna madaftari madogo.",
+            "english": "We don't have large notebooks. We have small notebooks."
+          }
+        ]
       },
       {
-        "swahili": "vitabu hivi",
-        "english": "these books"
+        "title": "Hiki na hivi · This and these",
+        "rule": "A ki-class noun such as kitabu takes hiki. Its vi-class plural vitabu takes hivi. The number also agrees: kitabu kimoja, vitabu viwili.",
+        "examples": [
+          {
+            "swahili": "Kitabu hiki ni bei gani?",
+            "english": "How much is this book?"
+          },
+          {
+            "swahili": "Naomba vitabu viwili.",
+            "english": "I'd like two books."
+          }
+        ]
       },
       {
-        "swahili": "kalamu mbili",
-        "english": "two pens."
+        "title": "Kulipa · Paying",
+        "rule": "Use Nitachukua … when you've chosen what to buy. Ask Naweza kulipa …? to check a payment method.",
+        "examples": [
+          {
+            "swahili": "Nitachukua kalamu mbili.",
+            "english": "I'll take two pens."
+          },
+          {
+            "swahili": "Naweza kulipa kwa simu?",
+            "english": "Can I pay by mobile phone?"
+          },
+          {
+            "swahili": "Risiti, tafadhali.",
+            "english": "A receipt, please."
+          }
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "sw": "duka",
+        "en": "shop"
+      },
+      {
+        "sw": "bidhaa",
+        "en": "product / goods"
+      },
+      {
+        "sw": "daftari",
+        "en": "notebook"
+      },
+      {
+        "sw": "kitabu",
+        "en": "book"
+      },
+      {
+        "sw": "kalamu",
+        "en": "pen"
+      },
+      {
+        "sw": "risiti",
+        "en": "receipt"
+      },
+      {
+        "sw": "pesa taslimu",
+        "en": "cash"
       }
     ],
     "check": {
-      "question": "Which phrase means “these books”?",
+      "question": "What does the shopkeeper say when there are no large notebooks?",
       "options": [
-        "kitabu hiki",
-        "vitabu hivi",
-        "vitabu hiki"
+        "Tuna madaftari makubwa.",
+        "Hatuna madaftari makubwa.",
+        "Naomba madaftari makubwa."
       ],
       "answer": 1,
-      "why": "Hivi goes with the plural vitabu."
+      "why": "Hatuna means we don't have."
     },
-    "speaking": "One person sells school supplies and the other buys them. Ask if books and pens are available, then confirm how many.",
+    "speaking": "Role-play buying school supplies. Ask for a large notebook, choose an alternative when it is out of stock, add two pens and ask how you can pay. Request a receipt.",
     "writing": {
-      "prompt": "Write a shop request for two books and one pen and ask for the total.",
-      "model": "Naomba vitabu viwili na kalamu moja, tafadhali. Jumla ni shilingi ngapi?"
+      "prompt": "Write a shop dialogue. Ask if large notebooks are in stock. Choose a small notebook and two pens. Ask to pay by phone and request a receipt.",
+      "model": "Mteja: Mna madaftari makubwa? Muuzaji: Hatuna, lakini tuna madaftari madogo. Mteja: Nitachukua daftari dogo moja na kalamu mbili. Naweza kulipa kwa simu? Muuzaji: Ndiyo. Mteja: Risiti, tafadhali."
     },
     "reading": {
-      "text": "Dukani kuna vitabu vitatu na kalamu tano. Nuru anachukua kitabu kimoja na kalamu mbili. Anampa muuzaji shilingi elfu sita.",
+      "text": "Nuru anaenda dukani kununua daftari kubwa. Muuzaji anasema, “Hatuna madaftari makubwa. Tuna madaftari madogo.” Nuru anachukua daftari dogo moja na kalamu mbili. Jumla ni shilingi elfu nne. Nuru analipa kwa simu na anaomba risiti.",
       "questions": [
         {
-          "question": "Nuru anachukua vitabu vingapi?",
-          "answer": "Kitabu kimoja."
+          "question": "Muuzaji ana madaftari ya aina gani?",
+          "answer": "Madaftari madogo."
         },
         {
-          "question": "Anachukua kalamu ngapi?",
-          "answer": "Mbili."
+          "question": "Nuru ananunua kalamu ngapi?",
+          "answer": "Kalamu mbili."
         },
         {
-          "question": "Anampa muuzaji kiasi gani?",
-          "answer": "Shilingi elfu sita."
+          "question": "Nuru analipa kwa njia gani?",
+          "answer": "Analipa kwa simu."
         }
       ]
     }
