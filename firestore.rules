@@ -335,6 +335,9 @@ service cloud.firestore {
           request.resource.data.get('universityInvitationCode', '') == 'UH-KISWAHILI-A1'
           && hamburgInvitationOpen()
           && request.resource.data.get('program', '') == 'swahili'
+          && request.resource.data.get('level', '') == 'A1'
+          && request.resource.data.get('className', '') == ''
+          && !request.resource.data.keys().hasAny(['classId', 'classRecordId', 'assignedClassId', 'contractStart', 'contractTermMonths'])
           && request.resource.data.get('institutionId', '') == 'university-hamburg'
           && request.resource.data.get('cohortId', '') == 'university-hamburg-kiswahili-a1'
           && request.resource.data.get('status', '') == 'registered'
@@ -350,7 +353,8 @@ service cloud.firestore {
           !request.resource.data.diff(resource.data).affectedKeys().hasAny([
             'status', 'paymentStatus', 'paid', 'balanceDue', 'tuitionFee',
             'trialStatus', 'trialStartedAt', 'trialEndsAt', 'trialPurgeAt',
-            'contractStart', 'contractEnd'
+            'contractStart', 'contractEnd', 'contractTermMonths', 'program', 'level', 'levelId',
+            'className', 'classId', 'classRecordId', 'assignedClassId'
           ]))
         && (resource.data.get('secondaryProgram', null) == null || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['program']))
         && (resource.data.get('accountType', '') != 'exam_only' || (
