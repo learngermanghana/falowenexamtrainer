@@ -6,6 +6,12 @@ export const SWAHILI_DAY_FIVE = {
   practiceOnly: true,
   audioKey: "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
   trackId: "swahili-a1-day-05",
+  radio: {
+    resourceRole: "falowenRadio",
+    youtubeId: "qfgDXc8yYiE",
+    title: "Familia Yangu",
+    instruction: "Sikiliza Falowen Radio kuhusu familia, kisha jibu maswali 1–8. Listen twice before answering.",
+  },
   aiLecture: null,
 };
 
@@ -57,7 +63,33 @@ export const FAMILY_READING = {
   ],
 };
 
-export const FAMILY_WRITING_MODEL = "Huyu ni mama yangu. Anaitwa Rehema. Huyu ni kaka yangu. Anaitwa Salim. Huyu ni dada yangu. Anaitwa Neema. Neema anapenda kupika.";
+export const FAMILY_WRITING_MODEL = "Familia yangu ni ndogo. Katika familia yangu kuna watu wanne. Ninaishi na mama yangu, baba yangu na dada yangu. Baba yangu anaitwa Musa na mama yangu anaitwa Amina. Nina dada mmoja, lakini sina kaka. Dada yangu ni mdogo. Babu na bibi yangu wanaishi karibu nasi. Tunapenda kupika na kula pamoja.";
+
+// Ruth's Falowen Radio comprehension sheet (questions 1–8).
+// This is separate from the existing signed Day 5 classroom conversation audio.
+export const FAMILY_RADIO_GAPS = [
+  { id: "parents", question: "Baba na mama ni __________.", answer: "wazazi" },
+  { id: "grandmother", question: "__________ ni grandmother, na babu ni grandfather.", answer: "Bibi" },
+  { id: "children", question: "Mtoto ni child, lakini __________ ni children.", answer: "watoto" },
+  { id: "brother", question: "Nina kaka __________ na dada wawili.", answer: "mmoja" },
+];
+
+export const FAMILY_RADIO_CHOICES = [
+  { id: "younger-sister", question: "Neno “dada mdogo” linamaanisha nini?", choices: ["Older sister", "Younger sister", "Younger brother"], answer: "Younger sister" },
+  { id: "one-brother", question: "Sentensi ipi ni sahihi?", choices: ["Nina kaka moja na dada wawili.", "Nina kaka mmoja na dada wawili.", "Nina mmoja kaka na wawili dada."], answer: "Nina kaka mmoja na dada wawili." },
+  { id: "father", question: "Unasemaje “This is my father” kwa Kiswahili?", choices: ["Huyu ni babu yangu.", "Huyu ni kaka yangu.", "Huyu ni baba yangu."], answer: "Huyu ni baba yangu." },
+  { id: "small-family", question: "Sentensi “Familia yangu ni ndogo” ina maana gani?", choices: ["My family is small.", "My family is happy.", "My family is big."], answer: "My family is small." },
+];
+
+export const FAMILY_RADIO_WRITING_TOPICS = [
+  "Idadi ya watu katika familia yako",
+  "Familia yako ni kubwa au ndogo",
+  "Wazazi wako",
+  "Kaka na dada zako",
+  "Babu na bibi",
+  "Wanafamilia wako wanaishi wapi",
+  "Kitu mnachopenda kufanya pamoja",
+];
 
 // Comprehension questions from the Day 5 recorded conversation.
 export const FAMILY_LISTENING = [
