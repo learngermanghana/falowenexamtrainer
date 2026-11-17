@@ -60,7 +60,14 @@ export default function WorkbookMusicPlayer({ song, artwork, story, recording, l
       <span className="workbook-music-eyebrow">{song.title}</span>
       {cues.length ? <><p className="workbook-music-video-line" lang={song.language === "Swahili" ? "sw" : "de"}>{active>=0?lines[active]:time===0?'Press Play to follow the lyrics':'♫'}</p>
         {showEnglish && active>=0 && english?.lines?.[active]?.en && <p lang="en">{english.lines[active].en}</p>}</>
-        : <><p className="workbook-music-video-line">Listen and explore the lyrics below.</p><p>Line highlighting is unavailable for this recording. Open the lyrics to read along at your own pace.</p></>}
+        : lines.length ? <div className="workbook-music-video-unsynced" lang={song.language === "Swahili" ? "sw" : "de"}>
+            <p className="workbook-music-video-line">{lines[0]}</p>
+            <div style={{maxHeight:190,overflowY:"auto",width:"100%",textAlign:"left",padding:"0 12px"}}>
+              {lines.map((line,index)=><p key={index} style={{margin:"4px 0",opacity:index===0?1:.78}}>{line}</p>)}
+            </div>
+            <small>Lyrics are available, but this MP3 has no verified line timestamps yet. The words shown here do not follow playback automatically.</small>
+          </div>
+        : <><p className="workbook-music-video-line">Lyrics are not published for this recording yet.</p><p>Play the song while its matching transcript is prepared.</p></>}
       {(recording?.transcriptionStatus==='automatic' || recording?.referenceOnly) && <small>{recording?.transcriptionStatus==='automatic'?'Automatic transcript draft':'Lyric draft'} · words need teacher review.</small>}
       {recording?.timingStatus==='estimated' && <small>Estimated line timing · listen and check.</small>}
     </div>}
