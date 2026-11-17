@@ -293,7 +293,7 @@ function SentencePattern({title,description,parts}) {
 function SentenceBuilderSection() {
   const [answers,setAnswers]=useState({});
   const [checks,setChecks]=useState({});
-  const correctCount=sentenceBuilderTasks.filter((task,index)=>JSON.stringify(answers[index]||[])===JSON.stringify(task.answer)).length;
+  const correctCount=sentenceBuilderTasks.filter((task,index)=>JSON.stringify((answers[index]||[]).map(item=>item.word))===JSON.stringify(task.answer)).length;
   return <section style={section} data-a1-day13-section="sentence-builder">
     <div style={{color:"#1d4ed8",fontSize:13,fontWeight:800}}>GUIDED PRACTICE · 12 TASKS</div>
     <h2 style={{margin:0}}>5. Sätze und Fragen bauen · Sentence Builder</h2>
