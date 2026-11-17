@@ -16,6 +16,7 @@ import { expandCourseBookEntries } from "../utils/courseBookEntries";
 import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
 import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";
 import { persistCourseCompletionSnapshot } from "../services/courseCompletionSnapshotService";
+import CourseBookLevelSelector from "./CourseBookLevelSelector";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
 import { useLessonProgress } from "../hooks/useLessonProgress";
@@ -947,14 +948,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 {lessonProgressError ? <p style={{ margin: "6px 0 0", color: "#fee2e2", fontSize: 13 }}>{lessonProgressError}</p> : null}
               </div>
               <div data-a1-coursebook-hero-actions="true" style={courseBookStyles.heroActions}>
-                <label style={{ display: "grid", gap: 4, minWidth: 120 }}>
-                  <span style={{ color: "#dbeafe", fontSize: 12, fontWeight: 800 }}>Level</span>
-                  <select style={courseBookStyles.heroSelect} value={selectedCourseLevel} onChange={(e) => setSelectedCourseLevel(e.target.value)}>
-                    {levels.map((level) => (
-                      <option key={level} value={level}>{level}</option>
-                    ))}
-                  </select>
-                </label>
+                <CourseBookLevelSelector levels={levels} value={selectedCourseLevel} onChange={setSelectedCourseLevel} />
                 <button type="button" style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d" }} onClick={() => nextLesson && openLesson(nextLesson)}>
                   Continue learning
                 </button>
