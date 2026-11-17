@@ -31,10 +31,10 @@ test("Day 7 uses the private recording and shows five matching answers on review
     expect(getAudio).toHaveBeenCalledWith("/api/course-media/swahili/a1/day-7/audio-url", {
       headers: { Authorization: "Bearer test-token" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Open answer sheet" }));
+    fireEvent.click(screen.getByRole("button", { name: "Receive & Submit · Review your answers" }));
     fireEvent.click(screen.getByText("Teil 4 · Listening answers"));
     expect(screen.getByText("Your answer: Wali na kuku")).toBeTruthy();
-    expect(screen.getByText("Model answer: Shilingi elfu tano")).toBeTruthy();
+    expect(screen.getByText("Suggested answer: Shilingi elfu tano")).toBeTruthy();
   } finally {
     globalThis.fetch = previousFetch;
   }
