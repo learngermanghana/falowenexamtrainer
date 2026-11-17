@@ -111,3 +111,16 @@ The Sprechen prompt dictionary is `web/src/data/speakingDictionary.js`, the Schr
 ## Public upcoming classes
 
 Admin Live Classes owns the scheduled German and Swahili cohorts in Firestore. The public classes endpoint returns Swahili A1 listings in `swahiliClasses` and keeps the existing `classes` array for German brochure, registration, and placement consumers. [Upcoming Classes](https://www.falowen.app/classes/) shows published Swahili class dates, timetable and confirmed tuition when present, with a WhatsApp enquiry link. Swahili listing visibility requires an open, publicly visible class with successful session generation. Swahili listings use no German placement, course agreement, or Paystack flow.
+
+## Kiswahili A2 and B1 title dictionaries — 17 November 2026
+
+`web/src/data/swahili/a2B1TitleDictionary.json` contains the titles-only Kiswahili
+A2 and B1 plans. Each level mirrors the German course dictionary's Day 0 and
+Days 1–28 in `shared/curriculumCanonical.json`, retaining day/chapter order and
+source IDs/titles for comparison. Entries have separate `swahili-*` IDs and
+`status: "titles-only"`. These are course-topic translations, not vocabulary
+entries, published workbooks, assessments or enrollment availability. The German
+speaking mock slots become Kiswahili speaking practice titles; they do not imply
+Goethe offers a Swahili exam. No German routes, resources, answer keys or scoring
+are copied. This file is not yet connected to Campus; published Kiswahili course
+books remain A1.
