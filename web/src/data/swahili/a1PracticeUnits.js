@@ -169,6 +169,10 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 7,
     "chapter": "Somo la 7",
     "title": "Chakula na Vinywaji",
+    "aiLecture": {
+      "youtubeId": "F35LGftA93I",
+      "title": "Chakula na Vinywaji · AI lecture"
+    },
     "objective": "Name foods and drinks and express simple preferences.",
     "grammar": "Vitenzi, mapendeleo na kuomba kwa adabu",
     "practiceOnly": true,

@@ -16,7 +16,8 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
   const [reading, setReading] = useState({});
   const [listeningAnswers, setListeningAnswers] = useState({});
   const [audio, setAudio] = useState({ url: "", loading: false, error: "" });
-  const listening = lesson.listening;
+  const { aiLecture, listening } = lesson;
+  const lectureHeadingId = `swahili-ai-lecture-${lesson.day}`;
   const grammarSections = lesson.grammarSections || [{ rule: lesson.rule, examples: lesson.examples }];
   const writingId = "swahili-writing-" + lesson.day;
 
@@ -51,6 +52,15 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
         <h1>{lesson.chapter} · {lesson.title}</h1>
         <p>{lesson.objective}</p>
       </header>
+      {aiLecture && (
+        <section className="swahili-book__tile" aria-labelledby={lectureHeadingId}>
+          <h2 id={lectureHeadingId}>{aiLecture.title}</h2>
+          <iframe title={aiLecture.title} loading="lazy" allowFullScreen
+            style={{ width: "100%", aspectRatio: "16 / 9", border: 0 }}
+            src={`https://www.youtube-nocookie.com/embed/${aiLecture.youtubeId}`} />
+          <a href={`https://youtu.be/${aiLecture.youtubeId}`} target="_blank" rel="noreferrer">Tazama kwenye YouTube</a>
+        </section>
+      )}
       <WorkbookTabNav activeTab={activeTab} onChange={selectTab} tabs={tabs}
         ariaLabel={lesson.chapter + " workbook sections"} renderLegacyGrammarPanel={false} />
       <section className="swahili-book__card swahili-book__activity" role="tabpanel" tabIndex={-1}>
