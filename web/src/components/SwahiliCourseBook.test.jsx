@@ -86,14 +86,39 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.queryByText("Salamu")).toBeNull();
   });
 
-  it("opens the assigned Swahili level and offers the published A1 book separately", async () => {
+  it("uses the German-style selector to switch a B1 learner between Swahili titles and A1 workbooks", async () => {
     mockUser = { uid: "swahili-student-1" };
-    mockStudentProfile.level = "C2";
-    render(<MemoryRouter><SwahiliCourseBook /></MemoryRouter>);
-    expect(screen.getByText("Swahili C2 lessons have not been published yet.")).toBeTruthy();
+    mockStudentProfile.level = "B1";
+    render(<MemoryRouter><SwahiliCourseBook basePath="/campus/course/swahili" /></MemoryRouter>);
+    const selector = () => screen.getByRole("combobox", { name: "Level" });
+    expect(selector().value).toBe("B1");
+    expect(within(selector()).getAllByRole("option").map(option => option.value)).toEqual(["A1", "A2", "B1"]);
+    expect(screen.getByText("Ulimwengu wa ndoto (Zoezi)")).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /Fungua Somo la/ })).toBeNull();
     expect(getDoc).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Open the A1 Course Book" }));
+
+    fireEvent.change(selector(), { target: { value: "A2" } });
+    expect(screen.getByText("Mazungumzo mafupi (Zoezi)")).toBeTruthy();
+    expect(screen.queryByText("Ulimwengu wa ndoto (Zoezi)")).toBeNull();
+    fireEvent.change(screen.getByRole("textbox", { name: "Search lessons" }), { target: { value: "mazungumzo" } });
+    expect(screen.getByText("Mazungumzo mafupi (Zoezi)")).toBeTruthy();
+    expect(screen.queryByText("Kuelezea watu (Zoezi)")).toBeNull();
+    expect(getDoc).not.toHaveBeenCalled();
+
+    fireEvent.change(selector(), { target: { value: "A1" } });
     expect(await screen.findByText(/0 of 2 required assignments submitted/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Fungua Somo la 5" }).getAttribute("href")).toBe("/campus/course/swahili/day-5");
+    fireEvent.change(selector(), { target: { value: "B1" } });
+    expect(screen.getByText("Ulimwengu wa ndoto (Zoezi)")).toBeTruthy();
+    expect(screen.queryByRole("progressbar")).toBeNull();
+  });
+
+  it("shows the assigned A2 and lower level, matching the German access rule", () => {
+    mockStudentProfile.className = "Swahili A2";
+    render(<MemoryRouter><SwahiliCourseBook /></MemoryRouter>);
+    const selector = screen.getByRole("combobox", { name: "Level" });
+    expect(selector.value).toBe("A2");
+    expect(within(selector).getAllByRole("option").map(option => option.value)).toEqual(["A1", "A2"]);
   });
 
   it("uses the learner's submissions and tutor decisions to show progress and resume", async () => {

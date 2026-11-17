@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { db, doc, getDoc } from "../firebase";
 import { SWAHILI_A1_CURRICULUM, SWAHILI_A1_PUBLISHED_LESSONS, SWAHILI_A1_ASSIGNMENTS } from "../data/swahili/a1Curriculum";
+import titleDictionary from "../data/swahili/a2B1TitleDictionary.json";
+import { getAccessibleLevels, normalizeCourseLevel } from "../utils/levelAccess";
+import CourseBookLevelSelector from "./CourseBookLevelSelector";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { styles } from "../styles";
 import { courseBookStyles as book } from "./courseBookStyles";
@@ -9,6 +12,7 @@ import "./CourseTabResponsive.css";
 
 const primaryLink = { ...styles.primaryButton, ...styles.primaryButtonLink, minHeight: 44 };
 
+const SWAHILI_LEVELS = ["A1", ...Object.keys(titleDictionary)];
 const LESSONS = SWAHILI_A1_CURRICULUM;
 const PUBLISHED = SWAHILI_A1_PUBLISHED_LESSONS;
 const ASSIGNMENTS = SWAHILI_A1_ASSIGNMENTS;
@@ -20,9 +24,13 @@ const FILTERS = [
 ];
 
 export default function SwahiliCourseOverview({ basePath, preview, uid, assignedLevel }) {
-  const level = preview ? "A1" : String(assignedLevel || "A1").trim().toUpperCase();
-  const [browseA1, setBrowseA1] = useState(false);
-  const showA1 = level === "A1" || browseA1;
+  const levels = getAccessibleLevels(preview ? "A1" : assignedLevel, SWAHILI_LEVELS);
+  const enrollment = normalizeCourseLevel(assignedLevel) || "A1";
+  const defaultLevel = levels.at(-1);
+  const [levelChoice, setLevelChoice] = useState(null);
+  const level = levelChoice?.uid === uid && levelChoice?.enrollment === enrollment && levels.includes(levelChoice?.level)
+    ? levelChoice.level : defaultLevel;
+  const showA1 = level === "A1";
   const [progress, setProgress] = useState(null);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -52,15 +60,52 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
     return () => { active = false; };
   }, [showA1, preview, uid]);
 
-  if (!showA1) return (
-    <section style={book.hero}>
-      <p style={book.heroEyebrow}>Kiswahili {level}</p>
-      <h2 style={book.heroTitle}>Kitabu cha Kozi ya Kiswahili</h2>
-      <p>Swahili {level} lessons have not been published yet.</p>
-      <button type="button" style={styles.primaryButton} onClick={() => setBrowseA1(true)}>Open the A1 Course Book</button>
-      <Link to="/">Back to Campus</Link>
-    </section>
-  );
+  function selectLevel(nextLevel) {
+    setLevelChoice({ uid, enrollment, level: nextLevel });
+    setSearch("");
+    setFilter("all");
+  }
+
+  const levelSelector = <CourseBookLevelSelector levels={levels} value={level} onChange={selectLevel} />;
+
+  if (!showA1) {
+    const query = search.trim().toLowerCase();
+    const titles = titleDictionary[level].filter(({ day, chapter, title }) =>
+      [`Day ${day}`, `Somo la ${day}`, chapter, title].some(value => value.toLowerCase().includes(query)));
+    return (
+      <div className="course-book a2-b1-course-book swahili-course-overview" data-swahili-course-book="true">
+        <section className="course-book-hero course-book-hero--compact" style={book.hero}>
+          <div data-a1-coursebook-hero-header="true" style={book.heroHeader}>
+            <div className="course-book-hero-copy">
+              <p style={book.heroEyebrow}>Kiswahili {level}</p>
+              <h2 style={book.heroTitle}>Kitabu cha Kozi ya Kiswahili</h2>
+              <p style={book.heroText}>Browse the lesson titles. Workbooks for this level are in preparation.</p>
+            </div>
+            <div data-a1-coursebook-hero-actions="true" style={book.heroActions}>
+              {levelSelector}
+            </div>
+          </div>
+        </section>
+        <section className="course-book-toolbar" style={book.toolbar}>
+          <h3 style={{ margin: 0 }}>Lessons</h3>
+          <input aria-label="Search lessons" placeholder="Search by day, topic or chapter…" value={search}
+            onChange={(event) => setSearch(event.target.value)} style={book.searchInput} />
+        </section>
+        {titles.length === 0 && <p style={book.emptyState}>No lessons match your search.</p>}
+        {titles.map(({ id, day, title, chapter }) => (
+          <article key={id} className="course-book-lesson-card" style={book.lessonCard}>
+            <div style={book.lessonMain}>
+              <span style={book.dayBubble}>{day === 0 ? "Mwongozo" : `Somo la ${day}`}</span>
+              <div>
+                <h3 style={book.lessonTitle}>{title}</h3>
+                {day > 0 && <p style={styles.helperText}>Chapter {chapter}</p>}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    );
+  }
 
   const personal = Boolean(!preview && uid && db);
   const records = personal && progress?.uid === uid ? progress.records : null;
@@ -106,6 +151,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
             <p style={book.heroText}>{nextLabel === "Review lessons" ? "All tutor assignments submitted." : <>Next: <strong>Somo la {next.day} · {next.title}</strong></>}</p>
           </div>
           <div data-a1-coursebook-hero-actions="true" className="course-book-hero-actions" style={book.heroActions}>
+            {levelSelector}
             {!preview && <Link style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }} to="/">← Back to Campus</Link>}
             <Link className="course-book-continue-button" style={primaryLink} to={lessonPath(next)}>{nextLabel}</Link>
             <button className="course-book-submit-secondary" type="button" style={{ ...styles.secondaryButton, minHeight: 44 }} aria-haspopup="dialog" onClick={showSubmit}>Review &amp; Submit</button>

@@ -12,6 +12,7 @@ import SwahiliCourseOverview from "./SwahiliCourseOverview";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import SwahiliReviewDraft, { SwahiliFinalSubmit, useSwahiliReviewDraft } from "./SwahiliReviewDraft";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
+import { normalizeCourseLevel } from "../utils/levelAccess";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import "./SwahiliCourseBook.css";
 
@@ -376,7 +377,12 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
     }
   };
 
-  if (!day) return <SwahiliCourseOverview basePath={basePath} preview={preview} uid={user?.uid} assignedLevel={studentProfile?.program === "swahili" ? studentProfile.level : undefined} />;
+  if (!day) {
+    const assignedLevel = studentProfile?.program === "swahili"
+      ? normalizeCourseLevel(studentProfile.level) || normalizeCourseLevel(studentProfile.className)
+      : "";
+    return <SwahiliCourseOverview basePath={basePath} preview={preview} uid={user?.uid} assignedLevel={assignedLevel} />;
+  }
 
   if (teacherView) {
     return isTeacher
