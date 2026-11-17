@@ -109,19 +109,34 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
     if (!chosen) return undefined;
     const controller = new AbortController();
     setRecordingLyrics(null);
-    fetch("/api/music-lyrics?track=" + encodeURIComponent(chosen.id), {
-      signal: controller.signal,
-      cache: "no-cache",
-    }).then(response => response.ok ? response.json() : null).then(data => {
-      if (controller.signal.aborted) return;
-      if (data?.objectKey === chosen.objectKey && typeof data.lyrics === "string" && data.lyrics.trim()) {
-        setRecordingLyrics({ id: chosen.id, objectKey: chosen.objectKey, lyrics: data.lyrics.trim(), cues: data.cues, timingStatus: data.timingStatus, transcriptionStatus: data.transcriptionStatus, referenceOnly: data.referenceOnly, recordingSha256: data.recordingSha256, englishTranslation: data.englishTranslation });
+    // Some published lyric endpoints resolve by R2 object key rather than
+    // playback ID. Retry only when the first response is absent/mismatched.
+    // Both routes must identify this exact MP3; never borrow another song.
+    const fetchMatchingLyrics = async () => {
+      const urls = [
+        "/api/music-lyrics?track=" + encodeURIComponent(chosen.id),
+        "/api/music-lyrics?key=" + encodeURIComponent(chosen.objectKey),
+      ];
+      for (const url of urls) {
+        try {
+          const response = await fetch(url, { signal: controller.signal, cache: "no-cache" });
+          if (!response.ok) continue;
+          const data = await response.json();
+          if (controller.signal.aborted) return;
+          if (data?.objectKey !== chosen.objectKey ||
+              typeof data.lyrics !== "string" || !data.lyrics.trim()) continue;
+          setRecordingLyrics({ id: chosen.id, objectKey: chosen.objectKey,
+            lyrics: data.lyrics.trim(), cues: data.cues,
+            timingStatus: data.timingStatus, transcriptionStatus: data.transcriptionStatus,
+            referenceOnly: data.referenceOnly, recordingSha256: data.recordingSha256,
+            englishTranslation: data.englishTranslation });
+          return;
+        } catch (error) {
+          if (controller.signal.aborted) return;
+        }
       }
-    }).catch(() => {
-      // Missing lyric sidecars are normal for newly uploaded MP3s.
-      // Playback always remains available, and a different song's text
-      // must never appear in this lesson.
-    });
+    };
+    fetchMatchingLyrics();
     return () => controller.abort();
   }, [chosen?.id, chosen?.objectKey]);
 
