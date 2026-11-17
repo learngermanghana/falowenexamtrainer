@@ -98,7 +98,7 @@ const heroImage =
 
 const LESSON_LEVEL = "A1";
 const LESSON_ID = "a1-day-13-revision-numbers-time-prices-statements";
-const LESSON_TITLE = "A1 Day 13 — Sentence Building with Days and Activities";
+const LESSON_TITLE = "A1 Day 13 — Statements and Questions with Time, Numbers and Prices";
 
 
 const numberReviewItems = [
@@ -131,10 +131,10 @@ const priceVerbReviewItems = [
       "Es kostet zwanzig Euro.","Er kosten zwanzig Euro."] },
 ];
 const groupTaskChecklist = [
-  "Write four original German sentences about your weekly routine.",
-  "Begin two sentences with Ich and two with a time phrase (Am Montag or Um acht Uhr).",
-  "Include at least two different weekdays and one clock time.",
-  "Keep the conjugated verb in position 2 in every statement.",
+  "Write three original statements using days, time, numbers or prices.",
+  "Write three W-questions (Wann, Wie viel, Wie viele or Um wie viel Uhr).",
+  "Write two yes/no questions beginning with the verb.",
+  "Use the verb in position 2 for statements and W-questions, and position 1 for yes/no questions.",
 ];
 
 const safeDocKey = (value = "") =>
@@ -259,6 +259,98 @@ function ChoiceReviewSection({ title, items }) {
     </div>
   );
 }
+
+const sentenceBuilderTasks = [
+  {type:"Statement",hint:"The German course starts at 6 p.m.",words:["18 Uhr.","beginnt","Der Deutschkurs","um"],answer:["Der Deutschkurs","beginnt","um","18 Uhr."],rule:"The conjugated verb beginnt is in position 2."},
+  {type:"Statement",hint:"I learn German on Monday.",words:["am Montag","Deutsch.","Ich","lerne"],answer:["Ich","lerne","am Montag","Deutsch."],rule:"The subject is first; the conjugated verb is second."},
+  {type:"Statement",hint:"On Friday I work at 9 a.m.",words:["ich","Am Freitag","um neun Uhr.","arbeite"],answer:["Am Freitag","arbeite","ich","um neun Uhr."],rule:"Am Freitag is one time phrase in position 1. The verb is still second."},
+  {type:"Statement",hint:"The book costs 20 euros.",words:["20 Euro.","Das Buch","kostet"],answer:["Das Buch","kostet","20 Euro."],rule:"Das Buch is singular, so use kostet."},
+  {type:"W-question",hint:"When does the German course start?",words:["der Deutschkurs?","Wann","beginnt"],answer:["Wann","beginnt","der Deutschkurs?"],rule:"W-question: question word, conjugated verb, subject."},
+  {type:"W-question",hint:"How much does the book cost?",words:["das Buch?","Wie viel","kostet"],answer:["Wie viel","kostet","das Buch?"],rule:"Wie viel is the question phrase; kostet follows."},
+  {type:"W-question",hint:"What time do you have German class?",words:["du","Deutschunterricht?","hast","Um wie viel Uhr"],answer:["Um wie viel Uhr","hast","du","Deutschunterricht?"],rule:"Um wie viel Uhr asks for the clock time."},
+  {type:"W-question",hint:"How many books do you have?",words:["Bücher","Wie viele","du?","hast"],answer:["Wie viele","Bücher","hast","du?"],rule:"Wie viele asks about countable plural objects."},
+  {type:"Yes/no question",hint:"Does the course start at 6 p.m.?",words:["der Kurs","um 18 Uhr?","Beginnt"],answer:["Beginnt","der Kurs","um 18 Uhr?"],rule:"Yes/no questions begin with the conjugated verb."},
+  {type:"Yes/no question",hint:"Does the book cost 20 euros?",words:["20 Euro?","Kostet","das Buch"],answer:["Kostet","das Buch","20 Euro?"],rule:"Put Kostet before das Buch."},
+  {type:"Yes/no question",hint:"Do you have time on Monday?",words:["am Montag","du","Zeit?","Hast"],answer:["Hast","du","am Montag","Zeit?"],rule:"Hast + du + time phrase + object."},
+  {type:"Yes/no question",hint:"Do the books cost 30 euros?",words:["die Bücher","30 Euro?","Kosten"],answer:["Kosten","die Bücher","30 Euro?"],rule:"The plural subject die Bücher needs kosten."},
+];
+const responsePracticeTasks = [
+  {question:"Wann beginnt der Deutschkurs?",choices:["Er kostet 20 Euro.","Er beginnt um 18 Uhr.","Ich bin 20 Jahre alt."],correct:1,tip:"Wann asks when something happens."},
+  {question:"Wie viel kostet das Buch?",choices:["Das Buch kostet 15 Euro.","Am Dienstag.","Um 9 Uhr."],correct:0,tip:"Wie viel kostet asks for a price."},
+  {question:"Beginnt der Kurs um 18 Uhr?",choices:["Zwanzig Euro.","Am Freitag.","Ja, er beginnt um 18 Uhr."],correct:2,tip:"A yes/no question can be answered with Ja or Nein."},
+  {question:"Wie viele Bücher hast du?",choices:["Ich habe drei Bücher.","Es ist halb acht.","Das Buch kostet zehn Euro."],correct:0,tip:"Wie viele asks how many countable items there are."},
+];
+const grammarStrip = {display:"flex",gap:6,flexWrap:"wrap",alignItems:"stretch"};
+const grammarCell = (background) => ({background,borderRadius:9,padding:"12px 14px",display:"grid",gap:3,minWidth:110,flex:"1 1 110px"});
+function SentencePattern({title,description,parts}) {
+  return <div style={{...card,border:"1px solid #dbeafe"}}>
+    <strong>{title}</strong><p style={{margin:0,color:"#475569"}}>{description}</p>
+    <div style={grammarStrip}>{parts.map((part,index)=><div key={index} style={grammarCell(part.color)}>
+      <small style={{color:"#334155"}}>{part.label}</small><strong>{part.word}</strong>
+    </div>)}</div>
+  </div>;
+}
+function SentenceBuilderSection() {
+  const [answers,setAnswers]=useState({});
+  const [checks,setChecks]=useState({});
+  const correctCount=sentenceBuilderTasks.filter((task,index)=>JSON.stringify(answers[index]||[])===JSON.stringify(task.answer)).length;
+  return <section style={section} data-a1-day13-section="sentence-builder">
+    <div style={{color:"#1d4ed8",fontSize:13,fontWeight:800}}>GUIDED PRACTICE · 12 TASKS</div>
+    <h2 style={{margin:0}}>5. Sätze und Fragen bauen · Sentence Builder</h2>
+    <p style={{margin:0,color:"#475569"}}>Tap the word tiles in order. Check each answer and use the grammar hint to correct any mistakes. You can remove a tile or reset the sentence.</p>
+    <div style={{...infoBox,background:"#f8fafc"}}><strong>Progress: {correctCount} of {sentenceBuilderTasks.length} correctly built</strong>
+      <div style={{height:8,background:"#dbeafe",borderRadius:99,overflow:"hidden"}}><div style={{height:"100%",width:(correctCount/sentenceBuilderTasks.length*100)+"%",background:"#2563eb"}}/></div>
+    </div>
+    {sentenceBuilderTasks.map((task,index)=>{
+      const selected=answers[index]||[];
+      const remaining=task.words.map((word,i)=>({word,i})).filter(({i})=>!selected.some(item=>item.i===i));
+      const correct=JSON.stringify(selected.map(item=>item.word))===JSON.stringify(task.answer);
+      return <div key={index} style={{...card,border:"1px solid #e2e8f0"}}>
+        <div style={{display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+          <strong>{index+1}. {task.type}</strong><small style={{color:"#475569"}}>{task.hint}</small>
+        </div>
+        <div style={{...grammarStrip,minHeight:45}}>
+          {selected.length ? selected.map((item,pos)=><button key={item.i} type="button" style={{...lightBtn,background:"#dbeafe",borderColor:"#93c5fd"}} aria-label={"Remove "+item.word}
+            onClick={()=>{setAnswers(old=>({...old,[index]:selected.filter((_,i)=>i!==pos)}));setChecks(old=>({...old,[index]:false}));}}>{item.word} ×</button>) :
+            <span style={{color:"#64748b"}}>Your sentence appears here…</span>}
+        </div>
+        <div style={grammarStrip}>{remaining.map(({word,i})=><button key={i} type="button" style={lightBtn}
+          onClick={()=>{setAnswers(old=>({...old,[index]:[...selected,{word,i}]}));setChecks(old=>({...old,[index]:false}));}}>{word} +</button>)}</div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <button type="button" style={darkBtn} disabled={selected.length!==task.words.length}
+            onClick={()=>setChecks(old=>({...old,[index]:true}))}>Check answer</button>
+          <button type="button" style={lightBtn} onClick={()=>{setAnswers(old=>({...old,[index]:[]}));setChecks(old=>({...old,[index]:false}));}}>Reset</button>
+        </div>
+        {checks[index] ? <div role="status" style={{...tipBox,borderColor:correct?"#bbf7d0":"#fde68a",background:correct?"#f0fdf4":"#fffbeb"}}>
+          <strong style={{color:correct?"#166534":"#9a3412"}}>{correct?"✓ Richtig!":"Try again. Hint:"}</strong>
+          <span>{task.rule}</span>
+        </div> : null}
+      </div>;
+    })}
+  </section>;
+}
+function ResponsePracticeSection() {
+  const [answers,setAnswers]=useState({});
+  const [checked,setChecked]=useState({});
+  return <section style={section} data-a1-day13-section="response-practice">
+    <h2 style={{margin:0}}>6. Fragen beantworten · Choose a Response</h2>
+    <p style={{margin:0,color:"#475569"}}>Read each question and choose the answer that makes sense.</p>
+    {responsePracticeTasks.map((task,index)=><fieldset key={index} style={{...card,minWidth:0}}>
+      <legend style={{fontWeight:700}}>{index+1}. {task.question}</legend>
+      {task.choices.map((choice,choiceIndex)=><label key={choice} style={{display:"flex",gap:8,alignItems:"flex-start"}}>
+        <input type="radio" name={"day13-response-"+index} checked={answers[index]===choiceIndex}
+          onChange={()=>{setAnswers(old=>({...old,[index]:choiceIndex}));setChecked(old=>({...old,[index]:false}));}}/>
+        <span>{choice}</span>
+      </label>)}
+      <button type="button" style={{...lightBtn,justifySelf:"start"}} disabled={answers[index]===undefined}
+        onClick={()=>setChecked(old=>({...old,[index]:true}))}>Check answer</button>
+      {checked[index] ? <p role="status" style={{margin:0,color:answers[index]===task.correct?"#166534":"#9a3412"}}>
+        {answers[index]===task.correct?"✓ Correct!":task.tip}
+      </p>:null}
+    </fieldset>)}
+  </section>;
+}
+
 function StatementContributionSection() {
   const { user, studentProfile } = useAuth();
   const className = getClassName(studentProfile);
@@ -342,7 +434,7 @@ function StatementContributionSection() {
           classKey,
           lessonId: LESSON_ID,
           lessonTitle: LESSON_TITLE,
-          contributionType: "sentence-building-days-activities",
+          contributionType: "sentence-building-statements-and-questions",
           authorName: getDisplayName(studentProfile, user),
           studentCode,
           studentUid: user?.uid || null,
@@ -367,10 +459,10 @@ function StatementContributionSection() {
   return (
     <section style={{ ...section, borderColor: "#86efac", background: "#f7fee7" }}>
       <div style={{display:"grid",gap:6}}>
-        <p style={{margin:0,color:"#166534",fontWeight:800}}>Part 5 · Self-practice · Optional class sharing</p>
-        <h2 style={{margin:0}}>Your Weekly Routine — Four Statements</h2>
+        <p style={{margin:0,color:"#166534",fontWeight:800}}>Part 7 · Self-practice · Optional class sharing</p>
+        <h2 style={{margin:0}}>Your Own Statements and Questions</h2>
         <p style={{margin:0}}>
-          Write your own sentences using the verb-second rule you have just learned.
+          Write three statements, three W-questions and two yes/no questions using numbers, time, days or prices.
           Optionally save them to the existing class discussion so classmates can read them.
           This is not a tutor-marked assignment.
         </p>
@@ -379,7 +471,7 @@ function StatementContributionSection() {
         <strong>Ideas for your own sentences</strong>
         <div><strong>Days:</strong> Montag · Dienstag · Mittwoch · Donnerstag · Freitag · Samstag · Sonntag</div>
         <div><strong>Activities:</strong> Deutsch lernen · zur Schule gehen · arbeiten · Musik hören · Sport treiben · einkaufen gehen</div>
-        <div><strong>Examples:</strong> Ich lerne am Montag Deutsch. · Um acht Uhr gehe ich zur Schule.</div>
+        <div><strong>Examples:</strong> Der Kurs beginnt um 18 Uhr. · Wann beginnt der Kurs? · Beginnt der Kurs um 18 Uhr?</div>
       </div>
       <div style={infoBox}>
         <strong>Your self-practice checklist</strong>
@@ -391,7 +483,7 @@ function StatementContributionSection() {
         Your answer box
         <textarea
           style={textareaStyle}
-          placeholder="Write four sentences here. Example: Ich lerne am Montag Deutsch. / Am Dienstag spiele ich Fußball. / Um acht Uhr ..."
+          placeholder="3 statements:\n1. Der Kurs beginnt um 18 Uhr.\n\n3 W-questions:\n1. Wann beginnt der Kurs?\n\n2 yes/no questions:\n1. Beginnt der Kurs um 18 Uhr?"
           value={draft}
           onChange={(event) => {
             setDraft(event.target.value);
@@ -436,14 +528,14 @@ export default function A1RevisionOriginalContentPage() {
     <div style={styles.pageWrap}>
       <div style={{ ...styles.page, display:"grid", gap:16 }}>
         <section style={{ ...section, background:"#f8fafc" }} aria-label="Day 13 revision introduction">
-          <div style={{color:"#1d4ed8",fontSize:13,fontWeight:800}}>A1 Day 13 · Quick revision, then a new skill</div>
-          <h2 style={{margin:0}}>Numbers, Days, Time, Prices and Statement Formation</h2>
+          <div style={{color:"#1d4ed8",fontSize:13,fontWeight:800}}>A1 Day 13 · Learn, build, ask and respond</div>
+          <h2 style={{margin:0}}>Sätze und Fragen bilden · Time, Numbers and Prices</h2>
           <p style={{margin:0,color:"#475569",lineHeight:1.7}}>
             First, answer 11 short questions to check what you already know.
             Then learn how to build German statements and write four sentences of your own.
           </p>
           <div style={{display:"flex",flexWrap:"wrap",alignItems:"center",gap:10}}>
-            <span style={{fontSize:13,color:"#475569"}}>11 revision questions · 1 grammar lesson · 1 self-practice task</span>
+            <span style={{fontSize:13,color:"#475569"}}>11 revision questions · 3 sentence patterns · 12 word builders · 4 responses · self-practice</span>
             <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
           </div>
         </section>
@@ -487,6 +579,31 @@ export default function A1RevisionOriginalContentPage() {
             <div><strong>Useful verb forms:</strong> ich lerne · ich gehe · ich spiele · ich arbeite</div>
           </div>
         </section>
+        <section style={section} data-a1-day13-section="question-formation">
+          <h2 style={{margin:0}}>Statements, W-questions and Yes/No Questions</h2>
+          <SentencePattern title="Statement · Aussagesatz" description="The conjugated verb stays in position 2." parts={[
+            {label:"Position 1 · Subject",word:"Der Kurs",color:"#dbeafe"},
+            {label:"Position 2 · Verb",word:"beginnt",color:"#dcfce7"},
+            {label:"More information",word:"um 18 Uhr.",color:"#fef3c7"}
+          ]}/>
+          <SentencePattern title="W-question · W-Frage" description="Question word + conjugated verb + subject." parts={[
+            {label:"Question word",word:"Wann",color:"#dbeafe"},
+            {label:"Verb",word:"beginnt",color:"#dcfce7"},
+            {label:"Subject",word:"der Kurs?",color:"#fef3c7"}
+          ]}/>
+          <SentencePattern title="Yes/no question · Ja/Nein-Frage" description="Start with the conjugated verb. Answer with Ja or Nein." parts={[
+            {label:"Position 1 · Verb",word:"Beginnt",color:"#dcfce7"},
+            {label:"Position 2 · Subject",word:"der Kurs",color:"#dbeafe"},
+            {label:"More information",word:"um 18 Uhr?",color:"#fef3c7"}
+          ]}/>
+          <div style={tipBox}><strong>Time and price language</strong>
+            <span><strong>um</strong> + time: um 18 Uhr · <strong>am</strong> + day: am Montag</span>
+            <span><strong>Wann?</strong> When? · <strong>Um wie viel Uhr?</strong> What time? · <strong>Wie viel?</strong> How much? · <strong>Wie viele?</strong> How many?</span>
+            <span><strong>kostet</strong> = singular: Das Buch kostet 20 Euro. · <strong>kosten</strong> = plural: Die Bücher kosten 30 Euro.</span>
+          </div>
+        </section>
+        <SentenceBuilderSection/>
+        <ResponsePracticeSection/>
         <StatementContributionSection/>
       </div>
     </div>
