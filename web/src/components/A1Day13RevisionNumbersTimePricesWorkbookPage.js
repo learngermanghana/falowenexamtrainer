@@ -424,8 +424,7 @@ export default function A1RevisionOriginalContentPage() {
           <div style={{color:"#1d4ed8",fontSize:13,fontWeight:800}}>A1 Day 13 · Learn, build, ask and respond</div>
           <h2 style={{margin:0}}>Sätze und Fragen bilden · Time, Numbers and Prices</h2>
           <p style={{margin:0,color:"#475569",lineHeight:1.7}}>
-            First, answer 11 short questions to check what you already know.
-            Then learn how to build German statements and write four sentences of your own.
+            Learn how to form German statements, W-questions and yes/no questions using familiar time and price examples.
           </p>
           <div style={{display:"flex",flexWrap:"wrap",alignItems:"center",gap:10}}>
             <span style={{fontSize:13,color:"#475569"}}>3 sentence patterns · 6 word builders · 2 responses · short writing task</span>
