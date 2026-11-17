@@ -587,7 +587,7 @@ export const AuthProvider = ({ children }) => {
   const signup = useCallback(
     async (email, password, profile = {}) => {
       const universityInvitation = resolveUniversityInvitation(profile.universityInvitationCode);
-      const program = universityInvitation ? "swahili" : profile.program || "german";
+      const program = universityInvitation?.program || profile.program || "german";
       if (!["german", "swahili"].includes(program)) {
         throw new Error("Please choose German or Swahili to register.");
       }
@@ -651,8 +651,8 @@ export const AuthProvider = ({ children }) => {
         role: "student",
         studentCode: studentId,
         about: "",
-        level: (profile.level || "").toUpperCase(),
-        className: profile.className || "",
+        level: universityInvitation?.level || (profile.level || "").toUpperCase(),
+        className: universityInvitation ? "" : profile.className || "",
         phone: profile.phone || "",
         location: profile.location || "",
         program,

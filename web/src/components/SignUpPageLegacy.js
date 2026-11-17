@@ -118,7 +118,8 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   const [message, setMessage] = useState("");
   const requestedSignup = useMemo(() => signupQueryContext(), []);
   const universityInvitation = useMemo(() => resolveUniversityInvitation(invitationCode), [invitationCode]);
-  const [program, setProgram] = useState(universityInvitation || initialProgram === "swahili" ? "swahili" : "german");
+  const [selectedProgram, setProgram] = useState(initialProgram === "swahili" ? "swahili" : "german");
+  const program = universityInvitation?.program || selectedProgram;
   const isSwahili = program === "swahili";
   const [germanLevel, setSelectedLevel] = useState(
     requestedSignup.level || "A1"
@@ -130,7 +131,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [germanPayment, setPaymentOption] = useState("trial");
   const [germanClass, setSelectedClass] = useState(loadPreferredClass() || "");
-  const selectedLevel = isSwahili ? "A1" : germanLevel;
+  const selectedLevel = universityInvitation?.level || (isSwahili ? "A1" : germanLevel);
   const learningMode = isSwahili ? "Online" : germanMode;
   const selectedClass = isSwahili ? "" : germanClass;
   const paymentOption = isSwahili ? "trial" : germanPayment;
@@ -754,7 +755,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           <label htmlFor="signup-program" style={styles.label}>{t("signup.courseLanguage")}</label>
           <select id="signup-program" name="program" style={styles.select} value={program} disabled={Boolean(universityInvitation)}
             onChange={(event) => { setProgram(event.target.value); setFieldErrors({}); setAuthError(""); }}>
-            <option value="german">{t("signup.programs.german")}</option>
+            {!universityInvitation && <option value="german">{t("signup.programs.german")}</option>}
             <option value="swahili">{t("signup.programs.swahili")}</option>
           </select>
           {isSwahili ? (

@@ -451,7 +451,7 @@ export default function SignUpPage(props) {
   return (
     <div ref={rootRef} className="signup-page-mobile-safe">
       <style>{MOBILE_INPUT_CSS}</style>
-      <SignUpPageLegacy {...props} initialProgram={initialProgram} invitationCode={universityInvitation?.code || ""} onAccountCreated={handleAccountCreated} />
+      <SignUpPageLegacy key={universityInvitation?.code || "public-signup"} {...props} initialProgram={initialProgram} invitationCode={universityInvitation?.code || ""} onAccountCreated={handleAccountCreated} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} rootRef={rootRef} />, mount) : null}
       <LegalFooter />
     </div>

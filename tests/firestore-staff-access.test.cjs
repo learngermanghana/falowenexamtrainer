@@ -99,7 +99,7 @@ test('Hamburg signup requires an administrator-configured, unexpired invitation'
   const visitorDb = env.unauthenticatedContext().firestore();
   const expiry = new Date(Date.now() + 600000);
   const profile = {
-    uid: 'university-learner', program: 'swahili', registrationSource: 'university-invite',
+    uid: 'university-learner', program: 'swahili', level: 'A1', registrationSource: 'university-invite',
     institutionId: 'university-hamburg', cohortId: 'university-hamburg-kiswahili-a1',
     universityInvitationCode: 'UH-KISWAHILI-A1', status: 'registered',
     institutionVerification: 'pending', accessType: 'invitation_pending',
@@ -114,7 +114,12 @@ test('Hamburg signup requires an administrator-configured, unexpired invitation'
   await assertFails(getDocs(collection(visitorDb, 'universityInvitations')));
   await assertFails(setDoc(doc(studentDb, 'students/invite-bad-code'), {...profile, universityInvitationCode: 'wrong'}));
   await assertFails(setDoc(doc(studentDb, 'students/invite-contract'), {...profile, contractEnd: ''}));
-  await assertSucceeds(setDoc(doc(studentDb, 'students/invite-valid'), profile));
+  await assertFails(setDoc(doc(studentDb, 'students/invite-german'), {...profile, program: 'german'}));
+  await assertFails(setDoc(doc(studentDb, 'students/invite-other-level'), {...profile, level: 'B1'}));
+  await assertFails(setDoc(doc(studentDb, 'students/invite-class'), {...profile, classRecordId: 'other-class'}));
+  const validStudent = doc(studentDb, 'students/invite-valid');
+  await assertSucceeds(setDoc(validStudent, profile));
+  await assertFails(setDoc(validStudent, {program: 'german'}, {merge: true}));
   await env.withSecurityRulesDisabled(context =>
     setDoc(doc(context.firestore(), path), {expiresAt: new Date(0)}));
   await assertFails(setDoc(doc(studentDb, 'students/invite-expired'), profile));
