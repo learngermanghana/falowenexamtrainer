@@ -669,19 +669,83 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "model": "Mnunuzi: Mna maparachichi? Muuzaji: Ndiyo. Mnunuzi: Naomba maparachichi manane na kichane kimoja cha ndizi. Jumla ni shilingi ngapi? Muuzaji: Shilingi elfu moja na mia saba. Mnunuzi: Unaweza kupunguza bei kidogo, tafadhali? Muuzaji: Sawa, lipa shilingi elfu moja na mia sita."
     },
     "reading": {
-      "text": "Muuzaji: Habari za leo? Karibu. Nikusaidie nini? Mnunuzi: Naomba machungwa makubwa ishirini, maparachichi manane, malimau matano, mafungu manne ya mchicha, mafungu mawili madogo ya vitunguu, kilo moja ya karoti na kichane kimoja cha ndizi. Mnunuzi: Jumla ni shilingi ngapi? Muuzaji: Jumla ni shilingi elfu tatu na mia tatu na hamsini. Mnunuzi: Ni ghali sana. Unaweza kupunguza bei kidogo, tafadhali? Muuzaji: Sawa. Nitapunguza shilingi mia moja na hamsini. Lipa shilingi elfu tatu na mia mbili. Mnunuzi: Asante sana. Muuzaji: Karibu tena.",
+      "title": "Safari ya Juma Sokoni na Kahawani",
+      "text": "Juma ni mwanafunzi. Leo asubuhi, Juma anakwenda sokoni kupata matunda na chakula. Sokoni, Juma anamwona muuza matunda na anasema, “Samahani, naomba matunda haya, tafadhali.”\n\nJuma ananunua maembe matatu na machungwa matano. Pia, ananunua mayai kumi. Muuza matunda anasema, “Jumla ni shilingi mia nne na hamsini.” Juma anatoa fedha na anasema, “Asante sana.” Muuza matunda anajibu, “Karibu sana!”\n\nBaadaye, Juma anakwenda kahawani. Anakaa karibu na dirisha kubwa. Anamwambia mhudumu, “Naomba kikombe cha kahawa na maji, tafadhali.” Mhudumu analeta kahawa na maji. Juma anafurahi sana. Anasema, “Naomba bili, tafadhali.”",
       "questions": [
         {
-          "question": "Mnunuzi anataka maparachichi mangapi?",
-          "answer": "Maparachichi manane."
+          "question": "Kwa nini Juma anakwenda sokoni asubuhi?",
+          "answer": "Anakwenda kupata matunda na chakula."
         },
         {
-          "question": "Jumla ilikuwa shilingi ngapi kabla ya punguzo?",
-          "answer": "Shilingi elfu tatu na mia tatu na hamsini (3,350)."
+          "question": "Juma ananunua maembe mangapi, machungwa mangapi na mayai mangapi?",
+          "answer": "Maembe matatu, machungwa matano na mayai kumi."
         },
         {
-          "question": "Mnunuzi analipa shilingi ngapi baada ya punguzo?",
-          "answer": "Shilingi elfu tatu na mia mbili (3,200)."
+          "question": "Juma analipa shilingi ngapi sokoni?",
+          "answer": "Shilingi mia nne na hamsini (450)."
+        },
+        {
+          "question": "Juma anakaa wapi kahawani?",
+          "answer": "Anakaa karibu na dirisha kubwa."
+        },
+        {
+          "question": "Juma anaomba vinywaji gani kahawani?",
+          "answer": "Kikombe cha kahawa na maji."
+        }
+      ]
+    },
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-10/audio-url",
+      "questions": [
+        {
+          "id": "first-item",
+          "question": "Mnunuzi anataka kununua nini kwanza?",
+          "choices": [
+            "Nyanya",
+            "Vitunguu",
+            "Ndizi mbivu"
+          ],
+          "answer": "Nyanya"
+        },
+        {
+          "id": "tomato-price",
+          "question": "Muuzaji anataja bei gani ya nyanya?",
+          "choices": [
+            "Shilingi mia moja",
+            "Shilingi mia tano",
+            "Shilingi mia nane"
+          ],
+          "answer": "Shilingi mia tano"
+        },
+        {
+          "id": "onion-quantity",
+          "question": "Mnunuzi anataka vitunguu vingapi?",
+          "choices": [
+            "Kimoja",
+            "Viwili",
+            "Vitatu"
+          ],
+          "answer": "Vitatu"
+        },
+        {
+          "id": "bananas",
+          "question": "Kwa nini mnunuzi hapati ndizi mbivu?",
+          "choices": [
+            "Ndizi zimeisha",
+            "Ndizi ni ghali",
+            "Ndizi hazijaiva"
+          ],
+          "answer": "Ndizi zimeisha"
+        },
+        {
+          "id": "total",
+          "question": "Jumla ni shilingi ngapi?",
+          "choices": [
+            "Shilingi mia tano",
+            "Shilingi mia nane",
+            "Shilingi elfu moja"
+          ],
+          "answer": "Shilingi mia nane"
         }
       ]
     }

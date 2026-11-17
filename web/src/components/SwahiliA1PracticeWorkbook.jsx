@@ -114,7 +114,12 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
         </>}
         {activeTab === "lesen" && <>
           <h2>Teil 3 · Kusoma (Reading)</h2>
-          <p className="swahili-book__tile" lang="sw">{lesson.reading.text}</p>
+          <div className="swahili-book__tile" lang="sw">
+            {lesson.reading.title && <h3>{lesson.reading.title}</h3>}
+            {lesson.reading.text.split("\n\n").map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </div>
           <div className="swahili-book__form">
             {lesson.reading.questions.map(({ question }, index) => (
               <label key={question}>{index + 1}. {question}
