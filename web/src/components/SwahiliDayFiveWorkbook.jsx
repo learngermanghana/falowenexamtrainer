@@ -13,6 +13,7 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useSwahiliWorkbookTab(tabs);
   const [writing, setWriting] = useState("");
+  const [readingAnswers, setReadingAnswers] = useState({});
   const [listeningAnswers, setListeningAnswers] = useState({});
   const [radioGaps, setRadioGaps] = useState({});
   const [radioChoices, setRadioChoices] = useState({});
@@ -107,10 +108,12 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
         {activeTab === "submit" && <>
           <h2>Wasilisha · Submit</h2>
           <p>Day 5 is practice only. Review your work and suggested answers here; nothing is sent to a tutor.</p>
+          <details className="swahili-book__tile"><summary>Review model writing</summary><p>{FAMILY_WRITING_MODEL}</p>{writing && <p><strong>Your answer:</strong> {writing}</p>}</details>
+          <details className="swahili-book__tile"><summary>Review reading answers</summary><ol>{FAMILY_READING.questions.map(({ question, answer }) => <li key={question}><strong>{question}</strong>{readingAnswers[question] && <div>Your answer: {readingAnswers[question]}</div>}<div>Suggested answer: {answer}</div></li>)}</ol></details>
           <div className="swahili-book__row">
-            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("schreiben")}>Review writing</button>
-            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("lesen")}>Review reading</button>
-            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("hoeren")}>Review listening</button>
+            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("schreiben")}>Edit writing</button>
+            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("lesen")}>Edit reading</button>
+            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("hoeren")}>Edit listening</button>
           </div>
         </>}
         {activeTab === "hoeren" && <>
