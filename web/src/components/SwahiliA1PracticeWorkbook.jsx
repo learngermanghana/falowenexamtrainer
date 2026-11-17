@@ -111,6 +111,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
           <label className="swahili-book__form" htmlFor={writingId}>Your practice answer
             <textarea id={writingId} rows={5} value={writing} onChange={(event) => setWriting(event.target.value)} />
           </label>
+          <p className="swahili-book__note">When you finish, open Receive &amp; Submit to review your work.</p>
         </>}
         {activeTab === "lesen" && <>
           <h2>Teil 3 · Kusoma (Reading)</h2>
@@ -157,7 +158,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
               ))}
             </div>
             <button type="button" className="swahili-book__button swahili-book__button--soft" onClick={() => selectTab("submit")}>
-              Receive & submit your work
+              Receive &amp; Submit · Review your answers
             </button>
           </> : <p>The listening recording and questions will appear here after upload.</p>}
         </>}
