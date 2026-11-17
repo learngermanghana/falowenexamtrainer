@@ -12,65 +12,63 @@ const sliceBetween = (start, end) => {
   return workbook.slice(first, last);
 };
 
-describe("A1 Day 13 focused self-practice", () => {
-  test("has exactly eleven revision questions across numbers, days/time and prices", () => {
-    const counts = [
-      ["const numberReviewItems = [", "const daysReviewItems = [", 4],
-      ["const daysReviewItems = [", "const timeReviewItems = [", 2],
-      ["const timeReviewItems = [", "const priceReviewItems = [", 2],
-      ["const priceReviewItems = [", "const priceVerbReviewItems = [", 2],
-      ["const priceVerbReviewItems = [", "const groupTaskChecklist = [", 1],
-    ];
-    let total = 0;
-    counts.forEach(([begin, end, expected]) => {
-      const block = sliceBetween(begin, end);
-      const actual = (block.match(/(?:\{\s*id:|\{\s*prompt:)/g) || []).length;
-      expect(actual).toBe(expected);
-      total += actual;
-    });
-    expect(total).toBe(11);
+describe("A1 Day 13 focused sentence and question practice", () => {
+  test("removes the old revision quizzes and keeps the concise lesson", () => {
+    expect(workbook).not.toContain("const numberReviewItems = [");
+    expect(workbook).not.toContain("const daysReviewItems = [");
+    expect(workbook).not.toContain("const timeReviewItems = [");
+    expect(workbook).not.toContain("const priceReviewItems = [");
     expect(workbook).not.toContain("const yearPracticeItems =");
-    expect(workbook).not.toContain("const birthdayMcqItems =");
+    expect(workbook).not.toContain('data-a1-day13-section="numbers"');
+    expect(workbook).toContain("3 sentence patterns · 6 word builders · 2 responses · short writing task");
   });
 
-  test("teaches subject-first and time-first verb-second statements", () => {
-    expect(workbook).toContain("4. Satzbildung");
-    expect(workbook).toContain("conjugated verb stays in position 2");
-    expect(workbook).toContain("Ich <strong");
-    expect(workbook).toContain("Am Montag <strong");
-    expect(workbook).toContain("Um acht Uhr <strong>");
+  test("teaches three distinct German sentence patterns", () => {
+    expect(workbook).toContain('data-a1-day13-section="question-formation"');
+    expect(workbook).toContain('title="Statement · Aussagesatz"');
+    expect(workbook).toContain('title="W-question · W-Frage"');
+    expect(workbook).toContain('title="Yes/no question · Ja/Nein-Frage"');
+    expect(workbook).toContain("The conjugated verb stays in position 2.");
+    expect(workbook).toContain("Start with the conjugated verb.");
   });
 
-  test("keeps existing class-discussion collection and save mechanism", () => {
+  test("provides six sentence builders and two response questions", () => {
+    const builders = sliceBetween("const sentenceBuilderTasks = [", "const responsePracticeTasks = [");
+    expect((builders.match(/\{type:"/g) || []).length).toBe(6);
+    expect((builders.match(/type:"Statement"/g) || []).length).toBe(3);
+    expect((builders.match(/type:"W-question"/g) || []).length).toBe(2);
+    expect((builders.match(/type:"Yes\/no question"/g) || []).length).toBe(1);
+    const responses = sliceBetween("const responsePracticeTasks = [", "const grammarStrip =");
+    expect((responses.match(/\{question:"/g) || []).length).toBe(2);
+    expect(workbook).toContain('data-a1-day13-section="sentence-builder"');
+    expect(workbook).toContain('data-a1-day13-section="response-practice"');
+  });
+
+  test("keeps existing class discussion and the shorter original-writing task", () => {
     expect(workbook).toContain('"group_discussion"');
     expect(workbook).toContain('const LESSON_ID = "a1-day-13-revision-numbers-time-prices-statements"');
-    expect(workbook).toContain('function StatementContributionSection()');
+    expect(workbook).toContain("function StatementContributionSection()");
     expect(workbook).toContain("await setDoc(");
     expect(workbook).toContain("onSnapshot(");
     expect(workbook).toContain("Save to class discussion");
-    expect(workbook).toContain("Write four original German sentences");
+    expect(workbook).toContain("Write two original statements about time or prices.");
+    expect(workbook).toContain("Write two W-questions (Wann or Wie viel).");
+    expect(workbook).toContain("Write one yes/no question beginning with the verb.");
+    expect(workbook).not.toContain("Write four original German sentences");
   });
 
-  test("never runs the retired Day 13 source-rewriting patch during startup, build or test", () => {
+  test("never runs the retired Day 13 source-rewriting patch", () => {
     const lifecycle = fs.readFileSync(path.resolve(process.cwd(), "..", "scripts", "patchA1TutorNavigationSelfPracticeSafety.mjs"), "utf8");
     const obsoletePatch = path.resolve(process.cwd(), "..", "scripts", "patchA1Day13RevisionClarity.mjs");
     expect(lifecycle).not.toContain('import("./patchA1Day13RevisionClarity.mjs")');
     expect(fs.existsSync(obsoletePatch)).toBe(false);
-    // These current question sets and sentence task belong to the authored
-    // workbook; build-time patching must not attempt legacy seven-sentence edits.
-    expect(workbook).toContain("const timeReviewItems = [");
-    expect(workbook).toContain('id:"t730"');
-    expect(workbook).toContain('id:"t545"');
-    expect(workbook).toContain("Write four original German sentences");
   });
 
-  test("retains the existing A1 tab layout and avoids tutor-marked assignments", () => {
+  test("retains the A1 self-practice tab and avoids tutor-marked assignments", () => {
     expect(app).toContain('withA1PracticeBook(13, "3.5"');
-    expect(app).toContain("Check numbers, days, time and prices, then learn to form German statements.");
     expect(workbook).not.toContain("A1TutorMarkedWorkbookShell");
-    expect(workbook).toContain('data-a1-day13-section="numbers"');
-    expect(workbook).toContain('data-a1-day13-section="days-time"');
-    expect(workbook).toContain('data-a1-day13-section="prices"');
-    expect(workbook).toContain('data-a1-day13-section="statement-formation"');
+    expect(workbook).toContain("<SentenceBuilderSection/>");
+    expect(workbook).toContain("<ResponsePracticeSection/>");
+    expect(workbook).toContain("<StatementContributionSection/>");
   });
 });
