@@ -4,7 +4,7 @@ import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GrammarSelfCheck } from "./MgahawaniGrammarPractice";
-import { SWAHILI_DAY_FIVE as lesson, FAMILY_GRAMMAR, FAMILY_LISTENING, FAMILY_READING, FAMILY_WRITING_MODEL } from "../data/swahili/dayFive";
+import { SWAHILI_DAY_FIVE as lesson, FAMILY_GRAMMAR, FAMILY_LISTENING, FAMILY_RADIO_GAPS, FAMILY_RADIO_CHOICES, FAMILY_RADIO_WRITING_TOPICS, FAMILY_READING, FAMILY_WRITING_MODEL } from "../data/swahili/dayFive";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR as tabs, WorkbookTabNav } from "./StandardWorkbookComponents";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import "./SwahiliCourseBook.css";
@@ -14,6 +14,8 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
   const [activeTab, setActiveTab] = useSwahiliWorkbookTab(tabs);
   const [writing, setWriting] = useState("");
   const [listeningAnswers, setListeningAnswers] = useState({});
+  const [radioGaps, setRadioGaps] = useState({});
+  const [radioChoices, setRadioChoices] = useState({});
   const [audio, setAudio] = useState({ url: "", loading: false, error: "" });
 
   async function loadListeningAudio() {
@@ -85,11 +87,13 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
         </>}
         {activeTab === "schreiben" && <>
           <h2>Teil 2 · Kuandika (Writing)</h2>
-          <p>Introduce three family members in 5–7 short sentences. Give each person’s name and say what one person does or likes to do. You can use fictional names.</p>
-          <p>Start with <strong>Huyu ni …</strong> and <strong>Anaitwa …</strong>. Add a sentence with <strong>anapenda …</strong> or <strong>yeye ni …</strong>.</p>
+          <p><strong>9. Andika kuhusu familia yako kwa sentensi zisizopungua saba.</strong> Write at least seven sentences about your family.</p>
+          <p>Unaweza kujumuisha · You can include:</p>
+          <ul>{FAMILY_RADIO_WRITING_TOPICS.map(topic => <li key={topic}>{topic}</li>)}</ul>
+          <p>Start with <strong>Familia yangu ni …</strong> or <strong>Katika familia yangu kuna …</strong>. You may use fictional details.</p>
           <p>Your practice answer stays on this page until you reload or leave the lesson.</p>
           <label className="swahili-book__form" htmlFor="family-writing">Your practice answer
-            <textarea id="family-writing" rows={5} value={writing} onChange={(event) => setWriting(event.target.value)} />
+            <textarea id="family-writing" rows={9} value={writing} onChange={(event) => setWriting(event.target.value)} />
           </label>
           <details><summary>Show model answer</summary><p>{FAMILY_WRITING_MODEL}</p></details>
         </>}
@@ -104,7 +108,7 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
         </>}
         {activeTab === "submit" && <>
           <h2>Wasilisha · Submit</h2>
-          <p>Day 5 is practice only. Compare your work with the model answers in Teil 2, Teil 3 and Teil 4.</p>
+          <p>Day 5 is practice only. Compare your seven-sentence writing and Falowen Radio answers with the model and answer keys in Teil 2, Teil 3 and Teil 4.</p>
           <div className="swahili-book__row">
             <button type="button" className="swahili-book__button" onClick={() => setActiveTab("schreiben")}>Review writing</button>
             <button type="button" className="swahili-book__button" onClick={() => setActiveTab("lesen")}>Review reading</button>
@@ -113,7 +117,55 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
         </>}
         {activeTab === "hoeren" && <>
           <h2>Teil 4 · Kusikiliza (Listening)</h2>
-          <p>Sikiliza sauti mara mbili, kisha chagua jibu sahihi. Listen twice, then choose one answer per question.</p>
+          <h3>Falowen Radio · Familia Yangu</h3>
+          <p>Sikiliza kipindi hiki mara mbili. Listen to the Falowen Radio episode, then complete A and B.</p>
+          <a href={`https://youtu.be/${lesson.radio.youtubeId}`} target="_blank" rel="noreferrer">
+            Play Familia Yangu on YouTube
+          </a>
+          <h3>A. Jaza nafasi · Fill in the blanks</h3>
+          <div className="swahili-book__quiz" lang="sw">
+            {FAMILY_RADIO_GAPS.map(({ id, question }, index) => (
+              <fieldset className="swahili-book__exercise" key={id}>
+                <legend>{index + 1}. {question}</legend>
+                <input
+                  aria-label={`Answer for question ${index + 1}`}
+                  type="text"
+                  autoComplete="off"
+                  value={radioGaps[id] || ""}
+                  onChange={event => setRadioGaps(current => ({ ...current, [id]: event.target.value }))}
+                />
+              </fieldset>
+            ))}
+          </div>
+          <h3>B. Chagua jibu sahihi · Multiple choice</h3>
+          <div className="swahili-book__quiz" lang="sw">
+            {FAMILY_RADIO_CHOICES.map(({ id, question, choices }, index) => (
+              <fieldset className="swahili-book__exercise" key={id}>
+                <legend>{index + 5}. {question}</legend>
+                <div className="swahili-book__choices">
+                  {choices.map((choice, optionIndex) => (
+                    <label className="swahili-book__choice" key={choice}>
+                      <input type="radio" name={`family-radio-${id}`} value={choice}
+                        checked={radioChoices[id] === choice}
+                        onChange={() => setRadioChoices(current => ({ ...current, [id]: choice }))} />
+                      {String.fromCharCode(97 + optionIndex)}) {choice}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))}
+          </div>
+          <details className="swahili-book__tile">
+            <summary>Majibu ya Falowen Radio · Show answer key</summary>
+            <ol lang="sw">
+              {FAMILY_RADIO_GAPS.map(({ id, answer }) => <li key={id}>{answer}</li>)}
+              {FAMILY_RADIO_CHOICES.map(({ id, answer, choices }) => (
+                <li key={id}>{String.fromCharCode(97 + choices.indexOf(answer))}) {answer}</li>
+              ))}
+            </ol>
+          </details>
+          <h3>Mazungumzo yaliyorekodiwa · Additional listening practice</h3>
+          <p>For the separate Day 5 recorded conversation, listen twice and select one answer per question.</p>
           <button type="button" className="swahili-book__button swahili-book__button--soft"
             onClick={loadListeningAudio} disabled={audio.loading}>
             {audio.loading ? "Inapakia sauti…" : audio.url ? "Pakia sauti tena · Refresh audio" : "Sikiliza sauti · Load audio"}
@@ -138,7 +190,7 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
             ))}
           </div>
           <details className="swahili-book__tile">
-            <summary>Show listening answer sheet</summary>
+            <summary>Show recorded conversation answer sheet</summary>
             <ol lang="sw">
               {FAMILY_LISTENING.map(({ id, answer }) => (
                 <li key={id}>{answer}</li>
