@@ -7,7 +7,7 @@ import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkb
 import "./SwahiliCourseBook.css";
 
 const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.map((tab) =>
-  tab.key === "submit" ? { ...tab, label: "Answer Sheet", description: "Model answers" } : tab);
+  tab.key === "submit" ? { ...tab, label: "Receive & Submit", description: "Review and submit your work" } : tab);
 
 export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
   const { user } = useAuth();
@@ -111,6 +111,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
           <label className="swahili-book__form" htmlFor={writingId}>Your practice answer
             <textarea id={writingId} rows={5} value={writing} onChange={(event) => setWriting(event.target.value)} />
           </label>
+          <p className="swahili-book__note">When you finish, open Receive &amp; Submit to review your work.</p>
         </>}
         {activeTab === "lesen" && <>
           <h2>Teil 3 · Kusoma (Reading)</h2>
@@ -157,36 +158,36 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
               ))}
             </div>
             <button type="button" className="swahili-book__button swahili-book__button--soft" onClick={() => selectTab("submit")}>
-              Open answer sheet
+              Receive &amp; Submit · Review your answers
             </button>
           </> : <p>The listening recording and questions will appear here after upload.</p>}
         </>}
         {activeTab === "submit" && <>
-          <h2>Answer Sheet · Majibu</h2>
-          <p>Compare your practice with the model answers. Answers entered here stay on this page until you reload or leave the chapter.</p>
+          <h2>Receive &amp; Submit · Wasilisha</h2>
+          <p>Your completed work is collected here for review. This lesson is practice-only, so it is not sent to a tutor or saved as a marked assignment.</p>
           <details className="swahili-book__tile">
-            <summary>Teil 2 · Model writing</summary>
+            <summary>Teil 2 · Review your writing</summary>
             <p>{lesson.writing.prompt}</p>
             {writing.trim() && <p><strong>Your answer:</strong> {writing}</p>}
             <p><strong>Model answer:</strong> {lesson.writing.model}</p>
           </details>
           <details className="swahili-book__tile">
-            <summary>Teil 3 · Reading answers</summary>
+            <summary>Teil 3 · Review your reading</summary>
             <ol>{lesson.reading.questions.map(({ question, answer }) => (
               <li key={question}>
                 <strong>{question}</strong>
                 {reading[question]?.trim() && <div>Your answer: {reading[question]}</div>}
-                <div>Model answer: {answer}</div>
+                <div>Suggested answer: {answer}</div>
               </li>
             ))}</ol>
           </details>
           {listening && <details className="swahili-book__tile">
-            <summary>Teil 4 · Listening answers</summary>
+            <summary>Teil 4 · Review your listening</summary>
             <ol lang="sw">{listening.questions.map(({ id, question, answer }) => (
               <li key={id}>
                 <strong>{question}</strong>
                 {listeningAnswers[id] && <div>Your answer: {listeningAnswers[id]}</div>}
-                <div>Model answer: {answer}</div>
+                <div>Suggested answer: {answer}</div>
               </li>
             ))}</ol>
           </details>}

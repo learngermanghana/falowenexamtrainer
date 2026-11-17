@@ -13,6 +13,7 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useSwahiliWorkbookTab(tabs);
   const [writing, setWriting] = useState("");
+  const [readingAnswers, setReadingAnswers] = useState({});
   const [listeningAnswers, setListeningAnswers] = useState({});
   const [radioGaps, setRadioGaps] = useState({});
   const [radioChoices, setRadioChoices] = useState({});
@@ -95,24 +96,24 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
           <label className="swahili-book__form" htmlFor="family-writing">Your practice answer
             <textarea id="family-writing" rows={9} value={writing} onChange={(event) => setWriting(event.target.value)} />
           </label>
-          <details><summary>Show model answer</summary><p>{FAMILY_WRITING_MODEL}</p></details>
+          
         </>}
         {activeTab === "lesen" && <>
           <h2>Teil 3 · Kusoma (Reading)</h2>
-          <p>Read about Asha’s family. Find the sentence that supports each answer before checking the answer sheet.</p>
+          <p>Read about Asha’s family. Record your answers, then review them in Receive & Submit.</p>
           <p className="swahili-book__tile">{FAMILY_READING.text}</p>
           <ol>{FAMILY_READING.questions.map(({ question }) => <li key={question}>{question}</li>)}</ol>
-          <details><summary>Show reading answer sheet</summary>
-            <ol>{FAMILY_READING.questions.map(({ question, answer }) => <li key={question}>{answer}</li>)}</ol>
-          </details>
+          
         </>}
         {activeTab === "submit" && <>
           <h2>Wasilisha · Submit</h2>
-          <p>Day 5 is practice only. Compare your seven-sentence writing and Falowen Radio answers with the model and answer keys in Teil 2, Teil 3 and Teil 4.</p>
+          <p>Day 5 is practice only. Review your work and suggested answers here; nothing is sent to a tutor.</p>
+          <details className="swahili-book__tile"><summary>Review model writing</summary><p>{FAMILY_WRITING_MODEL}</p>{writing && <p><strong>Your answer:</strong> {writing}</p>}</details>
+          <details className="swahili-book__tile"><summary>Review reading answers</summary><ol>{FAMILY_READING.questions.map(({ question, answer }) => <li key={question}><strong>{question}</strong>{readingAnswers[question] && <div>Your answer: {readingAnswers[question]}</div>}<div>Suggested answer: {answer}</div></li>)}</ol></details>
           <div className="swahili-book__row">
-            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("schreiben")}>Review writing</button>
-            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("lesen")}>Review reading</button>
-            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("hoeren")}>Review listening</button>
+            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("schreiben")}>Edit writing</button>
+            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("lesen")}>Edit reading</button>
+            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("hoeren")}>Edit listening</button>
           </div>
         </>}
         {activeTab === "hoeren" && <>
@@ -156,7 +157,7 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
             ))}
           </div>
           <details className="swahili-book__tile">
-            <summary>Majibu ya Falowen Radio · Show answer key</summary>
+            <summary>Receive &amp; Submit · Review Falowen Radio answers</summary>
             <ol lang="sw">
               {FAMILY_RADIO_GAPS.map(({ id, answer }) => <li key={id}>{answer}</li>)}
               {FAMILY_RADIO_CHOICES.map(({ id, answer, choices }) => (
@@ -190,7 +191,7 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
             ))}
           </div>
           <details className="swahili-book__tile">
-            <summary>Show recorded conversation answer sheet</summary>
+            <summary>Receive &amp; Submit · Review listening answers</summary>
             <ol lang="sw">
               {FAMILY_LISTENING.map(({ id, answer }) => (
                 <li key={id}>{answer}</li>

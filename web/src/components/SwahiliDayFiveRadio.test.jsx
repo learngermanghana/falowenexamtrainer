@@ -31,7 +31,8 @@ test("Day 5 workbook mirrors the Radio questions but keeps other recorded listen
   fireEvent.change(screen.getByRole("textbox", { name: "Answer for question 1" }), { target: { value: "wazazi" } });
   expect(screen.getByRole("textbox", { name: "Answer for question 1" }).value).toBe("wazazi");
   expect(screen.getByText(/Additional listening practice/)).toBeVisible();
-  expect(screen.getByText("Majibu ya Falowen Radio · Show answer key")).toBeVisible();
+  fireEvent.click(screen.getByRole("tab", { name: /Submit/ }));
+  expect(screen.getByText("Receive & Submit · Review Falowen Radio answers")).toBeVisible();
   expect(screen.getAllByRole("radio")).toHaveLength(27);
 });
 
@@ -44,6 +45,7 @@ test("Day 5 writing requests at least seven sentences with the supplied model hi
   expect(screen.getByText(/sentensi zisizopungua saba/)).toBeVisible();
   expect(screen.getByText(/Idadi ya watu katika familia yako/)).toBeVisible();
   expect(screen.queryByText(/Tunapenda kupika na kula pamoja/)).toBeNull();
-  fireEvent.click(screen.getByText("Show model answer"));
+  fireEvent.click(screen.getByRole("tab", { name: /Submit/ }));
+  fireEvent.click(screen.getByText("Review model writing"));
   expect(screen.getByText(/Tunapenda kupika na kula pamoja/)).toBeVisible();
 });
