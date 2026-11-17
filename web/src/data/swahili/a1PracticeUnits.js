@@ -484,45 +484,101 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 10,
     "chapter": "Somo la 10",
     "title": "Sokoni",
-    "objective": "Buy produce by weight, bargain politely and confirm the total at a market stall.",
-    "grammar": "Prices per kilo, quantity agreement and bargaining",
+    "objective": "Buy fruits and vegetables at a market, read prices up to 10,000 shillings and bargain politely.",
+    "grammar": "Numbers, Ji-/Ma- nouns and polite requests",
     "practiceOnly": true,
     "grammarSections": [
       {
-        "title": "Bei kwa kilo · Price per kilo",
-        "rule": "Use Kilo moja ya … ni bei gani? to ask the price per kilo. Use nusu kilo ya … to request half a kilo.",
+        "title": "Namba 100–10,000",
+        "rule": "Use mia for hundreds and elfu for thousands. Join the parts of the amount with na.",
         "examples": [
           {
-            "swahili": "Kilo moja ya nyanya ni bei gani?",
-            "english": "How much is one kilo of tomatoes?"
+            "swahili": "mia moja · mia tano · elfu moja · elfu kumi",
+            "english": "100 · 500 · 1,000 · 10,000"
           },
           {
-            "swahili": "Naomba nusu kilo ya nyanya.",
-            "english": "I'd like half a kilo of tomatoes."
+            "swahili": "shilingi elfu tatu na mia tatu na hamsini",
+            "english": "3,350 shillings"
+          },
+          {
+            "swahili": "shilingi elfu tatu na mia mbili",
+            "english": "3,200 shillings"
           }
         ]
       },
       {
-        "title": "Idadi · Counting produce",
-        "rule": "Countable ma-class plurals use forms such as mawili and matatu. Ndizi uses mbili or tatu. The question word also agrees: mayai mangapi? and ndizi ngapi?",
+        "title": "Ngeli ya Ji-/Ma- · Noun agreement",
+        "rule": "Many singular nouns have no visible ji- prefix. The plural usually starts with ma-. In the present tense, use li- with a singular subject and ya- with a plural subject.",
         "examples": [
           {
-            "swahili": "Naomba mayai mawili na ndizi tatu.",
-            "english": "I'd like two eggs and three bananas."
+            "swahili": "Chungwa kubwa linagharimu shilingi hamsini.",
+            "english": "A large orange costs 50 shillings."
+          },
+          {
+            "swahili": "Machungwa makubwa yanagharimu shilingi hamsini kila moja.",
+            "english": "Large oranges cost 50 shillings each."
+          },
+          {
+            "swahili": "soko → masoko · parachichi → maparachichi · limau → malimau",
+            "english": "market(s) · avocado(s) · lemon(s)"
           }
         ]
       },
       {
-        "title": "Kupatana bei · Agreeing on a price",
-        "rule": "Use unaweza kupunguza bei? to ask politely for a lower price. Use jumla ni shilingi ngapi? to confirm the total.",
+        "title": "Vipimo na idadi · Units and quantities",
+        "rule": "Use quantities that fit the product. Match agreeing numbers to the noun: fungu moja, mafungu mawili, mafungu manne. Kilo uses moja. With a ki-class measure, use kichane kimoja cha ….",
         "examples": [
           {
-            "swahili": "Unaweza kupunguza bei kidogo, tafadhali?",
-            "english": "Could you lower the price a little, please?"
+            "swahili": "mafungu manne ya mchicha",
+            "english": "four bundles of mchicha (amaranth greens)"
+          },
+          {
+            "swahili": "kilo moja ya karoti",
+            "english": "one kilo of carrots"
+          },
+          {
+            "swahili": "kichane kimoja cha ndizi",
+            "english": "one bunch of bananas"
+          }
+        ]
+      },
+      {
+        "title": "Kuna, pana, mna · Talking about what is there",
+        "rule": "Use kuna for general presence, pana for presence at a particular spot, and locative mna for presence inside. In a direct question to sellers, Mna …? can also mean ‘Do you have …?’",
+        "examples": [
+          {
+            "swahili": "Sokoni kuna matunda na mboga.",
+            "english": "There are fruits and vegetables at the market."
+          },
+          {
+            "swahili": "Hapa pana machungwa.",
+            "english": "There are oranges here at this spot."
+          },
+          {
+            "swahili": "Kikapuni mna malimau.",
+            "english": "There are lemons inside the basket."
+          },
+          {
+            "swahili": "Mna maparachichi?",
+            "english": "Do you have avocados?"
+          }
+        ]
+      },
+      {
+        "title": "Kuomba na kupatana bei · Requesting and bargaining",
+        "rule": "Use naomba for a polite request. Ask the unit price or total, then use tafadhali to soften a request for a lower price.",
+        "examples": [
+          {
+            "swahili": "Naomba maparachichi manane, tafadhali.",
+            "english": "I’d like eight avocados, please."
           },
           {
             "swahili": "Jumla ni shilingi ngapi?",
             "english": "How much is the total?"
+          },
+          {
+            "swahili": "Ni ghali sana. Unaweza kupunguza bei kidogo, tafadhali?",
+            "english": "It’s very expensive. Could you lower the price a little, please?"
           }
         ]
       }
@@ -555,6 +611,46 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       {
         "sw": "punguzo",
         "en": "discount"
+      },
+      {
+        "sw": "muuzaji",
+        "en": "seller"
+      },
+      {
+        "sw": "mnunuzi",
+        "en": "buyer"
+      },
+      {
+        "sw": "chungwa",
+        "en": "orange"
+      },
+      {
+        "sw": "parachichi",
+        "en": "avocado"
+      },
+      {
+        "sw": "limau",
+        "en": "lemon"
+      },
+      {
+        "sw": "mchicha",
+        "en": "amaranth greens"
+      },
+      {
+        "sw": "fungu",
+        "en": "bundle"
+      },
+      {
+        "sw": "kichane",
+        "en": "bunch"
+      },
+      {
+        "sw": "karoti",
+        "en": "carrot"
+      },
+      {
+        "sw": "jumla",
+        "en": "total"
       }
     ],
     "check": {
@@ -567,25 +663,25 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "answer": 1,
       "why": "Kupunguza bei means to lower the price."
     },
-    "speaking": "At a market stall, tomatoes are 4,000 shillings per kilo and bananas are 500 shillings each. The buyer asks for half a kilo of tomatoes and two bananas, asks for a better price and confirms the total. Swap roles and change the produce.",
+    "speaking": "Role-play a buyer and a seller. Ask what the stall has, order produce by number, bundle or kilo, ask the total, and agree on a lower price. Use the dialogue in Reading as a model and swap roles.",
     "writing": {
-      "prompt": "Write a dialogue asking the price per kilo of tomatoes, ordering half a kilo and two bananas, and asking the seller for a discount.",
-      "model": "Mteja: Kilo moja ya nyanya ni bei gani? Muuzaji: Shilingi elfu nne. Mteja: Naomba nusu kilo ya nyanya na ndizi mbili. Unaweza kupunguza bei kidogo? Muuzaji: Sawa, jumla ni shilingi elfu mbili na mia tano."
+      "prompt": "Write a short market dialogue. Ask if the seller has avocados, request eight avocados and a bunch of bananas, ask for the total and bargain politely.",
+      "model": "Mnunuzi: Mna maparachichi? Muuzaji: Ndiyo. Mnunuzi: Naomba maparachichi manane na kichane kimoja cha ndizi. Jumla ni shilingi ngapi? Muuzaji: Shilingi elfu moja na mia saba. Mnunuzi: Unaweza kupunguza bei kidogo, tafadhali? Muuzaji: Sawa, lipa shilingi elfu moja na mia sita."
     },
     "reading": {
-      "text": "Asha ananunua nyanya na ndizi sokoni. Kilo moja ya nyanya ni shilingi elfu nne. Asha anaomba nusu kilo ya nyanya na ndizi mbili. Ndizi mbili ni shilingi elfu moja. Muuzaji anasema jumla ni shilingi elfu tatu. Asha anaomba punguzo. Muuzaji anasema, “Sawa, ni shilingi elfu mbili na mia tano.”",
+      "text": "Muuzaji: Habari za leo? Karibu. Nikusaidie nini? Mnunuzi: Naomba machungwa makubwa ishirini, maparachichi manane, malimau matano, mafungu manne ya mchicha, mafungu mawili madogo ya vitunguu, kilo moja ya karoti na kichane kimoja cha ndizi. Mnunuzi: Jumla ni shilingi ngapi? Muuzaji: Jumla ni shilingi elfu tatu na mia tatu na hamsini. Mnunuzi: Ni ghali sana. Unaweza kupunguza bei kidogo, tafadhali? Muuzaji: Sawa. Nitapunguza shilingi mia moja na hamsini. Lipa shilingi elfu tatu na mia mbili. Mnunuzi: Asante sana. Muuzaji: Karibu tena.",
       "questions": [
         {
-          "question": "Asha anaomba nyanya kiasi gani?",
-          "answer": "Nusu kilo."
+          "question": "Mnunuzi anataka maparachichi mangapi?",
+          "answer": "Maparachichi manane."
         },
         {
-          "question": "Asha ananunua ndizi ngapi?",
-          "answer": "Ndizi mbili."
+          "question": "Jumla ilikuwa shilingi ngapi kabla ya punguzo?",
+          "answer": "Shilingi elfu tatu na mia tatu na hamsini (3,350)."
         },
         {
-          "question": "Asha analipa shilingi ngapi baada ya punguzo?",
-          "answer": "Shilingi elfu mbili na mia tano."
+          "question": "Mnunuzi analipa shilingi ngapi baada ya punguzo?",
+          "answer": "Shilingi elfu tatu na mia mbili (3,200)."
         }
       ]
     }
