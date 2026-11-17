@@ -72,13 +72,12 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(setDoc).not.toHaveBeenCalled();
   });
 
-  it("lists Sokoni and Dukani immediately after Mgahawani", () => {
+  it("lists all 20 lessons in order, including the updated practice lessons", () => {
     render(<MemoryRouter><SwahiliCourseBook preview /></MemoryRouter>);
     const links = screen.getAllByRole("link", { name: /Fungua Somo la/ });
-    expect(links).toHaveLength(17);
+    expect(links).toHaveLength(20);
     const paths = links.map(link => link.getAttribute("href"));
-    expect(paths.slice(5, 8)).toEqual(["/swahili/day-6", "/swahili/day-10", "/swahili/day-11"]);
-    for (const day of [7, 8, 9]) expect(paths).not.toContain("/swahili/day-" + day);
+    expect(paths.slice(5, 11)).toEqual([6, 7, 8, 9, 10, 11].map(day => `/swahili/day-${day}`));
     expect(screen.getByRole("heading", { name: "Sokoni" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Dukani" })).toBeTruthy();
     expect(screen.getByText("Salamu")).toBeTruthy();
@@ -359,7 +358,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     const feedback = screen.getByRole("link", { name: "View feedback and resubmit" });
     expect(feedback.getAttribute("href")).toBe("/campus/course/swahili/day-1?view=submit");
     fireEvent.click(screen.getByRole("button", { name: "Needs revision" }));
-    expect(screen.getByText("1 shown from 17 A1 units · 17 available")).toBeTruthy();
+    expect(screen.getByText("1 shown from 20 A1 units · 20 available")).toBeTruthy();
     expect(screen.queryByRole("link", { name: "Fungua Somo la 6" })).toBeNull();
     const paths = getDoc.mock.calls.map((call) => call[0]);
     expect(paths).toEqual(expect.arrayContaining([
