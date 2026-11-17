@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { db, doc, getDoc } from "../firebase";
 import { SWAHILI_A1_CURRICULUM, SWAHILI_A1_PUBLISHED_LESSONS, SWAHILI_A1_ASSIGNMENTS } from "../data/swahili/a1Curriculum";
@@ -34,7 +34,6 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
   const [progress, setProgress] = useState(null);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const submitDialog = useRef(null);
 
   useEffect(() => {
     if (!showA1 || preview || !uid || !db) return undefined;
@@ -121,7 +120,6 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
     ? "Review lessons" : "Continue learning";
   const lessonPath = ({ day }) => `${basePath}/day-${day}`;
   const submitPath = (lesson) => `${lessonPath(lesson)}?view=submit`;
-  const showSubmit = () => submitDialog.current?.showModal?.();
   const query = search.trim().toLowerCase();
   const visible = LESSONS.filter((lesson) => {
     const record = records?.find((entry) => entry.day === lesson.day);
@@ -154,7 +152,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
             {levelSelector}
             {!preview && <Link style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }} to="/">← Back to Campus</Link>}
             <Link className="course-book-continue-button" style={primaryLink} to={lessonPath(next)}>{nextLabel}</Link>
-            <button className="course-book-submit-secondary" type="button" style={{ ...styles.secondaryButton, minHeight: 44 }} aria-haspopup="dialog" onClick={showSubmit}>Review &amp; Submit</button>
+            <Link className="course-book-submit-secondary" style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }} to={submitPath(next)}>Receive &amp; Submit</Link>
           </div>
         </div>
         <div className="course-book-quick-stats" style={book.statGrid}>
@@ -220,7 +218,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
                     <span style={book.chip}>{badge}</span>
                   </div>
                   {published && <div className="course-book-included" style={book.includedRow}>
-                    {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", lesson.day === 5 ? "Model Answers" : lesson.practiceOnly ? "Answer Sheet" : "Review & Submit"].map((label) =>
+                    {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", lesson.day === 5 ? "Practice · Review & Submit" : "Receive & Submit"].map((label) =>
                       <span key={label} style={book.includedChip}>{label}</span>)}
                   </div>}
                   {record?.review === "needs_revision" && (
@@ -248,19 +246,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
         );
       })}
 
-      <dialog className="swahili-submit-dialog" ref={submitDialog} aria-labelledby="swahili-submit-title">
-        <div style={book.submitPanelHeader}>
-          <h3 id="swahili-submit-title">Submit your workbook answers</h3>
-          <button type="button" style={styles.secondaryButton} onClick={() => submitDialog.current.close()}>Close</button>
-        </div>
-        <div style={{ display: "grid", gap: 8 }}>
-          {ASSIGNMENTS.map((lesson) => (
-            <Link key={lesson.day} to={submitPath(lesson)} style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }}>
-              Somo la {lesson.day} · {lesson.title}
-            </Link>
-          ))}
-        </div>
-      </dialog>
+
     </div>
   );
 }
