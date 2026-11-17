@@ -6,6 +6,7 @@ const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 const { registerPublicFxRoutes } = require("./publicFxRates");
+const { registerCourseDiscountRoutes, recordDiscountPayment } = require("./courseDiscounts");
 const { registerMockCommerceRoutes, processMockWebhook } = require("./mockCommerce");
 const { registerBookCommerceRoutes, processBookWebhook } = require("./bookCommerce");
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
@@ -251,6 +252,7 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
 // Exam-only purchases reuse the same Paystack credentials and authenticated backend.
 registerMockCommerceRoutes(app, { admin, getAuthedUser });
 registerBookCommerceRoutes(app, { admin });
+registerCourseDiscountRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling });
 
 // Voice-only test pilot. No payment routes or payment webhook integration.
 registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
@@ -373,6 +375,20 @@ app.post("/paystack/initialize", async (req, res) => {
       },
       { display_name: "Plan after payment", variable_name: "plan_after", value: planAfterPayment },
     ];
+
+    // Serialize the first checkout against an offer being applied to the same account.
+    if (student.uid === authedUser.uid && paidSoFar === 0 && !student.courseCheckoutStartedAt) {
+      const canStart = await admin.firestore().runTransaction(async tx => {
+        const current = (await tx.get(match.ref)).data();
+        if (!current || current.courseDiscount?.id !== student.courseDiscount?.id ||
+            normalizeStudentBilling(current).effectiveBalance !== balanceDue) return false;
+        if (!current.courseCheckoutStartedAt) {
+          tx.set(match.ref, { courseCheckoutStartedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        }
+        return true;
+      });
+      if (!canStart) return res.status(409).json({ error: "Your tuition changed. Refresh and review the new balance." });
+    }
 
     const paystackResponse = await fetch("https://api.paystack.co/transaction/initialize", {
       method: "POST",
@@ -687,7 +703,31 @@ app.post("/paystack/webhook", async (req, res) => {
       updated_at: admin.firestore.FieldValue.serverTimestamp(),
     };
 
-    await match.ref.set(updates, { merge: true });
+    const eventUpdates = {
+        status: "handled",
+        studentId: match.ref.id,
+        studentCode,
+        email,
+        checkoutAmount: checkoutAmountPaid,
+        tuitionAmount: tuitionAmountPaid,
+        studentFeeContribution,
+        falowenFeeContribution: roundMoney(
+          Math.max(paystackFee - studentFeeContribution, 0)
+        ),
+        paystackFee,
+        feePolicy: data?.metadata?.feePolicy || "legacy_merchant_paid",
+        paymentStatus,
+        balanceDue,
+        contractTermMonths: finalMonths,
+        handledAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+    const trackDiscountRedemption = student.courseDiscount && !student.courseDiscount.redeemedAt;
+    if (trackDiscountRedemption) {
+      await recordDiscountPayment({ db, studentRef: match.ref, student, eventRef, eventUpdates,
+        updates, normalizeStudentBilling, timestamp: admin.firestore.FieldValue.serverTimestamp() });
+    } else {
+      await match.ref.set(updates, { merge: true });
+    }
     const sheetStudent = {
       ...student,
       ...updates,
@@ -706,27 +746,7 @@ app.post("/paystack/webhook", async (req, res) => {
       console.warn("Payment succeeded but sheet sync failed", error?.message || error);
     });
 
-    await eventRef.set(
-      {
-        status: "handled",
-        studentId: match.ref.id,
-        studentCode,
-        email,
-        checkoutAmount: checkoutAmountPaid,
-        tuitionAmount: tuitionAmountPaid,
-        studentFeeContribution,
-        falowenFeeContribution: roundMoney(
-          Math.max(paystackFee - studentFeeContribution, 0)
-        ),
-        paystackFee,
-        feePolicy: data?.metadata?.feePolicy || "legacy_merchant_paid",
-        paymentStatus,
-        balanceDue,
-        contractTermMonths: finalMonths,
-        handledAt: admin.firestore.FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
+    if (!trackDiscountRedemption) await eventRef.set(eventUpdates, { merge: true });
 
     return res.json({
       status: "synced",

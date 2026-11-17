@@ -128,3 +128,7 @@ speaking mock slots become Kiswahili speaking practice titles; they do not imply
 Goethe offers a Swahili exam. No German routes, resources, answer keys or scoring
 are copied. This file is not yet connected to Campus; published Kiswahili course
 books remain A1.
+
+### Course discount links
+
+Admin creates offers through the Campus `/api/course-discounts/admin` API. A share link opens signup or sign-in tied to the offer's program and level. A learner's first checkout can allocate one use and save server-calculated GHS tuition. Allocation is transactional and bound to the learner; expiry and revocation stop new allocations. Already allocated offers keep their price for retries. A signed Paystack payment marks the first redemption while normal tuition, balance and contract rules still apply.

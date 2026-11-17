@@ -95,7 +95,7 @@ const staticClassOptions = (now) => Object.keys(classCatalog)
     source: "static",
   }));
 
-const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitationCode = "" }) => {
+const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitationCode = "", courseDiscount = null }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { i18n, t } = useTranslation();
   const fxQuote = useFalowenUsdGhsRate();
@@ -119,7 +119,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   const requestedSignup = useMemo(() => signupQueryContext(), []);
   const universityInvitation = useMemo(() => resolveUniversityInvitation(invitationCode), [invitationCode]);
   const [selectedProgram, setProgram] = useState(initialProgram === "swahili" ? "swahili" : "german");
-  const program = universityInvitation?.program || selectedProgram;
+  const program = universityInvitation?.program || courseDiscount?.program || selectedProgram;
   const isSwahili = program === "swahili";
   const [germanLevel, setSelectedLevel] = useState(
     requestedSignup.level || "A1"
@@ -131,10 +131,10 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [germanPayment, setPaymentOption] = useState("trial");
   const [germanClass, setSelectedClass] = useState(loadPreferredClass() || "");
-  const selectedLevel = universityInvitation?.level || (isSwahili ? "A1" : germanLevel);
+  const selectedLevel = universityInvitation?.level || courseDiscount?.level || (isSwahili ? "A1" : germanLevel);
   const learningMode = isSwahili ? "Online" : germanMode;
   const selectedClass = isSwahili ? "" : germanClass;
-  const paymentOption = isSwahili ? "trial" : germanPayment;
+  const paymentOption = isSwahili || courseDiscount ? "trial" : germanPayment;
   const [publicClasses, setPublicClasses] = useState([]);
   const [publicClassesLoaded, setPublicClassesLoaded] = useState(false);
   const [hasConsented, setHasConsented] = useState(false);
@@ -752,11 +752,12 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
               <small>Registration is linked automatically to your university cohort. Ruth will verify eligibility before learning access is approved. No payment details needed.</small>
             </div>
           ) : null}
+          {courseDiscount && <p style={styles.helperText}>Offer tuition: <strong>{formatMoney(courseDiscount.total)}</strong> ({formatMoney(courseDiscount.discount)} off). Continue to Paystack after creating your account.</p>}
           <label htmlFor="signup-program" style={styles.label}>{t("signup.courseLanguage")}</label>
-          <select id="signup-program" name="program" style={styles.select} value={program} disabled={Boolean(universityInvitation)}
+          <select id="signup-program" name="program" style={styles.select} value={program} disabled={Boolean(universityInvitation || courseDiscount)}
             onChange={(event) => { setProgram(event.target.value); setFieldErrors({}); setAuthError(""); }}>
-            {!universityInvitation && <option value="german">{t("signup.programs.german")}</option>}
-            <option value="swahili">{t("signup.programs.swahili")}</option>
+            {!universityInvitation && courseDiscount?.program !== "swahili" && <option value="german">{t("signup.programs.german")}</option>}
+            {courseDiscount?.program !== "german" && <option value="swahili">{t("signup.programs.swahili")}</option>}
           </select>
           {isSwahili ? (
             universityInvitation ? null : <p style={styles.helperText}>{t("signup.swahiliTrial")}</p>
@@ -765,6 +766,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           <select
             required
             id="signup-selectedLevel"
+            disabled={Boolean(courseDiscount)}
             ref={(element) => {
               fieldRefs.current.selectedLevel = element;
             }}
@@ -906,6 +908,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             {!publicClassesLoaded ? " Loading the latest class list…" : ""}
           </p>
 
+          {!courseDiscount && <>
           <label style={styles.label}>How would you like to start?</label>
           <div
             ref={(element) => {
@@ -985,6 +988,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             title="Tuition summary"
             description={`For ${selectedLevel} tuition is ${formatMoney(tuitionSummary.tuitionFee)}${approximateUsd(tuitionSummary.tuitionFee, fxQuote) ? ` (≈ ${approximateUsd(tuitionSummary.tuitionFee, fxQuote)} USD)` : ""}. You may begin with the 7-day trial or choose immediate Paystack payment above.`}
           />
+          </>}
           </>}
 
           </fieldset>

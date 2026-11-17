@@ -28,7 +28,8 @@ export const getRecommendedTuitionAmount = (studentProfile = {}) => {
   return validIntent ? intent : remainingBalance;
 };
 
-export const initializeOnboardingPaystackCheckout = async ({
+export const startTuitionPaystackCheckout = async ({
+  amount,
   studentProfile = {},
   idToken = "",
   user = null,
@@ -46,7 +47,6 @@ export const initializeOnboardingPaystackCheckout = async ({
   if (!idToken) {
     throw new Error("Your login session is missing. Refresh the page and try again.");
   }
-  const amount = getRecommendedTuitionAmount(studentProfile);
   if (!Number.isFinite(amount) || amount <= 0) {
     throw new Error("Your tuition balance is unavailable. Please open Account & Billing.");
   }
@@ -95,6 +95,9 @@ export const initializeOnboardingPaystackCheckout = async ({
   }
   return checkoutUrl.toString();
 };
+
+export const initializeOnboardingPaystackCheckout = (options = {}) =>
+  startTuitionPaystackCheckout({ ...options, amount: getRecommendedTuitionAmount(options.studentProfile) });
 
 export const redirectToPaystackCheckout = (checkoutUrl) => {
   window.location.assign(checkoutUrl);
