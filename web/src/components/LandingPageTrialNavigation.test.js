@@ -31,7 +31,7 @@ describe("Falowen public landing calls to action", () => {
     expect(landing).toContain('navHelp: "À propos"');
     expect(landing).toContain('footerHelp: "About us"');
     expect(landing).toContain('href="/about-us">{copy.navHelp}');
-    expect(landing).toContain('href="/about-us">{copy.supportLink}');
+    expect(landing).toContain('href="/about-us">{copy.all}');
     expect(landing).toContain('{ href: "/about-us", labelKey: "footerHelp" }');
     expect(app).toContain('location.pathname === "/about-us"');
     expect(app).toContain('return <PublicAdmissionsVisitorGuidePage />;');
