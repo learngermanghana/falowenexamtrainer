@@ -2321,6 +2321,336 @@
       "timingStatus": "estimated",
       "timingMethod": "Waveform-guided approximate line windows for uploaded 158.4-second MP3; teacher listening review required, especially starts and ends",
       "source": "Teacher-supplied replacement A2 Day 1.1 audio and lyric narrative, 2026-11-02"
+    },
+    {
+      "lyrics": "[Intro]\nMazingira, mazingira,\nYanahitaji upendo wetu.\nHatua ndogo kila siku,\nZinaleta mabadiliko.\n[Verse 1]\nNikienda kununua bidhaa,\nNabeba mfuko wa kitambaa.\nBadala ya plastiki mpya,\nNautumia tena na tena.\nNinabeba chupa yangu,\nNinaijaza maji kila siku.\nBila kutupa chupa nyingi,\nNinaweka mazingira safi.\n[Chorus]\nMazingira huanza na mimi,\nMazingira huanza na wewe.\nKwa hatua ndogo kila siku,\nTunaweza kuleta mabadiliko.\nOkoa maji, okoa umeme,\nPunguza taka, panda mti.\nTukifanya kazi pamoja,\nDunia yetu itakuwa safi.\n[Verse 2]\nNikipiga mswaki asubuhi,\nNinafunga bomba la maji.\nNinaoga kwa muda mfupi,\nIli niokoe maji zaidi.\nNikiondoka katika chumba,\nNinazima taa na vifaa.\nKwa kutumia umeme vizuri,\nNinalinda mazingira yetu.\n[Chorus]\nMazingira huanza na mimi,\nMazingira huanza na wewe.\nKwa hatua ndogo kila siku,\nTunaweza kuleta mabadiliko.\nOkoa maji, okoa umeme,\nPunguza taka, panda mti.\nTukifanya kazi pamoja,\nDunia yetu itakuwa safi.\n[Verse 3]\nKwa safari iliyo fupi,\nNinatembea kwa miguu.\nBadala ya kutumia gari,\nNinaendesha baiskeli yangu.\nNinatenganisha taka nyumbani,\nKaratasi, chupa na plastiki.\nVitu vingine natumia tena,\nIli nipunguze taka nyingi.\n[Bridge]\nSi lazima tufanye yote,\nKwa siku moja, hapana.\nAnza na jambo moja rahisi,\nKisha endelea kila siku.\nMimi, wewe na majirani,\nTukishirikiana pamoja,\nTutaisafisha dunia yetu,\nKwa ajili ya maisha yajayo.\n[Final Chorus]\nMazingira huanza na mimi,\nMazingira huanza na wewe.\nKwa hatua ndogo kila siku,\nTunaweza kuleta mabadiliko.\nOkoa maji, okoa umeme,\nPunguza taka, panda mti.\nTukifanya kazi pamoja,\nDunia yetu itakuwa safi.\n[Outro]\nHatua ndogo, moyo mkubwa,\nMabadiliko yanawezekana.\nMazingira huanza nyumbani,\nMazingira huanza na mimi.",
+      "cues": [
+        {
+          "start": 6.04,
+          "end": 7.94,
+          "text": "Mazingira, mazingira,"
+        },
+        {
+          "start": 8.44,
+          "end": 10.2,
+          "text": "Yanahitaji upendo wetu."
+        },
+        {
+          "start": 10.8,
+          "end": 12.54,
+          "text": "Hatua ndogo kila siku,"
+        },
+        {
+          "start": 12.88,
+          "end": 14.94,
+          "text": "Zinaleta mabadiliko."
+        },
+        {
+          "start": 20.08,
+          "end": 22.48,
+          "text": "Nikienda kununua bidhaa,"
+        },
+        {
+          "start": 22.48,
+          "end": 24.86,
+          "text": "Nabeba mfuko wa kitambaa."
+        },
+        {
+          "start": 24.88,
+          "end": 26.64,
+          "text": "Badala ya plastiki mpya,"
+        },
+        {
+          "start": 26.96,
+          "end": 28.98,
+          "text": "Nautumia tena na tena."
+        },
+        {
+          "start": 29.66,
+          "end": 31.36,
+          "text": "Ninabeba chupa yangu,"
+        },
+        {
+          "start": 31.76,
+          "end": 33.78,
+          "text": "Ninaijaza maji kila siku."
+        },
+        {
+          "start": 34.18,
+          "end": 36.18,
+          "text": "Bila kutupa chupa nyingi,"
+        },
+        {
+          "start": 36.68,
+          "end": 38.6,
+          "text": "Ninaweka mazingira safi."
+        },
+        {
+          "start": 39.24,
+          "end": 41.14,
+          "text": "Mazingira huanza na mimi,"
+        },
+        {
+          "start": 41.36,
+          "end": 43.38,
+          "text": "Mazingira huanza na wewe."
+        },
+        {
+          "start": 43.86,
+          "end": 45.66,
+          "text": "Kwa hatua ndogo kila siku,"
+        },
+        {
+          "start": 45.68,
+          "end": 48.18,
+          "text": "Tunaweza kuleta mabadiliko."
+        },
+        {
+          "start": 48.58,
+          "end": 50.46,
+          "text": "Okoa maji, okoa umeme,"
+        },
+        {
+          "start": 50.94,
+          "end": 52.72,
+          "text": "Punguza taka, panda mti."
+        },
+        {
+          "start": 53.18,
+          "end": 55.38,
+          "text": "Tukifanya kazi pamoja,"
+        },
+        {
+          "start": 55.46,
+          "end": 57.96,
+          "text": "Dunia yetu itakuwa safi."
+        },
+        {
+          "start": 63.1,
+          "end": 64.98,
+          "text": "Nikipiga mswaki asubuhi,"
+        },
+        {
+          "start": 65.5,
+          "end": 67.4,
+          "text": "Ninafunga bomba la maji."
+        },
+        {
+          "start": 67.88,
+          "end": 69.8,
+          "text": "Ninaoga kwa muda mfupi,"
+        },
+        {
+          "start": 70.04,
+          "end": 72.18,
+          "text": "Ili niokoe maji zaidi."
+        },
+        {
+          "start": 72.54,
+          "end": 74.6,
+          "text": "Nikiondoka katika chumba,"
+        },
+        {
+          "start": 75.08,
+          "end": 77.0,
+          "text": "Ninazima taa na vifaa."
+        },
+        {
+          "start": 77.32,
+          "end": 79.4,
+          "text": "Kwa kutumia umeme vizuri,"
+        },
+        {
+          "start": 79.88,
+          "end": 81.78,
+          "text": "Ninalinda mazingira yetu."
+        },
+        {
+          "start": 82.44,
+          "end": 84.32,
+          "text": "Mazingira huanza na mimi,"
+        },
+        {
+          "start": 84.56,
+          "end": 86.6,
+          "text": "Mazingira huanza na wewe."
+        },
+        {
+          "start": 87.08,
+          "end": 88.82,
+          "text": "Kwa hatua ndogo kila siku,"
+        },
+        {
+          "start": 88.88,
+          "end": 91.38,
+          "text": "Tunaweza kuleta mabadiliko."
+        },
+        {
+          "start": 91.8,
+          "end": 93.66,
+          "text": "Okoa maji, okoa umeme,"
+        },
+        {
+          "start": 94.14,
+          "end": 95.92,
+          "text": "Punguza taka, panda mti."
+        },
+        {
+          "start": 96.38,
+          "end": 98.58,
+          "text": "Tukifanya kazi pamoja,"
+        },
+        {
+          "start": 98.64,
+          "end": 101.16,
+          "text": "Dunia yetu itakuwa safi."
+        },
+        {
+          "start": 111.08,
+          "end": 113.16,
+          "text": "Kwa safari iliyo fupi,"
+        },
+        {
+          "start": 113.66,
+          "end": 115.42,
+          "text": "Ninatembea kwa miguu."
+        },
+        {
+          "start": 116.04,
+          "end": 117.94,
+          "text": "Badala ya kutumia gari,"
+        },
+        {
+          "start": 118.28,
+          "end": 120.18,
+          "text": "Ninaendesha baiskeli yangu."
+        },
+        {
+          "start": 120.4,
+          "end": 122.6,
+          "text": "Ninatenganisha taka nyumbani,"
+        },
+        {
+          "start": 122.78,
+          "end": 125.0,
+          "text": "Karatasi, chupa na plastiki."
+        },
+        {
+          "start": 125.34,
+          "end": 127.42,
+          "text": "Vitu vingine natumia tena,"
+        },
+        {
+          "start": 127.68,
+          "end": 129.66,
+          "text": "Ili nipunguze taka nyingi."
+        },
+        {
+          "start": 129.82,
+          "end": 132.36,
+          "text": "Si lazima tufanye yote,"
+        },
+        {
+          "start": 132.82,
+          "end": 134.6,
+          "text": "Kwa siku moja, hapana."
+        },
+        {
+          "start": 134.88,
+          "end": 137.16,
+          "text": "Anza na jambo moja rahisi,"
+        },
+        {
+          "start": 137.46,
+          "end": 139.38,
+          "text": "Kisha endelea kila siku."
+        },
+        {
+          "start": 139.88,
+          "end": 141.78,
+          "text": "Mimi, wewe na majirani,"
+        },
+        {
+          "start": 142.28,
+          "end": 144.18,
+          "text": "Tukishirikiana pamoja,"
+        },
+        {
+          "start": 144.54,
+          "end": 146.74,
+          "text": "Tutaisafisha dunia yetu,"
+        },
+        {
+          "start": 147.24,
+          "end": 149.02,
+          "text": "Kwa ajili ya maisha yajayo."
+        },
+        {
+          "start": 149.64,
+          "end": 151.52,
+          "text": "Mazingira huanza na mimi,"
+        },
+        {
+          "start": 151.76,
+          "end": 153.8,
+          "text": "Mazingira huanza na wewe."
+        },
+        {
+          "start": 154.28,
+          "end": 156.06,
+          "text": "Kwa hatua ndogo kila siku,"
+        },
+        {
+          "start": 156.08,
+          "end": 158.58,
+          "text": "Tunaweza kuleta mabadiliko."
+        },
+        {
+          "start": 159.0,
+          "end": 160.84,
+          "text": "Okoa maji, okoa umeme,"
+        },
+        {
+          "start": 161.36,
+          "end": 163.12,
+          "text": "Punguza taka, panda mti."
+        },
+        {
+          "start": 163.6,
+          "end": 165.78,
+          "text": "Tukifanya kazi pamoja,"
+        },
+        {
+          "start": 165.84,
+          "end": 168.38,
+          "text": "Dunia yetu itakuwa safi."
+        },
+        {
+          "start": 168.86,
+          "end": 172.42,
+          "text": "Hatua ndogo, moyo mkubwa,"
+        },
+        {
+          "start": 173.66,
+          "end": 177.18,
+          "text": "Mabadiliko yanawezekana."
+        },
+        {
+          "start": 178.42,
+          "end": 186.8,
+          "text": "Mazingira huanza nyumbani,"
+        },
+        {
+          "start": 195.26,
+          "end": 197.3,
+          "text": "Mazingira huanza na mimi."
+        }
+      ],
+      "objectKey": "swahili/music/B1/day-28/Mazingira Huanza Na Mimi.mp3",
+      "timingStatus": "estimated",
+      "timingMethod": "Multilingual CTC forced alignment of the supplied recording and lyrics",
+      "durationSeconds": 198.432,
+      "recordingSha256": "b6cbf03a8bb86d10561b6bd8c2ba8b4b947e8c9824e4b4f48270ad436a71c338"
     }
   ]
 }

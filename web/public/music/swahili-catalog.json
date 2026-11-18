@@ -38,6 +38,18 @@
       "featured": true,
       "objectKey": "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
       "audioUrl": "https://www.falowen.app/api/music?track=swahili-a1-day-05"
+    },
+    {
+      "id": "swahili-b1-day-28",
+      "title": "Mazingira Huanza Na Mimi",
+      "level": "B1",
+      "day": 28,
+      "topic": "Kutunza mazingira",
+      "language": "Swahili",
+      "type": "Lesson song",
+      "coursebook": true,
+      "objectKey": "swahili/music/B1/day-28/Mazingira Huanza Na Mimi.mp3",
+      "audioUrl": "https://www.falowen.app/api/music?track=swahili-b1-day-28"
     }
   ]
 }

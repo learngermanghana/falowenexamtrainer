@@ -1,3 +1,4 @@
+import WorkbookDayMusic from "./WorkbookDayMusic";
 import React, { useState, useEffect } from "react";
 import SwahiliB1Day28Listening, { listeningQuestions } from "./SwahiliB1Day28Listening";
 import { useAuth } from "../context/AuthContext";
@@ -136,27 +137,10 @@ export default function SwahiliB1Day28Workbook({ uid }) {
       <section className="swahili-book__card" role="tabpanel" tabIndex={-1} aria-label={tabs.find(tab => tab.key === activeTab).label}>
         {activeTab === "references" && <>
           <h2>Muziki</h2>
-          <h3>Mazingira huanza mlangoni kwetu</h3>
-          <div style={{ overflowX: "auto" }}><table><thead><tr><th scope="col">Kiswahili</th><th scope="col">English</th></tr></thead><tbody>
-          <tr><td>BETI YA 1</td><td></td></tr>
-          <tr><td>Mbele ya nyumba yetu kuna taka nyingi.</td><td>There is a lot of rubbish outside our house.</td></tr>
-          <tr><td>Majirani wengine wanalalamika,</td><td>Some neighbours complain,</td></tr>
-          <tr><td>lakini kwa muda mrefu hakuna aliyeanza.</td><td>but for a long time nobody has started.</td></tr>
-          <tr><td>KIITIKIO</td><td></td></tr>
-          <tr><td>Mazingira huanza mlangoni kwetu,</td><td>The environment starts at our doorstep,</td></tr>
-          <tr><td>kwa hatua ndogo kila siku.</td><td>with small steps every day.</td></tr>
-          <tr><td>Pamoja tunaweza kuleta mabadiliko.</td><td>Together, we can make a difference.</td></tr>
-          <tr><td>BETI YA 2</td><td></td></tr>
-          <tr><td>Tunawaalika majirani kufanya usafi.</td><td>We invite the neighbours to clean up.</td></tr>
-          <tr><td>Tunatenganisha taka na kupanda maua,</td><td>We sort the waste and plant flowers,</td></tr>
-          <tr><td>ili mtaa wetu uwe safi na mzuri.</td><td>so that our neighbourhood becomes clean and beautiful.</td></tr>
-          <tr><td>MWISHO</td><td></td></tr>
-          <tr><td>Jioni tunakaa pamoja uwanjani.</td><td>In the evening, we sit together in the courtyard.</td></tr>
-          <tr><td>Wazo moja limeleta jambo zuri.</td><td>One idea has created something good.</td></tr>
-          </tbody></table></div>
-          <h3>Baada ya kusoma au kusikiliza</h3>
-          <p>Ni tatizo gani linatajwa mwanzoni?</p>
-          <p>Majirani wanafanya nini pamoja?</p>
+          <WorkbookDayMusic program="swahili" level="B1" day={28} hideLegacyNotes />
+          <h3>Baada ya kusikiliza</h3>
+          <p>Mwimbaji anabeba nini anapoenda kununua bidhaa?</p>
+          <p>Anapunguza matumizi ya maji kwa njia gani mbili?</p>
           <p>Ujumbe mkuu wa kiitikio ni upi?</p>
           <details><summary>Ujumbe mkuu</summary>
           <p>Ujumbe mkuu
