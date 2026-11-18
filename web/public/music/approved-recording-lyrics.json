@@ -2,6 +2,173 @@
   "version": 1,
   "recordings": [
     {
+      "trackId": "swahili-a1-day-10",
+      "objectKey": "swahili/music/A1/day-10/Leo Tunaenda Sokoni.mp3",
+      "title": "Leo Tunaenda Sokoni",
+      "lyrics": "[Intro]\nLeo tunaenda wapi?\nSokoni, sokoni!\nLeo tunaenda sokoni,\nKaribuni, twende pamoja!\n[Verse 1]\nHabari gani? Nzuri, asante!\nHabari yako? Njema sana, asante!\nKaribu mteja wangu, nikusaidie nini?\nAsante muuzaji, nataka vitu vingi.\n[Verse 2]\nNaomba embe moja,\nMachungwa matatu,\nMayai manne, mapapai mawili,\nNanasi moja, maboga mawili.\nNaomba jembe moja,\nNa magunia mawili.\n[Chorus]\nSokoni, sokoni, leo tunanunua,\nSokoni, sokoni, vitu vingi tunanunua.\nMuuzaji anauza, mnunuzi ananunua,\nSokoni, sokoni, leo tunafurahia!\nSokoni, sokoni, leo tunafurahia!\n[Verse 3]\nMuuzaji, muuzaji, jumla ni shilingi ngapi?\nJumla ni shilingi elfu nne tu.\nHe, ni ghali sana, tafadhali punguza bei!\nSawa mteja wangu, lipa shilingi elfu tatu.\n[Final Chorus]\nSokoni, sokoni, leo tunanunua,\nSokoni, sokoni, vitu vingi tunanunua.\nMuuzaji anauza, mnunuzi ananunua,\nSokoni, sokoni, leo tunafurahia!\n[Outro]\nSawa, asante sana, hizi hapa fedha zako.\nAsante mteja wangu, karibu tena siku nyingine.\nHaya, asante, tutaonana tena.\nKwaheri, kwaheri, tutaonana sokoni.",
+      "cues": [
+        {
+          "start": 3.38,
+          "end": 4.58,
+          "text": "Leo tunaenda wapi?"
+        },
+        {
+          "start": 6.05,
+          "end": 7.84,
+          "text": "Sokoni, sokoni!"
+        },
+        {
+          "start": 8.72,
+          "end": 10.92,
+          "text": "Leo tunaenda sokoni,"
+        },
+        {
+          "start": 11.42,
+          "end": 13.91,
+          "text": "Karibuni, twende pamoja!"
+        },
+        {
+          "start": 24.19,
+          "end": 26.85,
+          "text": "Habari gani? Nzuri, asante!"
+        },
+        {
+          "start": 27.27,
+          "end": 29.72,
+          "text": "Habari yako? Njema sana, asante!"
+        },
+        {
+          "start": 30.23,
+          "end": 33.48,
+          "text": "Karibu mteja wangu, nikusaidie nini?"
+        },
+        {
+          "start": 33.75,
+          "end": 36.91,
+          "text": "Asante muuzaji, nataka vitu vingi."
+        },
+        {
+          "start": 38.72,
+          "end": 40.45,
+          "text": "Naomba embe moja,"
+        },
+        {
+          "start": 41.77,
+          "end": 43.36,
+          "text": "Machungwa matatu,"
+        },
+        {
+          "start": 43.55,
+          "end": 45.24,
+          "text": "Mayai manne, mapapai mawili,"
+        },
+        {
+          "start": 45.46,
+          "end": 47.49,
+          "text": "Nanasi moja, maboga mawili."
+        },
+        {
+          "start": 47.65,
+          "end": 49.01,
+          "text": "Naomba jembe moja,"
+        },
+        {
+          "start": 49.08,
+          "end": 50.39,
+          "text": "Na magunia mawili."
+        },
+        {
+          "start": 50.57,
+          "end": 53.43,
+          "text": "Sokoni, sokoni, leo tunanunua,"
+        },
+        {
+          "start": 53.64,
+          "end": 56.59,
+          "text": "Sokoni, sokoni, vitu vingi tunanunua."
+        },
+        {
+          "start": 56.81,
+          "end": 59.66,
+          "text": "Muuzaji anauza, mnunuzi ananunua,"
+        },
+        {
+          "start": 59.82,
+          "end": 61.58,
+          "text": "Sokoni, sokoni, leo tunafurahia!"
+        },
+        {
+          "start": 61.73,
+          "end": 63.94,
+          "text": "Sokoni, sokoni, leo tunafurahia!"
+        },
+        {
+          "start": 76.12,
+          "end": 79.78,
+          "text": "Muuzaji, muuzaji, jumla ni shilingi ngapi?"
+        },
+        {
+          "start": 79.9,
+          "end": 81.35,
+          "text": "Jumla ni shilingi elfu nne tu."
+        },
+        {
+          "start": 82.49,
+          "end": 85.41,
+          "text": "He, ni ghali sana, tafadhali punguza bei!"
+        },
+        {
+          "start": 85.58,
+          "end": 88.85,
+          "text": "Sawa mteja wangu, lipa shilingi elfu tatu."
+        },
+        {
+          "start": 89,
+          "end": 91.88,
+          "text": "Sokoni, sokoni, leo tunanunua,"
+        },
+        {
+          "start": 92.04,
+          "end": 94.99,
+          "text": "Sokoni, sokoni, vitu vingi tunanunua."
+        },
+        {
+          "start": 95.21,
+          "end": 98.08,
+          "text": "Muuzaji anauza, mnunuzi ananunua,"
+        },
+        {
+          "start": 98.22,
+          "end": 101.98,
+          "text": "Sokoni, sokoni, leo tunafurahia!"
+        },
+        {
+          "start": 102.76,
+          "end": 105.28,
+          "text": "Sawa, asante sana, hizi hapa fedha zako."
+        },
+        {
+          "start": 105.38,
+          "end": 108.04,
+          "text": "Asante mteja wangu, karibu tena siku nyingine."
+        },
+        {
+          "start": 108.1,
+          "end": 109.63,
+          "text": "Haya, asante, tutaonana tena."
+        },
+        {
+          "start": 109.71,
+          "end": 112.75,
+          "text": "Kwaheri, kwaheri, tutaonana sokoni."
+        }
+      ],
+      "duration": 128.424,
+      "recordingSha256": "5ba2a1e2f44a2db00e4b8eb6a23a8e78d837318c0d488c28316a9a365d719b96",
+      "source": "Lyrics embedded in the supplied MP3; approximate line cues from the recording's phrase boundaries and repeating chorus.",
+      "timingStatus": "estimated"
+    },
+    {
       "trackId": "swahili-a1-day-06",
       "objectKey": "swahili/music/A1/day-06/Chakula Kizuri Mgahawani.mp3",
       "title": "Chakula Kizuri Mgahawani",

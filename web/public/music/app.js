@@ -768,7 +768,7 @@ function checkAnswers() {
 }
 function renderBehindTheSong(track) {
   const swahili = track.musicLanguage === "swahili";
-  const story = swahili ? {
+  const story = swahili && !editorialStories?.byObjectKey?.[track.objectKey] ? {
     storyDe: "Wimbo huu unakutambulisha kwa familia ya Jason.",
     storyEn: "The song introduces Jason’s family through questions about names, jobs and interests.",
     focusDe: "Huyu ni nani? Anaitwa nani?",
