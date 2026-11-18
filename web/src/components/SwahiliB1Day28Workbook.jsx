@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
+import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
+import { WorkbookTabNav } from "./StandardWorkbookComponents";
 import "./SwahiliCourseBook.css";
 
 const tabs = [
-  { key: "radio", label: "Falowen Radio" },
   { key: "references", label: "Muziki" },
   { key: "grammar", label: "Sarufi na msamiati" },
   { key: "sprechen", label: "1 · Kuzungumza" },
@@ -13,6 +14,27 @@ const tabs = [
   { key: "hoeren", label: "4 · Kusikiliza" },
   { key: "review", label: "Kujikagua" },
 ];
+
+const radioIntro = <div lang="sw">
+    <h3>🎙️ Falowen Radio · Kutunza Mazingira Kila Siku 10.28</h3>
+    <p>Falowen Radio ni hatua ya kusikiliza kabla ya kuanza mazoezi ya somo. Hakuna kazi ya kuwasilisha katika sehemu hii.</p>
+    <details><summary>Soma nakala ya kipindi</summary>
+    <p>Bwana Ali: Habari na karibu Falowen Radio! Mimi ni Bwana Ali, nikiwa katika studio yetu mjini Arusha. Leo tunazungumzia namna ya kutunza mazingira katika maisha ya kila siku.</p>
+    <p>Maria: Ninapoenda kununua bidhaa, ninabeba mfuko wa kitambaa badala ya kuchukua mifuko mipya ya plastiki. Pia ninatumia chupa ya maji inayoweza kutumiwa tena.</p>
+    <p>Bwana Ali: Unafanya nini na taka nyumbani?</p>
+    <p>Maria: Ninatenganisha karatasi, plastiki, chupa na taka za chakula kulingana na utaratibu wa eneo letu. Ni muhimu kujua sheria za mahali tunapoishi.</p>
+    <p>Bwana Ali: Sasa tunaye Juma kutoka Moshi. Unaokoa vipi maji na nishati?</p>
+    <p>Juma: Ninazima taa na vifaa nisivyotumia. Pia ninafunga bomba la maji ninapopiga mswaki na ninaoga kwa muda mfupi ili niokoe maji.</p>
+    <p>Bwana Ali: Asha kutoka Dar es Salaam, unasafiri vipi?</p>
+    <p>Asha: Kwa safari fupi ninatembea au kutumia baiskeli. Kwa safari ndefu ninatumia basi inapowezekana. Pia ninanunua vyakula vya eneo letu na vya msimu.</p>
+    <p>Bwana Ali: Asanteni! Kupunguza plastiki, kutenganisha taka, kuokoa maji na nishati, na kuchagua usafiri mzuri ni hatua ndogo zenye maana.</p>
+    </details>
+    <h3>Mambo ya kuzingatia</h3>
+    <p>Maria anatumia nini badala ya mifuko mipya ya plastiki?</p>
+    <p>Juma anaokoaje maji na nishati?</p>
+    <p>Asha anachagua usafiri gani kwa safari fupi?</p>
+    <p>Ni tabia gani unaweza kuanza wiki hii?</p>
+  </div>;
 
 export default function SwahiliB1Day28Workbook({ uid }) {
   const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
@@ -27,6 +49,7 @@ export default function SwahiliB1Day28Workbook({ uid }) {
     catch { /* The exercise remains editable when browser storage is unavailable. */ }
   }
   return (
+    <RadioFirstWorkbookGate level="Kiswahili B1" day={28} transcriptIntro={radioIntro}>
     <main className="swahili-book swahili-book--workbook" lang="sw">
       <Link to="/campus/course">← Kitabu cha kozi</Link>
       <header className="swahili-book__hero">
@@ -34,32 +57,9 @@ export default function SwahiliB1Day28Workbook({ uid }) {
         <h1>Kutunza Mazingira katika Maisha ya Kila Siku</h1>
         <p>Mwisho wa siku utaweza kutaja angalau tabia tatu zinazolinda mazingira, kueleza namna na lengo la tendo, na kutoa pendekezo moja linaloweza kutekelezwa katika eneo unaloishi.</p>
       </header>
-      <nav className="swahili-workbook-actions" aria-label="Sehemu za somo">
-        {tabs.map(tab => <button key={tab.key} type="button" aria-current={tab.key === activeTab ? "page" : undefined}
-          onClick={() => selectTab(tab.key)}>{tab.label}</button>)}
-      </nav>
+      <WorkbookTabNav activeTab={activeTab} onChange={selectTab} tabs={tabs}
+        ariaLabel="Kiswahili B1 Somo la 28" renderLegacyGrammarPanel={false} />
       <section className="swahili-book__card" role="tabpanel" tabIndex={-1} aria-label={tabs.find(tab => tab.key === activeTab).label}>
-        {activeTab === "radio" && <>
-          <h2>Falowen Radio</h2>
-          <h3>🎙️ Falowen Radio · Kutunza Mazingira Kila Siku 10.28</h3>
-          <p>Falowen Radio ni hatua ya kusikiliza kabla ya kuanza mazoezi ya somo. Hakuna kazi ya kuwasilisha katika sehemu hii.</p>
-          <details><summary>Soma nakala ya kipindi</summary>
-          <p>Bwana Ali: Habari na karibu Falowen Radio! Mimi ni Bwana Ali, nikiwa katika studio yetu mjini Arusha. Leo tunazungumzia namna ya kutunza mazingira katika maisha ya kila siku.</p>
-          <p>Maria: Ninapoenda kununua bidhaa, ninabeba mfuko wa kitambaa badala ya kuchukua mifuko mipya ya plastiki. Pia ninatumia chupa ya maji inayoweza kutumiwa tena.</p>
-          <p>Bwana Ali: Unafanya nini na taka nyumbani?</p>
-          <p>Maria: Ninatenganisha karatasi, plastiki, chupa na taka za chakula kulingana na utaratibu wa eneo letu. Ni muhimu kujua sheria za mahali tunapoishi.</p>
-          <p>Bwana Ali: Sasa tunaye Juma kutoka Moshi. Unaokoa vipi maji na nishati?</p>
-          <p>Juma: Ninazima taa na vifaa nisivyotumia. Pia ninafunga bomba la maji ninapopiga mswaki na ninaoga kwa muda mfupi ili niokoe maji.</p>
-          <p>Bwana Ali: Asha kutoka Dar es Salaam, unasafiri vipi?</p>
-          <p>Asha: Kwa safari fupi ninatembea au kutumia baiskeli. Kwa safari ndefu ninatumia basi inapowezekana. Pia ninanunua vyakula vya eneo letu na vya msimu.</p>
-          <p>Bwana Ali: Asanteni! Kupunguza plastiki, kutenganisha taka, kuokoa maji na nishati, na kuchagua usafiri mzuri ni hatua ndogo zenye maana.</p>
-          </details>
-          <h3>Mambo ya kuzingatia</h3>
-          <p>Maria anatumia nini badala ya mifuko mipya ya plastiki?</p>
-          <p>Juma anaokoaje maji na nishati?</p>
-          <p>Asha anachagua usafiri gani kwa safari fupi?</p>
-          <p>Ni tabia gani unaweza kuanza wiki hii?</p>
-        </>}
         {activeTab === "references" && <>
           <h2>Muziki</h2>
           <h3>Mazingira huanza mlangoni kwetu</h3>
@@ -275,5 +275,6 @@ export default function SwahiliB1Day28Workbook({ uid }) {
       </section>
       <SwahiliWorkbookNavigation tabs={tabs} activeTab={activeTab} onChange={selectTab} />
     </main>
+    </RadioFirstWorkbookGate>
   );
 }
