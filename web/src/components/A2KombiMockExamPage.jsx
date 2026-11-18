@@ -74,6 +74,7 @@ function A2KombiAttempt({mockNumber,paper}) {
   const [now,setNow]=useState(Date.now());
   const [connecting,setConnecting]=useState(false);
   const [connectionError,setConnectionError]=useState("");
+  const [failedCheckpoint,setFailedCheckpoint]=useState("");
   const [grading,setGrading]=useState(false);
   const [gradingError,setGradingError]=useState("");
   const [retry,setRetry]=useState(0);
@@ -105,21 +106,33 @@ function A2KombiAttempt({mockNumber,paper}) {
     window.scrollTo?.({top:0,behavior:"smooth"});
   },[keys]);
 
+  const checkpoint = useCallback(async section => {
+    if (!attemptId || !idToken) return;
+    try {
+      await saveA2MockAttempt({
+        idToken, attemptId, section, status: "in_progress", state: getA2KombiState(keys, paper.id, section),
+      });
+      setFailedCheckpoint(current => current === section ? "" : current);
+    } catch {
+      setFailedCheckpoint(section);
+    }
+  }, [idToken, attemptId, keys, paper.id]);
+
   useEffect(()=>{
     if(stage==="lesen"&&lesen.startedAt&& !lesen.completedAt&&msRemaining<=0){
       const submitted={...lesen,completedAt:Date.now()};
-      localStorage.setItem(keys.lesen,JSON.stringify(submitted));setLesen(submitted);advance("lesen");
+      localStorage.setItem(keys.lesen,JSON.stringify(submitted));setLesen(submitted);checkpoint("lesen");advance("lesen");
     }
     if(stage==="hoeren"&&hoeren.startedAt&&!hoeren.completedAt&&msRemaining<=0){
       const submitted={...hoeren,completedAt:Date.now()};
       if(keys.hoeren)localStorage.setItem(keys.hoeren,JSON.stringify(submitted));
-      setHoeren(submitted);advance("hoeren");
+      setHoeren(submitted);checkpoint("hoeren");advance("hoeren");
     }
     if(stage==="schreiben"&&writing.startedAt&& !writing.submittedAt&&msRemaining<=0){
       const submitted={...writing,submittedAt:Date.now()};
-      localStorage.setItem(keys.schreiben,JSON.stringify(submitted));setWriting(submitted);advance("schreiben");
+      localStorage.setItem(keys.schreiben,JSON.stringify(submitted));setWriting(submitted);checkpoint("schreiben");advance("schreiben");
     }
-  },[stage,lesen,hoeren,writing,msRemaining,keys,advance]);
+  },[stage,lesen,hoeren,writing,msRemaining,keys,advance,checkpoint]);
 
   const begin=async()=>{
     if(!idToken||connecting)return;
@@ -161,11 +174,6 @@ function A2KombiAttempt({mockNumber,paper}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[started,attemptId,idToken]);
 
-  const checkpoint=async(section)=>{
-    if(!attemptId)return;
-    try{await saveA2MockAttempt({idToken,attemptId,section,status:"in_progress",state:getA2KombiState(keys,paper.id,section)});}
-    catch(error){setConnectionError(error?.response?.data?.error||error.message||"A checkpoint could not sync, but your answers are saved.");}
-  };
   const submitReading=()=>{
     if(!window.confirm("Lesen abgeben? Nicht beantwortete Fragen werden als falsch gewertet."))return;
     const next={...lesen,completedAt:Date.now()};localStorage.setItem(keys.lesen,JSON.stringify(next));setLesen(next);
@@ -236,6 +244,10 @@ function A2KombiAttempt({mockNumber,paper}) {
       </button>
     </section>:null}
     {connectionError?<p role="alert">{connectionError} <button type="button" onClick={stage==="intro"?begin:reconnect}>Retry server connection</button></p>:null}
+    {failedCheckpoint && !flow.verifiedResult ? <p role="alert">
+      {LABELS[failedCheckpoint]} is saved on this device. Server upload needs a retry.{" "}
+      <button type="button" onClick={() => checkpoint(failedCheckpoint)}>Retry saving answers</button>
+    </p> : null}
     {started&&!attemptId?<p role="status">Connecting your exam attempt. Your saved work remains available.</p>:null}
     {stage==="lesen"?<section className="a2-mock2-shell" lang="de">
       <header className="a2-mock2-progress">

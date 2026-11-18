@@ -48,7 +48,7 @@ const transcriptLimit = session => session.examFlow
   ? (["B2-1","C1-1","C2-1"].includes(session.examFlow?.key) ? 6400 : recordingSeconds(session)>=120 ? MAX_FLOW_CHARS : recordingSeconds(session)>=60 ? 2400 : 800)
   : examiner(session) ? MAX_EXAM_CHARS : MAX_CONFIRMED_CHARS;
 const confirmedAnswers = session => (Array.isArray(session.confirmedAnswers) ? session.confirmedAnswers : []).slice(0, answerLimit(session));
-const a2MockTask = id => /^(a2-mock-0[123])-speaking-teil-([123])$/.exec(id || "");
+const a2MockTask = id => /^(a2-mock-0[1-8])-speaking-teil-([123])$/.exec(id || "");
 const boundA2MockExaminer = task => Boolean(a2MockTask(task?.id) && task?.mockAttemptId);
 const coursePartFinished = session => Boolean(session?.examFlow) &&
   (taskFlows.isComplete(session) || Number(session.answeredTurns) >= answerLimit(session));
@@ -135,7 +135,7 @@ const cleanExamTask = (task) => ({
   courseAssignmentKey: assignmentConfig(task?.courseAssignmentKey)
     ? String(task.courseAssignmentKey).trim().toUpperCase() : "",
   mockAttemptId: assignmentConfig(task?.courseAssignmentKey) ||
-    (/^(?:a2-mock-0[123]|b1-mock-0[12])-speaking-teil-[123]$/.test(String(task?.id || "")) && !task?.courseAssignmentKey)
+    (/^(?:a2-mock-0[1-8]|b1-mock-0[12])-speaking-teil-[123]$/.test(String(task?.id || "")) && !task?.courseAssignmentKey)
     ? String(task?.mockAttemptId || "").trim().slice(0,120) : "",
 });
 const examOpening = (level, task) => {

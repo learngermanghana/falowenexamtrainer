@@ -5833,7 +5833,7 @@ app.post("/a2-mock/submission-diagnostic", async (req, res) => {
     sprechen: ["recording", "upload", "marking"],
     result: ["upload", "publishing"],
   };
-  if (!["a2-mock-01", "a2-mock-02", "a2-mock-03"].includes(mockId) ||
+  if (!/^a2-mock-0[1-8]$/.test(mockId || "") ||
       !Object.hasOwn(phases, module) || !phases[module].includes(phase) ||
       !["failed", "retry_failed", "retry_succeeded"].includes(outcome)) {
     return res.status(400).json({ error: "Invalid mock diagnostic." });

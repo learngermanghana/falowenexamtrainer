@@ -1357,7 +1357,7 @@ test("course status and reset cannot access another assignment's scoped session"
  expect(invalid.code).toBe(400);
 });
 
-test.each(["a2-mock-01", "a2-mock-02", "a2-mock-03"])("%s binds a speaking session and saves its resume receipt", async mockId => {
+test.each(Array.from({ length: 8 }, (_, index) => `a2-mock-0${index + 1}`))("%s binds a speaking session and saves its resume receipt", async mockId => {
   const api = setup({ LIVE_SPEAK_TESTING_ACCESS: "true" });
   const attemptKey = "a2MockExamUsers/u123/attempts/test-attempt";
   api.docs.set(attemptKey, { uid: "u123", mockId, status: "in_progress" });
