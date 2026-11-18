@@ -22,7 +22,12 @@
       "name": "Felix Asadu",
       "role": "German Language Instructor",
       "image": "/classes/media/felix-asadu.png",
-      "bio": "Founder of Learn Language Education Academy and founder/software developer of Falowen. He studied International Management at IUBH in Germany, holds a Goethe-Institut B2 German certificate and a TEFL certificate in Teaching English as a Foreign Language."
+      "bio": "German Language Instructor, founder of Learn Language Education Academy and founder/software developer of Falowen. He holds a degree in International Management from IUBH in Germany, a Goethe-Institut B2 German certificate, and a TEFL certificate in Teaching English as a Foreign Language.",
+      "credentials": [
+        "International Management · IUBH Germany",
+        "Goethe-Institut B2 · German",
+        "TEFL Certificate"
+      ]
     },
     {
       "name": "Sabina Michel",
@@ -35,13 +40,22 @@
       "role": "Kiswahili Language Instructor & Researcher",
       "image": "/classes/media/ruth-ndekiro-shao.webp",
       "bio": "Dr. Ruth Ndekiro Shao is a Kiswahili language instructor and researcher with over eight years of experience, including teaching at the University of Ghana and the University of Hamburg in Germany. She holds a PhD in Kiswahili from the University of Dar es Salaam and teaches learners from beginner to advanced levels. Her expertise spans linguistics, translation, second language acquisition, and curriculum development. She combines interactive digital tools with culturally rich, learner-centered teaching to help students communicate confidently in Kiswahili.",
-      "imagePosition": "center 14%"
+      "imagePosition": "center 14%",
+      "credentials": [
+        "PhD in Kiswahili · University of Dar es Salaam",
+        "8+ years teaching experience",
+        "University of Ghana & University of Hamburg"
+      ]
     },
     {
       "name": "Catherine Agbleze Etornam",
       "role": "Academic Assistant",
       "image": "https://raw.githubusercontent.com/learngermanghana/falowenexamtrainer/main/photos/Catherine.jpeg",
-      "bio": "University of Ghana graduate in Philosophy with Political Science and holder of a Goethe A2 German certificate. She supports prospective and current students with enquiries, onboarding and academic guidance."
+      "bio": "University of Ghana graduate in Philosophy with Political Science and holder of a Goethe A2 German certificate. She supports prospective and current students with enquiries, onboarding and academic guidance.",
+      "credentials": [
+        "Philosophy with Political Science · University of Ghana",
+        "Goethe German A2 Certificate"
+      ]
     },
     {
       "name": "Hana",
