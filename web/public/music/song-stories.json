@@ -2,6 +2,12 @@
   "version": 1,
   "description": "Bilingual editorial descriptions of song scenarios and learning focus; no unsupported personal songwriter claims.",
   "byObjectKey": {
+    "swahili/music/A1/day-10/Leo Tunaenda Sokoni.mp3": {
+      "storyDe": "Sokoni, mnunuzi anamsalimu muuzaji, anaomba matunda na anapunguza bei kutoka shilingi elfu nne hadi elfu tatu.",
+      "storyEn": "At the market, a customer greets the seller, asks for fruit and bargains the price down from four thousand to three thousand shillings.",
+      "focusDe": "Jumla ni shilingi ngapi? Tafadhali punguza bei!",
+      "focusEn": "How much is the total? Please lower the price!"
+    },
     "music/a1/day-02/Ich heiße Bina.mp3": {
       "storyDe": "Bina ruft bei einer Sprachschule an und buchstabiert ihren Namen. Ein einfacher Anruf wird zu einer kleinen Geschichte über einen neuen Anfang.",
       "storyEn": "Bina calls a language school and spells her name. A simple phone call becomes a story about a new beginning.",

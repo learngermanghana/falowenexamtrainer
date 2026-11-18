@@ -1,6 +1,19 @@
 {
   "tracks": [
     {
+      "id": "swahili-a1-day-10",
+      "title": "Leo Tunaenda Sokoni",
+      "level": "A1",
+      "day": 10,
+      "topic": "Sokoni · At the market",
+      "language": "Swahili",
+      "type": "Lesson song",
+      "coursebook": true,
+      "featured": true,
+      "objectKey": "swahili/music/A1/day-10/Leo Tunaenda Sokoni.mp3",
+      "audioUrl": "https://www.falowen.app/api/music?track=swahili-a1-day-10"
+    },
+    {
       "id": "swahili-a1-day-06",
       "title": "Chakula Kizuri Mgahawani",
       "level": "A1",

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
+import WorkbookDayMusic from "./WorkbookDayMusic";
 import { GrammarSelfCheck } from "./MgahawaniGrammarPractice";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import "./SwahiliCourseBook.css";
@@ -67,7 +68,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
       <section className="swahili-book__card swahili-book__activity" role="tabpanel" tabIndex={-1}>
         {activeTab === "references" && <>
           <h2>Music · Muziki</h2>
-          <p>No song is available for this chapter yet.</p>
+          {lesson.day === 10 ? <WorkbookDayMusic level="A1" day={lesson.day} program="swahili" compact /> : <p>No song is available for this chapter yet.</p>}
         </>}
         {activeTab === "grammar" && <>
           <h2>Sarufi · {lesson.grammar}</h2>
