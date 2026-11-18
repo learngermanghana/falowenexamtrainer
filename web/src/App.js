@@ -658,6 +658,7 @@ function App() {
   const isExamOnlyAccount = studentProfile?.accountType === "exam_only";
   if (isExamOnlyAccount) {
     return <MockExamOnlyGate><ExamProvider><AppShell
+      isStaff={isStaff}
       allowedSections={{ ...allowedSections, course: false, attendance: false, discussion: false, classMembers: false }}
       availableTabs={[]} defaultCampusSection="account" enableNotifications={enableNotifications}
       saveStudentProfile={saveStudentProfile} logout={logout} notificationStatus={notificationStatus}
@@ -700,6 +701,7 @@ function App() {
   return (
     <ExamProvider>
       <AppShell
+        isStaff={isStaff}
         allowedSections={allowedSections}
         availableTabs={availableTabs}
         defaultCampusSection={defaultCampusSection}
@@ -720,6 +722,7 @@ function App() {
 export default function AccountProtectedApp() { return <AccountDeletionBoundary><App /></AccountDeletionBoundary>; }
 
 const AppShell = ({
+  isStaff,
   allowedSections,
   availableTabs,
   defaultCampusSection,
