@@ -22,7 +22,12 @@
       "name": "Felix Asadu",
       "role": "German Language Instructor",
       "image": "/classes/media/felix-asadu.png",
-      "bio": "Founder of Learn Language Education Academy and founder/software developer of Falowen. He studied International Management at IUBH in Germany, holds a Goethe-Institut B2 German certificate and a TEFL certificate in Teaching English as a Foreign Language."
+      "bio": "German Language Instructor, founder of Learn Language Education Academy and founder/software developer of Falowen. He holds a degree in International Management from IUBH in Germany, a Goethe-Institut B2 German certificate, and a TEFL certificate in Teaching English as a Foreign Language.",
+      "credentials": [
+        "International Management · IUBH Germany",
+        "Goethe-Institut B2 · German",
+        "TEFL Certificate"
+      ]
     },
     {
       "name": "Sabina Michel",
