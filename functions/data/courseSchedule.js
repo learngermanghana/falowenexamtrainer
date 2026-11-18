@@ -700,7 +700,7 @@ const courseSchedules = {
     },
     {
       day: 13,
-      topic: "Revision",
+      topic: "Einfache Aussagesätze und Fragen bilden",
       chapter: "3.5",
       goal:
         "Recap from the lesen and horen. Understand numbers, time, asking of price and how to formulate statements in German",
