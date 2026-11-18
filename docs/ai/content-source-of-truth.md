@@ -116,18 +116,11 @@ The Sprechen prompt dictionary is `web/src/data/speakingDictionary.js`, the Schr
 
 Admin Live Classes owns the scheduled German and Swahili cohorts in Firestore. The public classes endpoint returns Swahili A1 listings in `swahiliClasses` and keeps the existing `classes` array for German brochure, registration, and placement consumers. [Upcoming Classes](https://www.falowen.app/classes/) shows published Swahili class dates, timetable and confirmed tuition when present, with a WhatsApp enquiry link. Swahili listing visibility requires an open, publicly visible class with successful session generation. Swahili listings use no German placement, course agreement, or Paystack flow.
 
-## Kiswahili A2 and B1 title dictionaries — 17 November 2026
+## Kiswahili A2 and B1 course dictionary — 18 November 2026
 
-`web/src/data/swahili/a2B1TitleDictionary.json` contains the titles-only Kiswahili
-A2 and B1 plans. Each level mirrors the German course dictionary's Day 0 and
-Days 1–28 in `shared/curriculumCanonical.json`, retaining day/chapter order and
-source IDs/titles for comparison. Entries have separate `swahili-*` IDs and
-`status: "titles-only"`. These are course-topic translations, not vocabulary
-entries, published workbooks, assessments or enrollment availability. The German
-speaking mock slots become Kiswahili speaking practice titles; they do not imply
-Goethe offers a Swahili exam. No German routes, resources, answer keys or scoring
-are copied. This file is not yet connected to Campus; published Kiswahili course
-books remain A1.
+Campus uses `web/src/data/swahili/a2B1TitleDictionary.json` for A2 and B1 lesson titles. Entries retain their Kiswahili IDs and the corresponding German chapter order and source IDs. Entries marked `titles-only` have no workbook. Speaking mock titles describe Kiswahili practice.
+
+B1 Day 28 (chapter 10.28), *Kutunza Mazingira katika Maisha ya Kila Siku*, has status `workbook`. The B1 course card opens `/campus/course/swahili/b1/day-28`. The route supports signed-in Kiswahili learners enrolled at B1 or higher and staff. The workbook includes the radio transcript, bilingual lyrics, grammar, speaking, writing practice and self-review. The final workbook reading and listening assessments are pending.
 
 ### Course discount links
 

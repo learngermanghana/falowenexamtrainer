@@ -78,7 +78,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
             <div className="course-book-hero-copy">
               <p style={book.heroEyebrow}>Kiswahili {level}</p>
               <h2 style={book.heroTitle}>Kitabu cha Kozi ya Kiswahili</h2>
-              <p style={book.heroText}>Browse the lesson titles. Workbooks for this level are in preparation.</p>
+              <p style={book.heroText}>{level === "B1" ? "Open the available workbook or browse the other lesson titles." : "Browse the lesson titles. Workbooks for this level are in preparation."}</p>
             </div>
             <div data-a1-coursebook-hero-actions="true" style={book.heroActions}>
               {levelSelector}
@@ -91,13 +91,14 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
             onChange={(event) => setSearch(event.target.value)} style={book.searchInput} />
         </section>
         {titles.length === 0 && <p style={book.emptyState}>No lessons match your search.</p>}
-        {titles.map(({ id, day, title, chapter }) => (
+        {titles.map(({ id, day, title, chapter, status }) => (
           <article key={id} className="course-book-lesson-card" style={book.lessonCard}>
             <div style={book.lessonMain}>
               <span style={book.dayBubble}>{day === 0 ? "Mwongozo" : `Somo la ${day}`}</span>
               <div>
                 <h3 style={book.lessonTitle}>{title}</h3>
                 {day > 0 && <p style={styles.helperText}>Chapter {chapter}</p>}
+                {status === "workbook" && <Link style={primaryLink} to={`${basePath}/${level.toLowerCase()}/day-${day}`}>Open workbook</Link>}
               </div>
             </div>
           </article>
