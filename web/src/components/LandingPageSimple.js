@@ -180,8 +180,10 @@ function MeetOurTeam({ team, language }) {
     if (!card) return;
     const gap = parseFloat(window.getComputedStyle(track).columnGap) || 0;
     const distance = card.getBoundingClientRect().width + gap;
+    const visibleCards = Math.max(1, Math.round(track.clientWidth / distance));
+    const positions = Math.max(1, team.length - visibleCards + 1);
     const current = Math.round(track.scrollLeft / distance);
-    const next = (current + direction + team.length) % team.length;
+    const next = (current + direction + positions) % positions;
     track.scrollTo({ left: next * distance, behavior: "smooth" });
   };
 
