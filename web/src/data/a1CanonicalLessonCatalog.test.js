@@ -18,7 +18,7 @@ describe("A1 canonical lesson catalog", () => {
     expect(getA1CanonicalLesson("3.5")).toMatchObject({
       day: 13,
       chapter: "3.5",
-      title: "Einfache Aussagesätze und Fragen bilden",
+      title: "Forming Simple Statements and Questions",
       destination: "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
     });
   });
