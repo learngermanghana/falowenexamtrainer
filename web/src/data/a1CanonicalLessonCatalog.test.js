@@ -14,6 +14,14 @@ const EXPECTED_ROUTE_KEYS = [
 ];
 
 describe("A1 canonical lesson catalog", () => {
+  test("Day 13 Kapitel 3.5 displays the updated sentence and question title", () => {
+    expect(getA1CanonicalLesson("3.5")).toMatchObject({
+      day: 13,
+      chapter: "3.5",
+      title: "Einfache Aussagesätze und Fragen bilden",
+      destination: "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
+    });
+  });
   test("gives every current A1 Course Book chapter resource a permanent route", () => {
     expect(A1_CANONICAL_LESSON_CATALOG.map((lesson) => lesson.routeKey).sort()).toEqual(
       [...EXPECTED_ROUTE_KEYS].sort(),
