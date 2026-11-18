@@ -163,21 +163,47 @@ const LANGUAGE_OPTIONS = [
 
 function MeetOurTeam({ team, language }) {
   const trackRef = React.useRef(null);
+  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [touching, setTouching] = useState(false);
   const labels = {
-    en: { kicker: "THE PEOPLE BEHIND FALOWEN", heading: "Meet our German and Kiswahili team", intro: "Real educators and advisors supporting your learning journey.", about: "Read full profile", less: "Close profile", all: "Meet the whole team", previous: "Previous team members", next: "Next team members" },
-    de: { kicker: "DIE MENSCHEN HINTER FALOWEN", heading: "Unser Deutsch- und Kiswahili-Team", intro: "Lerne die Lehrkräfte und Berater kennen, die dich begleiten.", about: "Ganzes Profil lesen", less: "Profil schließen", all: "Das gesamte Team kennenlernen", previous: "Vorherige Teammitglieder", next: "Nächste Teammitglieder" },
-    fr: { kicker: "L'ÉQUIPE DERRIÈRE FALOWEN", heading: "Notre équipe d'allemand et de kiswahili", intro: "Découvrez les enseignants et conseillers qui vous accompagnent.", about: "Voir le profil", less: "Fermer le profil", all: "Découvrir toute l'équipe", previous: "Membres précédents", next: "Membres suivants" },
+    en: { kicker: "THE PEOPLE BEHIND FALOWEN", heading: "Meet our German and Kiswahili team", intro: "Real educators and advisors supporting your learning journey.", about: "Read full profile", less: "Close profile", all: "Meet the whole team", previous: "Previous team members", next: "Next team members", pause: "Pause automatic rotation", play: "Resume automatic rotation" },
+    de: { kicker: "DIE MENSCHEN HINTER FALOWEN", heading: "Unser Deutsch- und Kiswahili-Team", intro: "Lerne die Lehrkräfte und Berater kennen, die dich begleiten.", about: "Ganzes Profil lesen", less: "Profil schließen", all: "Das gesamte Team kennenlernen", previous: "Vorherige Teammitglieder", next: "Nächste Teammitglieder", pause: "Automatischen Wechsel pausieren", play: "Automatischen Wechsel fortsetzen" },
+    fr: { kicker: "L'ÉQUIPE DERRIÈRE FALOWEN", heading: "Notre équipe d'allemand et de kiswahili", intro: "Découvrez les enseignants et conseillers qui vous accompagnent.", about: "Voir le profil", less: "Fermer le profil", all: "Découvrir toute l'équipe", previous: "Membres précédents", next: "Membres suivants", pause: "Mettre le défilement automatique en pause", play: "Reprendre le défilement automatique" },
   };
   const copy = labels[language] || labels.en;
   const move = (direction) => {
     const track = trackRef.current;
     if (!track) return;
     const card = track.querySelector(".falowen-team-card");
-    const distance = card ? card.getBoundingClientRect().width + 16 : track.clientWidth;
-    track.scrollBy({ left: distance * direction, behavior: "smooth" });
+    if (!card) return;
+    const gap = parseFloat(window.getComputedStyle(track).columnGap) || 0;
+    const distance = card.getBoundingClientRect().width + gap;
+    const current = Math.round(track.scrollLeft / distance);
+    const next = (current + direction + team.length) % team.length;
+    track.scrollTo({ left: next * distance, behavior: "smooth" });
   };
+
+  useEffect(() => {
+    if (paused || hovered || focused || touching || team.length < 2) return undefined;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const timer = window.setInterval(() => {
+      if (document.hidden || trackRef.current?.querySelector("details[open]")) return;
+      move(1);
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, [paused, hovered, focused, touching, team.length]);
   return (
-    <section className="falowen-team-section" aria-labelledby="falowen-team-heading">
+    <section className="falowen-team-section" aria-labelledby="falowen-team-heading"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}
+      onTouchStart={() => setTouching(true)}
+      onTouchEnd={() => setTouching(false)}
+      onTouchCancel={() => setTouching(false)}
+    >
       <div className="falowen-team-top">
         <div>
           <span className="falowen-home-section-kicker">{copy.kicker}</span>
@@ -210,6 +236,7 @@ function MeetOurTeam({ team, language }) {
           ))}
         </div>
         <div className="falowen-team-controls" aria-label={copy.heading}>
+          <button type="button" onClick={() => setPaused((value) => !value)} aria-label={paused ? copy.play : copy.pause} aria-pressed={paused}>{paused ? "▶" : "Ⅱ"}</button>
           <button type="button" onClick={() => move(-1)} aria-label={copy.previous}>‹</button>
           <button type="button" onClick={() => move(1)} aria-label={copy.next}>›</button>
         </div>
