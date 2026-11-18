@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import SwahiliB1Day28Reading from "./SwahiliB1Day28Reading";
 import { Link } from "react-router-dom";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
@@ -43,6 +44,17 @@ export default function SwahiliB1Day28Workbook({ uid }) {
     try { return (draftKey && sessionStorage.getItem(draftKey)) || ""; }
     catch { return ""; }
   });
+  const readingKey = uid && `swahili-b1-day-28:reading:${uid}`;
+  const [reading, setReading] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem(readingKey)) || {}; }
+    catch { return {}; }
+  });
+  function updateReading(id, text) {
+    const next = { ...reading, [id]: text };
+    setReading(next);
+    try { if (readingKey) sessionStorage.setItem(readingKey, JSON.stringify(next)); }
+    catch { /* Keep answers editable when browser storage is unavailable. */ }
+  }
   function updateWriting(text) {
     setWriting(text);
     try { if (draftKey) sessionStorage.setItem(draftKey, text); }
@@ -251,10 +263,7 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <p>Nimetumia muundo unaofaa wa sarufi.</p>
           <p>Nimeomba jibu na kuhitimisha kwa salamu.</p>
         </>}
-        {activeTab === "lesen" && <>
-          <h2>3 · Kusoma</h2>
-          <p>Kazi ya kusoma itaongezwa baadaye.</p>
-        </>}
+        {activeTab === "lesen" && <SwahiliB1Day28Reading answers={reading} onAnswer={updateReading} />}
         {activeTab === "hoeren" && <>
           <h2>4 · Kusikiliza</h2>
           <p>Sauti na maswali ya kusikiliza vitaongezwa baadaye.</p>

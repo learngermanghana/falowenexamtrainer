@@ -120,7 +120,7 @@ Admin Live Classes owns the scheduled German and Swahili cohorts in Firestore. T
 
 Campus uses `web/src/data/swahili/a2B1TitleDictionary.json` for A2 and B1 lesson titles. Entries retain their Kiswahili IDs and the corresponding German chapter order and source IDs. Entries marked `titles-only` have no workbook. Speaking mock titles describe Kiswahili practice.
 
-B1 Day 28 (chapter 10.28), *Kutunza Mazingira katika Maisha ya Kila Siku*, has status `workbook`. The B1 course card opens `/campus/course/swahili/b1/day-28`. The route supports signed-in Kiswahili learners enrolled at B1 or higher and staff. The radio transcript opens before the workbook. Continue opens the requested workbook section using the shared radio-first gate. The workbook includes bilingual lyrics, grammar, speaking, writing practice and self-review. The final workbook reading and listening assessments are pending.
+B1 Day 28 (chapter 10.28), *Kutunza Mazingira katika Maisha ya Kila Siku*, has status `workbook`. The B1 course card opens `/campus/course/swahili/b1/day-28`. The route supports signed-in Kiswahili learners enrolled at B1 or higher and staff. The radio transcript opens before the workbook. Continue opens the requested workbook section using the shared radio-first gate. The workbook includes bilingual lyrics, grammar, speaking, writing practice and self-review. Teil 3 contains the environmental-care reading, bilingual vocabulary support and five written comprehension questions. The final listening assessment is pending.
 
 ### Course discount links
 
