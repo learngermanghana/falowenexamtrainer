@@ -56,7 +56,7 @@ describe("standardized A1 teacher videos", () => {
       expect.objectContaining({
         chapter: "1.2",
         topic: "Personal Pronouns and Verb Conjugation",
-        url: "https://youtu.be/9CTJ-2nsY8U",
+        url: "https://youtu.be/PxV62u_UJko",
       })
     );
 
@@ -72,16 +72,39 @@ describe("standardized A1 teacher videos", () => {
     expect(lesson.resources.teacherVideo).toEqual(
       expect.objectContaining({
         chapter: "1.2",
-        url: "https://youtu.be/9CTJ-2nsY8U",
+        url: "https://youtu.be/PxV62u_UJko",
       })
     );
     expect(lesson.resources.videos).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           key: "a1-day3-chapter-1-2-teacher-video",
-          url: "https://youtu.be/9CTJ-2nsY8U",
+          url: "https://youtu.be/PxV62u_UJko",
         }),
       ])
+    );
+  });
+
+  test("Day 12 Chapter 8 uses the updated 24-hour clock teacher lecture", () => {
+    const configuredVideo = getCanonicalA1TeacherVideoResource(12, "8");
+    expect(configuredVideo).toEqual(
+      expect.objectContaining({
+        chapter: "8",
+        topic: "The 24-Hour Clock",
+        url: "https://youtu.be/iUaAtLdBXCY",
+      })
+    );
+
+    const lesson = normalizeLesson(
+      {
+        day: 12,
+        chapter: "8",
+        lesen_hören: { chapter: "8" },
+      },
+      "A1"
+    );
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({ url: "https://youtu.be/iUaAtLdBXCY" })
     );
   });
 

@@ -1,7 +1,7 @@
 const A1_TEACHER_VIDEO_ENTRIES = [
   [1, "0.1", "Greetings and Asking About Well-being", "https://youtu.be/jXUJ3VTBlcE"],
   [3, "1.1", "Personal Information, Articles, Adjectives and W-Questions", "https://youtu.be/Ygbpt6yC_f4"],
-  [3, "1.2", "Personal Pronouns and Verb Conjugation", "https://youtu.be/9CTJ-2nsY8U"],
+  [3, "1.2", "Personal Pronouns and Verb Conjugation", "https://youtu.be/PxV62u_UJko"],
   [4, "2", "German Numbers", "https://youtu.be/XFZbjeKFgxw"],
   [5, "1.3", "Introducing Yourself and Articles", "https://youtu.be/KuGq_0r0FCY"],
   [6, "2.3", "Family and Hobbies", "https://youtu.be/sHYGyoOZ31Q"],
@@ -10,7 +10,7 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [9, "5", "German Cases", "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0"],
   [10, "6", "Objects and Colors", "https://youtu.be/sDL5z3lsITk"],
   [11, "7", "Understanding Time", "https://youtu.be/I_bDa_Vz4JE"],
-  [12, "8", "The 24-Hour Clock", "https://youtu.be/O10ziTyE3Ww"],
+  [12, "8", "The 24-Hour Clock", "https://youtu.be/iUaAtLdBXCY"],
   [13, "3.5", "Revision: Numbers, Time and Prices", "https://youtu.be/0aprj_rMWw8"],
   [14, "3.6", "Modal Verbs", "https://youtu.be/0zps4OYwShg"],
   [15, "4.7", "Introduction to Speaking Exams", "https://youtu.be/o9nn_hSDzw8"],
