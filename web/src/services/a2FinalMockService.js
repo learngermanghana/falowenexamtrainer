@@ -20,10 +20,10 @@ export const scoreA2MockWriting = async ({ sms, email, attemptId, idToken, mockI
   return response.data?.result || response.data;
 };
 
-export const startA2MockAttempt = async ({ idToken, mockId = "a2-mock-01" }) => {
+export const startA2MockAttempt = async ({ idToken, mockId = "a2-mock-01", resumeOnly = false }) => {
   const response = await axios.post(
     `${backendUrl}/a2-mock/attempt/start`,
-    { mockId },
+    { mockId, ...(resumeOnly ? { resumeOnly } : {}) },
     { headers: authHeaders(idToken) },
   );
   return response.data;

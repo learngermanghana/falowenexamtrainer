@@ -27,7 +27,7 @@ const TASKS = [
     hint:"Discuss time, place, gift, food and invitations with the German-speaking examiner." },
 ];
 
-function A2Mock2ConversationalSpeakingAttempt({embedded=false,onComplete,reviewReleased=false,attemptId=""}) {
+function A2Mock2ConversationalSpeakingAttempt({embedded=false,onComplete,reviewReleased=false,attemptId="",onPartSaved}) {
   const {user} = useAuth();
   const storageKey = getStudentMockStorageKey(STORAGE_KEY,user?.uid);
   const [data,setData] = useState(() => read(storageKey));
@@ -46,6 +46,7 @@ function A2Mock2ConversationalSpeakingAttempt({embedded=false,onComplete,reviewR
     // Persist immediately, before the parent reads section completion.
     localStorage.setItem(storageKey,JSON.stringify(next));
     setData(next);
+    onPartSaved?.();
     return true;
   };
 

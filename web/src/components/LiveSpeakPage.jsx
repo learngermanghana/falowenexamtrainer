@@ -1,3 +1,4 @@
+import { reportA2MockSubmission } from "../services/a2MockSubmissionDiagnostics";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -91,6 +92,19 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const contextualLevel = String(initialLevel || "").toUpperCase();
   const fixedLevel = embedded && /^(A1|A2|B1|B2|C1|C2)$/.test(contextualLevel) ? contextualLevel : "";
   const safeLevel = fixedLevel || selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
+  const a2MockId = deferFeedback ? examTask?.id?.match(/^(a2-mock-0[123])-speaking-teil-[123]$/)?.[1] : null;
+  const submissionFailures = useRef(new Set());
+  const reportSpeaking = useCallback((phase, succeeded) => {
+    if (!a2MockId) return;
+    const retry = submissionFailures.current.has(phase);
+    if (succeeded && !retry) return;
+    if (succeeded) submissionFailures.current.delete(phase);
+    else submissionFailures.current.add(phase);
+    reportA2MockSubmission({
+      idToken, mockId: a2MockId, module: "sprechen", phase,
+      outcome: succeeded ? "retry_succeeded" : retry ? "retry_failed" : "failed",
+    });
+  }, [idToken, a2MockId]);
   const examinerEntry = embedded && practiceSource === "exam-speaking-practice";
   const Container = embedded ? "section" : "main";
   const supportedExaminer=examinerEntry && ["A1","A2","B1","B2","C1","C2"].includes(safeLevel);
@@ -138,18 +152,24 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     const scopedPath = courseAssignmentKey && path === "/live-speak/status"
       ? `${path}?courseAssignmentKey=${encodeURIComponent(courseAssignmentKey)}` : path;
     const payload = body !== undefined && courseAssignmentKey ? { ...body, courseAssignmentKey } : body;
+    const uploading = ["/live-speak/session/turn", "/live-speak/session/confirm"].includes(path) && !body?.intro;
     const result = await fetch(backendUrl + scopedPath, {
       method, headers, body: payload === undefined ? undefined : JSON.stringify(payload),
+    }).catch(error => {
+      if (uploading) reportSpeaking("upload", false);
+      throw error;
     });
     const data = await result.json().catch(() => ({}));
     if (!result.ok) {
+      if (uploading) reportSpeaking("upload", false);
       const err = new Error(data.error || "Live Speak is temporarily unavailable.");
       err.code = data.code;
       err.status = result.status;
       throw err;
     }
+    if (uploading) reportSpeaking("upload", true);
     return data;
-  }, [idToken, courseAssignmentKey]);
+  }, [idToken, courseAssignmentKey, reportSpeaking]);
 
   const refresh = useCallback(async () => {
     if (!idToken) { setLoading(false); return; }
@@ -667,7 +687,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       });
       if (!mounted.current) return;
       stopAudio();
-      if (gradedCourseMock && !result.assessment) {
+      if ((gradedCourseMock || a2MockId) && !result.assessment) {
         throw new Error("Your answers are saved, but AI marking is incomplete. Tap Retry feedback.");
       }
       const accepted = onExamCompleted?.({sessionId:session.sessionId,taskId:session.examTask?.id || examTask?.id,
@@ -677,9 +697,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         keyword:session.examTask?.keywords || examTask?.keywords,
         feedback:result.feedback,assessment:result.assessment || null,
         words:session.examFlow?.cards || session.examFlow?.requestCards || []});
-      if (gradedCourseMock && accepted === false) {
+      if ((gradedCourseMock || a2MockId) && accepted === false) {
         throw new Error("Your exam answers are saved. Retry feedback to complete the mark.");
       }
+      reportSpeaking("marking", true);
       setExamFeedback(result.feedback);
       setExamAssessment(result.assessment || null);
       setSession(null);
@@ -690,6 +711,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       await refresh();
     } catch (err) {
       autoFeedbackRequested.current = false;
+      reportSpeaking("marking", false);
       if (gradedCourseMock && err.code === "course_mock_part_incomplete") {
         try {
           const status = await api("/live-speak/status");
@@ -706,7 +728,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       }
       if (mounted.current) {
         setErrorMessage(err.message);
-        setNotice(gradedCourseMock
+        setNotice(gradedCourseMock || a2MockId
           ? "Your confirmed answers remain saved. Marking is pending; use Retry feedback."
           : "");
       }
@@ -783,6 +805,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       };
       recordingStarted.current = Date.now();
       recorder.start(500);
+      if (!localOnly) reportSpeaking("recording", true);
       setRecording(true);
       setRecordingSeconds(0);
       recordingTicker.current = setInterval(() => {
@@ -793,6 +816,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       }, 300);
     } catch (err) {
       mediaRef.current?.getTracks().forEach(track => track.stop());
+      if (!localOnly) reportSpeaking("recording", false);
       setErrorMessage(microphoneFailureMessage(err));
     } finally {
       recordingStarting.current = false;

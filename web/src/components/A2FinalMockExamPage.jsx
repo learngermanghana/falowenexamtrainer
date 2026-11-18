@@ -1,3 +1,4 @@
+import { runA2MockSubmissionStep } from "../services/a2MockSubmissionDiagnostics";
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
 import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresentation";
@@ -318,11 +319,13 @@ export default function A2FinalMockExamPage() {
   const [exam, setExam] = useState(() => readStoredState(storageKey));
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
+  const [writingUpload, setWritingUpload] = useState("");
   const [error, setError] = useState("");
   const timeoutHandledRef = useRef("");
   const saveTimerRef = useRef(null);
   const lastAutosaveStageRef = useRef("");
-  const completionSaveRef = useRef("");
+  const completionSaveRef = useRef(null);
+  const [resultStatus, setResultStatus] = useState("");
   const completionRetryCountRef = useRef(0);
   const savedCompletionToastRef = useRef("");
   const savedStageToastRef = useRef("");
@@ -380,24 +383,25 @@ export default function A2FinalMockExamPage() {
     if (!exam.completed || exam.writingPending || !attemptId || !idToken) return undefined;
 
     const completionKey = `${attemptId}:${Number(exam.overall?.score || 0)}:${completionRetryNonce}`;
-    if (completionSaveRef.current === completionKey) return undefined;
-    completionSaveRef.current = completionKey;
+    if (completionSaveRef.current?.key !== completionKey) {
+      const promise = runA2MockSubmissionStep({
+        idToken, mockId: A2_FINAL_MOCK_ID, retry: completionRetryNonce > 0,
+      }, "result", "publishing", () => saveA2MockAttempt({
+        idToken, attemptId, section: "result", state: exam, sectionScores: exam.sectionScores,
+        status: "completed", overall: exam.overall,
+      }));
+      completionSaveRef.current = { key: completionKey, promise };
+    }
 
     let cancelled = false;
-    saveA2MockAttempt({
-      idToken,
-      attemptId,
-      section: "result",
-      state: exam,
-      sectionScores: exam.sectionScores,
-      status: "completed",
-      overall: exam.overall,
-    })
+    setResultStatus("saving");
+    completionSaveRef.current.promise
       .then((response) => {
         if (cancelled) return;
         if (response?.completionSync && response.completionSync.ok === false) {
           throw new Error(response.completionSync.error || "Could not sync final A2 mock result.");
         }
+        setResultStatus("saved");
         if (savedCompletionToastRef.current !== attemptId) {
           savedCompletionToastRef.current = attemptId;
           announceExamSuccess("A2 mock result saved successfully.");
@@ -411,7 +415,7 @@ export default function A2FinalMockExamPage() {
       .catch((saveError) => {
         if (cancelled) return;
         console.error("Could not finalize A2 mock result sync", saveError);
-        completionSaveRef.current = "";
+        setResultStatus("failed");
         const retryIndex = Math.min(completionRetryCountRef.current, 3);
         const retryDelay = [3000, 10000, 30000, 60000][retryIndex];
         completionRetryCountRef.current += 1;
@@ -460,7 +464,7 @@ export default function A2FinalMockExamPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const startExam = async ({ forceNew = false } = {}) => {
+  const startExam = async ({ forceNew = false, resumeOnly = false } = {}) => {
     if (busy) return;
     setBusy("start");
     setError("");
@@ -481,7 +485,8 @@ export default function A2FinalMockExamPage() {
         window.localStorage.removeItem(storageKey);
       }
 
-      const response = await startA2MockAttempt({ idToken, mockId: A2_FINAL_MOCK_ID });
+      const response = await startA2MockAttempt({ idToken, mockId: A2_FINAL_MOCK_ID, resumeOnly });
+      if (resumeOnly && !response?.resumed) throw new Error("No active attempt was found on your account.");
       if (response?.resumed && response?.state && !forceNew) {
         const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
         const localSavedAt = Number(exam.clientSavedAtMs || 0);
@@ -494,6 +499,18 @@ export default function A2FinalMockExamPage() {
         setExam({
           ...emptyState(),
           ...newestState,
+          speakingProgress: {
+            ...newestState.speakingProgress,
+            attempts: {
+              ...newestState.speakingProgress?.attempts,
+              ...(Object.keys(response.examinerParts || {}).length ? {
+                examinerParts: {
+                  ...response.examinerParts,
+                  ...newestState.speakingProgress?.attempts?.examinerParts,
+                },
+              } : {}),
+            },
+          },
           attemptInfo: {
             attemptId: response.attemptId,
             attemptNumber: response.attemptNumber,
@@ -541,44 +558,56 @@ export default function A2FinalMockExamPage() {
   const submitSchreiben = useCallback(async () => {
     if (busy) return;
     setBusy("schreiben");
+    setWritingUpload("saving");
     setError("");
+    const attemptId = exam.attemptInfo?.attemptId || "";
+    const context = { idToken, mockId: A2_FINAL_MOCK_ID };
+    const submittedState = {
+      ...exam,
+      stage: "schreiben",
+      writingPending: true,
+      clientSavedAtMs: Date.now(),
+    };
+    // Save the texts independently so a marking failure can be resumed on another device.
+    setExam(submittedState);
     try {
-      const result = await scoreA2MockWriting({
-        sms: exam.schreibenSms,
-        email: exam.schreibenEmail,
-        attemptId: exam.attemptInfo?.attemptId || "",
-        idToken,
-      });
+      await runA2MockSubmissionStep(context, "schreiben", "upload", () => saveA2MockAttempt({
+        idToken, attemptId, section: "schreiben", state: submittedState,
+        sectionScores: exam.sectionScores,
+      }));
+      setWritingUpload("saved");
+      const result = await runA2MockSubmissionStep(context, "schreiben", "marking", () => scoreA2MockWriting({
+        sms: exam.schreibenSms, email: exam.schreibenEmail, attemptId, idToken,
+      }));
       moveToSection("sprechen", {
         schreibenResult: result,
         writingPending: false,
         sectionScores: { ...exam.sectionScores, schreiben: Number(result?.score || 0) },
-        speakingProgress: exam.speakingProgress || { attempts: {} },
       });
     } catch (markError) {
-      // Submission and grading are separate. The student keeps the text and
-      // moves to Sprechen; no final score is released until retry succeeds.
+      if (markError.submissionPhase === "upload") setWritingUpload("failed");
       moveToSection("sprechen", { writingPending: true });
-      setError("");
     } finally {
       setBusy("");
     }
-  }, [
-    busy,
-    exam.attemptInfo?.attemptId,
-    exam.schreibenEmail,
-    exam.schreibenSms,
-    exam.sectionScores,
-    exam.speakingProgress,
-    idToken,
-    moveToSection,
-  ]);
+  }, [busy, exam, idToken, moveToSection]);
 
   const retryPendingWriting = async () => {
     if (busy || !exam.writingPending) return;
     setBusy("schreiben"); setError("");
     try {
-      const result = await scoreA2MockWriting({ sms: exam.schreibenSms, email: exam.schreibenEmail, attemptId: exam.attemptInfo?.attemptId || "", idToken });
+      const context = { idToken, mockId: A2_FINAL_MOCK_ID, retry: true };
+      if (writingUpload !== "saved") {
+        await runA2MockSubmissionStep(context, "schreiben", "upload", () => saveA2MockAttempt({
+          idToken, attemptId: exam.attemptInfo?.attemptId, section: exam.stage,
+          state: { ...exam, clientSavedAtMs: Date.now() }, sectionScores: exam.sectionScores,
+        }));
+        setWritingUpload("saved");
+      }
+      const result = await runA2MockSubmissionStep(context,
+        "schreiben", "marking", () => scoreA2MockWriting({
+          sms: exam.schreibenSms, email: exam.schreibenEmail, attemptId: exam.attemptInfo?.attemptId || "", idToken,
+        }));
       setExam(current => {
         const sectionScores = {...current.sectionScores, schreiben:Number(result?.score || 0)};
         const total = Number(Object.values(sectionScores)
@@ -1022,6 +1051,9 @@ export default function A2FinalMockExamPage() {
         {error ? <p className="a1-final-mock-error">{error}</p> : null}
         <div className="a1-final-mock-submitbar">
           <span>Results remain hidden until the full mock is complete.</span>
+          {busy === "schreiben" ? <p role="status">{writingUpload === "saved"
+          ? "Schreiben submitted to Falowen. AI marking in progress."
+          : "Schreiben saved on this device. Waiting for server confirmation."}</p> : null}
           <button type="button" onClick={submitSchreiben} disabled={busy === "schreiben"}>
             {busy === "schreiben" ? "Marking Schreiben …" : "Submit Schreiben → Sprechen"}
           </button>
@@ -1166,6 +1198,9 @@ export default function A2FinalMockExamPage() {
           <button type="button" className="a1-final-mock-start" onClick={() => startExam()} disabled={busy === "start"}>
             {busy === "start" ? "Preparing mock …" : "Start or resume all 4 modules"}
           </button>
+          {idToken ? <button type="button" onClick={() => startExam({ resumeOnly: true })} disabled={busy === "start"}>
+            Resume attempt
+          </button> : null}
         </article>
       </main>
     );
@@ -1187,6 +1222,15 @@ export default function A2FinalMockExamPage() {
       {exam.stage === "schreiben" ? renderSchreiben() : null}
       {exam.stage === "sprechen" ? (
         <>
+          {exam.writingPending ? <section aria-label="Schreiben submission">
+            <p role="status">{writingUpload === "saved"
+              ? "Schreiben submitted to Falowen. AI marking needs a retry."
+              : "Schreiben saved on this device. Submission or marking needs a retry."}</p>
+            {error ? <p role="alert">{error}</p> : null}
+            <button type="button" onClick={retryPendingWriting} disabled={busy === "schreiben"}>
+              {busy === "schreiben" ? "AI marking in progress…" : "Retry Schreiben marking"}
+            </button>
+          </section> : null}
           <SectionHeader label="Sprechen · 15 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
           <A2FinalMockSpeaking
             externalSecondsLeft={secondsLeft}
@@ -1208,7 +1252,16 @@ export default function A2FinalMockExamPage() {
           </button>
         </article>
       ) : null}
-      {exam.stage === "result" && !exam.writingPending && canReviewFullMock(exam) ? renderResult() : null}
+      {exam.stage === "result" && !exam.writingPending && canReviewFullMock(exam) ? <>
+        <p role="status">{resultStatus === "saved" ? "Saved in Falowen Results."
+          : resultStatus === "failed" ? "Saving to Falowen Results needs a retry."
+          : "Saving to Falowen Results…"}</p>
+        {resultStatus === "failed" ? <button type="button" onClick={() => {
+          window.clearTimeout(completionRetryTimerRef.current);
+          setCompletionRetryNonce(value => value + 1);
+        }}>Retry saving Results</button> : null}
+        {renderResult()}
+      </> : null}
     </main>
   );
 }

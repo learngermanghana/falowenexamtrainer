@@ -27,3 +27,5 @@ B1-8.24 (Konsum und Nachhaltigkeit) uses the owner-provided private R2 object `b
 ## A2 mock submission and Lesen Teil 4
 
 In A2 Lesen samples, learners choose **X – Keine passende Anzeige** in the answer menu when none of the adverts fits. The reference sheet contains the adverts labelled a–f. For A2 Mocks 1–3, Sprechen can recover a saved examiner mark for the same session after a connection failure. In Mocks 2 and 3, a sign-in token refresh preserves the active final scoring request and displays its outcome when it finishes.
+
+A2 Mocks 1–3 distinguish local writing, server submission, AI marking and Results publishing. Use **Resume attempt** with the same student account to reopen an active attempt. Mocks 2 and 3 restore submitted writing and the server's verified speaking parts at the next unfinished module. The speaking examiner writes the resume reference in the same transaction as the verified receipt. This release requires both the Firebase Functions and learner frontend updates. Verify with a test learner on two devices before confirming the change in production. The submission diagnostic log uses only mock, module, phase and retry outcome.
