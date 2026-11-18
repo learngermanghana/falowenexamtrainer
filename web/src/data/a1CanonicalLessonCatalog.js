@@ -65,7 +65,7 @@ const PRACTICE_LESSONS = [
   practice({
     chapter: "3.5",
     day: 13,
-    title: "Einfache Aussagesätze und Fragen bilden",
+    title: "Forming Simple Statements and Questions",
     destination: "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
   }),
   practice({
