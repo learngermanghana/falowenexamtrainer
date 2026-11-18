@@ -142,7 +142,7 @@ test("shared academy profile contains the current team, teaching media and publi
     "Hana",
   ]);
   assert.match(profile.team.find((member) => member.name === "Catherine Agbleze Etornam")?.image || "", /^https:\/\/raw\.githubusercontent\.com\//);
-  assert.match(profile.team.find((member) => member.name === "Sabina Michel")?.role || "", /German Teacher/);
+  assert.equal(profile.team.find((member) => member.name === "Sabina Michel")?.role, "Student Support & Administrative Coordinator");
   const ruth = profile.team.find((member) => member.name === "Dr. Ruth Ndekiro Shao");
   assert.equal(ruth.role, "Kiswahili Language Instructor & Researcher");
   assert.equal(ruth.image, "/classes/media/ruth-ndekiro-shao.webp");

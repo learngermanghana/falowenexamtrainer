@@ -57,7 +57,10 @@ describe("Falowen public marketing redesign", () => {
     const styles = read("./LandingPageMarketing.css");
     const guideStyles = read("./PublicAdmissionsVisitorGuidePage.css");
     expect(wrapper).toContain("/homepage-reviews.js");
-    expect(landing).toContain("falowen-home-support");
+    expect(landing).toContain("falowen-team-section");
+    expect(landing).toContain("academyProfile.team");
+    expect(landing).not.toContain('className="falowen-home-support"');
+    expect(landing).not.toContain('className="falowen-home-hybrid"');
     expect(landing).toContain("falowen-home-reviews-intro");
     expect(landing).toContain("academyProfile.classroomImage");
     expect(landing).toContain("FOOTER_LINKS");
