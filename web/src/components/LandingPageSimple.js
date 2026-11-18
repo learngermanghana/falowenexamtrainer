@@ -196,6 +196,11 @@ function MeetOurTeam({ team, language }) {
               <div className="falowen-team-card-body">
                 <h3>{person.name}</h3>
                 <p className="falowen-team-role">{person.role}</p>
+                {Array.isArray(person.credentials) && person.credentials.length > 0 && (
+                  <div className="falowen-team-credentials" aria-label="Qualifications">
+                    {person.credentials.map((credential) => <span key={credential}>{credential}</span>)}
+                  </div>
+                )}
                 <details className="falowen-team-profile">
                   <summary>{copy.about}</summary>
                   <p>{person.bio}</p>
