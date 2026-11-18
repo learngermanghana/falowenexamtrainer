@@ -120,14 +120,15 @@ export const openCompletedWorkbook = (locationLike, windowRef) => {
 export const shouldShowRadioFirst = (level, day) =>
   Boolean(resolveRadioFirstWorkbookResource(level, day));
 
-const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseBookPath = "/campus/course" }) => {
+const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseBookPath = "/campus/course", transcriptIntro = null }) => {
   const explicitRadio = isFalowenRadioResource(resource) ? resource : null;
-  const radio = explicitRadio || resolveRadioFirstWorkbookResource(level, day);
+  const radio = explicitRadio || (transcriptIntro ? null : resolveRadioFirstWorkbookResource(level, day));
+  const hasIntro = Boolean(radio || transcriptIntro);
   const location = useLocation();
   const navigate = useNavigate();
   const requestedView = String(new URLSearchParams(location.search || "").get("view") || "").toLowerCase();
-  const forceRadio = Boolean(radio && requestedView === "radio");
-  const completedAtMount = !radio || (!forceRadio && hasCompletedRadioStep(location.search, level, day));
+  const forceRadio = Boolean(hasIntro && requestedView === "radio");
+  const completedAtMount = !hasIntro || (!forceRadio && hasCompletedRadioStep(location.search, level, day));
   const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(() => completedAtMount);
   const [isContinuing, setIsContinuing] = useState(false);
   const continueHref = buildCompletedRadioHref(location);
@@ -144,6 +145,7 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseB
       level: String(level || "").toUpperCase(),
       day: Number(day),
       hasRadio: Boolean(radio),
+      hasTranscriptIntro: Boolean(transcriptIntro),
       radioKey: radio?.key || "",
       youtubeId: radio?.youtubeId || "",
       search: location.search,
@@ -153,7 +155,7 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseB
       isContinuing,
       continueHref,
     });
-  }, [continueHref, day, hasEnteredWorkbook, isContinuing, level, location.search, radio]);
+  }, [continueHref, day, hasEnteredWorkbook, isContinuing, level, location.search, radio, transcriptIntro]);
 
   if (hasEnteredWorkbook) return children;
 
@@ -205,10 +207,15 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseB
         </span>
         <h1 style={{ margin: 0 }}>{String(level).toUpperCase()} · Day {day} · Falowen Radio</h1>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-          Listen to Falowen Radio first. Continue opens the student workbook.
+          {transcriptIntro ? "Read the Falowen Radio transcript, then continue to the workbook." : "Listen to Falowen Radio first. Continue opens the student workbook."}
         </p>
       </header>
-      <FalowenRadioTabContent
+      {transcriptIntro ? <section style={styles.card}>
+        {transcriptIntro}
+        <button type="button" style={styles.primaryButton} disabled={isContinuing} onClick={handleContinue}>
+          {isContinuing ? "Opening workbook…" : "Continue to workbook →"}
+        </button>
+      </section> : <FalowenRadioTabContent
         level={level}
         day={day}
         resource={radio}
@@ -216,7 +223,7 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseB
         actionDisabled={isContinuing}
         persistCompletionInUrl={false}
         onContinue={handleContinue}
-      />
+      />}
     </div>
   );
 };
