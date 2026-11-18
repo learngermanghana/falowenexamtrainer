@@ -73,13 +73,17 @@ describe("Falowen current six-slide public homepage and iPhone navigation", () =
     expect(nav.getByRole("link",{name:"Livres"})).toHaveAttribute("href","/books");
   });
 
-  it("keeps iPhone-safe CSS, upcoming class card, support and review area",()=>{
+  it("keeps iPhone-safe CSS, upcoming class card, team profiles and review area",()=>{
     const {container}=renderHome();
     const css=fs.readFileSync(path.resolve(__dirname,"../components/LandingPageMarketing.css"),"utf8");
     expect(css).toContain("env(safe-area-inset-bottom)");
     expect(css).toContain("@media (max-width: 600px)");
     expect(container.querySelector(".falowen-home-reviews-intro")).toBeInTheDocument();
-    expect(container.querySelector(".falowen-home-support")).toBeInTheDocument();
+    expect(container.querySelector(".falowen-team-section")).toBeInTheDocument();
+    expect(screen.getByRole("heading",{name:"Meet our German and Kiswahili team"})).toBeInTheDocument();
+    expect(container.querySelectorAll(".falowen-team-card")).toHaveLength(5);
+    expect(container.querySelector(".falowen-home-hybrid")).not.toBeInTheDocument();
+    expect(container.querySelector(".falowen-home-support")).not.toBeInTheDocument();
     expect(screen.getByRole("heading",{name:"Find your next class"})).toBeInTheDocument();
   });
 });
