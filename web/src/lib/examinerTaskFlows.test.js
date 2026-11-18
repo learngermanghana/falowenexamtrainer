@@ -462,3 +462,26 @@ describe("No-dead-end grading when planning is unsuccessful", () => {
     expect(flows.isComplete(session)).toBe(true);
   });
 });
+
+test.each(["04", "05", "06", "07", "08"])("A2 Mock %s uses its own four planning points through preview, dialogue and marking", number => {
+  const mockId = `a2-mock-${number}`;
+  const canonical = require("../../../functions/functionz/a2KombiMarkingSets")[mockId].speaking.teil3;
+  const task = { id: `${mockId}-speaking-teil-3`, teil: "Teil 3", prompt: "Client-supplied prompt" };
+  const examFlow = flows.createExaminerFlow("A2", task, "simulation");
+  const session = { examFlow, examTask: task, answeredTurns: 1 };
+  const view = flows.publicFlow(session);
+  expect(view).toMatchObject({
+    scenario: canonical.situation, points: canonical.points, criteria: canonical.points, studentCalendar: [],
+  });
+  expect(examinerTaskPreview("A2", task)).toMatchObject({ scenario: view.scenario, points: view.points });
+  const plan = flows.responsePlan(session);
+  expect(plan).toMatchObject({ dynamic: true, scripted: false });
+  const instructions = flows.partnerInstructions(session, plan);
+  expect(instructions).toContain(canonical.points[3]);
+  expect(instructions).not.toContain("Your private free times");
+  const complete = { ...session, answeredTurns: 2 };
+  const transcript = "Ja, so machen wir das.";
+  const decisions = examFlow.planningPoints.map(point => ({ point: point.id, value: "Vereinbart", quote: transcript }));
+  expect(flows.mergeDecisions(complete, decisions.slice(0, 3), transcript).complete).toBe(false);
+  expect(flows.mergeDecisions(complete, decisions, transcript).complete).toBe(true);
+});

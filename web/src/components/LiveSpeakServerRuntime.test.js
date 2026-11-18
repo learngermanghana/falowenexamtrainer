@@ -1387,3 +1387,27 @@ test.each(Array.from({ length: 8 }, (_, index) => `a2-mock-0${index + 1}`))("%s 
     mockAttemptId: "test-attempt", completed: true,
   });
 });
+
+test("Mock 8 Teil 3 feedback receives the birthday task criteria instead of calendar availability", async () => {
+  const api = setup({ LIVE_SPEAK_TESTING_ACCESS: "true" });
+  const mockId = "a2-mock-08";
+  api.docs.set("a2MockExamUsers/u123/attempts/test-attempt", { uid: "u123", mockId, status: "in_progress" });
+  const started = await api.call("POST", "/live-speak/session/start", {
+    level: "A2", source: "exam-speaking-practice", examinerFlowVersion: 1,
+    examTask: { id: `${mockId}-speaking-teil-3`, teil: "Teil 3", mockAttemptId: "test-attempt" },
+  });
+  expect(started.code).toBe(200);
+  expect(started.payload.examFlow.points).toContain("Wer sammelt das Geld ein?");
+  const answers = ["Wir feiern am Freitag.", "Ich kaufe die Karte.", "Wir bringen Kuchen mit.", "Ich sammle das Geld ein."];
+  api.docs.set(sessionKey, { ...api.docs.get(sessionKey), taskReady: true, answeredTurns: 4, confirmedAnswers: answers });
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({ choices: [{ message: { content: JSON.stringify({
+    taskScores: answers.map((_, index) => ({ step: index + 1, score: 2 })),
+    summary: "Gut gemacht.", priority: "Üben Sie Rückfragen.",
+  }) } }] });
+  const reply = await api.call("POST", "/live-speak/session/exam-feedback", { sessionId: started.payload.sessionId });
+  expect(reply.code).toBe(200);
+  const marking = JSON.parse(api.fakeClient.chat.completions.create.mock.calls[0][0].messages.at(-1).content);
+  expect(marking.task.keywords).toContain("Wer sammelt das Geld ein?");
+  expect(marking.task.keywords).not.toContain("both calendars");
+  expect(marking.examContext.requiredCriteria).toHaveLength(4);
+});

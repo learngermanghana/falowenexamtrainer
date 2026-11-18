@@ -1032,7 +1032,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         }
         task = record.examTask || {prompt:record.topic};
         level = cleanLevel(record.level);
-        if (record.examFlow?.key === "A2-3") task={...task,prompt:taskFlows.publicFlow(record).scenario,keywords:"Find one appointment free in both calendars"};
+        if (record.examFlow?.key === "A2-3") {
+          const planning = taskFlows.publicFlow(record);
+          task = { ...task, prompt: planning.scenario, keywords: record.examFlow.planningPoints
+            ? planning.points.join(" / ") : "Find one appointment free in both calendars" };
+        }
         if (record.examFlow?.key === "B1-3") task={...task,prompt:"Discuss presentations: " + record.examFlow.contextTopic};
         examContext = record.examFlow ? {flow:taskFlows.publicFlow(record),dialogue:savedMessages(record),
           requiredCriteria:taskFlows.profileFor(record.examFlow)?.criteria,
