@@ -8,6 +8,7 @@ import { styles } from "../styles";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 
 const lessons = [
+  { day: 28, title: "B1 · Kutunza Mazingira katika Maisha ya Kila Siku" },
   { day: 1, title: "Alfabeti, sauti na matamshi" },
   { day: 6, title: "Mgahawani" },
 ];
@@ -20,9 +21,10 @@ export default function SwahiliResults({ uid }) {
     if (!db || !uid) return;
     let active = true;
     Promise.all(lessons.map(async ({ day, title }) => {
+      const lessonDoc = day === 28 ? "b1-day-28" : `day-${day}`;
       const [submission, review] = await Promise.all([
-        getDoc(doc(db, "users", uid, "swahiliLessons", `day-${day}`)),
-        getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_day-${day}`)),
+        getDoc(doc(db, "users", uid, "swahiliLessons", lessonDoc)),
+        getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_${lessonDoc}`)),
       ]);
       if (submission.data()?.status !== "submitted") return null;
       return { day, title, review: getCurrentSwahiliReview(submission.data(), review.data()) };
@@ -35,17 +37,17 @@ export default function SwahiliResults({ uid }) {
   }, [uid]);
 
   useEffect(() => {
-    if (/^#swahili-day-(1|6)$/.test(hash) && rows) {
+    if (/^#swahili-(day-(1|6)|b1-day-28)$/.test(hash) && rows) {
       document.getElementById(hash.slice(1))?.scrollIntoView?.({ block: "start" });
     }
   }, [hash, rows]);
 
   const results = (rows || []).filter(({ review }) => Number.isInteger(review?.score)).map(({ day, title, review }) => {
-    const id = `swahili-day-${day}`;
+    const id = day === 28 ? "swahili-b1-day-28" : `swahili-day-${day}`;
     const writing = Object.entries(review.answerReference?.writing || {});
     const reading = Object.values(review.answerReference?.reading || {});
     return {
-      id, assignmentId: id, assignment: `Day ${day} · ${title}`, level: "A1",
+      id, assignmentId: id, assignment: `Day ${day} · ${title}`, level: day === 28 ? "B1" : "A1",
       score: review.score, revisionRequested: review.status === "needs_revision", comments: review.feedback, source: "swahili_tutor",
       date: review.reviewedAt?.toDate?.().toISOString(),
       referenceParts: [
@@ -72,11 +74,11 @@ export default function SwahiliResults({ uid }) {
       </section>
       {results.length > 0 && <ResultHistory results={results} focusedResultId={hash.slice(1)} />}
       {pending.map(({ day, title, review }) => (
-        <article id={`swahili-day-${day}`} key={day} style={styles.resultCard}>
+        <article id={day === 28 ? "swahili-b1-day-28" : `swahili-day-${day}`} key={day} style={styles.resultCard}>
           <h3>Day {day} · {title}</h3>
           <p>{review?.status === "needs_revision" ? "Revision needed" : review ? "Reviewed" : "Awaiting tutor review"}</p>
           {review?.feedback && <p style={{ whiteSpace: "pre-wrap" }}>{review.feedback}</p>}
-          {review?.status === "needs_revision" && <Link to={`/campus/course/swahili/day-${day}?view=submit`}>Revise submission</Link>}
+          {review?.status === "needs_revision" && <Link to={`/campus/course/swahili/${day === 28 ? "b1/day-28" : `day-${day}`}?view=submit`}>Revise submission</Link>}
         </article>
       ))}
     </div>

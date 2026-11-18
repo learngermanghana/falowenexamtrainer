@@ -1,5 +1,9 @@
-import React, { useState } from "react";
-import SwahiliB1Day28Reading from "./SwahiliB1Day28Reading";
+import React, { useState, useEffect } from "react";
+import SwahiliB1Day28Listening, { listeningQuestions } from "./SwahiliB1Day28Listening";
+import { useAuth } from "../context/AuthContext";
+import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
+import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
+import SwahiliB1Day28Reading, { readingQuestions } from "./SwahiliB1Day28Reading";
 import { Link } from "react-router-dom";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
@@ -13,7 +17,7 @@ const tabs = [
   { key: "schreiben", label: "2 · Kuandika" },
   { key: "lesen", label: "3 · Kusoma" },
   { key: "hoeren", label: "4 · Kusikiliza" },
-  { key: "review", label: "Kujikagua" },
+  { key: "submit", label: "Kagua na uwasilishe" },
 ];
 
 const radioIntro = <div lang="sw">
@@ -49,13 +53,71 @@ export default function SwahiliB1Day28Workbook({ uid }) {
     try { return JSON.parse(sessionStorage.getItem(readingKey)) || {}; }
     catch { return {}; }
   });
+  const { user, studentProfile } = useAuth();
+  const canSubmit = canSubmitSwahiliWorkbook({ user, studentProfile }) && uid === user?.uid;
+  const listeningKey = uid && `swahili-b1-day-28:listening:${uid}`;
+  const [listening, setListening] = useState(() => {
+    try { return (listeningKey && JSON.parse(sessionStorage.getItem(listeningKey))) || {}; }
+    catch { return {}; }
+  });
+  const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loadingWork, setLoadingWork] = useState(true);
+  const missing = [
+    !writing.trim() && "2 · Kuandika",
+    readingQuestions.some(({ id }) => !reading[id]?.trim()) && "3 · Kusoma",
+    listeningQuestions.some(({ id }) => !listening[id]?.trim()) && "4 · Kusikiliza",
+  ].filter(Boolean);
+
+  useEffect(() => {
+    if (!canSubmit || !db) { setLoadingWork(false); return; }
+    let active = true;
+    getDoc(doc(db, "users", uid, "swahiliLessons", "b1-day-28")).then(snapshot => {
+      if (!active || !snapshot.exists()) return;
+      const prior = snapshot.data();
+      setSubmitted(true);
+      setWriting(current => current || prior.writing?.email || "");
+      setReading(current => ({ ...prior.readingAnswers, ...current }));
+      setListening(current => ({ ...prior.listeningAnswers, ...current }));
+    }).catch(() => { if (active) setNotice("Imeshindikana kupakia kazi ya awali."); })
+      .finally(() => { if (active) setLoadingWork(false); });
+    return () => { active = false; };
+  }, [uid, canSubmit]);
+
+  async function submitWork() {
+    if (!canSubmit || !db || loadingWork || saving || missing.length) return;
+    setSaving(true);
+    setNotice("");
+    try {
+      await setDoc(doc(db, "users", uid, "swahiliLessons", "b1-day-28"), {
+        studentId: uid, userId: uid, studentName: studentProfile?.name || user.displayName || "",
+        studentEmail: user.email || "", program: "swahili", level: "B1", day: 28,
+        lessonId: "swahili-b1-day-28", title: "Kutunza Mazingira katika Maisha ya Kila Siku",
+        status: "submitted", submittedAt: serverTimestamp(), writing: { email: writing.trim() },
+        readingAnswers: reading, listeningAnswers: listening,
+      });
+      setSubmitted(true);
+      setNotice("Kazi yako imewasilishwa kwa mwalimu.");
+    } catch { setNotice("Imeshindikana kuwasilisha kazi. Jaribu tena."); }
+    finally { setSaving(false); }
+  }
+  function updateListening(id, text) {
+    setNotice("");
+    const next = { ...listening, [id]: text };
+    setListening(next);
+    try { if (listeningKey) sessionStorage.setItem(listeningKey, JSON.stringify(next)); }
+    catch { /* Keep the draft in memory. */ }
+  }
   function updateReading(id, text) {
+    setNotice("");
     const next = { ...reading, [id]: text };
     setReading(next);
     try { if (readingKey) sessionStorage.setItem(readingKey, JSON.stringify(next)); }
     catch { /* Keep answers editable when browser storage is unavailable. */ }
   }
   function updateWriting(text) {
+    setNotice("");
     setWriting(text);
     try { if (draftKey) sessionStorage.setItem(draftKey, text); }
     catch { /* The exercise remains editable when browser storage is unavailable. */ }
@@ -247,15 +309,6 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <label htmlFor="sw-b1-28-writing">Andika barua pepe yako</label>
           <textarea id="sw-b1-28-writing" rows={9} value={writing} onChange={event => updateWriting(event.target.value)} />
           <p>Maneno: {writing.trim() ? writing.trim().split(/\s+/).length : 0} · Lengo: 100–120</p>
-          <details><summary>Mfano wa barua pepe</summary>
-          <p>Mada: Tuisafishe na kuipendezesha sehemu yetu</p>
-          <p>Wapendwa majirani,</p>
-          <p>Katika uwanja wetu kuna taka nyingi. Kwa hiyo, ningependa kuwaalika kwenye shughuli ya pamoja ya usafi siku ya Jumamosi saa nne asubuhi. Tutakutana mbele ya lango kuu.</p>
-          <p>Kwanza tutakusanya na kutenganisha taka. Baadaye tutapanda maua ili eneo letu liwe safi na zuri. Tafadhali, leteni glavu na ndoo mlizo nazo. Badala ya kununua vifaa vipya, tunaweza kuazima vifaa kutoka kwa majirani.</p>
-          <p>Mvua kubwa ikinyesha, tutahamisha shughuli hadi Jumamosi inayofuata. Tafadhali nijulishe kabla ya Alhamisi kama utaweza kushiriki.</p>
-          <p>Salamu,</p>
-          <p>Lena</p>
-          </details>
           <h3>Orodha ya mwisho</h3>
           <p>Nimeeleza tatizo na sababu ya kuandika.</p>
           <p>Nimetaja mahali, tarehe na saa.</p>
@@ -264,12 +317,15 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <p>Nimeomba jibu na kuhitimisha kwa salamu.</p>
         </>}
         {activeTab === "lesen" && <SwahiliB1Day28Reading answers={reading} onAnswer={updateReading} />}
-        {activeTab === "hoeren" && <>
-          <h2>4 · Kusikiliza</h2>
-          <p>Sauti na maswali ya kusikiliza vitaongezwa baadaye.</p>
-        </>}
-        {activeTab === "review" && <>
-          <h2>Kujikagua</h2>
+        {activeTab === "hoeren" && <SwahiliB1Day28Listening answers={listening} onAnswer={updateListening} />}
+        {activeTab === "submit" && <>
+          <h2>Kagua na uwasilishe kazi</h2>
+          {submitted && <p>Kazi iliyowasilishwa awali inaweza kusasishwa.</p>}
+          {missing.length > 0 && <p>Kamilisha: {missing.join(", ")}</p>}
+          <button type="button" disabled={!canSubmit || loadingWork || saving || missing.length > 0} onClick={submitWork}>
+            {saving ? "Inawasilishwa…" : submitted ? "Wasilisha marekebisho" : "Wasilisha kwa mwalimu"}
+          </button>
+          {notice && <p role="status">{notice}</p>}
           <h3>Tathmini binafsi</h3>
           <ul><li>kutaja tabia zinazolinda mazingira.</li><li>kueleza namna kwa “kwa + kitenzi-jina”.</li><li>kutaja njia mbadala kwa “badala ya”.</li><li>kueleza lengo kwa “ili”.</li><li>kutoa maoni yenye faida, changamoto na pendekezo.</li><li>kuandika mwaliko mfupi wa shughuli ya mazingira.</li></ul>
           <h3>Kazi ya ziada · Tafakari</h3>
