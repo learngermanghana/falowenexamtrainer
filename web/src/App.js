@@ -1,3 +1,5 @@
+import { normalizeCourseLevel } from "./utils/levelAccess";
+import SwahiliB1Day28Workbook from "./components/SwahiliB1Day28Workbook";
 import SwahiliDayFiveWorkbook from "./components/SwahiliDayFiveWorkbook";
 import SwahiliCourseBook from "./components/SwahiliCourseBook";
 import SwahiliDaySixWorkbook from "./components/SwahiliDaySixWorkbook";
@@ -981,6 +983,10 @@ const AppShell = ({
             }
           />
           <Route path="/campus/course/preview/:level" element={<NextLevelPreviewPage />} />
+          <Route path="/campus/course/swahili/b1/day-28" element={
+            isStaff || ["B1", "B2", "C1", "C2"].includes(normalizeCourseLevel(studentProfile?.level) || normalizeCourseLevel(studentProfile?.className))
+              ? <SwahiliB1Day28Workbook key={user?.uid} uid={user?.uid} /> : <Navigate to="/campus/course" replace />
+          } />
           <Route path="/campus/course/swahili/day-1" element={<SwahiliCourseBook day={1} basePath="/campus/course/swahili" />} />
           <Route path="/campus/course/swahili/day-5" element={<SwahiliDayFiveWorkbook />} />
           <Route path="/campus/course/swahili/day-6" element={<SwahiliDaySixWorkbook basePath="/campus/course/swahili" />} />
