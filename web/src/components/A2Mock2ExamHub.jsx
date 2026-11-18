@@ -52,7 +52,7 @@ function A2Mock2ExamHubAttempt(){
  const [finalRetry,setFinalRetry] = useState(0);
  const [finalState,setFinalState] = useState({status:"idle",error:""});
  const registrationInFlight = useRef(false);
- const finalizationInFlight = useRef(false);
+ const finalizationInFlight = useRef(null);
  const mountedRef = useRef(true);
  useEffect(() => () => { mountedRef.current = false; }, []);
  const stage = flow.stage;
@@ -119,24 +119,33 @@ function A2Mock2ExamHubAttempt(){
  // Save current answers and obtain the actual server-verified four-skill score.
  // A retry reuses previously persisted AI marks instead of paying to grade again.
  useEffect(() => {
-  if (stage !== "result" || !flow.attemptInfo?.attemptId || !idToken ||
-      flow.verifiedResult || !isA2Mock2ReviewReady(STORAGE) || finalizationInFlight.current) return;
-  let cancelled = false;
-  finalizationInFlight.current = true;
-  setFinalState({status:"marking",error:""});
-  finalizeA2Mock2({keys:STORAGE,attemptId:flow.attemptInfo.attemptId,idToken})
-   .then(verifiedResult => {
-    if (cancelled) return;
-    setFlow(old => ({...old,verifiedResult,verifiedAt:Date.now()}));
-    setFinalState({status:"saved",error:""});
-    announceExamSuccess("Your verified A2 Mock 2 result was saved.");
-   })
-   .catch(error => {
-    if (!cancelled) setFinalState({status:"failed",error:error?.response?.data?.error || error.message || "Could not save the final score."});
-   })
-   .finally(() => { finalizationInFlight.current = false; });
-  return () => { cancelled = true; };
- }, [stage,flow.attemptInfo?.attemptId,flow.verifiedResult,idToken,STORAGE,finalRetry]);
+   const attemptId = flow.attemptInfo?.attemptId;
+   if (stage !== "result" || !attemptId || !idToken ||
+       flow.verifiedResult || !isA2Mock2ReviewReady(STORAGE)) return;
+   // Token refresh can rerun this effect while marking is still in flight.
+   // Subscribe to the same request so the refreshed view receives its outcome.
+   if (finalizationInFlight.current?.attemptId !== attemptId ||
+       finalizationInFlight.current?.retry !== finalRetry) {
+     finalizationInFlight.current = {
+       attemptId,
+       retry: finalRetry,
+       promise: finalizeA2Mock2({ keys: STORAGE, attemptId, idToken }),
+     };
+   }
+   let active = true;
+   setFinalState({ status: "marking", error: "" });
+   finalizationInFlight.current.promise.then(verifiedResult => {
+     if (!active) return;
+     setFlow(old => ({ ...old, verifiedResult, verifiedAt: Date.now() }));
+     setFinalState({ status: "saved", error: "" });
+     announceExamSuccess("Your verified A2 Mock 2 result was saved.");
+   }).catch(error => {
+     if (!active) return;
+     const message = error?.response?.data?.error || error.message || "Could not save the final score.";
+     setFinalState({ status: "failed", error: message });
+   });
+   return () => { active = false; };
+ }, [stage, flow.attemptInfo?.attemptId, flow.verifiedResult, idToken, STORAGE, finalRetry]);
  // Lightweight staff monitoring signal: metadata only, never answers or audio.
  const reportProgress = useCallback(async () => {
   if (!idToken || stage === "intro") return;

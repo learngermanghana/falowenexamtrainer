@@ -624,19 +624,21 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
                     <div>
                       <strong>Aufgabe {item.number}</strong>
                       <p>{item.person}</p>
-                      {submitted ? <small className={answers[item.number] === item.answer ? "a2-reading-correct" : "a2-reading-wrong"}>{answers[item.number] === item.answer ? "Correct" : `Correct answer: ${item.answer}`}</small> : null}
+                      {submitted ? <small className={answers[item.number] === item.answer ? "a2-reading-correct" : "a2-reading-wrong"}>{answers[item.number] === item.answer ? "Correct" : `Correct answer: ${item.answer === "X" ? "X – Keine passende Anzeige" : item.answer}`}</small> : null}
                     </div>
                     <label>
                       Anzeige:
                       <select value={answers[item.number] || ""} onChange={(event) => setAnswer(item.number, event.target.value)} disabled={submitted}>
                         <option value="">—</option>
-                        {["a", "b", "c", "d", "e", "f", "X"].map((option) => <option value={option} key={option}>{option}</option>)}
+                        {["a", "b", "c", "d", "e", "f"].map((option) => <option value={option} key={option}>{option}</option>)}
+                        <option value="X">X – Keine passende Anzeige</option>
                       </select>
                     </label>
                   </div>
                 ))}
               </div>
               <h3 className="a2-mock-ads-title">Internet-Anzeigen</h3>
+              <p>Wenn keine Anzeige von a bis f passt, wählen Sie <strong>X – Keine passende Anzeige</strong> in der Antwortliste der Aufgabe.</p>
               <div className="a2-mock-ads-grid">
                 {sample.teil4.ads.map((item) => (
                   <article className="a2-mock-ad" key={item.id}>

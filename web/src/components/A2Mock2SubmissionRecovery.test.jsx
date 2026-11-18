@@ -3,9 +3,11 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { MemoryRouter } from "react-router-dom";
 import A2Mock2ExamHub from "./A2Mock2ExamHub";
 import { getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
+import { scoreA2MockWriting } from "../services/a2FinalMockService";
 import { markLetterWithAI, scoreA2MockSpeaking } from "../services/coachService";
 
-jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: { uid: "mock-2-recovery-student" }, idToken: "test-token" }) }));
+let mockToken = "test-token";
+jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: { uid: "mock-2-recovery-student" }, idToken: mockToken }) }));
 jest.mock("../services/a2FinalMockService", () => ({
   startA2MockAttempt: jest.fn().mockResolvedValue({attemptId:"server-recovery-attempt",attemptNumber:1,firstAttempt:true}),
   saveA2MockAttempt: jest.fn().mockResolvedValue({ok:true}),
@@ -33,6 +35,7 @@ const mount = () => render(<MemoryRouter><A2Mock2ExamHub /></MemoryRouter>);
 
 beforeEach(() => {
   localStorage.clear();
+  mockToken = "test-token";
   window.scrollTo = jest.fn();
   markLetterWithAI.mockReset().mockRejectedValue(new Error("Writing marking unavailable"));
   scoreA2MockSpeaking.mockReset().mockRejectedValue(new Error("Speaking marking unavailable"));
@@ -108,4 +111,27 @@ test("completion tracker immediately counts Lesen and Hören without refreshing 
   } finally {
     confirm.mockRestore();
   }
+});
+
+test("final scoring reports its failure after the sign-in token refreshes", async () => {
+  completedFirstTwo();
+  save("schreiben", { startedAt: Date.now() - 1000, submittedAt: Date.now(), sms: "Hallo", email: "Guten Tag" });
+  save("sprechen", completeSpeech());
+  save("flow", { stage: "result", startedAt: Date.now(), attemptInfo: { attemptId: "server-recovery-attempt" } });
+
+  scoreA2MockWriting.mockClear();
+  let failMarking;
+  scoreA2MockWriting.mockImplementationOnce(() => new Promise((_resolve, reject) => {
+    failMarking = reject;
+  }));
+  const { rerender } = mount();
+  await waitFor(() => expect(failMarking).toEqual(expect.any(Function)));
+
+  mockToken = "refreshed-token";
+  rerender(<MemoryRouter><A2Mock2ExamHub /></MemoryRouter>);
+  failMarking(new Error("Writing marking temporarily unavailable"));
+
+  expect(await screen.findByRole("button", { name: "Retry final scoring safely" })).toBeInTheDocument();
+  expect(screen.getByText(/Writing marking temporarily unavailable/)).toBeInTheDocument();
+  expect(scoreA2MockWriting).toHaveBeenCalledTimes(1);
 });
