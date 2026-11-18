@@ -1,8 +1,15 @@
 import catalogue from "../data/goetheExaminerPublicFlows.json";
+import { getA2KombiSet } from "../data/a2KombiMockSets";
 export const examinerTaskPreview = (level,task,mode="guided") => {
   const part=String(task?.teil || "").match(/^(?:teil[-\s]*)?([123])$/i)?.[1];
   const key=`${level}-${part}`, profile=catalogue.profiles[key];
   if (!profile) return null;
+  const kombiId = key === "A2-3" && /^(a2-mock-0[4-8])-speaking-teil-3$/.exec(task?.id || "")?.[1];
+  const plan = kombiId ? getA2KombiSet(kombiId)?.speaking.teil3 : null;
+  if (plan) {
+    return { key, mode, title: "Etwas gemeinsam planen", role: profile.role, maxAnswers: profile.maxAnswers,
+      scenario: plan.situation, points: plan.points, stageGuide: "Discuss each point with your partner and agree on a plan." };
+  }
   const selected=String(task?.keywords || task?.prompt || "Freizeit").split(/[,;·]/)[0].trim().slice(0,120);
   let cards=[],cardThemes=[];
   if (key === "A1-2" || key === "A2-1") {

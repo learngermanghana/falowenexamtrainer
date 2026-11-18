@@ -92,7 +92,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const contextualLevel = String(initialLevel || "").toUpperCase();
   const fixedLevel = embedded && /^(A1|A2|B1|B2|C1|C2)$/.test(contextualLevel) ? contextualLevel : "";
   const safeLevel = fixedLevel || selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
-  const a2MockId = deferFeedback ? examTask?.id?.match(/^(a2-mock-0[123])-speaking-teil-[123]$/)?.[1] : null;
+  const a2MockId = deferFeedback ? examTask?.id?.match(/^(a2-mock-0[1-8])-speaking-teil-[123]$/)?.[1] : null;
   const submissionFailures = useRef(new Set());
   const reportSpeaking = useCallback((phase, succeeded) => {
     if (!a2MockId) return;
@@ -678,7 +678,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         sessionId: session.sessionId,
       }).catch(async err => {
         // A lost response can leave a verified mark on the server.
-        if (!deferFeedback || !/^a2-mock-0[123]-speaking-teil-[123]$/.test(examTask?.id || "") ||
+        if (!a2MockId ||
             (err.status && err.status < 500)) throw err;
         const status = await api("/live-speak/status").catch(() => null);
         const saved = status?.lastExamResult;

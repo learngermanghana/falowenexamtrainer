@@ -1,10 +1,22 @@
 // Server-owned task state. No model call is needed for instructions or transitions.
 const catalogue = require("../data/goetheExaminerFlows.json");
+const a2KombiMarkingSets = require("./a2KombiMarkingSets");
 const clean = (value, length=1200) => String(value || "").replace(/[\r\n\t]/g," ").trim().slice(0,length);
 const partNumber = task => String(task?.teil || "").match(/^(?:teil[-\s]*)?([123])$/i)?.[1] || "";
 const profileFor = flow => {
   const profile = catalogue.profiles[flow?.key];
   if (profile && flow.key === "A1-2" && flow.cards?.length) return {...profile,maxAnswers:flow.cards.length*2};
+  if (profile && flow.key === "A2-3" && flow.planningPoints) {
+    return {
+      ...profile,
+      title: "Etwas gemeinsam planen",
+      criteria: flow.planningPoints.map(point => point.text),
+      decisionPoints: flow.planningPoints.map(point => point.id),
+      studentCalendar: [],
+      hints: [],
+      stageGuide: "Discuss each point with your partner and agree on a plan.",
+    };
+  }
   return profile && flow.planningPoints ? {...profile, decisionPoints:flow.planningPoints.map(point=>point.id)} : profile || null;
 };
 const planningTopic = task => {
@@ -43,7 +55,13 @@ function createExaminerFlow(level, task, mode="guided") {
   const profile = catalogue.profiles[key];
   if (!profile) return null;
   const flow = {version:1,key,mode:mode === "simulation" ? "simulation" : "guided",decisions:[]};
-  if (key === "A2-3") {
+  const kombiId = key === "A2-3" && /^(a2-mock-0[4-8])-speaking-teil-3$/.exec(task?.id || "")?.[1];
+  const kombiPlan = kombiId ? a2KombiMarkingSets[kombiId].speaking.teil3 : null;
+  if (kombiPlan) {
+    flow.scenario = kombiPlan.situation;
+    flow.planningPoints = kombiPlan.points.map((text, index) => ({ id: `point-${index + 1}`, text }));
+  }
+  if (key === "A2-3" && !kombiPlan) {
     const planning=catalogue.a2PlanningTasks.find(item=>item.topic === clean(task?.prompt,180));
     if (planning) {flow.calendar=planning;flow.scenario=planning.scenario;}
   }
@@ -153,7 +171,10 @@ function currentStep(flow, answered=0) {
   }
   if (flow.key === "A2-2") {action=answered ? "follow-up" : "monologue";instruction=answered ? "Warum ist das für Sie wichtig? Nennen Sie bitte ein Beispiel." : `Zum Thema „${flow.contextTopic || "Alltag"}“: ${flow.presentationQuestion || ""} ${profile.opening}`;}
   if (flow.key === "A2-3" || flow.key === "B1-1") action="negotiate";
-  if (flow.key === "A2-3") instruction=flow.scenario + " Wann hast du Zeit?";
+  if (flow.key === "A2-3") instruction=flow.planningPoints
+    ? (answered === 0 ? flow.scenario + " " + flow.planningPoints[0].text
+      : flow.planningPoints.find(point => !flow.decisions?.some(decision => decision.point === point.id))?.text || "Haben wir alles vereinbart?")
+    : flow.scenario + " Wann hast du Zeit?";
   if (flow.key === "B1-1" && flow.contextTopic) instruction = `Planen Sie gemeinsam: ${flow.contextTopic}. Besprechen Sie: ${(flow.planningPoints || []).map(point=>point.text).join(" ") || "wann und wo, wie Sie hinkommen und wer was übernimmt"} Was schlägst du vor?`;
   if (flow.key === "B1-2") {action="presentation";instruction=`Ihr Thema ist „${flow.contextTopic || "Alltag"}“. ${flow.presentationQuestion || ""} ${profile.opening}`;}
   if (flow.key === "B1-3") {
@@ -210,7 +231,7 @@ function publicFlow(session) {
     cards:flow.cards?.map(card=>card.word) || [],card:flow.card || "",
     requestCards:flow.requestCards?.map(card=>({word:card.word,symbol:card.symbol,...(card.picture ? {picture:card.picture} : {})})) || [],
     cardThemes:flow.cards?.map(card=>card.theme || "") || [],
-    points:flow.key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : flow.key === "B2-1" ? catalogue.b2PresentationPoints : flow.key === "B1-2" ? catalogue.presentationPoints : flow.key === "B1-1" ? flow.planningPoints?.map(point=>point.text) || ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : flow.points || [],
+    points:flow.key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : flow.key === "B2-1" ? catalogue.b2PresentationPoints : flow.key === "B1-2" ? catalogue.presentationPoints : flow.key === "B1-1" ? flow.planningPoints?.map(point=>point.text) || ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : flow.planningPoints?.map(point=>point.text) || flow.points || [],
     studentCalendar:flow.calendar?.studentCalendar || profile.studentCalendar || [],
     calendarDay:flow.calendar?.day || "",studentSchedule:flow.calendar?.studentSchedule || [],
     scenario:flow.scenario || "",
@@ -224,12 +245,13 @@ function responsePlan(session) {
   const profile=profileFor(flow), step=currentStep(flow,n);
   if (!profile) return null;
   const previous=currentStep(flow,n-1);
+  const scripted = flow.key === "A2-3" && !flow.planningPoints;
   const dynamic=(flow.key === "B2-1" && n === 1) || (flow.key === "B2-2" && n>0 && n<profile.maxAnswers) || previous?.action === "ask-question" || previous?.action === "make-request" ||
-    previous?.action === "feedback-and-question" || (flow.key === "A1-1" && previous?.action === "number") || (previous?.action === "negotiate" && flow.key !== "A2-3") ||
+    previous?.action === "feedback-and-question" || (flow.key === "A1-1" && previous?.action === "number") || (previous?.action === "negotiate" && !scripted) ||
     (flow.key === "A2-2" && n === 1) ||
     ((flow.key === "C1-1" || flow.key === "C2-1") && n > 0 && n < profile.maxAnswers) ||
     ((flow.key === "C1-2" || flow.key === "C2-2") && n > 0 && n < profile.maxAnswers);
-  return {dynamic,scripted:flow.key === "A2-3",step,previous,reply:step?.instruction || "Danke. Dieser Prüfungsteil ist beendet. Ihre Antworten sind gespeichert.",ready:!step};
+  return {dynamic,scripted,step,previous,reply:step?.instruction || "Danke. Dieser Prüfungsteil ist beendet. Ihre Antworten sind gespeichert.",ready:!step};
 }
 function partnerInstructions(session,plan) {
   const flow=session.examFlow, profile=profileFor(flow);
@@ -256,7 +278,7 @@ function partnerInstructions(session,plan) {
     (flow.key === "B1-3" && flow.mockPresentationFeedback
       ? "First answer the candidate's actual question about your partner's short presentation, then ask exactly ONE new relevant question about their own presentation topic: " + JSON.stringify(flow.contextTopic) + ". Do not repeat the presentation. " : "") +
     (flow.key === "B1-1" ? "German Termin intent: 'Ich habe frei', 'Da habe ich Zeit', 'Da kann ich', 'Samstag geht bei mir' and 'Das klappt' can affirm a concrete appointment proposed by the partner. Never require the word 'passen'. When the learner only expresses availability but no definite time and place has been agreed, ACKNOWLEDGE that availability and ask ONE specific question for the missing detail, without repeating the opening. 'Ich kann nicht', 'keine Zeit', 'leider', and a conflicting day or hour must never count as acceptance. A proposal by the student does not alone mean the partner has agreed. For 'wann und wo' both time and place are needed. " : "") +
-    (flow.key === "A2-3" ? "Your private free times are " + JSON.stringify(flow.calendar?.partnerCalendar || profile.partnerCalendar) +
+    (flow.key === "A2-3" && !flow.planningPoints ? "Your private free times are " + JSON.stringify(flow.calendar?.partnerCalendar || profile.partnerCalendar) +
       ". You cannot meet outside those times. The student's card is separate. Do not reveal your whole calendar. " : "") +
     "State: " + JSON.stringify({task:session.examTask,role:plan.previous?.role,action:plan.previous?.action,
       planningPoints:flow.planningPoints,
@@ -308,8 +330,8 @@ function mergeDecisions(session, proposed, transcript) {
   for (const d of Array.isArray(proposed) ? proposed.slice(0,4) : []) {
     if (!profile.decisionPoints?.includes(d?.point) || !clean(d.quote,250) || !transcript.includes(clean(d.quote,250))) continue;
     if (d.withdrawn === true) {accepted.delete(d.point);continue;}
-    if (session.examFlow.key === "A2-3" && appointmentIntent(transcript).negative) continue;
-    if (session.examFlow.key === "A2-3") {
+    if (session.examFlow.key === "A2-3" && !session.examFlow.planningPoints && appointmentIntent(transcript).negative) continue;
+    if (session.examFlow.key === "A2-3" && !session.examFlow.planningPoints) {
       const target=session.examFlow.calendar?.agreement || {day:"Mittwoch",hour:18};
       if (!String(d.value || "").includes(`${target.day} ${target.hour}:00`)) continue;
     }

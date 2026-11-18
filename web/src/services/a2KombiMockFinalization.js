@@ -21,6 +21,12 @@ export function getA2KombiState(keys, mockId, stage = "result") {
   return {mockId,assessmentVersion,stage,clientSavedAtMs:Date.now(),
     lesenAnswers:lesen.answers || {},...(assessmentVersion===A2_MOCK_04_FOUR_VERSION?{hoerenAnswers:hoeren.answers||{}}:{}),
     schreibenSubmittedAt:schreiben.submittedAt || null,
+    schreibenSubmission: schreiben.submittedAt ? {
+      startedAt: schreiben.startedAt || schreiben.submittedAt,
+      submittedAt: schreiben.submittedAt,
+      sms: schreiben.sms || "",
+      email: schreiben.email || "",
+    } : null,
     sprechenSessionIds:["1","2","3"].map(teil=>sprechen.parts?.[teil]?.sessionId || null)};
 }
 
