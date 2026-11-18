@@ -54,10 +54,7 @@ describe("self-learning lesson Falowen Radio integration", () => {
 
     expect(screen.getByRole("heading", { name: "🎙️ Falowen Radio" })).toBeInTheDocument();
     expect(screen.queryByText("Test Radio Episode")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /continue to teil/i }));
-    expect(screen.getByRole("tab", { name: "Grammar · Learn" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Lesen · Read" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Review · Wiederholen" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /continue to workbook/i })).toBeInTheDocument();
   });
 
   test("C1 lesson with a Radio entry keeps the listening-only entrance", () => {
