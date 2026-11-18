@@ -160,6 +160,59 @@ const LANGUAGE_OPTIONS = [
   { value: "fr", label: "Français" },
 ];
 
+
+function MeetOurTeam({ team, language }) {
+  const trackRef = React.useRef(null);
+  const labels = {
+    en: { kicker: "THE PEOPLE BEHIND FALOWEN", heading: "Meet our German and Kiswahili team", intro: "Real educators and advisors supporting your learning journey.", about: "Read full profile", less: "Close profile", all: "Meet the whole team", previous: "Previous team members", next: "Next team members" },
+    de: { kicker: "DIE MENSCHEN HINTER FALOWEN", heading: "Unser Deutsch- und Kiswahili-Team", intro: "Lerne die Lehrkräfte und Berater kennen, die dich begleiten.", about: "Ganzes Profil lesen", less: "Profil schließen", all: "Das gesamte Team kennenlernen", previous: "Vorherige Teammitglieder", next: "Nächste Teammitglieder" },
+    fr: { kicker: "L'ÉQUIPE DERRIÈRE FALOWEN", heading: "Notre équipe d'allemand et de kiswahili", intro: "Découvrez les enseignants et conseillers qui vous accompagnent.", about: "Voir le profil", less: "Fermer le profil", all: "Découvrir toute l'équipe", previous: "Membres précédents", next: "Membres suivants" },
+  };
+  const copy = labels[language] || labels.en;
+  const move = (direction) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const card = track.querySelector(".falowen-team-card");
+    const distance = card ? card.getBoundingClientRect().width + 16 : track.clientWidth;
+    track.scrollBy({ left: distance * direction, behavior: "smooth" });
+  };
+  return (
+    <section className="falowen-team-section" aria-labelledby="falowen-team-heading">
+      <div className="falowen-team-top">
+        <div>
+          <span className="falowen-home-section-kicker">{copy.kicker}</span>
+          <h2 id="falowen-team-heading">{copy.heading}</h2>
+          <p>{copy.intro}</p>
+        </div>
+        <a className="falowen-team-about-link" href="/about-us">{copy.all} <span aria-hidden="true">→</span></a>
+      </div>
+      <div className="falowen-team-carousel-wrap">
+        <div className="falowen-team-track" ref={trackRef} role="region" aria-label={copy.heading} tabIndex={0}>
+          {team.map((person) => (
+            <article className="falowen-team-card" key={person.name}>
+              <div className="falowen-team-image-wrap">
+                <img src={person.image} alt={person.name} loading="lazy" style={person.imagePosition ? { objectPosition: person.imagePosition } : undefined} />
+              </div>
+              <div className="falowen-team-card-body">
+                <h3>{person.name}</h3>
+                <p className="falowen-team-role">{person.role}</p>
+                <details className="falowen-team-profile">
+                  <summary>{copy.about}</summary>
+                  <p>{person.bio}</p>
+                </details>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="falowen-team-controls" aria-label={copy.heading}>
+          <button type="button" onClick={() => move(-1)} aria-label={copy.previous}>‹</button>
+          <button type="button" onClick={() => move(1)} aria-label={copy.next}>›</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function LandingPageSimple({ onSignUp, onLogin }) {
   const { i18n } = useTranslation();
   const detected = String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2);
@@ -228,40 +281,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
 
         <FalowenHomepageCarousel language={language} classroomImage={academyProfile.classroomImage} onSignUp={signup} />
 
-        <section className="falowen-home-hybrid" aria-labelledby="falowen-hybrid-heading">
-          <div className="falowen-home-hybrid-heading">
-            <div>
-              <span className="falowen-home-section-kicker">{copy.hybridEyebrow}</span>
-              <h2 id="falowen-hybrid-heading">{copy.hybridTitle}</h2>
-              <p>{copy.hybridIntro}</p>
-            </div>
-            <a href="/classes" className="falowen-home-hybrid-action">{copy.hybridAction} →</a>
-          </div>
-          <div className="falowen-home-hybrid-options">
-            <article className="falowen-home-hybrid-option">
-              <span className="falowen-home-hybrid-icon" aria-hidden="true">⌖</span>
-              <div><h3>{copy.hybridInPersonTitle}</h3><p>{copy.hybridInPersonText}</p></div>
-            </article>
-            <article className="falowen-home-hybrid-option">
-              <span className="falowen-home-hybrid-icon" aria-hidden="true">▣</span>
-              <div><h3>{copy.hybridOnlineTitle}</h3><p>{copy.hybridOnlineText}</p></div>
-            </article>
-            <article className="falowen-home-hybrid-option">
-              <span className="falowen-home-hybrid-icon" aria-hidden="true">▶</span>
-              <div><h3>{copy.hybridRecordedTitle}</h3><p>{copy.hybridRecordedText}</p></div>
-            </article>
-          </div>
-        </section>
-
-        <section className="falowen-home-support" aria-labelledby="falowen-support-heading">
-          <div className="falowen-home-support-copy">
-            <span className="falowen-home-section-kicker">{copy.supportEyebrow}</span>
-            <h2 id="falowen-support-heading">{copy.supportTitle}</h2>
-            <p>{copy.supportText}</p>
-            {copy.supportPractice && <p>{copy.supportPractice}</p>}
-          </div>
-          <a className="falowen-home-support-link" href="/about-us">{copy.supportLink} →</a>
-        </section>
+        <MeetOurTeam team={academyProfile.team} language={language} />
 
         <div className="falowen-home-reviews-intro"><p>{copy.reviewsIntro}</p></div>
         {/* /homepage-reviews.js injects genuine Google reviews before the final CTA. */}
