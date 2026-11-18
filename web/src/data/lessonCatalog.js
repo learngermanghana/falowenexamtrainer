@@ -240,7 +240,7 @@ const lessonCatalog = Object.freeze([
     "sequence": 16,
     "day": 13,
     "chapter": "3.5",
-    "title": "Einfache Aussagesätze und Fragen bilden",
+    "title": "Forming Simple Statements and Questions",
     "assignmentId": "A1-3.5",
     "assignmentType": "Schreiben & Sprechen",
     "kind": "schreiben_sprechen",
