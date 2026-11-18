@@ -1058,7 +1058,7 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 13,
-      topic: "Einfache Aussagesätze und Fragen bilden",
+      topic: "Forming Simple Statements and Questions",
       chapter: "3.5",
       goal:
         "Recap from the lesen and horen. Understand numbers, time, asking of price and how to formulate statements in German",
