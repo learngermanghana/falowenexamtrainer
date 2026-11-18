@@ -248,3 +248,31 @@ test("a rejected audio quota is reported honestly rather than as an internet fai
     expect(x.uploadCount()).toBe(1);
   } finally {x.rendered.unmount();x.cleanup();}
 });
+
+test("A2 full mock recovers a saved speaking mark when the feedback response is lost", async () => {
+  const mockTask = { id: "a2-mock-03-speaking-teil-2", teil: "Teil 2", prompt: "Freizeit", mockAttemptId: "attempt-3" };
+  const assessment = { score: 6, maxScore: 8 };
+  const finished = { ...saved, level: "A2", examTask: mockTask, taskReady: true, answeredTurns: 2 };
+  const onExamCompleted = jest.fn();
+  let feedbackRequested = false;
+  global.fetch.mockImplementation(async url => {
+    if (String(url).endsWith("/exam-feedback")) {
+      feedbackRequested = true;
+      throw new TypeError("Network connection lost");
+    }
+    if (String(url).endsWith("/status")) return ok(feedbackRequested
+      ? { enabled: true, lastExamResult: { ...finished, assessment, feedback: "Gut gemacht." } }
+      : { enabled: true, activeSession: finished });
+    return ok(finished);
+  });
+
+  render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A2" freshAttempt deferFeedback
+    practiceSource="exam-speaking-practice" practiceTopic={mockTask.prompt}
+    examTask={mockTask} onExamCompleted={onExamCompleted} /></MemoryRouter>);
+  fireEvent.click(await screen.findByRole("button", { name: "Resume speaking" }));
+
+  await waitFor(() => expect(onExamCompleted).toHaveBeenCalledWith(expect.objectContaining({
+    sessionId: finished.sessionId, taskId: mockTask.id, assessment,
+  })));
+  expect(global.fetch.mock.calls.filter(([url]) => String(url).endsWith("/exam-feedback"))).toHaveLength(1);
+});

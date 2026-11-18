@@ -51,7 +51,7 @@ function A2Mock3ExamHubAttempt() {
   const [finalBusy,setFinalBusy]=useState(false);
   const [retryFinal,setRetryFinal]=useState(0);
   const connecting=useRef(false);
-  const finalizing=useRef(false);
+  const finalizing=useRef(null);
   const stage=flow.stage;
   const complete=ORDER.filter(k=>progress[k].done).length;
   const index=ORDER.indexOf(stage);
@@ -86,23 +86,36 @@ function A2Mock3ExamHubAttempt() {
     }).catch(err=>setConnectionError(err?.response?.data?.error || err.message || "Could not save progress."));
   },[idToken,flow.attemptInfo?.attemptId,flow.verifiedResult,stage,keys]);
 
-  useEffect(()=>{
-    if(stage!=="result" || !flow.attemptInfo?.attemptId || !idToken || flow.verifiedResult ||
-       !isA2Mock3ReviewReady(keys) || finalizing.current) return;
-    let active=true;
-    finalizing.current=true;
+  useEffect(() => {
+    const attemptId = flow.attemptInfo?.attemptId;
+    if (stage !== "result" || !attemptId || !idToken ||
+        flow.verifiedResult || !isA2Mock3ReviewReady(keys)) return;
+    // Token refresh can rerun this effect while marking is still in flight.
+    // Subscribe to the same request so the refreshed view receives its outcome.
+    if (finalizing.current?.attemptId !== attemptId ||
+        finalizing.current?.retry !== retryFinal) {
+      finalizing.current = {
+        attemptId,
+        retry: retryFinal,
+        promise: finalizeA2Mock3({ keys: keys, attemptId, idToken }),
+      };
+    }
+    let active = true;
     setFinalBusy(true);
     setFinalError("");
-    finalizeA2Mock3({keys,attemptId:flow.attemptInfo.attemptId,idToken})
-      .then(verifiedResult=>{
-        if(!active)return;
-        setFlow(old=>({...old,verifiedResult,verifiedAt:Date.now()}));
-        announceExamSuccess("A2 Mock 3 result saved.");
-      })
-      .catch(err=>{if(active)setFinalError(err?.response?.data?.error||err.message||"Result not verified.");})
-      .finally(()=>{finalizing.current=false;if(active)setFinalBusy(false);});
-    return ()=>{active=false;};
-  },[stage,idToken,flow.attemptInfo?.attemptId,flow.verifiedResult,keys,retryFinal]);
+    finalizing.current.promise.then(verifiedResult => {
+      if (!active) return;
+      setFlow(old => ({ ...old, verifiedResult, verifiedAt: Date.now() }));
+      setFinalBusy(false);
+      announceExamSuccess("Your verified A2 Mock 3 result was saved.");
+    }).catch(error => {
+      if (!active) return;
+      const message = error?.response?.data?.error || error.message || "Could not save the final score.";
+      setFinalError(message);
+      setFinalBusy(false);
+    });
+    return () => { active = false; };
+  }, [stage, flow.attemptInfo?.attemptId, flow.verifiedResult, idToken, keys, retryFinal]);
 
   const advance=useCallback(()=>{
     setProgress(progressFor(keys));

@@ -771,9 +771,10 @@ export default function A2FinalMockExamPage() {
                     onChange={(event) => setLesenAnswer(`t4-${item.number}`, event.target.value)}
                   >
                     <option value="">—</option>
-                    {["a", "b", "c", "d", "e", "f", "X"].map((option) => (
+                    {["a", "b", "c", "d", "e", "f"].map((option) => (
                       <option value={option} key={option}>{option}</option>
                     ))}
+                    <option value="X">X – Keine passende Anzeige</option>
                   </select>
                 </label>
               </div>

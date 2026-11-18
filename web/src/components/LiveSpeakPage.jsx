@@ -656,6 +656,14 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     try {
       const result = await api("/live-speak/session/exam-feedback", "POST", {
         sessionId: session.sessionId,
+      }).catch(async err => {
+        // A lost response can leave a verified mark on the server.
+        if (!deferFeedback || !/^a2-mock-0[123]-speaking-teil-[123]$/.test(examTask?.id || "") ||
+            (err.status && err.status < 500)) throw err;
+        const status = await api("/live-speak/status").catch(() => null);
+        const saved = status?.lastExamResult;
+        if (saved?.sessionId === session.sessionId && saved.assessment && saved.feedback) return saved;
+        throw err;
       });
       if (!mounted.current) return;
       stopAudio();
