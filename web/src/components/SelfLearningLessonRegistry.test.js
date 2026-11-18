@@ -49,11 +49,12 @@ describe("self-learning lesson Falowen Radio integration", () => {
     expect(shouldSkipSelfLearningRadio("B2", "?radio=done")).toBe(false);
   });
 
-  test("B2 ignores retired Falowen Radio metadata and opens the redesigned lesson directly", () => {
+  test("B2 Day 1 plays its approved Radio before the redesigned lesson", () => {
     renderRegisteredLesson("B2", 1, radio);
 
-    expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "🎙️ Falowen Radio" })).toBeInTheDocument();
     expect(screen.queryByText("Test Radio Episode")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /continue to teil/i }));
     expect(screen.getByRole("tab", { name: "Grammar · Learn" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Lesen · Read" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Review · Wiederholen" })).toBeInTheDocument();
