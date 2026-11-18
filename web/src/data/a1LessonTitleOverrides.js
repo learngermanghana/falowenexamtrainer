@@ -3,7 +3,7 @@ const A1_LESSON_TITLE_OVERRIDES = Object.freeze({
   "A1-1.2": "Present-Tense Verb Conjugation Practice",
   "A1-2": "Numbers, Phone Numbers and Addresses",
   "A1-1.3": "Self-Introduction Practice with Articles",
-  "A1-3.5": "Einfache Aussagesätze und Fragen bilden",
+  "A1-3.5": "Forming Simple Statements and Questions",
   "A1-4.7": "Goethe A1 Speaking Exam Structure",
   "A1-11": "Instructions and the German Imperative",
   "A1-12.3": "Introduction to Letter Writing",
