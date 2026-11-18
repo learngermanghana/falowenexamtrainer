@@ -1,6 +1,6 @@
 {
-  "version": 8,
-  "updated": "2026-11-02",
+  "version": 9,
+  "updated": "2026-11-18",
   "description": "Teacher-approved published course music. Strictly music/ R2 keys; no private Hören recordings or storage credentials.",
   "tracks": [
     {
@@ -76,8 +76,8 @@
       "approved": true
     },
     {
-      "id": "r2-a1-day-21-b64_SGV1dGUga2FubiBpY2ggbGVpZGVyIG5pY2h0Lm1wMw",
-      "title": "Heute kann ich leider nicht",
+      "id": "r2-a1-day-21-b64_QmluYSwgdHV0IG1pciBsZWlkLm1wMw",
+      "title": "Bina, tut mir leid",
       "level": "A1",
       "day": 21,
       "assignmentKey": "A1-13",
@@ -85,12 +85,12 @@
       "type": "Learning story",
       "genre": "Warm German Pop",
       "language": "German",
-      "audioUrl": "https://www.falowen.app/api/music?track=r2-a1-day-21-b64_SGV1dGUga2FubiBpY2ggbGVpZGVyIG5pY2h0Lm1wMw",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a1-day-21-b64_QmluYSwgdHV0IG1pciBsZWlkLm1wMw",
       "featured": false,
       "attendance": true,
       "coursebook": true,
       "slides": true,
-      "objectKey": "music/a1/day-21/Heute kann ich leider nicht.mp3",
+      "objectKey": "music/a1/day-21/Bina, tut mir leid.mp3",
       "approved": true
     },
     {
