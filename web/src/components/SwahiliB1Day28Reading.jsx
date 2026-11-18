@@ -1,6 +1,6 @@
 import React from "react";
 
-const questions = [
+export const readingQuestions = [
   { id: "read-duty", prompt: "Ni kwa nini kutunza mazingira ni jukumu muhimu katika maisha ya kila siku?", english: "Why is caring for the environment an important duty in daily life?" },
   { id: "read-waste", prompt: "Kulingana na insha, ni njia gani mbili za kushughulikia taka vizuri?", english: "According to the essay, what are two ways to handle waste properly?" },
   { id: "read-trees", prompt: "Kupanda miti kuna faida gani mbili zilizotajwa katika maandishi?", english: "What two benefits of planting trees are mentioned in the text?" },
@@ -21,7 +21,7 @@ export default function SwahiliB1Day28Reading({ answers, onAnswer }) {
       <p><strong>Msamiati</strong> · Uchafuzi wa mazingira (environmental pollution), Mabadiliko ya tabianchi (climate change), Kurejeleza (to recycle), Nishati (energy/power), Mmomonyoko wa udongo (soil erosion).</p>
     </details>
     <h3>Maswali 5 ya Ufahamu</h3>
-    <ol>{questions.map(({ id, prompt, english }) => (
+    <ol>{readingQuestions.map(({ id, prompt, english }) => (
       <li key={id}>
         <label htmlFor={id}>{prompt}</label>
         <p lang="en">{english}</p>

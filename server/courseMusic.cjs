@@ -131,6 +131,13 @@ function createSwahiliListeningHandler(recording, options = {}) {
     },
   });
 }
+function createSwahiliB1Day28AudioHandler(options) {
+  return createSwahiliListeningHandler({
+    id: 'swahili-b1-day28-listening',
+    key: 'swahili/B1/day-28/day-28.mp3',
+  }, options);
+}
+
 function createSwahiliDayOneAudioHandler(options) {
   return createSwahiliListeningHandler(SWAHILI_DAY_ONE_LISTENING, options);
 }
@@ -202,4 +209,4 @@ function createClassroomBankAudioHandler(options = {}) {
     return signObject(recording, env);
   } });
 }
-module.exports = { createSwahiliDayOneAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayTenAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
+module.exports = { createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayTenAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
