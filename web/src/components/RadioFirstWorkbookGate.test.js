@@ -125,8 +125,9 @@ describe("Radio link gating", () => {
     expect(hasPlayableRadioResource({ url: "https://youtu.be/abc123" })).toBe(true);
   });
 
-  test("does not show Falowen Radio for B2 while no B2 Radio link exists", () => {
-    expect(shouldShowRadioFirst("B2", 1)).toBe(false);
+  test("shows the approved B2 Day 1 Radio but does not invent links for other days", () => {
+    expect(shouldShowRadioFirst("B2", 1)).toBe(true);
+    expect(resolveRadioFirstWorkbookResource("B2", 1)).toEqual(expect.objectContaining({ youtubeId: "tkWdHUjBPxg" }));
     expect(shouldShowRadioFirst("B2", 2)).toBe(false);
     expect(shouldShowRadioFirst("B2", 28)).toBe(false);
   });
