@@ -19,6 +19,7 @@ function setup(overrides = {}, authOverride = {}) {
   const doc = key => ({
     key,
     get:async()=>snapshot(key),
+    collection: name => ({ doc: id => doc(key + "/" + name + "/" + id) }),
     update:async(value)=>mutate(key,value,true),
   });
   const db = {
@@ -1354,4 +1355,35 @@ test("course status and reset cannot access another assignment's scoped session"
  expect(api.docs.get("liveSpeakSessions/u123__course__A2-8.22").endedAt).toBeUndefined();
  const invalid=await api.call("GET","/live-speak/status",{courseAssignmentKey:"../another-student"});
  expect(invalid.code).toBe(400);
+});
+
+test.each(["a2-mock-01", "a2-mock-02", "a2-mock-03"])("%s binds a speaking session and saves its resume receipt", async mockId => {
+  const api = setup({ LIVE_SPEAK_TESTING_ACCESS: "true" });
+  const attemptKey = "a2MockExamUsers/u123/attempts/test-attempt";
+  api.docs.set(attemptKey, { uid: "u123", mockId, status: "in_progress" });
+  const examTask = { id: `${mockId}-speaking-teil-2`, teil: "Teil 2", mockAttemptId: "test-attempt" };
+  const request = { level: "A2", source: "exam-speaking-practice", examTask, examinerFlowVersion: 1 };
+  const rejected = await api.call("POST", "/live-speak/session/start", {
+    ...request, examTask: { ...examTask, mockAttemptId: "different-attempt" },
+  });
+  expect(rejected.code).toBe(403);
+  const start = await api.call("POST", "/live-speak/session/start", request);
+  expect(start.code).toBe(200);
+  expect(start.payload.examTask.mockAttemptId).toBe("test-attempt");
+
+  // Exercise the marking route with two already confirmed answers.
+  api.docs.set(sessionKey, { ...api.docs.get(sessionKey), examFlow: null, taskReady: true,
+    answeredTurns: 2, confirmedAnswers: ["Ich lese gern.", "Am Abend habe ich Zeit."] });
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({ choices: [{ message: {
+    content: JSON.stringify({ taskScores: [{ step: 1, score: 2, comment: "Good." },
+      { step: 2, score: 2, comment: "Good." }], summary: "Gut gemacht.", priority: "Use full sentences." }),
+  } }] });
+  const marked = await api.call("POST", "/live-speak/session/exam-feedback", { sessionId: start.payload.sessionId });
+  expect(marked.code).toBe(200);
+  expect(api.docs.get(attemptKey).examinerParts["2"]).toEqual({
+    sessionId: start.payload.sessionId, assessment: { score: 4, maxScore: 4 },
+  });
+  expect(api.docs.get("liveSpeakExamResults/" + start.payload.sessionId)).toMatchObject({
+    mockAttemptId: "test-attempt", completed: true,
+  });
 });

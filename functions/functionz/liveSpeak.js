@@ -48,6 +48,8 @@ const transcriptLimit = session => session.examFlow
   ? (["B2-1","C1-1","C2-1"].includes(session.examFlow?.key) ? 6400 : recordingSeconds(session)>=120 ? MAX_FLOW_CHARS : recordingSeconds(session)>=60 ? 2400 : 800)
   : examiner(session) ? MAX_EXAM_CHARS : MAX_CONFIRMED_CHARS;
 const confirmedAnswers = session => (Array.isArray(session.confirmedAnswers) ? session.confirmedAnswers : []).slice(0, answerLimit(session));
+const a2MockTask = id => /^(a2-mock-0[123])-speaking-teil-([123])$/.exec(id || "");
+const boundA2MockExaminer = task => Boolean(a2MockTask(task?.id) && task?.mockAttemptId);
 const coursePartFinished = session => Boolean(session?.examFlow) &&
   (taskFlows.isComplete(session) || Number(session.answeredTurns) >= answerLimit(session));
 const feedbackOpen = session => examiner(session) && !session.endedAt &&
@@ -133,7 +135,7 @@ const cleanExamTask = (task) => ({
   courseAssignmentKey: assignmentConfig(task?.courseAssignmentKey)
     ? String(task.courseAssignmentKey).trim().toUpperCase() : "",
   mockAttemptId: assignmentConfig(task?.courseAssignmentKey) ||
-    (/^(?:a2-mock-01|b1-mock-0[12])-speaking-teil-[123]$/.test(String(task?.id || "")) && !task?.courseAssignmentKey)
+    (/^(?:a2-mock-0[123]|b1-mock-0[12])-speaking-teil-[123]$/.test(String(task?.id || "")) && !task?.courseAssignmentKey)
     ? String(task?.mockAttemptId || "").trim().slice(0,120) : "",
 });
 const examOpening = (level, task) => {
@@ -383,6 +385,18 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           return error(res,403,"mock_attempt_mismatch","This speaking part is not linked to your active B1 mock attempt.");
         }
       }
+      const a2Mock = a2MockTask(examTask?.id);
+      if (a2Mock && examTask.mockAttemptId) {
+        if (level !== "A2" || !/^[a-zA-Z0-9_-]{1,120}$/.test(examTask.mockAttemptId)) {
+          return error(res,400,"mock_attempt_mismatch","This speaking part is not linked to your A2 mock.");
+        }
+        examTask.teil = "Teil " + a2Mock[2];
+        const attempt = (await db().collection("a2MockExamUsers").doc(student.auth.uid)
+          .collection("attempts").doc(examTask.mockAttemptId).get()).data();
+        if (attempt?.uid !== student.auth.uid || attempt.mockId !== a2Mock[1] || attempt.status !== "in_progress") {
+          return error(res,403,"mock_attempt_mismatch","This speaking part is not linked to your active A2 mock.");
+        }
+      }
       if (examTask?.courseAssignmentKey) {
         // Course exam parts must reference an attempt created and owned by the
         // signed-in student on the server before any new voice session begins.
@@ -417,6 +431,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
             (existing.examTask?.courseAssignmentKey !== examTask.courseAssignmentKey ||
               existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) ||
             (/^b1-mock-0[12]-speaking-teil-[123]$/.test(examTask?.id || "") &&
+              (existing.examTask?.id !== examTask.id || existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) ||
+            (a2Mock && examTask.mockAttemptId &&
               (existing.examTask?.id !== examTask.id || existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) ||
             (/^b1-mock-03-speaking-teil-[123]$/.test(examTask?.id || "") &&
               existing.examTask?.id !== examTask.id)) {
@@ -1076,7 +1092,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         answers.every((_answer,index) =>
           obj.taskScores.some(item => Number(item?.step) === index + 1 &&
             Number.isInteger(Number(item?.score)) && Number(item.score) >= 0 && Number(item.score) <= 2));
-      if (assignmentConfig(task.courseAssignmentKey) && !validMark(parsed)) {
+      if ((assignmentConfig(task.courseAssignmentKey) || boundA2MockExaminer(task)) && !validMark(parsed)) {
         // Re-ask once within this same feedback operation, not another
         // learner-visible attempt. Missing JSON fields are model failures,
         // never evidence that the learner has not completed the Teil.
@@ -1151,7 +1167,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         ...(isPlanning ? {participationAudit:{lowInformationTurns:unproductiveTurns,
           modelScore:originalModelScore,appliedMaximum:engagementCap}} : {}),
       } : null;
-      if (assignmentConfig(task.courseAssignmentKey) && !assessment) {
+      if ((assignmentConfig(task.courseAssignmentKey) || boundA2MockExaminer(task)) && !assessment) {
         throw new Error("The graded speaking assessment was incomplete. Retry feedback before continuing.");
       }
       const feedback=assessment
@@ -1169,6 +1185,21 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
             (Boolean(assignmentConfig(record.examTask?.courseAssignmentKey)) &&
               Number(record.answeredTurns) >= answerLimit(record)))
           : Boolean(record.taskReady);
+        const a2Mock = a2MockTask(record.examTask?.id);
+        const mockAttemptId = record.examTask?.mockAttemptId;
+        if (a2Mock && level === "A2" && completed && assessment &&
+            /^[a-zA-Z0-9_-]{1,120}$/.test(mockAttemptId || "")) {
+          const attemptRef = db().collection("a2MockExamUsers").doc(student.auth.uid)
+            .collection("attempts").doc(mockAttemptId);
+          const attempt = (await tx.get(attemptRef)).data();
+          if (attempt?.uid === student.auth.uid && attempt.mockId === a2Mock[1] &&
+              attempt.status === "in_progress" && !attempt.examinerParts?.[a2Mock[2]]) {
+            // The same transaction saves the immutable grading receipt and its resume reference.
+            tx.set(attemptRef, { examinerParts: { [a2Mock[2]]: {
+              sessionId, assessment: { score: assessment.score, maxScore: assessment.maxScore },
+            } } }, { merge: true });
+          }
+        }
         tx.update(sessionRef, {feedback,assessment, feedbackStatus:"complete", feedbackLeaseUntil:0,
           endedAt:admin.firestore.FieldValue.serverTimestamp()});
         // An immutable per-attempt snapshot remains after the next live session starts.

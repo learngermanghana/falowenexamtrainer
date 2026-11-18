@@ -5823,6 +5823,25 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
     return res.status(500).json({ error: err.message || "Could not save the A1 mock attempt." });
   }
 });
+// Operational metadata only. Learner content and identifiers are excluded.
+app.post("/a2-mock/submission-diagnostic", async (req, res) => {
+  const user = await requireAuthenticatedUser(req, res, { allowGuest: false });
+  if (!user) return;
+  const { mockId, module, phase, outcome } = req.body || {};
+  const phases = {
+    schreiben: ["upload", "marking"],
+    sprechen: ["recording", "upload", "marking"],
+    result: ["upload", "publishing"],
+  };
+  if (!["a2-mock-01", "a2-mock-02", "a2-mock-03"].includes(mockId) ||
+      !Object.hasOwn(phases, module) || !phases[module].includes(phase) ||
+      !["failed", "retry_failed", "retry_succeeded"].includes(outcome)) {
+    return res.status(400).json({ error: "Invalid mock diagnostic." });
+  }
+  console.info("A2 mock submission", { mockId, module, phase, outcome });
+  return res.status(204).end();
+});
+
 app.post("/a2-mock/attempt/start", async (req, res) => {
   let authedUser;
   try {
@@ -5832,6 +5851,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
     const mockId = String(req.body?.mockId || "a2-mock-01").trim().slice(0, 80);
     if (!["a2-mock-01", "a2-mock-02", "a2-mock-03", "a2-mock-04", "a2-mock-05", "a2-mock-06", "a2-mock-07", "a2-mock-08"].includes(mockId)) return res.status(400).json({ error: "Unsupported A2 mock." });
 
+    const canResumeByMock = /^a2-mock-0[123]$/.test(mockId);
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
 
@@ -5843,24 +5863,33 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
       const userSnap = await tx.get(userRef);
       const userData = userSnap.exists ? userSnap.data() || {} : {};
 
-      const activeAttemptId = String(userData.activeAttemptId || "").trim();
+      const activeAttemptId = String((canResumeByMock && userData.activeAttemptByMock?.[mockId]) || userData.activeAttemptId || "").trim();
       if (activeAttemptId) {
         const activeRef = userRef.collection("attempts").doc(activeAttemptId);
         const activeSnap = await tx.get(activeRef);
         if (activeSnap.exists) {
           const activeData = activeSnap.data() || {};
           if (activeData.mockId === mockId && activeData.status === "in_progress") {
+            if (canResumeByMock && userData.activeAttemptByMock?.[mockId] !== activeAttemptId) {
+              tx.set(userRef, { activeAttemptByMock: { [mockId]: activeAttemptId } }, { merge: true });
+            }
             responsePayload = {
               attemptId: activeAttemptId,
               attemptNumber: Number(activeData.attemptNumber || 1),
               firstAttempt: Boolean(activeData.firstAttempt),
               state: activeData.state || null,
+              examinerParts: activeData.examinerParts || {},
               assessmentVersion: activeData.assessmentVersion || (/^a2-mock-0[4-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1"),
               resumed: true,
             };
             return;
           }
         }
+      }
+
+      if (req.body?.resumeOnly === true) {
+        responsePayload = { resumed: false };
+        return;
       }
 
       const assessmentVersion = ["a2-mock-04", "a2-mock-05", "a2-mock-06", "a2-mock-07"].includes(mockId) ? "four-module-v2"
@@ -5878,6 +5907,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
           ...(isSecondMock ? { attemptCountByMock: { [mockId]: attemptNumber } } : { attemptCount: attemptNumber }),
           activeAttemptId: newAttemptRef.id,
+          ...(canResumeByMock ? { activeAttemptByMock: { [mockId]: newAttemptRef.id } } : {}),
           updatedAt: now,
         },
         { merge: true },
@@ -5908,6 +5938,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
       };
     });
 
+    res.set("Cache-Control", "no-store, private");
     return res.json(responsePayload);
   } catch (err) {
     console.error("/a2-mock/attempt/start error", err);

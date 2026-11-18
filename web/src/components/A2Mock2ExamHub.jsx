@@ -1,3 +1,5 @@
+import { runA2MockSubmissionStep } from "../services/a2MockSubmissionDiagnostics";
+import { resumeA2MockSections } from "../services/a2MockCloudResume";
 import { getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { announceExamSuccess } from "../services/interactionFeedback";
@@ -56,6 +58,34 @@ function A2Mock2ExamHubAttempt(){
  const mountedRef = useRef(true);
  useEffect(() => () => { mountedRef.current = false; }, []);
  const stage = flow.stage;
+ const [resuming, setResuming] = useState(false);
+ const [checkpoint, setCheckpoint] = useState("");
+ const [checkpointRetry, setCheckpointRetry] = useState(0);
+ const uploadRetry = useRef(false);
+ const checkpointSpeaking = useCallback(() => setCheckpointRetry(value => value + 1), []);
+ const retryCheckpoint = () => {
+   uploadRetry.current = true;
+   checkpointSpeaking();
+ };
+ const resumeAttempt = async (startIfMissing = false) => {
+   setResuming(true);
+   setAttemptError("");
+   try {
+     const resumed = await resumeA2MockSections({ keys: STORAGE, idToken, mockId: "a2-mock-02" });
+     if (!resumed) {
+       if (!startIfMissing) throw new Error("No active attempt was found on your account.");
+       setFlow({ stage: "lesen", startedAt: Date.now() });
+       return;
+     }
+     setProgress(getProgress(STORAGE));
+     setFlow(resumed);
+   } catch (error) {
+     setAttemptError(error.message);
+   } finally {
+     setResuming(false);
+   }
+ };
+
  const index = ORDER.indexOf(stage);
  const completed = ORDER.filter(k=>progress[k].done).length;
  const refresh = useCallback(()=>setProgress(getProgress(STORAGE)),[STORAGE]);
@@ -108,13 +138,21 @@ function A2Mock2ExamHubAttempt(){
  useEffect(() => {
   const attemptId=flow.attemptInfo?.attemptId;
   if (!attemptId || !idToken || stage === "intro" || stage === "result" || flow.verifiedResult) return;
-  saveA2MockAttempt({
+  setCheckpoint("saving");
+  let active = true;
+  const saveCheckpoint = () => saveA2MockAttempt({
    idToken,attemptId,section:stage,status:"in_progress",
-   state:savedA2Mock2State(STORAGE,stage),
-  }).catch(error => {
-   setAttemptError(error?.response?.data?.error || error.message || "Could not save exam checkpoint.");
+   state:{ ...savedA2Mock2State(STORAGE,stage), attemptStartedAtMs: flow.startedAt },
   });
- }, [idToken,flow.attemptInfo?.attemptId,flow.verifiedResult,stage,STORAGE]);
+  const retry = uploadRetry.current;
+  uploadRetry.current = false;
+  const upload = stage === "sprechen"
+    ? runA2MockSubmissionStep({ idToken, mockId: "a2-mock-02", retry }, "schreiben", "upload", saveCheckpoint)
+    : saveCheckpoint();
+  upload.then(response => { if (active) setCheckpoint(response?.staleIgnored ? "failed" : "saved"); })
+   .catch(() => { if (active) setCheckpoint("failed"); });
+  return () => { active = false; };
+ }, [idToken,flow.attemptInfo?.attemptId,flow.verifiedResult,flow.startedAt,stage,STORAGE,checkpointRetry]);
 
  // Save current answers and obtain the actual server-verified four-skill score.
  // A retry reuses previously persisted AI marks instead of paying to grade again.
@@ -129,7 +167,7 @@ function A2Mock2ExamHubAttempt(){
      finalizationInFlight.current = {
        attemptId,
        retry: finalRetry,
-       promise: finalizeA2Mock2({ keys: STORAGE, attemptId, idToken }),
+       promise: finalizeA2Mock2({ keys: STORAGE, attemptId, idToken, retry: finalRetry > 0 }),
      };
    }
    let active = true;
@@ -141,7 +179,9 @@ function A2Mock2ExamHubAttempt(){
      announceExamSuccess("Your verified A2 Mock 2 result was saved.");
    }).catch(error => {
      if (!active) return;
-     const message = error?.response?.data?.error || error.message || "Could not save the final score.";
+     const moduleLabel = { schreiben: "Schreiben", sprechen: "Sprechen", result: "Results" }[error.submissionModule];
+     const message = (moduleLabel ? moduleLabel + " · " : "") +
+       (error?.response?.data?.error || error.message || "Could not save the final score.");
      setFinalState({ status: "failed", error: message });
    });
    return () => { active = false; };
@@ -188,11 +228,6 @@ function A2Mock2ExamHubAttempt(){
     : `${{ lesen: "Lesen", hoeren: "Hören", schreiben: "Schreiben" }[stage] || "Mock"} completed. Continue to the next section.`);
   window.scrollTo({top:0,behavior:"smooth"});
  },[STORAGE, stage]);
- const start = () => {
-  announceExamSuccess("A2 Mock 2 started successfully.");
-  setFlow({stage:"lesen",startedAt:Date.now()});
-  window.scrollTo({top:0,behavior:"smooth"});
- };
  const restart = () => {
   if (!flow.verifiedResult || !isA2Mock2ReviewReady(STORAGE) || !window.confirm("Start a new full mock? Your verified result will remain saved in Results.")) return;
   try {
@@ -211,7 +246,7 @@ function A2Mock2ExamHubAttempt(){
   lesen:<A2Mock2Lesen embedded onComplete={advance}/>,
   hoeren:<A2Mock2Hoeren embedded onComplete={advance}/>,
   schreiben:<A2Mock2Schreiben embedded onComplete={advance}/>,
-  sprechen:<A2Mock2Sprechen embedded onComplete={advance} attemptId={flow.attemptInfo?.attemptId || ""}/>,
+  sprechen:<A2Mock2Sprechen embedded onComplete={advance} onPartSaved={checkpointSpeaking} attemptId={flow.attemptInfo?.attemptId || ""}/>,
  };
  return <main className="a2-mock2-full" lang="en">
    <div className="a2-mock2-top"><AppBackButton label="Back to Mock Exams" fallbackPath="/exams/mocks"/><span>A2 · Full Mock Exam 2</span></div>
@@ -232,11 +267,18 @@ function A2Mock2ExamHubAttempt(){
      <h2>Ready for your second A2 mock exam?</h2>
      <p>Start once. When you submit a module, the next one opens automatically. You can come back to the saved exam, but an active timer keeps running. In Speaking, the AI examiner asks questions in German; listen, then answer using the microphone.</p>
      <p>Reading 30 min · Listening 30 min · Writing 30 min · Speaking approx. 15 min</p>
-     <button type="button" className="a2-mock2-primary" onClick={start}>Start full mock exam</button>
+     <button type="button" className="a2-mock2-primary" onClick={() => resumeAttempt(true)} disabled={resuming}>Start full mock exam</button>
+     {idToken ? <button type="button" disabled={resuming} onClick={() => resumeAttempt()}>{resuming ? "Finding attempt…" : "Resume attempt"}</button> : null}
    </section>:null}
    {attemptError && stage !== "result" ? <p role="alert">{attemptError} <button type="button" onClick={()=>setAttemptRetry(n=>n+1)}>Retry exam connection</button></p> : null}
    {ORDER.includes(stage)?<section className="a2-mock2-full-current" key={stage}>
      <div className="a2-mock2-full-module"><strong>Module {index+1} of 4 · {LABELS[index]}</strong><p>{stage==="sprechen" ? "Listen to your AI examiner and answer in German. Complete all three speaking parts to finish your mock exam." : "Submit this module to move automatically to the next one. Your answers are saved."}</p></div>
+     {progress.schreiben.done ? <p role="status">{checkpoint === "saved"
+       ? "Schreiben submitted to Falowen. AI marking runs after Sprechen."
+       : checkpoint === "failed" ? "Schreiben saved on this device. Upload needs a retry."
+       : "Schreiben saved on this device. Waiting for server confirmation."}
+       {checkpoint === "failed" ? <button type="button" onClick={retryCheckpoint}>Retry saving to Falowen</button> : null}
+     </p> : null}
      {screens[stage]}
    </section>:null}
    {stage==="result" && isA2Mock2ReviewReady(STORAGE)?<section className="a2-mock2-full-intro">
@@ -247,7 +289,7 @@ function A2Mock2ExamHubAttempt(){
       <p>Lesen {flow.verifiedResult.sectionScores.lesen}/25 · Hören {flow.verifiedResult.sectionScores.hoeren}/25 · Schreiben {flow.verifiedResult.sectionScores.schreiben}/25 · Sprechen {flow.verifiedResult.sectionScores.sprechen}/25</p>
       <p>Saved to Falowen Results and the administrator's score records.</p>
     </div> : <p role="status"><strong>Final result not yet verified.</strong> All sections are finished, but a verified final score requires server-side assessment. Your answers are preserved.</p>}
-    {!flow.verifiedResult ? <p role="status">{!flow.attemptInfo?.attemptId ? "Connecting to the exam server…" : finalState.status === "marking" ? "Verifying writing and speaking, then saving your result…" : finalState.status === "failed" ? "Verification needs attention. Your existing answers remain saved." : "Preparing verified scoring…"}</p> : null}
+    {!flow.verifiedResult ? <p role="status">{!flow.attemptInfo?.attemptId ? "Connecting to the exam server…" : finalState.status === "marking" ? "AI marking in progress · Schreiben and Sprechen" : finalState.status === "failed" ? "Verification needs attention. Your existing answers remain saved." : "Preparing verified scoring…"}</p> : null}
     {attemptError ? <p role="alert">{attemptError} <button type="button" onClick={()=>setAttemptRetry(n=>n+1)}>Reconnect exam</button></p> : null}
     {finalState.status === "failed" ? <p role="alert">{finalState.error} <button type="button" onClick={()=>setFinalRetry(n=>n+1)}>Retry final scoring safely</button></p> : null}
     <p role="status">{progressSyncState === "sending" ? "Synchronising progress…" : progressSyncState === "saved" ? "Progress synchronised; final marking may still be pending." : progressSyncState === "failed" ? "Progress sync failed. Retry safely below." : "Checking progress sync…"}</p>

@@ -64,7 +64,7 @@ export function restoreA2Mock2Backup(keys, response) {
   }
   if (changed) {
     const next = PARTS.find(part => !completedStamp(readJson(keys[part]))) || "sprechen";
-    localStorage.setItem(keys.flow, JSON.stringify({stage:next, startedAt:cloud.attemptStartedAtMs}));
+    localStorage.setItem(keys.flow, JSON.stringify({...localFlow, stage:next, startedAt:cloud.attemptStartedAtMs}));
   }
   return changed;
 }
