@@ -117,3 +117,31 @@ test("backend defaults to the high accuracy GPT-4o transcription model", async (
     else process.env.OPENAI_TRANSCRIPTION_MODEL = previousModel;
   }
 });
+
+test("picture-card transcription checks uncertainty and preserves a clear short request", async () => {
+  async function transcribe(text, logprobs) {
+    return backend.transcribeAudioFile({
+      file: { buffer: Buffer.from("fixture"), originalname: "a1-tutor-speaking.webm", mimetype: "audio/mp4" },
+      model: "gpt-4o-transcribe",
+      pictureCard: true,
+      getOpenAIClient: () => ({ audio: { transcriptions: { create: async request => {
+        assert.match(request.file.path, /\.m4a$/);
+        assert.deepEqual(request.include, ["logprobs"]);
+        assert.doesNotMatch(request.prompt, /Stift/);
+        return { text, logprobs };
+      } } } }),
+    });
+  }
+  const text = "Einen Stift, bitte.";
+  const words = text.split(" ").map(token => ({ token, logprob: -0.02 }));
+  assert.equal((await transcribe(text, words)).text, text);
+  for (const response of [
+    [text, words.map(word => ({ ...word, logprob: -2 }))],
+    ["[unverständlich]", words],
+    [text, []],
+    ["...", []],
+  ]) {
+    await assert.rejects(transcribe(...response), { code: "TRANSCRIPTION_UNCLEAR" });
+  }
+  await assert.rejects(transcribe("", []), { code: "NO_SPEECH_DETECTED" });
+});

@@ -18,6 +18,7 @@ function tutorRequestPrompt(card) {
     "Situation: " + card.context,
     "An acceptable example (do not require exact words): " + card.modelAnswer,
     "Accept any natural, comprehensible polite request appropriate for the selected picture, including imperatives with bitte.",
+    "A short noun phrase with bitte can be a clear, polite request. Credit request meaning and politeness independently of sentence completeness.",
     "Score task fit and request meaning 0–4, politeness (bitte / Sie or equivalent) 0–2,",
     "intelligibility of transcribed speech 0–2, and completeness of the spoken expression 0–2.",
     "You only have a speech-to-text transcript, not audio prosody. Do NOT claim to judge pronunciation or accent.",

@@ -2226,8 +2226,8 @@ app.get("/exam-room/results", async (req, res) => {
 
 app.get("/scores/summary", scoresSummaryHandler);
 
-const transcribeAudio = async (file) => {
-  const result = await transcribeAudioFile({ file, getOpenAIClient });
+const transcribeAudio = async (file, pictureCard = false) => {
+  const result = await transcribeAudioFile({ file, getOpenAIClient, pictureCard });
   return result.text;
 };
 
@@ -6674,7 +6674,8 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
 
     if (!audioFile) return res.status(400).json({ error: "Audio file is required" });
 
-    const transcript = ((await transcribeAudio(audioFile)) || "").slice(0, 8000);
+    const pictureCard = contextType === "A1 tutor checkpoint A1-11" && level === "A1" && String(teil) === "3";
+    const transcript = ((await transcribeAudio(audioFile, pictureCard)) || "").slice(0, 8000);
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) return res.status(429).json({ error: "Daily speaking analysis limit reached", code: "SPEAKING_QUOTA_REACHED" });
@@ -6688,7 +6689,7 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     // Day 17 tutor checkpoint needs a numeric 0–10 score. The regular speaking
     // endpoint returns prose feedback only; do not silently leave this homework
     // ungradable. Derive the question from a server-owned picture-card whitelist.
-    if (contextType === "A1 tutor checkpoint A1-11" && level === "A1" && String(teil) === "3") {
+    if (pictureCard) {
       const card = getA1TutorRequestCard(req.body?.cardId);
       if (!card) return res.status(400).json({ error: "Choose a valid Goethe A1 picture card before recording." });
       if (!transcript.trim()) return res.status(422).json({ error: "No speech was recognized. Please record your request again." });

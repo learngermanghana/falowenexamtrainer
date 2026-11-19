@@ -58,7 +58,8 @@ function validateAudioFile(file) {
 async function writeTempAudioFile(file) {
   const { mimeType } = validateAudioFile(file);
   const originalExtension = path.extname(String(file?.originalname || "")).replace(/[^a-z0-9.]/gi, "");
-  const extension = originalExtension || `.${extensionForMimeType(mimeType)}`;
+  const extension = mimeType === "application/octet-stream" && originalExtension
+    ? originalExtension : `.${extensionForMimeType(mimeType)}`;
   const tempPath = path.join(os.tmpdir(), `falowen-speaking-${Date.now()}-${Math.random().toString(36).slice(2, 9)}${extension}`);
   await fsPromises.writeFile(tempPath, file.buffer);
   return tempPath;
@@ -78,7 +79,7 @@ const waitForReadStreamOpen = (stream) =>
     stream.once("error", handleError);
   });
 
-async function transcribeAudioFile({ file, getOpenAIClient, model = process.env.OPENAI_TRANSCRIPTION_MODEL || "gpt-4o-transcribe" }) {
+async function transcribeAudioFile({ file, getOpenAIClient, pictureCard = false, model = process.env.OPENAI_TRANSCRIPTION_MODEL || "gpt-4o-transcribe" }) {
   const tempPath = await writeTempAudioFile(file);
   const client = getOpenAIClient();
   let audioStream = null;
@@ -86,19 +87,30 @@ async function transcribeAudioFile({ file, getOpenAIClient, model = process.env.
   try {
     audioStream = fs.createReadStream(tempPath);
     await waitForReadStreamOpen(audioStream);
+    const checkConfidence = pictureCard && ["gpt-4o-transcribe", "gpt-4o-mini-transcribe"].includes(model);
     const transcription = await client.audio.transcriptions.create({
       file: audioStream,
       model,
       language: "de",
+      ...(pictureCard ? { prompt: "Kurze Äußerung im Deutschkurs A1. Nur hörbare Wörter wörtlich transkribieren. Auch Satzfragmente und Grammatikfehler beibehalten. Unverständliches nicht ergänzen." } : {}),
+      ...(checkConfidence ? { include: ["logprobs"], response_format: "json" } : {}),
     });
     const text = String(transcription?.text || "").trim();
     if (!text) {
       throw codedError("NO_SPEECH_DETECTED", "No clear speech was detected in the recording.", 422);
     }
+    if (pictureCard) {
+      const words = (transcription.logprobs || []).filter(entry => /[\p{L}\p{N}]/u.test(entry.token) && Number.isFinite(entry.logprob));
+      const uncertain = words.filter(entry => entry.logprob < Math.log(0.5));
+      const unclear = !/[\p{L}\p{N}]/u.test(text) || /^[[ (]*(?:unverständlich|unintelligible|inaudible|Stille|keine Sprache)[\] ).!]*$/iu.test(text);
+      if (unclear || (words.length > 0 && uncertain.length > words.length / 2) || (checkConfidence && !words.length)) {
+        throw codedError("TRANSCRIPTION_UNCLEAR", "Falowen could not reliably transcribe this recording. Replay it and record your request again. No score was saved.");
+      }
+    }
     return { text, model };
   } catch (error) {
     if (error?.code && String(error.code).startsWith("AUDIO_")) throw error;
-    if (error?.code === "NO_SPEECH_DETECTED") throw error;
+    if (error?.code === "NO_SPEECH_DETECTED" || error?.code === "TRANSCRIPTION_UNCLEAR") throw error;
     const timedOut = error?.code === "ETIMEDOUT" || error?.name === "AbortError" || /timed?\s*out/i.test(String(error?.message || ""));
     throw codedError(
       timedOut ? "TRANSCRIPTION_TIMEOUT" : "TRANSCRIPTION_FAILED",

@@ -52,6 +52,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
   const [practiceBlob, setPracticeBlob] = useState(null);
   const [blob, setBlob] = useState(null);
   const [preview, setPreview] = useState("");
+  const [recognizedWords, setRecognizedWords] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const activeBlob = practiceMode ? practiceBlob : blob;
@@ -109,8 +110,13 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
         media.getTracks().forEach((track) => track.stop());
         if (stream.current === media) stream.current = null;
         if (!mountedRef.current) return;
-        setActiveBlob(buildRecordedAudioBlob(chunks, next));
-        setRecording(false);
+        try {
+          setActiveBlob(buildRecordedAudioBlob(chunks, next));
+        } catch (cause) {
+          setError(userFacingAudioError(cause));
+        } finally {
+          setRecording(false);
+        }
       };
       recorder.current = next;
       setActiveBlob(null);
@@ -175,6 +181,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
         ...(isPictureCardTask ? ["Corrected example: " + (result.correction || drawnCard.modelAnswer)] : []),
       ].join("\n");
       updateSectionText(sectionKey, storedText);
+      setRecognizedWords(isPictureCardTask ? result.transcript || "" : "");
       setBlob(null);
     } catch (cause) {
       setError(cause?.response?.data?.error || cause?.message || "Could not assess the recording.");
@@ -292,7 +299,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
       </div>
       {error ? <p role="alert" style={{ color: "#b91c1c" }}>{error}</p> : null}
       {saved.startsWith(marker) && !alreadyAssessed ? <p role="status">This older assessment needs verification. Record and assess again to enable automatic marking.</p> : null}
-      {alreadyAssessed ? <div style={{ background: "#f0fdf4", borderRadius: 10, padding: 12, whiteSpace: "pre-wrap" }}><strong>Assessment saved in your assignment draft</strong><p>{saved.replace(marker, "").trim()}</p><small>Only score and feedback are stored; the audio is not permanently uploaded. Open Review & Submit to send this assignment.</small></div> : null}
+      {alreadyAssessed ? <div style={{ background: "#f0fdf4", borderRadius: 10, padding: 12, whiteSpace: "pre-wrap" }}><strong>Assessment saved in your assignment draft</strong><p>{saved.replace(marker, "").trim()}</p>{recognizedWords && <p><strong>Words Falowen heard</strong><br /><span lang="de">{recognizedWords}</span></p>}<small>Only score and feedback are stored; the audio is not permanently uploaded. Open Review & Submit to send this assignment.</small></div> : null}
     </div>
   );
 }
