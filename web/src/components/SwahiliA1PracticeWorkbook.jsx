@@ -123,7 +123,21 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
             ))}
           </div>
           <div className="swahili-book__form">
-            {lesson.reading.questions.map(({ question }, index) => (
+            {lesson.reading.questions.map(({ question, choices }, index) => choices ? (
+              <fieldset className="swahili-book__exercise" key={question}>
+                <legend>{index + 1}. {question}</legend>
+                <div className="swahili-book__choices">
+                  {choices.map(choice => (
+                    <label className="swahili-book__choice" key={choice}>
+                      <input type="radio" name={`swahili-${lesson.day}-reading-${index}`}
+                        checked={reading[question] === choice}
+                        onChange={() => setReading(prior => ({ ...prior, [question]: choice }))} />
+                      {choice}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ) : (
               <label key={question}>{index + 1}. {question}
                 <input value={reading[question] || ""}
                   onChange={(event) => setReading((prior) => ({ ...prior, [question]: event.target.value }))} />
