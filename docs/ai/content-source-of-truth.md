@@ -127,3 +127,5 @@ B1 Day 28 (chapter 10.28), *Kutunza Mazingira katika Maisha ya Kila Siku*, has s
 ### Course discount links
 
 Admin creates offers through the Campus `/api/course-discounts/admin` API. A share link opens signup or sign-in tied to the offer's program and level. A learner's first checkout can allocate one use and save server-calculated GHS tuition. Allocation is transactional and bound to the learner; expiry and revocation stop new allocations. Already allocated offers keep their price for retries. A signed Paystack payment marks the first redemption while normal tuition, balance and contract rules still apply.
+
+Workbook submissions carry the course program (`german` or `swahili`). Admin uses the submitted course to label score rows and route tutor copies for dual-program students.

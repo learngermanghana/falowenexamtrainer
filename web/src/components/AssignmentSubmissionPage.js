@@ -1111,6 +1111,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       const answerKeySource = resolveAnswerKeySource(answerKeyRegistry, selectedCanonicalAssignmentKey);
 
       return {
+      program: "german",
       title: form.assignmentTitle,
       assignmentTitle: form.assignmentTitle,
       level: selectedAssignmentLevel,

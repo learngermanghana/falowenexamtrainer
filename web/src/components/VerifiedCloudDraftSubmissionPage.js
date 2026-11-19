@@ -758,6 +758,7 @@ const VerifiedCloudDraftSubmissionPage = ({
       });
       const payload = {
         ...recordingAttachments,
+        program: "german",
         ...(savedSpeaking ? { attachments: savedSpeaking.recordings.map(({ sectionKey, audioUrl }) => ({
           name: `Teil ${sectionKey.slice(-1)} recording`, url: audioUrl,
         })) } : {}),
