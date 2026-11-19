@@ -5,7 +5,7 @@
 // never force a full Google Sheets upsert.
 const SHEET_INPUT_FIELDS = Object.freeze([
   "studentCode", "studentcode", "uid", "email", "name", "phone",
-  "location", "level", "className", "status", "enrollDate", "joined_at",
+  "location", "program", "level", "className", "status", "enrollDate", "joined_at",
   "initialPaymentAmount", "paidAmount", "paid", "balanceDue", "balance",
   "tuitionFee", "paymentStatus", "contractStart", "contractEnd",
   "trialStartedAt", "trialEndsAt", "trialPurgeAt", "trialUsedAt",
