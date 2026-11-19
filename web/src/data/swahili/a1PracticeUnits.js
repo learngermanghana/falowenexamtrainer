@@ -905,6 +905,61 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
           "answer": "C) Ni shilingi ngapi?"
         }
       ]
+    },
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-11/audio-url",
+      "questions": [
+        {
+          "id": "milk",
+          "question": "Mteja anataka maziwa gani?",
+          "choices": [
+            "A) Maziwa ya unga",
+            "B) Maziwa ya pakti",
+            "C) Maziwa ya ng’ombe"
+          ],
+          "answer": "B) Maziwa ya pakti"
+        },
+        {
+          "id": "bread",
+          "question": "Mteja anaomba mkate gani?",
+          "choices": [
+            "A) Mkate mdogo mmoja",
+            "B) Mikate mikubwa miwili",
+            "C) Mkate mkubwa mmoja"
+          ],
+          "answer": "C) Mkate mkubwa mmoja"
+        },
+        {
+          "id": "eggs",
+          "question": "Kwa nini mteja hapati mayai sita?",
+          "choices": [
+            "A) Mayai yameisha",
+            "B) Mayai ni ghali",
+            "C) Duka limefungwa"
+          ],
+          "answer": "A) Mayai yameisha"
+        },
+        {
+          "id": "sugar",
+          "question": "Mteja anataka sukari kiasi gani?",
+          "choices": [
+            "A) Kilo moja",
+            "B) Nusu kilo",
+            "C) Kilo mbili"
+          ],
+          "answer": "B) Nusu kilo"
+        },
+        {
+          "id": "total",
+          "question": "Jumla ni shilingi ngapi?",
+          "choices": [
+            "A) Shilingi elfu mbili",
+            "B) Shilingi elfu nne",
+            "C) Shilingi elfu tatu"
+          ],
+          "answer": "C) Shilingi elfu tatu"
+        }
+      ]
     }
   },
   "12": {

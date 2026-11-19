@@ -1,4 +1,4 @@
-const { createSwahiliDayOneAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayTenAudioHandler, createMusicHandler } = require("../server/courseMusic.cjs");
+const { createSwahiliDayOneAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createMusicHandler } = require("../server/courseMusic.cjs");
 
 const env = {
   FIREBASE_API_KEY: "test-key",
@@ -90,6 +90,7 @@ test("Day 1 signs its own private recording and rejects anonymous access", async
 test.each([
   [7, "07", createSwahiliDaySevenAudioHandler],
   [10, "10", createSwahiliDayTenAudioHandler],
+  [11, "11", createSwahiliDayElevenAudioHandler],
 ])("Day %i only signs its private recording for a signed-in account", async (day, folderDay, createHandler) => {
   const handler = createHandler({ env, fetchImpl: validAccountLookup });
   const route = `/course-media/swahili/a1/day-${day}/audio-url`;
