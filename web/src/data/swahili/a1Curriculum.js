@@ -1,7 +1,7 @@
 // Planned A1 learning sequence reviewed against Dr. Ruth's 10-topic syllabus.
 // Retain the identities and routes of the three existing Falowen workbooks:
 // Day 1 = pronunciation, Day 5 = family practice, Day 6 = restaurant.
-// New units are practice workbooks. Only Days 1 and 6 are tutor-marked.
+// New units are practice workbooks. Days 1, 6 and 11 are tutor-marked.
 import { SWAHILI_A1_PRACTICE_UNITS } from "./a1PracticeUnits.js";
 import { SWAHILI_DAY_ONE } from "./dayOne.js";
 import { SWAHILI_DAY_FIVE } from "./dayFive.js";

@@ -48,6 +48,31 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.queryByRole("link", { name: "Fungua Somo la 1" })).toBeNull();
   });
 
+  it("submits the Day 11 learner responses only after explicit confirmation", async () => {
+    mockUser = { uid: "day11-learner" };
+    const lesson = SWAHILI_A1_PRACTICE_UNITS[11];
+    render(<MemoryRouter initialEntries={["/campus/course/swahili/day-11?view=schreiben"]}>
+      <SwahiliA1PracticeWorkbook lesson={lesson} />
+    </MemoryRouter>);
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Nataka mkate." } });
+    for (const tab of ["Teil 3", "Teil 4"]) {
+      openTab(tab);
+      for (const group of screen.getAllByRole("group")) fireEvent.click(within(group).getAllByRole("radio")[0]);
+    }
+    fireEvent.click(screen.getByRole("button", { name: /Review your answers/ }));
+    expect(screen.queryByText(/Suggested answer|Model answer/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
+    expect(setDoc).not.toHaveBeenCalled();
+    screen.getAllByRole("checkbox").forEach(box => fireEvent.click(box));
+    fireEvent.click(screen.getByRole("button", { name: /Submit to tutor/ }));
+    expect(await screen.findByText(/Submitted for tutor review/)).toBeTruthy();
+    expect(setDoc).toHaveBeenCalledWith("/users/day11-learner/swahiliLessons/day-11", expect.objectContaining({
+      status: "submitted", lessonId: "swahili-day-11", writing: { dialogue: "Nataka mkate." },
+      readingAnswers: Object.fromEntries(lesson.reading.questions.map(q => [q.id, q.choices[0]])),
+      listeningAnswers: Object.fromEntries(lesson.listening.questions.map(q => [q.id, q.choices[0]])),
+    }));
+  });
+
   it("keeps new practice answers across tabs and shows matched models without submitting", () => {
     const lesson = SWAHILI_A1_PRACTICE_UNITS[20];
     render(<MemoryRouter initialEntries={["/swahili/day-20?view=schreiben"]}>
@@ -123,7 +148,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(getDoc).not.toHaveBeenCalled();
 
     fireEvent.change(selector(), { target: { value: "A1" } });
-    expect(await screen.findByText(/0 of 2 required assignments submitted/)).toBeTruthy();
+    expect(await screen.findByText(/0 of 3 required assignments submitted/)).toBeTruthy();
     expect(screen.getByRole("link", { name: "Fungua Somo la 5" }).getAttribute("href")).toBe("/campus/course/swahili/day-5");
     fireEvent.change(selector(), { target: { value: "B1" } });
     expect(screen.getByText("Ulimwengu wa ndoto (Zoezi)")).toBeTruthy();
@@ -145,8 +170,8 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
       data: () => ({ status: "reviewed" }),
     }));
     render(<MemoryRouter><SwahiliCourseBook basePath="/campus/course/swahili" /></MemoryRouter>);
-    expect(await screen.findByText("1 of 2 required assignments submitted · 50% complete")).toBeTruthy();
-    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("50");
+    expect(await screen.findByText("1 of 3 required assignments submitted · 33% complete")).toBeTruthy();
+    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("33");
     expect(screen.getByText("1 reviewed")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Continue learning" }).getAttribute("href")).toBe("/campus/course/swahili/day-6");
   });

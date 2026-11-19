@@ -10,6 +10,7 @@ import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 const lessons = [
   { day: 28, title: "B1 · Kutunza Mazingira katika Maisha ya Kila Siku" },
   { day: 1, title: "Alfabeti, sauti na matamshi" },
+  { day: 11, title: "Dukani" },
   { day: 6, title: "Mgahawani" },
 ];
 
@@ -37,7 +38,7 @@ export default function SwahiliResults({ uid }) {
   }, [uid]);
 
   useEffect(() => {
-    if (/^#swahili-(day-(1|6)|b1-day-28)$/.test(hash) && rows) {
+    if (/^#swahili-(day-(1|6|11)|b1-day-28)$/.test(hash) && rows) {
       document.getElementById(hash.slice(1))?.scrollIntoView?.({ block: "start" });
     }
   }, [hash, rows]);
@@ -53,6 +54,7 @@ export default function SwahiliResults({ uid }) {
       referenceParts: [
         ...(writing.length ? [{ id: "teil2", answers: writing.map(([question, answer]) => ({ question, answer })) }] : []),
         ...(reading.length ? [{ id: "teil3", answers: reading.map(({ prompt, answer }) => ({ question: prompt, answer })) }] : []),
+        ...(day === 11 ? [{ id: "teil4", answers: Object.values(review.answerReference?.listening || {}).map(({ prompt, answer }) => ({ question: prompt, answer })) }] : []),
       ],
     };
   });
