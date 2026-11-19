@@ -55,7 +55,7 @@ function normalizeRoute({ startMarker, endMarker, category, limitExpression, blo
   let block = source.slice(start, end);
   block = removeQuotaBlocks(block);
 
-  const transcriptPattern = /(    const transcript = \(\(await transcribeAudio\(audioFile\)\) \|\| ""\)\.slice\(0, 8000\);)/;
+  const transcriptPattern = /(    const transcript = \(\(await transcribeAudio\(audioFile(?:, pictureCard)?\)\) \|\| ""\)\.slice\(0, 8000\);)/;
   if (!transcriptPattern.test(block)) {
     throw new Error(`Missing transcript anchor in ${startMarker}`);
   }
