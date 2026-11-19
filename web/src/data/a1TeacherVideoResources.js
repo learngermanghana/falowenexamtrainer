@@ -20,7 +20,7 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [19, "5.9", "Goethe A1 Speaking Confidence Lab", "https://youtu.be/uAAlpkhZ2qs"],
   [20, "12.3", "Introduction to Letter Writing", "https://youtu.be/mgfauvqhoCI"],
   [21, "13", "Weather", "https://youtu.be/7m2fssEbTd8"],
-  [22, "14.1", "Health and Body Parts", "https://youtu.be/hktvDESwX3k"],
+  [22, "14.1", "Health and Body Parts", "https://youtu.be/qHwczAnb9lA"],
 ];
 
 const normalizeChapter = (value = "") => String(value || "").trim().toLowerCase();
