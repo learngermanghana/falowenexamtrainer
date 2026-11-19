@@ -14,7 +14,7 @@ const READING_REVISIONS = {
   // The new listening replaces old Teil 2 choices; the five-sign reading is unchanged.
   "A1-7": { revision: "five-opening-hours-signs-new-time-listening-v4", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-8": { revision: "day12-two-reading-parts-v4", sections: { "teil-1": 5, "teil-2": 3 } },
-  "A1-11": { revision: "goethe-requests-and-bahnhof-listening-v2", sections: { "teil-1": 0, "teil-2": 5, "teil-3": 0 } },
+  "A1-11": { revision: "goethe-requests-and-bahnhof-listening-v2", sections: { "teil-1": 0, "teil-2": 5, "teil-3": 5 } },
   "A1-13": { revision: "weather-situations-and-radio-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-14.1": { revision: "health-advertisements-and-appointment-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
 };

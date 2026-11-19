@@ -666,6 +666,12 @@ const VerifiedCloudDraftSubmissionPage = ({
       });
       return;
     }
+    if (!submissionText) {
+      const message = "The answer box is empty. Check your saved workbook answers in Review & Submit. No submission was sent.";
+      setStatus({ loading: false, error: message, success: "" });
+      onSubmissionError?.(message);
+      return;
+    }
     const submissionWordCount = submissionText ? submissionText.split(/\s+/).filter(Boolean).length : 0;
     if (!allowIncompleteSubmission && submissionText.length < MIN_SUBMISSION_CHARACTERS) {
       setStatus({
