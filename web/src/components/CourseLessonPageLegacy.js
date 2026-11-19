@@ -9,6 +9,7 @@ import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
+import A1Day22HealthLessonNotes from "./A1Day22HealthLessonNotes";
 
 const DAY0_AI_ORIENTATION_VIDEO = {
   id: "qPwxBYlu3CE",
@@ -603,7 +604,11 @@ const CourseLessonPage = ({ routeState = null, routeLevel = "", routeDay = null 
 
         <TextBlock title="Schreiben">{entry.schreiben}</TextBlock>
         <TextBlock title="Sprechen">{entry.sprechen}</TextBlock>
-        <TextBlock title="Zusatzmaterial">{entry.zusatzmaterial}</TextBlock>
+        {normalizeLevel(level) === "A1" && Number(day) === 22 && normalizeChapter(requestedChapter || entry.chapter) === "14.1" ? (
+          <A1Day22HealthLessonNotes />
+        ) : (
+          <TextBlock title="Zusatzmaterial">{entry.zusatzmaterial}</TextBlock>
+        )}
       </article>
     </div>
   );
