@@ -35,5 +35,7 @@ export function speakingTurnLabel({recording=false,pending=false,busy=false,feed
 // A 90s recording at 32kbps exceeds 350kB before container overhead.
 export function speakingRecordingBitrate({localOnly=false,maxRecordingSeconds=20}={}) {
   const seconds=Number(maxRecordingSeconds)||20;
-  return localOnly || seconds>75 ? 24000 : 32000;
+  if (localOnly || seconds > 75) return 24000;
+  // At 64 kbps, 35 seconds uses 280 kB before container overhead.
+  return seconds <= 35 ? 64000 : 32000;
 }

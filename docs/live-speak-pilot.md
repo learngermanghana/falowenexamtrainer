@@ -5,6 +5,7 @@ This version is for testing a natural German AI speaking partner before deciding
 
 - Two **free** five-minute sessions for each signed-in student, available for seven days from activation. Credits are issued once per Firebase user.
 - Up to ten AI turns in each five-minute session, including the initial spoken greeting.
+- During exam recording, learners can see their active microphone and, where supported, its input level. The browser requests automatic gain control and uses 64 kbps for answers limited to 35 seconds or less.
 - Students record short (2–20 second) German answers; the server first transcribes **without giving corrections**. The browser shows what it heard, lets students play their original local recording and review/edit or record again, then a separately authenticated confirmation triggers at most one correction and an audible follow-up. The recordings stay local/transient.
 - A1–C2 supported, with native-standard-German speech instruction. This is *turn-by-turn*, not a simultaneous or interruptible realtime voice call.
 - The page is reachable at `/campus/live-speak` by signed-in learners, but only signed-in students can activate the pilot. It is deliberately not advertised on the main homepage or billing page.

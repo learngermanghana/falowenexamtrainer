@@ -31,6 +31,8 @@ test("90-second Goethe recordings are not truncated by the 350kB upload budget",
   }
   expect(speakingRecordingBitrate({maxRecordingSeconds:75})).toBe(32000);
   expect(speakingRecordingBitrate({maxRecordingSeconds:60})).toBe(32000);
-  expect(speakingRecordingBitrate({maxRecordingSeconds:20})).toBe(32000);
+  expect(speakingRecordingBitrate({maxRecordingSeconds:20})).toBe(64000);
+  expect(speakingRecordingBitrate({maxRecordingSeconds:35}) * 35 / 8).toBeLessThan(350000 - 32768);
+  expect(speakingRecordingBitrate({maxRecordingSeconds:36})).toBe(32000);
   expect(speakingRecordingBitrate({localOnly:true,maxRecordingSeconds:20})).toBe(24000);
 });

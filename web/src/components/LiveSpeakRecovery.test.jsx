@@ -182,7 +182,8 @@ async function recordFailedExamAnswer({status=503,code="voice_unavailable",error
   global.MediaRecorder=class {
     static isTypeSupported(){return true;}
     constructor(_stream,options) {
-      expect(options.audioBitsPerSecond).toBe(32000);
+      expect(options.audioBitsPerSecond).toBe(64000);
+      expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith({audio:expect.objectContaining({autoGainControl:true,noiseSuppression:true,echoCancellation:true})});
       capturedRecorder=this;this.state="inactive";this.mimeType="audio/webm";
     }
     start(){
