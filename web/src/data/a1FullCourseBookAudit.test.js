@@ -143,7 +143,7 @@ describe("A1 full Course Book consolidation", () => {
       "https://youtu.be/Ygbpt6yC_f4",
     );
     expect(getCanonicalA1TeacherVideoResource(3, "1.2")?.url).toBe(
-      "https://youtu.be/9CTJ-2nsY8U",
+      "https://youtu.be/PxV62u_UJko",
     );
 
     const day3Practice = componentSource("A1Day3SchreibenSprechenKapitel11WorkbookPage.js");
