@@ -750,7 +750,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     recordingStarting.current = true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation:true, noiseSuppression:true, channelCount:1 },
+        audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true, channelCount:1 },
       });
       if (!mounted.current) { stream.getTracks().forEach(track => track.stop()); return; }
       // Do not discard the replayable German question until the phone has
@@ -1121,14 +1121,14 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   onClick={()=>setAnswerMode("type")}>⌨ Type</button>
               </div>
               {answerMode==="record" ? <>
-                <SpeakingRecorder recording={recording}
+                <SpeakingRecorder recording={recording} stream={recording ? mediaRef.current : null}
                   disabled={busy || feedbackBusy || expired || Boolean(pending) || Boolean(audioRetry) ||
                     voiceState === "playing" || taskReady || Boolean(session.feedbackStatus) ||
                     (details?.capReached && !session.examTryout)}
                   onRecord={()=>startRecording(false)} onStop={stopRecording}/>
                 {studentAudioUrl ? <div className="speaking-recording-preview">
                   <small>Preview your recording</small>
-                  <audio ref={studentPlaybackRef} src={studentAudioUrl} preload="metadata" controls
+                  <audio ref={studentPlaybackRef} src={studentAudioUrl} preload="metadata" controls={!recording}
                     aria-label="Listen to your own recording"/>
                 </div> : null}
               </> : <div className="speaking-typed-answer">
