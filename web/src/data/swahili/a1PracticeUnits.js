@@ -1,4 +1,4 @@
-// A1 practice workbooks and their matching model answers.
+// Published Kiswahili A1 workbook activities. Tutor references are stored in Admin.
 export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
   "2": {
     "day": 2,
@@ -6,7 +6,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Salamu",
     "objective": "Greet people and respond appropriately in everyday situations.",
     "grammar": "Common greetings and personal pronouns",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Greetings change with the time or situation. Use Habari za asubuhi? in the morning and Habari za jioni? in the evening. Nzuri is a short reply. For a respectful greeting to an elder, use Shikamoo and listen for Marahaba. In Habari yako? the word yako addresses one person; Habari zenu? addresses a group.",
     "examples": [
       {
@@ -34,23 +34,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Greet a classmate in the morning, ask how they are and end the conversation. Swap roles and greet an elder.",
     "writing": {
-      "prompt": "Write four lines of a morning greeting and farewell between classmates.",
-      "model": "Habari za asubuhi? — Nzuri, asante. Habari yako? — Njema, asante. Kwaheri! — Kwaheri!"
+      "prompt": "Write four lines of a morning greeting and farewell between classmates."
     },
     "reading": {
       "text": "Asubuhi, Asha anamwona Juma. Asha anasema, “Habari za asubuhi?” Juma anasema, “Nzuri, asante.”",
       "questions": [
         {
           "question": "Asha anamsalimu nani?",
-          "answer": "Juma."
+          "id": "read-1"
         },
         {
           "question": "Asha anasema nini?",
-          "answer": "Habari za asubuhi?"
+          "id": "read-2"
         },
         {
           "question": "Juma anajibu nini?",
-          "answer": "Nzuri, asante."
+          "id": "read-3"
         }
       ]
     }
@@ -61,7 +60,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Utambulisho",
     "objective": "Introduce yourself and other people using short sentences.",
     "grammar": "Present-tense kuwa and subject markers",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Use ni with a name or role and si to deny a role. For an action in progress, attach the subject marker and -na- to the verb: ni-na-soma, u-na-soma, a-na-soma.",
     "examples": [
       {
@@ -89,23 +88,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Introduce yourself at a new class. Ask your partner their name and introduce them to a third person.",
     "writing": {
-      "prompt": "Write four sentences giving your name and role, then introduce another person and say what they study.",
-      "model": "Ninaitwa Amina. Mimi ni mwanafunzi. Huyu ni Omar. Anasoma Kiswahili."
+      "prompt": "Write four sentences giving your name and role, then introduce another person and say what they study."
     },
     "reading": {
       "text": "Ninaitwa Mariam. Mimi ni mwanafunzi. Huyu ni Musa. Yeye ni mwalimu.",
       "questions": [
         {
           "question": "Mwanafunzi anaitwa nani?",
-          "answer": "Mariam."
+          "id": "read-1"
         },
         {
           "question": "Mwalimu anaitwa nani?",
-          "answer": "Musa."
+          "id": "read-2"
         },
         {
           "question": "Musa ni nani?",
-          "answer": "Mwalimu."
+          "id": "read-3"
         }
       ]
     }
@@ -116,7 +114,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Nchi na Lugha",
     "objective": "Say where people come from and which languages they speak.",
     "grammar": "Questions: nani, wapi, gani; present tense",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Use unatoka wapi? to ask where someone comes from and unazungumza lugha gani? to ask which language they speak. Change u- to ni- to give your own answer and to a- to speak about another person. Use nani for who, as in Huyu ni nani?",
     "examples": [
       {
@@ -144,23 +142,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Meet a new classmate. Ask where they come from and which languages they speak, then introduce them to the group.",
     "writing": {
-      "prompt": "Write a brief introduction with your country and two languages, followed by one question for your partner.",
-      "model": "Ninatoka Ghana. Ninazungumza Kiingereza na Kiswahili. Unazungumza lugha gani?"
+      "prompt": "Write a brief introduction with your country and two languages, followed by one question for your partner."
     },
     "reading": {
       "text": "Fatuma anatoka Tanzania. Anazungumza Kiswahili. David anatoka Kenya na anazungumza Kiswahili na Kiingereza.",
       "questions": [
         {
           "question": "Fatuma anatoka wapi?",
-          "answer": "Tanzania."
+          "id": "read-1"
         },
         {
           "question": "David anatoka wapi?",
-          "answer": "Kenya."
+          "id": "read-2"
         },
         {
           "question": "David anazungumza lugha gani?",
-          "answer": "Kiswahili na Kiingereza."
+          "id": "read-3"
         }
       ]
     }
@@ -175,7 +172,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "objective": "Share food and drink preferences, then agree what to bring to a class picnic. Apply polite ordering in the listening exercise.",
     "grammar": "Vitenzi, mapendeleo na kuomba kwa adabu",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "check": {
       "question": "Which phrase means “I don’t like milk”?",
       "options": [
@@ -188,23 +185,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Plan a class picnic. Ask your partner what they like to eat and drink, offer two choices, and agree who will bring each item. Change one choice if your partner dislikes it.",
     "writing": {
-      "prompt": "Write a short picnic message. Say what you like, decline one drink politely, and say what you will bring.",
-      "model": "Ninapenda chapati na matunda. Sitaki soda, asante. Nitaleta chapati na maji."
+      "prompt": "Write a short picnic message. Say what you like, decline one drink politely, and say what you will bring."
     },
     "reading": {
       "text": "Hassan na Amina wanapanga kula pamoja baada ya darasa. Hassan anapenda chapati na chai. Amina hapendi chai. Anapenda juisi ya embe. Hassan ataleta chapati na Amina ataleta juisi.",
       "questions": [
         {
           "question": "Hassan anapenda kinywaji gani?",
-          "answer": "Chai."
+          "id": "read-1"
         },
         {
           "question": "Amina anapenda juisi gani?",
-          "answer": "Juisi ya embe."
+          "id": "read-2"
         },
         {
           "question": "Nani ataleta chapati?",
-          "answer": "Hassan."
+          "id": "read-3"
         }
       ]
     },
@@ -320,8 +316,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Wali na samaki",
             "Wali na kuku",
             "Chapati na kuku"
-          ],
-          "answer": "Wali na kuku"
+          ]
         },
         {
           "id": "drink",
@@ -330,8 +325,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Chai",
             "Kahawa",
             "Maji baridi"
-          ],
-          "answer": "Maji baridi"
+          ]
         },
         {
           "id": "offer",
@@ -340,8 +334,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Chai au kahawa",
             "Juisi au maziwa",
             "Maji au soda"
-          ],
-          "answer": "Chai au kahawa"
+          ]
         },
         {
           "id": "accept",
@@ -350,8 +343,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Ndiyo, anakubali chai",
             "Hapana, maji yanatosha",
             "Ndiyo, anakubali kahawa"
-          ],
-          "answer": "Hapana, maji yanatosha"
+          ]
         },
         {
           "id": "bill",
@@ -360,8 +352,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Shilingi elfu tatu",
             "Shilingi elfu nne",
             "Shilingi elfu tano"
-          ],
-          "answer": "Shilingi elfu tano"
+          ]
         }
       ]
     }
@@ -372,7 +363,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Namba na Umri",
     "objective": "Confirm a phone number and classroom number, and use age as a short review.",
     "grammar": "Compound numbers, digit-by-digit confirmation and age review",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Use na to join tens and units in numbers such as ishirini na moja. Read a phone number one digit at a time, including the opening zero. For age, use nina miaka followed by the number of years.",
     "examples": [
       {
@@ -404,23 +395,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "One learner reads a fictional phone number and a classroom number. Their partner writes both down, asks for a repeat, and reads them back to confirm. Swap roles.",
     "writing": {
-      "prompt": "Write a short message giving a classroom number in words and a four-digit fictional contact code in digits and in words.",
-      "model": "Darasa letu ni namba ishirini na moja. Msimbo ni 0725: sifuri, saba, mbili, tano."
+      "prompt": "Write a short message giving a classroom number in words and a four-digit fictional contact code in digits and in words."
     },
     "reading": {
       "text": "Amina anasoma Kiswahili katika darasa namba ishirini na moja. Msimbo wa kuingia ni 0725. Juma anauliza, “Tafadhali, rudia msimbo.” Amina anasema, “Sifuri, saba, mbili, tano.”",
       "questions": [
         {
           "question": "Darasa lina namba gani?",
-          "answer": "Ishirini na moja."
+          "id": "read-1"
         },
         {
           "question": "Msimbo wa kuingia ni upi?",
-          "answer": "0725."
+          "id": "read-2"
         },
         {
           "question": "Msimbo unaanza na namba gani?",
-          "answer": "Sifuri."
+          "id": "read-3"
         }
       ]
     }
@@ -431,7 +421,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Marafiki",
     "objective": "Describe friends and make a simple plan to meet.",
     "grammar": "M-/Wa- adjective agreement and invitations with Je, ungependa …?",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Adjectives usually follow the noun. With many adjectives for people, use m- for one person and wa- for several: rafiki mrefu → marafiki warefu. Use Je, ungependa …? to invite a friend and Tukutane … to suggest where or when to meet.",
     "examples": [
       {
@@ -459,23 +449,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Describe one friend and invite your partner to an activity. Your partner suggests a day or place. Agree on both, then swap roles.",
     "writing": {
-      "prompt": "Write a short message to a friend. Invite them to an activity and suggest a day and meeting place.",
-      "model": "Habari, Neema! Je, ungependa kucheza mpira Jumamosi? Tukutane uwanjani."
+      "prompt": "Write a short message to a friend. Invite them to an activity and suggest a day and meeting place."
     },
     "reading": {
       "text": "Pili na Neema ni marafiki. Wote wanapenda mpira. Pili anamwalika Neema kucheza mpira Jumamosi. Neema anakubali. Wanapanga kukutana uwanjani.",
       "questions": [
         {
           "question": "Pili na Neema wanapenda nini?",
-          "answer": "Mpira."
+          "id": "read-1"
         },
         {
           "question": "Watacheza mpira siku gani?",
-          "answer": "Jumamosi."
+          "id": "read-2"
         },
         {
           "question": "Watakutana wapi?",
-          "answer": "Uwanjani."
+          "id": "read-3"
         }
       ]
     }
@@ -486,7 +475,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Sokoni",
     "objective": "Buy fruits and vegetables at a market, read prices up to 10,000 shillings and bargain politely.",
     "grammar": "Numbers, Ji-/Ma- nouns and polite requests",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "grammarSections": [
       {
         "title": "Namba 100–10,000",
@@ -665,8 +654,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Role-play a buyer and a seller. Ask what the stall has, order produce by number, bundle or kilo, ask the total, and agree on a lower price. Use the dialogue in Reading as a model and swap roles.",
     "writing": {
-      "prompt": "Write a short market dialogue. Ask if the seller has avocados, request eight avocados and a bunch of bananas, ask for the total and bargain politely.",
-      "model": "Mnunuzi: Mna maparachichi? Muuzaji: Ndiyo. Mnunuzi: Naomba maparachichi manane na kichane kimoja cha ndizi. Jumla ni shilingi ngapi? Muuzaji: Shilingi elfu moja na mia saba. Mnunuzi: Unaweza kupunguza bei kidogo, tafadhali? Muuzaji: Sawa, lipa shilingi elfu moja na mia sita."
+      "prompt": "Write a short market dialogue. Ask if the seller has avocados, request eight avocados and a bunch of bananas, ask for the total and bargain politely."
     },
     "reading": {
       "title": "Safari ya Juma Sokoni na Kahawani",
@@ -674,23 +662,23 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "questions": [
         {
           "question": "Kwa nini Juma anakwenda sokoni asubuhi?",
-          "answer": "Anakwenda kupata matunda na chakula."
+          "id": "read-1"
         },
         {
           "question": "Juma ananunua maembe mangapi, machungwa mangapi na mayai mangapi?",
-          "answer": "Maembe matatu, machungwa matano na mayai kumi."
+          "id": "read-2"
         },
         {
           "question": "Juma analipa shilingi ngapi sokoni?",
-          "answer": "Shilingi mia nne na hamsini (450)."
+          "id": "read-3"
         },
         {
           "question": "Juma anakaa wapi kahawani?",
-          "answer": "Anakaa karibu na dirisha kubwa."
+          "id": "read-4"
         },
         {
           "question": "Juma anaomba vinywaji gani kahawani?",
-          "answer": "Kikombe cha kahawa na maji."
+          "id": "read-5"
         }
       ]
     },
@@ -704,8 +692,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Nyanya",
             "Vitunguu",
             "Ndizi mbivu"
-          ],
-          "answer": "Nyanya"
+          ]
         },
         {
           "id": "tomato-price",
@@ -714,8 +701,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Shilingi mia moja",
             "Shilingi mia tano",
             "Shilingi mia nane"
-          ],
-          "answer": "Shilingi mia tano"
+          ]
         },
         {
           "id": "onion-quantity",
@@ -724,8 +710,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Kimoja",
             "Viwili",
             "Vitatu"
-          ],
-          "answer": "Vitatu"
+          ]
         },
         {
           "id": "bananas",
@@ -734,8 +719,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Ndizi zimeisha",
             "Ndizi ni ghali",
             "Ndizi hazijaiva"
-          ],
-          "answer": "Ndizi zimeisha"
+          ]
         },
         {
           "id": "total",
@@ -744,8 +728,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "Shilingi mia tano",
             "Shilingi mia nane",
             "Shilingi elfu moja"
-          ],
-          "answer": "Shilingi mia nane"
+          ]
         }
       ]
     }
@@ -962,7 +945,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Mapishi ya Kitanzania",
     "objective": "Follow simple cooking instructions and talk about Tanzanian dishes.",
     "grammar": "Imperatives and sequence words",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Use instructions in the order they happen, starting with kwanza, then kisha, and finally mwishowe. Examples of commands to one person include osha, kata and ongeza. Ongeza comes from kuongeza.",
     "examples": [
       {
@@ -990,23 +973,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Explain three steps for preparing a simple salad. Your partner repeats them in the right order.",
     "writing": {
-      "prompt": "Write three instructions to prepare a tomato and onion salad. Use kwanza, kisha and mwishowe.",
-      "model": "Kwanza, osha nyanya. Kisha, kata nyanya na vitunguu. Mwishowe, ongeza chumvi."
+      "prompt": "Write three instructions to prepare a tomato and onion salad. Use kwanza, kisha and mwishowe."
     },
     "reading": {
       "text": "Kwanza, osha mchele. Kisha, ongeza maji. Pika mchele mpaka uive. Mwishowe, toa wali kwenye sufuria.",
       "questions": [
         {
           "question": "Unaosha nini kwanza?",
-          "answer": "Mchele."
+          "id": "read-1"
         },
         {
           "question": "Unaongeza nini?",
-          "answer": "Maji."
+          "id": "read-2"
         },
         {
           "question": "Unatoa wali kutoka wapi?",
-          "answer": "Kutoka kwenye sufuria."
+          "id": "read-3"
         }
       ]
     }
@@ -1017,7 +999,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Nyumbani",
     "objective": "Describe your home, rooms and where you live.",
     "grammar": "Locative -ni and common prepositions",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "On familiar place nouns, -ni can give a location: nyumba → nyumbani and jikoni means in the kitchen. Use karibu na for near, mbele ya for in front of, and nyuma ya for behind.",
     "examples": [
       {
@@ -1045,23 +1027,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Draw a simple home plan. Describe where two rooms are while your partner follows on the drawing.",
     "writing": {
-      "prompt": "Write four sentences about an imaginary home. Include one room and two location phrases.",
-      "model": "Ninaishi hapa. Nyumba ina vyumba viwili. Bafu liko karibu na jiko. Bustani iko nyuma ya nyumba."
+      "prompt": "Write four sentences about an imaginary home. Include one room and two location phrases."
     },
     "reading": {
       "text": "Nyumba ya Nia ina vyumba viwili. Bafu liko karibu na jiko. Bustani iko mbele ya nyumba.",
       "questions": [
         {
           "question": "Nyumba ina vyumba vingapi?",
-          "answer": "Viwili."
+          "id": "read-1"
         },
         {
           "question": "Bafu liko wapi?",
-          "answer": "Karibu na jiko."
+          "id": "read-2"
         },
         {
           "question": "Bustani iko wapi?",
-          "answer": "Mbele ya nyumba."
+          "id": "read-3"
         }
       ]
     }
@@ -1072,7 +1053,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Vitu vya Nyumbani",
     "objective": "Name household objects and say where they are.",
     "grammar": "Basic locatives: -po, -ko, -mo",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Where you put an object affects how you describe its location: -po can point to a specific spot, -ko to a more general place and -mo to the inside of something. The beginning agrees with the object: kiti takes ki-, funguo takes zi-.",
     "examples": [
       {
@@ -1100,23 +1081,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Ask where three everyday objects are. Describe what is here, upstairs or inside a bag.",
     "writing": {
-      "prompt": "Write three sentences locating a chair, a room and your keys. Use one example each of -po, -ko and -mo.",
-      "model": "Kiti kipo hapa. Chumba kiko ghorofani. Funguo zimo ndani ya mfuko."
+      "prompt": "Write three sentences locating a chair, a room and your keys. Use one example each of -po, -ko and -mo."
     },
     "reading": {
       "text": "Kiti kipo pale karibu na mlango. Chumba kiko ghorofani. Vitabu vimo ndani ya sanduku.",
       "questions": [
         {
           "question": "Kiti kipo wapi?",
-          "answer": "Pale karibu na mlango."
+          "id": "read-1"
         },
         {
           "question": "Chumba kiko wapi?",
-          "answer": "Ghorofani."
+          "id": "read-2"
         },
         {
           "question": "Vitabu vimo wapi?",
-          "answer": "Ndani ya sanduku."
+          "id": "read-3"
         }
       ]
     }
@@ -1127,7 +1107,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Shughuli za Kila Siku",
     "objective": "Describe simple everyday activities and routines.",
     "grammar": "Present tense and habitual hu-",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "The present uses a subject marker and -na-: ninakula, unakula, anakula. For a repeated habit, hu- can replace this subject-and-tense pattern; use an explicit subject if it is unclear who does it.",
     "examples": [
       {
@@ -1155,23 +1135,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Compare morning routines. Use one sentence for what you are doing now and two for your habits.",
     "writing": {
-      "prompt": "Write four sentences about your routine, including two with hu- and one about what you are doing now.",
-      "model": "Kila asubuhi mimi huamka mapema. Kisha mimi hunywa chai. Jioni mimi husoma nyumbani. Sasa ninaandika."
+      "prompt": "Write four sentences about your routine, including two with hu- and one about what you are doing now."
     },
     "reading": {
       "text": "Kila asubuhi Asha huamka mapema. Baadaye yeye hunywa chai. Jioni husoma nyumbani. Sasa anaandika barua.",
       "questions": [
         {
           "question": "Asha hunywa nini asubuhi?",
-          "answer": "Chai."
+          "id": "read-1"
         },
         {
           "question": "Husoma wapi jioni?",
-          "answer": "Nyumbani."
+          "id": "read-2"
         },
         {
           "question": "Anafanya nini sasa?",
-          "answer": "Anaandika barua."
+          "id": "read-3"
         }
       ]
     }
@@ -1182,7 +1161,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Saa na Siku",
     "objective": "Tell time, name weekdays and discuss a simple schedule.",
     "grammar": "Time expressions and days of the week",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "The Swahili clock counts from roughly 6 a.m. or 6 p.m. So saa moja asubuhi is 7 a.m. and saa moja jioni is 7 p.m. Add the period of the day and use na nusu for half past.",
     "examples": [
       {
@@ -1210,23 +1189,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Plan a morning study session. Ask for the day and time, suggest another time and confirm the final arrangement.",
     "writing": {
-      "prompt": "Write a two-event schedule with weekdays and times in Kiswahili, then add the matching digital times.",
-      "model": "Jumatatu ninasoma saa mbili asubuhi (08:00). Ijumaa ninakutana na Asha saa moja jioni (19:00)."
+      "prompt": "Write a two-event schedule with weekdays and times in Kiswahili, then add the matching digital times."
     },
     "reading": {
       "text": "Jumatatu darasa linaanza saa mbili asubuhi. Jumatano darasa linaanza saa tatu na nusu asubuhi.",
       "questions": [
         {
           "question": "Darasa linaanza saa ngapi Jumatatu?",
-          "answer": "Saa mbili asubuhi (08:00)."
+          "id": "read-1"
         },
         {
           "question": "Darasa linaanza saa ngapi Jumatano?",
-          "answer": "Saa tatu na nusu asubuhi (09:30)."
+          "id": "read-2"
         },
         {
           "question": "Ni siku gani darasa linaanza baadaye?",
-          "answer": "Jumatano."
+          "id": "read-3"
         }
       ]
     }
@@ -1237,7 +1215,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Burudani na Mapendeleo",
     "objective": "Talk about hobbies and things you like or dislike.",
     "grammar": "Preference verbs and short questions",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Use kupenda with an activity in the ku- form: kusoma (to read), kucheza (to play), kuimba (to sing). Ask Unapenda kufanya nini? and reply with Ninapenda or Sipendi.",
     "examples": [
       {
@@ -1265,23 +1243,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Interview a partner about two hobbies and suggest one activity you both like.",
     "writing": {
-      "prompt": "Write two hobbies you like and one you dislike, then write one question for a partner.",
-      "model": "Ninapenda kusoma na kuimba. Sipendi kucheza mpira. Unapenda kufanya nini?"
+      "prompt": "Write two hobbies you like and one you dislike, then write one question for a partner."
     },
     "reading": {
       "text": "Neema anapenda kuimba na kusoma. Hapendi kucheza mpira. Baraka anapenda kucheza mpira na kusoma.",
       "questions": [
         {
           "question": "Neema anapenda kufanya nini?",
-          "answer": "Kuimba na kusoma."
+          "id": "read-1"
         },
         {
           "question": "Neema hapendi nini?",
-          "answer": "Kucheza mpira."
+          "id": "read-2"
         },
         {
           "question": "Wote wanapenda nini?",
-          "answer": "Kusoma."
+          "id": "read-3"
         }
       ]
     }
@@ -1292,7 +1269,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Mjini",
     "objective": "Name places in town and ask for simple directions.",
     "grammar": "Wapi? and basic location expressions",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Ask Wapi? for a location. The location verb agrees with the place: soko liko wapi? and shule iko wapi? Use nenda moja kwa moja for go straight and geuka kulia or kushoto for turn right or left.",
     "examples": [
       {
@@ -1320,23 +1297,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Use an imaginary town map. Ask for the bank and give two directions plus a landmark. Swap roles for the market.",
     "writing": {
-      "prompt": "Write directions from a school to a bank. Include two instructions and a landmark.",
-      "model": "Kutoka shuleni, nenda moja kwa moja. Geuka kulia. Benki iko karibu na soko."
+      "prompt": "Write directions from a school to a bank. Include two instructions and a landmark."
     },
     "reading": {
       "text": "Kutoka shuleni, nenda moja kwa moja. Geuka kushoto. Soko liko mbele yako. Benki iko karibu na soko.",
       "questions": [
         {
           "question": "Unaanzia wapi?",
-          "answer": "Shuleni."
+          "id": "read-1"
         },
         {
           "question": "Unageuka upande gani?",
-          "answer": "Kushoto."
+          "id": "read-2"
         },
         {
           "question": "Benki iko karibu na nini?",
-          "answer": "Soko."
+          "id": "read-3"
         }
       ]
     }
@@ -1347,7 +1323,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Usafiri",
     "objective": "Talk about local transport and simple journeys.",
     "grammar": "Motion verbs, kwa and common travel phrases",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Use kwenda for going, kutoka for leaving or coming from, and kufika for arriving. Put kwa before the transport method. Use kutoka … hadi … to show a route.",
     "examples": [
       {
@@ -1375,23 +1351,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Ask how to travel to town. Compare two types of transport and say where your trip starts and ends.",
     "writing": {
-      "prompt": "Describe a short journey. Name the starting point, the destination, the transport and one time.",
-      "model": "Ninatoka nyumbani saa mbili asubuhi. Ninakwenda mjini kwa basi. Ninafika saa tatu asubuhi."
+      "prompt": "Describe a short journey. Name the starting point, the destination, the transport and one time."
     },
     "reading": {
       "text": "Musa anatoka nyumbani saa moja asubuhi. Anakwenda sokoni kwa daladala. Anafika saa mbili asubuhi.",
       "questions": [
         {
           "question": "Musa anatoka wapi?",
-          "answer": "Nyumbani."
+          "id": "read-1"
         },
         {
           "question": "Anasafiri kwa nini?",
-          "answer": "Kwa daladala."
+          "id": "read-2"
         },
         {
           "question": "Anafika saa ngapi?",
-          "answer": "Saa mbili asubuhi."
+          "id": "read-3"
         }
       ]
     }
@@ -1402,7 +1377,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Hospitalini",
     "objective": "Describe basic symptoms and understand simple medical instructions.",
     "grammar": "Body vocabulary, ninaumwa and polite imperatives",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "rule": "Say ninaumwa to report feeling unwell, then name what hurts. The subject agreement follows the body part: kichwa kinauma (head) and tumbo linauma (stomach). Use tafadhali when making a polite request.",
     "examples": [
       {
@@ -1430,23 +1405,22 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Take turns as a patient and a clinic receptionist. Say where it hurts and make a polite request to see a doctor.",
     "writing": {
-      "prompt": "Write four short lines between a receptionist and a patient asking to see a doctor.",
-      "model": "Habari. Una shida gani? — Ninaumwa. Kichwa kinauma. — Tafadhali, subiri hapa. — Asante. Naomba kuonana na daktari."
+      "prompt": "Write four short lines between a receptionist and a patient asking to see a doctor."
     },
     "reading": {
       "text": "Asha yuko hospitalini. Anasema, “Tumbo linauma.” Anaomba kuonana na daktari. Mhudumu anasema, “Tafadhali, subiri hapa.”",
       "questions": [
         {
           "question": "Asha yuko wapi?",
-          "answer": "Hospitalini."
+          "id": "read-1"
         },
         {
           "question": "Anaumwa sehemu gani?",
-          "answer": "Tumbo."
+          "id": "read-2"
         },
         {
           "question": "Mhudumu anamwambia nini?",
-          "answer": "Tafadhali, subiri hapa."
+          "id": "read-3"
         }
       ]
     }

@@ -41,7 +41,7 @@ export default function SwahiliReviewDraft({ writing, questions, reading, listen
     {listeningQuestions.length > 0 ? <>
       <h3>Teil 4 · Listening</h3>
       <ol>{listeningQuestions.map((question, index) => (
-        <li key={question.id}><strong>{question.question || `Question ${index + 1}`}</strong>
+        <li key={question.id}><strong>{question.question || question.prompt || `Question ${index + 1}`}</strong>
           <p>{listening?.[question.id] || "Unanswered"}</p></li>
       ))}</ol>
     </> : listening && <p>Optional listening answers saved in this draft: {Object.values(listening).filter(Boolean).length}.</p>}

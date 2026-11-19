@@ -4,19 +4,24 @@ import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GrammarSelfCheck } from "./MgahawaniGrammarPractice";
-import { SWAHILI_DAY_FIVE as lesson, FAMILY_GRAMMAR, FAMILY_LISTENING, FAMILY_RADIO_GAPS, FAMILY_RADIO_CHOICES, FAMILY_RADIO_WRITING_TOPICS, FAMILY_READING, FAMILY_WRITING_MODEL } from "../data/swahili/dayFive";
-import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR as tabs, WorkbookTabNav } from "./StandardWorkbookComponents";
+import { SWAHILI_DAY_FIVE as lesson, FAMILY_GRAMMAR, FAMILY_LISTENING, FAMILY_RADIO_GAPS, FAMILY_RADIO_CHOICES, FAMILY_RADIO_WRITING_TOPICS, FAMILY_READING } from "../data/swahili/dayFive";
+import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
+import SwahiliAssignmentReview, { useSwahiliAssignment } from "./SwahiliAssignmentReview";
 import "./SwahiliCourseBook.css";
+
+const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.map(tab => tab.key === "submit" ? { ...tab, label: "Review & Submit" } : tab);
+const listeningQuestions = [
+  ...FAMILY_RADIO_GAPS.map(q => ({ ...q, id: "radio-" + q.id })),
+  ...FAMILY_RADIO_CHOICES.map(q => ({ ...q, id: "radio-" + q.id })),
+  ...FAMILY_LISTENING,
+];
 
 export default function SwahiliDayFiveWorkbook({ preview = false }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useSwahiliWorkbookTab(tabs);
-  const [writing, setWriting] = useState("");
-  const [readingAnswers, setReadingAnswers] = useState({});
-  const [listeningAnswers, setListeningAnswers] = useState({});
-  const [radioGaps, setRadioGaps] = useState({});
-  const [radioChoices, setRadioChoices] = useState({});
+  const assignment = useSwahiliAssignment(lesson, preview, activeTab, FAMILY_READING.questions, listeningQuestions);
+  const { writing, setWriting, reading, setReading, listeningAnswers, setListeningAnswers } = assignment;
   const [audio, setAudio] = useState({ url: "", loading: false, error: "" });
 
   async function loadListeningAudio() {
@@ -92,30 +97,22 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
           <p>Unaweza kujumuisha · You can include:</p>
           <ul>{FAMILY_RADIO_WRITING_TOPICS.map(topic => <li key={topic}>{topic}</li>)}</ul>
           <p>Start with <strong>Familia yangu ni …</strong> or <strong>Katika familia yangu kuna …</strong>. You may use fictional details.</p>
-          <p>Your practice answer stays on this page until you reload or leave the lesson.</p>
-          <label className="swahili-book__form" htmlFor="family-writing">Your practice answer
+
+          <label className="swahili-book__form" htmlFor="family-writing">Your writing answer
             <textarea id="family-writing" rows={9} value={writing} onChange={(event) => setWriting(event.target.value)} />
           </label>
           
         </>}
         {activeTab === "lesen" && <>
           <h2>Teil 3 · Kusoma (Reading)</h2>
-          <p>Read about Asha’s family. Record your answers, then review them in Receive & Submit.</p>
+          <p>Read about Asha’s family. Record your answers, then review them in Review & Submit.</p>
           <p className="swahili-book__tile">{FAMILY_READING.text}</p>
-          <ol>{FAMILY_READING.questions.map(({ question }) => <li key={question}>{question}</li>)}</ol>
+          <ol>{FAMILY_READING.questions.map(({ id, question }) => <li key={id}>
+            <label>{question}<input value={reading[id] || ""} onChange={event => setReading(current => ({ ...current, [id]: event.target.value }))} /></label>
+          </li>)}</ol>
           
         </>}
-        {activeTab === "submit" && <>
-          <h2>Wasilisha · Submit</h2>
-          <p>Day 5 is practice only. Review your work and suggested answers here; nothing is sent to a tutor.</p>
-          <details className="swahili-book__tile"><summary>Review model writing</summary><p>{FAMILY_WRITING_MODEL}</p>{writing && <p><strong>Your answer:</strong> {writing}</p>}</details>
-          <details className="swahili-book__tile"><summary>Review reading answers</summary><ol>{FAMILY_READING.questions.map(({ question, answer }) => <li key={question}><strong>{question}</strong>{readingAnswers[question] && <div>Your answer: {readingAnswers[question]}</div>}<div>Suggested answer: {answer}</div></li>)}</ol></details>
-          <div className="swahili-book__row">
-            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("schreiben")}>Edit writing</button>
-            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("lesen")}>Edit reading</button>
-            <button type="button" className="swahili-book__button" onClick={() => setActiveTab("hoeren")}>Edit listening</button>
-          </div>
-        </>}
+        {activeTab === "submit" && <SwahiliAssignmentReview assignment={assignment} />}
         {activeTab === "hoeren" && <>
           <h2>Teil 4 · Kusikiliza (Listening)</h2>
           <h3>Falowen Radio · Familia Yangu</h3>
@@ -132,8 +129,8 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
                   aria-label={`Answer for question ${index + 1}`}
                   type="text"
                   autoComplete="off"
-                  value={radioGaps[id] || ""}
-                  onChange={event => setRadioGaps(current => ({ ...current, [id]: event.target.value }))}
+                  value={listeningAnswers["radio-" + id] || ""}
+                  onChange={event => setListeningAnswers(current => ({ ...current, ["radio-" + id]: event.target.value }))}
                 />
               </fieldset>
             ))}
@@ -147,8 +144,8 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
                   {choices.map((choice, optionIndex) => (
                     <label className="swahili-book__choice" key={choice}>
                       <input type="radio" name={`family-radio-${id}`} value={choice}
-                        checked={radioChoices[id] === choice}
-                        onChange={() => setRadioChoices(current => ({ ...current, [id]: choice }))} />
+                        checked={listeningAnswers["radio-" + id] === choice}
+                        onChange={() => setListeningAnswers(current => ({ ...current, ["radio-" + id]: choice }))} />
                       {String.fromCharCode(97 + optionIndex)}) {choice}
                     </label>
                   ))}
@@ -156,15 +153,6 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
               </fieldset>
             ))}
           </div>
-          <details className="swahili-book__tile">
-            <summary>Receive &amp; Submit · Review Falowen Radio answers</summary>
-            <ol lang="sw">
-              {FAMILY_RADIO_GAPS.map(({ id, answer }) => <li key={id}>{answer}</li>)}
-              {FAMILY_RADIO_CHOICES.map(({ id, answer, choices }) => (
-                <li key={id}>{String.fromCharCode(97 + choices.indexOf(answer))}) {answer}</li>
-              ))}
-            </ol>
-          </details>
           <h3>Mazungumzo yaliyorekodiwa · Additional listening practice</h3>
           <p>For the separate Day 5 recorded conversation, listen twice and select one answer per question.</p>
           <button type="button" className="swahili-book__button swahili-book__button--soft"
@@ -190,14 +178,6 @@ export default function SwahiliDayFiveWorkbook({ preview = false }) {
               </fieldset>
             ))}
           </div>
-          <details className="swahili-book__tile">
-            <summary>Receive &amp; Submit · Review listening answers</summary>
-            <ol lang="sw">
-              {FAMILY_LISTENING.map(({ id, answer }) => (
-                <li key={id}>{answer}</li>
-              ))}
-            </ol>
-          </details>
         </>}
       </section>
       <SwahiliWorkbookNavigation tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />

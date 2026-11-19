@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { loadSwahiliSubmissions } from "../utils/swahiliSubmissions";
 import { Link } from "react-router-dom";
 import { db, doc, getDoc } from "../firebase";
 import { SWAHILI_A1_CURRICULUM, SWAHILI_A1_PUBLISHED_LESSONS, SWAHILI_A1_ASSIGNMENTS } from "../data/swahili/a1Curriculum";
@@ -38,23 +39,22 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
   useEffect(() => {
     if (!showA1 || preview || !uid || !db) return undefined;
     let active = true;
-    Promise.all(ASSIGNMENTS.map(async ({ day }) => {
-      const [submission, review] = await Promise.allSettled([
-        getDoc(doc(db, "users", uid, "swahiliLessons", `day-${day}`)),
-        getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_day-${day}`)),
-      ]);
-      const work = submission.status === "fulfilled" && submission.value.exists() ? submission.value.data() : null;
-      const feedback = review.status === "fulfilled" && review.value.exists() ? review.value.data() : null;
+    loadSwahiliSubmissions(uid).then(submissions => Promise.all(ASSIGNMENTS.map(async ({ day }) => {
+      const work = submissions.get(`day-${day}`);
+      const review = work && await getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_day-${day}`)).catch(() => null);
+      const feedback = review?.data();
       // A fresh resubmission must not inherit an older tutor decision.
       const currentReview = getCurrentSwahiliReview(work, feedback);
       return {
         day,
-        submitted: submission.status === "fulfilled" ? submission.value.exists() : null,
+        submitted: Boolean(work),
         review: currentReview?.status || null,
         feedback: currentReview?.feedback || "",
       };
-    })).then((records) => {
+    }))).then((records) => {
       if (active) setProgress({ uid, records });
+    }).catch(() => {
+      if (active) setProgress({ uid, records: ASSIGNMENTS.map(({ day }) => ({ day, submitted: null })) });
     });
     return () => { active = false; };
   }, [showA1, preview, uid]);
@@ -219,7 +219,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
                     <span style={book.chip}>{badge}</span>
                   </div>
                   {published && <div className="course-book-included" style={book.includedRow}>
-                    {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", lesson.day === 5 ? "Practice · Review & Submit" : "Receive & Submit"].map((label) =>
+                    {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", "Review & Submit"].map((label) =>
                       <span key={label} style={book.includedChip}>{label}</span>)}
                   </div>}
                   {record?.review === "needs_revision" && (
