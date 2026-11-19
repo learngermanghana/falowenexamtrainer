@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { loadSwahiliSubmissions } from "../utils/swahiliSubmissions";
 import { Link, useLocation } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -7,11 +8,11 @@ import ResultHistory from "./ResultHistory";
 import { styles } from "../styles";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 
+import { SWAHILI_A1_ASSIGNMENTS } from "../data/swahili/a1Curriculum";
+
 const lessons = [
   { day: 28, title: "B1 · Kutunza Mazingira katika Maisha ya Kila Siku" },
-  { day: 1, title: "Alfabeti, sauti na matamshi" },
-  { day: 11, title: "Dukani" },
-  { day: 6, title: "Mgahawani" },
+  ...SWAHILI_A1_ASSIGNMENTS,
 ];
 
 export default function SwahiliResults({ uid }) {
@@ -21,15 +22,13 @@ export default function SwahiliResults({ uid }) {
   useEffect(() => {
     if (!db || !uid) return;
     let active = true;
-    Promise.all(lessons.map(async ({ day, title }) => {
+    loadSwahiliSubmissions(uid).then(submissions => Promise.all(lessons.map(async ({ day, title }) => {
       const lessonDoc = day === 28 ? "b1-day-28" : `day-${day}`;
-      const [submission, review] = await Promise.all([
-        getDoc(doc(db, "users", uid, "swahiliLessons", lessonDoc)),
-        getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_${lessonDoc}`)),
-      ]);
-      if (submission.data()?.status !== "submitted") return null;
-      return { day, title, review: getCurrentSwahiliReview(submission.data(), review.data()) };
-    })).then((entries) => {
+      const submission = submissions.get(lessonDoc);
+      if (submission?.status !== "submitted") return null;
+      const review = await getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_${lessonDoc}`));
+      return { day, title, review: getCurrentSwahiliReview(submission, review.data()) };
+    }))).then((entries) => {
       if (active) setRows(entries.filter(Boolean));
     }).catch(() => {
       if (active) setFailed(true);
@@ -38,7 +37,7 @@ export default function SwahiliResults({ uid }) {
   }, [uid]);
 
   useEffect(() => {
-    if (/^#swahili-(day-(1|6|11)|b1-day-28)$/.test(hash) && rows) {
+    if (/^#swahili-(day-([1-9]|1[0-9]|20)|b1-day-28)$/.test(hash) && rows) {
       document.getElementById(hash.slice(1))?.scrollIntoView?.({ block: "start" });
     }
   }, [hash, rows]);
@@ -54,7 +53,7 @@ export default function SwahiliResults({ uid }) {
       referenceParts: [
         ...(writing.length ? [{ id: "teil2", answers: writing.map(([question, answer]) => ({ question, answer })) }] : []),
         ...(reading.length ? [{ id: "teil3", answers: reading.map(({ prompt, answer }) => ({ question: prompt, answer })) }] : []),
-        ...(day === 11 ? [{ id: "teil4", answers: Object.values(review.answerReference?.listening || {}).map(({ prompt, answer }) => ({ question: prompt, answer })) }] : []),
+        ...(review.answerReference?.listening ? [{ id: "teil4", answers: Object.values(review.answerReference?.listening || {}).map(({ prompt, answer }) => ({ question: prompt, answer })) }] : []),
       ],
     };
   });

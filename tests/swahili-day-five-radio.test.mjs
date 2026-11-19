@@ -27,8 +27,7 @@ test("Day 5 radio questions are complete and preserve the supplied key", () => {
   assert.equal(FAMILY_RADIO_WRITING_TOPICS.length, 7);
   assert.match(FAMILY_WRITING_MODEL, /Tunapenda kupika na kula pamoja/);
   assert.match(workbook, /zisizopungua saba/);
-  assert.match(workbook, /radioGaps/);
-  assert.match(workbook, /radioChoices/);
+  assert.match(workbook, /listeningAnswers\["radio-" \+ id\]/);
   // This other listening activity belongs to a different recorded dialogue.
   assert.equal(FAMILY_LISTENING.length, 5);
   assert.match(workbook, /Additional listening practice/);

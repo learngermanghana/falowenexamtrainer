@@ -7,7 +7,7 @@ import SwahiliA1PracticeWorkbook from "./SwahiliA1PracticeWorkbook";
 import { SWAHILI_A1_PRACTICE_UNITS } from "../data/swahili/a1PracticeUnits";
 import SwahiliDaySixWorkbook from "./SwahiliDaySixWorkbook";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
-import { setDoc, getDoc } from "../firebase";
+import { setDoc, getDoc, getDocs } from "../firebase";
 
 let mockUser = null;
 let mockStudentProfile = null;
@@ -16,6 +16,7 @@ jest.mock("../context/AuthContext", () => ({
 }));
 jest.mock("../firebase", () => ({
   db: {},
+  collection: jest.fn((_db, ...segments) => "/" + segments.join("/")),
   doc: jest.fn((_db, ...segments) => "/" + segments.join("/")),
   getDoc: jest.fn(async () => ({ exists: () => false })),
   getDocs: jest.fn(async () => ({ docs: [] })),
@@ -34,6 +35,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     mockUser = null;
     mockStudentProfile = { program: "swahili" };
     jest.clearAllMocks();
+    getDocs.mockResolvedValue({ docs: [] });
     getDoc.mockImplementation(async () => ({ exists: () => false }));
   });
 
@@ -73,12 +75,12 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     }));
   });
 
-  it("keeps new practice answers across tabs and shows matched models without submitting", () => {
+  it("reviews only learner answers across tabs in preview", () => {
     const lesson = SWAHILI_A1_PRACTICE_UNITS[20];
     render(<MemoryRouter initialEntries={["/swahili/day-20?view=schreiben"]}>
       <SwahiliA1PracticeWorkbook lesson={lesson} preview />
     </MemoryRouter>);
-    fireEvent.change(screen.getByRole("textbox", { name: "Your practice answer" }), {
+    fireEvent.change(screen.getByRole("textbox", { name: "Your writing answer" }), {
       target: { value: "Ninaumwa." },
     });
     openTab("Teil 3");
@@ -88,12 +90,11 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     openTab("Teil 4");
     expect(screen.getByText(/after upload/)).toBeTruthy();
     expect(screen.queryByRole("radio")).toBeNull();
-    openTab("Receive & Submit");
-    fireEvent.click(screen.getByText("Teil 2 · Review your writing"));
-    fireEvent.click(screen.getByText("Teil 3 · Review your reading"));
+    openTab("Review & Submit");
+
     expect(screen.getByText("Ninaumwa.")).toBeTruthy();
-    expect(screen.getByText("Your answer: Hospitali.")).toBeTruthy();
-    expect(screen.getByText("Suggested answer: Hospitalini.")).toBeTruthy();
+    expect(screen.getByText("Hospitali.")).toBeTruthy();
+    expect(screen.queryByText(/Suggested answer|Model answer/)).toBeNull();
     expect(setDoc).not.toHaveBeenCalled();
   });
 
@@ -148,7 +149,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(getDoc).not.toHaveBeenCalled();
 
     fireEvent.change(selector(), { target: { value: "A1" } });
-    expect(await screen.findByText(/0 of 3 required assignments submitted/)).toBeTruthy();
+    expect(await screen.findByText(/0 of 20 required assignments submitted/)).toBeTruthy();
     expect(screen.getByRole("link", { name: "Fungua Somo la 5" }).getAttribute("href")).toBe("/campus/course/swahili/day-5");
     fireEvent.change(selector(), { target: { value: "B1" } });
     expect(screen.getByText("Ulimwengu wa ndoto (Zoezi)")).toBeTruthy();
@@ -165,15 +166,16 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
 
   it("uses the learner's submissions and tutor decisions to show progress and resume", async () => {
     mockUser = { uid: "swahili-student-1" };
+    getDocs.mockResolvedValue({ docs: [{ id: "day-1", data: () => ({ status: "submitted" }) }] });
     getDoc.mockImplementation(async (path) => ({
       exists: () => path.endsWith("/day-1") || path.endsWith("/swahiliTeacherReviews/swahili-student-1"),
       data: () => ({ status: "reviewed" }),
     }));
     render(<MemoryRouter><SwahiliCourseBook basePath="/campus/course/swahili" /></MemoryRouter>);
-    expect(await screen.findByText("1 of 3 required assignments submitted · 33% complete")).toBeTruthy();
-    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("33");
+    expect(await screen.findByText("1 of 20 required assignments submitted · 5% complete")).toBeTruthy();
+    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("5");
     expect(screen.getByText("1 reviewed")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Continue learning" }).getAttribute("href")).toBe("/campus/course/swahili/day-6");
+    expect(screen.getByRole("link", { name: "Continue learning" }).getAttribute("href")).toBe("/campus/course/swahili/day-2");
   });
 
   it("opens Submit directly and can move back through workbook sections", () => {
@@ -356,6 +358,9 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
 
   it("shows only current, student-owned tutor feedback and prioritizes revisions", async () => {
     mockUser = { uid: "swahili-student-1" };
+    getDocs.mockResolvedValue({ docs: [1, 6].map(day => ({
+      id: "day-" + day, data: () => ({ submittedAt: { toMillis: () => day === 1 ? 100 : 300 } }),
+    })) });
     getDoc.mockImplementation(async (path) => {
       const record = ({
         "/users/swahili-student-1/swahiliLessons/day-1": {
@@ -387,8 +392,8 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.queryByRole("link", { name: "Fungua Somo la 6" })).toBeNull();
     const paths = getDoc.mock.calls.map((call) => call[0]);
     expect(paths).toEqual(expect.arrayContaining([
-      "/users/swahili-student-1/swahiliLessons/day-1",
-      "/users/swahili-student-1/swahiliLessons/day-6",
+      "/swahiliTeacherReviews/swahili-student-1",
+      "/swahiliTeacherReviews/swahili-student-1_day-6",
     ]));
     expect(paths.every((path) => !path.includes("german") && !path.includes("results"))).toBe(true);
   });

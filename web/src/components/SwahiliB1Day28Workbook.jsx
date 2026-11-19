@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { WorkbookTabNav } from "./StandardWorkbookComponents";
+import SwahiliReviewDraft, { SwahiliFinalSubmit } from "./SwahiliReviewDraft";
 import "./SwahiliCourseBook.css";
 
 const tabs = [
@@ -306,9 +307,11 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <h2>Kagua na uwasilishe kazi</h2>
           {submitted && <p>Kazi iliyowasilishwa awali inaweza kusasishwa.</p>}
           {missing.length > 0 && <p>Kamilisha: {missing.join(", ")}</p>}
-          <button type="button" disabled={!canSubmit || loadingWork || saving || missing.length > 0} onClick={submitWork}>
+          <SwahiliReviewDraft writing={{ "Barua pepe": writing }} questions={readingQuestions} reading={reading}
+            listeningQuestions={listeningQuestions} listening={listening} />
+          <SwahiliFinalSubmit requireListening disabled={!canSubmit || loadingWork || saving || missing.length > 0} onSubmit={submitWork}>
             {saving ? "Inawasilishwa…" : submitted ? "Wasilisha marekebisho" : "Wasilisha kwa mwalimu"}
-          </button>
+          </SwahiliFinalSubmit>
           {notice && <p role="status">{notice}</p>}
           <h3>Tathmini binafsi</h3>
           <ul><li>kutaja tabia zinazolinda mazingira.</li><li>kueleza namna kwa “kwa + kitenzi-jina”.</li><li>kutaja njia mbadala kwa “badala ya”.</li><li>kueleza lengo kwa “ili”.</li><li>kutoa maoni yenye faida, changamoto na pendekezo.</li><li>kuandika mwaliko mfupi wa shughuli ya mazingira.</li></ul>

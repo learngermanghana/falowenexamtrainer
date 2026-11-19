@@ -3,7 +3,7 @@ export const SWAHILI_DAY_FIVE = {
   chapter: "Somo la 5",
   title: "Familia yangu",
   objective: "Introduce your family using simple Kiswahili sentences.",
-  practiceOnly: true,
+  practiceOnly: false,
   audioKey: "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
   trackId: "swahili-a1-day-05",
   radio: {
@@ -56,10 +56,10 @@ export const FAMILY_GRAMMAR = [
 export const FAMILY_READING = {
   text: "Huyu ni Asha. Ana kaka mmoja na dada wawili. Kaka yake anaitwa Juma. Dada yake Mariam ni mwalimu. Mama yao anapenda kusoma.",
   questions: [
-    { question: "Asha ana dada wangapi?", answer: "Ana dada wawili." },
-    { question: "Kaka yake anaitwa nani?", answer: "Anaitwa Juma." },
-    { question: "Mariam anafanya kazi gani?", answer: "Yeye ni mwalimu." },
-    { question: "Mama yao anapenda kufanya nini?", answer: "Anapenda kusoma." },
+    { id: "read-1", question: "Asha ana dada wangapi?", answer: "Ana dada wawili." },
+    { id: "read-2", question: "Kaka yake anaitwa nani?", answer: "Anaitwa Juma." },
+    { id: "read-3", question: "Mariam anafanya kazi gani?", answer: "Yeye ni mwalimu." },
+    { id: "read-4", question: "Mama yao anapenda kufanya nini?", answer: "Anapenda kusoma." },
   ],
 };
 

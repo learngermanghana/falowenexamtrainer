@@ -1,68 +1,27 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import WorkbookDayMusic from "./WorkbookDayMusic";
 import { GrammarSelfCheck } from "./MgahawaniGrammarPractice";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
-import { db, doc, serverTimestamp, setDoc } from "../firebase";
-import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
-import SwahiliReviewDraft, { SwahiliFinalSubmit, useSwahiliReviewDraft } from "./SwahiliReviewDraft";
+import SwahiliAssignmentReview, { useSwahiliAssignment } from "./SwahiliAssignmentReview";
 import "./SwahiliCourseBook.css";
 
 const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.map((tab) =>
-  tab.key === "submit" ? { ...tab, label: "Receive & Submit", description: "Review and submit your work" } : tab);
+  tab.key === "submit" ? { ...tab, label: "Review & Submit", description: "Review and submit your work" } : tab);
 
 export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
-  const { user, studentProfile } = useAuth();
-  const tutorMarked = lesson.practiceOnly === false;
-  const reviewLabel = tutorMarked ? "Review & Submit" : "Receive & Submit";
-  const workbookTabs = tutorMarked ? tabs.map(tab => tab.key === "submit" ? { ...tab, label: reviewLabel } : tab) : tabs;
-  const canSubmit = tutorMarked && canSubmitSwahiliWorkbook({ user, studentProfile, preview });
-  const [activeTab, selectTab] = useSwahiliWorkbookTab(workbookTabs);
-  const [writing, setWriting] = useState("");
-  const [reading, setReading] = useState({});
-  const [listeningAnswers, setListeningAnswers] = useState({});
+  const { user } = useAuth();
+  const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
+  const assignment = useSwahiliAssignment(lesson, preview, activeTab, lesson.reading.questions, lesson.listening?.questions);
+  const { writing, setWriting, reading, setReading, listeningAnswers, setListeningAnswers } = assignment;
   const [audio, setAudio] = useState({ url: "", loading: false, error: "" });
   const { aiLecture, listening } = lesson;
   const lectureHeadingId = `swahili-ai-lecture-${lesson.day}`;
   const grammarSections = lesson.grammarSections || [{ rule: lesson.rule, examples: lesson.examples }];
   const vocabulary = lesson.vocabulary;
   const writingId = "swahili-writing-" + lesson.day;
-
-  const [submission, setSubmission] = useState("idle");
-  const [submittedAnswers, setSubmittedAnswers] = useState("");
-  const answers = { writing, reading, listeningAnswers };
-  const restoreDraft = useCallback(draft => {
-    setWriting(typeof draft.writing === "string" ? draft.writing : "");
-    setReading(draft.reading || {});
-    setListeningAnswers(draft.listeningAnswers || {});
-  }, []);
-  const draft = useSwahiliReviewDraft(canSubmit ? user.uid : null, lesson.day, answers, restoreDraft);
-  const snapshot = JSON.stringify(answers);
-  const submitted = submittedAnswers === snapshot;
-  const complete = tutorMarked && writing.trim() &&
-    lesson.reading.questions.every(({ id, choices }) => choices.includes(reading[id])) &&
-    listening.questions.every(({ id, choices }) => choices.includes(listeningAnswers[id]));
-
-  async function submitWork() {
-    if (!canSubmit || !complete || !db || submitted || submission === "sending") return;
-    setSubmission("sending");
-    try {
-      await setDoc(doc(db, "users", user.uid, "swahiliLessons", `day-${lesson.day}`), {
-        studentId: user.uid, userId: user.uid, program: "swahili", level: "A1",
-        day: lesson.day, lessonId: `swahili-day-${lesson.day}`, title: lesson.title,
-        status: "submitted", writing: { dialogue: writing.trim() }, readingAnswers: reading,
-        listeningAnswers, listeningTeacherLed: false, submittedAt: serverTimestamp(),
-        studentName: studentProfile?.name || studentProfile?.displayName || user.displayName || "",
-        studentEmail: user.email || "",
-      });
-      setSubmittedAnswers(snapshot);
-      setSubmission("idle");
-    } catch {
-      setSubmission("error");
-    }
-  }
 
   async function loadListeningAudio() {
     if (!listening || audio.loading) return;
@@ -104,7 +63,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
           <a href={`https://youtu.be/${aiLecture.youtubeId}`} target="_blank" rel="noreferrer">Tazama kwenye YouTube</a>
         </section>
       )}
-      <WorkbookTabNav activeTab={activeTab} onChange={selectTab} tabs={workbookTabs}
+      <WorkbookTabNav activeTab={activeTab} onChange={selectTab} tabs={tabs}
         ariaLabel={lesson.chapter + " workbook sections"} renderLegacyGrammarPanel={false} />
       <section className="swahili-book__card swahili-book__activity" role="tabpanel" tabIndex={-1}>
         {activeTab === "references" && <>
@@ -150,10 +109,10 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
         {activeTab === "schreiben" && <>
           <h2>Teil 2 · Kuandika (Writing)</h2>
           <p>{lesson.writing.prompt}</p>
-          <label className="swahili-book__form" htmlFor={writingId}>{tutorMarked ? "Your writing answer" : "Your practice answer"}
+          <label className="swahili-book__form" htmlFor={writingId}>Your writing answer
             <textarea id={writingId} rows={5} value={writing} onChange={(event) => setWriting(event.target.value)} />
           </label>
-          <p className="swahili-book__note">When you finish, open {reviewLabel} to review your work.</p>
+          <p className="swahili-book__note">When you finish, open Review &amp; Submit to review your work.</p>
         </>}
         {activeTab === "lesen" && <>
           <h2>Teil 3 · Kusoma (Reading)</h2>
@@ -171,8 +130,8 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
                   {choices.map(choice => (
                     <label className="swahili-book__choice" key={choice}>
                       <input type="radio" name={`swahili-${lesson.day}-reading-${index}`}
-                        checked={reading[id || question] === choice}
-                        onChange={() => setReading(prior => ({ ...prior, [id || question]: choice }))} />
+                        checked={reading[id] === choice}
+                        onChange={() => setReading(prior => ({ ...prior, [id]: choice }))} />
                       {choice}
                     </label>
                   ))}
@@ -180,8 +139,8 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
               </fieldset>
             ) : (
               <label key={question}>{index + 1}. {question}
-                <input value={reading[question] || ""}
-                  onChange={(event) => setReading((prior) => ({ ...prior, [question]: event.target.value }))} />
+                <input value={reading[id] || ""}
+                  onChange={(event) => setReading((prior) => ({ ...prior, [id]: event.target.value }))} />
               </label>
             ))}
           </div>
@@ -214,56 +173,13 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
               ))}
             </div>
             <button type="button" className="swahili-book__button swahili-book__button--soft" onClick={() => selectTab("submit")}>
-              {reviewLabel} · Review your answers
+              Review &amp; Submit · Review your answers
             </button>
           </> : <p>The listening recording and questions will appear here after upload.</p>}
         </>}
-        {activeTab === "submit" && tutorMarked && <>
-          <h2>Review &amp; Submit · Wasilisha</h2>
-          <SwahiliReviewDraft writing={{ Mazungumzo: writing }} questions={lesson.reading.questions}
-            reading={reading} listening={listeningAnswers} listeningQuestions={listening.questions}
-            draft={canSubmit ? draft : null} />
-          {canSubmit ? <>
-            {!complete && <p>Complete your writing and all five reading and five listening questions before submitting.</p>}
-            <SwahiliFinalSubmit requireListening disabled={!complete || !db || submission === "sending" || submitted} onSubmit={submitWork}>
-              {submission === "sending" ? "Submitting…" : "Wasilisha kazi · Submit to tutor"}
-            </SwahiliFinalSubmit>
-            {submitted && <p role="status">Submitted for tutor review. <Link to="/campus/results">View results</Link></p>}
-            {submission === "error" && <p role="alert">Submission failed. Your answers are still here. Please try again.</p>}
-          </> : <p>Open this lesson in your signed-in Kiswahili Campus to submit.</p>}
-        </>}
-        {activeTab === "submit" && !tutorMarked && <>
-          <h2>Receive &amp; Submit · Wasilisha</h2>
-          <p>Your completed work is collected here for review. This lesson is practice-only, so it is not sent to a tutor or saved as a marked assignment.</p>
-          <details className="swahili-book__tile">
-            <summary>Teil 2 · Review your writing</summary>
-            <p>{lesson.writing.prompt}</p>
-            {writing.trim() && <p><strong>Your answer:</strong> {writing}</p>}
-            <p><strong>Model answer:</strong> {lesson.writing.model}</p>
-          </details>
-          <details className="swahili-book__tile">
-            <summary>Teil 3 · Review your reading</summary>
-            <ol>{lesson.reading.questions.map(({ question, answer }) => (
-              <li key={question}>
-                <strong>{question}</strong>
-                {reading[question]?.trim() && <div>Your answer: {reading[question]}</div>}
-                <div>Suggested answer: {answer}</div>
-              </li>
-            ))}</ol>
-          </details>
-          {listening && <details className="swahili-book__tile">
-            <summary>Teil 4 · Review your listening</summary>
-            <ol lang="sw">{listening.questions.map(({ id, question, answer }) => (
-              <li key={id}>
-                <strong>{question}</strong>
-                {listeningAnswers[id] && <div>Your answer: {listeningAnswers[id]}</div>}
-                <div>Suggested answer: {answer}</div>
-              </li>
-            ))}</ol>
-          </details>}
-        </>}
+        {activeTab === "submit" && <SwahiliAssignmentReview assignment={assignment} />}
       </section>
-      <SwahiliWorkbookNavigation tabs={workbookTabs} activeTab={activeTab} onChange={selectTab} />
+      <SwahiliWorkbookNavigation tabs={tabs} activeTab={activeTab} onChange={selectTab} />
     </main>
   );
 }
