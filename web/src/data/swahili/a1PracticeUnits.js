@@ -756,7 +756,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Dukani",
     "objective": "Ask what is in stock, choose a product and pay at a shop counter.",
     "grammar": "Stock questions, Ki-/Vi- agreement and paying",
-    "practiceOnly": true,
+    "practiceOnly": false,
     "grammarSections": [
       {
         "title": "Bidhaa zilizopo · Stock",
@@ -847,8 +847,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Role-play buying school supplies. Ask for a large notebook, choose an alternative when it is out of stock, add two pens and ask how you can pay. Request a receipt.",
     "writing": {
-      "prompt": "Write a shop dialogue. Ask if large notebooks are in stock. Choose a small notebook and two pens. Ask to pay by phone and request a receipt.",
-      "model": "Mteja: Mna madaftari makubwa? Muuzaji: Hatuna, lakini tuna madaftari madogo. Mteja: Nitachukua daftari dogo moja na kalamu mbili. Naweza kulipa kwa simu? Muuzaji: Ndiyo. Mteja: Risiti, tafadhali."
+      "prompt": "Write a shop dialogue. Ask if large notebooks are in stock. Choose a small notebook and two pens. Ask to pay by phone and request a receipt."
     },
     "reading": {
       "title": "Mazungumzo Dukani (Shopping Dialogue)",
@@ -862,7 +861,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "C) Shuleni (At school)",
             "D) Nyumbani (At home)"
           ],
-          "answer": "B) Dukani (At the shop)"
+          "id": "shop"
         },
         {
           "question": "Amina aliuliza kama muuzaji anayo bidhaa gani za kwanza? (Which items did Amina first ask the shopkeeper about?)",
@@ -872,7 +871,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "C) Juisi na chai",
             "D) Samaki na kuku"
           ],
-          "answer": "B) Maziwa na mkate"
+          "id": "first-items"
         },
         {
           "question": "Amina aliomba kiasi gani cha maziwa? (How much milk did Amina request?)",
@@ -882,7 +881,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "C) Kilo moja (One kilo)",
             "D) Vikombe viwili (Two cups)"
           ],
-          "answer": "B) Lita moja (One liter)"
+          "id": "milk-quantity"
         },
         {
           "question": "Jumla ya gharama ya vitu vyote ilikuwa shilingi ngapi? (What was the total price of all the items?)",
@@ -892,7 +891,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "C) Shilingi elfu nne na mia tano (4,500)",
             "D) Shilingi elfu tano (5,000)"
           ],
-          "answer": "C) Shilingi elfu nne na mia tano (4,500)"
+          "id": "total"
         },
         {
           "question": "Maneno gani yanatumiwa kuuliza bei ya kitu kwa Kiswahili? (Which phrase is used to ask the price of something in Swahili?)",
@@ -902,7 +901,57 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "C) Ni shilingi ngapi?",
             "D) Karibu tena!"
           ],
-          "answer": "C) Ni shilingi ngapi?"
+          "id": "price-question"
+        }
+      ]
+    },
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-11/audio-url",
+      "questions": [
+        {
+          "id": "milk",
+          "question": "Mteja anataka maziwa gani?",
+          "choices": [
+            "A) Maziwa ya unga",
+            "B) Maziwa ya pakti",
+            "C) Maziwa ya ng’ombe"
+          ]
+        },
+        {
+          "id": "bread",
+          "question": "Mteja anaomba mkate gani?",
+          "choices": [
+            "A) Mkate mdogo mmoja",
+            "B) Mikate mikubwa miwili",
+            "C) Mkate mkubwa mmoja"
+          ]
+        },
+        {
+          "id": "eggs",
+          "question": "Kwa nini mteja hapati mayai sita?",
+          "choices": [
+            "A) Mayai yameisha",
+            "B) Mayai ni ghali",
+            "C) Duka limefungwa"
+          ]
+        },
+        {
+          "id": "sugar",
+          "question": "Mteja anataka sukari kiasi gani?",
+          "choices": [
+            "A) Kilo moja",
+            "B) Nusu kilo",
+            "C) Kilo mbili"
+          ]
+        },
+        {
+          "id": "total",
+          "question": "Jumla ni shilingi ngapi?",
+          "choices": [
+            "A) Shilingi elfu mbili",
+            "B) Shilingi elfu nne",
+            "C) Shilingi elfu tatu"
+          ]
         }
       ]
     }

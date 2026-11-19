@@ -35,11 +35,13 @@ Run `node scripts/checkAiDocumentation.mjs`. It validates required sources, inte
 
 ## Kiswahili Course Book layout
 
+Kiswahili A1 Day 11 uses the signed recording `swahili/A1/day-11/day-11.mp3` in Teil 4. Day 11 sends the learner’s writing and five reading and five listening choices to the tutor through Review & Submit. Admin owns the reference answers.
+
 Kiswahili A1 Day 7 uses the private R2 recording `swahili/A1/day-07/day-07.mp3` via the existing signed-audio flow. Its five listening questions and matching answers are local workbook practice. The Grammar tab covers present-tense preferences, polite requests, hunger and thirst, and food and drink vocabulary.
 
 Campus uses the shared German Course Book **Level** selector and the same enrolled-level ceiling for Kiswahili. A B1 learner can browse A1, A2 or B1, and an A2 learner can browse A1 or A2. A2 and B1 display titles from `a2B1TitleDictionary.json` in the existing lesson-card layout. Workbooks and tutor progress are available from the A1 selection. Switching the visible level does not update enrollment.
 
-The Kiswahili **A1 Course Book has 20 workbooks** in `web/src/data/swahili/a1Curriculum.js`. The original Day 1, Day 5 and Day 6 workbooks retain their routes. Days 2–4 and 7–20 use `a1PracticeUnits.js` and the shared practice workbook, with grammar self-checks, speaking, writing, reading and model answer sheets. Teil 4 is reserved for the teacher's audio and questions. Only Days 1 and 6 enter the tutor queue and count toward assignment progress. Public previews show the practice content and never read personal progress.
+The Kiswahili **A1 Course Book has 20 workbooks** in `web/src/data/swahili/a1Curriculum.js`. The original Day 1, Day 5 and Day 6 workbooks retain their routes. Days 2–4 and 7–20 use `a1PracticeUnits.js` and the shared practice workbook, with grammar self-checks, speaking, writing, reading and model answer sheets. Teil 4 is reserved for the teacher's audio and questions. Days 1, 6 and 11 enter the tutor queue and count toward assignment progress. Public previews show the practice content and never read personal progress.
 
 Falowen's existing learner shell is **programme-aware**: only the authenticated student profile's `program` determines whether Campus displays the German or Kiswahili learning experience. Kiswahili accounts reuse the same header, logout, shared Course Book styles, and Account Settings. Home uses the existing Falowen card components with Kiswahili-specific copy and only the **published** Day 1 and Lesson 6 links; it does not show German mock exams, German ChatGPT Companion, German music/books, German vocabulary, German results, attendance, or German class-member views. The unavailable sections are filtered from navigation and forbidden by Campus section permissions; German account navigation is unchanged. Non-staff Kiswahili learners opening German Campus routes, attendance or Exams Room deep links return to their own course, including on the exams subdomain, while non-staff German learners cannot open Kiswahili Campus workbooks. Staff retain their existing review paths. This is a frontend programme boundary; Firestore security rules remain authoritative and unchanged.
 
@@ -89,7 +91,7 @@ Falowen Music uses the same player for its German and Swahili tabs. Swahili trac
 
 Swahili Day 5 uses the shared German-layout workbook music player and exact-key English translations. The bundled Swahili timing comes from recording-based word alignment and is labeled estimated until playback review. Campus Music opens the Swahili library for Swahili learners. Books, Vocabulary, Attendance, Class Members and Discussion use Swahili placeholders until their content is adapted.
 
-Kiswahili Days 1 and 6 use Review & Submit to show the learner’s actual writing and reading answers. Save & Review keeps a device-local draft keyed by learner and lesson. Final submission writes to the existing Swahili tutor queue; Day 5 stays practice-only until its assignment is supplied. Workbook navigation remains in the page on mobile.
+Kiswahili Days 1, 6 and 11 use Review & Submit to show the learner’s actual writing and reading answers. Save & Review keeps a device-local draft keyed by learner and lesson. Final submission writes to the existing Swahili tutor queue; Day 5 stays practice-only until its assignment is supplied. Workbook navigation remains in the page on mobile.
 
 ## Kiswahili A1 Day 1 and Day 5 workbook practice
 
