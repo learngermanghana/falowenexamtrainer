@@ -2651,6 +2651,149 @@
       "timingMethod": "Multilingual CTC forced alignment of the supplied recording and lyrics",
       "durationSeconds": 198.432,
       "recordingSha256": "b6cbf03a8bb86d10561b6bd8c2ba8b4b947e8c9824e4b4f48270ad436a71c338"
+    },
+    {
+      "trackId": "r2-a2-day-27-b64_SGFuZHkgd2VnLm1wMw",
+      "objectKey": "music/a2/day-27/Handy weg.mp3",
+      "assignmentKey": "A2-10.27",
+      "title": "Handy weg",
+      "lyrics": "[Verse 1]\nJeden Tag auf TikTok,\nschau ich Videos an.\nManchmal mache ich selbst eins,\nyeah, so fängt mein Tag an.\n\n[Chorus]\nOh, das macht mir Spaß,\nich zeige, was ich mag.\nHey, die Welt ist bunt,\njeden neuen Tag.\n\n[Verse 2]\nIch filme meinen Alltag,\nund lade Videos hoch.\nIch tanze zu der Musik,\nmeine Freunde lachen auch.\nIch teile meine Ideen,\nbekomme viele Likes.\nManchmal folge ich Trends,\ndie Zeit vergeht so schnell.\n\n[Chorus]\nOh, das macht mir Spaß,\nich zeige, was ich mag.\nHey, die Welt ist bunt,\njeden neuen Tag.\nYeah, ich bin dabei,\nund teile meinen Tag.\nDoch nach einer Stunde,\nleg ich mein Handy weg.\n\n[Outro]\nLa, la, das macht mir Spaß,\nhey, jetzt ist mein Handy aus!",
+      "cues": [
+        {
+          "start": 13.2,
+          "end": 15.88,
+          "text": "Jeden Tag auf TikTok,"
+        },
+        {
+          "start": 15.88,
+          "end": 18.96,
+          "text": "schau ich Videos an."
+        },
+        {
+          "start": 19.02,
+          "end": 21.14,
+          "text": "Manchmal mache ich selbst eins,"
+        },
+        {
+          "start": 21.14,
+          "end": 24.03,
+          "text": "yeah, so fängt mein Tag an."
+        },
+        {
+          "start": 24.06,
+          "end": 26.94,
+          "text": "Oh, das macht mir Spaß,"
+        },
+        {
+          "start": 26.94,
+          "end": 29.84,
+          "text": "ich zeige, was ich mag."
+        },
+        {
+          "start": 30.22,
+          "end": 33.4,
+          "text": "Hey, die Welt ist bunt,"
+        },
+        {
+          "start": 33.4,
+          "end": 36.16,
+          "text": "jeden neuen Tag."
+        },
+        {
+          "start": 36.26,
+          "end": 38.94,
+          "text": "Ich filme meinen Alltag,"
+        },
+        {
+          "start": 38.94,
+          "end": 41.92,
+          "text": "und lade Videos hoch."
+        },
+        {
+          "start": 42.04,
+          "end": 45.0,
+          "text": "Ich tanze zu der Musik,"
+        },
+        {
+          "start": 45.0,
+          "end": 48.08,
+          "text": "meine Freunde lachen auch."
+        },
+        {
+          "start": 48.22,
+          "end": 51.56,
+          "text": "Ich teile meine Ideen,"
+        },
+        {
+          "start": 51.56,
+          "end": 54.4,
+          "text": "bekomme viele Likes."
+        },
+        {
+          "start": 54.56,
+          "end": 57.08,
+          "text": "Manchmal folge ich Trends,"
+        },
+        {
+          "start": 57.08,
+          "end": 60.84,
+          "text": "die Zeit vergeht so schnell."
+        },
+        {
+          "start": 61.1,
+          "end": 64.02,
+          "text": "Oh, das macht mir Spaß,"
+        },
+        {
+          "start": 64.02,
+          "end": 66.92,
+          "text": "ich zeige, was ich mag."
+        },
+        {
+          "start": 67.26,
+          "end": 70.38,
+          "text": "Hey, die Welt ist bunt,"
+        },
+        {
+          "start": 70.38,
+          "end": 73.16,
+          "text": "jeden neuen Tag."
+        },
+        {
+          "start": 73.36,
+          "end": 76.36,
+          "text": "Yeah, ich bin dabei,"
+        },
+        {
+          "start": 76.36,
+          "end": 79.52,
+          "text": "und teile meinen Tag."
+        },
+        {
+          "start": 79.68,
+          "end": 82.18,
+          "text": "Doch nach einer Stunde,"
+        },
+        {
+          "start": 82.18,
+          "end": 85.36,
+          "text": "leg ich mein Handy weg."
+        },
+        {
+          "start": 85.46,
+          "end": 87.76,
+          "text": "La, la, das macht mir Spaß,"
+        },
+        {
+          "start": 92.14,
+          "end": 99.52,
+          "text": "hey, jetzt ist mein Handy aus!"
+        }
+      ],
+      "recordingSha256": "0d5266e722c1c0605bdac6cc3f3d6ffbdf56953ea321ca8ef4dc5e58ae719b59",
+      "duration": 109.104,
+      "timingStatus": "estimated",
+      "timingMethod": "Whisper small German token alignment (DTW) against the embedded lyrics"
     }
   ]
 }
