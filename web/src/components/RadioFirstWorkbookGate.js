@@ -120,7 +120,7 @@ export const openCompletedWorkbook = (locationLike, windowRef) => {
 export const shouldShowRadioFirst = (level, day) =>
   Boolean(resolveRadioFirstWorkbookResource(level, day));
 
-const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseBookPath = "/campus/course", transcriptIntro = null }) => {
+const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseBookPath = "/campus/course", transcriptIntro = null, introInstruction }) => {
   const explicitRadio = isFalowenRadioResource(resource) ? resource : null;
   const radio = explicitRadio || (transcriptIntro ? null : resolveRadioFirstWorkbookResource(level, day));
   const hasIntro = Boolean(radio || transcriptIntro);
@@ -207,7 +207,9 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseB
         </span>
         <h1 style={{ margin: 0 }}>{String(level).toUpperCase()} · Day {day} · Falowen Radio</h1>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-          {transcriptIntro ? "Read the Falowen Radio transcript, then continue to the workbook." : "Listen to Falowen Radio first. Continue opens the student workbook."}
+          {introInstruction || (transcriptIntro
+            ? "Read the Falowen Radio transcript, then continue to the workbook."
+            : "Listen to Falowen Radio first. Continue opens the student workbook.")}
         </p>
       </header>
       {transcriptIntro ? <section style={styles.card}>

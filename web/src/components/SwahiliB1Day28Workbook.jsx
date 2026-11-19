@@ -8,6 +8,7 @@ import SwahiliB1Day28Reading, { readingQuestions } from "./SwahiliB1Day28Reading
 import { Link } from "react-router-dom";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
+import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { WorkbookTabNav } from "./StandardWorkbookComponents";
 import SwahiliReviewDraft, { SwahiliFinalSubmit } from "./SwahiliReviewDraft";
 import "./SwahiliCourseBook.css";
@@ -22,26 +23,81 @@ const tabs = [
   { key: "submit", label: "Kagua na uwasilishe" },
 ];
 
-const radioIntro = <div lang="sw">
-    <h3>🎙️ Falowen Radio · Kutunza Mazingira Kila Siku 10.28</h3>
-    <p>Falowen Radio ni hatua ya kusikiliza kabla ya kuanza mazoezi ya somo. Hakuna kazi ya kuwasilisha katika sehemu hii.</p>
-    <details><summary>Soma nakala ya kipindi</summary>
-    <p>Bwana Ali: Habari na karibu Falowen Radio! Mimi ni Bwana Ali, nikiwa katika studio yetu mjini Arusha. Leo tunazungumzia namna ya kutunza mazingira katika maisha ya kila siku.</p>
-    <p>Maria: Ninapoenda kununua bidhaa, ninabeba mfuko wa kitambaa badala ya kuchukua mifuko mipya ya plastiki. Pia ninatumia chupa ya maji inayoweza kutumiwa tena.</p>
-    <p>Bwana Ali: Unafanya nini na taka nyumbani?</p>
-    <p>Maria: Ninatenganisha karatasi, plastiki, chupa na taka za chakula kulingana na utaratibu wa eneo letu. Ni muhimu kujua sheria za mahali tunapoishi.</p>
-    <p>Bwana Ali: Sasa tunaye Juma kutoka Moshi. Unaokoa vipi maji na nishati?</p>
-    <p>Juma: Ninazima taa na vifaa nisivyotumia. Pia ninafunga bomba la maji ninapopiga mswaki na ninaoga kwa muda mfupi ili niokoe maji.</p>
-    <p>Bwana Ali: Asha kutoka Dar es Salaam, unasafiri vipi?</p>
-    <p>Asha: Kwa safari fupi ninatembea au kutumia baiskeli. Kwa safari ndefu ninatumia basi inapowezekana. Pia ninanunua vyakula vya eneo letu na vya msimu.</p>
-    <p>Bwana Ali: Asanteni! Kupunguza plastiki, kutenganisha taka, kuokoa maji na nishati, na kuchagua usafiri mzuri ni hatua ndogo zenye maana.</p>
-    </details>
-    <h3>Mambo ya kuzingatia</h3>
-    <p>Maria anatumia nini badala ya mifuko mipya ya plastiki?</p>
-    <p>Juma anaokoaje maji na nishati?</p>
-    <p>Asha anachagua usafiri gani kwa safari fupi?</p>
-    <p>Ni tabia gani unaweza kuanza wiki hii?</p>
-  </div>;
+const musicQuestions = [
+  [
+    "Taja njia mbili za kutunza mazingira zilizotajwa katika wimbo.",
+    "Tunaweza kupanda miti na kuweka taka kwenye pipa.",
+  ],
+  [
+    "Kwa nini tunapaswa kupunguza matumizi ya plastiki?",
+    "Tunapaswa kupunguza plastiki kwa sababu inachafua mazingira na inaweza kuwadhuru wanyama.",
+  ],
+  [
+    "Wewe unafanya nini katika maisha yako ya kila siku ili kutunza mazingira?",
+    "Katika maisha yangu ya kila siku, ninaweka taka kwenye pipa na ninatumia mfuko unaoweza kutumiwa tena. Pia ninazima taa wakati sizitumii na ninajaribu kutumia maji kwa uangalifu.",
+  ],
+  [
+    "Ni tatizo gani kubwa la mazingira katika eneo lako? Linaweza kutatuliwa kwa njia gani?",
+    "Katika eneo langu, taka za plastiki ni tatizo kubwa. Watu wanapaswa kutumia mapipa ya taka na kupunguza matumizi ya plastiki. Serikali pia inaweza kuweka mapipa mengi na kutoa elimu kuhusu mazingira.",
+  ],
+];
+
+const radioQuestions = [
+  [
+    "Taja matatizo mawili ya mazingira yaliyozungumziwa katika podcast.",
+    "Matatizo mawili ni uchafuzi wa mazingira na matumizi makubwa ya plastiki.",
+  ],
+  [
+    "Ni njia gani zilizopendekezwa za kupunguza taka nyumbani?",
+    "Tunaweza kutenganisha taka, kutumia baadhi ya vitu tena na kuepuka kununua bidhaa zenye vifungashio vingi.",
+  ],
+  [
+    "Ni nani mwenye jukumu la kutunza mazingira: wananchi, serikali au makampuni? Eleza maoni yako.",
+    "Kwa maoni yangu, kila mtu ana jukumu la kutunza mazingira. Wananchi wanapaswa kuweka mazingira safi, serikali inapaswa kutunga sheria nzuri na makampuni yanapaswa kupunguza taka zinazotokana na bidhaa zao.",
+  ],
+  [
+    "Kama ungeanzisha mradi wa mazingira katika shule, chuo au eneo lako, ungefanya mradi gani?",
+    "Ningeanzisha mradi wa kupanda miti na kukusanya taka. Ningewaomba wanafunzi na wakazi washiriki. Pia tungeweka mapipa tofauti kwa plastiki, karatasi na taka nyingine.",
+  ],
+];
+
+function MediaQuestions({ title, questions }) {
+  return (
+    <section lang="sw">
+      <h3>{title}</h3>
+      {["Majibu mafupi", "Kuzungumza"].map((heading, index) => (
+        <section key={heading}>
+          <h4>{heading}</h4>
+          <ol start={index * 2 + 1}>
+            {questions.slice(index * 2, index * 2 + 2).map(([prompt, answer]) => (
+              <li key={prompt}>
+                <p>{prompt}</p>
+                <details>
+                  <summary>Onyesha jibu</summary>
+                  <p>{answer}</p>
+                </details>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
+    </section>
+  );
+}
+
+const radioResource = {
+  title: "Kutunza Mazingira",
+  youtubeId: "aeXVw4Q4olE",
+  instruction: "Sikiliza kipindi, kisha jibu maswali.",
+};
+
+const radioIntro = (
+  <div lang="sw">
+    <FalowenRadioTabContent level="Kiswahili B1" day={28} resource={radioResource} />
+    <p><a href="https://youtu.be/aeXVw4Q4olE?si=mE7Lv8rc-LRliwsC" target="_blank" rel="noreferrer">Tazama kwenye YouTube</a></p>
+    <MediaQuestions title="Maswali kuhusu podcast" questions={radioQuestions} />
+  </div>
+);
 
 export default function SwahiliB1Day28Workbook({ uid }) {
   const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
@@ -125,7 +181,8 @@ export default function SwahiliB1Day28Workbook({ uid }) {
     catch { /* The exercise remains editable when browser storage is unavailable. */ }
   }
   return (
-    <RadioFirstWorkbookGate level="Kiswahili B1" day={28} transcriptIntro={radioIntro}>
+    <RadioFirstWorkbookGate level="Kiswahili B1" day={28} transcriptIntro={radioIntro}
+      introInstruction="Sikiliza kipindi cha Falowen Radio, kisha jibu maswali kabla ya kuendelea.">
     <main className="swahili-book swahili-book--workbook" lang="sw">
       <Link to="/campus/course">← Kitabu cha kozi</Link>
       <header className="swahili-book__hero">
@@ -139,14 +196,7 @@ export default function SwahiliB1Day28Workbook({ uid }) {
         {activeTab === "references" && <>
           <h2>Muziki</h2>
           <WorkbookDayMusic program="swahili" level="B1" day={28} hideLegacyNotes />
-          <h3>Baada ya kusikiliza</h3>
-          <p>Mwimbaji anabeba nini anapoenda kununua bidhaa?</p>
-          <p>Anapunguza matumizi ya maji kwa njia gani mbili?</p>
-          <p>Ujumbe mkuu wa kiitikio ni upi?</p>
-          <details><summary>Ujumbe mkuu</summary>
-          <p>Ujumbe mkuu
-          Mabadiliko makubwa yanaweza kuanza na hatua ndogo zinazofanywa na watu wengi kila siku.</p>
-          </details>
+          <MediaQuestions title="Maswali kuhusu wimbo" questions={musicQuestions} />
         </>}
         {activeTab === "grammar" && <>
           <h2>Sarufi na msamiati</h2>
