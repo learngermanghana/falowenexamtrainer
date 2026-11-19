@@ -66,6 +66,18 @@ test('private bank telephone audio requires staff and signs only the uploaded Da
  }
 });
 
+test('A2 Day 27 staff playback uses the supplied digital communication recording', async () => {
+ const {createClassroomBankAudioHandler}=require('../server/courseMusic.cjs');
+ const key='a2/day-27/digitale-kommunikation.mp3';
+ const handler=createClassroomBankAudioHandler({
+   env,fetchImpl:async()=>({ok:true,json:async()=>({users:[{localId:'teacher',customAttributes:'{"role":"teacher"}'}]})}),
+ });
+ const res=response();
+ await handler({method:'GET',headers:{authorization:'Bearer test-teacher'},url:'/?'+new URLSearchParams({day:'27',key})},res);
+ assert.equal(res.code,200);
+ assert.equal(new URL(res.body.url).pathname,'/'+key);
+});
+
 test('Day 19 is a staff-only exact-key conversation; private keys cannot use public music playback', async () => {
  const {createClassroomBankAudioHandler}=require('../server/courseMusic.cjs');
  const key='a2/day-19/einkaufen-wo-und-wie.mp3';
