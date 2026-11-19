@@ -245,15 +245,13 @@ async function upsertStudentToSheet(student) {
     student.trialConvertedAt,
   ].some((value) => value !== undefined && value !== null && String(value).trim() !== "");
 
-  const { headers, headerMap } = hasTrialMetadata
-    ? await ensureHeaders(sheets, sheetId, tabName, [
-        "TrialStartedAt",
-        "TrialEndsAt",
-        "TrialPurgeAt",
-        "TrialUsedAt",
-        "TrialConvertedAt",
-      ])
-    : await loadHeaderMap(sheets, sheetId, tabName);
+  const program = String(student.program || "").trim().toLowerCase();
+  const requiredHeaders = hasTrialMetadata
+    ? ["TrialStartedAt", "TrialEndsAt", "TrialPurgeAt", "TrialUsedAt", "TrialConvertedAt"]
+    : [];
+  if (program) requiredHeaders.push("Program");
+  const { headers, headerMap } = await ensureHeaders(sheets, sheetId, tabName, requiredHeaders);
+  const colProgram = findCol(headerMap, "Program");
 
   // Find important columns by header names (supports variations)
   const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
@@ -410,6 +408,7 @@ async function upsertStudentToSheet(student) {
     pushCell(colName, student.name || "");
     pushCell(colPhone, student.phone || "");
     pushCell(colLocation, student.location || "");
+    if (program) pushCell(colProgram, program);
     pushCell(colLevel, student.level || "");
     pushCell(colClassName, student.className || "");
     pushCell(colStatus, student.status || "");
@@ -469,6 +468,7 @@ async function upsertStudentToSheet(student) {
   if (colName !== null) row[colName] = student.name || "";
   if (colPhone !== null) row[colPhone] = student.phone || "";
   if (colLocation !== null) row[colLocation] = student.location || "";
+  if (colProgram !== null) row[colProgram] = program;
   if (colLevel !== null) row[colLevel] = student.level || "";
   if (colClassName !== null) row[colClassName] = student.className || "";
   if (colStatus !== null) row[colStatus] = student.status || "";
