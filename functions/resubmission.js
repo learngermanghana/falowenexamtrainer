@@ -524,6 +524,7 @@ exports.submitAssignmentResubmission = onCall({ region: "europe-west1" }, async 
       const trustedStudentCode = cleanText(trustedStudentCodes[0] || data.studentCode, 120);
 
       transaction.set(submissionRef, {
+        program: "german",
         title: validated.title,
         assignmentTitle: validated.title,
         assignmentKey: validated.canonicalAssignmentKey,
