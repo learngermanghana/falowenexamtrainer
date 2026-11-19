@@ -851,19 +851,58 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "model": "Mteja: Mna madaftari makubwa? Muuzaji: Hatuna, lakini tuna madaftari madogo. Mteja: Nitachukua daftari dogo moja na kalamu mbili. Naweza kulipa kwa simu? Muuzaji: Ndiyo. Mteja: Risiti, tafadhali."
     },
     "reading": {
-      "text": "Nuru anaenda dukani kununua daftari kubwa. Muuzaji anasema, “Hatuna madaftari makubwa. Tuna madaftari madogo.” Nuru anachukua daftari dogo moja na kalamu mbili. Jumla ni shilingi elfu nne. Nuru analipa kwa simu na anaomba risiti.",
+      "title": "Mazungumzo Dukani (Shopping Dialogue)",
+      "text": "Mteja (Amina): Hujambo!\n\nMuuzaji: Sijambo! Karibu dukani. Nikupe nini leo?\n\nMteja: Asante! Mna maziwa na mkate leo?\n\nMuuzaji: Ndiyo, tunayo.\n\nMteja: Naomba lita moja ya maziwa na mkate mmoja, tafadhali.\n\nMuuzaji: Haya, haya hapa. Unahitaji kitu kingine?\n\nMteja: Ndiyo, naomba pia sabuni moja. Jumla ni shilingi ngapi?\n\nMuuzaji: Maziwa ni shilingi 2,000, mkate ni shilingi 1,500, na sabuni ni shilingi 1,000. Jumla ni shilingi elfu nne na mia tano (4,500 TSh).\n\nMteja: Haya, chukua pesa.\n\nMuuzaji: Asante sana! Karibu tena.\n\nMteja: Asante, siku njema!",
       "questions": [
         {
-          "question": "Muuzaji ana madaftari ya aina gani?",
-          "answer": "Madaftari madogo."
+          "question": "Amina alienda wapi katika hadithi hii? (Where did Amina go?)",
+          "choices": [
+            "A) Mgahawani (At the restaurant)",
+            "B) Dukani (At the shop)",
+            "C) Shuleni (At school)",
+            "D) Nyumbani (At home)"
+          ],
+          "answer": "B) Dukani (At the shop)"
         },
         {
-          "question": "Nuru ananunua kalamu ngapi?",
-          "answer": "Kalamu mbili."
+          "question": "Amina aliuliza kama muuzaji anayo bidhaa gani za kwanza? (Which items did Amina first ask the shopkeeper about?)",
+          "choices": [
+            "A) Sukari na mchele",
+            "B) Maziwa na mkate",
+            "C) Juisi na chai",
+            "D) Samaki na kuku"
+          ],
+          "answer": "B) Maziwa na mkate"
         },
         {
-          "question": "Nuru analipa kwa njia gani?",
-          "answer": "Analipa kwa simu."
+          "question": "Amina aliomba kiasi gani cha maziwa? (How much milk did Amina request?)",
+          "choices": [
+            "A) Lita mbili (Two liters)",
+            "B) Lita moja (One liter)",
+            "C) Kilo moja (One kilo)",
+            "D) Vikombe viwili (Two cups)"
+          ],
+          "answer": "B) Lita moja (One liter)"
+        },
+        {
+          "question": "Jumla ya gharama ya vitu vyote ilikuwa shilingi ngapi? (What was the total price of all the items?)",
+          "choices": [
+            "A) Shilingi elfu kumi (10,000)",
+            "B) Shilingi elfu mbili (2,000)",
+            "C) Shilingi elfu nne na mia tano (4,500)",
+            "D) Shilingi elfu tano (5,000)"
+          ],
+          "answer": "C) Shilingi elfu nne na mia tano (4,500)"
+        },
+        {
+          "question": "Maneno gani yanatumiwa kuuliza bei ya kitu kwa Kiswahili? (Which phrase is used to ask the price of something in Swahili?)",
+          "choices": [
+            "A) Mna chakula gani?",
+            "B) Unapenda kula nini?",
+            "C) Ni shilingi ngapi?",
+            "D) Karibu tena!"
+          ],
+          "answer": "C) Ni shilingi ngapi?"
         }
       ]
     }
