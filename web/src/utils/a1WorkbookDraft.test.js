@@ -243,3 +243,22 @@ test("A1-8 drops both replaced reading sections and preserves 6–8 in fresh dra
   } });
   expect(fresh.sections["teil-2"].answers).toEqual({ 6: "B", 7: "C", 8: "B" });
 });
+
+test.each([
+  ["A1-9", {
+    "teil-1": { answers: { 1: "B" } },
+    "teil-2": { answers: { 1: "A" } },
+    "teil-3": { text: "Ich esse gern Reis." },
+  }, "Ich esse gern Reis."],
+  ["A1-11", {
+    "teil-1": { text: "Speaking assessment" },
+    "teil-2": { answers: { 1: "B" } },
+    "teil-3": { answers: { 1: "Richtig", 2: "Falsch", 3: "Richtig", 4: "Falsch", 5: "Richtig" } },
+  }, "1. Richtig\n2. Falsch\n3. Richtig\n4. Falsch\n5. Richtig"],
+])("%s retains workbook answers through saving, reopening and review", (assignmentKey, sections, finalPart) => {
+  saveA1WorkbookDraft({ assignmentKey, sections });
+  const draft = readA1WorkbookDraft(assignmentKey);
+  expect(draft.sections).toEqual(sections);
+  const text = buildA1WorkbookSubmissionText({ assignment: getA1Assignment(assignmentKey), draft });
+  expect(text).toContain(`TEIL 3\n${finalPart}`);
+});
