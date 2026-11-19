@@ -1,6 +1,6 @@
 {
-  "version": 9,
-  "updated": "2026-11-18",
+  "version": 10,
+  "updated": "2026-11-19",
   "description": "Teacher-approved published course music. Strictly music/ R2 keys; no private Hören recordings or storage credentials.",
   "tracks": [
     {
@@ -443,6 +443,24 @@
       "coursebook": true,
       "slides": true,
       "objectKey": "music/b1/day-12/Ein Umweg zum Ziel.mp3",
+      "approved": true
+    },
+    {
+      "id": "r2-a2-day-27-b64_SGFuZHkgd2VnLm1wMw",
+      "title": "Handy weg",
+      "level": "A2",
+      "day": 27,
+      "assignmentKey": "A2-10.27",
+      "topic": "Digitale Kommunikation",
+      "type": "Learning story",
+      "genre": "Pop",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-27-b64_SGFuZHkgd2VnLm1wMw",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/day-27/Handy weg.mp3",
       "approved": true
     }
   ]
