@@ -137,7 +137,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
             <section className="swahili-day2-practice__task"><h3>Kazi yako · Your task</h3><ol>{lesson.writing.guide.steps.map(step => <li key={step}>{step}</li>)}</ol></section>
             <section className="swahili-day2-practice__task swahili-day2-practice__task--hint"><h3>Maneno muhimu · Phrase bank</h3><div className="swahili-day2-practice__hint-list">{lesson.writing.guide.phrases.map(phrase => <span key={phrase} lang="sw">{phrase}</span>)}</div><p>Use your own names and responses. These are hints, not a completed answer.</p></section>
           </div>
-          <div className="swahili-day2-practice__editor"><div className="swahili-day2-practice__editor-heading"><label htmlFor={writingId}>Jibu lako · Your writing</label><span aria-live="polite">{writing.trim() ? writing.trim().split(/\\s+/).length : 0} words</span></div>
+          <div className="swahili-day2-practice__editor"><div className="swahili-day2-practice__editor-heading"><label htmlFor={writingId}>Jibu lako · Your writing</label><span aria-live="polite">{writing.trim() ? writing.trim().split(/\s+/).length : 0} words</span></div>
             <textarea id={writingId} rows={9} placeholder={lesson.writing.guide.placeholder} value={writing} onChange={(event) => setWriting(event.target.value)} />
             <p>Write at least four lines. Your response stays in your assignment draft until you submit it.</p>
           </div>
