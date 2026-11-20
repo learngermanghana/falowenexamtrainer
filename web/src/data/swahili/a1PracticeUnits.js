@@ -472,6 +472,16 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
   "10": {
     "day": 10,
     "chapter": "Somo la 10",
+    "aiLecture": {
+      "title": "Video ya AI · Sokoni",
+      "youtubeId": "xLN5QX669JA"
+    },
+    "radio": {
+      "resourceRole": "falowenRadio",
+      "youtubeId": "4_ygEiW5QjI",
+      "title": "Falowen Radio · Sokoni",
+      "instruction": "Sikiliza kipindi kuhusu kununua vitu sokoni. This podcast is separate from the Teil 4 listening recording."
+    },
     "title": "Sokoni",
     "objective": "Buy fruits and vegetables at a market, read prices up to 10,000 shillings and bargain politely.",
     "grammar": "Numbers, Ji-/Ma- nouns and polite requests",
