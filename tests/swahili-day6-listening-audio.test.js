@@ -1,4 +1,4 @@
-const { createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createMusicHandler } = require("../server/courseMusic.cjs");
+const { createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayThreeAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createMusicHandler } = require("../server/courseMusic.cjs");
 
 const env = {
   FIREBASE_API_KEY: "test-key",
@@ -89,6 +89,7 @@ test("Day 1 signs its own private recording and rejects anonymous access", async
 
 test.each([
   [2, "02", createSwahiliDayTwoAudioHandler],
+  [3, "03", createSwahiliDayThreeAudioHandler],
   [7, "07", createSwahiliDaySevenAudioHandler],
   [10, "10", createSwahiliDayTenAudioHandler],
   [11, "11", createSwahiliDayElevenAudioHandler],
