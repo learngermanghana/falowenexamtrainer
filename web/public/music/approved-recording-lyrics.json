@@ -2794,6 +2794,439 @@
       "duration": 109.104,
       "timingStatus": "estimated",
       "timingMethod": "Whisper small German token alignment (DTW) against the embedded lyrics"
+    },
+    {
+      "trackId": "r2-a1-day-16-b64_SWNoIG3DtmNodGUgU3VwcGUubXAz",
+      "assignmentKey": "A1-9",
+      "objectKey": "music/a1/day-16/Ich möchte Suppe.mp3",
+      "title": "So bestelle ich mein Essen",
+      "lyrics": "[Verse 1]\nIm Restaurant seh ich die Karte,\nder Kellner fragt: „Was möchten Sie?“\nIch sage: „Eine Suppe, bitte,\naber kein Fleisch für mich.“\nEr nickt und schreibt die Bestellung auf,\nzeigt freundlich auf das Tagesgericht.\nIch frage noch: „Ist Reis dabei?“\nEr sagt: „Natürlich, das geht.“\n[Chorus]\nIch möchte Suppe,\nkeinen Fisch.\nIch trinke Wasser,\nkeinen Saft.\nSo bestelle ich mein Essen,\nganz einfach und entspannt.\nIch möchte Suppe,\nkeinen Fisch.\nEin Stückchen Brot\nnoch mit dazu.\nSo bestelle ich mein Essen,\nund ich weiß genau, was ich tu.\n[Verse 2]\nMir schmecken Reis und Gemüse,\nsie möchte heute keinen Kuchen.\nDer Kellner bringt uns unser Essen,\nwir sagen: „Vielen Dank!“\nDie Teller duften, alles ist warm,\nwir nehmen uns die Zeit.\nSie probiert das grüne Gemüse,\nund lächelt: „Das schmeckt fein.“\n[Chorus]\nIch möchte Suppe,\nkeinen Fisch.\nIch trinke Wasser,\nkeinen Saft.\nSo bestelle ich mein Essen,\nganz einfach und entspannt.\nIch möchte Suppe,\nkeinen Fisch.\nEin Stückchen Brot\nnoch mit dazu.\nSo bestelle ich mein Essen,\nund ich weiß genau, was ich tu.\n[Verse 3]\nDer Kellner fragt: „Schmeckt es Ihnen?“\nIch sage: „Ja, es schmeckt sehr gut!“\n„Noch ein Glas Wasser, bitte,\nund etwas Brot dazu.“\nSie nimmt noch einen Kaffee,\nich möchte lieber Tee.\nWir sitzen hier zusammen,\nder Abend ist so schön.\nWir reden über unsern Tag,\nund draußen wird es still.\nNoch ein Schluck, noch ein Lachen,\nso lang, wie jeder will.\n[Bridge]\n„Die Rechnung, bitte!“\n„Zusammen oder getrennt?“\n„Wir zahlen heute zusammen.“\nDer Kellner lächelt nett.\nWir teilen uns die Rechnung,\nund sagen: „Auf Wiedersehn!“\n„Das Essen war sehr lecker,\nwir werden wiederkomm’n.“\n[Final Chorus]\nIch möchte Suppe,\nkeinen Fisch.\nIch trinke Wasser,\nkeinen Saft.\nSo bestelle ich mein Essen,\nganz einfach und entspannt.\nIch möchte Suppe,\nkeinen Fisch.\nEin Stückchen Brot\nnoch mit dazu.\nSo bestelle ich mein Essen,\nund ich weiß genau, was ich tu.\nIch möchte Suppe,\nkeinen Fisch.\nIch trinke Wasser,\nkeinen Saft.\nSo bestelle ich mein Essen,\nganz einfach und entspannt.\n[Outro]\nDas Essen schmeckt uns sehr,\nwir kommen morgen wieder.\nMit Deutsch kann ich beim Essen\nbestellen immer besser.\nHmm … Essen bestellen …\nOh … auf Wiedersehen.",
+      "cues": [
+        {
+          "start": 0.19,
+          "end": 4.4,
+          "text": "Im Restaurant seh ich die Karte,"
+        },
+        {
+          "start": 4.55,
+          "end": 8.0,
+          "text": "der Kellner fragt: „Was möchten Sie?“"
+        },
+        {
+          "start": 8.19,
+          "end": 12.0,
+          "text": "Ich sage: „Eine Suppe, bitte,"
+        },
+        {
+          "start": 12.0,
+          "end": 14.0,
+          "text": "aber kein Fleisch für mich.“"
+        },
+        {
+          "start": 14.0,
+          "end": 17.98,
+          "text": "Er nickt und schreibt die Bestellung auf,"
+        },
+        {
+          "start": 17.98,
+          "end": 22.0,
+          "text": "zeigt freundlich auf das Tagesgericht."
+        },
+        {
+          "start": 22.19,
+          "end": 25.0,
+          "text": "Ich frage noch: „Ist Reis dabei?“"
+        },
+        {
+          "start": 25.0,
+          "end": 28.0,
+          "text": "Er sagt: „Natürlich, das geht.“"
+        },
+        {
+          "start": 28.19,
+          "end": 30.22,
+          "text": "Ich möchte Suppe,"
+        },
+        {
+          "start": 30.53,
+          "end": 32.0,
+          "text": "keinen Fisch."
+        },
+        {
+          "start": 32.0,
+          "end": 34.0,
+          "text": "Ich trinke Wasser,"
+        },
+        {
+          "start": 34.39,
+          "end": 36.0,
+          "text": "keinen Saft."
+        },
+        {
+          "start": 36.19,
+          "end": 39.32,
+          "text": "So bestelle ich mein Essen,"
+        },
+        {
+          "start": 39.4,
+          "end": 43.0,
+          "text": "ganz einfach und entspannt."
+        },
+        {
+          "start": 43.19,
+          "end": 45.14,
+          "text": "Ich möchte Suppe,"
+        },
+        {
+          "start": 45.44,
+          "end": 46.78,
+          "text": "keinen Fisch."
+        },
+        {
+          "start": 46.81,
+          "end": 49.24,
+          "text": "Ein Stückchen Brot"
+        },
+        {
+          "start": 49.24,
+          "end": 51.0,
+          "text": "noch mit dazu."
+        },
+        {
+          "start": 51.19,
+          "end": 54.6,
+          "text": "So bestelle ich mein Essen,"
+        },
+        {
+          "start": 54.64,
+          "end": 58.81,
+          "text": "und ich weiß genau, was ich tu."
+        },
+        {
+          "start": 59.19,
+          "end": 63.0,
+          "text": "Mir schmecken Reis und Gemüse,"
+        },
+        {
+          "start": 63.0,
+          "end": 66.0,
+          "text": "sie möchte heute keinen Kuchen."
+        },
+        {
+          "start": 66.19,
+          "end": 70.0,
+          "text": "Der Kellner bringt uns unser Essen,"
+        },
+        {
+          "start": 70.0,
+          "end": 72.0,
+          "text": "wir sagen: „Vielen Dank!“"
+        },
+        {
+          "start": 72.0,
+          "end": 75.31,
+          "text": "Die Teller duften, alles ist warm,"
+        },
+        {
+          "start": 75.31,
+          "end": 79.0,
+          "text": "wir nehmen uns die Zeit."
+        },
+        {
+          "start": 79.19,
+          "end": 82.29,
+          "text": "Sie probiert das grüne Gemüse,"
+        },
+        {
+          "start": 82.31,
+          "end": 86.0,
+          "text": "und lächelt: „Das schmeckt fein.“"
+        },
+        {
+          "start": 86.19,
+          "end": 88.5,
+          "text": "Ich möchte Suppe,"
+        },
+        {
+          "start": 88.85,
+          "end": 90.46,
+          "text": "keinen Fisch."
+        },
+        {
+          "start": 90.46,
+          "end": 93.13,
+          "text": "Ich trinke Wasser,"
+        },
+        {
+          "start": 93.48,
+          "end": 95.0,
+          "text": "keinen Saft."
+        },
+        {
+          "start": 95.19,
+          "end": 99.39,
+          "text": "So bestelle ich mein Essen,"
+        },
+        {
+          "start": 99.39,
+          "end": 104.0,
+          "text": "ganz einfach und entspannt."
+        },
+        {
+          "start": 104.19,
+          "end": 105.6,
+          "text": "Ich möchte Suppe,"
+        },
+        {
+          "start": 105.83,
+          "end": 106.86,
+          "text": "keinen Fisch."
+        },
+        {
+          "start": 106.86,
+          "end": 108.68,
+          "text": "Ein Stückchen Brot"
+        },
+        {
+          "start": 108.69,
+          "end": 110.0,
+          "text": "noch mit dazu."
+        },
+        {
+          "start": 110.19,
+          "end": 113.18,
+          "text": "So bestelle ich mein Essen,"
+        },
+        {
+          "start": 113.18,
+          "end": 116.81,
+          "text": "und ich weiß genau, was ich tu."
+        },
+        {
+          "start": 117.19,
+          "end": 121.29,
+          "text": "Der Kellner fragt: „Schmeckt es Ihnen?“"
+        },
+        {
+          "start": 121.29,
+          "end": 125.0,
+          "text": "Ich sage: „Ja, es schmeckt sehr gut!“"
+        },
+        {
+          "start": 125.19,
+          "end": 128.57,
+          "text": "„Noch ein Glas Wasser, bitte,"
+        },
+        {
+          "start": 128.57,
+          "end": 131.0,
+          "text": "und etwas Brot dazu.“"
+        },
+        {
+          "start": 131.0,
+          "end": 133.0,
+          "text": "Sie nimmt noch einen Kaffee,"
+        },
+        {
+          "start": 133.19,
+          "end": 134.37,
+          "text": "ich möchte lieber Tee."
+        },
+        {
+          "start": 134.37,
+          "end": 136.0,
+          "text": "Wir sitzen hier zusammen,"
+        },
+        {
+          "start": 136.0,
+          "end": 137.9,
+          "text": "der Abend ist so schön."
+        },
+        {
+          "start": 138.08,
+          "end": 140.06,
+          "text": "Wir reden über unsern Tag,"
+        },
+        {
+          "start": 140.06,
+          "end": 142.0,
+          "text": "und draußen wird es still."
+        },
+        {
+          "start": 142.19,
+          "end": 143.11,
+          "text": "Noch ein Schluck, noch ein Lachen,"
+        },
+        {
+          "start": 143.28,
+          "end": 144.82,
+          "text": "so lang, wie jeder will."
+        },
+        {
+          "start": 144.82,
+          "end": 146.2,
+          "text": "„Die Rechnung, bitte!“"
+        },
+        {
+          "start": 146.2,
+          "end": 148.0,
+          "text": "„Zusammen oder getrennt?“"
+        },
+        {
+          "start": 148.19,
+          "end": 150.02,
+          "text": "„Wir zahlen heute zusammen.“"
+        },
+        {
+          "start": 150.02,
+          "end": 152.0,
+          "text": "Der Kellner lächelt nett."
+        },
+        {
+          "start": 152.19,
+          "end": 153.98,
+          "text": "Wir teilen uns die Rechnung,"
+        },
+        {
+          "start": 153.98,
+          "end": 156.0,
+          "text": "und sagen: „Auf Wiedersehn!“"
+        },
+        {
+          "start": 156.17,
+          "end": 158.0,
+          "text": "„Das Essen war sehr lecker,"
+        },
+        {
+          "start": 158.19,
+          "end": 161.0,
+          "text": "wir werden wiederkomm’n.“"
+        },
+        {
+          "start": 161.0,
+          "end": 162.66,
+          "text": "Ich möchte Suppe,"
+        },
+        {
+          "start": 162.89,
+          "end": 164.0,
+          "text": "keinen Fisch."
+        },
+        {
+          "start": 164.19,
+          "end": 166.85,
+          "text": "Ich trinke Wasser,"
+        },
+        {
+          "start": 167.23,
+          "end": 168.75,
+          "text": "keinen Saft."
+        },
+        {
+          "start": 168.75,
+          "end": 173.0,
+          "text": "So bestelle ich mein Essen,"
+        },
+        {
+          "start": 173.19,
+          "end": 176.0,
+          "text": "ganz einfach und entspannt."
+        },
+        {
+          "start": 176.0,
+          "end": 177.66,
+          "text": "Ich möchte Suppe,"
+        },
+        {
+          "start": 177.89,
+          "end": 179.0,
+          "text": "keinen Fisch."
+        },
+        {
+          "start": 179.19,
+          "end": 181.35,
+          "text": "Ein Stückchen Brot"
+        },
+        {
+          "start": 181.35,
+          "end": 183.0,
+          "text": "noch mit dazu."
+        },
+        {
+          "start": 183.0,
+          "end": 188.0,
+          "text": "So bestelle ich mein Essen,"
+        },
+        {
+          "start": 188.19,
+          "end": 190.91,
+          "text": "und ich weiß genau, was ich tu."
+        },
+        {
+          "start": 191.02,
+          "end": 192.65,
+          "text": "Ich möchte Suppe,"
+        },
+        {
+          "start": 192.88,
+          "end": 194.0,
+          "text": "keinen Fisch."
+        },
+        {
+          "start": 194.19,
+          "end": 196.96,
+          "text": "Ich trinke Wasser,"
+        },
+        {
+          "start": 197.35,
+          "end": 199.0,
+          "text": "keinen Saft."
+        },
+        {
+          "start": 199.0,
+          "end": 203.0,
+          "text": "So bestelle ich mein Essen,"
+        },
+        {
+          "start": 203.19,
+          "end": 207.0,
+          "text": "ganz einfach und entspannt."
+        },
+        {
+          "start": 207.0,
+          "end": 211.0,
+          "text": "Das Essen schmeckt uns sehr,"
+        },
+        {
+          "start": 211.19,
+          "end": 214.11,
+          "text": "wir kommen morgen wieder."
+        },
+        {
+          "start": 214.11,
+          "end": 218.0,
+          "text": "Mit Deutsch kann ich beim Essen"
+        },
+        {
+          "start": 218.19,
+          "end": 221.0,
+          "text": "bestellen immer besser."
+        },
+        {
+          "start": 221.0,
+          "end": 226.0,
+          "text": "Hmm … Essen bestellen …"
+        },
+        {
+          "start": 226.19,
+          "end": 228.0,
+          "text": "Oh … auf Wiedersehen."
+        }
+      ],
+      "duration": 237.192,
+      "recordingSha256": "e85d34c0127fce862f9c982f9fe50eac87d1251537a7da60f2090f7fe77e6200",
+      "source": "Owner-selected full recording lyrics; offline acoustic alignment. Line timings pending listening review.",
+      "timingStatus": "estimated"
     }
   ]
 }

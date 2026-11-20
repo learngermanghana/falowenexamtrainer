@@ -1,6 +1,6 @@
 {
-  "version": 10,
-  "updated": "2026-11-19",
+  "version": 11,
+  "updated": "2026-11-20",
   "description": "Teacher-approved published course music. Strictly music/ R2 keys; no private Hören recordings or storage credentials.",
   "tracks": [
     {
@@ -73,6 +73,24 @@
       "coursebook": true,
       "slides": true,
       "objectKey": "music/a1/day-14/Einsteigen – Wir fahren los.mp3",
+      "approved": true
+    },
+    {
+      "id": "r2-a1-day-16-b64_SWNoIG3DtmNodGUgU3VwcGUubXAz",
+      "title": "So bestelle ich mein Essen",
+      "level": "A1",
+      "day": 16,
+      "assignmentKey": "A1-9",
+      "topic": "Day 16 · Essen im Restaurant",
+      "type": "Learning story",
+      "genre": "",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a1-day-16-b64_SWNoIG3DtmNodGUgU3VwcGUubXAz",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a1/day-16/Ich möchte Suppe.mp3",
       "approved": true
     },
     {
