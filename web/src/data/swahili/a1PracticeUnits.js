@@ -32,9 +32,27 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "answer": 1,
       "why": "Marahaba answers the respectful greeting Shikamoo."
     },
-    "speaking": "Greet a classmate in the morning, ask how they are and end the conversation. Swap roles and greet an elder.",
+    "speaking": "Work in pairs and groups: practise morning greetings, respectful greetings, names and countries, then switch roles.",
     "writing": {
-      "prompt": "Write four lines of a morning greeting and farewell between classmates."
+      "prompt": "Write a short dialogue between two classmates meeting for the first time. Include a greeting, two names, a question about where someone comes from, and a farewell.",
+      "guide": {
+        "steps": [
+          "Begin with a greeting and a short reply.",
+          "Ask each other's names and introduce yourselves.",
+          "Ask where one person comes from and give an answer.",
+          "End with a polite farewell."
+        ],
+        "phrases": [
+          "Habari za asubuhi?",
+          "Nzuri, asante.",
+          "Unaitwa nani?",
+          "Jina langu ni…",
+          "Unatoka wapi?",
+          "Ninatoka…",
+          "Kwa heri!"
+        ],
+        "placeholder": "A: Habari za asubuhi?\\nB: ...\\nA: ..."
+      }
     },
     "reading": {
       "title": "Salamu katika Utamaduni wa Kiswahili",
@@ -214,6 +232,45 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
           ]
         }
       ]
+    },
+    "groupPractice": {
+      "stages": [
+        {
+          "title": "Salamu za asubuhi · Morning greetings",
+          "instruction": "In pairs: Student A greets Student B, asks how they are, then says goodbye. Switch roles."
+        },
+        {
+          "title": "Shikamoo na Marahaba · Respectful greetings",
+          "instruction": "In groups of three: one learner plays an elder. Practise Shikamoo / Marahaba, then explain when to use it."
+        },
+        {
+          "title": "Jitambulishe · Introduce yourself",
+          "instruction": "Ask your partner their name and country. Answer using Ninaitwa… and Ninatoka…. Introduce your partner to the group."
+        }
+      ],
+      "phrases": [
+        {
+          "swahili": "Habari za asubuhi? — Nzuri, asante.",
+          "english": "Good morning — Fine, thank you."
+        },
+        {
+          "swahili": "Shikamoo! — Marahaba!",
+          "english": "Respectful greeting and response."
+        },
+        {
+          "swahili": "Unaitwa nani? — Ninaitwa…",
+          "english": "What is your name? — I am called…."
+        },
+        {
+          "swahili": "Unatoka wapi? — Ninatoka…",
+          "english": "Where are you from? — I come from…."
+        },
+        {
+          "swahili": "Kwa heri! — Kwa heri!",
+          "english": "Goodbye — Goodbye."
+        }
+      ],
+      "challenge": "Each learner speaks without reading for 30 seconds: greet, introduce themselves, ask one question, and say goodbye. Peers give one helpful suggestion."
     }
   },
   "3": {
