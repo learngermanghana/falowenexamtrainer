@@ -190,6 +190,14 @@ export default function SwahiliB1Day28Workbook({ uid }) {
         <h1>Kutunza Mazingira katika Maisha ya Kila Siku</h1>
         <p>Mwisho wa siku utaweza kutaja angalau tabia tatu zinazolinda mazingira, kueleza namna na lengo la tendo, na kutoa pendekezo moja linaloweza kutekelezwa katika eneo unaloishi.</p>
       </header>
+      <section className="swahili-book__tile" aria-label="AI lesson video">
+        <h2>Video ya AI · Kutunza Mazingira</h2>
+        <p>Tazama video ya somo. Taja tabia tatu za kutunza mazingira.</p>
+        <iframe title="Video ya AI · Kutunza Mazingira" loading="lazy" allowFullScreen
+          style={{ width: "100%", aspectRatio: "16 / 9", border: 0 }}
+          src="https://www.youtube-nocookie.com/embed/kcqRGi5KLMs" />
+        <a href="https://youtu.be/kcqRGi5KLMs" target="_blank" rel="noopener noreferrer">Tazama video kwenye YouTube</a>
+      </section>
       <WorkbookTabNav activeTab={activeTab} onChange={selectTab} tabs={tabs}
         ariaLabel="Kiswahili B1 Somo la 28" renderLegacyGrammarPanel={false} />
       <section className="swahili-book__card" role="tabpanel" tabIndex={-1} aria-label={tabs.find(tab => tab.key === activeTab).label}>
