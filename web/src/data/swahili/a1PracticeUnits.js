@@ -4,8 +4,8 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 2,
     "chapter": "Somo la 2",
     "title": "Salamu",
-    "objective": "Greet people and respond appropriately in everyday situations.",
-    "grammar": "Common greetings and personal pronouns",
+    "objective": "Greet people respectfully, introduce yourself, and identify where a person comes from.",
+    "grammar": "Salamu, viwakilishi vya nafsi na kujitambulisha",
     "practiceOnly": false,
     "rule": "Greetings change with the time or situation. Use Habari za asubuhi? in the morning and Habari za jioni? in the evening. Nzuri is a short reply. For a respectful greeting to an elder, use Shikamoo and listen for Marahaba. In Habari yako? the word yako addresses one person; Habari zenu? addresses a group.",
     "examples": [
@@ -37,19 +37,181 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "prompt": "Write four lines of a morning greeting and farewell between classmates."
     },
     "reading": {
-      "text": "Asubuhi, Asha anamwona Juma. Asha anasema, “Habari za asubuhi?” Juma anasema, “Nzuri, asante.”",
+      "title": "Salamu katika Utamaduni wa Kiswahili",
+      "text": "Katika utamaduni wa Waswahili, salamu ni jambo muhimu sana. Unapokutana na mtu, ni muhimu kumsalimia kwa heshima.\n\nAsubuhi, watu husema, “Habari za asubuhi?” Mtu mwingine hujibu, “Nzuri” au “Salama.”\n\nUnapokutana na mtu mzima au mzee, unaweza kusema, “Shikamoo!” Mzee hujibu, “Marahaba!” Hii ni salamu ya kuonyesha heshima kubwa.\n\nWatoto na vijana hutumia salamu za kawaida kama “Hujambo?” na kujibu “Sijambo.”\n\nMara nyingi, marafiki wanapokutana mtaani hutumia salamu za kirafiki kama “Mambo?” na kujibu “Poa!” au “Safi!”\n\nUnapoondoka, unasema “Kwa heri” na mwenzako anaweza kujibu “Kwa heri!”",
       "questions": [
         {
-          "question": "Asha anamsalimu nani?",
-          "id": "read-1"
+          "id": "read-1",
+          "question": "Unasema nini unapomsalimia mtu mzima au mzee kwa heshima?",
+          "choices": [
+            "Mambo?",
+            "Kwa heri",
+            "Shikamoo",
+            "Sijambo"
+          ]
         },
         {
-          "question": "Asha anasema nini?",
-          "id": "read-2"
+          "id": "read-2",
+          "question": "Mtu akikuambia “Hujambo?”, unajibu vipi?",
+          "choices": [
+            "Sijambo",
+            "Marahaba",
+            "Poa",
+            "Kwa heri"
+          ]
         },
         {
-          "question": "Juma anajibu nini?",
-          "id": "read-3"
+          "id": "read-3",
+          "question": "Salamu gani hutumiwa sana na marafiki au vijana mtaani?",
+          "choices": [
+            "Shikamoo",
+            "Mambo?",
+            "Kwa herini",
+            "Hamjambo?"
+          ]
+        },
+        {
+          "id": "read-4",
+          "question": "Mtu akikuambia “Shikamoo”, jibu sahihi ni lipi?",
+          "choices": [
+            "Salama",
+            "Sijambo",
+            "Marahaba",
+            "Asante"
+          ]
+        },
+        {
+          "id": "read-5",
+          "question": "Unasema nini unapoaga?",
+          "choices": [
+            "Karibu",
+            "Habari",
+            "Mambo",
+            "Kwa heri"
+          ]
+        }
+      ]
+    },
+    "grammarSections": [
+      {
+        "title": "Salamu na heshima · Greetings and respect",
+        "rule": "Use Habari za asubuhi? in the morning, and reply Nzuri or Salama. Greet an elder respectfully with Shikamoo; the response is Marahaba. Friends may say Mambo? and answer Poa or Safi. Say Kwa heri when leaving.",
+        "examples": [
+          {
+            "swahili": "Habari za asubuhi? — Nzuri, asante.",
+            "english": "Good morning. — Fine, thank you."
+          },
+          {
+            "swahili": "Shikamoo! — Marahaba!",
+            "english": "Respectful greeting to an elder and the response."
+          },
+          {
+            "swahili": "Mambo? — Poa!",
+            "english": "Informal greeting among friends."
+          },
+          {
+            "swahili": "Kwa heri! — Kwa heri!",
+            "english": "Goodbye! — Goodbye!"
+          }
+        ]
+      },
+      {
+        "title": "Viwakilishi vya nafsi · Personal pronouns",
+        "rule": "Mimi, wewe, yeye, sisi, ninyi and wao mean I, you (singular), he/she, we, you (plural) and they. In simple identity statements ni means am/is/are; si expresses not.",
+        "examples": [
+          {
+            "swahili": "Mimi ni mwanafunzi.",
+            "english": "I am a student."
+          },
+          {
+            "swahili": "Wewe ni mwalimu.",
+            "english": "You are a teacher."
+          },
+          {
+            "swahili": "Yeye ni daktari.",
+            "english": "He or she is a doctor."
+          },
+          {
+            "swahili": "Sisi ni wanafunzi. Ninyi ni walimu. Wao ni marafiki.",
+            "english": "We are students. You (plural) are teachers. They are friends."
+          },
+          {
+            "swahili": "Mimi si mwalimu.",
+            "english": "I am not a teacher."
+          }
+        ]
+      },
+      {
+        "title": "Kujitambulisha · Introducing yourself",
+        "rule": "Ask Unaitwa nani? to learn someone's name, and Unatoka wapi? to ask where they come from. The present-tense subject prefix ni- means I and u- means you (singular): ninaitwa / unaitwa; ninatoka / unatoka.",
+        "examples": [
+          {
+            "swahili": "Jina langu ni Amina.",
+            "english": "My name is Amina."
+          },
+          {
+            "swahili": "Unaitwa nani? — Ninaitwa Juma.",
+            "english": "What is your name? — My name is Juma."
+          },
+          {
+            "swahili": "Unatoka wapi? — Ninatoka Tanzania.",
+            "english": "Where are you from? — I come from Tanzania."
+          }
+        ]
+      }
+    ],
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-2/audio-url",
+      "questions": [
+        {
+          "id": "listen-name",
+          "question": "Mtu wa pili anaitwa nani?",
+          "choices": [
+            "Amina",
+            "Juma",
+            "Nairobi",
+            "Ali"
+          ]
+        },
+        {
+          "id": "listen-juma-country",
+          "question": "Juma anatoka nchi gani?",
+          "choices": [
+            "Kenya",
+            "Uganda",
+            "Tanzania",
+            "Ghana"
+          ]
+        },
+        {
+          "id": "listen-amina-country",
+          "question": "Amina anatoka wapi?",
+          "choices": [
+            "Tanzania",
+            "Kenya",
+            "Rwanda",
+            "Uganda"
+          ]
+        },
+        {
+          "id": "listen-amina-city",
+          "question": "Amina anaishi wapi sasa?",
+          "choices": [
+            "Arusha",
+            "Dodoma",
+            "Dar es Salaam",
+            "Nairobi"
+          ]
+        },
+        {
+          "id": "listen-juma-city",
+          "question": "Juma anaishi katika mji gani?",
+          "choices": [
+            "Dar es Salaam",
+            "Mombasa",
+            "Nairobi",
+            "Kampala"
+          ]
         }
       ]
     }
