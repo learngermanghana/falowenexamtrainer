@@ -8,6 +8,9 @@ const BUILD_REVISION_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 let registrationStarted = false;
 let buildRevisionTimer = null;
 
+// Embedded lecture players and workbook drafts can lose their place on reload.
+const isLearningPage = () => /^\/(campus|swahili)(\/|$)/i.test(window.location.pathname);
+
 const getLastForceRefreshAt = () => {
   try {
     return Number(window.localStorage.getItem(FORCE_REFRESH_KEY) || 0);
@@ -65,6 +68,7 @@ const checkForNewBuild = async ({ reloadOnChange = true } = {}) => {
   }
   if (loadedRevision === revision) return false;
 
+  if (reloadOnChange && isLearningPage()) return false;
   setLoadedBuildRevision(revision);
   if (reloadOnChange) window.location.reload();
   return true;
@@ -86,7 +90,7 @@ const forcePeriodicRefresh = async (registration) => {
   const lastRefreshAt = getLastForceRefreshAt();
   const shouldForceRefresh = !lastRefreshAt || now - lastRefreshAt >= FORCE_REFRESH_INTERVAL_MS;
 
-  if (!shouldForceRefresh) return;
+  if (!shouldForceRefresh || isLearningPage()) return;
 
   if (!markForceRefreshAt(now)) {
     return;
@@ -98,14 +102,14 @@ const forcePeriodicRefresh = async (registration) => {
     console.error("Failed to refresh service worker assets", error);
   }
 
-  window.location.reload();
+  if (!isLearningPage()) window.location.reload();
 };
 
 const setupUpdateHandlers = (registration) => {
   let hasRefreshed = false;
 
   navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (hasRefreshed || !navigator.serviceWorker.controller) return;
+    if (hasRefreshed || !navigator.serviceWorker.controller || isLearningPage()) return;
     hasRefreshed = true;
     window.location.reload();
   });

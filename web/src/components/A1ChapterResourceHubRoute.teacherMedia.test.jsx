@@ -1,6 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { getCanonicalA1TeacherVideoResource } from "../data/a1TeacherVideoResources";
 import { buildA1WorkbookVideoModel } from "./A1WorkbookVideoHeader";
 import A1ChapterResourceHubRoute, {
   A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
@@ -25,7 +26,7 @@ test("shows both the A1 teacher lecture and AI video in the chapter hub before R
   expect(screen.getByText((_, element) => element?.textContent === "🎬 Kapitel 0.1 teacher lecture video")).toBeVisible();
   expect(screen.getByRole("link", { name: /Watch teacher video/i })).toHaveAttribute(
     "href",
-    "https://youtu.be/CqFbBQG9M3U",
+    getCanonicalA1TeacherVideoResource(1, "0.1").url,
   );
   expect(screen.getByText((_, element) => element?.textContent === "🤖 Kapitel 0.1 AI grammar video")).toBeVisible();
   expect(screen.getByRole("link", { name: /Watch AI video/i })).toHaveAttribute(
@@ -54,7 +55,7 @@ test("shows the configured AI video beside the teacher lecture for A1 Day 12", a
   expect(screen.getByText((_, element) => element?.textContent === "🎬 Kapitel 8 teacher lecture video")).toBeVisible();
   expect(screen.getByRole("link", { name: /Watch teacher video/i })).toHaveAttribute(
     "href",
-    "https://youtu.be/hLpPFOthVkU",
+    getCanonicalA1TeacherVideoResource(12, "8").url,
   );
   expect(screen.getByText((_, element) => element?.textContent === "🤖 Kapitel 8 AI grammar video")).toBeVisible();
   expect(screen.getByRole("link", { name: /Watch AI video/i })).toHaveAttribute(
