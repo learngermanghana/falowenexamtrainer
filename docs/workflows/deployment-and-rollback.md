@@ -15,6 +15,10 @@ Reviewed: 2026-11-01.
 4. Merge only when intended. Check the deployment SHA, status and actual live endpoint response before claiming success.
 5. For affected cross-repo payloads (Admin marking, course records), validate learner and Admin deployments independently.
 
+## Verify a release during a lesson
+
+Open German A1 Day 1 in Campus before publishing a preview update. With the lecture playing, switch tabs, return, and reconnect. The lecture should stay open and continue from its current position. Campus and the Swahili course preview suppress automatic update reloads, including the daily refresh. A learner can open a fresh tab or reload manually to pick up the release.
+
 ## Recovery
 - A reverted UI commit does not necessarily revert Firestore data, MP3 uploads or published lyrics sidecars.
 - For website failures, revert the offending PR through GitHub, run tests and verify the newly deployed revision. For Firebase migrations or security rules, use their dedicated deployment/rollback procedures with explicit authorization.
