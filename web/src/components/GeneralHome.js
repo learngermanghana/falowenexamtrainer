@@ -24,30 +24,19 @@ const classLevelFromName = (className = "") => {
   return match?.[1] || "";
 };
 
-const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClassSchedule, onJoinZoom, onContinueLearning, onOpenAccount, isSwahili = false }) => {
+const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClassSchedule, onJoinZoom, onOpenAccount, isSwahili = false }) => {
   const { t } = useTranslation();
   const studentName =
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
   const levelKey = detectLevelKey(studentProfile);
-  const courseLabel = isSwahili ? "Kiswahili A1 course" : levelKey ? levelKey + " course" : "course";
-  const courseBadge = isSwahili ? "KISWAHILI A1 · COURSE READY" : levelKey ? levelKey + " COURSE · READY" : "YOUR CAMPUS";
   const hasAssignedClass = Boolean(className || classId);
 
   return (
     <div className={"falowen-learner-hero" + (isSwahili ? " falowen-learner-hero--single" : "")}>
       <section className="falowen-learner-hero__welcome" aria-label="Welcome to Falowen">
-        <span className="falowen-learner-hero__badge"><span aria-hidden="true" />{courseBadge}</span>
         <h1>Welcome back, {studentName}.</h1>
         <p className="falowen-learner-hero__lead">Your campus is ready. Let’s make progress.</p>
-        <p className="falowen-learner-hero__description">
-          {isSwahili
-            ? "Your Kiswahili course is ready. Continue published lessons in Campus and submit work for tutor review."
-            : "Your " + courseLabel + " is ready. Use Campus for daily learning, and use Exams Room for exam practice."}
-        </p>
         <div className="falowen-learner-hero__actions">
-          <button type="button" className="falowen-learner-hero__primary" onClick={onContinueLearning}>
-            Open Campus <span aria-hidden="true">→</span>
-          </button>
           <button type="button" className="falowen-learner-hero__secondary" onClick={onOpenAccount}>Account</button>
           {!isSwahili && (
             <button type="button" className="falowen-learner-hero__zoom" onClick={onJoinZoom}>
@@ -316,7 +305,6 @@ const GeneralHome = ({
         <WelcomeHero
           studentProfile={studentProfile}
           isSwahili
-          onContinueLearning={openCampus}
           onOpenAccount={openAccount}
         />
         <TrialCountdownBanner studentProfile={studentProfile} onCompletePayment={openBilling} />
@@ -360,7 +348,6 @@ const GeneralHome = ({
         classId={preferredClassId}
         onViewClassSchedule={openFullClassSchedule}
         onJoinZoom={joinZoom}
-        onContinueLearning={openCampus}
         onOpenAccount={openAccount}
       />
 
