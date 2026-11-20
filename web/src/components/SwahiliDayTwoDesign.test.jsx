@@ -20,7 +20,7 @@ test("Day 2 group practice has structured role-play stages and leads to Schreibe
   expect(screen.getByRole("heading", { name: /Kuandika · Mazungumzo ya salamu/ })).toBeTruthy();
   expect(screen.getByRole("textbox", { name: /Your writing/ })).toBeTruthy();
   fireEvent.change(screen.getByRole("textbox", { name: /Your writing/ }), { target: { value: "Habari za asubuhi? Ninaitwa Amina." } });
-  expect(screen.getByText("6 words")).toBeTruthy();
+  expect(screen.getByText("5 words")).toBeTruthy();
   expect(screen.queryByText(/Model answer|Suggested answer/i)).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "Review & Submit" }));
   expect(screen.getByRole("heading", { name: /Review & Submit/ })).toBeTruthy();
