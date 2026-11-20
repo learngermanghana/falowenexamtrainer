@@ -276,53 +276,375 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
   "3": {
     "day": 3,
     "chapter": "Somo la 3",
-    "title": "Utambulisho",
-    "objective": "Introduce yourself and other people using short sentences.",
-    "grammar": "Present-tense kuwa and subject markers",
+    "title": "Mapishi Jikoni kwa Asha",
+    "objective": "Read about family cooking, understand a conversation about ugali, and explain a simple recipe.",
+    "grammar": "Vitenzi vya kupika, maneno ya mpangilio na mahitaji",
     "practiceOnly": false,
-    "rule": "Use ni with a name or role and si to deny a role. For an action in progress, attach the subject marker and -na- to the verb: ni-na-soma, u-na-soma, a-na-soma.",
+    "rule": "Use Kwanza, Kisha, Halafu and Mwishowe to order cooking instructions. The regular one-person imperative drops ku-: kuosha → osha, kupika → pika, kuongeza → ongeza. Use Tunahitaji to say what ingredients are needed.",
     "examples": [
       {
-        "swahili": "Mimi ni mwanafunzi.",
-        "english": "I am a student."
+        "swahili": "Kwanza, osha mchele.",
+        "english": "First, wash the rice."
       },
       {
-        "swahili": "Yeye si mwalimu.",
-        "english": "They are not a teacher."
+        "swahili": "Kisha, ongeza tui la nazi.",
+        "english": "Then, add coconut milk."
       },
       {
-        "swahili": "Anasoma Kiswahili.",
-        "english": "They study Kiswahili."
+        "swahili": "Tunahitaji unga wa mahindi na maji.",
+        "english": "We need maize flour and water."
       }
     ],
     "check": {
-      "question": "Which sentence means “She studies Kiswahili”?",
+      "question": "Which phrase means ‘We need maize flour and water’?",
       "options": [
-        "Anasoma Kiswahili.",
-        "Ninasoma Kiswahili.",
-        "Unasoma Kiswahili."
+        "Tunahitaji unga wa mahindi na maji.",
+        "Ninapenda wali wa nazi.",
+        "Chakula hiki ni kitamu."
       ],
       "answer": 0,
-      "why": "A- marks he or she; -na- marks the present."
+      "why": "Tunahitaji means ‘we need’; unga wa mahindi is maize flour."
     },
-    "speaking": "Introduce yourself at a new class. Ask your partner their name and introduce them to a third person.",
+    "speaking": "Explain a simple recipe with a partner, naming ingredients and ordering the steps.",
     "writing": {
-      "prompt": "Write four sentences giving your name and role, then introduce another person and say what they study."
+      "prompt": "Andika maelekezo mafupi ya kupika ugali au wali wa nazi. Write five to seven short sentences naming the ingredients and explaining the preparation in order.",
+      "guide": {
+        "heading": "Kuandika · Mapishi yangu",
+        "steps": [
+          "Name the dish you want to prepare.",
+          "Say which ingredients you need.",
+          "Describe the first cooking step using Kwanza.",
+          "Describe the next steps using Kisha or Halafu.",
+          "Finish with Mwishowe and say the food is ready."
+        ],
+        "phrases": [
+          "Tunahitaji…",
+          "Kwanza, …",
+          "Kisha, …",
+          "Halafu, …",
+          "Ongeza…",
+          "Koroga…",
+          "Mwishowe, …"
+        ],
+        "placeholder": "Leo ninapika …\nTunahitaji …\nKwanza, …",
+        "minimumLines": 5
+      }
     },
     "reading": {
-      "text": "Ninaitwa Mariam. Mimi ni mwanafunzi. Huyu ni Musa. Yeye ni mwalimu.",
+      "title": "Mapishi Jikoni kwa Asha",
+      "text": "Leo ni siku ya Jumapili. Asha yupo jikoni na mama yake. Wanapika wali wa nazi na samaki wa kupaka kwa ajili ya chakula cha mchana.\n\nKwanza, Asha anasafisha mchele na kuweka tui la nazi sufuriani. Pili, mama anapaka samaki viungo vyenye harufu nzuri kisha anamchoma. Wanafamilia wote wanapenda pia kula ugali na maharage, lakini leo wamechagua wali na samaki.\n\nBaada ya kupika, wanaketi mezani pamoja kula. Baba anasema, “Chakula hiki ni kitamu sana, asante!”",
       "questions": [
         {
-          "question": "Mwanafunzi anaitwa nani?",
-          "id": "read-1"
+          "id": "read-1",
+          "question": "Asha na mama yake wanapika chakula gani leo?",
+          "choices": [
+            "Ugali na nyama",
+            "Chipsi na kuku",
+            "Wali wa nazi na samaki wa kupaka",
+            "Pilau na supu"
+          ]
         },
         {
-          "question": "Mwalimu anaitwa nani?",
-          "id": "read-2"
+          "id": "read-2",
+          "question": "Asha na mama yake wapo wapi wanapopika?",
+          "choices": [
+            "Dukani",
+            "Jikoni",
+            "Shuleni",
+            "Mgahawani"
+          ]
         },
         {
-          "question": "Musa ni nani?",
-          "id": "read-3"
+          "id": "read-3",
+          "question": "Asha anatumia nini kupika wali uwe wa nazi?",
+          "choices": [
+            "Maji ya kawaida tu",
+            "Tui la nazi",
+            "Maziwa ya ng’ombe",
+            "Juisi ya embe"
+          ]
+        },
+        {
+          "id": "read-4",
+          "question": "Chakula kingine gani cha Kitanzania ambacho wanafamilia wanapenda kula?",
+          "choices": [
+            "Ugali na maharage",
+            "Pizza na pasta",
+            "Mkate na siagi",
+            "Matunda na chai"
+          ]
+        },
+        {
+          "id": "read-5",
+          "question": "Baba anasema nini baada ya kuonja chakula?",
+          "choices": [
+            "Sitaki kula leo.",
+            "Chakula ni cha moto sana.",
+            "Chakula hiki ni kitamu sana, asante!",
+            "Naomba bili, tafadhali."
+          ]
+        }
+      ]
+    },
+    "grammarSections": [
+      {
+        "title": "Vitenzi vya kupika · Cooking actions",
+        "rule": "Many Kiswahili cooking verbs begin with ku- in the infinitive. For a regular one-person command, remove ku-: kuosha → osha; kukata → kata; kupika → pika; kuongeza → ongeza. Say tafadhali for a polite instruction.",
+        "examples": [
+          {
+            "swahili": "Osha mchele, tafadhali.",
+            "english": "Wash the rice, please."
+          },
+          {
+            "swahili": "Kata vitunguu.",
+            "english": "Cut the onions."
+          },
+          {
+            "swahili": "Ongeza tui la nazi.",
+            "english": "Add coconut milk."
+          },
+          {
+            "swahili": "Koroga ugali polepole.",
+            "english": "Stir the ugali slowly."
+          }
+        ]
+      },
+      {
+        "title": "Mpangilio wa mapishi · Ordering recipe steps",
+        "rule": "Kwanza means first; kisha and halafu mean then; baadaye means later; mwishowe means finally. Use these words to explain cooking in a clear order.",
+        "examples": [
+          {
+            "swahili": "Kwanza, chemsha maji.",
+            "english": "First, boil the water."
+          },
+          {
+            "swahili": "Kisha, tia unga polepole.",
+            "english": "Then, add flour slowly."
+          },
+          {
+            "swahili": "Halafu, koroga ugali.",
+            "english": "Then, stir the ugali."
+          },
+          {
+            "swahili": "Mwishowe, pakua chakula.",
+            "english": "Finally, serve the food."
+          }
+        ]
+      },
+      {
+        "title": "Viungo na mahitaji · Ingredients and needs",
+        "rule": "Ask Unahitaji nini? for what someone needs, and answer Tunahitaji … for we need. For ugali, use unga wa mahindi (maize flour) and maji (water). For coconut rice, use tui la nazi (coconut milk).",
+        "examples": [
+          {
+            "swahili": "Unahitaji nini kwa ugali?",
+            "english": "What do you need for ugali?"
+          },
+          {
+            "swahili": "Tunahitaji unga wa mahindi na maji.",
+            "english": "We need maize flour and water."
+          },
+          {
+            "swahili": "Maji ya moto ni muhimu.",
+            "english": "Hot water is important."
+          },
+          {
+            "swahili": "Wali wa nazi hutumia tui la nazi.",
+            "english": "Coconut rice uses coconut milk."
+          }
+        ]
+      },
+      {
+        "title": "Kupenda na kueleza ladha · Preferences and taste",
+        "rule": "Use Ninapenda … for I like …, Unapenda …? to ask someone what they like, and Chakula hiki ni kitamu for this food is delicious. Unajua kupika …? asks whether someone knows how to cook.",
+        "examples": [
+          {
+            "swahili": "Ninapenda ugali na maharage.",
+            "english": "I like ugali and beans."
+          },
+          {
+            "swahili": "Unajua kupika ugali?",
+            "english": "Do you know how to cook ugali?"
+          },
+          {
+            "swahili": "Ndiyo, najua kupika vizuri.",
+            "english": "Yes, I know how to cook well."
+          },
+          {
+            "swahili": "Chakula hiki ni kitamu sana!",
+            "english": "This food is very delicious!"
+          }
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "sw": "jikoni",
+        "en": "in the kitchen"
+      },
+      {
+        "sw": "wali wa nazi",
+        "en": "coconut rice"
+      },
+      {
+        "sw": "samaki wa kupaka",
+        "en": "fish with a spiced coconut coating"
+      },
+      {
+        "sw": "tui la nazi",
+        "en": "coconut milk"
+      },
+      {
+        "sw": "mchele",
+        "en": "uncooked rice"
+      },
+      {
+        "sw": "viungo",
+        "en": "spices"
+      },
+      {
+        "sw": "ugali",
+        "en": "maize meal staple"
+      },
+      {
+        "sw": "maharage",
+        "en": "beans"
+      },
+      {
+        "sw": "unga wa mahindi",
+        "en": "maize flour"
+      },
+      {
+        "sw": "maji ya moto",
+        "en": "hot water"
+      },
+      {
+        "sw": "koroga",
+        "en": "stir"
+      },
+      {
+        "sw": "polepole",
+        "en": "slowly"
+      }
+    ],
+    "groupPractice": {
+      "heading": "Kuzungumza · Mapishi ya familia",
+      "intro": "In pairs or groups of three, practise describing food and preparing ugali. Change roles after each round.",
+      "stages": [
+        {
+          "title": "Chakula unachopenda · Favourite dishes",
+          "instruction": "Ask one another which Tanzanian foods you enjoy. Reply using Ninapenda… and describe one dish."
+        },
+        {
+          "title": "Unahitaji nini? · Ingredients",
+          "instruction": "One student asks what is needed for ugali. The partner names unga wa mahindi and maji, and explains why the water should be hot."
+        },
+        {
+          "title": "Jinsi ya kupika · Steps",
+          "instruction": "Explain how to prepare ugali using kwanza, kisha, halafu and mwishowe. A partner repeats the steps in order."
+        }
+      ],
+      "phrases": [
+        {
+          "swahili": "Unapenda kula nini?",
+          "english": "What do you like eating?"
+        },
+        {
+          "swahili": "Ninapenda wali wa nazi.",
+          "english": "I like coconut rice."
+        },
+        {
+          "swahili": "Unajua kupika ugali?",
+          "english": "Do you know how to cook ugali?"
+        },
+        {
+          "swahili": "Tunahitaji unga wa mahindi na maji.",
+          "english": "We need maize flour and water."
+        },
+        {
+          "swahili": "Tia unga polepole.",
+          "english": "Add the flour slowly."
+        },
+        {
+          "swahili": "Koroga mpaka ugali uwe mgumu.",
+          "english": "Stir until the ugali is firm."
+        }
+      ],
+      "challenge": "Work in groups of three. One learner explains a short recipe, one repeats the steps, and the third checks the correct order. Rotate roles."
+    },
+    "referencePractice": {
+      "heading": "Mazoezi ya msamiati · Cooking phrases",
+      "instruction": "No song is linked for Day 3. Practise these short cooking phrases aloud before group practice.",
+      "phrases": [
+        {
+          "swahili": "Nina njaa sana.",
+          "english": "I am very hungry."
+        },
+        {
+          "swahili": "Napenda ugali na nyama.",
+          "english": "I like ugali and meat."
+        },
+        {
+          "swahili": "Tunahitaji unga wa mahindi na maji.",
+          "english": "We need maize flour and water."
+        },
+        {
+          "swahili": "Chakula hiki ni kitamu sana.",
+          "english": "This food is very delicious."
+        }
+      ]
+    },
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-3/audio-url",
+      "questions": [
+        {
+          "id": "listen-favorite",
+          "question": "Mzungumzaji A anapenda chakula gani?",
+          "choices": [
+            "Ugali",
+            "Chapati",
+            "Pilau",
+            "Wali wa nazi"
+          ]
+        },
+        {
+          "id": "listen-skill",
+          "question": "Mzungumzaji B anasema nini kuhusu kupika ugali?",
+          "choices": [
+            "Hajui kupika",
+            "Anajua kupika vizuri",
+            "Anataka kununua ugali",
+            "Anapika samaki"
+          ]
+        },
+        {
+          "id": "listen-ingredients",
+          "question": "Wanahitaji nini kupika ugali?",
+          "choices": [
+            "Mchele na tui la nazi",
+            "Unga wa mahindi na maji",
+            "Mayai na maziwa",
+            "Nyama na mafuta"
+          ]
+        },
+        {
+          "id": "listen-water",
+          "question": "Maji ya kupika ugali yanapaswa kuwa ya namna gani?",
+          "choices": [
+            "Baridi",
+            "Ya uvuguvugu",
+            "Ya moto",
+            "Ya chumvi"
+          ]
+        },
+        {
+          "id": "listen-process",
+          "question": "Baada ya kutia unga polepole, wanafanya nini?",
+          "choices": [
+            "Wanakoroga mpaka ugali uwe mgumu",
+            "Wanaongeza sukari",
+            "Wanakata nyama",
+            "Wanapika wali"
+          ]
         }
       ]
     }
