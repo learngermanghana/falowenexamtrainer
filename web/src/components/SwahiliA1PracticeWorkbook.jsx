@@ -81,7 +81,11 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
       <section className="swahili-book__card swahili-book__activity" role="tabpanel" tabIndex={-1}>
         {activeTab === "references" && <>
           <h2>Music · Muziki</h2>
-          {lesson.day === 10 ? <WorkbookDayMusic level="A1" day={lesson.day} program="swahili" compact /> : <p>No song is available for this chapter yet.</p>}
+          {lesson.day === 10 ? <WorkbookDayMusic level="A1" day={lesson.day} program="swahili" compact /> : lesson.referencePractice ? <div className="swahili-day2-practice">
+            <div className="swahili-day2-practice__header"><h3>{lesson.referencePractice.heading}</h3><p>{lesson.referencePractice.instruction}</p></div>
+            <div className="swahili-day2-practice__phrases">{lesson.referencePractice.phrases.map(item => <div key={item.swahili}><strong lang="sw">{item.swahili}</strong><span>{item.english}</span></div>)}</div>
+            <button type="button" className="swahili-book__button" onClick={() => selectTab("sprechen")}>Go to Group Practice</button>
+          </div> : <p>No song is available for this chapter yet.</p>}
         </>}
         {activeTab === "grammar" && <>
           <h2>Sarufi · {lesson.grammar}</h2>
@@ -115,7 +119,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
           <GrammarSelfCheck questionId={"swahili-grammar-" + lesson.day} item={lesson.check} />
         </>}
         {activeTab === "sprechen" && (lesson.groupPractice ? <div className="swahili-day2-practice">
-          <header className="swahili-day2-practice__header"><span className="swahili-day2-practice__eyebrow">TEIL 1 · GROUP PRACTICE</span><h2>Kuzungumza · Salamu na kujitambulisha</h2><p>Practise together. Change partners and swap roles after every conversation.</p></header>
+          <header className="swahili-day2-practice__header"><span className="swahili-day2-practice__eyebrow">TEIL 1 · GROUP PRACTICE</span><h2>{lesson.groupPractice.heading || "Kuzungumza · Salamu na kujitambulisha"}</h2><p>{lesson.groupPractice.intro || "Practise together. Change partners and swap roles after every conversation."}</p></header>
           <div className="swahili-day2-practice__steps" aria-label="Group practice stages">
             {lesson.groupPractice.stages.map((stage, index) => <article className="swahili-day2-practice__step" key={stage.title}>
               <span className="swahili-day2-practice__number">{index + 1}</span><div><h3>{stage.title}</h3><p>{stage.instruction}</p></div>
@@ -132,14 +136,14 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
           <p>Use the examples in Grammar to prepare your first exchange, then try again with different details.</p>
         </>)}
         {activeTab === "schreiben" && (lesson.writing.guide ? <div className="swahili-day2-practice">
-          <header className="swahili-day2-practice__header"><span className="swahili-day2-practice__eyebrow">TEIL 2 · SCHREIBEN</span><h2>Kuandika · Mazungumzo ya salamu</h2><p>{lesson.writing.prompt}</p></header>
+          <header className="swahili-day2-practice__header"><span className="swahili-day2-practice__eyebrow">TEIL 2 · SCHREIBEN</span><h2>{lesson.writing.guide.heading || "Kuandika · Mazungumzo ya salamu"}</h2><p>{lesson.writing.prompt}</p></header>
           <div className="swahili-day2-practice__writing-grid">
             <section className="swahili-day2-practice__task"><h3>Kazi yako · Your task</h3><ol>{lesson.writing.guide.steps.map(step => <li key={step}>{step}</li>)}</ol></section>
             <section className="swahili-day2-practice__task swahili-day2-practice__task--hint"><h3>Maneno muhimu · Phrase bank</h3><div className="swahili-day2-practice__hint-list">{lesson.writing.guide.phrases.map(phrase => <span key={phrase} lang="sw">{phrase}</span>)}</div><p>Use your own names and responses. These are hints, not a completed answer.</p></section>
           </div>
           <div className="swahili-day2-practice__editor"><div className="swahili-day2-practice__editor-heading"><label htmlFor={writingId}>Jibu lako · Your writing</label><span aria-live="polite">{writing.trim() ? writing.trim().split(/\s+/).length : 0} words</span></div>
             <textarea id={writingId} rows={9} placeholder={lesson.writing.guide.placeholder} value={writing} onChange={(event) => setWriting(event.target.value)} />
-            <p>Write at least four lines. Your response stays in your assignment draft until you submit it.</p>
+            <p>Write at least {lesson.writing.guide.minimumLines || 4} lines. Your response stays in your assignment draft until you submit it.</p>
           </div>
           <div className="swahili-day2-practice__footer"><span>Ready? Review your answer and the Lesen/Hören tasks before sending to your tutor.</span><button type="button" className="swahili-book__button" onClick={() => selectTab("submit")}>Review &amp; Submit</button></div>
         </div> : <>

@@ -971,8 +971,8 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "practiceOnly": false,
     "grammarSections": [
       {
-        "title": "Bidhaa zilizopo · Stock",
-        "rule": "Use Mna …? to ask what the shop has. The shopkeeper can answer with Tuna … or Hatuna ….",
+        "title": "Kuuliza bidhaa dukani · Asking what is in stock",
+        "rule": "Use Mna …? when asking a seller ‘Do you have …?’ Tuna … means ‘We have …’ and Hatuna … means ‘We do not have …’. Use Naomba …, tafadhali to request an item politely.",
         "examples": [
           {
             "swahili": "Mna madaftari makubwa?",
@@ -981,16 +981,32 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
           {
             "swahili": "Hatuna madaftari makubwa. Tuna madaftari madogo.",
             "english": "We don't have large notebooks. We have small notebooks."
+          },
+          {
+            "swahili": "Naomba daftari moja, tafadhali.",
+            "english": "One notebook, please."
           }
         ]
       },
       {
-        "title": "Hiki na hivi · This and these",
-        "rule": "A ki-class noun such as kitabu takes hiki. Its vi-class plural vitabu takes hivi. The number also agrees: kitabu kimoja, vitabu viwili.",
+        "title": "Ngeli ya Ki-/Vi- · Singular and plural agreement",
+        "rule": "Many nouns in the Ki-/Vi- class change ki- to vi- in the plural. The demonstratives and numbers agree: kitabu hiki / vitabu hivi, kitabu kimoja / vitabu viwili. Do not use vi- with unrelated nouns such as daftari or kalamu.",
         "examples": [
           {
-            "swahili": "Kitabu hiki ni bei gani?",
-            "english": "How much is this book?"
+            "swahili": "kitabu → vitabu",
+            "english": "book → books"
+          },
+          {
+            "swahili": "kiti → viti",
+            "english": "chair → chairs"
+          },
+          {
+            "swahili": "Kitabu hiki ni kizuri.",
+            "english": "This book is good."
+          },
+          {
+            "swahili": "Vitabu hivi ni vizuri.",
+            "english": "These books are good."
           },
           {
             "swahili": "Naomba vitabu viwili.",
@@ -999,20 +1015,46 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
         ]
       },
       {
-        "title": "Kulipa · Paying",
-        "rule": "Use Nitachukua … when you've chosen what to buy. Ask Naweza kulipa …? to check a payment method.",
+        "title": "Bei na kiasi · Prices and quantities",
+        "rule": "Ask ‘Bei gani?’ or ‘Ni shilingi ngapi?’ to find out the price. Use lita moja ya …, kilo moja ya … and nusu kilo ya … with suitable products. Jumla is the total.",
         "examples": [
           {
-            "swahili": "Nitachukua kalamu mbili.",
-            "english": "I'll take two pens."
+            "swahili": "Maziwa ni shilingi ngapi?",
+            "english": "How much is the milk?"
+          },
+          {
+            "swahili": "Naomba lita moja ya maziwa.",
+            "english": "I'd like one litre of milk."
+          },
+          {
+            "swahili": "Naomba nusu kilo ya sukari.",
+            "english": "I'd like half a kilogram of sugar."
+          },
+          {
+            "swahili": "Jumla ni shilingi elfu nne na mia tano.",
+            "english": "The total is 4,500 shillings."
+          }
+        ]
+      },
+      {
+        "title": "Kuchagua na kulipa · Choosing and paying",
+        "rule": "Nitachukua … means ‘I'll take …’. Naweza kulipa kwa …? asks if you can pay using a method. Say Risiti, tafadhali to ask for a receipt, and Asante / Karibu to thank and reply.",
+        "examples": [
+          {
+            "swahili": "Nitachukua daftari dogo na kalamu mbili.",
+            "english": "I'll take a small notebook and two pens."
           },
           {
             "swahili": "Naweza kulipa kwa simu?",
-            "english": "Can I pay by mobile phone?"
+            "english": "Can I pay by phone?"
           },
           {
-            "swahili": "Risiti, tafadhali.",
-            "english": "A receipt, please."
+            "swahili": "Naweza kulipa kwa pesa taslimu?",
+            "english": "Can I pay in cash?"
+          },
+          {
+            "swahili": "Risiti, tafadhali. — Karibu tena!",
+            "english": "A receipt, please. — Come again!"
           }
         ]
       }
@@ -1045,6 +1087,46 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       {
         "sw": "pesa taslimu",
         "en": "cash"
+      },
+      {
+        "sw": "muuzaji",
+        "en": "shopkeeper / seller"
+      },
+      {
+        "sw": "mteja",
+        "en": "customer"
+      },
+      {
+        "sw": "maziwa",
+        "en": "milk"
+      },
+      {
+        "sw": "mkate",
+        "en": "bread"
+      },
+      {
+        "sw": "sabuni",
+        "en": "soap"
+      },
+      {
+        "sw": "sukari",
+        "en": "sugar"
+      },
+      {
+        "sw": "bei",
+        "en": "price"
+      },
+      {
+        "sw": "jumla",
+        "en": "total"
+      },
+      {
+        "sw": "nusu kilo",
+        "en": "half a kilogram"
+      },
+      {
+        "sw": "kulipa",
+        "en": "to pay"
       }
     ],
     "check": {
@@ -1059,7 +1141,28 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "speaking": "Role-play buying school supplies. Ask for a large notebook, choose an alternative when it is out of stock, add two pens and ask how you can pay. Request a receipt.",
     "writing": {
-      "prompt": "Write a shop dialogue. Ask if large notebooks are in stock. Choose a small notebook and two pens. Ask to pay by phone and request a receipt."
+      "prompt": "Andika mazungumzo mafupi kati ya mteja na muuzaji dukani. Ask for a large notebook, accept a small notebook if unavailable, request two pens, ask the total, choose a payment method and request a receipt.",
+      "guide": {
+        "heading": "Kuandika · Ununuzi dukani",
+        "steps": [
+          "Greet the shopkeeper and ask about large notebooks.",
+          "Show that large notebooks are unavailable and offer a small notebook.",
+          "Ask for a small notebook and two pens, then ask the total price.",
+          "Ask to pay by phone or cash, request a receipt and say goodbye."
+        ],
+        "phrases": [
+          "Karibu dukani.",
+          "Mna madaftari makubwa?",
+          "Hatuna …",
+          "Naomba … tafadhali.",
+          "Nitachukua …",
+          "Jumla ni shilingi ngapi?",
+          "Naweza kulipa kwa simu?",
+          "Risiti, tafadhali."
+        ],
+        "placeholder": "Mteja: Hujambo! Mna madaftari makubwa?\\nMuuzaji: ...",
+        "minimumLines": 6
+      }
     },
     "reading": {
       "title": "Mazungumzo Dukani (Shopping Dialogue)",
@@ -1164,6 +1267,73 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
             "B) Shilingi elfu nne",
             "C) Shilingi elfu tatu"
           ]
+        }
+      ]
+    },
+    "groupPractice": {
+      "heading": "Kuzungumza · Mazungumzo dukani",
+      "intro": "Work in pairs and small groups. One learner is the shopkeeper and the other is the customer. Change roles after each round.",
+      "stages": [
+        {
+          "title": "Uliza bidhaa · Ask for items",
+          "instruction": "Customer: greet the seller and ask whether large notebooks are available. Seller: answer using Tuna… or Hatuna…."
+        },
+        {
+          "title": "Chagua bidhaa · Choose an alternative",
+          "instruction": "The large notebooks are sold out. Offer a small notebook and two pens. Ask their price and confirm the total."
+        },
+        {
+          "title": "Lipa na uage · Pay and say goodbye",
+          "instruction": "Ask whether payment by phone or cash is accepted, request a receipt, thank the seller and swap roles."
+        }
+      ],
+      "phrases": [
+        {
+          "swahili": "Shikamoo / Hujambo! — Karibu dukani.",
+          "english": "Greeting — Welcome to the shop."
+        },
+        {
+          "swahili": "Mna madaftari makubwa?",
+          "english": "Do you have large notebooks?"
+        },
+        {
+          "swahili": "Hatuna makubwa. Tuna madogo.",
+          "english": "We don't have large ones. We have small ones."
+        },
+        {
+          "swahili": "Nitachukua daftari dogo na kalamu mbili.",
+          "english": "I'll take a small notebook and two pens."
+        },
+        {
+          "swahili": "Jumla ni shilingi ngapi?",
+          "english": "How much is the total?"
+        },
+        {
+          "swahili": "Naweza kulipa kwa simu? Risiti, tafadhali.",
+          "english": "Can I pay by phone? A receipt, please."
+        }
+      ],
+      "challenge": "In groups of three, practise a 45-second shop conversation. The third learner checks for a greeting, a stock question, a polite request, a price question and a farewell. Rotate roles."
+    },
+    "referencePractice": {
+      "heading": "Mazoezi ya msamiati · Shopping language warm-up",
+      "instruction": "No Day 11 song has been linked yet. Practise these phrases aloud before starting the speaking and writing tasks.",
+      "phrases": [
+        {
+          "swahili": "Mna maziwa na mkate?",
+          "english": "Do you have milk and bread?"
+        },
+        {
+          "swahili": "Naomba lita moja ya maziwa.",
+          "english": "One litre of milk, please."
+        },
+        {
+          "swahili": "Jumla ni shilingi ngapi?",
+          "english": "What is the total?"
+        },
+        {
+          "swahili": "Asante sana! — Karibu tena!",
+          "english": "Thank you! — Come again!"
         }
       ]
     }
