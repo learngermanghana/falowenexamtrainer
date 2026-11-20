@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a1-day-19-b64_U28gc3ByZWNoZW4gd2lyIGF1ZiBEZXV0c2NoLm1wMw",
+  "objectKey": "music/a1/day-19/So sprechen wir auf Deutsch.mp3",
+  "level": "A1",
+  "day": 19,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nIch stehe vor meiner Prüfung.\nAuf dem Tisch liegt eine Karte.\nDas Wort auf der Karte: Brot.\nIch frage: Möchten Sie Brot?\n\n[Chorus]\nIch frage freundlich, du antwortest.\nBitte schön, ja, vielen Dank.\nSo sprechen wir auf Deutsch.\n\n[Verse 2]\nDann sehe ich eine Tasche.\nIch sage: Geben Sie mir die Tasche, bitte.\nMia gibt sie mir und lächelt.\nIch sage: Danke, das ist nett.\n\n[Chorus]\nIch frage freundlich, du antwortest.\nBitte schön, ja, vielen Dank.\nSo sprechen wir auf Deutsch.\n\n[Outro]\nIch kann fragen und antworten.\nJetzt bin ich wirklich bereit.\nMit Falowen frage ich ganz freundlich.",
+  "status": "review-only",
+  "recordingSha256": "8f3d3fee35865adc9baa21abbdf69733e52283b137c724443039d475e88fb635",
+  "audioBytes": 2620598,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 12.18,
+      "end": 14.44,
+      "text": "Ich stehe vor meiner Prüfung."
+    },
+    {
+      "start": 15.86,
+      "end": 17.76,
+      "text": "Auf dem Tisch liegt eine Karte."
+    },
+    {
+      "start": 17.78,
+      "end": 21.16,
+      "text": "Das Wort auf der Karte: Brot."
+    },
+    {
+      "start": 21.18,
+      "end": 25.64,
+      "text": "Ich frage: Möchten Sie Brot?"
+    },
+    {
+      "start": 25.9,
+      "end": 27.96,
+      "text": "Ich frage freundlich, du antwortest."
+    },
+    {
+      "start": 27.98,
+      "end": 29.56,
+      "text": "Bitte schön, ja, vielen Dank."
+    },
+    {
+      "start": 29.72,
+      "end": 31.36,
+      "text": "So sprechen wir auf Deutsch."
+    },
+    {
+      "start": 53.28,
+      "end": 55.48,
+      "text": "Dann sehe ich eine Tasche."
+    },
+    {
+      "start": 56.72,
+      "end": 60.42,
+      "text": "Ich sage: Geben Sie mir die Tasche, bitte."
+    },
+    {
+      "start": 60.98,
+      "end": 62.32,
+      "text": "Mia gibt sie mir und lächelt."
+    },
+    {
+      "start": 63.64,
+      "end": 65.62,
+      "text": "Ich sage: Danke, das ist nett."
+    },
+    {
+      "start": 67.02,
+      "end": 69.06,
+      "text": "Ich frage freundlich, du antwortest."
+    },
+    {
+      "start": 69.08,
+      "end": 70.42,
+      "text": "Bitte schön, ja, vielen Dank."
+    },
+    {
+      "start": 70.44,
+      "end": 72.54,
+      "text": "So sprechen wir auf Deutsch."
+    },
+    {
+      "start": 80.78,
+      "end": 83.46,
+      "text": "Ich kann fragen und antworten."
+    },
+    {
+      "start": 83.48,
+      "end": 86.54,
+      "text": "Jetzt bin ich wirklich bereit."
+    },
+    {
+      "start": 87.44,
+      "end": 91.9,
+      "text": "Mit Falowen frage ich ganz freundlich."
+    }
+  ],
+  "matchCoverage": 0.903,
+  "weakestLineCoverage": 0.5,
+  "totalLines": 17,
+  "duration": 110.72
+}

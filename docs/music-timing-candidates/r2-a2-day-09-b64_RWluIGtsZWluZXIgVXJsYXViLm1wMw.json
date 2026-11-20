@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a2-day-09-b64_RWluIGtsZWluZXIgVXJsYXViLm1wMw",
+  "objectKey": "music/a2/day-09/Ein kleiner Urlaub.mp3",
+  "level": "A2",
+  "day": 9,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nLetzten Sommer war ich am Meer.\nMeine Freundin war auch dabei.\nWir sind früh mit dem Zug gefahren.\nAm Abend haben wir den Strand gesehen.\n\n[Chorus]\nEin kleiner Urlaub, weit vom Alltag,\ndie Luft ist warm, das Wasser blau.\nDiese Tage bleiben in Erinnerung.\n\n[Verse 2]\nAm zweiten Tag hat es geregnet.\nWir sind deshalb ins Museum gegangen.\nDort haben wir viel Neues entdeckt.\nAm letzten Tag kam die Sonne zurück.\n\n[Chorus]\nEin kleiner Urlaub, weit vom Alltag,\ndie Luft ist warm, das Wasser blau.\nDiese Tage bleiben in Erinnerung.\n\n[Outro]\nWir haben viele Fotos gemacht.\nNächstes Jahr fahren wir wieder hin.\nMit Falowen kann ich von Reisen erzählen.",
+  "status": "needs-review",
+  "recordingSha256": "05c8fe7c2994af24056ace2ffd3eb840755ae0783ec5047c035ca11a63adba54",
+  "audioBytes": 2858609,
+  "reason": "Low acoustic match: total=84.6%, weakest line=0.0%",
+  "recognizedSnippet": " Letzten  Sommer  war  ich  am  Meer,  meine  Freundin  war  auch  dabei  Wir  sind  früh  mit  dem  Zug  gefahren,  am  Abend  haben  wir  den  Strand  gesehen  Ein  kleiner  Urlaub  weit  vom  Alltag  Die  Luft  ist  warm,  das  Wasser  blau  Diese  Tage  bleiben  in  der  Ende  rum  Wir  sind  deshalb  ins  Museum  gegangen,  dort  haben  wir  viel  Neues  entdeckt,  am  letzten  Tag  kam  die  Sonne  zurück,  ein  kleiner  Urlaub  weit  vom  Alter,"
+}

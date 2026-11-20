@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a2-day-06-b64_RWluIFBsYXR6IGbDvHIgZGljaC5tcDM",
+  "objectKey": "music/a2/day-06/Ein Platz für dich.mp3",
+  "level": "A2",
+  "day": 6,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nMeine Schwester bekommt ein neues Zimmer.\nWir tragen den Tisch ins Haus.\nDas Bett steht neben dem Fenster.\nDie Lampe kommt auf den Schreibtisch.\n\n[Chorus]\nEin Platz für dich, ein Platz für mich,\nein helles Zimmer wird gemütlich.\nMit kleinen Dingen fühlt es sich gut an.\n\n[Verse 2]\nDer Schrank passt nicht an die Wand.\nAlso stellen wir ihn neben die Tür.\nDann hängen wir ein Bild auf.\nMeine Schwester sagt: Jetzt ist es schön.\n\n[Chorus]\nEin Platz für dich, ein Platz für mich,\nein helles Zimmer wird gemütlich.\nMit kleinen Dingen fühlt es sich gut an.\n\n[Outro]\nWir sitzen noch eine Weile zusammen.\nDas neue Zimmer ist endlich fertig.\nBei Falowen beschreibe ich mein neues Zimmer.",
+  "status": "review-only",
+  "recordingSha256": "3e79bf2a323d2706813c9a6cbfc312fc0076bc61fc7ad8ef6b080212a69a3375",
+  "audioBytes": 2848270,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 10.88,
+      "end": 15.06,
+      "text": "Meine Schwester bekommt ein neues Zimmer."
+    },
+    {
+      "start": 15.5,
+      "end": 19.22,
+      "text": "Wir tragen den Tisch ins Haus."
+    },
+    {
+      "start": 20.18,
+      "end": 24.94,
+      "text": "Das Bett steht neben dem Fenster."
+    },
+    {
+      "start": 24.96,
+      "end": 30.74,
+      "text": "Die Lampe kommt auf den Schreibtisch."
+    },
+    {
+      "start": 30.76,
+      "end": 35.22,
+      "text": "Ein Platz für dich, ein Platz für mich,"
+    },
+    {
+      "start": 35.3,
+      "end": 40.96,
+      "text": "ein helles Zimmer wird gemütlich."
+    },
+    {
+      "start": 40.98,
+      "end": 48.3,
+      "text": "Mit kleinen Dingen fühlt es sich gut an."
+    },
+    {
+      "start": 51.16,
+      "end": 53.9,
+      "text": "Der Schrank passt nicht an die Wand."
+    },
+    {
+      "start": 53.92,
+      "end": 56.62,
+      "text": "Also stellen wir ihn neben die Tür."
+    },
+    {
+      "start": 57.2,
+      "end": 59.5,
+      "text": "Dann hängen wir ein Bild auf."
+    },
+    {
+      "start": 59.6,
+      "end": 62.68,
+      "text": "Meine Schwester sagt: Jetzt ist es schön."
+    },
+    {
+      "start": 62.7,
+      "end": 67.2,
+      "text": "Ein Platz für dich, ein Platz für mich,"
+    },
+    {
+      "start": 67.88,
+      "end": 73.02,
+      "text": "ein helles Zimmer wird gemütlich."
+    },
+    {
+      "start": 73.04,
+      "end": 80.28,
+      "text": "Mit kleinen Dingen fühlt es sich gut an."
+    },
+    {
+      "start": 82.58,
+      "end": 88.26,
+      "text": "Wir sitzen noch eine Weile zusammen."
+    },
+    {
+      "start": 88.62,
+      "end": 93.7,
+      "text": "Das neue Zimmer ist endlich fertig."
+    },
+    {
+      "start": 93.72,
+      "end": 101.48,
+      "text": "Bei Falowen beschreibe ich mein neues Zimmer."
+    }
+  ],
+  "matchCoverage": 0.964,
+  "weakestLineCoverage": 0.833,
+  "totalLines": 17,
+  "duration": 128.08
+}

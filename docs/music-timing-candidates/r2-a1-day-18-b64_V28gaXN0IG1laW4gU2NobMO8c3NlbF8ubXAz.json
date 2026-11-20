@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-18-b64_V28gaXN0IG1laW4gU2NobMO8c3NlbF8ubXAz",
+  "objectKey": "music/a1/day-18/Wo ist mein Schlüssel_.mp3",
+  "level": "A1",
+  "day": 18,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nIch suche meinen Schlüssel.\nEr liegt nicht auf dem Tisch.\nMia fragt: Ist er in der Tasche?\nIch sehe in die Tasche.\n\n[Chorus]\nAuf dem Tisch, in der Tasche.\nUnter dem Stuhl, neben mir.\nWo ist er? Jetzt sehe ich ihn!\n\n[Verse 2]\nMein Schlüssel liegt unter dem Buch.\nIch nehme ihn in die Hand.\nDann gehe ich mit Mia\nzum Bäcker um die Ecke.\n\n[Chorus]\nAuf dem Tisch, in der Tasche.\nUnter dem Stuhl, neben mir.\nWo ist er? Jetzt sehe ich ihn!\n\n[Outro]\nJetzt habe ich meinen Schlüssel.\nUnd wir sind schon unterwegs.\nBei Falowen weiß ich, wo es liegt.",
+  "status": "needs-review",
+  "recordingSha256": "78f01a9df35bb0ea09b8218a730ab190ede2f4c91ed7d7cf163611ffa516b54e",
+  "audioBytes": 3456615,
+  "reason": "Low acoustic match: total=23.7%, weakest line=0.0%",
+  "recognizedSnippet": " Ich  möchte  heute  einkaufen  gehen,  doch  wo  ist  nur  mein  Schlüssel?  Ich  suche  ihn  im  ganzen  Haus,  ich  kann  ihn  leider  nicht  sehen.  Ich  schaue  auf  den  Tisch,  dort  liegt  nun  mein  Handy.  Ich  suche  in  meiner  Tasche,  doch  mein  Schlüssel  ist  nicht  da.  Vielleicht  liegt  er  auf  dem  Sofa,  vielleicht  liegt  er  unter  dem  Bett  Ich  schaue  neben  die  Lampe,  doch  dort  finde  ich  ihn  nicht  Wo  ist  mein"
+}

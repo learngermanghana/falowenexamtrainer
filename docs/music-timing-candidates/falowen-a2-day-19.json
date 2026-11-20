@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a2-day-19-b64_RGllIHJpY2h0aWdlIFdhaGwubXAz",
+  "objectKey": "music/a2/day-19/Die richtige Wahl.mp3",
+  "level": "A2",
+  "day": 19,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nMia braucht neue Schuhe für den Winter.\nOnline findet sie ein günstiges Paar.\nDoch sie kennt ihre Größe nicht genau.\nDarum gehen wir zuerst in ein Geschäft.\n\n[Chorus]\nWo kaufen wir am besten ein?\nWir schauen, fragen, vergleichen.\nDann treffen wir die richtige Wahl.\n\n[Verse 2]\nIm Geschäft probiert Mia zwei Paare.\nDas zweite sitzt viel bequemer.\nDer Preis ist auch in Ordnung.\nMia kauft es gleich und ist zufrieden.\n\n[Chorus]\nWo kaufen wir am besten ein?\nWir schauen, fragen, vergleichen.\nDann treffen wir die richtige Wahl.\n\n[Outro]\nZu Hause stellt sie die Schuhe ins Regal.\nJetzt kann der Winter kommen.\nMit Falowen kann ich Preise vergleichen.",
+  "status": "review-only",
+  "recordingSha256": "9c5badbfac95596b45dcadeecd9be7d58d8e341239dc9098cc73b2b1a710e332",
+  "audioBytes": 2925599,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 10.4,
+      "end": 14.3,
+      "text": "Mia braucht neue Schuhe für den Winter."
+    },
+    {
+      "start": 14.32,
+      "end": 20.16,
+      "text": "Online findet sie ein günstiges Paar."
+    },
+    {
+      "start": 20.18,
+      "end": 23.58,
+      "text": "Doch sie kennt ihre Größe nicht genau."
+    },
+    {
+      "start": 23.6,
+      "end": 27.52,
+      "text": "Darum gehen wir zuerst in ein Geschäft."
+    },
+    {
+      "start": 27.54,
+      "end": 34.22,
+      "text": "Wo kaufen wir am besten ein?"
+    },
+    {
+      "start": 34.5,
+      "end": 38.26,
+      "text": "Wir schauen, fragen, vergleichen."
+    },
+    {
+      "start": 38.28,
+      "end": 45.52,
+      "text": "Dann treffen wir die richtige Wahl."
+    },
+    {
+      "start": 53.64,
+      "end": 59.26,
+      "text": "Im Geschäft probiert Mia zwei Paare."
+    },
+    {
+      "start": 59.28,
+      "end": 63.82,
+      "text": "Das zweite sitzt viel bequemer."
+    },
+    {
+      "start": 64.32,
+      "end": 66.82,
+      "text": "Der Preis ist auch in Ordnung."
+    },
+    {
+      "start": 67.58,
+      "end": 73.34,
+      "text": "Mia kauft es gleich und ist zufrieden."
+    },
+    {
+      "start": 73.36,
+      "end": 79.0,
+      "text": "Wo kaufen wir am besten ein?"
+    },
+    {
+      "start": 79.36,
+      "end": 83.18,
+      "text": "Wir schauen, fragen, vergleichen."
+    },
+    {
+      "start": 84.1,
+      "end": 90.22,
+      "text": "Dann treffen wir die richtige Wahl."
+    },
+    {
+      "start": 94.74,
+      "end": 97.68,
+      "text": "Zu Hause stellt sie die Schuhe ins Regal."
+    },
+    {
+      "start": 97.7,
+      "end": 101.36,
+      "text": "Jetzt kann der Winter kommen."
+    },
+    {
+      "start": 101.38,
+      "end": 108.08,
+      "text": "Mit Falowen kann ich Preise vergleichen."
+    }
+  ],
+  "matchCoverage": 0.941,
+  "weakestLineCoverage": 0.75,
+  "totalLines": 17,
+  "duration": 127.2
+}

@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-12-b64_WmVpdCB1bmQgRGF0dW0ubXAz",
+  "objectKey": "music/a1/day-12/Zeit und Datum.mp3",
+  "level": "A1",
+  "day": 12,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nMein Handy zeigt sechzehn Uhr.\nIch habe heute einen Termin.\nMia fragt: Wann treffen wir uns?\nIch sage: Um achtzehn Uhr.\n\n[Chorus]\nUm achtzehn Uhr, am dritten Mai.\nIch schreibe Zeit und Datum auf.\nDann bin ich pünktlich da.\n\n[Verse 2]\nMia schreibt den Tag ins Handy.\nHeute ist der dritte Mai.\nSie sagt: Bis um achtzehn Uhr!\nIch sage: Ja, bis dann.\n\n[Chorus]\nUm achtzehn Uhr, am dritten Mai.\nIch schreibe Zeit und Datum auf.\nDann bin ich pünktlich da.\n\n[Outro]\nAm Abend treffen wir uns.\nDer Termin klappt genau.\nMit Falowen bin ich pünktlich da.",
+  "status": "needs-review",
+  "recordingSha256": "444c0f306de7b261124e3446c5a30c32ca6effc3a67334691623aa8727ff3e73",
+  "audioBytes": 4501459,
+  "reason": "Low acoustic match: total=32.6%, weakest line=0.0%",
+  "recognizedSnippet": " Mein  Handy  zeigt  14  Uhr  Ich  schau  in  den  Kalender  Heute  habe  ich  einen  Termin  Um  16  Uhr  treffe  ich  Freunde  Um  8  Uhr  beginnt  mein  Deutschkurs,  um  12  Uhr  machen  wir  Pause  Um  18  Uhr  bin  ich  wieder  frei,  um  22  Uhr  gehe  ich  schlafen  Ich  schreibe  Datum  und  Uhrzeit  auf,  dann  vergesse  ich  keinen  Termin  Welcher  Tag,  um  wie  viel  Uhr,  ich  schaue  in  den  Kalender  Januar,  Februar,"
+}

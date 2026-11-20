@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-b1-day-27-b64_Vm9yIHVuc2VyZXIgVMO8ci5tcDM",
+  "objectKey": "music/b1/day-27/Vor unserer Tür.mp3",
+  "level": "B1",
+  "day": 27,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nVor unserem Haus liegt oft viel Müll.\nManche Nachbarn ärgern sich darüber,\ndoch lange hat niemand etwas gemacht,\nweil alle nur auf andere gewartet haben.\n\n[Chorus]\nDie Umwelt beginnt vor unserer Tür,\nmit kleinen Schritten jeden Tag.\nGemeinsam können wir etwas verändern.\n\n[Verse 2]\nWir laden die Nachbarn zum Aufräumen ein.\nAm Samstag kommen mehr Menschen als erwartet.\nWir trennen den Müll und pflanzen Blumen,\ndamit unsere Straße wieder schöner wird.\n\n[Chorus]\nDie Umwelt beginnt vor unserer Tür,\nmit kleinen Schritten jeden Tag.\nGemeinsam können wir etwas verändern.\n\n[Outro]\nAm Abend sitzen wir zusammen im Hof.\nAus einer Idee ist etwas Gutes geworden.\nMit Falowen kann ich gemeinsam Veränderungen anstoßen.",
+  "status": "review-only",
+  "recordingSha256": "9813abe4cc3918693e7756137169fc12a1178bb7cac6afcc35c792e583a820c8",
+  "audioBytes": 3622830,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 19.32,
+      "end": 23.02,
+      "text": "Vor unserem Haus liegt oft viel Müll."
+    },
+    {
+      "start": 23.04,
+      "end": 26.92,
+      "text": "Manche Nachbarn ärgern sich darüber,"
+    },
+    {
+      "start": 29.74,
+      "end": 31.82,
+      "text": "doch lange hat niemand etwas gemacht,"
+    },
+    {
+      "start": 32.02,
+      "end": 36.62,
+      "text": "weil alle nur auf andere gewartet haben."
+    },
+    {
+      "start": 37.68,
+      "end": 41.64,
+      "text": "Die Umwelt beginnt vor unserer Tür,"
+    },
+    {
+      "start": 41.86,
+      "end": 46.7,
+      "text": "mit kleinen Schritten jeden Tag."
+    },
+    {
+      "start": 47.28,
+      "end": 51.3,
+      "text": "Gemeinsam können wir etwas verändern."
+    },
+    {
+      "start": 56.64,
+      "end": 60.84,
+      "text": "Wir laden die Nachbarn zum Aufräumen ein."
+    },
+    {
+      "start": 61.64,
+      "end": 65.96,
+      "text": "Am Samstag kommen mehr Menschen als erwartet."
+    },
+    {
+      "start": 66.64,
+      "end": 71.04,
+      "text": "Wir trennen den Müll und pflanzen Blumen,"
+    },
+    {
+      "start": 71.54,
+      "end": 75.48,
+      "text": "damit unsere Straße wieder schöner wird."
+    },
+    {
+      "start": 76.44,
+      "end": 80.32,
+      "text": "Die Umwelt beginnt vor unserer Tür,"
+    },
+    {
+      "start": 80.34,
+      "end": 85.3,
+      "text": "mit kleinen Schritten jeden Tag."
+    },
+    {
+      "start": 85.32,
+      "end": 90.34,
+      "text": "Gemeinsam können wir etwas verändern."
+    },
+    {
+      "start": 115.0,
+      "end": 119.34,
+      "text": "Am Abend sitzen wir zusammen im Hof."
+    },
+    {
+      "start": 119.36,
+      "end": 124.3,
+      "text": "Aus einer Idee ist etwas Gutes geworden."
+    },
+    {
+      "start": 124.32,
+      "end": 131.36,
+      "text": "Mit Falowen kann ich gemeinsam Veränderungen anstoßen."
+    }
+  ],
+  "matchCoverage": 0.943,
+  "weakestLineCoverage": 0.667,
+  "totalLines": 17,
+  "duration": 156.0
+}

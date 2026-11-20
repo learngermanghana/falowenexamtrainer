@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-07-b64_V2FzIGtvc3RldCBkYXNfLm1wMw",
+  "objectKey": "music/a1/day-07/Was kostet das_.mp3",
+  "level": "A1",
+  "day": 7,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nAuf dem Markt sehe ich Äpfel.\nIch frage: Was kostet das?\nDer Mann sagt: Zwei Euro.\nIch sage: Das ist gut.\n\n[Chorus]\nWie viel kostet das?\nIch möchte bitte zwei Stück.\nDanke schön und auf Wiedersehen.\n\n[Verse 2]\nMia möchte rote Blumen.\nSie fragt: Haben Sie Rosen?\nDie Frau sagt: Ja, hier bitte.\nMia sagt: Die mag ich gern.\n\n[Chorus]\nWie viel kostet das?\nIch möchte bitte zwei Stück.\nDanke schön und auf Wiedersehen.\n\n[Outro]\nWir tragen unsere Taschen heim.\nUnd trinken zu Hause Tee.\nBei Falowen frage ich nach Preisen.",
+  "status": "needs-review",
+  "recordingSha256": "d48555c85dfd6e4397bc3c6031901ccab1b0c910e10fa891ef66884825336221",
+  "audioBytes": 3492407,
+  "reason": "Low acoustic match: total=57.0%, weakest line=0.0%",
+  "recognizedSnippet": " Heute  gehe  ich  auf  den  Markt,  ich  sehe  Äpfel,  Rot  und  Grün  Ich  frage  freundlich,  was  kostet  das?  Der  Verkäufer  sagt  zwei  Euro  Ich  nenne  mir  zwei,  sie  sehen  gut  aus  Ich  kaufe  noch  ein  Stück  Bro  Ich  sage  danke  schönen  Tag  Und  gehe  weiter  durch  den  Markt  Hier  gibt  es  Obst,  hier  gibt  es  Bro  Die  Gumm  sind  Geld,  die  Äpfel  rot,  ich  sehe  viel,  ich  frage  nach  Und"
+}

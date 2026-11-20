@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a2-day-04-b64_RGVyIG5ldWUgVHJlZmZwdW5rdC5tcDM",
+  "objectKey": "music/a2/day-04/Der neue Treffpunkt.mp3",
+  "level": "A2",
+  "day": 4,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nMia und ich wollen uns treffen.\nAm Nachmittag habe ich endlich Zeit.\nIch schlage das Café am Markt vor.\nMia sagt: Dort ist es oft zu laut.\n\n[Chorus]\nWo möchten wir uns treffen?\nVielleicht im Park, vielleicht am See.\nWir finden einen Ort für uns.\n\n[Verse 2]\nSie schlägt die kleine Bibliothek vor.\nDort gibt es einen ruhigen Garten.\nWir treffen uns um fünf am Eingang.\nIch bringe Tee in einer Flasche mit.\n\n[Chorus]\nWo möchten wir uns treffen?\nVielleicht im Park, vielleicht am See.\nWir finden einen Ort für uns.\n\n[Outro]\nWir sitzen draußen und reden lange.\nDer neue Treffpunkt gefällt uns beiden.\nBei Falowen lerne ich, Treffen zu planen.",
+  "status": "review-only",
+  "recordingSha256": "0f1e43ba271293d175066a093b0d135a2802ecf148f6371c5e7b54f61346e3b5",
+  "audioBytes": 4336858,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 15.6,
+      "end": 18.28,
+      "text": "Mia und ich wollen uns treffen."
+    },
+    {
+      "start": 18.3,
+      "end": 25.74,
+      "text": "Am Nachmittag habe ich endlich Zeit."
+    },
+    {
+      "start": 28.58,
+      "end": 33.16,
+      "text": "Ich schlage das Café am Markt vor."
+    },
+    {
+      "start": 36.82,
+      "end": 39.96,
+      "text": "Mia sagt: Dort ist es oft zu laut."
+    },
+    {
+      "start": 40.62,
+      "end": 43.38,
+      "text": "Wo möchten wir uns treffen?"
+    },
+    {
+      "start": 43.4,
+      "end": 48.88,
+      "text": "Vielleicht im Park, vielleicht am See."
+    },
+    {
+      "start": 49.26,
+      "end": 54.46,
+      "text": "Wir finden einen Ort für uns."
+    },
+    {
+      "start": 56.92,
+      "end": 61.72,
+      "text": "Sie schlägt die kleine Bibliothek vor."
+    },
+    {
+      "start": 62.5,
+      "end": 68.7,
+      "text": "Dort gibt es einen ruhigen Garten."
+    },
+    {
+      "start": 71.26,
+      "end": 75.72,
+      "text": "Wir treffen uns um fünf am Eingang."
+    },
+    {
+      "start": 75.74,
+      "end": 82.58,
+      "text": "Ich bringe Tee in einer Flasche mit."
+    },
+    {
+      "start": 82.6,
+      "end": 86.32,
+      "text": "Wo möchten wir uns treffen?"
+    },
+    {
+      "start": 86.34,
+      "end": 91.7,
+      "text": "Vielleicht im Park, vielleicht am See."
+    },
+    {
+      "start": 91.72,
+      "end": 97.24,
+      "text": "Wir finden einen Ort für uns."
+    },
+    {
+      "start": 111.44,
+      "end": 116.48,
+      "text": "Wir sitzen draußen und reden lange."
+    },
+    {
+      "start": 116.5,
+      "end": 120.24,
+      "text": "Der neue Treffpunkt gefällt uns beiden."
+    },
+    {
+      "start": 120.26,
+      "end": 126.36,
+      "text": "Bei Falowen lerne ich, Treffen zu planen."
+    }
+  ],
+  "matchCoverage": 0.943,
+  "weakestLineCoverage": 0.75,
+  "totalLines": 17,
+  "duration": 178.72
+}

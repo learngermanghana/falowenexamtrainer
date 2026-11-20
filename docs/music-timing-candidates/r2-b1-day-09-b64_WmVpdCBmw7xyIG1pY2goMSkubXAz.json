@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-b1-day-09-b64_WmVpdCBmw7xyIG1pY2goMSkubXAz",
+  "objectKey": "music/b1/day-09/Zeit für mich(1).mp3",
+  "level": "B1",
+  "day": 9,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nAm Morgen beginnt mein Postfach zu klingeln.\nSchon vor acht kommen neue Aufgaben.\nIch arbeite gern mit meinem Team,\ndoch abends bin ich oft zu erschöpft.\n\n[Chorus]\nEs gibt Zeit für Arbeit und Zeit für mich,\nfür Menschen, die mir wichtig sind.\nIch muss nicht alles heute schaffen.\n\n[Verse 2]\nIch spreche offen mit meiner Chefin.\nWir planen die Aufgaben besser zusammen.\nJetzt schalte ich nach Feierabend ab,\nauch wenn noch Nachrichten auf mich warten.\n\n[Chorus]\nEs gibt Zeit für Arbeit und Zeit für mich,\nfür Menschen, die mir wichtig sind.\nIch muss nicht alles heute schaffen.\n\n[Outro]\nHeute esse ich mit meiner Familie.\nZum ersten Mal seit Tagen bin ich wirklich da.\nMit Falowen sage ich klar, was ich brauche.",
+  "status": "review-only",
+  "recordingSha256": "130bc7dbb9a1516b1e29b29f2ef96bee6006f3b1b3d826e86b89cffb59a1a959",
+  "audioBytes": 2574698,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 13.72,
+      "end": 17.52,
+      "text": "Am Morgen beginnt mein Postfach zu klingeln."
+    },
+    {
+      "start": 17.54,
+      "end": 21.72,
+      "text": "Schon vor acht kommen neue Aufgaben."
+    },
+    {
+      "start": 21.74,
+      "end": 24.62,
+      "text": "Ich arbeite gern mit meinem Team,"
+    },
+    {
+      "start": 24.64,
+      "end": 27.86,
+      "text": "doch abends bin ich oft zu erschöpft."
+    },
+    {
+      "start": 27.88,
+      "end": 31.16,
+      "text": "Es gibt Zeit für Arbeit und Zeit für mich,"
+    },
+    {
+      "start": 31.48,
+      "end": 34.64,
+      "text": "für Menschen, die mir wichtig sind."
+    },
+    {
+      "start": 34.66,
+      "end": 37.16,
+      "text": "Ich muss nicht alles heute schaffen."
+    },
+    {
+      "start": 43.4,
+      "end": 47.04,
+      "text": "Ich spreche offen mit meiner Chefin."
+    },
+    {
+      "start": 47.06,
+      "end": 50.62,
+      "text": "Wir planen die Aufgaben besser zusammen."
+    },
+    {
+      "start": 50.64,
+      "end": 53.94,
+      "text": "Jetzt schalte ich nach Feierabend ab,"
+    },
+    {
+      "start": 53.96,
+      "end": 57.02,
+      "text": "auch wenn noch Nachrichten auf mich warten."
+    },
+    {
+      "start": 57.04,
+      "end": 60.36,
+      "text": "Es gibt Zeit für Arbeit und Zeit für mich,"
+    },
+    {
+      "start": 60.38,
+      "end": 64.24,
+      "text": "für Menschen, die mir wichtig sind."
+    },
+    {
+      "start": 64.26,
+      "end": 66.62,
+      "text": "Ich muss nicht alles heute schaffen."
+    },
+    {
+      "start": 72.34,
+      "end": 75.6,
+      "text": "Heute esse ich mit meiner Familie."
+    },
+    {
+      "start": 75.62,
+      "end": 80.26,
+      "text": "Zum ersten Mal seit Tagen bin ich wirklich da."
+    },
+    {
+      "start": 80.28,
+      "end": 87.16,
+      "text": "Mit Falowen sage ich klar, was ich brauche."
+    }
+  ],
+  "matchCoverage": 0.957,
+  "weakestLineCoverage": 0.833,
+  "totalLines": 17,
+  "duration": 106.4
+}

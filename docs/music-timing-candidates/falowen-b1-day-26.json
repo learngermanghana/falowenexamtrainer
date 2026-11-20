@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-b1-day-26-b64_UmljaHRpZyBmcmFnZW4ubXAz",
+  "objectKey": "music/b1/day-26/Richtig fragen.mp3",
+  "level": "B1",
+  "day": 26,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nWir wollen heute nach Hamburg reisen.\nAm Bahnhof steht plötzlich eine große Anzeige.\nUnser Zug fällt wegen einer Störung aus,\nund Mia wird langsam richtig nervös.\n\n[Chorus]\nEin Plan kann sich ganz schnell ändern,\ndoch eine Lösung gibt es oft.\nWir bleiben ruhig und fragen nach.\n\n[Verse 2]\nEin Mitarbeiter erklärt uns die Alternativen.\nWir nehmen einen anderen Zug über Hannover.\nObwohl wir eine Stunde später ankommen,\nschaffen wir noch den Termin am Abend.\n\n[Chorus]\nEin Plan kann sich ganz schnell ändern,\ndoch eine Lösung gibt es oft.\nWir bleiben ruhig und fragen nach.\n\n[Outro]\nMia lacht, als wir endlich aussteigen.\nAus dem Problem wurde eine kleine Geschichte.\nBei Falowen lerne ich, ruhig nach Lösungen zu fragen.",
+  "status": "review-only",
+  "recordingSha256": "1b779f5b0769002f3c584f9a8490c14cbbac400a2a7a08a82d166b43dd5bd572",
+  "audioBytes": 2789506,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 10.6,
+      "end": 13.8,
+      "text": "Wir wollen heute nach Hamburg reisen."
+    },
+    {
+      "start": 13.82,
+      "end": 19.44,
+      "text": "Am Bahnhof steht plötzlich eine große Anzeige."
+    },
+    {
+      "start": 20.36,
+      "end": 24.06,
+      "text": "Unser Zug fällt wegen einer Störung aus,"
+    },
+    {
+      "start": 24.08,
+      "end": 29.22,
+      "text": "und Mia wird langsam richtig nervös."
+    },
+    {
+      "start": 31.24,
+      "end": 34.82,
+      "text": "Ein Plan kann sich ganz schnell ändern,"
+    },
+    {
+      "start": 34.84,
+      "end": 39.88,
+      "text": "doch eine Lösung gibt es oft."
+    },
+    {
+      "start": 39.9,
+      "end": 41.72,
+      "text": "Wir bleiben ruhig und fragen nach."
+    },
+    {
+      "start": 51.62,
+      "end": 55.82,
+      "text": "Ein Mitarbeiter erklärt uns die Alternativen."
+    },
+    {
+      "start": 55.84,
+      "end": 60.9,
+      "text": "Wir nehmen einen anderen Zug über Hannover."
+    },
+    {
+      "start": 60.92,
+      "end": 66.24,
+      "text": "Obwohl wir eine Stunde später ankommen,"
+    },
+    {
+      "start": 67.12,
+      "end": 71.94,
+      "text": "schaffen wir noch den Termin am Abend."
+    },
+    {
+      "start": 73.4,
+      "end": 76.98,
+      "text": "Ein Plan kann sich ganz schnell ändern,"
+    },
+    {
+      "start": 77.0,
+      "end": 81.98,
+      "text": "doch eine Lösung gibt es oft."
+    },
+    {
+      "start": 82.0,
+      "end": 83.74,
+      "text": "Wir bleiben ruhig und fragen nach."
+    },
+    {
+      "start": 94.74,
+      "end": 98.62,
+      "text": "Mia lacht, als wir endlich aussteigen."
+    },
+    {
+      "start": 99.0,
+      "end": 103.58,
+      "text": "Aus dem Problem wurde eine kleine Geschichte."
+    },
+    {
+      "start": 106.46,
+      "end": 111.28,
+      "text": "Bei Falowen lerne ich, ruhig nach Lösungen zu fragen."
+    }
+  ],
+  "matchCoverage": 0.911,
+  "weakestLineCoverage": 0.5,
+  "totalLines": 17,
+  "duration": 121.04
+}

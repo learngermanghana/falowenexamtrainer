@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-02-b64_SWNoIGhlacOfZSBCaW5hLm1wMw",
+  "objectKey": "music/a1/day-02/Ich heiße Bina.mp3",
+  "level": "A1",
+  "day": 2,
+  "source": "approved",
+  "lyrics": "[Intro]\nHmm, hmm, hmm …\nOh-oh, yeah …\nHmm, hmm, hmm …\n\n[Verse 1]\nHeute rufe ich die Schule an,\nIch möchte einen Deutschkurs machen.\nDie Frau sagt freundlich: „Guten Tag!\nWie heißen Sie? Sagen Sie es mir.“\n\nIch sage: „Hallo, ich heiße Bina,\nIch komme aus Ghana, das ist mein Land.“\nSie fragt: „Wie schreibt man Ihren Namen?“\nIch buchstabiere langsam dann.\n\n[Chorus]\nIch heiße Bina, B – I – N – A!\nOh-oh, das ist mein Name, ja!\nB – I – N – A, hmm, hmm, hmm,\nSo schreibt man meinen Namen!\n\nWie heißt du? Sag es mir!\nIch heiße Bina, und wie heißt du?\nOh-oh, hmm, hmm, hmm,\nJetzt kennst du meinen Namen!\n\n[Verse 2]\nDie Frau fragt: „Wo wohnen Sie?“\nIch sage: „In Accra, hier bin ich.“\nSie sagt: „Bitte noch einmal Ihren Namen!“\nIch sage langsam: „B – I – N – A.“\n\nSie schreibt meinen Namen auf,\nUnd sagt: „Danke, alles klar!\nIhr Deutschkurs beginnt am Montag.“\nIch freue mich, ich bin bald da!\n\n[Chorus]\nIch heiße Bina, B – I – N – A!\nOh-oh, das ist mein Name, ja!\nB – I – N – A, hmm, hmm, hmm,\nSo schreibt man meinen Namen!\n\nWie heißt du? Sag es mir!\nIch heiße Bina, und wie heißt du?\nOh-oh, hmm, hmm, hmm,\nJetzt kennst du meinen Namen!\n\n[Outro]\nHmm, hmm, hmm …\nIch heiße Bina, B – I – N – A.\nOh-oh, und wie heißt du?\nHmm, hmm, hmm …",
+  "status": "needs-review",
+  "recordingSha256": "bff8440f79a18941381e371c2cfdacac4ce0fbbde7aad84c52d0ca8df40740ff",
+  "audioBytes": 3892679,
+  "reason": "Low acoustic match: total=78.1%, weakest line=0.0%",
+  "recognizedSnippet": " Heute  rufe  ich  die  Schule  an,  ich  möchte  einen  Deutschkurs  machen.  Die  Frau  sagt  freundlich  guten  Tag  Wie  heißen  Sie,  sagen  Sie  es  mir  Ich  sage  Hallo,  ich  heiße  Bina  Ich  komme  aus  Ghana,  das  ist  mein  Land  Sie  fragt  wie  schreibt  man  Ihren  Namen  Ich  buche  tabiere  langsam,  dann  ich  heiße  Bina,  B -I -N -A  Oh,  oh,  das  ist  mein  Name,  ja  B -I -N -A  Mhm,  so"
+}

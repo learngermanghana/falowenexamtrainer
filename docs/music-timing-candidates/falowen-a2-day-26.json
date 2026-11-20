@@ -1,0 +1,103 @@
+{
+  "trackId": "r2-a2-day-26-b64_V2llIGljaCBtaWNoIGbDvGhsZS5tcDM",
+  "objectKey": "music/a2/day-26/Wie ich mich fühle.mp3",
+  "level": "A2",
+  "day": 26,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nMorgen habe ich eine wichtige Prüfung.\nHeute bin ich ziemlich nervös.\nMein Freund merkt das sofort.\nEr fragt: Was macht dir Sorgen?\n\n[Chorus]\nManchmal bin ich froh, manchmal traurig,\nmanchmal habe ich ein bisschen Angst.\nIch darf sagen, wie ich mich fühle.\n\n[Verse 2]\nWir sprechen lange über meine Gedanken.\nEr erzählt von seiner letzten Prüfung.\nDanach fühle ich mich ruhiger.\nIch weiß: Ich habe viel gelernt.\n\n[Chorus]\nManchmal bin ich froh, manchmal traurig,\nmanchmal habe ich ein bisschen Angst.\nIch darf sagen, wie ich mich fühle.\n\n[Outro]\nAm Morgen gehe ich mit neuem Mut los.\nEgal was kommt, ich versuche es.\nBei Falowen kann ich sagen, wie ich mich fühle.",
+  "status": "review-only",
+  "recordingSha256": "cb9cfd6efa476263df2f6f1eac50751990ef3659a7438a163dcd6f3f963c679d",
+  "audioBytes": 2854222,
+  "alignmentThreshold": "standard",
+  "cues": [
+    {
+      "start": 0,
+      "end": 4.64,
+      "text": "Morgen habe ich eine wichtige Prüfung."
+    },
+    {
+      "start": 7.78,
+      "end": 11.38,
+      "text": "Heute bin ich ziemlich nervös."
+    },
+    {
+      "start": 13.56,
+      "end": 18.04,
+      "text": "Mein Freund merkt das sofort."
+    },
+    {
+      "start": 18.88,
+      "end": 22.16,
+      "text": "Er fragt: Was macht dir Sorgen?"
+    },
+    {
+      "start": 25.28,
+      "end": 29.2,
+      "text": "Manchmal bin ich froh, manchmal traurig,"
+    },
+    {
+      "start": 29.22,
+      "end": 36.52,
+      "text": "manchmal habe ich ein bisschen Angst."
+    },
+    {
+      "start": 38.14,
+      "end": 43.34,
+      "text": "Ich darf sagen, wie ich mich fühle."
+    },
+    {
+      "start": 43.36,
+      "end": 50.16,
+      "text": "Wir sprechen lange über meine Gedanken."
+    },
+    {
+      "start": 50.18,
+      "end": 54.16,
+      "text": "Er erzählt von seiner letzten Prüfung."
+    },
+    {
+      "start": 54.18,
+      "end": 57.62,
+      "text": "Danach fühle ich mich ruhiger."
+    },
+    {
+      "start": 57.64,
+      "end": 60.78,
+      "text": "Ich weiß: Ich habe viel gelernt."
+    },
+    {
+      "start": 60.8,
+      "end": 65.38,
+      "text": "Manchmal bin ich froh, manchmal traurig,"
+    },
+    {
+      "start": 68.24,
+      "end": 72.0,
+      "text": "manchmal habe ich ein bisschen Angst."
+    },
+    {
+      "start": 72.02,
+      "end": 79.4,
+      "text": "Ich darf sagen, wie ich mich fühle."
+    },
+    {
+      "start": 98.0,
+      "end": 100.28,
+      "text": "Am Morgen gehe ich mit neuem Mut los."
+    },
+    {
+      "start": 100.3,
+      "end": 107.76,
+      "text": "Egal was kommt, ich versuche es."
+    },
+    {
+      "start": 107.78,
+      "end": 115.14,
+      "text": "Bei Falowen kann ich sagen, wie ich mich fühle."
+    }
+  ],
+  "matchCoverage": 0.953,
+  "weakestLineCoverage": 0.625,
+  "totalLines": 17,
+  "duration": 133.36
+}

@@ -1,0 +1,13 @@
+{
+  "trackId": "r2-a1-day-01-b64_R3V0ZW4gTW9yZ2VuLCBndXRlbiBUYWcubXAz",
+  "objectKey": "music/a1/day-01/Guten Morgen, guten Tag.mp3",
+  "level": "A1",
+  "day": 1,
+  "source": "draft-review-only",
+  "lyrics": "[Verse 1]\nIch sehe Mia vor dem Haus.\nSie winkt und ruft: Hallo!\nIch sage: Guten Morgen, Mia!\nSie fragt mich: Wie geht es dir?\n\n[Chorus]\nHallo, hallo, wie geht es dir?\nMir geht es gut, danke dir!\nUnd wie geht es heute dir?\n\n[Verse 2]\nMein Freund Ben kommt auch dazu.\nEr sagt: Mir geht es nicht gut.\nWir fragen: Brauchst du Hilfe?\nEr sagt: Ein bisschen Ruhe.\n\n[Chorus]\nHallo, hallo, wie geht es dir?\nMir geht es gut, danke dir!\nUnd wie geht es heute dir?\n\n[Outro]\nWir sagen: Gute Besserung!\nBis morgen, macht es gut!\nBei Falowen sage ich freundlich Hallo.",
+  "status": "needs-review",
+  "recordingSha256": "0b537675c837321da3490f314d6298a96af3fb2f99ab3678edf3377a2d104dc6",
+  "audioBytes": 3687707,
+  "reason": "Low acoustic match: total=49.5%, weakest line=0.0%",
+  "recognizedSnippet": " Am  Morgen  gehe  ich  aus  dem  Haus,  ich  sehe  mir  vor  der  Tür  Sie  sagt  hallo,  guten  Morgen,  frag  mich  wie  geht  es  dir  Ich  sage  Danke,  mir  geht's  gut  Und  wie  geht  es  dir  heute?  Sie  sagt  mir  geht  es  auch  sehr  gut  Wir  lachen  und  gehen  weiter  Guten  Morgen,  guten  Tag  Wie  geht  es  dir?  Wie  war  dein  Tag?  Mir  geht  es  gut  Und  wie  geht's  dir?  Schön"
+}
