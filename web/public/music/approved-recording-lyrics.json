@@ -3227,6 +3227,199 @@
       "recordingSha256": "e85d34c0127fce862f9c982f9fe50eac87d1251537a7da60f2090f7fe77e6200",
       "source": "Owner-selected full recording lyrics; offline acoustic alignment. Line timings pending listening review.",
       "timingStatus": "estimated"
+    },
+    {
+      "trackId": "r2-b1-day-20-b64_VHJhdW1iZXJ1Zi5tcDM",
+      "assignmentKey": "B1-6.20",
+      "objectKey": "music/b1/day-20/Traumberuf.mp3",
+      "title": "Mein Traumberuf",
+      "lyrics": "[Verse 1]\nMein Bruder hat einen Traum,\ner möchte Krankenpfleger sein.\nEr arbeitet gern mit Menschen,\nund hilft den Kranken gern.\nEr möchte vieles lernen,\ndie Zukunft liegt vor ihm.\nOh, oh, ein neuer Anfang,\nsein großer Traum beginnt.\n[Chorus]\nOh, oh, mein Traumberuf,\noh, oh, ich gebe nicht auf.\nIch lerne für die Zukunft,\nund glaube fest daran.\nOh, oh, mein Traumberuf,\noh, oh, die Zeit ist da.\nMit Mut und neuen Ideen,\nwird mein großer Traum bald wahr.\n[Verse 2]\nMein Bruder sucht die Ausbildung,\ner fragt, was er dafür braucht.\nEr schreibt die Bewerbung,\nund schickt die Unterlagen raus.\nEr wartet auf die Antwort,\nund hofft auf einen Platz.\nOh, oh, die Zukunft ruft,\nsein Traum wird langsam wahr.\n[Chorus]\nOh, oh, mein Traumberuf,\noh, oh, ich gebe nicht auf.\nIch lerne für die Zukunft,\nund glaube fest daran.\nOh, oh, mein Traumberuf,\noh, oh, die Zeit ist da.\nMit Mut und neuen Ideen,\nwird mein großer Traum bald wahr.\n[Outro]\nOh, oh, mein Traumberuf,\ndie Zukunft wartet schon.\nMit Falowen lerne ich,\nüber meinen Beruf zu sprechen.",
+      "cues": [
+        {
+          "start": 11.2,
+          "end": 13.0,
+          "text": "Mein Bruder hat einen Traum,"
+        },
+        {
+          "start": 13.36,
+          "end": 16.0,
+          "text": "er möchte Krankenpfleger sein."
+        },
+        {
+          "start": 16.44,
+          "end": 19.36,
+          "text": "Er arbeitet gern mit Menschen,"
+        },
+        {
+          "start": 19.36,
+          "end": 21.79,
+          "text": "und hilft den Kranken gern."
+        },
+        {
+          "start": 22.19,
+          "end": 24.95,
+          "text": "Er möchte vieles lernen,"
+        },
+        {
+          "start": 25.39,
+          "end": 28.49,
+          "text": "die Zukunft liegt vor ihm."
+        },
+        {
+          "start": 29.0,
+          "end": 31.52,
+          "text": "Oh, oh, ein neuer Anfang,"
+        },
+        {
+          "start": 31.81,
+          "end": 35.0,
+          "text": "sein großer Traum beginnt."
+        },
+        {
+          "start": 35.19,
+          "end": 37.71,
+          "text": "Oh, oh, mein Traumberuf,"
+        },
+        {
+          "start": 38.01,
+          "end": 41.04,
+          "text": "oh, oh, ich gebe nicht auf."
+        },
+        {
+          "start": 41.49,
+          "end": 44.65,
+          "text": "Ich lerne für die Zukunft,"
+        },
+        {
+          "start": 44.65,
+          "end": 47.38,
+          "text": "und glaube fest daran."
+        },
+        {
+          "start": 48.0,
+          "end": 51.44,
+          "text": "Oh, oh, mein Traumberuf,"
+        },
+        {
+          "start": 51.83,
+          "end": 54.98,
+          "text": "oh, oh, die Zeit ist da."
+        },
+        {
+          "start": 55.19,
+          "end": 57.08,
+          "text": "Mit Mut und neuen Ideen,"
+        },
+        {
+          "start": 57.08,
+          "end": 60.04,
+          "text": "wird mein großer Traum bald wahr."
+        },
+        {
+          "start": 60.36,
+          "end": 63.41,
+          "text": "Mein Bruder sucht die Ausbildung,"
+        },
+        {
+          "start": 63.73,
+          "end": 66.57,
+          "text": "er fragt, was er dafür braucht."
+        },
+        {
+          "start": 67.0,
+          "end": 69.51,
+          "text": "Er schreibt die Bewerbung,"
+        },
+        {
+          "start": 69.51,
+          "end": 72.59,
+          "text": "und schickt die Unterlagen raus."
+        },
+        {
+          "start": 73.19,
+          "end": 75.93,
+          "text": "Er wartet auf die Antwort,"
+        },
+        {
+          "start": 75.93,
+          "end": 78.86,
+          "text": "und hofft auf einen Platz."
+        },
+        {
+          "start": 79.3,
+          "end": 81.82,
+          "text": "Oh, oh, die Zukunft ruft,"
+        },
+        {
+          "start": 82.1,
+          "end": 85.46,
+          "text": "sein Traum wird langsam wahr."
+        },
+        {
+          "start": 86.19,
+          "end": 88.72,
+          "text": "Oh, oh, mein Traumberuf,"
+        },
+        {
+          "start": 89.03,
+          "end": 92.06,
+          "text": "oh, oh, ich gebe nicht auf."
+        },
+        {
+          "start": 92.52,
+          "end": 95.73,
+          "text": "Ich lerne für die Zukunft,"
+        },
+        {
+          "start": 95.73,
+          "end": 98.47,
+          "text": "und glaube fest daran."
+        },
+        {
+          "start": 98.92,
+          "end": 101.65,
+          "text": "Oh, oh, mein Traumberuf,"
+        },
+        {
+          "start": 101.95,
+          "end": 104.38,
+          "text": "oh, oh, die Zeit ist da."
+        },
+        {
+          "start": 105.19,
+          "end": 107.33,
+          "text": "Mit Mut und neuen Ideen,"
+        },
+        {
+          "start": 107.33,
+          "end": 110.64,
+          "text": "wird mein großer Traum bald wahr."
+        },
+        {
+          "start": 111.01,
+          "end": 113.2,
+          "text": "Oh, oh, mein Traumberuf,"
+        },
+        {
+          "start": 113.92,
+          "end": 116.49,
+          "text": "die Zukunft wartet schon."
+        },
+        {
+          "start": 117.19,
+          "end": 119.65,
+          "text": "Mit Falowen lerne ich,"
+        },
+        {
+          "start": 119.65,
+          "end": 123.0,
+          "text": "über meinen Beruf zu sprechen."
+        }
+      ],
+      "duration": 133.224,
+      "recordingSha256": "d7f0e2bb93a32253bcf9a8e43e8fe7054af11b64ac53b45460493fe2f468012e",
+      "source": "Owner-selected full recording lyrics; offline acoustic alignment. Line timings pending listening review.",
+      "timingStatus": "estimated"
     }
   ]
 }

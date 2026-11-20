@@ -55,7 +55,7 @@ test('all course timing drafts validate without promoting automatic transcripts 
  }
 });
 
-test('the complete current library has timing coverage: 68 course recordings plus two class songs',()=>{
+test('the complete current library has timing coverage: 69 course recordings plus two class songs',()=>{
  const manifest=require('../web/public/music/timing-coverage.json');
  const known=[...require('../web/public/music/timings.json').recordings,
   ...require('../web/public/music/approved-recording-lyrics.json').recordings,
@@ -65,7 +65,7 @@ test('the complete current library has timing coverage: 68 course recordings plu
   require('../web/public/music/b1-day-12-detour-timing.json')];
  const drafts=require('../web/public/music/studio-drafts.json').tracks;
  const classes=require('../web/public/music/class-timings.json').recordings;
- assert.equal(manifest.courseRecordings.length,68);
+ assert.equal(manifest.courseRecordings.length,69);
  for(const track of manifest.courseRecordings){
   const pack=known.find(p=>p.objectKey===track.objectKey && validateCues(p.cues,p.lyrics).length)
     || drafts.find(p=>p.recordingObjectKey===track.objectKey && validateCues(p.cues,p.lyrics).length);
