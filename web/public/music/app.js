@@ -769,12 +769,14 @@ function checkAnswers() {
 function renderBehindTheSong(track) {
   const swahili = track.musicLanguage === "swahili";
   const story = swahili && !editorialStories?.byObjectKey?.[track.objectKey] ? {
-    storyDe: "Wimbo huu unakutambulisha kwa familia ya Jason.",
-    storyEn: "The song introduces Jason’s family through questions about names, jobs and interests.",
-    focusDe: "Huyu ni nani? Anaitwa nani?",
-    focusEn: "Who is this? What is their name?",
+    storyDe: "Sikiliza wimbo, kisha usome maneno yake.",
+    storyEn: "Listen to the song, then read its lyrics.",
+    focusDe: "Chagua mstari mmoja na ueleze maana yake.",
+    focusEn: "Choose one line and explain what it means.",
   } : songStoryForTrack(track,editorialStories);
   byId("story-language-heading").textContent = swahili ? "Kuhusu wimbo" : "Die Idee hinter dem Song";
+  byId("story-focus-heading").textContent = swahili ? "Utakachojifunza" : "Das lernst du";
+  byId("story-language-heading").lang = byId("story-focus-heading").lang = swahili ? "sw" : "de";
   byId("story-de").lang = byId("story-focus-de").lang = swahili ? "sw" : "de";
   byId("story-de").textContent=story.storyDe;
   byId("story-en").textContent=story.storyEn;

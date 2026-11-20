@@ -45,3 +45,19 @@ test("German appears before English, and the story stays outside the existing li
   assert.match(app,/song-stories\.json/);
   assert.match(app,/\.textContent=story\.storyDe/);
 });
+
+test("every Swahili slide recording has a matching bilingual story and English for each sung line", async () => {
+  const {withEnglishTranslation} = await import("../server/musicLyrics.cjs");
+  const tracks = JSON.parse(readFileSync(new URL("../web/public/music/swahili-catalog.json", import.meta.url))).tracks;
+  const recordings = JSON.parse(readFileSync(new URL("../web/public/music/approved-recording-lyrics.json", import.meta.url))).recordings;
+  for (const track of tracks) {
+    const recording = recordings.find(item => item.objectKey === track.objectKey);
+    const pack = withEnglishTranslation(recording);
+    const story = songStoryForTrack(track, stories);
+    assert.equal(story.curated, true, track.title);
+    assert.deepEqual(pack.story, {sw:story.storyDe, en:story.storyEn, focusSw:story.focusDe, focusEn:story.focusEn});
+    const lines = pack.lyrics.split(/\r?\n/).map(line => line.trim()).filter(line => line && !/^\[.*\]$/.test(line));
+    assert.deepEqual(pack.englishTranslation?.lines.map(row => row.de), lines, track.title);
+    assert.ok(pack.englishTranslation.lines.every(row => row.en.trim() && row.en !== row.de));
+  }
+});

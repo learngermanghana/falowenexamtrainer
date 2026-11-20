@@ -3,6 +3,396 @@
   "description": "Editor-authored English for exact recording keys and matching German lines. Course-draft translations are separately bound to draft identity and remain explicitly unverified against the audio.",
   "recordings": [
     {
+      "objectKey": "swahili/music/A1/day-10/Leo Tunaenda Sokoni.mp3",
+      "lines": [
+        {
+          "de": "Leo tunaenda wapi?",
+          "en": "Where are we going today?"
+        },
+        {
+          "de": "Sokoni, sokoni!",
+          "en": "To the market, to the market!"
+        },
+        {
+          "de": "Leo tunaenda sokoni,",
+          "en": "Today we’re going to the market."
+        },
+        {
+          "de": "Karibuni, twende pamoja!",
+          "en": "Come along, everyone, let’s go together!"
+        },
+        {
+          "de": "Habari gani? Nzuri, asante!",
+          "en": "How’s it going? Fine, thank you!"
+        },
+        {
+          "de": "Habari yako? Njema sana, asante!",
+          "en": "How are you? Very well, thank you!"
+        },
+        {
+          "de": "Karibu mteja wangu, nikusaidie nini?",
+          "en": "Welcome! How can I help you?"
+        },
+        {
+          "de": "Asante muuzaji, nataka vitu vingi.",
+          "en": "Thank you. I’d like quite a few things."
+        },
+        {
+          "de": "Naomba embe moja,",
+          "en": "I’d like one mango,"
+        },
+        {
+          "de": "Machungwa matatu,",
+          "en": "three oranges,"
+        },
+        {
+          "de": "Mayai manne, mapapai mawili,",
+          "en": "four eggs, two papayas,"
+        },
+        {
+          "de": "Nanasi moja, maboga mawili.",
+          "en": "one pineapple and two pumpkins."
+        },
+        {
+          "de": "Naomba jembe moja,",
+          "en": "I’d like one hoe"
+        },
+        {
+          "de": "Na magunia mawili.",
+          "en": "and two sacks."
+        },
+        {
+          "de": "Sokoni, sokoni, leo tunanunua,",
+          "en": "At the market, at the market, we’re shopping today."
+        },
+        {
+          "de": "Sokoni, sokoni, vitu vingi tunanunua.",
+          "en": "At the market, at the market, we buy all sorts of things."
+        },
+        {
+          "de": "Muuzaji anauza, mnunuzi ananunua,",
+          "en": "The seller sells, the customer buys."
+        },
+        {
+          "de": "Sokoni, sokoni, leo tunafurahia!",
+          "en": "At the market, at the market, we’re having fun today!"
+        },
+        {
+          "de": "Sokoni, sokoni, leo tunafurahia!",
+          "en": "At the market, at the market, we’re having fun today!"
+        },
+        {
+          "de": "Muuzaji, muuzaji, jumla ni shilingi ngapi?",
+          "en": "Excuse me, how many shillings is that altogether?"
+        },
+        {
+          "de": "Jumla ni shilingi elfu nne tu.",
+          "en": "It’s just four thousand shillings altogether."
+        },
+        {
+          "de": "He, ni ghali sana, tafadhali punguza bei!",
+          "en": "Oh, that’s very expensive! Could you lower the price, please?"
+        },
+        {
+          "de": "Sawa mteja wangu, lipa shilingi elfu tatu.",
+          "en": "All right, you can pay three thousand shillings."
+        },
+        {
+          "de": "Sokoni, sokoni, leo tunanunua,",
+          "en": "At the market, at the market, we’re shopping today."
+        },
+        {
+          "de": "Sokoni, sokoni, vitu vingi tunanunua.",
+          "en": "At the market, at the market, we buy all sorts of things."
+        },
+        {
+          "de": "Muuzaji anauza, mnunuzi ananunua,",
+          "en": "The seller sells, the customer buys."
+        },
+        {
+          "de": "Sokoni, sokoni, leo tunafurahia!",
+          "en": "At the market, at the market, we’re having fun today!"
+        },
+        {
+          "de": "Sawa, asante sana, hizi hapa fedha zako.",
+          "en": "All right, thank you very much. Here’s your money."
+        },
+        {
+          "de": "Asante mteja wangu, karibu tena siku nyingine.",
+          "en": "Thank you for shopping here. Come back another day!"
+        },
+        {
+          "de": "Haya, asante, tutaonana tena.",
+          "en": "All right, thanks. See you again."
+        },
+        {
+          "de": "Kwaheri, kwaheri, tutaonana sokoni.",
+          "en": "Goodbye, goodbye! See you at the market."
+        }
+      ]
+    },
+    {
+      "objectKey": "swahili/music/B1/day-28/Mazingira Huanza Na Mimi.mp3",
+      "lines": [
+        {
+          "de": "Mazingira, mazingira,",
+          "en": "The environment, the environment,"
+        },
+        {
+          "de": "Yanahitaji upendo wetu.",
+          "en": "it needs our love."
+        },
+        {
+          "de": "Hatua ndogo kila siku,",
+          "en": "Small steps every day"
+        },
+        {
+          "de": "Zinaleta mabadiliko.",
+          "en": "make a difference."
+        },
+        {
+          "de": "Nikienda kununua bidhaa,",
+          "en": "When I go shopping,"
+        },
+        {
+          "de": "Nabeba mfuko wa kitambaa.",
+          "en": "I take a cloth bag."
+        },
+        {
+          "de": "Badala ya plastiki mpya,",
+          "en": "Instead of using new plastic bags,"
+        },
+        {
+          "de": "Nautumia tena na tena.",
+          "en": "I use it again and again."
+        },
+        {
+          "de": "Ninabeba chupa yangu,",
+          "en": "I carry my own bottle."
+        },
+        {
+          "de": "Ninaijaza maji kila siku.",
+          "en": "I fill it with water every day."
+        },
+        {
+          "de": "Bila kutupa chupa nyingi,",
+          "en": "By throwing away fewer bottles,"
+        },
+        {
+          "de": "Ninaweka mazingira safi.",
+          "en": "I keep my surroundings clean."
+        },
+        {
+          "de": "Mazingira huanza na mimi,",
+          "en": "Caring for the environment starts with me."
+        },
+        {
+          "de": "Mazingira huanza na wewe.",
+          "en": "Caring for the environment starts with you."
+        },
+        {
+          "de": "Kwa hatua ndogo kila siku,",
+          "en": "With small steps every day,"
+        },
+        {
+          "de": "Tunaweza kuleta mabadiliko.",
+          "en": "we can make a difference."
+        },
+        {
+          "de": "Okoa maji, okoa umeme,",
+          "en": "Save water, save electricity."
+        },
+        {
+          "de": "Punguza taka, panda mti.",
+          "en": "Cut down on waste, plant a tree."
+        },
+        {
+          "de": "Tukifanya kazi pamoja,",
+          "en": "If we work together,"
+        },
+        {
+          "de": "Dunia yetu itakuwa safi.",
+          "en": "our world will be clean."
+        },
+        {
+          "de": "Nikipiga mswaki asubuhi,",
+          "en": "When I brush my teeth in the morning,"
+        },
+        {
+          "de": "Ninafunga bomba la maji.",
+          "en": "I turn off the tap."
+        },
+        {
+          "de": "Ninaoga kwa muda mfupi,",
+          "en": "I take short showers"
+        },
+        {
+          "de": "Ili niokoe maji zaidi.",
+          "en": "to save more water."
+        },
+        {
+          "de": "Nikiondoka katika chumba,",
+          "en": "When I leave a room,"
+        },
+        {
+          "de": "Ninazima taa na vifaa.",
+          "en": "I turn off the lights and appliances."
+        },
+        {
+          "de": "Kwa kutumia umeme vizuri,",
+          "en": "By using electricity wisely,"
+        },
+        {
+          "de": "Ninalinda mazingira yetu.",
+          "en": "I protect our environment."
+        },
+        {
+          "de": "Mazingira huanza na mimi,",
+          "en": "Caring for the environment starts with me."
+        },
+        {
+          "de": "Mazingira huanza na wewe.",
+          "en": "Caring for the environment starts with you."
+        },
+        {
+          "de": "Kwa hatua ndogo kila siku,",
+          "en": "With small steps every day,"
+        },
+        {
+          "de": "Tunaweza kuleta mabadiliko.",
+          "en": "we can make a difference."
+        },
+        {
+          "de": "Okoa maji, okoa umeme,",
+          "en": "Save water, save electricity."
+        },
+        {
+          "de": "Punguza taka, panda mti.",
+          "en": "Cut down on waste, plant a tree."
+        },
+        {
+          "de": "Tukifanya kazi pamoja,",
+          "en": "If we work together,"
+        },
+        {
+          "de": "Dunia yetu itakuwa safi.",
+          "en": "our world will be clean."
+        },
+        {
+          "de": "Kwa safari iliyo fupi,",
+          "en": "For a short journey,"
+        },
+        {
+          "de": "Ninatembea kwa miguu.",
+          "en": "I go on foot."
+        },
+        {
+          "de": "Badala ya kutumia gari,",
+          "en": "Instead of taking the car,"
+        },
+        {
+          "de": "Ninaendesha baiskeli yangu.",
+          "en": "I ride my bike."
+        },
+        {
+          "de": "Ninatenganisha taka nyumbani,",
+          "en": "I sort my waste at home:"
+        },
+        {
+          "de": "Karatasi, chupa na plastiki.",
+          "en": "paper, bottles and plastic."
+        },
+        {
+          "de": "Vitu vingine natumia tena,",
+          "en": "Some things I use again"
+        },
+        {
+          "de": "Ili nipunguze taka nyingi.",
+          "en": "so I throw less away."
+        },
+        {
+          "de": "Si lazima tufanye yote,",
+          "en": "We don’t have to do everything"
+        },
+        {
+          "de": "Kwa siku moja, hapana.",
+          "en": "in a single day, no."
+        },
+        {
+          "de": "Anza na jambo moja rahisi,",
+          "en": "Start with one simple thing,"
+        },
+        {
+          "de": "Kisha endelea kila siku.",
+          "en": "then keep it up every day."
+        },
+        {
+          "de": "Mimi, wewe na majirani,",
+          "en": "You, me and our neighbours,"
+        },
+        {
+          "de": "Tukishirikiana pamoja,",
+          "en": "if we all work together,"
+        },
+        {
+          "de": "Tutaisafisha dunia yetu,",
+          "en": "we’ll clean up our world"
+        },
+        {
+          "de": "Kwa ajili ya maisha yajayo.",
+          "en": "for the sake of future generations."
+        },
+        {
+          "de": "Mazingira huanza na mimi,",
+          "en": "Caring for the environment starts with me."
+        },
+        {
+          "de": "Mazingira huanza na wewe.",
+          "en": "Caring for the environment starts with you."
+        },
+        {
+          "de": "Kwa hatua ndogo kila siku,",
+          "en": "With small steps every day,"
+        },
+        {
+          "de": "Tunaweza kuleta mabadiliko.",
+          "en": "we can make a difference."
+        },
+        {
+          "de": "Okoa maji, okoa umeme,",
+          "en": "Save water, save electricity."
+        },
+        {
+          "de": "Punguza taka, panda mti.",
+          "en": "Cut down on waste, plant a tree."
+        },
+        {
+          "de": "Tukifanya kazi pamoja,",
+          "en": "If we work together,"
+        },
+        {
+          "de": "Dunia yetu itakuwa safi.",
+          "en": "our world will be clean."
+        },
+        {
+          "de": "Hatua ndogo, moyo mkubwa,",
+          "en": "Small steps, a big heart:"
+        },
+        {
+          "de": "Mabadiliko yanawezekana.",
+          "en": "change is possible."
+        },
+        {
+          "de": "Mazingira huanza nyumbani,",
+          "en": "Caring for the environment starts at home."
+        },
+        {
+          "de": "Mazingira huanza na mimi.",
+          "en": "Caring for the environment starts with me."
+        }
+      ]
+    },
+    {
       "objectKey": "swahili/music/A1/day-06/Chakula Kizuri Mgahawani.mp3",
       "lines": [
         {
