@@ -1,4 +1,4 @@
-import { SWAHILI_A1_PRACTICE_UNITS } from "../web/src/data/swahili/a1PracticeUnits";
+import { SWAHILI_A1_PRACTICE_UNITS } from "../data/swahili/a1PracticeUnits";
 
 test("Day 2 reading and listening are five selectable questions each, with no answer key in learner lesson", () => {
   const day = SWAHILI_A1_PRACTICE_UNITS[2];
