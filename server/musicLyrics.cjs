@@ -11,6 +11,7 @@ const b1InterviewTiming = require('../web/public/music/b1-day-19-interview-timin
 const screenBreakTiming = require('../web/public/music/b1-day-10-screen-break-timing.json');
 const detourTiming = require('../web/public/music/b1-day-12-detour-timing.json');
 const estimatedTimings = { recordings:[...acousticTimings.recordings,day4NumberTiming,b1InterviewTiming,screenBreakTiming,detourTiming] };
+const songStories = require('../web/public/music/song-stories.json');
 const englishRegistry = require('../web/public/music/english-translations.json');
 const englishTranslations = {...englishRegistry,transcripts:[...(englishRegistry.transcripts || []),
   day4NumberTiming.englishTranslation],drafts:[...(englishRegistry.drafts || []),b1InterviewTiming.englishTranslation,screenBreakTiming.englishTranslation,detourTiming.englishTranslation]};
@@ -97,6 +98,8 @@ function withEnglishTranslation(pack, translations=englishTranslations) {
   const match=candidates.find(row=>row.objectKey===pack.objectKey &&
     Array.isArray(row.lines) && lines.length>0 && row.lines.length===lines.length &&
     row.lines.every((line,i)=>line.de===lines[i] && typeof line.en==='string' && line.en.trim()));
+  const story = isSwahiliMusicKey(pack.objectKey) && songStories.byObjectKey[pack.objectKey];
+  if (story) pack = {...pack, story: {sw:story.storyDe, en:story.storyEn, focusSw:story.focusDe, focusEn:story.focusEn}};
   return match ? {...pack,englishTranslation:{source:match.source||'recording',lines:match.lines}} : pack;
 }
 async function readBounded(response) {

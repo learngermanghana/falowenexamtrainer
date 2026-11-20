@@ -15,6 +15,8 @@ GitHub Actions can run a bounded CPU-only scan for candidate reports. Do not cop
 
 `timingStatus=estimated` is not the same as manually verified audio. Follow-lyrics highlighting and English text must continue to label estimates/drafts clearly.
 
+Swahili recordings use the same exact-line English registry. Their bilingual stories and learning prompts live in `song-stories.json`; the lyrics API includes the matching Swahili story for the teaching slides.
+
 ## Student experience
 - A1 English toggle defaults on when a matching published translation exists; A2/B1 defaults off. German remains primary.
 - Translation does not invoke a paid model during playback.

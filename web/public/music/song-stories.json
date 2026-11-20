@@ -2,6 +2,24 @@
   "version": 1,
   "description": "Bilingual editorial descriptions of song scenarios and learning focus; no unsupported personal songwriter claims.",
   "byObjectKey": {
+    "swahili/music/A1/day-06/Chakula Kizuri Mgahawani.mp3": {
+      "storyDe": "Mgeni anapofika mgahawani, anaomba orodha ya vyakula. Anachagua wali na kuku pamoja na juisi ya embe. Baada ya kula, anaomba bili. Ni shilingi elfu tano.",
+      "storyEn": "A guest arrives at a restaurant and asks for the menu. They order rice and chicken with mango juice. After the meal, they ask for the bill. It comes to five thousand shillings.",
+      "focusDe": "Tumia “Naomba…” kuagiza chakula na vinywaji. Uliza bei kwa kusema “Jumla ni shilingi ngapi?”",
+      "focusEn": "Use “Naomba…” to order food and drinks politely. Ask for the total with “Jumla ni shilingi ngapi?”"
+    },
+    "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3": {
+      "storyDe": "Jason anakukaribisha nyumbani kwao. Baba yake Daniel ni mhandisi anayependa kusoma vitabu. Mama yake Maria ni mhadhiri anayependa kupika. Baada ya kukutambulisha kwa kaka na dada yake, Jason anakuuliza kuhusu familia yako.",
+      "storyEn": "Jason welcomes you into his home. His father Daniel is an engineer who loves to read. His mother Maria is a lecturer who enjoys cooking. After introducing his brother and sister, Jason asks about your family.",
+      "focusDe": "Uliza “Anaitwa nani?” na “Anapenda kufanya nini?” Kisha mtambulishe mtu wa familia yako.",
+      "focusEn": "Ask “What’s their name?” and “What do they like doing?” Then introduce someone from your own family."
+    },
+    "swahili/music/B1/day-28/Mazingira Huanza Na Mimi.mp3": {
+      "storyDe": "Mwimbaji anaanza na vitu viwili vya kawaida: mfuko wa kitambaa na chupa anayojaza tena. Nyumbani, anafunga bomba anapopiga mswaki. Kwa safari fupi, anatembea au anaendesha baiskeli. Mwishoni, anawaalika majirani washirikiane naye.",
+      "storyEn": "The singer starts with two everyday items: a cloth shopping bag and a refillable bottle. At home, they turn off the tap while brushing their teeth. For short trips, they walk or cycle. By the end, they invite their neighbours to join in.",
+      "focusDe": "Eleza tabia yako kwa kutumia “niki-”, kama katika “Nikipiga mswaki, ninafunga bomba.” Pendekeza jambo moja ambalo familia yako inaweza kufanya.",
+      "focusEn": "Use “niki-” to connect a situation with a habit: “When I brush my teeth, I turn off the tap.” Suggest one change your family could make."
+    },
     "swahili/music/A1/day-10/Leo Tunaenda Sokoni.mp3": {
       "storyDe": "Sokoni, mnunuzi anamsalimu muuzaji, anaomba matunda na anapunguza bei kutoka shilingi elfu nne hadi elfu tatu.",
       "storyEn": "At the market, a customer greets the seller, asks for fruit and bargains the price down from four thousand to three thousand shillings.",

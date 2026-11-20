@@ -16,7 +16,7 @@ async function room(track,pack,{studio=null,translations=null,classTimings=null,
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
  const w=dom.window;
  Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,coverForTrack,songStoryForTrack,approximateScrollTop,matchingEnglishTranslation,matchingDraftEnglishTranslation,matchingTranscriptEnglishTranslation,
-  matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('class-timings')?{recordings:classTimings||[]}:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('swahili-catalog')?{tracks:swahiliTracks}:String(url).includes('catalog.json')?{tracks:classTimings?[track]:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
+  matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('song-stories')?JSON.parse(read('web/public/music/song-stories.json')):String(url).includes('class-timings')?{recordings:classTimings||[]}:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('swahili-catalog')?{tracks:swahiliTracks}:String(url).includes('catalog.json')?{tracks:classTimings?[track]:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
  const a=w.document.getElementById('audio');
  a.play=()=>Promise.resolve(); a.pause=()=>{};a.load=()=>{};Object.defineProperty(a,'readyState',{value:1});
  w.eval(read('web/public/music/app.js').replace(/^import .*;\n/gm,''));
@@ -170,18 +170,31 @@ test('A2 Day 21 enables English for its exact fingerprint-bound automatic transc
  dom.window.close();
 });
 
-test('Swahili song links select the Swahili tab and show the recording lyrics', async () => {
- const [track] = JSON.parse(read('web/public/music/swahili-catalog.json')).tracks;
- const pack = JSON.parse(read('web/public/music/approved-recording-lyrics.json')).recordings
-   .find(row => row.objectKey === track.objectKey);
- const {w,dom} = await room(track,pack,{swahiliTracks:[track]});
- try {
-  const d = w.document;
-  assert.equal(d.querySelector('[data-music-language="swahili"]').getAttribute('aria-pressed'),'true');
-  d.querySelector('[data-tab="lyrics"]').click();
-  assert.match(d.getElementById('lyrics-text').textContent,/Mimi ni Jason/);
-  d.getElementById('back-library').click();
-  d.querySelector('[data-music-language="german"]').click();
-  assert.doesNotMatch(d.getElementById('tracks').textContent,/Karibu Kufahamu Familia Yangu/);
- } finally { dom.window.close(); }
+test('each Swahili song opens its own bilingual lyrics and story', async () => {
+ const tracks = JSON.parse(read('web/public/music/swahili-catalog.json')).tracks;
+ const recordings = JSON.parse(read('web/public/music/approved-recording-lyrics.json')).recordings;
+ const translations = JSON.parse(read('web/public/music/english-translations.json'));
+ const stories = JSON.parse(read('web/public/music/song-stories.json')).byObjectKey;
+ for (const track of tracks) {
+  const pack = recordings.find(row => row.objectKey === track.objectKey);
+  const {w,dom} = await room(track,pack,{swahiliTracks:tracks,translations});
+  try {
+   const d = w.document;
+   assert.equal(d.querySelector('[data-music-language="swahili"]').getAttribute('aria-pressed'),'true');
+   assert.equal(d.getElementById('story-en').textContent,stories[track.objectKey].storyEn);
+   assert.equal(d.getElementById('story-de').textContent,stories[track.objectKey].storyDe);
+   d.querySelector('[data-tab="lyrics"]').click();
+   const toggle = d.getElementById('show-english');
+   assert.equal(toggle.disabled,false);
+   toggle.checked=true;
+   toggle.dispatchEvent(new w.Event('change',{bubbles:true}));
+   const text = d.getElementById('lyrics-text').textContent;
+   for (const {de,en} of translations.recordings.find(row => row.objectKey === track.objectKey).lines) {
+    assert.ok(text.includes(de) && text.includes(en), track.title);
+   }
+   d.getElementById('back-library').click();
+   d.querySelector('[data-music-language="german"]').click();
+   assert.ok(!d.getElementById('tracks').textContent.includes(track.title));
+  } finally { dom.window.close(); }
+ }
 });
