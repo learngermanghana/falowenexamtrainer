@@ -131,6 +131,7 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
     const fallback = checkedRecording?.cues.length ? checkedRecording
       : refinedEstimate || (ownerFallback?.cues.length ? ownerFallback : estimate || checkedRecording || ownerFallback);
     const sendFallback = () => res.status(200).json(withEnglishTranslation({...fallback,
+      ...(fallback===ownerFallback && approved?.recordingSha256 ? {recordingSha256:approved.recordingSha256} : {}),
       source:fallback===estimate ? 'acoustic-estimate' : checkedRecording ? 'bundled' : 'owner-supplied',
       timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? (recorded.timingStatus === 'estimated' ? 'estimated' : 'published') : approved?.timingStatus || 'missing'}));
     try {
