@@ -68,5 +68,467 @@
     "license": "https://www.pexels.com/license/",
     "provider": "Pexels",
     "photoId": 5064934
+  },
+  "gutenmorgengutentag": {
+    "path": "/music/covers/photos/gutenmorgengutentag.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-01/Guten Morgen, guten Tag.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "ichheissebina": {
+    "path": "/music/covers/photos/ichheissebina.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-02/Ich heiße Bina.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "werbistdusagesmir": {
+    "path": "/music/covers/photos/werbistdusagesmir.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-03/Wer bist du_ Sag es mir!.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "dasistmeinenummer": {
+    "path": "/music/covers/photos/dasistmeinenummer.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-04/Das ist meine Nummer.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "schondichkennenzulernen": {
+    "path": "/music/covers/photos/schondichkennenzulernen.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-05/Schön, dich kennenzulernen.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einsonntagmitmeinerfamilie": {
+    "path": "/music/covers/photos/einsonntagmitmeinerfamilie.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-06/Ein Sonntag mit meiner Familie.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "waskostetdas": {
+    "path": "/music/covers/photos/waskostetdas.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-07/Was kostet das_.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "vielelandervielesprachen": {
+    "path": "/music/covers/photos/vielelandervielesprachen.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-08/Viele Länder, viele Sprachen.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "derkleinehund": {
+    "path": "/music/covers/photos/derkleinehund.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-09/Der kleine Hund.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "dasgehortmir": {
+    "path": "/music/covers/photos/dasgehortmir.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-10/Das gehört mir.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "meintagvonmorgensbis": {
+    "path": "/music/covers/photos/meintagvonmorgensbis.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-11/Mein Tag – Von morgens bis.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "samstagumzehn": {
+    "path": "/music/covers/photos/samstagumzehn.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-12/Samstag um zehn.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "beifalowenubeichdas": {
+    "path": "/music/covers/photos/beifalowenubeichdas.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-15/Bei Falowen übe ich das.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "woistderbahnhof": {
+    "path": "/music/covers/photos/woistderbahnhof.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-17/Wo ist der Bahnhof_.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "woistmeinschlussel": {
+    "path": "/music/covers/photos/woistmeinschlussel.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-18/Wo ist mein Schlüssel_.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "sosprechenwiraufdeutsch": {
+    "path": "/music/covers/photos/sosprechenwiraufdeutsch.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-19/So sprechen wir auf Deutsch.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "binatutmirleid": {
+    "path": "/music/covers/photos/binatutmirleid.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-21/Bina, tut mir leid.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "arzttermin": {
+    "path": "/music/covers/photos/arzttermin.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a1/day-22/Arzttermin.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einnettesgesprach": {
+    "path": "/music/covers/photos/einnettesgesprach.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-01/Ein nettes Gespräch.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "mariaistwunderbar": {
+    "path": "/music/covers/photos/mariaistwunderbar.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-02/Maria ist wunderbar.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "derneuetreffpunkt": {
+    "path": "/music/covers/photos/derneuetreffpunkt.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-04/Der neue Treffpunkt.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "dersamstagwunderbar": {
+    "path": "/music/covers/photos/dersamstagwunderbar.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-05/Der Samstag wunderbar.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einplatzfurdich": {
+    "path": "/music/covers/photos/einplatzfurdich.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-06/Ein Platz für dich.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einewohnungzuunspassen": {
+    "path": "/music/covers/photos/einewohnungzuunspassen.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-07/Eine Wohnung zu uns passen.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einabendzuzweit": {
+    "path": "/music/covers/photos/einabendzuzweit.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-08/Ein Abend zu zweit.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einkleinerurlaub": {
+    "path": "/music/covers/photos/einkleinerurlaub.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-09/Ein kleiner Urlaub.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "dieweltentdecken": {
+    "path": "/music/covers/photos/dieweltentdecken.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-10/Die Welt entdecken.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "mitdemradmitdemzug": {
+    "path": "/music/covers/photos/mitdemradmitdemzug.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-11/Mit dem Rad, mit dem Zug.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "bewerbungsgesprach": {
+    "path": "/music/covers/photos/bewerbungsgesprach.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-13/Bewerbungsgespräch.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "meintraumberuf": {
+    "path": "/music/covers/photos/meintraumberuf.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-14/Mein Traumberuf.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "kleinemomente": {
+    "path": "/music/covers/photos/kleinemomente.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-15/Kleine Momente.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "kleineschritte": {
+    "path": "/music/covers/photos/kleineschritte.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-16/Kleine Schritte.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "ichgehezurapotheke": {
+    "path": "/music/covers/photos/ichgehezurapotheke.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-17/Ich gehe zur Apotheke.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einneuesleben": {
+    "path": "/music/covers/photos/einneuesleben.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-18/Ein neues Leben.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "dierichtigewahl": {
+    "path": "/music/covers/photos/dierichtigewahl.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-19/Die richtige Wahl.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "hoflichreklamieren": {
+    "path": "/music/covers/photos/hoflichreklamieren.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-20/Höflich reklamieren.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "endlichwochenende": {
+    "path": "/music/covers/photos/endlichwochenende.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-21/Endlich Wochenende.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "zeitfurmich": {
+    "path": "/music/covers/photos/zeitfurmich.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-22/Zeit für mich.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "endlichurlaub": {
+    "path": "/music/covers/photos/endlichurlaub.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-24/Endlich Urlaub.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "endlichurlaubsong": {
+    "path": "/music/covers/photos/endlichurlaubsong.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-25/Endlich Urlaub.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "wieichmichfuhle": {
+    "path": "/music/covers/photos/wieichmichfuhle.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-26/Wie ich mich fühle.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "handyweg": {
+    "path": "/music/covers/photos/handyweg.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-27/Handy weg.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einkleinerplan": {
+    "path": "/music/covers/photos/einkleinerplan.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/a2/day-28/Ein kleiner Plan.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "eintraumgehtnichtverloren": {
+    "path": "/music/covers/photos/eintraumgehtnichtverloren.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-01/Ein Traum geht nicht verloren(1).mp3",
+    "width": 360,
+    "height": 360
+  },
+  "freundschaftamfluss": {
+    "path": "/music/covers/photos/freundschaftamfluss.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-02/Freundschaft am Fluss.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einkleinererfolg": {
+    "path": "/music/covers/photos/einkleinererfolg.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-03/Ein kleiner Erfolg.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "ortzumleben": {
+    "path": "/music/covers/photos/ortzumleben.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-04/Ort zum Leben.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "unsermittelweg": {
+    "path": "/music/covers/photos/unsermittelweg.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-07/Unser Mittelweg.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "gesundbleibenimkleinen": {
+    "path": "/music/covers/photos/gesundbleibenimkleinen.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-08/Gesund bleiben im Kleinen.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "zeitfurmichsong": {
+    "path": "/music/covers/photos/zeitfurmichsong.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-09/Zeit für mich(1).mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einenmomentweg": {
+    "path": "/music/covers/photos/einenmomentweg.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-10/Einen Moment Weg.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "nichteinerallein": {
+    "path": "/music/covers/photos/nichteinerallein.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-11/Nicht einer allein.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "echtegesprache": {
+    "path": "/music/covers/photos/echtegesprache.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-15/Echte Gespräche.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "atmeeinundatmeaus": {
+    "path": "/music/covers/photos/atmeeinundatmeaus.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-16/Atme Ein und Atme Aus.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "jederlerntaufseineweise": {
+    "path": "/music/covers/photos/jederlerntaufseineweise.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-17/Jeder lernt auf seine Weise.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "nichtperfektklingen": {
+    "path": "/music/covers/photos/nichtperfektklingen.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-19/Nicht Perfekt klingen.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "traumberuf": {
+    "path": "/music/covers/photos/traumberuf.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-20/Traumberuf.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "wenigerkaufen": {
+    "path": "/music/covers/photos/wenigerkaufen.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-24/Weniger kaufen.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "alskundehabeichauchrechte": {
+    "path": "/music/covers/photos/alskundehabeichauchrechte.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-25/Als Kunde habe ich auch Rechte.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "richtigfragen": {
+    "path": "/music/covers/photos/richtigfragen.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-26/Richtig fragen.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "vorunserertur": {
+    "path": "/music/covers/photos/vorunserertur.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-27/Vor unserer Tür.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "einkleinerweg": {
+    "path": "/music/covers/photos/einkleinerweg.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "music/b1/day-28/Ein kleiner Weg.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "leotunaendasokoni": {
+    "path": "/music/covers/photos/leotunaendasokoni.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "swahili/music/A1/day-10/Leo Tunaenda Sokoni.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "chakulakizurimgahawani": {
+    "path": "/music/covers/photos/chakulakizurimgahawani.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "swahili/music/A1/day-06/Chakula Kizuri Mgahawani.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "karibukufahamufamiliayangu": {
+    "path": "/music/covers/photos/karibukufahamufamiliayangu.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "swahili/music/A1/day-05/Karibu Kufahamu Familia Yangu.mp3",
+    "width": 360,
+    "height": 360
+  },
+  "mazingirahuanzanamimi": {
+    "path": "/music/covers/photos/mazingirahuanzanamimi.jpg",
+    "provider": "Falowen recording",
+    "objectKey": "swahili/music/B1/day-28/Mazingira Huanza Na Mimi.mp3",
+    "width": 360,
+    "height": 360
   }
 }

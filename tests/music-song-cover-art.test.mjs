@@ -1,3 +1,4 @@
+import {createHash} from "node:crypto";
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
@@ -38,5 +39,25 @@ test('all audited course recordings and new public songs have local photo artwor
   const cover=coverForTrack(track);assert.match(cover,/^\/music\/covers\/photos\/[a-z]+\.jpg$/);
   assert.ok(existsSync(new URL('../web/public'+cover,import.meta.url)),cover);
  }
- for(const photo of Object.values(sources)){assert.match(photo.source,/^https:\/\/www.pexels.com\/photo\//);assert.equal(photo.license,'https://www.pexels.com/license/');}
+ for(const photo of Object.values(sources)){
+  if(photo.provider === "Falowen recording"){
+   assert.equal(coverForTrack({objectKey:photo.objectKey}),photo.path);
+   assert.ok(photo.width>0 && photo.width===photo.height);
+   continue;
+  }
+  assert.match(photo.source,/^https:\/\/www.pexels.com\/photo\//);assert.equal(photo.license,'https://www.pexels.com/license/');}
+});
+
+test('each recording-specific image has distinct content and resolves for its song',()=>{
+ const sources=JSON.parse(readFileSync(new URL('../web/public/music/covers/photo-sources.json',import.meta.url),'utf8'));
+ const hashes=new Set();
+ for(const cover of Object.values(sources).filter(row=>row.provider==='Falowen recording')){
+  const path=coverForTrack({objectKey:cover.objectKey});
+  assert.equal(path,cover.path);
+  const bytes=readFileSync(new URL('../web/public'+path,import.meta.url));
+  const hash=createHash('sha256').update(bytes).digest('hex');
+  assert.ok(!hashes.has(hash),cover.objectKey);
+  hashes.add(hash);
+ }
+ assert.ok(hashes.size>0);
 });

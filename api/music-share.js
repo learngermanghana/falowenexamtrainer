@@ -24,7 +24,8 @@ module.exports = function musicShare(req, res) {
   const description = escapeHtml('Listen to ' + track.title + ' on Falowen Music. ' + (track.language === 'Swahili' ? 'Swahili' : 'German') + ' songs' + (track.level !== 'ALL' ? ' · ' + track.level + ' · Day ' + track.day : ' for every level') + '.');
   const canonical = 'https://music.falowen.app/song/' + encodeURIComponent(id);
   const theme = artwork.byObjectKey[track.objectKey] || artwork.byTrackId[id] || artwork.default;
-  const image = 'https://music.falowen.app' + sources[theme].path;
+  const cover = sources[theme];
+  const image = 'https://music.falowen.app' + cover.path;
   template ||= fs.readFileSync(path.join(__dirname, '../web/public/music/index.html'), 'utf8');
   const html = template.replace('<body>', '<body data-track="' + escapeHtml(id) + '">')
     .replace(/<title>[^<]*<\/title>/, '<title>' + title + '</title>')
@@ -34,7 +35,7 @@ module.exports = function musicShare(req, res) {
     .replace(/<meta property="og:title" content="[^"]*">/, '<meta property="og:title" content="' + title + '">')
     .replace(/<meta property="og:description" content="[^"]*">/, '<meta property="og:description" content="' + description + '">')
     .replace(/<meta property="og:url" content="[^"]*">/, '<meta property="og:url" content="' + canonical + '">')
-    .replace('</head>', '<meta property="og:image" content="' + image + '"><meta property="og:image:width" content="1000"><meta property="og:image:height" content="1000"><meta property="og:image:alt" content="Song artwork"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="' + title + '"><meta name="twitter:description" content="' + description + '"><meta name="twitter:image" content="' + image + '"></head>');
+    .replace('</head>', '<meta property="og:image" content="' + image + '"><meta property="og:image:width" content="'+(cover.width || 1000)+'"><meta property="og:image:height" content="'+(cover.height || 1000)+'"><meta property="og:image:alt" content="Song artwork"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="' + title + '"><meta name="twitter:description" content="' + description + '"><meta name="twitter:image" content="' + image + '"></head>');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=3600');
   return res.status(200).end(req.method === 'HEAD' ? undefined : html);

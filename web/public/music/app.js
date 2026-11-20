@@ -1,5 +1,5 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
-import { coverForTrack } from "./cover-art.js?v=20261115-b1-day12";
+import { coverForTrack } from "./cover-art.js?v=20261120-recording-covers";
 import { songStoryForTrack } from "./song-story.js?v=20261102-bilingual";
 import { buildPlaybackQueue, advancePlaybackQueue } from "./playback-queue.js?v=20261101-continuous";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
