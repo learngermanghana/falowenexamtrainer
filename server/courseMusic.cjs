@@ -101,6 +101,11 @@ const SWAHILI_DAY_FIVE_LISTENING = Object.freeze({
   key: 'swahili/A1/day-05/day-05.mp3',
 });
 
+const SWAHILI_DAY_TWO_LISTENING = Object.freeze({
+  id: 'swahili-a1-day02-listening',
+  key: 'swahili/A1/day-02/day-02.mp3',
+});
+
 const SWAHILI_DAY_ONE_LISTENING = Object.freeze({
   id: 'swahili-a1-day01-listening',
   key: 'swahili/A1/day-01/day-01.mp3',
@@ -144,6 +149,9 @@ function createSwahiliB1Day28AudioHandler(options) {
 
 function createSwahiliDayOneAudioHandler(options) {
   return createSwahiliListeningHandler(SWAHILI_DAY_ONE_LISTENING, options);
+}
+function createSwahiliDayTwoAudioHandler(options) {
+  return createSwahiliListeningHandler(SWAHILI_DAY_TWO_LISTENING, options);
 }
 function createSwahiliDayFiveAudioHandler(options) {
   return createSwahiliListeningHandler(SWAHILI_DAY_FIVE_LISTENING, options);
@@ -218,4 +226,4 @@ function createClassroomBankAudioHandler(options = {}) {
     return signObject(recording, env);
   } });
 }
-module.exports = { createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
+module.exports = { createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
