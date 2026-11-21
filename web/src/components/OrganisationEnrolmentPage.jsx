@@ -7,6 +7,13 @@ import "./OrganisationEnrolmentPage.css";
 
 const columns = [["name", "Full name"], ["email", "Student email"], ["phone", "Phone"], ["level", "Level"], ["location", "Location"], ["emergencyContactPhone", "Emergency number"], ["language", "Course language"]];
 const emptyRow = () => Object.fromEntries(columns.map(([key]) => [key, ""]));
+// Accept the public-facing Kiswahili name when importing spreadsheet rows.
+const normalizePastedCourseLanguage = value => {
+  const language = String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+  if (["swahili", "kiswahili", "kiswahili (swahili)"].includes(language)) return "Swahili";
+  if (["german", "deutsch"].includes(language)) return "German";
+  return ""; // Unknown names should require an explicit choice, not an incorrect default.
+};
 export default function OrganisationEnrolmentPage() {
   return <PartnerAccount enrolment>{({ profile }) => <OrganisationEnrolmentForm key={profile.id} profile={profile} />}</PartnerAccount>;
 }
@@ -31,7 +38,15 @@ function OrganisationEnrolmentForm({ profile }) {
       const next = old.map(row => ({ ...row }));
       values.forEach((cells, r) => {
         const index = rowIndex + r; next[index] ||= emptyRow();
-        cells.forEach((value, c) => { const key = columns[columnIndex + c]?.[0]; if (key) next[index][key] = value.trim(); });
+        cells.forEach((value, c) => {
+          const key = columns[columnIndex + c]?.[0];
+          if (!key) return;
+          const normalized = key === "language" ? normalizePastedCourseLanguage(value) : value.trim();
+          if ((key === "language" || key === "level") && next[index][key] !== normalized) {
+            next[index].requestedClassId = "";
+          }
+          next[index][key] = normalized;
+        });
       });
       return next;
     });
