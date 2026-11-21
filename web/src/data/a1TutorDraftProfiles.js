@@ -246,8 +246,14 @@ export const validateA1TutorDraftSubmissionSections = ({ assignmentKey = "", sec
     const serializedLines = sections.get(sectionKey) || [];
     if (sectionProfile.writing || sectionProfile.embeddedWriting || sectionProfile.speaking) {
       const response = serializedLines.join("\n");
-      if (sectionProfile.speaking ? !isA1TutorSpeakingAssessment(sectionKey, assignmentKey, response) : !response.trim()) {
-        missing.push(`${sectionKey.replace("teil-", "Teil ")} ${sectionProfile.speaking ? "speaking assessment" : "writing"}`);
+      const isDay19Transcript = String(assignmentKey || "").trim().toUpperCase() === "A1-5.9";
+      const complete = sectionProfile.speaking && isDay19Transcript
+        ? hasValue(response)
+        : sectionProfile.speaking
+          ? isA1TutorSpeakingAssessment(sectionKey, assignmentKey, response)
+          : hasValue(response);
+      if (!complete) {
+        missing.push(`${sectionKey.replace("teil-", "Teil ")} ${sectionProfile.speaking && !isDay19Transcript ? "speaking assessment" : sectionProfile.speaking ? "speaking answer" : "writing"}`);
       }
       return;
     }
