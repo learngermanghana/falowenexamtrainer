@@ -141,18 +141,18 @@ test("published A2 course PDF maps only to the clean 328-page private R2 object"
  const obj=DIGITAL_BOOK_OBJECTS["a2-course-workbook-digital"];
  assert.deepEqual(obj,{
    bucket:"falowen-books-private",
-   key:"Falowen-A2-Course-Materials-Clean.pdf",
+   key:"book/Falowen-A2-Course-Materials-Clean-2.pdf",
    filename:"Falowen-A2-Course-Materials-Clean.pdf",
  });
  const url=signPrivateBookDownload({bookId:"a2-course-workbook-digital",env}).url;
- assert.equal(new URL(url).pathname,"/Falowen-A2-Course-Materials-Clean.pdf");
+ assert.equal(new URL(url).pathname,"/book/Falowen-A2-Course-Materials-Clean-2.pdf");
  assert.match(url,/X-Amz-Expires=90/);
 });
 
 test("A1 and B1 full course PDFs are exact private paid objects", () => {
  const expected=[
-  ["a1-digital","Falowen-A1-Course-Materials.pdf"],
-  ["b1-course-workbook-digital","Falowen-B1-Course-Materials.pdf"],
+  ["a1-digital","book/Falowen-A1-Course-Materials-1.pdf"],
+  ["b1-course-workbook-digital","book/Falowen-B1-Course-Materials-1.pdf"],
  ];
  for(const [bookId,key] of expected){
   assert.equal(DIGITAL_BOOK_OBJECTS[bookId].bucket,"falowen-books-private");
