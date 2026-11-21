@@ -60,7 +60,7 @@
         rating: STAR_VALUES[review?.starRating] || 0,
         text: typeof review?.comment === "string" ? review.comment.trim() : "",
         createdAt: review?.createTime || ""
-      })).filter(review => review.rating > 0);
+      })).filter(review => review.rating > 0 || !!review.text);
     }
 
     function formatDate(value) {
@@ -78,17 +78,19 @@
         return;
       }
 
-      const average = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
-      ratingBox.setAttribute("aria-label", `${average.toFixed(1)} out of 5 from ${reviews.length} exported Google reviews`);
-      ratingBox.innerHTML = `<strong>${average.toFixed(1)} ★</strong><span>${reviews.length} exported Google reviews</span>`;
+      const rated = reviews.filter(review => review.rating > 0);
+      const average = rated.length ? rated.reduce((sum, review) => sum + review.rating, 0) / rated.length : 0;
+      const averageText = rated.length ? average.toFixed(1) : "–";
+      ratingBox.setAttribute("aria-label", `${averageText} out of 5 from ${rated.length} rated reviews; ${reviews.length} Google reviews displayed`);
+      ratingBox.innerHTML = `<strong>${averageText} ★</strong><span>${reviews.length} exported Google reviews · ${rated.length} rated</span>`;
 
       grid.innerHTML = reviews.map(review => {
         const filled = "★★★★★".slice(0, review.rating);
-        const empty = "☆☆☆☆☆".slice(0, 5 - review.rating);
+        const empty = review.rating ? "☆☆☆☆☆".slice(0, 5 - review.rating) : "";
         const date = formatDate(review.createdAt);
         return `
           <article class="card">
-            <div class="stars" aria-label="${review.rating} out of 5 stars">${filled}${empty}</div>
+            <div class="stars" aria-label="${review.rating ? review.rating + " out of 5 stars" : "Star rating not recorded"}">${review.rating ? filled + empty : "Rating not recorded"}</div>
             ${review.text ? `<p>“${escapeHtml(review.text)}”</p>` : `<p class="empty">Star rating only — no written comment.</p>`}
             <footer><strong>${escapeHtml(review.name)}</strong><span>${date ? `${escapeHtml(date)} · ` : ""}Google Review</span></footer>
           </article>`;
