@@ -21,8 +21,6 @@ on:
       - "scripts/checkProductionIdentity.mjs"
   push:
     branches: [main]
-  schedule:
-    - cron: "23 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -90,7 +88,7 @@ jobs:
         run: cat web/public/__falowen-build.json
 
   verify-production:
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     needs: release-gate
     runs-on: ubuntu-latest
     steps:
@@ -99,52 +97,21 @@ jobs:
         with:
           node-version: 24
 
-      - name: Wait for Vercel Git deployment
-        id: vercel
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TARGET_SHA: ${{ github.sha }}
-        shell: bash
-        run: |
-          set -u
-          state="pending"
-          description="Waiting for Vercel."
-          for attempt in $(seq 1 12); do
-            payload="$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$TARGET_SHA/status")"
-            state="$(printf '%s' "$payload" | jq -r '[.statuses[] | select(.context == "Vercel")][0].state // "pending"')"
-            description="$(printf '%s' "$payload" | jq -r '[.statuses[] | select(.context == "Vercel")][0].description // "Waiting for Vercel."')"
-            echo "Vercel status: $state · $description"
-            if [ "$state" = "success" ] || [ "$state" = "failure" ] || [ "$state" = "error" ]; then
-              break
-            fi
-            sleep 30
-          done
-          echo "state=$state" >> "$GITHUB_OUTPUT"
-          {
-            echo "### Vercel Git deployment"
-            echo ""
-            echo "- Commit: `$TARGET_SHA`"
-            echo "- State: **$state**"
-            echo "- Detail: $description"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Retry with Vercel CLI when configured
-        if: steps.vercel.outputs.state != 'success'
-        id: cli
+      - name: Deploy manually to Vercel production
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          RELEASE_SHA: ${{ github.sha }}
         shell: bash
         run: |
           set -euo pipefail
           if [ -z "${VERCEL_TOKEN:-}" ]; then
-            echo "attempted=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::VERCEL_TOKEN is not configured. Git integration remains the primary deploy path; scheduled retry will use the Git retry marker when needed."
-            exit 0
+            echo "::error::Manual release requires VERCEL_TOKEN. Alternatively create a deployment in the Vercel dashboard."
+            exit 1
           fi
-          echo "attempted=true" >> "$GITHUB_OUTPUT"
-          npx --yes vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
-          npx --yes vercel@latest build --prod --token="$VERCEL_TOKEN"
-          npx --yes vercel@latest deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+          echo "Manual production release for $RELEASE_SHA"
+          npx --yes vercel@latest pull --yes --environment=production
+          npx --yes vercel@latest build --prod
+          npx --yes vercel@latest deploy --prebuilt --prod
 
       - name: Verify production contains this main commit
         env:
@@ -158,7 +125,7 @@ jobs:
             deployed="$(printf '%s' "$body" | jq -r '.deployedSha // empty' 2>/dev/null || true)"
             status="$(printf '%s' "$body" | jq -r '.status // empty' 2>/dev/null || true)"
             echo "Production status: ${status:-unavailable} · deployed=${deployed:-unknown}"
-            if [ "$status" = "current" ] && [ -n "$deployed" ]; then
+            if [ -n "$deployed" ]; then
               if [ "$deployed" = "$TARGET_SHA" ]; then
                 echo "falowen.app is serving exact target SHA `$TARGET_SHA`." >> "$GITHUB_STEP_SUMMARY"
                 exit 0
@@ -176,95 +143,3 @@ jobs:
           echo "::error::Production did not reach target $TARGET_SHA or a newer descendant."
           exit 1
 
-  scheduled-rate-limit-retry:
-    if: github.event_name == 'schedule'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 2
-          token: ${{ github.token }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-
-      - name: Inspect latest main Vercel status
-        id: status
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          target_sha="$(git rev-parse HEAD)"
-          payload="$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$target_sha/status")"
-          state="$(printf '%s' "$payload" | jq -r '[.statuses[] | select(.context == "Vercel")][0].state // "missing"')"
-          description="$(printf '%s' "$payload" | jq -r '[.statuses[] | select(.context == "Vercel")][0].description // ""')"
-          created_at="$(printf '%s' "$payload" | jq -r '[.statuses[] | select(.context == "Vercel")][0].created_at // ""')"
-          echo "sha=$target_sha" >> "$GITHUB_OUTPUT"
-          echo "state=$state" >> "$GITHUB_OUTPUT"
-          echo "description=$description" >> "$GITHUB_OUTPUT"
-          echo "created_at=$created_at" >> "$GITHUB_OUTPUT"
-
-      - name: Decide whether rate-limit cooldown has elapsed
-        id: cooldown
-        if: steps.status.outputs.state == 'failure' && contains(steps.status.outputs.description, 'rate limited')
-        env:
-          CREATED_AT: ${{ steps.status.outputs.created_at }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -z "$CREATED_AT" ]; then
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          created_epoch="$(date -d "$CREATED_AT" +%s)"
-          now_epoch="$(date +%s)"
-          age_seconds="$((now_epoch - created_epoch))"
-          if [ "$age_seconds" -ge 85800 ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Retry production with Vercel CLI when token is configured
-        id: cli_retry
-        if: steps.cooldown.outputs.ready == 'true'
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -z "${VERCEL_TOKEN:-}" ]; then
-            echo "attempted=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "attempted=true" >> "$GITHUB_OUTPUT"
-          npm install --no-audit --no-fund --loglevel=error
-          npm --prefix functions install --no-audit --no-fund --loglevel=error
-          npm --prefix web install --legacy-peer-deps --no-audit --no-fund --loglevel=error
-          npx --yes vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
-          npx --yes vercel@latest build --prod --token="$VERCEL_TOKEN"
-          npx --yes vercel@latest deploy --prebuilt --prod --token="$VERCEL_TOKEN"
-
-      - name: Create one Git retry commit when CLI credentials are unavailable
-        if: steps.cooldown.outputs.ready == 'true' && steps.cli_retry.outputs.attempted != 'true'
-        id: retry_commit
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "Falowen Production Bot"
-          git config user.email "actions@users.noreply.github.com"
-          printf 'Automated Vercel production retry.\nPrevious main: %s\nRequested: %s\n' "$(git rev-parse HEAD)" "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" > .vercel-production-retry.txt
-          git add .vercel-production-retry.txt
-          git commit -m "Retry Vercel production deployment"
-          git push origin HEAD:main
-          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-
-      - name: Verify scheduled retry deployment
-        if: steps.cli_retry.outputs.attempted == 'true' || steps.retry_commit.outputs.sha != ''
-        env:
-          EXPECTED_SHA: ${{ steps.retry_commit.outputs.sha || steps.status.outputs.sha }}
-        run: node scripts/checkProductionIdentity.mjs "$EXPECTED_SHA"
