@@ -100,7 +100,7 @@ describe("service worker build asset safety", () => {
   it("does not fetch the build manifest on every navigation", () => {
     expect(serviceWorker).toContain("const BUILD_MANIFEST_RECHECK_MS = 30 * 60 * 1000");
     expect(serviceWorker).toContain("refreshBuildPrecacheWhenDue()");
-    expect(serviceWorker).toContain('fetch(BUILD_ASSET_MANIFEST_URL, { cache: "default" })');
+    expect(serviceWorker).toContain('cache: force ? "no-store" : "default"');
     expect(serviceWorker).toContain("lastBuildManifestCheckAt = Date.now()");
     expect(serviceWorker).toContain("lastBuildManifestCheckAt = 0");
   });
