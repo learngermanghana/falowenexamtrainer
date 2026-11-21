@@ -28,6 +28,16 @@ describe("VerifiedCloudDraftSubmissionPage", () => {
     expect(source).toContain("if (!confirmed && !compact && !allowUnconfirmedSubmission)");
   });
 
+
+  test("transcript-only Day 19 submissions omit audio attachments", () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, "VerifiedCloudDraftSubmissionPage.js"),
+      "utf8",
+    );
+    expect(source).toContain(".filter(({ audioUrl }) => /^https:\\/\\//i.test(String(audioUrl || \"\")))");
+    expect(source).toContain("savedAudioAttachments.length ? { attachments: savedAudioAttachments } : {}");
+  });
+
   test("A1 canonical submissions opt into compact review mode", () => {
     const source = fs.readFileSync(
       path.join(__dirname, "A1CanonicalSubmissionPanel.jsx"),
