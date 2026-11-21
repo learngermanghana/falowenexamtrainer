@@ -18,8 +18,7 @@ describe("production deployment contract", () => {
     expect(identity.headers).toEqual(expect.arrayContaining([
       expect.objectContaining({ key: "Cache-Control", value: expect.stringMatching(/no-store/) }),
     ]));
-    expect(config.git?.deploymentEnabled?.main).toBe(true);
-    expect(config.git?.deploymentEnabled?.["*"]).toBe(false);
+    expect(config.git?.deploymentEnabled).toBe(false);
   });
 
   test("production health workflow verifies the live SHA", () => {
@@ -29,8 +28,10 @@ describe("production deployment contract", () => {
     expect(workflow).toContain("VERCEL_PROJECT_ID");
     expect(workflow).toContain("vercel@latest deploy --prebuilt --prod");
     expect(workflow).toContain("/api/deployment-status");
-    expect(workflow).toContain("checkProductionIdentity.mjs");
-    expect(workflow).toContain("EXPECTED_SHA");
+    expect(workflow).toMatch(/verify-production:\n\s+if: github\.event_name == 'workflow_dispatch' && github\.ref == 'refs\/heads\/main'/);
+    expect(workflow).toContain("Deploy manually to Vercel production");
+    expect(workflow).not.toMatch(/^\s+schedule:/m);
+    expect(workflow).not.toContain("scheduled-rate-limit-retry");
   });
 
   test("the production API reports the deployed Vercel SHA against main", () => {
