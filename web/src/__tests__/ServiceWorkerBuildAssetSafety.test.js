@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import vm from "vm";
 
 const repositoryRoot = path.resolve(__dirname, "../../..");
 const serviceWorker = fs.readFileSync(
@@ -102,6 +103,33 @@ describe("service worker build asset safety", () => {
     expect(serviceWorker).toContain('fetch(BUILD_ASSET_MANIFEST_URL, { cache: "default" })');
     expect(serviceWorker).toContain("lastBuildManifestCheckAt = Date.now()");
     expect(serviceWorker).toContain("lastBuildManifestCheckAt = 0");
+  });
+
+  it("forces a fresh HTTP manifest during installation even if the old manifest is cached", async () => {
+    const manifestSource = serviceWorker.slice(
+      serviceWorker.indexOf("const normalizeBuildPrecacheManifest"),
+      serviceWorker.indexOf("const readCachedBuildPrecacheManifest"),
+    );
+    const cached = { revision: "old-deployment", assets: ["/assets/old.js"] };
+    const latest = { revision: "new-deployment", assets: ["/assets/new.js"] };
+    const modes = [];
+    const readManifest = vm.runInNewContext(
+      manifestSource + "\nreadBuildPrecacheManifest;",
+      {
+        BUILD_ASSET_MANIFEST_URL: "/offline-build-assets.json",
+        fetch: async (url, options) => {
+          expect(url).toBe("/offline-build-assets.json");
+          modes.push(options.cache);
+          return { ok: true, json: async () => options.cache === "no-store" ? latest : cached };
+        },
+      },
+    );
+
+    expect((await readManifest()).revision).toBe("old-deployment");
+    expect((await readManifest({ force: true })).revision).toBe("new-deployment");
+    expect(modes).toEqual(["default", "no-store"]);
+    expect(serviceWorker).toContain("const manifest = await readBuildPrecacheManifest({ force });");
+    expect(serviceWorker).toContain("await refreshBuildAssetPrecache({ force: true })");
   });
 
   it("uses the current offline cache version", () => {
