@@ -26,3 +26,13 @@ test("a 403 without an explicitly verified workbook stops before queueing",async
   await expect(queuePlacementResult(event,sheets,token,async()=>({ok:false,status:403,json:async()=>({})}))).rejects.toThrow(/HTTP 403/);
   expect(sheets).not.toHaveBeenCalled();
 });
+
+test("Kiswahili outbox retains language identity without a new workbook",async()=>{
+  const sheets=jest.fn().mockResolvedValueOnce({sheets:["Outbox","Placement Results"].map((title,sheetId)=>({properties:{title,sheetId}}))})
+    .mockResolvedValueOnce({values:[headers]}).mockResolvedValueOnce({});
+  await queuePlacementResult({...event,language:"swahili"},sheets,token,access("user"));
+  const [claim,outbox,results]=sheets.mock.calls[2][1].body.requests;
+  expect(claim.addNamedRange.namedRange.name).toContain("12345678");
+  expect(outbox.appendCells.rows[0].values[3].userEnteredValue.stringValue).toMatch(/Kiswahili/);
+  expect(results.appendCells.rows[0].values[9].userEnteredValue.stringValue).toBe("swahili");
+});
