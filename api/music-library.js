@@ -10,7 +10,11 @@ module.exports = async function musicLibraryHandler(req,res) {
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('Cache-Control','public, max-age=120, stale-if-error=120');
   res.setHeader('Vercel-CDN-Cache-Control', 'max-age=120');
-  if(req.method !== 'GET') return res.status(405).json({error:'Method not allowed'});
+  if(req.method !== 'GET') {
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
+    return res.status(405).json({error:'Method not allowed'});
+  }
   const now=Date.now();
   if(cache.tracks && now<cache.expiresAt) return res.status(200).json({ok:true,tracks:cache.tracks});
   try{
@@ -19,6 +23,9 @@ module.exports = async function musicLibraryHandler(req,res) {
     return res.status(200).json({ok:true,tracks});
   }catch(error){
     console.warn('Music listing unavailable:',error?.code || error?.message);
+    // Never cache an error or a stale fallback as a fresh 2-minute catalog.
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
     if(cache.tracks) return res.status(200).json({ok:true,tracks:cache.tracks,stale:true});
     return res.status(503).json({ok:false,error:'Music discovery is temporarily unavailable. Published songs remain accessible.'});
   }
