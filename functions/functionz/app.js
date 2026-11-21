@@ -2226,9 +2226,19 @@ app.get("/exam-room/results", async (req, res) => {
 
 app.get("/scores/summary", scoresSummaryHandler);
 
-const transcribeAudio = async (file, pictureCard = false) => {
-  const result = await transcribeAudioFile({ file, getOpenAIClient, pictureCard });
+const transcribeAudio = async (file, pictureCard = false, transcriptionPrompt = "") => {
+  const result = await transcribeAudioFile({ file, getOpenAIClient, pictureCard, transcriptionPrompt });
   return result.text;
+};
+
+const a1Day19TranscriptionPrompt = (teil) => {
+  const common = "German (Deutsch), Goethe A1 speaking assessment. Transcribe only words that are actually audible, as spoken. Keep beginner grammar errors, fragments, repetitions and code-switching exactly as heard; do not translate, correct, complete, or infer missing speech. The task context is only a light vocabulary hint and must never override the audio.";
+  const part = {
+    "1": "Teil 1 self-introduction: possible words include ich heiße, ich bin ... Jahre alt, ich komme aus Ghana, ich wohne in, ich spreche, Deutsch, Beruf, studiere, Hobby, buchstabieren, Telefonnummer. Transcribe any name and number as heard.",
+    "2": "Teil 2 question and answer: shopping and supermarket. Possible words include einkaufen, Supermarkt, wann, normalerweise. Preserve the learner's actual question and answer; do not generate either one.",
+    "3": "Teil 3 polite request and reaction: umbrella and helping. Possible words include Regenschirm, bitte, können Sie, geben, helfen, ja, gern, natürlich, tut mir leid. Preserve the exact words spoken; do not supply a model request or reaction."
+  }[String(teil)] || "";
+  return [common, part].filter(Boolean).join(" ");
 };
 
 
@@ -6675,7 +6685,9 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     if (!audioFile) return res.status(400).json({ error: "Audio file is required" });
 
     const pictureCard = contextType === "A1 tutor checkpoint A1-11" && level === "A1" && String(teil) === "3";
-    const transcript = ((await transcribeAudio(audioFile, pictureCard)) || "").slice(0, 8000);
+    const a1Day19 = level === "A1" && contextType === "A1 Day 19 tutor speaking workbook";
+    const transcriptionPrompt = a1Day19 ? a1Day19TranscriptionPrompt(teil) : "";
+    const transcript = ((await transcribeAudio(audioFile, pictureCard, transcriptionPrompt)) || "").slice(0, 8000);
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) return res.status(429).json({ error: "Daily speaking analysis limit reached", code: "SPEAKING_QUOTA_REACHED" });
