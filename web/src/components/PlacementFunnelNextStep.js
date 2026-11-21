@@ -23,6 +23,8 @@ const button = (background, color = "#fff") => ({
 });
 
 export default function PlacementFunnelNextStep({ result }) {
+  const isSwahili = result.language === "swahili";
+  const languageName = isSwahili ? "Kiswahili" : "German";
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
@@ -33,11 +35,12 @@ export default function PlacementFunnelNextStep({ result }) {
   const source = context.source || context.src || "placement-test";
   const video = context.video || context.lesson || "";
 
-  const classesUrl = buildPublicFunnelUrl("/classes/", {
+  const classesUrl = buildPublicFunnelUrl(isSwahili ? "/signup/" : "/classes/", {
     source,
     video,
     leadId: result.attemptId || "",
     level: result.level,
+    ...(isSwahili ? {program:"swahili"} : {}),
     utm_source: context.utm_source || source,
     utm_medium: context.utm_medium || "placement_test",
     utm_campaign: context.utm_campaign || "public_funnel",
@@ -48,13 +51,14 @@ export default function PlacementFunnelNextStep({ result }) {
     video,
     leadId: result.attemptId || "",
     level: result.level,
+    ...(isSwahili ? {program:"swahili"} : {}),
     utm_source: context.utm_source || source,
     utm_medium: context.utm_medium || "placement_test",
     utm_campaign: context.utm_campaign || "public_funnel",
     utm_content: "continue_application",
   });
   const whatsappText = encodeURIComponent(
-    `Hello Falowen, my placement-test result is ${result.level} (${result.correct}/${result.total}). Please help me choose a class.`
+    `Hello Falowen, my ${languageName} placement-test result is ${result.level} (${result.correct}/${result.total}). Please help me choose the right learning option.`
   );
 
   const saveReminder = async (event) => {
@@ -72,7 +76,7 @@ export default function PlacementFunnelNextStep({ result }) {
     setStatus("Saving your placement result and contact details...");
     try {
       const payload={
-        id:result.attemptId,action:"contact",name:normalizedName,email:normalizedEmail,
+        id:result.attemptId,action:"contact",language:result.language||"german",name:normalizedName,email:normalizedEmail,
         phone:normalizedPhone,consent:true,
       };
       let saved;
@@ -91,12 +95,13 @@ export default function PlacementFunnelNextStep({ result }) {
         id: result.attemptId,
         createdAt: new Date().toISOString(),
         source: "placement-test-result",
+        program: result.language||"german",
         status: "placement_completed",
         email: normalizedEmail,
         name: normalizedName,
         phone: normalizedPhone,
         level: result.level,
-        className: `${result.level} recommendation`,
+        className: `${languageName} ${result.level} recommendation`,
         classSlug: result.level.toLowerCase(),
         placementCorrect: result.correct,
         placementA1: result.a1,
@@ -132,12 +137,12 @@ export default function PlacementFunnelNextStep({ result }) {
     <section style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 16, background: "#eff6ff", display: "grid", gap: 14, marginTop: 12 }}>
       <div>
         <p style={{ margin: 0, color: "#1d4ed8", fontSize: 12, fontWeight: 900, textTransform: "uppercase" }}>Your next step</p>
-        <h2 style={{ margin: "5px 0", fontSize: 22 }}>Continue with your recommended {result.level} path</h2>
+        <h2 style={{ margin: "5px 0", fontSize: 22 }}>Continue with your recommended {languageName} {result.level} path</h2>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>Your original YouTube lesson or campaign source stays connected as you choose a class and apply.</p>
       </div>
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <a href={classesUrl} onClick={() => trackPublicFunnelEvent("recommended_class_click", { level: result.level })} style={button("#2563eb")}>Choose a {result.level} class</a>
+        <a href={classesUrl} onClick={() => trackPublicFunnelEvent("recommended_class_click", { level: result.level })} style={button("#2563eb")}>{isSwahili ? "Start Kiswahili learning" : `Choose a ${result.level} class`}</a>
         <a href={signupUrl} onClick={() => trackPublicFunnelEvent("continue_application_click", { level: result.level })} style={{ ...button("#fff", "#1d4ed8"), borderColor: "#2563eb" }}>Continue application</a>
         <a href={`https://wa.me/233205706589?text=${whatsappText}`} target="_blank" rel="noopener noreferrer" onClick={() => trackPublicFunnelEvent("placement_whatsapp_click", { level: result.level })} style={button("#16a34a")}>Ask on WhatsApp</a>
       </div>
@@ -155,7 +160,7 @@ export default function PlacementFunnelNextStep({ result }) {
         </div>
         <label style={{display:"flex",alignItems:"flex-start",gap:9,color:"#475569",fontSize:13}}>
           <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} />
-          I agree that Falowen may contact me about German classes and registration. My test result will be used to recommend a starting level.
+          I agree that Falowen may contact me about {languageName} learning and registration. My test result will be used to recommend a starting level.
         </label>
         {status ? <div role="status" style={{ color: status.startsWith("We could") || status.startsWith("Enter") ? "#b91c1c" : "#166534", fontSize: 13 }}>{status}</div> : null}
       </form>}
