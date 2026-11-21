@@ -5,6 +5,7 @@
 | Change | Check or edit first | Related docs / validation |
 | --- | --- | --- |
 | Public routes, tabs, onboarding | `web/src/`, `web/public/falowen-help.md`, `web/public/falowen-navigation.json` | `web/public/llms.txt`, Help page, [Help contract](../FALOWEN_HELP_AND_NAVIGATION.md) |
+| Public German / Kiswahili placement tests | `web/src/components/PlacementTestPage2026.jsx`, `placementTest2026Data.js`, `swahiliPlacementTestData.js`, `api/placement-attempts.js` | Teacher-provided Kiswahili A1–B1 diagnostic; private `SWAHILI_PLACEMENT_ANSWER_KEY` Vercel secret; never commit its answer key or PDF; verify language-aware email/outbox tests |
 | A1–C2 day, chapter, grammar, section | Canonical learner course content and `scripts/generateFalowenCourseMap.mjs` | Generated `falowen-course-map.json` in build output; public schedules; do not directly commit generated map |
 | A1 tutor workbooks / optional music | `web/src/components/A1TutorMarkedWorkbookShell.js`, navigation and submission components | [A1 shared migration](../a1-shared-workbook-migration.md), `README.md`, targeted workbook tests |
 | A2/B1 workbooks | Level-specific workbook sources | Canonical assignment keys and [assessment sync](../assessment-task-sync.md) |
@@ -129,3 +130,16 @@ B1 Day 28 (chapter 10.28), *Kutunza Mazingira katika Maisha ya Kila Siku*, has s
 Admin creates offers through the Campus `/api/course-discounts/admin` API. A share link opens signup or sign-in tied to the offer's program and level. A learner's first checkout can allocate one use and save server-calculated GHS tuition. Allocation is transactional and bound to the learner; expiry and revocation stop new allocations. Already allocated offers keep their price for retries. A signed Paystack payment marks the first redemption while normal tuition, balance and contract rules still apply.
 
 Workbook submissions carry the course program (`german` or `swahili`). Admin uses the submitted course to label score rows and route tutor copies for dual-program students.
+
+
+## Public German and Kiswahili A1–B1 placement assessment — 21 November 2026
+
+The homepage now places a compact three-way visitor decision section between the carousel and the educator team. Its placement card can select **German** or **Kiswahili**; both use the existing `/placement-test` route, with `?language=swahili` for Kiswahili. The exam practice card remains German Goethe-style practice. The beginner card retains normal signup language selection.
+
+Both placement experiences reuse the same public 30-question / 20-minute timer, resume-from-local-browser behavior, result email/outbox, existing private PlacementAttempts sheet, and Admin monitoring endpoint. A separate browser key and language marker on every start/complete/contact event prevents German and Kiswahili attempts or admissions messages from being interchanged. A signed start ticket is checked against the submitted language before accepting a Kiswahili completion. The result CTA passes `program=swahili` for Kiswahili, rather than sending learners to the German class list.
+
+The question wording and four choices in `web/src/components/swahiliPlacementTestData.js` are transcribed from the teacher-supplied four-page PDF `SWAHILI CEFR PLACEMENT TEST (A1–B1)`; **the PDF and confidential answer key must never become downloadable public assets or be committed to this public Git repository**. The key is stored only as the encrypted `SWAHILI_PLACEMENT_ANSWER_KEY` Vercel environment variable (30 zero-based comma-separated option indices). Kiswahili answers are scored exclusively by the backend, and the frontend displays the score returned by the server. Kiswahili submissions do not display the teacher's correct-answer key in the browser. No new cron jobs, polling workers, or databases are added.
+
+The teacher's thresholds are distinct from German's existing scoring: 8/10 for A1 mastery, 8/10 for A2 advancement, 7/10 for B1 mastery. This gives suggested A1 when A1 < 8, suggested A2 when A1 ≥ 8 but A2 < 8 or B1 < 7, and suggested B1 only when all three thresholds are passed. A suggestion is **not** an official CEFR certificate or a replacement for a speaking/writing interview.
+
+Review before public release: the supplied source contains potentially awkward prompts in questions 24, 26 and 27. They are transcribed as provided, without silently editing the instructor's test. If the teacher revises those questions, keep the numbering, four choices, answer key and any saved attempt versions aligned. Validate with `web/src/components/swahiliPlacementTestData.test.js`, `web/src/components/HomepageStartPaths.test.jsx`, and the existing placement server/outbox/email tests. For docs updates, run `node scripts/checkAiDocumentation.mjs`; for published assessment changes, run `node scripts/generateAssessmentTaskRegistry.mjs --check`. Deploy only after appropriate build and pipeline checks, and verify actual production revision.

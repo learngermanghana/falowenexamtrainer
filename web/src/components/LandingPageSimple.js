@@ -5,6 +5,7 @@ import { updatePageMeta } from "../lib/pageMeta";
 import academyProfile from "../data/publicAcademyProfile.json";
 import VisitorQuestionHelper from "./VisitorQuestionHelper";
 import FalowenHomepageCarousel from "./FalowenHomepageCarousel";
+import HomepageStartPaths from "./HomepageStartPaths";
 import "./LandingPageMarketing.css";
 
 const COPY = {
@@ -314,6 +315,8 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
         </nav>
 
         <FalowenHomepageCarousel language={language} classroomImage={academyProfile.classroomImage} onSignUp={signup} />
+
+        <HomepageStartPaths language={language} onSignUp={signup} />
 
         <MeetOurTeam team={academyProfile.team} language={language} />
 

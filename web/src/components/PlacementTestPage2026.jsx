@@ -13,6 +13,7 @@ import {
   getRemainingMs,
   formatRemaining,
 } from "./placementTest2026Data";
+import { swahiliPlacementTest, swahiliPlacementQuestions, SWAHILI_PLACEMENT_STORAGE_KEY } from "./swahiliPlacementTestData";
 
 const initialSession = () => ({
   id: null,
@@ -20,13 +21,16 @@ const initialSession = () => ({
   completedAt: null,
   completionReason: null,
   answers: {},
+  serverScore: null,
   activeIndex: 0,
 });
 
-const readSession = () => {
+const readSession = (language = "german") => {
   if (typeof window === "undefined") return initialSession();
+  const questions = language === "swahili" ? swahiliPlacementQuestions : placementQuestions;
+  const storageKey = language === "swahili" ? SWAHILI_PLACEMENT_STORAGE_KEY : PLACEMENT_STORAGE_KEY;
   try {
-    const saved = JSON.parse(window.localStorage.getItem(PLACEMENT_STORAGE_KEY) || "null");
+    const saved = JSON.parse(window.localStorage.getItem(storageKey) || "null");
     if (!saved || typeof saved !== "object" || !Number.isFinite(saved.startedAt)) return initialSession();
     const startedAt = saved.startedAt;
     const timedOut = Date.now() >= startedAt + PLACEMENT_DURATION_MS;
@@ -39,9 +43,10 @@ const readSession = () => {
       completionReason: wasCompleted ? saved.completionReason || "submitted" : timedOut ? "time" : null,
       answers: Object.fromEntries(
         Object.entries(saved.answers || {}).filter(([id, value]) =>
-          placementQuestions.some((question) => question.id === id && question.options.includes(value))
+          questions.some((question) => question.id === id && question.options.includes(value))
         )
       ),
+      serverScore: saved.serverScore && ["A1","A2","B1"].includes(saved.serverScore.level) ? saved.serverScore : null,
       activeIndex: Math.max(0, Math.min(29, Number.isInteger(saved.activeIndex) ? saved.activeIndex : 0)),
     };
   } catch (_error) {
@@ -69,11 +74,15 @@ const buttonBase = {
 const primaryButton = { ...buttonBase, borderColor: "#1d4ed8", background: "#1d4ed8", color: "#fff" };
 const subtleText = { fontSize: 14, color: "#64748b", lineHeight: 1.55 };
 
-export default function PlacementTestPage2026() {
+export default function PlacementTestPage2026({ language = "german" }) {
   const { t, i18n } = useTranslation();
-  const [session, setSession] = useState(readSession);
+  const isSwahili = language === "swahili";
+  const test = isSwahili ? swahiliPlacementTest : placementTest;
+  const questions = isSwahili ? swahiliPlacementQuestions : placementQuestions;
+  const storageKey = isSwahili ? SWAHILI_PLACEMENT_STORAGE_KEY : PLACEMENT_STORAGE_KEY;
+  const [session, setSession] = useState(() => readSession(language));
   const [now, setNow] = useState(() => Date.now());
-  const trackedCompletion = useRef(Boolean(session.completedAt));
+  const trackedCompletion = useRef(Boolean(session.completedAt && (!isSwahili || session.serverScore)));
   const [starting,setStarting] = useState(false);
   const [startError,setStartError] = useState("");
   const [delivery,setDelivery] = useState("");
@@ -81,17 +90,22 @@ export default function PlacementTestPage2026() {
   const started = Boolean(session.startedAt);
   const finished = Boolean(session.completedAt);
   const remaining = finished ? 0 : getRemainingMs(session.startedAt, now);
-  const activeQuestion = placementQuestions[session.activeIndex];
-  const levelStats = useMemo(() => buildLevelStats(placementTest.sections, session.answers), [session.answers]);
-  const correct = Object.values(levelStats).reduce((sum, stat) => sum + stat.correct, 0);
-  const answered = placementQuestions.filter((question) =>
-    Object.prototype.hasOwnProperty.call(session.answers, question.id)
-  ).length;
-  const suggestedLevel = getPlacementLevel(levelStats);
+  const activeQuestion = questions[session.activeIndex];
+  const levelStats = useMemo(() => isSwahili
+    ? Object.fromEntries(["A1","A2","B1"].map(level => [level, {
+        correct: Number(session.serverScore?.[level.toLowerCase()] || 0),
+        answered: questions.filter(q => q.level === level && Object.prototype.hasOwnProperty.call(session.answers,q.id)).length,
+        total: 10,
+      }]))
+    : buildLevelStats(test.sections, session.answers),
+    [isSwahili, session.serverScore, session.answers, questions, test.sections]);
+  const correct = isSwahili ? Number(session.serverScore?.total || 0) : Object.values(levelStats).reduce((sum, stat) => sum + stat.correct, 0);
+  const answered = questions.filter((question) => Object.prototype.hasOwnProperty.call(session.answers, question.id)).length;
+  const suggestedLevel = isSwahili ? (session.serverScore?.level || "A1") : getPlacementLevel(levelStats);
 
   useEffect(() => {
-    const pageTitle = t("placement2026.title", { defaultValue: placementTest.title });
-    const pageDescription = t("placement2026.description", { defaultValue: placementTest.subtitle });
+    const pageTitle = isSwahili ? test.title : t("placement2026.title", { defaultValue: test.title });
+    const pageDescription = isSwahili ? test.subtitle : t("placement2026.description", { defaultValue: test.subtitle });
     updatePageMeta({
       title: pageTitle,
       description: pageDescription,
@@ -112,15 +126,15 @@ export default function PlacementTestPage2026() {
         },
       }],
     });
-  }, [i18n.language, t]);
+  }, [i18n.language, t, isSwahili, test.title, test.subtitle]);
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(PLACEMENT_STORAGE_KEY, JSON.stringify(session));
+      window.localStorage.setItem(storageKey, JSON.stringify(session));
     } catch (_error) {
       // Private browsing or storage quotas should not prevent taking the test.
     }
-  }, [session]);
+  }, [session, storageKey]);
 
   useEffect(() => {
     if (!started || finished) return undefined;
@@ -149,15 +163,21 @@ export default function PlacementTestPage2026() {
   }, [started]);
 
   useEffect(() => {
-    if (!session.id || !session.completedAt) return undefined;
+    if (!session.id || !session.completedAt || (isSwahili && session.serverScore)) return undefined;
     let active = true;
-    const payload = {id:session.id, action:"complete", ticket:session.ticket,
-      answers:answersToIndices(session.answers,placementQuestions)};
+    const payload = {id:session.id, action:"complete", language, ticket:session.ticket,
+      answers:answersToIndices(session.answers,questions)};
     const send = async () => {
       if (active) setDelivery("saving");
       try {
-        await sendPlacementEventOnce(payload);
-        if (active) setDelivery("queued");
+        // Kiswahili needs the server-owned score. Re-requesting a completed attempt
+        // is safe: the existing private outbox deduplicates by attempt ID.
+        const response = isSwahili ? await postPlacementEvent(payload) : await sendPlacementEventOnce(payload);
+        if (isSwahili && !response.score) throw new Error("Private placement score unavailable");
+        if (active) {
+          if (isSwahili) setSession(previous => ({...previous, serverScore:response.score}));
+          setDelivery("queued");
+        }
       } catch (_) {
         if (active) setDelivery("failed");
       }
@@ -165,19 +185,20 @@ export default function PlacementTestPage2026() {
     send();
     window.addEventListener("online",send);
     return () => { active = false; window.removeEventListener("online",send); };
-  }, [session.id,session.completedAt,session.answers,session.ticket,retry]);
+  }, [session.id,session.completedAt,session.answers,session.ticket,session.serverScore,retry,isSwahili,language,questions]);
 
   useEffect(() => {
-    if (!finished || trackedCompletion.current) return;
+    if (!finished || trackedCompletion.current || (isSwahili && !session.serverScore)) return;
     trackedCompletion.current = true;
     recordEvent("complete", {
       correct,
-      total: placementQuestions.length,
+      total: questions.length,
+      language,
       level: suggestedLevel,
       reason: session.completionReason,
     });
     recordEvent("level_assigned", { level: suggestedLevel });
-  }, [finished, correct, suggestedLevel, session.completionReason]);
+  }, [finished, correct, suggestedLevel, session.completionReason, session.serverScore, isSwahili, language, questions.length]);
 
   const begin = async (event) => {
     event.preventDefault();
@@ -187,7 +208,7 @@ export default function PlacementTestPage2026() {
     setStartError("");
     let result;
     try {
-      result = await postPlacementEvent({action:"start",id:makePlacementAttemptId(),
+      result = await postPlacementEvent({action:"start",language,id:makePlacementAttemptId(),
         email:data.get("email"),name:data.get("name"),classEmails:data.has("classEmails")});
       if (!result.ticket) throw new Error("Please refresh and try again.");
     } catch (error) {
@@ -199,7 +220,7 @@ export default function PlacementTestPage2026() {
     setNow(current);
     trackedCompletion.current = false;
     setSession({ ...initialSession(), id:result.id, ticket:result.ticket, startedAt: current });
-    recordEvent("start", { questionCount: placementQuestions.length, durationMinutes: 20 });
+    recordEvent("start", { questionCount: questions.length, durationMinutes: 20, language });
   };
 
   const answer = (question, option) => {
@@ -240,16 +261,16 @@ export default function PlacementTestPage2026() {
   return (
     <main style={{ ...styles.container, maxWidth: 880, display: "grid", gap: 16, paddingBottom: 56 }}>
       <section style={{ ...styles.card, display: "grid", gap: 9 }}>
-        <p style={{ ...subtleText, margin: 0, color: "#1d4ed8", fontWeight: 850 }}>FREE GERMAN LEVEL CHECK</p>
-        <h1 style={{ ...styles.sectionTitle, margin: 0 }}>{placementTest.title}</h1>
-        <p style={{ ...subtleText, margin: 0 }}>{placementTest.subtitle}</p>
-        <p style={{ ...subtleText, margin: 0 }}>This is a preliminary class-placement recommendation, not an official Goethe or CEFR certificate.</p>
+        <p style={{ ...subtleText, margin: 0, color: "#1d4ed8", fontWeight: 850 }}>FREE {isSwahili ? "KISWAHILI" : "GERMAN"} LEVEL CHECK</p>
+        <h1 style={{ ...styles.sectionTitle, margin: 0 }}>{test.title}</h1>
+        <p style={{ ...subtleText, margin: 0 }}>{test.subtitle}</p>
+        <p style={{ ...subtleText, margin: 0 }}>This is a preliminary placement recommendation, not an official CEFR certificate.</p>
       </section>
 
       {!started ? (
         <section style={{ ...styles.card, display: "grid", gap: 14 }}>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            {placementTest.sections.map((section) => (
+            {test.sections.map((section) => (
               <span key={section.id} style={{ ...styles.badge, background: "#eff6ff", color: "#1e40af", padding: "9px 13px" }}>
                 {section.level} · 10 questions
               </span>
@@ -263,11 +284,11 @@ export default function PlacementTestPage2026() {
             </p>
           </div>
           <form onSubmit={begin} style={{display:"grid",gap:12,maxWidth:480}}>
-            <strong>Where should we send your German placement result?</strong>
+            <strong>Where should we send your {isSwahili ? "Kiswahili" : "German"} placement result?</strong>
             <span>We’ll email your score and recommended starting level. No account is required.</span>
             <label>Email address <input name="email" type="email" required maxLength={180} autoComplete="email" /></label>
             <label>First name (optional) <input name="name" maxLength={120} autoComplete="given-name" /></label>
-            <label><input name="classEmails" type="checkbox" /> Also email me about upcoming German classes at my level.</label>
+            <label><input name="classEmails" type="checkbox" /> Also email me about upcoming {isSwahili ? "Kiswahili learning opportunities" : "German classes"} at my level.</label>
             {startError && <span role="alert">{startError}</span>}
             <button type="submit" disabled={starting} style={{...primaryButton,justifySelf:"start"}}>{starting ? "Starting…" : "Start test →"}</button>
           </form>
@@ -313,7 +334,7 @@ export default function PlacementTestPage2026() {
           {!finished ? (
             <section style={{ ...styles.card, display: "grid", gap: 16 }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {placementTest.sections.map((section, index) => {
+                {test.sections.map((section, index) => {
                   const isActive = activeQuestion.level === section.level;
                   const count = section.questions.filter((q) => Object.prototype.hasOwnProperty.call(session.answers, q.id)).length;
                   return (
@@ -364,7 +385,7 @@ export default function PlacementTestPage2026() {
               <div style={{ display: "grid", gap: 5 }}>
                 <span style={subtleText}>Jump to a question</span>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {placementQuestions.slice(Math.floor(session.activeIndex / 10) * 10, Math.floor(session.activeIndex / 10) * 10 + 10).map((question) => (
+                  {questions.slice(Math.floor(session.activeIndex / 10) * 10, Math.floor(session.activeIndex / 10) * 10 + 10).map((question) => (
                     <button
                       key={question.id} type="button" title={"Question " + question.number}
                       aria-label={"Go to question " + question.number}
@@ -384,8 +405,14 @@ export default function PlacementTestPage2026() {
                 <button type="button" style={buttonBase} onClick={submit}>Submit test</button>
               </div>
             </section>
+          ) : (isSwahili && !session.serverScore) ? (
+            <section role="status" style={{ ...styles.card, display:"grid", gap:12 }}>
+              <strong>{delivery === "failed" ? "Your result could not be saved yet." : "Your Kiswahili answers have been submitted."}</strong>
+              <p>We are checking your answers securely. Your test is saved in this browser; please keep this page open until your recommended level appears.</p>
+              {delivery === "failed" ? <button type="button" style={primaryButton} onClick={() => setRetry(n => n + 1)}>Retry saving my result</button> : null}
+            </section>
           ) : (
-            <section data-placement-registered={Boolean(session.ticket)} data-placement-attempt-id={session.id||""} data-placement-a1={levelStats.A1.correct} data-placement-a2={levelStats.A2.correct} data-placement-b1={levelStats.B1.correct} style={{ ...styles.card, display: "grid", gap: 15, border: "1px solid #bfdbfe" }}>
+            <section data-placement-language={language} data-placement-registered={Boolean(session.ticket)} data-placement-attempt-id={session.id||""} data-placement-a1={levelStats.A1.correct} data-placement-a2={levelStats.A2.correct} data-placement-b1={levelStats.B1.correct} style={{ ...styles.card, display: "grid", gap: 15, border: "1px solid #bfdbfe" }}>
               <div style={{ padding: 14, background: "#eff6ff", borderRadius: 12 }}>
                 <p style={{ ...subtleText, margin: 0, fontWeight: 800 }}>{session.completionReason === "time" ? "Time is up · answers submitted automatically" : "Assessment complete"}</p>
                 <h2 style={{ fontSize: 27, margin: "7px 0", color: "#0f172a" }}>Your suggested starting level: {suggestedLevel}</h2>
@@ -397,7 +424,7 @@ export default function PlacementTestPage2026() {
                 "Saving your result for email…"}</div>}
               <h3 style={{ margin: 0 }}>Your results by level</h3>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
-                {placementTest.sections.map((section) => {
+                {test.sections.map((section) => {
                   const score = levelStats[section.level];
                   return (
                     <div key={section.level} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 14 }}>
@@ -412,26 +439,31 @@ export default function PlacementTestPage2026() {
                 })}
               </div>
               <p style={{ ...subtleText, margin: 0 }}>
-                {suggestedLevel === "A1" ? "Build stronger foundations in everyday grammar and vocabulary before advancing." :
-                  suggestedLevel === "A2" ? "Your A1 and A2 foundations are strong; A2 can help you prepare for B1 structures." :
-                  "You showed strong performance across all three sections. B1 is a suggested starting point."}
+                {isSwahili ? (suggestedLevel === "A1"
+                  ? "Start with core expressions, everyday vocabulary and basic Kiswahili grammar."
+                  : suggestedLevel === "A2"
+                    ? "Continue building A2 skills before moving to more complex B1 structures."
+                    : "You showed strong performance across all three sections. B1 is a suggested starting point.")
+                  : (suggestedLevel === "A1" ? "Build stronger foundations in everyday grammar and vocabulary before advancing."
+                    : suggestedLevel === "A2" ? "Your A1 and A2 foundations are strong; A2 can help you prepare for B1 structures."
+                    : "You showed strong performance across all three sections. B1 is a suggested starting point.")}
               </p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <a onClick={()=>recordEvent("recommended_class_click",{level:suggestedLevel})} href={"/classes/?level=" + encodeURIComponent(suggestedLevel)} style={{ ...primaryButton, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>View {suggestedLevel} classes</a>
+                <a onClick={()=>recordEvent("recommended_class_click",{level:suggestedLevel,language})} href={isSwahili ? "/signup?program=swahili&level="+encodeURIComponent(suggestedLevel)+"&source=placement-test" : "/classes/?level=" + encodeURIComponent(suggestedLevel)} style={{ ...primaryButton, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>{isSwahili ? "Continue with Kiswahili" : `View ${suggestedLevel} classes`}</a>
                 <button type="button" style={buttonBase} onClick={() => setSession(initialSession())}>Retake test</button>
               </div>
               <details style={{ padding: 12, border: "1px solid #e2e8f0", borderRadius: 12 }}>
-                <summary style={{ cursor: "pointer", fontWeight: 800 }}>Review answers (after submission)</summary>
+                <summary style={{ cursor: "pointer", fontWeight: 800 }}>{isSwahili ? "Review your submitted answers" : "Review answers (after submission)"}</summary>
                 <ol style={{ paddingLeft: 22, display: "grid", gap: 14 }}>
-                  {placementQuestions.map((question) => {
+                  {questions.map((question) => {
                     const selected = session.answers[question.id];
                     return (
                       <li key={question.id}>
                         <div><strong>{question.level} · {question.text}</strong></div>
-                        <div style={{ ...subtleText, color: selected === question.correct ? "#166534" : "#b91c1c" }}>
+                        <div style={{ ...subtleText, color: isSwahili ? "#475569" : selected === question.correct ? "#166534" : "#b91c1c" }}>
                           Your answer: {selected || "Not answered"}
                         </div>
-                        <div style={{ ...subtleText, color: "#166534" }}>Correct: {question.correct}</div>
+                        {!isSwahili && <div style={{ ...subtleText, color: "#166534" }}>Correct: {question.correct}</div>}
                       </li>
                     );
                   })}

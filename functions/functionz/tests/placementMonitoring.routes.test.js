@@ -37,3 +37,31 @@ describe("encrypted public placement monitoring", () => {
     expect(()=>handler.unseal(cipher.slice(0,-3)+"xyz")).toThrow();
   });
 });
+
+describe("Kiswahili placement uses its private answer key and level thresholds",()=>{
+  const previous = process.env.SWAHILI_PLACEMENT_ANSWER_KEY;
+  afterEach(()=>{
+    if(previous===undefined) delete process.env.SWAHILI_PLACEMENT_ANSWER_KEY;
+    else process.env.SWAHILI_PLACEMENT_ANSWER_KEY=previous;
+  });
+  test("uses 8/10 for A1 and A2, 7/10 for B1, preserving German scoring",()=>{
+    // Synthetic test key only; never commit the teacher's confidential production key.
+    process.env.SWAHILI_PLACEMENT_ANSWER_KEY=Array(30).fill(0).join(",");
+    const perfect=Array(30).fill(0);
+    expect(handler.grade(perfect,"swahili")).toEqual({a1:10,a2:10,b1:10,total:30,answered:30,level:"B1"});
+    const a2=[...perfect];for(let i=20;i<24;i++)a2[i]=null;
+    expect(handler.grade(a2,"swahili").level).toBe("A2");
+    const stillA2=[...perfect];for(let i=10;i<13;i++)stillA2[i]=null;
+    expect(handler.grade(stillA2,"swahili").level).toBe("A2");
+    const a1=[...perfect];for(let i=0;i<3;i++)a1[i]=null;
+    expect(handler.grade(a1,"swahili").level).toBe("A1");
+    expect(handler.grade(perfect,"german").total).toBeLessThan(30);
+    expect(()=>handler.grade(Array(30).fill(4),"swahili")).toThrow();
+  });
+  test("rejects unsupported language and unavailable private key",()=>{
+    delete process.env.SWAHILI_PLACEMENT_ANSWER_KEY;
+    expect(()=>handler.grade(Array(30).fill(null),"swahili")).toThrow(/configured/);
+    expect(()=>handler.placementLanguage("french")).toThrow(/Unsupported/);
+    expect(handler.placementLanguage(undefined)).toBe("german");
+  });
+});
