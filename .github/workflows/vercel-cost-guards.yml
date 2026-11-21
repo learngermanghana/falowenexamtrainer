@@ -5,6 +5,11 @@ on:
     paths:
       - 'vercel.json'
       - 'api/music-library.js'
+      - 'web/src/serviceWorkerRegistration.js'
+      - 'web/public/firebase-messaging-sw.js'
+      - 'web/src/serviceWorkerRegistration.test.js'
+      - 'web/src/__tests__/ServiceWorkerBuildAssetSafety.test.js'
+      - 'tests/cdn-request-guards.test.cjs'
       - 'scripts/vercelIgnoreBuild.cjs'
       - 'tests/cost-controls-contract.test.cjs'
       - 'tests/vercel-build-ignore.test.cjs'
@@ -22,4 +27,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test tests/vercel-build-ignore.test.cjs tests/cost-controls-contract.test.cjs
+      - run: node --test tests/vercel-build-ignore.test.cjs tests/cost-controls-contract.test.cjs tests/cdn-request-guards.test.cjs
