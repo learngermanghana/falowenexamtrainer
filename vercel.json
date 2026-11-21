@@ -504,6 +504,13 @@
       "dest": "/index.html"
     },
     {
+      "src": "/learn-swahili/?",
+      "dest": "/__seo/swahili.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/goethe-a1-preparation/?",
       "dest": "/__seo/goethe-a1-preparation.html"
     },
