@@ -64,10 +64,14 @@ describe("public 30-question placement test", () => {
   test("starts on user action and auto-submits unanswered items at timeout", async () => {
     render(<PlacementTestPage2026 />);
     expect(screen.getByRole("button", { name: /start test/i })).toBeInTheDocument();
-    expect(screen.queryByText("20:00")).not.toBeInTheDocument();
+    // The introduction shows a static duration, not the running countdown.
+    expect(screen.getByText("20:00")).toBeInTheDocument();
+    expect(screen.getByText("20-minute timed assessment")).toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Time left:/i)).not.toBeInTheDocument();
     expect(screen.getByLabelText(/Email address/)).toBeRequired();
     await startTest();
-    expect(screen.getByText("20:00")).toBeInTheDocument();
+    // Only the live, accessible countdown begins after registration/start.
+    expect(screen.getByLabelText("Time left: 20:00")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: "A. heiße" }));
     act(() => { jest.advanceTimersByTime(20 * 60 * 1000); });
     expect(screen.getByText(/Time is up/i)).toBeInTheDocument();
