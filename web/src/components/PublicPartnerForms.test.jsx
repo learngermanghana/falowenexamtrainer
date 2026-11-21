@@ -118,3 +118,48 @@ test("partner signing still saves the agreement and preserves the enrolment link
   })));
   expect(await screen.findByRole("link", { name: /Continue to add your students/ })).toHaveAttribute("href", "/organisation-enrolment");
 });
+
+
+test.each([
+  ["Kiswahili", "Swahili", "A1 Kiswahili Class — 2027-01-06"],
+  ["  kIsWaHiLi  ", "Swahili", "A1 Kiswahili Class — 2027-01-06"],
+  ["Swahili", "Swahili", "A1 Kiswahili Class — 2027-01-06"],
+  ["Kiswahili (Swahili)", "Swahili", "A1 Kiswahili Class — 2027-01-06"],
+  ["Deutsch", "German", "A1 German Class — 2027-01-04"],
+  ["GERMAN", "German", "A1 German Class — 2027-01-04"],
+])("pasted spreadsheet language %s matches the %s class catalogue", async (input, expected, className) => {
+  show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
+  const row = ["Pasted Learner", "pasted@example.test", "0200000000", "A1", "Accra", "0240000000", input].join("\t");
+  fireEvent.paste(screen.getByLabelText("Student 1 Full name"), {
+    clipboardData: { getData: format => format === "text" ? row : "" },
+  });
+  expect(screen.getByLabelText("Student 1 Course language")).toHaveValue(expected);
+  expect(screen.getByLabelText("Student 1 Level")).toHaveValue("A1");
+  expect(await screen.findByRole("option", { name: className })).toBeInTheDocument();
+});
+
+test("pasting mixed-language students preserves their levels and submits canonical programme values", async () => {
+  show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
+  const records = [
+    ["Kiswahili Learner", "kiswahili@example.test", "0200000000", "A1", "Accra", "0240000000", "Kiswahili"],
+    ["German Learner", "german@example.test", "0200000001", "A1", "Accra", "0240000001", "Deutsch"],
+  ];
+  fireEvent.paste(screen.getByLabelText("Student 1 Full name"), {
+    clipboardData: { getData: format => format === "text" ? records.map(row => row.join("\t")).join("\n") : "" },
+  });
+  expect(screen.getByLabelText("Student 1 Course language")).toHaveValue("Swahili");
+  expect(screen.getByLabelText("Student 2 Course language")).toHaveValue("German");
+  expect(screen.getByLabelText("Student 1 Level")).toHaveValue("A1");
+  expect(screen.getByLabelText("Student 2 Level")).toHaveValue("A1");
+  await screen.findByRole("option", { name: "A1 Kiswahili Class — 2027-01-06" });
+  fireEvent.change(screen.getByLabelText("Student 1 Requested class"), { target: { value: "sw-a1" } });
+  fireEvent.change(screen.getByLabelText("Student 2 Requested class"), { target: { value: "de-a1" } });
+  fireEvent.submit(screen.getByRole("button", { name: "Submit for Falowen review" }).closest("form"));
+  await waitFor(() => expect(partnerRequest).toHaveBeenCalled());
+  const [action, payload] = partnerRequest.mock.calls[0];
+  expect(action).toBe("organisation-enrolments");
+  expect(payload.students).toMatchObject([
+    { language: "Swahili", level: "A1", requestedClassId: "sw-a1" },
+    { language: "German", level: "A1", requestedClassId: "de-a1" },
+  ]);
+});
