@@ -85,11 +85,23 @@ describe("service worker build asset safety", () => {
 
   it("reloads an already-open Falowen tab when a later build revision appears", () => {
     expect(registration).toContain('const BUILD_REVISION_KEY = "falowen:loaded-build-revision"');
-    expect(registration).toContain("const BUILD_REVISION_CHECK_INTERVAL_MS = 5 * 60 * 1000");
+    expect(registration).toContain("const BUILD_REVISION_CHECK_INTERVAL_MS = 30 * 60 * 1000");
+    expect(registration).toContain("const BUILD_REVISION_CHECK_MIN_GAP_MS = 10 * 60 * 1000");
+    expect(registration).toContain('cache: "default"');
+    expect(registration).toContain("checkForNewBuildWhenDue");
+    expect(registration).toContain("updateWorkerWhenDue");
     expect(registration).toContain("checkForNewBuild");
     expect(registration).toContain("window.sessionStorage");
     expect(registration).toContain("window.location.reload()");
     expect(registration).toContain('document.addEventListener("visibilitychange"');
+  });
+
+  it("does not fetch the build manifest on every navigation", () => {
+    expect(serviceWorker).toContain("const BUILD_MANIFEST_RECHECK_MS = 30 * 60 * 1000");
+    expect(serviceWorker).toContain("refreshBuildPrecacheWhenDue()");
+    expect(serviceWorker).toContain('fetch(BUILD_ASSET_MANIFEST_URL, { cache: "default" })');
+    expect(serviceWorker).toContain("lastBuildManifestCheckAt = Date.now()");
+    expect(serviceWorker).toContain("lastBuildManifestCheckAt = 0");
   });
 
   it("uses the current offline cache version", () => {
