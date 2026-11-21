@@ -18,22 +18,23 @@
         text: review && review.comment ? review.comment.trim() : "",
         createdAt: review && review.createTime ? review.createTime : ""
       };
-    }).filter(function (review) { return review.rating > 0; });
+    }).filter(function (review) { return review.rating > 0 || !!review.text; });
   }
 
   function stars(count) {
-    return "★★★★★".slice(0, count);
+    return count > 0 ? "★★★★★".slice(0, count) : "Rating not recorded";
   }
 
   function summary(reviews) {
-    if (!reviews.length) return { average: "–", count: 0 };
-    var total = reviews.reduce(function (sum, review) { return sum + review.rating; }, 0);
-    return { average: (total / reviews.length).toFixed(1), count: reviews.length };
+    var rated = reviews.filter(function (review) { return review.rating > 0; });
+    if (!rated.length) return { average: "–", count: reviews.length, ratedCount: 0 };
+    var total = rated.reduce(function (sum, review) { return sum + review.rating; }, 0);
+    return { average: (total / rated.length).toFixed(1), count: reviews.length, ratedCount: rated.length };
   }
 
   function selectFeatured(reviews) {
-    var writtenFiveStar = reviews.filter(function (review) { return review.rating === 5 && review.text; });
-    return writtenFiveStar.slice(0, 3);
+    var featured = reviews.filter(function (review) { return review.text && (review.rating === 5 || review.rating === 0); });
+    return featured.slice(0, 3);
   }
 
   function mountReviews(reviews) {
@@ -57,15 +58,15 @@
           '<h2 id="falowen-google-reviews-title">Trusted by German learners in Ghana and abroad</h2>' +
           '<p>Real feedback from learners using Falowen and Learn Language Education Academy.</p>' +
         '</div>' +
-        '<div class="falowen-google-reviews__score" aria-label="' + stats.average + ' out of 5 from ' + stats.count + ' exported Google reviews">' +
+        '<div class="falowen-google-reviews__score" aria-label="' + stats.average + ' out of 5 from ' + stats.ratedCount + ' rated Google reviews, ' + stats.count + ' reviews displayed">' +
           '<strong>' + stats.average + ' <span aria-hidden="true">★</span></strong>' +
-          '<span>' + stats.count + ' exported Google reviews</span>' +
+          '<span>' + stats.count + ' exported Google reviews (' + stats.ratedCount + ' rated)</span>' +
         '</div>' +
       '</div>' +
       '<div class="falowen-google-reviews__grid">' +
         featuredReviews.map(function (review) {
           return '<article class="falowen-google-review-card">' +
-            '<div class="falowen-google-review-card__stars" aria-label="' + review.rating + ' out of 5 stars">' + stars(review.rating) + '</div>' +
+            '<div class="falowen-google-review-card__stars" aria-label="' + (review.rating > 0 ? review.rating + ' out of 5 stars' : 'Star rating not recorded') + '">' + stars(review.rating) + '</div>' +
             '<p>“' + escapeHtml(review.text) + '”</p>' +
             '<footer><strong>' + escapeHtml(review.name) + '</strong><span>Google Review</span></footer>' +
           '</article>';
