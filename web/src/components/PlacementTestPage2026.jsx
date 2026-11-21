@@ -439,9 +439,14 @@ export default function PlacementTestPage2026({ language = "german" }) {
                 })}
               </div>
               <p style={{ ...subtleText, margin: 0 }}>
-                {suggestedLevel === "A1" ? "Start with core expressions, everyday vocabulary and basic Kiswahili grammar." :
-                  suggestedLevel === "A2" ? "Continue building A2 skills before moving to more complex B1 structures." :
-                  "You showed strong performance across all three sections. B1 is a suggested starting point."}
+                {isSwahili ? (suggestedLevel === "A1"
+                  ? "Start with core expressions, everyday vocabulary and basic Kiswahili grammar."
+                  : suggestedLevel === "A2"
+                    ? "Continue building A2 skills before moving to more complex B1 structures."
+                    : "You showed strong performance across all three sections. B1 is a suggested starting point.")
+                  : (suggestedLevel === "A1" ? "Build stronger foundations in everyday grammar and vocabulary before advancing."
+                    : suggestedLevel === "A2" ? "Your A1 and A2 foundations are strong; A2 can help you prepare for B1 structures."
+                    : "You showed strong performance across all three sections. B1 is a suggested starting point.")}
               </p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <a onClick={()=>recordEvent("recommended_class_click",{level:suggestedLevel,language})} href={isSwahili ? "/signup?program=swahili&level="+encodeURIComponent(suggestedLevel)+"&source=placement-test" : "/classes/?level=" + encodeURIComponent(suggestedLevel)} style={{ ...primaryButton, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>{isSwahili ? "Continue with Kiswahili" : `View ${suggestedLevel} classes`}</a>
