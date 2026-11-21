@@ -3,10 +3,16 @@ const FORCE_REFRESH_KEY = "app-last-force-refresh-at";
 const FORCE_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const BUILD_MANIFEST_PATH = `${process.env.PUBLIC_URL || ""}/offline-build-assets.json`;
 const BUILD_REVISION_KEY = "falowen:loaded-build-revision";
-const BUILD_REVISION_CHECK_INTERVAL_MS = 5 * 60 * 1000;
+// Revisions stay visible after a tab returns, without five-minute background requests.
+const BUILD_REVISION_CHECK_INTERVAL_MS = 30 * 60 * 1000;
+const BUILD_REVISION_CHECK_MIN_GAP_MS = 10 * 60 * 1000;
+const WORKER_UPDATE_MIN_GAP_MS = 30 * 60 * 1000;
 
 let registrationStarted = false;
 let buildRevisionTimer = null;
+let lastBuildRevisionCheckAt = 0;
+let lastWorkerUpdateAt = 0;
+let buildRevisionCheckPromise = null;
 
 // Embedded lecture players and workbook drafts can lose their place on reload.
 const isLearningPage = () => /^\/(campus|swahili)(\/|$)/i.test(window.location.pathname);
@@ -50,7 +56,9 @@ const setLoadedBuildRevision = (revision) => {
 };
 
 const fetchCurrentBuildRevision = async () => {
-  const response = await fetch(BUILD_MANIFEST_PATH, { cache: "no-store" });
+  // A five-minute HTTP cache avoids CDN hits from concurrent browser tabs.
+  // Vercel's short max-age still lets a deployed revision become visible.
+  const response = await fetch(BUILD_MANIFEST_PATH, { cache: "default" });
   if (!response.ok) throw new Error(`Build manifest returned ${response.status}`);
   const payload = await response.json();
   return typeof payload?.revision === "string" ? payload.revision.trim() : "";
@@ -74,10 +82,48 @@ const checkForNewBuild = async ({ reloadOnChange = true } = {}) => {
   return true;
 };
 
+// One update check per active browser window; no requests in background tabs.
+// Returning to a visible tab after a ten-minute absence still checks promptly.
+const checkForNewBuildWhenDue = ({ reloadOnChange = true, force = false } = {}) => {
+  if (typeof window === "undefined" || typeof document === "undefined"
+    || document.visibilityState === "hidden"
+    || (typeof navigator !== "undefined" && navigator.onLine === false)) {
+    return Promise.resolve(false);
+  }
+  if (buildRevisionCheckPromise) return buildRevisionCheckPromise;
+  const now = Date.now();
+  if (!force && now - lastBuildRevisionCheckAt < BUILD_REVISION_CHECK_MIN_GAP_MS) {
+    return Promise.resolve(false);
+  }
+  lastBuildRevisionCheckAt = now;
+  buildRevisionCheckPromise = checkForNewBuild({ reloadOnChange })
+    .catch((error) => {
+      // Allow the next focus/reconnect to retry a failed network check.
+      lastBuildRevisionCheckAt = 0;
+      throw error;
+    })
+    .finally(() => { buildRevisionCheckPromise = null; });
+  return buildRevisionCheckPromise;
+};
+
+const updateWorkerWhenDue = async (registration, { force = false } = {}) => {
+  if (typeof document === "undefined" || document.visibilityState === "hidden"
+    || (typeof navigator !== "undefined" && navigator.onLine === false)) return;
+  const now = Date.now();
+  if (!force && now - lastWorkerUpdateAt < WORKER_UPDATE_MIN_GAP_MS) return;
+  lastWorkerUpdateAt = now;
+  try {
+    await registration.update();
+  } catch (error) {
+    lastWorkerUpdateAt = 0;
+    throw error;
+  }
+};
+
 const startBuildRevisionChecks = () => {
   if (typeof window === "undefined" || buildRevisionTimer) return;
   buildRevisionTimer = window.setInterval(() => {
-    checkForNewBuild().catch((error) =>
+    void checkForNewBuildWhenDue().catch((error) =>
       console.error("Falowen build revision check failed", error)
     );
   }, BUILD_REVISION_CHECK_INTERVAL_MS);
@@ -132,9 +178,11 @@ const setupUpdateHandlers = (registration) => {
 
 const setupUpdateChecks = (registration) => {
   const runUpdate = async () => {
+    if (document.visibilityState === "hidden"
+      || (typeof navigator !== "undefined" && navigator.onLine === false)) return;
     try {
-      await registration.update();
-      await checkForNewBuild();
+      await updateWorkerWhenDue(registration);
+      await checkForNewBuildWhenDue();
     } catch (error) {
       console.error("Service worker/build update check failed", error);
     }
@@ -158,8 +206,8 @@ const startRegistration = () => {
     .then(async (registration) => {
       setupUpdateHandlers(registration);
       setupUpdateChecks(registration);
-      await registration.update();
-      await checkForNewBuild({ reloadOnChange: false });
+      await updateWorkerWhenDue(registration, { force: true });
+      await checkForNewBuildWhenDue({ reloadOnChange: false, force: true });
       startBuildRevisionChecks();
       await forcePeriodicRefresh(registration);
     })
@@ -204,4 +252,6 @@ export const __private__ = {
   getLoadedBuildRevision,
   setLoadedBuildRevision,
   startBuildRevisionChecks,
+  checkForNewBuildWhenDue,
+  updateWorkerWhenDue,
 };
