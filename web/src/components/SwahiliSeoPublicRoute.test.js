@@ -10,6 +10,8 @@ test("Swahili public page is crawlable and has canonical, educational content an
   expect(html).toContain("Learn Swahili online in Ghana and across Africa");
   expect(html).toContain('type="application/ld+json"');
   expect(html).toContain('href="/signup?program=swahili"');
+  expect(html).toContain('href="/placement-test?language=swahili"');
+  expect(html).not.toContain('href="/placement-test?program=swahili"');
   expect(html).toContain("Dr. Ruth Ndekiro Shao");
   expect(html).not.toContain("enable JavaScript to run");
 });
