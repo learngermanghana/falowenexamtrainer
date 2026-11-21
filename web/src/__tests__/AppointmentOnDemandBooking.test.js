@@ -19,6 +19,7 @@ const loadPage = () => {
   document.write(markup);
   document.close();
   window.scrollTo = jest.fn();
+  document.getElementById("details-step").scrollIntoView = jest.fn();
   const fetchMock = jest.fn(async (url, options = {}) => {
     if (options.method === "POST") {
       return { ok: true, json: async () => ({
@@ -65,7 +66,7 @@ describe("public appointment booking is loaded on demand", () => {
     }));
     await waitFor(() => expect(document.getElementById("choose-step").hidden).toBe(false));
     expect(document.getElementById("booking-entry").hidden).toBe(true);
-    expect(document.querySelector(".booking-time-button")).not.toBeNull();
+    await waitFor(() => expect(document.querySelector(".booking-time-button")).not.toBeNull());
   });
 
   test("manual refresh and booking POST still work after choosing calendar", async () => {
