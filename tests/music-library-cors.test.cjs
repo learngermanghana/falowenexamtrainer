@@ -14,7 +14,8 @@ test('public catalog CORS stays identical across origins and cached responses', 
     assert.equal(res.code,200);
     assert.equal(res.body.tracks[0].id,'public-song');
     assert.equal(headers.Vary,undefined);
-    assert.match(headers['Cache-Control'],/s-maxage=45/);
+    assert.match(headers['Cache-Control'],/max-age=120/);
+    assert.equal(headers['Vercel-CDN-Cache-Control'], 'max-age=120');
     assert.equal(headers['Access-Control-Allow-Credentials'],undefined);
     assert.equal(headers['Access-Control-Allow-Origin'], '*');
   }
