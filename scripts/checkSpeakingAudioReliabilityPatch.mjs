@@ -105,7 +105,7 @@ const checks = [
   ]],
   ["functions/functionz/app.js", [
     'require("./speakingAudioReliability")',
-    "transcribeAudioFile({ file, getOpenAIClient, pictureCard })",
+    "transcribeAudioFile({ file, getOpenAIClient, pictureCard, transcriptionPrompt })",
     ".slice(0, 8000)",
     "SPEAKING_QUOTA_REACHED",
     "NO_SPEECH_DETECTED|TRANSCRIPTION_",
