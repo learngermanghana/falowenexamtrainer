@@ -143,6 +143,12 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
+      - name: Test bilingual placement Figma layout and results
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/components/PlacementTestPage.figmaLayout.test.jsx
+
       - name: Test concise A2 Day 4 grammar
         working-directory: web
         env:
