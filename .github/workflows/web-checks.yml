@@ -147,7 +147,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/components/PlacementTestPage.figmaLayout.test.jsx
+        run: npx jest --runInBand --runTestsByPath src/components/PlacementTestPage.figmaLayout.test.jsx src/components/PlacementFunnelNextStep.program.test.jsx src/lib/publicFunnelTracking.program.test.js
 
       - name: Test concise A2 Day 4 grammar
         working-directory: web
