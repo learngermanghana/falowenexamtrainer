@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 20919)
-Total output lines: 2494
-
 // Published Kiswahili A1 workbook activities. Tutor references are stored in Admin.
 export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
   "2": {
@@ -1046,7 +1043,351 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
           {
             "swahili": "shilingi elfu tatu na mia mbili",
             "english": "3,200 shillings"
-  …2919 tokens truncated…pa shilingi mia nne.",
+          }
+        ]
+      },
+      {
+        "title": "Ngeli ya Ji-/Ma- · Noun agreement",
+        "rule": "Many singular nouns have no visible ji- prefix. The plural usually starts with ma-. In the present tense, use li- with a singular subject and ya- with a plural subject.",
+        "examples": [
+          {
+            "swahili": "Chungwa kubwa linagharimu shilingi hamsini.",
+            "english": "A large orange costs 50 shillings."
+          },
+          {
+            "swahili": "Machungwa makubwa yanagharimu shilingi hamsini kila moja.",
+            "english": "Large oranges cost 50 shillings each."
+          },
+          {
+            "swahili": "soko → masoko · parachichi → maparachichi · limau → malimau",
+            "english": "market(s) · avocado(s) · lemon(s)"
+          }
+        ]
+      },
+      {
+        "title": "Vipimo na idadi · Units and quantities",
+        "rule": "Use quantities that fit the product. Match agreeing numbers to the noun: fungu moja, mafungu mawili, mafungu manne. Kilo uses moja. With a ki-class measure, use kichane kimoja cha ….",
+        "examples": [
+          {
+            "swahili": "mafungu manne ya mchicha",
+            "english": "four bundles of mchicha (amaranth greens)"
+          },
+          {
+            "swahili": "kilo moja ya karoti",
+            "english": "one kilo of carrots"
+          },
+          {
+            "swahili": "kichane kimoja cha ndizi",
+            "english": "one bunch of bananas"
+          }
+        ]
+      },
+      {
+        "title": "Kuna, pana, mna · Talking about what is there",
+        "rule": "Use kuna for general presence, pana for presence at a particular spot, and locative mna for presence inside. In a direct question to sellers, Mna …? can also mean ‘Do you have …?’",
+        "examples": [
+          {
+            "swahili": "Sokoni kuna matunda na mboga.",
+            "english": "There are fruits and vegetables at the market."
+          },
+          {
+            "swahili": "Hapa pana machungwa.",
+            "english": "There are oranges here at this spot."
+          },
+          {
+            "swahili": "Kikapuni mna malimau.",
+            "english": "There are lemons inside the basket."
+          },
+          {
+            "swahili": "Mna maparachichi?",
+            "english": "Do you have avocados?"
+          }
+        ]
+      },
+      {
+        "title": "Kuomba na kupatana bei · Requesting and bargaining",
+        "rule": "Use naomba for a polite request. Ask the unit price or total, then use tafadhali to soften a request for a lower price.",
+        "examples": [
+          {
+            "swahili": "Naomba maparachichi manane, tafadhali.",
+            "english": "I’d like eight avocados, please."
+          },
+          {
+            "swahili": "Jumla ni shilingi ngapi?",
+            "english": "How much is the total?"
+          },
+          {
+            "swahili": "Ni ghali sana. Unaweza kupunguza bei kidogo, tafadhali?",
+            "english": "It’s very expensive. Could you lower the price a little, please?"
+          }
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "sw": "soko",
+        "en": "market"
+      },
+      {
+        "sw": "nyanya",
+        "en": "tomatoes"
+      },
+      {
+        "sw": "vitunguu",
+        "en": "onions"
+      },
+      {
+        "sw": "mayai",
+        "en": "eggs"
+      },
+      {
+        "sw": "ndizi",
+        "en": "bananas"
+      },
+      {
+        "sw": "nusu kilo",
+        "en": "half a kilo"
+      },
+      {
+        "sw": "punguzo",
+        "en": "discount"
+      },
+      {
+        "sw": "muuzaji",
+        "en": "seller"
+      },
+      {
+        "sw": "mnunuzi",
+        "en": "buyer"
+      },
+      {
+        "sw": "chungwa",
+        "en": "orange"
+      },
+      {
+        "sw": "parachichi",
+        "en": "avocado"
+      },
+      {
+        "sw": "limau",
+        "en": "lemon"
+      },
+      {
+        "sw": "mchicha",
+        "en": "amaranth greens"
+      },
+      {
+        "sw": "fungu",
+        "en": "bundle"
+      },
+      {
+        "sw": "kichane",
+        "en": "bunch"
+      },
+      {
+        "sw": "karoti",
+        "en": "carrot"
+      },
+      {
+        "sw": "jumla",
+        "en": "total"
+      }
+    ],
+    "check": {
+      "question": "How do you ask the seller to lower the price?",
+      "options": [
+        "Jumla ni shilingi ngapi?",
+        "Unaweza kupunguza bei?",
+        "Unataka mayai mangapi?"
+      ],
+      "answer": 1,
+      "why": "Kupunguza bei means to lower the price."
+    },
+    "speaking": "Role-play a buyer and a seller. Ask what the stall has, order produce by number, bundle or kilo, ask the total, and agree on a lower price. Use the dialogue in Reading as a model and swap roles.",
+    "writing": {
+      "prompt": "Write a short market dialogue. Ask if the seller has avocados, request eight avocados and a bunch of bananas, ask for the total and bargain politely."
+    },
+    "reading": {
+      "title": "Safari ya Juma Sokoni na Kahawani",
+      "text": "Juma ni mwanafunzi. Leo asubuhi, Juma anakwenda sokoni kupata matunda na chakula. Sokoni, Juma anamwona muuza matunda na anasema, “Samahani, naomba matunda haya, tafadhali.”\n\nJuma ananunua maembe matatu na machungwa matano. Pia, ananunua mayai kumi. Muuza matunda anasema, “Jumla ni shilingi mia nne na hamsini.” Juma anatoa fedha na anasema, “Asante sana.” Muuza matunda anajibu, “Karibu sana!”\n\nBaadaye, Juma anakwenda kahawani. Anakaa karibu na dirisha kubwa. Anamwambia mhudumu, “Naomba kikombe cha kahawa na maji, tafadhali.” Mhudumu analeta kahawa na maji. Juma anafurahi sana. Anasema, “Naomba bili, tafadhali.”",
+      "questions": [
+        {
+          "question": "Kwa nini Juma anakwenda sokoni asubuhi?",
+          "id": "read-1"
+        },
+        {
+          "question": "Juma ananunua maembe mangapi, machungwa mangapi na mayai mangapi?",
+          "id": "read-2"
+        },
+        {
+          "question": "Juma analipa shilingi ngapi sokoni?",
+          "id": "read-3"
+        },
+        {
+          "question": "Juma anakaa wapi kahawani?",
+          "id": "read-4"
+        },
+        {
+          "question": "Juma anaomba vinywaji gani kahawani?",
+          "id": "read-5"
+        }
+      ]
+    },
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-10/audio-url",
+      "questions": [
+        {
+          "id": "first-item",
+          "question": "Mnunuzi anataka kununua nini kwanza?",
+          "choices": [
+            "Nyanya",
+            "Vitunguu",
+            "Ndizi mbivu"
+          ]
+        },
+        {
+          "id": "tomato-price",
+          "question": "Muuzaji anataja bei gani ya nyanya?",
+          "choices": [
+            "Shilingi mia moja",
+            "Shilingi mia tano",
+            "Shilingi mia nane"
+          ]
+        },
+        {
+          "id": "onion-quantity",
+          "question": "Mnunuzi anataka vitunguu vingapi?",
+          "choices": [
+            "Kimoja",
+            "Viwili",
+            "Vitatu"
+          ]
+        },
+        {
+          "id": "bananas",
+          "question": "Kwa nini mnunuzi hapati ndizi mbivu?",
+          "choices": [
+            "Ndizi zimeisha",
+            "Ndizi ni ghali",
+            "Ndizi hazijaiva"
+          ]
+        },
+        {
+          "id": "total",
+          "question": "Jumla ni shilingi ngapi?",
+          "choices": [
+            "Shilingi mia tano",
+            "Shilingi mia nane",
+            "Shilingi elfu moja"
+          ]
+        }
+      ]
+    }
+  },
+  "11": {
+    "day": 11,
+    "chapter": "Somo la 11",
+    "title": "Dukani",
+    "objective": "Ask what is in stock, choose a product and pay at a shop counter.",
+    "grammar": "Buying from the Shop + Numbers · Nambari na kununua dukani",
+    "practiceOnly": false,
+    "grammarSections": [
+      {
+        "title": "Nambari · Numbers",
+        "rule": "Count aloud before using numbers with shop items. These are the basic forms for 1–10; some numbers change to agree with the noun.",
+        "examples": [
+          {
+            "swahili": "moja · mbili · tatu · nne · tano",
+            "english": "one · two · three · four · five"
+          },
+          {
+            "swahili": "sita · saba · nane · tisa · kumi",
+            "english": "six · seven · eight · nine · ten"
+          }
+        ]
+      },
+      {
+        "title": "Bidhaa na idadi · Items and quantities",
+        "rule": "Place the quantity after the item. The handout’s examples use nouns whose forms stay the same in the singular and plural: sahani, saa, kofia, simu, kalamu, redio and nyanya. Do not add vi- to their numbers. Other noun classes have their own agreement.",
+        "examples": [
+          {
+            "swahili": "sahani tatu · saa moja · kofia tatu",
+            "english": "three plates · one clock/watch · three hats"
+          },
+          {
+            "swahili": "simu tatu · kalamu nne",
+            "english": "three phones · four pens"
+          },
+          {
+            "swahili": "redio moja · nyanya nne",
+            "english": "one radio · four tomatoes"
+          }
+        ]
+      },
+      {
+        "title": "Nitanunua … · I will buy …",
+        "rule": "In nitanunua, ni- means I, -ta- marks the future, and -nunua means buy. Put the item and quantity after the verb.",
+        "examples": [
+          {
+            "swahili": "Nitanunua kalamu kumi.",
+            "english": "I will buy ten pens."
+          }
+        ]
+      },
+      {
+        "title": "Ni shilingi ngapi? · Asking the price",
+        "rule": "Use Ni shilingi ngapi? to ask the price in shillings. Mia means hundred: mia tano is 500 and mia nne is 400. The dialogue gives the total for ten pens, not the price of each pen.",
+        "examples": [
+          {
+            "swahili": "Ni shilingi ngapi?",
+            "english": "How many shillings is it?"
+          },
+          {
+            "swahili": "Kalamu kumi ni shilingi mia tano.",
+            "english": "Ten pens cost 500 shillings."
+          }
+        ]
+      },
+      {
+        "title": "Tafadhali punguza bei · Bargaining and paying",
+        "rule": "Tafadhali makes a request polite. Punguza bei means lower the price; lipa means pay. In the handout, the seller reduces the total from 500 to 400 shillings.",
+        "examples": [
+          {
+            "swahili": "Tafadhali punguza bei.",
+            "english": "Please lower the price."
+          },
+          {
+            "swahili": "Sawa, lipa shilingi mia nne.",
+            "english": "Okay, pay 400 shillings."
+          }
+        ]
+      },
+      {
+        "title": "Mazungumzo dukani · Shop dialogue",
+        "rule": "Mteja is the customer and muuzaji is the seller. Greet, name the item and quantity, ask the price, bargain, then thank the seller and say goodbye.",
+        "examples": [
+          {
+            "swahili": "Mteja: Habari?",
+            "english": "Customer: How are you?"
+          },
+          {
+            "swahili": "Muuzaji: Nzuri. Karibu.",
+            "english": "Seller: Fine. Welcome."
+          },
+          {
+            "swahili": "Mteja: Asante. Nitanunua kalamu kumi. Ni shilingi ngapi?",
+            "english": "Customer: Thank you. I will buy ten pens. How much is it?"
+          },
+          {
+            "swahili": "Muuzaji: Kalamu kumi ni shilingi mia tano.",
+            "english": "Seller: Ten pens cost 500 shillings."
+          },
+          {
+            "swahili": "Mteja: Tafadhali punguza bei.",
+            "english": "Customer: Please lower the price."
+          },
+          {
+            "swahili": "Muuzaji: Sawa, lipa shilingi mia nne.",
             "english": "Seller: Okay, pay 400 shillings."
           },
           {
