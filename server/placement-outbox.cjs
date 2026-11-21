@@ -6,7 +6,7 @@ const append = (sheetId, values) => ({appendCells:{
   sheetId, rows:[{values:values.map(cell)}], fields:"userEnteredValue"
 }});
 
-async function queuePlacementResult({id, contact, score, at}, sheets, token, fetchImpl=fetch) {
+async function queuePlacementResult({id, contact, score, at, language="german"}, sheets, token, fetchImpl=fetch) {
   const book = process.env.PLACEMENT_ANNOUNCEMENT_SHEET_ID;
   if (!book) throw Error("Placement workbook unavailable");
   const access = await fetchImpl("https://www.googleapis.com/drive/v3/files/"+encodeURIComponent(book)+
@@ -29,7 +29,7 @@ async function queuePlacementResult({id, contact, score, at}, sheets, token, fet
   const outbox = tabs.Outbox, results = tabs["Placement Results"];
   if (outbox == null || results == null) throw Error("Placement workbook tabs unavailable");
   const headers = (await call("/values/Outbox!A1:AZ1")).values[0];
-  const {subject,html} = buildPlacementResultEmail({name:contact.name,score});
+  const {subject,html} = buildPlacementResultEmail({name:contact.name,score,language});
   const fields = {status:"PENDING",to:contact.email,subject:subject+" · "+id.slice(-8),html,
     created_at:at, email_type:"placement_result",recipient_name:contact.name,
     dedupe_key:id,retry_count:0,delivery_origin:"placement_test"};
@@ -48,7 +48,7 @@ async function queuePlacementResult({id, contact, score, at}, sheets, token, fet
   const requests = [
     {addNamedRange:{namedRange:{name,range:{sheetId:results,startRowIndex:0,endRowIndex:1,startColumnIndex:0,endColumnIndex:1}}}},
     append(outbox,headers.map(header=>fields[header] ?? "")),
-    append(results,[id,at,contact.name,contact.email,score.total,score.level,contact.classEmails,lookup("status"),lookup("sent_at")])
+    append(results,[id,at,contact.name,contact.email,score.total,score.level,contact.classEmails,lookup("status"),lookup("sent_at"),language])
   ];
   try { await call(":batchUpdate",{method:"POST",body:{requests}}); }
   catch (error) {
