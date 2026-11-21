@@ -1,0 +1,25 @@
+name: Falowen Vercel cost guards
+
+on:
+  pull_request:
+    paths:
+      - 'vercel.json'
+      - 'api/music-library.js'
+      - 'scripts/vercelIgnoreBuild.cjs'
+      - 'tests/cost-controls-contract.test.cjs'
+      - 'tests/vercel-build-ignore.test.cjs'
+      - '.github/workflows/vercel-cost-guards.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/vercel-build-ignore.test.cjs tests/cost-controls-contract.test.cjs
