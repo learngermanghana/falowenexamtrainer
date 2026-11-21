@@ -74,12 +74,13 @@ export default function A1FamilyRecording({ value, onMarked, task = null, disabl
       const result = await analyzeAudio({
         transcriptionOnly: true, audioBlob: blob, teil: task?.teil || "1", level: "A1", userId: user.uid,
         idToken: await user.getIdToken(), contextType: task ? "A1 Day 19 tutor speaking workbook" : "A1 Day 7 family speaking workbook",
+        persistAudio: !task,
         question: task?.prompt || "Sprich über deine Familie: Familienmitglieder, Namen und Alter, Berufe, Hobbys und Wohnort. Assess this beginner A1 family description. Give a score out of 10, explain correct language and mistakes, and give a short corrected example. Do not penalize invented personal details.",
       });
       if (!String(result.transcript || "").trim()) throw new Error("No clear answer was heard. Please try again.");
-      if (!/^https:\/\//i.test(result.audioUrl || "")) throw new Error("Your recording could not be saved online. Please retry; your recording is still available here.");
+      if (!task && !/^https:\/\//i.test(result.audioUrl || "")) throw new Error("Your recording could not be saved online. Please retry; your recording is still available here.");
       if (mounted.current && !disabledRef.current) {
-        onMarked({ transcript: task ? String(result.transcript).trim().slice(0, 800) : result.transcript, audioUrl: result.audioUrl, savedAt: new Date().toISOString() });
+        onMarked({ transcript: task ? String(result.transcript).trim().slice(0, 800) : result.transcript, ...(task ? {} : { audioUrl: result.audioUrl }), savedAt: new Date().toISOString() });
         setBlob(null);
         setUrl("");
       }
@@ -93,14 +94,14 @@ export default function A1FamilyRecording({ value, onMarked, task = null, disabl
     </button>
     {url ? <audio controls src={url} aria-label={task ? "Your recording" : "Your family recording"} /> : null}
     {blob ? <button type="button" style={styles.primaryButton} disabled={disabled || !user || phase !== "idle"} onClick={mark}>
-      {phase === "marking" ? "Saving recording…" : "Save recording"}
+      {phase === "marking" ? (task ? "Transcribing answer…" : "Saving recording…") : (task ? "Save transcript" : "Save recording")}
     </button> : null}
     {!user ? <p>Sign in to save your answer.</p> : null}
     {error ? <p role="alert">{error}</p> : null}
     {value ? <div style={{ whiteSpace: "pre-wrap" }}>
       {value.audioUrl ? <audio controls src={value.audioUrl} aria-label={task ? "Saved recording" : "Saved family recording"} /> : null}
       <h3>Your spoken answer</h3><p>{value.transcript}</p>
-      <p>{task ? "Your recording is saved for tutor review." : "Your recording is saved. AI marks the complete assignment after final submission."}</p>
+      <p>{task ? "Your transcript is saved for tutor review. The audio is discarded after transcription." : "Your recording is saved. AI marks the complete assignment after final submission."}</p>
     </div> : null}
   </div>;
 }

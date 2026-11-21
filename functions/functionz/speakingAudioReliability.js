@@ -79,7 +79,7 @@ const waitForReadStreamOpen = (stream) =>
     stream.once("error", handleError);
   });
 
-async function transcribeAudioFile({ file, getOpenAIClient, pictureCard = false, model = process.env.OPENAI_TRANSCRIPTION_MODEL || "gpt-4o-transcribe" }) {
+async function transcribeAudioFile({ file, getOpenAIClient, pictureCard = false, transcriptionPrompt = "", model = process.env.OPENAI_TRANSCRIPTION_MODEL || "gpt-4o-transcribe" }) {
   const tempPath = await writeTempAudioFile(file);
   const client = getOpenAIClient();
   let audioStream = null;
@@ -87,19 +87,22 @@ async function transcribeAudioFile({ file, getOpenAIClient, pictureCard = false,
   try {
     audioStream = fs.createReadStream(tempPath);
     await waitForReadStreamOpen(audioStream);
-    const checkConfidence = pictureCard && ["gpt-4o-transcribe", "gpt-4o-mini-transcribe"].includes(model);
+    const checkConfidence = (pictureCard || Boolean(transcriptionPrompt)) && ["gpt-4o-transcribe", "gpt-4o-mini-transcribe"].includes(model);
+    const prompt = String(transcriptionPrompt || (pictureCard
+      ? "Kurze Äußerung im Deutschkurs A1. Nur hörbare Wörter wörtlich transkribieren. Auch Satzfragmente und Grammatikfehler beibehalten. Unverständliches nicht ergänzen."
+      : "")).trim();
     const transcription = await client.audio.transcriptions.create({
       file: audioStream,
       model,
       language: "de",
-      ...(pictureCard ? { prompt: "Kurze Äußerung im Deutschkurs A1. Nur hörbare Wörter wörtlich transkribieren. Auch Satzfragmente und Grammatikfehler beibehalten. Unverständliches nicht ergänzen." } : {}),
+      ...(prompt ? { prompt } : {}),
       ...(checkConfidence ? { include: ["logprobs"], response_format: "json" } : {}),
     });
     const text = String(transcription?.text || "").trim();
     if (!text) {
       throw codedError("NO_SPEECH_DETECTED", "No clear speech was detected in the recording.", 422);
     }
-    if (pictureCard) {
+    if (pictureCard || transcriptionPrompt) {
       const words = (transcription.logprobs || []).filter(entry => /[\p{L}\p{N}]/u.test(entry.token) && Number.isFinite(entry.logprob));
       const uncertain = words.filter(entry => entry.logprob < Math.log(0.5));
       const unclear = !/[\p{L}\p{N}]/u.test(text) || /^[[ (]*(?:unverständlich|unintelligible|inaudible|Stille|keine Sprache)[\] ).!]*$/iu.test(text);
