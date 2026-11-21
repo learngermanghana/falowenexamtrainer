@@ -12,10 +12,7 @@
   "buildCommand": "npm --prefix web run build",
   "outputDirectory": "web/dist",
   "git": {
-    "deploymentEnabled": {
-      "main": true,
-      "*": false
-    }
+    "deploymentEnabled": false
   },
   "headers": [
     {
