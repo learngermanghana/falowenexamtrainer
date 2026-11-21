@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { makePlacementAttemptId, postPlacementEvent, sendPlacementEventOnce, answersToIndices } from "../lib/placementMonitoring";
-import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
 import {
   placementTest,
@@ -59,20 +58,6 @@ const recordEvent = (action, payload = {}) => {
     window.dataLayer.push({ event: "placement_test", action, ...payload });
   }
 };
-
-const buttonBase = {
-  minHeight: 44,
-  borderRadius: 12,
-  padding: "11px 16px",
-  border: "1px solid #cbd5e1",
-  background: "#fff",
-  color: "#1e293b",
-  font: "inherit",
-  fontWeight: 750,
-  cursor: "pointer",
-};
-const primaryButton = { ...buttonBase, borderColor: "#1d4ed8", background: "#1d4ed8", color: "#fff" };
-const subtleText = { fontSize: 14, color: "#64748b", lineHeight: 1.55 };
 
 export default function PlacementTestPage2026({ language = "german" }) {
   const { t, i18n } = useTranslation();
@@ -256,214 +241,238 @@ export default function PlacementTestPage2026({ language = "german" }) {
   };
 
   const label = remaining <= 60000 && started ? "Final minute" : remaining <= 5 * 60000 && started ? "Five minutes or less remaining" : "Time left";
-  const timerColor = remaining <= 60000 ? "#b91c1c" : remaining <= 5 * 60000 ? "#b45309" : "#1d4ed8";
+
+  const languageName = isSwahili ? "Kiswahili" : "German";
+  const resultUrl = isSwahili
+    ? "/signup?program=swahili&level=" + encodeURIComponent(suggestedLevel) + "&source=placement-test"
+    : "/classes/?level=" + encodeURIComponent(suggestedLevel);
 
   return (
-    <main style={{ ...styles.container, maxWidth: 880, display: "grid", gap: 16, paddingBottom: 56 }}>
-      <section style={{ ...styles.card, display: "grid", gap: 9 }}>
-        <p style={{ ...subtleText, margin: 0, color: "#1d4ed8", fontWeight: 850 }}>FREE {isSwahili ? "KISWAHILI" : "GERMAN"} LEVEL CHECK</p>
-        <h1 style={{ ...styles.sectionTitle, margin: 0 }}>{test.title}</h1>
-        <p style={{ ...subtleText, margin: 0 }}>{test.subtitle}</p>
-        <p style={{ ...subtleText, margin: 0 }}>This is a preliminary placement recommendation, not an official CEFR certificate.</p>
-      </section>
-
+    <main className="falowen-placement-main">
       {!started ? (
-        <section style={{ ...styles.card, display: "grid", gap: 14 }}>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            {test.sections.map((section) => (
-              <span key={section.id} style={{ ...styles.badge, background: "#eff6ff", color: "#1e40af", padding: "9px 13px" }}>
-                {section.level} · 10 questions
-              </span>
-            ))}
-          </div>
-          <div style={{ padding: 14, border: "1px solid #bfdbfe", borderRadius: 14, background: "#eff6ff" }}>
-            <strong>20-minute timed assessment</strong>
-            <p style={{ ...subtleText, margin: "6px 0 0" }}>
-              Select Start test when ready. You can skip questions and return before submitting.
-              The timer keeps running if you refresh or leave the page. At 00:00 your responses submit automatically.
+        <section className="falowen-placement-intro" aria-label={languageName + " placement test introduction"}>
+          <div className="falowen-placement-intro-copy">
+            <span className="falowen-placement-kicker">Free {languageName} level check</span>
+            <h1>{test.title}</h1>
+            <p className="falowen-placement-summary">{test.subtitle}</p>
+            <div className="falowen-placement-levels" aria-label="Assessment levels">
+              {test.sections.map((section, index) => (
+                <div className="falowen-placement-level" key={section.id}>
+                  <div className="falowen-placement-level-top">
+                    <strong>{section.level}</strong>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                  </div>
+                  <small>{section.questions.length} questions</small>
+                </div>
+              ))}
+            </div>
+            <div className="falowen-placement-time-note">
+              <div className="falowen-placement-time-heading">
+                <strong>20-minute timed assessment</strong>
+                <span>20:00</span>
+              </div>
+              <p>Select Start test when ready. You can skip questions and return before submitting. The timer keeps running if you refresh or leave the page. At 00:00 your responses submit automatically.</p>
+            </div>
+            <p className="falowen-placement-disclaimer">
+              This is a preliminary class-placement recommendation, not an official {isSwahili ? "CEFR" : "Goethe or CEFR"} certificate.
             </p>
           </div>
-          <form onSubmit={begin} style={{display:"grid",gap:12,maxWidth:480}}>
-            <strong>Where should we send your {isSwahili ? "Kiswahili" : "German"} placement result?</strong>
-            <span>We’ll email your score and recommended starting level. No account is required.</span>
-            <label>Email address <input name="email" type="email" required maxLength={180} autoComplete="email" /></label>
-            <label>First name (optional) <input name="name" maxLength={120} autoComplete="given-name" /></label>
-            <label><input name="classEmails" type="checkbox" /> Also email me about upcoming {isSwahili ? "Kiswahili learning opportunities" : "German classes"} at my level.</label>
-            {startError && <span role="alert">{startError}</span>}
-            <button type="submit" disabled={starting} style={{...primaryButton,justifySelf:"start"}}>{starting ? "Starting…" : "Start test →"}</button>
-          </form>
+          <div className="falowen-placement-start-card">
+            <div className="falowen-placement-start-meta">
+              <span>Before you begin</span>
+              <span>100% free</span>
+            </div>
+            <h2>Where should we send your {languageName} placement result?</h2>
+            <p>We’ll email your score and recommended starting level. No account is required.</p>
+            <form onSubmit={begin} aria-label={languageName + " placement registration"}>
+              <label className="falowen-placement-form-label">
+                Email address
+                <input name="email" type="email" placeholder="you@example.com" required maxLength={180} autoComplete="email" />
+              </label>
+              <label className="falowen-placement-form-label">
+                First name (optional)
+                <input name="name" placeholder="Your first name" maxLength={120} autoComplete="given-name" />
+              </label>
+              <label className="falowen-placement-checkbox">
+                <input name="classEmails" type="checkbox" />
+                <span>Also email me about upcoming {isSwahili ? "Kiswahili learning opportunities" : "German classes"} at my level.</span>
+              </label>
+              {startError ? <div className="falowen-placement-error" role="alert">{startError}</div> : null}
+              <button className="falowen-placement-primary falowen-placement-start-submit" type="submit" disabled={starting}>
+                <span>{starting ? "Starting…" : "Start test"}</span>
+                <span className="falowen-placement-primary-arrow" aria-hidden="true">→</span>
+              </button>
+              <p className="falowen-placement-start-note">Your 20 minutes begin when you start.</p>
+            </form>
+          </div>
         </section>
       ) : (
-        <>
+        <div className="falowen-placement-workspace">
+          <div className="falowen-placement-workspace-top">
+            <div>
+              <span className="falowen-placement-kicker">{finished ? "Your placement result" : "Placement assessment in progress"}</span>
+              <h1>{languageName} · A1–B1</h1>
+            </div>
+            <span className="falowen-placement-free">{finished ? "Completed" : "30 questions · 20 minutes"}</span>
+          </div>
           {!finished ? (
-            <section
-              aria-label="Placement test progress and timer"
-              style={{
-                ...styles.card,
-                display: "grid",
-                gap: 10,
-                position: "sticky",
-                top: 8,
-                zIndex: 10,
-                background: remaining <= 60000 ? "#fef2f2" : "#fff",
-                border: "1px solid #cbd5e1",
-                boxShadow: "0 4px 18px rgba(15,23,42,0.08)",
-              }}
-            >
-              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+            <section className="falowen-placement-progress-shell" aria-label="Placement test progress and timer">
+              <div className="falowen-placement-progress-top">
                 <div>
-                  <strong>{activeQuestion.level} · Question {activeQuestion.number} of 30</strong>
-                  <div style={subtleText}>{answered} of 30 answered</div>
+                  <strong>{activeQuestion.level} · Question {activeQuestion.number} of {questions.length}</strong>
+                  <small>{answered} of {questions.length} answered</small>
                 </div>
-                <div aria-label={label + ": " + formatRemaining(remaining)} style={{ textAlign: "right", color: timerColor }}>
-                  <div style={{ fontSize: 12, fontWeight: 750 }}>{label}</div>
-                  <strong style={{ fontSize: 26, fontVariantNumeric: "tabular-nums" }}>{formatRemaining(remaining)}</strong>
+                <div className={"falowen-placement-countdown" + (remaining <= 60000 ? " is-critical" : remaining <= 5 * 60000 ? " is-warning" : "")}
+                  aria-label={label + ": " + formatRemaining(remaining)}>
+                  <small>{label}</small>
+                  <strong>{formatRemaining(remaining)}</strong>
                 </div>
               </div>
-              <div aria-hidden="true" style={{ background: "#e2e8f0", height: 8, borderRadius: 999, overflow: "hidden" }}>
-                <div style={{ width: Math.round(answered / 30 * 100) + "%", background: "#2563eb", height: "100%" }} />
+              <div className="falowen-placement-progress" role="progressbar" aria-label="Questions answered" aria-valuenow={answered} aria-valuemin={0} aria-valuemax={questions.length}>
+                <div style={{ width: Math.round(answered / questions.length * 100) + "%" }} />
               </div>
               {remaining <= 5 * 60000 ? (
-                <p aria-live="polite" style={{ margin: 0, color: timerColor, fontSize: 13, fontWeight: 650 }}>
+                <p className="falowen-placement-timer-warning" aria-live="polite">
                   {remaining <= 60000 ? "Final minute. Submit now or your responses will be submitted automatically." : "Five minutes left. Unanswered questions count as incorrect."}
                 </p>
               ) : null}
             </section>
           ) : null}
-
           {!finished ? (
-            <section style={{ ...styles.card, display: "grid", gap: 16 }}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <section className="falowen-placement-question-card">
+              <nav className="falowen-placement-section-nav" aria-label="Assessment sections">
                 {test.sections.map((section, index) => {
-                  const isActive = activeQuestion.level === section.level;
-                  const count = section.questions.filter((q) => Object.prototype.hasOwnProperty.call(session.answers, q.id)).length;
+                  const count = section.questions.filter(q => Object.prototype.hasOwnProperty.call(session.answers, q.id)).length;
                   return (
-                    <button key={section.id} type="button" style={isActive ? primaryButton : buttonBase} onClick={() => navigate(index * 10)}>
-                      {section.level} <span style={{ fontWeight: 450 }}>({count}/10)</span>
+                    <button key={section.id} type="button" aria-pressed={activeQuestion.level === section.level} onClick={() => navigate(index * 10)}>
+                      {section.level} <span>({count}/10)</span>
                     </button>
                   );
                 })}
+              </nav>
+              <div className="falowen-placement-question-heading">
+                <small>{activeQuestion.level} · {activeQuestion.topic}</small>
+                <h2>{activeQuestion.number}. {activeQuestion.text}</h2>
               </div>
-              <div style={{ display: "grid", gap: 5 }}>
-                <span style={{ ...subtleText, fontWeight: 750 }}>{activeQuestion.topic}</span>
-                <h2 style={{ fontSize: 22, color: "#0f172a", lineHeight: 1.45, margin: 0 }}>
-                  {activeQuestion.number}. {activeQuestion.text}
-                </h2>
-              </div>
-              <fieldset style={{ display: "grid", gap: 10, padding: 0, margin: 0, border: 0 }}>
-                <legend style={{ ...subtleText, marginBottom: 10 }}>Choose one answer.</legend>
+              <fieldset className="falowen-placement-options">
+                <legend>Choose one answer.</legend>
                 {activeQuestion.options.map((option, index) => {
                   const selected = session.answers[activeQuestion.id] === option;
                   return (
-                    <label key={index} style={{
-                      display: "flex", alignItems: "center", gap: 12, minHeight: 48,
-                      cursor: "pointer", padding: "12px 14px", borderRadius: 12,
-                      border: selected ? "2px solid #2563eb" : "1px solid #cbd5e1",
-                      background: selected ? "#eff6ff" : "#fff", color: "#0f172a",
-                    }}>
-                      <input
-                        type="radio"
-                        name={"placement-" + activeQuestion.id}
-                        checked={selected}
+                    <label key={index} className={"falowen-placement-option" + (selected ? " is-selected" : "")}>
+                      <input type="radio" name={"placement-" + activeQuestion.id} checked={selected}
                         onChange={() => answer(activeQuestion, option)}
-                        aria-label={String.fromCharCode(65 + index) + ". " + option}
-                      />
-                      <strong style={{ minWidth: 22 }}>{String.fromCharCode(65 + index)}.</strong>
+                        aria-label={String.fromCharCode(65 + index) + ". " + option} />
+                      <span className="falowen-placement-option-index">{String.fromCharCode(65 + index)}.</span>
                       <span>{option}</span>
                     </label>
                   );
                 })}
               </fieldset>
-              <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-                <button type="button" style={{ ...buttonBase, opacity: activeQuestion.number === 1 ? 0.5 : 1 }} disabled={activeQuestion.number === 1} onClick={() => navigate(session.activeIndex - 1)}>← Previous</button>
-                {activeQuestion.number < 30 ? (
-                  <button type="button" style={primaryButton} onClick={() => navigate(session.activeIndex + 1)}>Next question →</button>
+              <div className="falowen-placement-question-actions">
+                <button className="falowen-placement-outline" type="button" disabled={activeQuestion.number === 1}
+                  onClick={() => navigate(session.activeIndex - 1)}>← Previous</button>
+                {activeQuestion.number < questions.length ? (
+                  <button className="falowen-placement-primary" type="button"
+                    onClick={() => navigate(session.activeIndex + 1)}>Next question →</button>
                 ) : (
-                  <button type="button" style={primaryButton} onClick={submit}>Finish test</button>
+                  <button className="falowen-placement-primary" type="button" onClick={submit}>Finish test →</button>
                 )}
               </div>
-              <div style={{ display: "grid", gap: 5 }}>
-                <span style={subtleText}>Jump to a question</span>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {questions.slice(Math.floor(session.activeIndex / 10) * 10, Math.floor(session.activeIndex / 10) * 10 + 10).map((question) => (
-                    <button
-                      key={question.id} type="button" title={"Question " + question.number}
+              <div className="falowen-placement-jump">
+                <span className="falowen-placement-jump-label">Jump to a question</span>
+                <div className="falowen-placement-jump-grid">
+                  {questions.slice(Math.floor(session.activeIndex / 10) * 10, Math.floor(session.activeIndex / 10) * 10 + 10).map(question => (
+                    <button key={question.id} type="button" title={"Question " + question.number}
                       aria-label={"Go to question " + question.number}
                       aria-current={question.number === activeQuestion.number ? "step" : undefined}
-                      onClick={() => navigate(question.number - 1)}
-                      style={{
-                        ...buttonBase, padding: 0, minHeight: 40, minWidth: 40,
-                        background: question.number === activeQuestion.number ? "#1d4ed8" : Object.prototype.hasOwnProperty.call(session.answers, question.id) ? "#dbeafe" : "#fff",
-                        color: question.number === activeQuestion.number ? "#fff" : "#1e293b",
-                      }}
-                    >{question.number}</button>
+                      className={Object.prototype.hasOwnProperty.call(session.answers, question.id) ? "is-answered" : ""}
+                      onClick={() => navigate(question.number - 1)}>
+                      {question.number}
+                    </button>
                   ))}
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                <span style={subtleText}>You can finish early. Unanswered questions count as incorrect.</span>
-                <button type="button" style={buttonBase} onClick={submit}>Submit test</button>
+              <div className="falowen-placement-finish-row">
+                <small>You can finish early. Unanswered questions count as incorrect.</small>
+                <button className="falowen-placement-outline" type="button" onClick={submit}>Submit test</button>
               </div>
             </section>
-          ) : (isSwahili && !session.serverScore) ? (
-            <section role="status" style={{ ...styles.card, display:"grid", gap:12 }}>
+          ) : isSwahili && !session.serverScore ? (
+            <section className="falowen-placement-pending" role="status">
               <strong>{delivery === "failed" ? "Your result could not be saved yet." : "Your Kiswahili answers have been submitted."}</strong>
-              <p>We are checking your answers securely. Your test is saved in this browser; please keep this page open until your recommended level appears.</p>
-              {delivery === "failed" ? <button type="button" style={primaryButton} onClick={() => setRetry(n => n + 1)}>Retry saving my result</button> : null}
+              <p>We are checking your answers securely. Your test is saved in this browser; keep this page open until your recommended level appears.</p>
+              {delivery === "failed" ? (
+                <button className="falowen-placement-primary" type="button" onClick={() => setRetry(n => n + 1)}>Retry saving my result →</button>
+              ) : null}
             </section>
           ) : (
-            <section data-placement-language={language} data-placement-registered={Boolean(session.ticket)} data-placement-attempt-id={session.id||""} data-placement-a1={levelStats.A1.correct} data-placement-a2={levelStats.A2.correct} data-placement-b1={levelStats.B1.correct} style={{ ...styles.card, display: "grid", gap: 15, border: "1px solid #bfdbfe" }}>
-              <div style={{ padding: 14, background: "#eff6ff", borderRadius: 12 }}>
-                <p style={{ ...subtleText, margin: 0, fontWeight: 800 }}>{session.completionReason === "time" ? "Time is up · answers submitted automatically" : "Assessment complete"}</p>
-                <h2 style={{ fontSize: 27, margin: "7px 0", color: "#0f172a" }}>Your suggested starting level: {suggestedLevel}</h2>
-                <div style={{ fontSize: 17 }}>Suggested level: <strong>{suggestedLevel}</strong> · Score: {correct}/30</div>
-                <p style={{ ...subtleText, marginBottom: 0 }}>Based on 30 grammar and vocabulary questions. Confirm with a speaking or writing check before final class placement.</p>
+            <section className="falowen-placement-results-card"
+              data-placement-language={language}
+              data-placement-registered={Boolean(session.ticket)}
+              data-placement-attempt-id={session.id || ""}
+              data-placement-a1={levelStats.A1.correct}
+              data-placement-a2={levelStats.A2.correct}
+              data-placement-b1={levelStats.B1.correct}>
+              <div className="falowen-placement-results-hero">
+                <span className="falowen-placement-kicker">{session.completionReason === "time" ? "Time is up · answers submitted automatically" : "Assessment complete"}</span>
+                <h2>Your suggested starting level: {suggestedLevel}</h2>
+                <div className="falowen-placement-results-scoreline">
+                  Suggested level: <strong>{suggestedLevel}</strong> · Score: {correct}/{questions.length}
+                </div>
+                <p>Based on 30 grammar and vocabulary questions. Confirm with a speaking or writing check before final class placement.</p>
               </div>
-              {session.ticket && <div role="status">{delivery === "queued" ? "Your result is queued for email." :
-                delivery === "failed" ? <>We couldn’t queue your result email. <button type="button" onClick={()=>setRetry(n=>n+1)}>Retry email</button></> :
-                "Saving your result for email…"}</div>}
-              <h3 style={{ margin: 0 }}>Your results by level</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
-                {test.sections.map((section) => {
+              {session.ticket ? (
+                <div className="falowen-placement-email-status" role="status">
+                  {delivery === "queued" ? "Your result is queued for email." : delivery === "failed" ? (
+                    <>We couldn’t queue your result email. <button type="button" className="falowen-placement-outline" onClick={() => setRetry(n => n + 1)}>Retry email</button></>
+                  ) : "Saving your result for email…"}
+                </div>
+              ) : null}
+              <h3 className="falowen-placement-results-heading">Your results by level</h3>
+              <div className="falowen-placement-results-grid">
+                {test.sections.map(section => {
                   const score = levelStats[section.level];
                   return (
-                    <div key={section.level} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 14 }}>
+                    <div className="falowen-placement-result-level" key={section.level}>
                       <strong>{section.level}</strong>
-                      <div style={{ fontSize: 23, fontWeight: 850 }}>{score.correct}/10</div>
-                      <div style={subtleText}>{score.answered}/10 answered</div>
-                      <div aria-hidden="true" style={{ marginTop: 8, background: "#e2e8f0", height: 7, borderRadius: 8, overflow: "hidden" }}>
-                        <div style={{ width: (score.correct * 10) + "%", height: "100%", background: "#2563eb" }} />
+                      <div className="score">{score.correct}/10</div>
+                      <small>{score.answered}/10 answered</small>
+                      <div className="falowen-placement-results-bar" aria-hidden="true">
+                        <div style={{ width: (score.correct * 10) + "%" }} />
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <p style={{ ...subtleText, margin: 0 }}>
-                {isSwahili ? (suggestedLevel === "A1"
-                  ? "Start with core expressions, everyday vocabulary and basic Kiswahili grammar."
-                  : suggestedLevel === "A2"
-                    ? "Continue building A2 skills before moving to more complex B1 structures."
-                    : "You showed strong performance across all three sections. B1 is a suggested starting point.")
-                  : (suggestedLevel === "A1" ? "Build stronger foundations in everyday grammar and vocabulary before advancing."
-                    : suggestedLevel === "A2" ? "Your A1 and A2 foundations are strong; A2 can help you prepare for B1 structures."
-                    : "You showed strong performance across all three sections. B1 is a suggested starting point.")}
+              <p className="falowen-placement-results-guidance">
+                {isSwahili ? (
+                  suggestedLevel === "A1" ? "Start with core expressions, everyday vocabulary and basic Kiswahili grammar."
+                  : suggestedLevel === "A2" ? "Continue building A2 skills before moving to more complex B1 structures."
+                  : "You showed strong performance across all three sections. B1 is a suggested starting point."
+                ) : (
+                  suggestedLevel === "A1" ? "Build stronger foundations in everyday grammar and vocabulary before advancing."
+                  : suggestedLevel === "A2" ? "Your A1 and A2 foundations are strong; A2 can help you prepare for B1 structures."
+                  : "You showed strong performance across all three sections. B1 is a suggested starting point."
+                )}
               </p>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <a onClick={()=>recordEvent("recommended_class_click",{level:suggestedLevel,language})} href={isSwahili ? "/signup?program=swahili&level="+encodeURIComponent(suggestedLevel)+"&source=placement-test" : "/classes/?level=" + encodeURIComponent(suggestedLevel)} style={{ ...primaryButton, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>{isSwahili ? "Continue with Kiswahili" : `View ${suggestedLevel} classes`}</a>
-                <button type="button" style={buttonBase} onClick={() => setSession(initialSession())}>Retake test</button>
+              <div className="falowen-placement-results-actions">
+                <a className="falowen-placement-primary" href={resultUrl}
+                  onClick={() => recordEvent("recommended_class_click", { level: suggestedLevel, language })}>
+                  {isSwahili ? "Continue with Kiswahili" : "View " + suggestedLevel + " classes"} →
+                </a>
+                <button className="falowen-placement-outline" type="button" onClick={() => setSession(initialSession())}>Retake test</button>
               </div>
-              <details style={{ padding: 12, border: "1px solid #e2e8f0", borderRadius: 12 }}>
-                <summary style={{ cursor: "pointer", fontWeight: 800 }}>{isSwahili ? "Review your submitted answers" : "Review answers (after submission)"}</summary>
-                <ol style={{ paddingLeft: 22, display: "grid", gap: 14 }}>
-                  {questions.map((question) => {
+              <details className="falowen-placement-review">
+                <summary>{isSwahili ? "Review your submitted answers" : "Review answers (after submission)"}</summary>
+                <ol>
+                  {questions.map(question => {
                     const selected = session.answers[question.id];
                     return (
                       <li key={question.id}>
-                        <div><strong>{question.level} · {question.text}</strong></div>
-                        <div style={{ ...subtleText, color: isSwahili ? "#475569" : selected === question.correct ? "#166534" : "#b91c1c" }}>
-                          Your answer: {selected || "Not answered"}
-                        </div>
-                        {!isSwahili && <div style={{ ...subtleText, color: "#166534" }}>Correct: {question.correct}</div>}
+                        <strong>{question.level} · {question.text}</strong>
+                        <div>Your answer: {selected || "Not answered"}</div>
+                        {!isSwahili ? <div>Correct: {question.correct}</div> : null}
                       </li>
                     );
                   })}
@@ -471,8 +480,12 @@ export default function PlacementTestPage2026({ language = "german" }) {
               </details>
             </section>
           )}
-        </>
+        </div>
       )}
+      <footer className="falowen-placement-foot">
+        <strong>{isSwahili ? "Karibu! A good place to begin learning Kiswahili." : "A little German. A great place to start."}</strong>
+        <span>A1–B1 placement&nbsp; / &nbsp;30 questions&nbsp; / &nbsp;20 minutes</span>
+      </footer>
     </main>
   );
 }
