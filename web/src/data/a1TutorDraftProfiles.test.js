@@ -107,3 +107,23 @@ test("A1-8 requires five true/false and three a/b/c Lesen responses", () => {
     "teil-2": { answers: { 6: "B", 7: "C", 8: "B" } },
   } } })).toEqual(expect.objectContaining({ complete: true, total: 8, completed: 8 }));
 });
+
+
+test("Day 19 transcript-only answers count toward progress and can be submitted for tutor review", () => {
+  const draft = { sections: {
+    "teil-1": { recording: { transcript: "Ich heiße Ama. Ich komme aus Ghana." } },
+    "teil-2": { recording: { transcript: "Wo ist der Supermarkt? Ich kaufe am Samstag ein." } },
+    "teil-3": { recording: { transcript: "Können Sie mir bitte den Regenschirm geben?" } },
+  } };
+  expect(getA1TutorDraftProgress({ assignmentKey: "A1-5.9", draft })).toEqual(
+    expect.objectContaining({ complete: true, completed: 3, total: 3 }),
+  );
+  expect(validateA1TutorDraftSubmissionSections({
+    assignmentKey: "A1-5.9",
+    sections: makeSerializedSections({
+      "teil-1": ["Ich heiße Ama. Ich komme aus Ghana."],
+      "teil-2": ["Wo ist der Supermarkt? Ich kaufe am Samstag ein."],
+      "teil-3": ["Können Sie mir bitte den Regenschirm geben?"],
+    }),
+  })).toEqual({ ok: true, message: "" });
+});
