@@ -194,3 +194,66 @@ describe('lesson update deferral', () => {
     expect(window.location.reload).not.toHaveBeenCalled();
   });
 });
+
+describe('request-efficient build checks', () => {
+  let previousDocument;
+  let previousFetch;
+
+  beforeEach(() => {
+    previousDocument = global.document;
+    previousFetch = global.fetch;
+    global.document = { visibilityState: 'visible' };
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true, json: async () => ({ revision: 'stable' }),
+    });
+  });
+
+  afterEach(() => {
+    if (previousDocument === undefined) delete global.document;
+    else global.document = previousDocument;
+    global.fetch = previousFetch;
+    jest.restoreAllMocks();
+  });
+
+  it('avoids background checks in a hidden tab without losing the current revision', async () => {
+    global.document.visibilityState = 'hidden';
+    await __private__.checkForNewBuildWhenDue({ force: true });
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(__private__.getLoadedBuildRevision()).toBe('');
+  });
+
+  it('coalesces duplicate requests and only rechecks after the foreground cooldown', async () => {
+    const start = 1_700_000_000_000;
+    const time = jest.spyOn(Date, 'now').mockReturnValue(start);
+    let resolveRequest;
+    global.fetch = jest.fn().mockImplementation(() =>
+      new Promise(resolve => { resolveRequest = resolve; })
+    );
+    const first = __private__.checkForNewBuildWhenDue({ reloadOnChange: false, force: true });
+    const second = __private__.checkForNewBuildWhenDue({ reloadOnChange: false, force: true });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    resolveRequest({ ok: true, json: async () => ({ revision: 'stable' }) });
+    await Promise.all([first, second]);
+
+    await __private__.checkForNewBuildWhenDue();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    time.mockReturnValue(start + 10 * 60 * 1000 + 1);
+    global.fetch.mockResolvedValue({ ok: true, json: async () => ({ revision: 'stable' }) });
+    await __private__.checkForNewBuildWhenDue();
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not make repeated service worker update requests on frequent tab focus', async () => {
+    const start = 1_700_000_000_000;
+    const time = jest.spyOn(Date, 'now').mockReturnValue(start);
+    const registration = { update: jest.fn().mockResolvedValue(undefined) };
+    await __private__.updateWorkerWhenDue(registration, { force: true });
+    await __private__.updateWorkerWhenDue(registration);
+    expect(registration.update).toHaveBeenCalledTimes(1);
+
+    time.mockReturnValue(start + 30 * 60 * 1000 + 1);
+    await __private__.updateWorkerWhenDue(registration);
+    expect(registration.update).toHaveBeenCalledTimes(2);
+  });
+});
