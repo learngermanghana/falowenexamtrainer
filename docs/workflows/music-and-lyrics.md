@@ -234,3 +234,7 @@ For staff, publishing reviewed lyric timing checks the assigned Music Studio
 page and the catalog language of the exact recording through Falowen Admin.
 The timing sidecar still sits beside the published MP3. Deploy the Admin
 Firebase authorization route before rolling out staff timing saves.
+
+### Kiswahili A1 Day 11 · Dukani
+
+The Music catalog and Day 11 workbook share `swahili-a1-day-11`. The teaching slide requests the same recording by its exact key. The 66 estimated line cues follow both passes of the final chorus in the supplied MP3. The recording pack also has matching English lines and a bilingual song story.
