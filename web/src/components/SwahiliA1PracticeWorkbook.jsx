@@ -82,7 +82,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
       <section className="swahili-book__card swahili-book__activity" role="tabpanel" tabIndex={-1}>
         {activeTab === "references" && <>
           <h2>Music · Muziki</h2>
-          {hasLessonSong && <WorkbookDayMusic level="A1" day={lesson.day} program="swahili" compact />}
+          {hasLessonSong && <WorkbookDayMusic level="A1" day={lesson.day} program="swahili" hideLegacyNotes compact />}
           {lesson.referencePractice ? <div className="swahili-day2-practice">
             <div className="swahili-day2-practice__header"><h3>{lesson.referencePractice.heading}</h3><p>{lesson.referencePractice.instruction}</p></div>
             <div className="swahili-day2-practice__phrases">{lesson.referencePractice.phrases.map(item => <div key={item.swahili}><strong lang="sw">{item.swahili}</strong><span>{item.english}</span></div>)}</div>
