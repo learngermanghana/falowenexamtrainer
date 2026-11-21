@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLocation } from "react-router-dom";
 import PlacementTestPage2026 from "./PlacementTestPage2026";
 import PlacementFunnelNextStep from "./PlacementFunnelNextStep";
 import {
@@ -20,6 +21,7 @@ const readResult = (root) => {
   const score = text.match(/Score:\s*(\d+)\s*\/\s*(\d+)/i);
   return {
     section,
+    language: section.dataset.placementLanguage === "swahili" ? "swahili" : "german",
     registered: section.dataset.placementRegistered === "true",
     level,
     attemptId: section.dataset.placementAttemptId || "",
@@ -32,6 +34,8 @@ const readResult = (root) => {
 };
 
 export default function PlacementTestPage() {
+  const location = useLocation();
+  const language = new URLSearchParams(location.search).get("language") === "swahili" ? "swahili" : "german";
   const rootRef = useRef(null);
   const trackedRef = useRef("");
   const [mount, setMount] = useState(null);
@@ -42,7 +46,7 @@ export default function PlacementTestPage() {
     trackPublicFunnelEvent("placement_test_view", {
       source: context.source || context.src || "direct",
     });
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -69,9 +73,10 @@ export default function PlacementTestPage() {
         current?.level === parsed.level &&
         current?.correct === parsed.correct &&
         current?.total === parsed.total &&
-        current?.attemptId === parsed.attemptId
+        current?.attemptId === parsed.attemptId &&
+        current?.language === parsed.language
           ? current
-          : { registered:parsed.registered, level: parsed.level, correct: parsed.correct, total: parsed.total, attemptId: parsed.attemptId, a1:parsed.a1, a2:parsed.a2, b1:parsed.b1 }
+          : { registered:parsed.registered, language:parsed.language, level: parsed.level, correct: parsed.correct, total: parsed.total, attemptId: parsed.attemptId, a1:parsed.a1, a2:parsed.a2, b1:parsed.b1 }
       );
 
       const key = parsed.attemptId;
@@ -94,11 +99,16 @@ export default function PlacementTestPage() {
       observer.disconnect();
       document.getElementById(MOUNT_ID)?.remove();
     };
-  }, []);
+  }, [language]);
 
   return (
     <div ref={rootRef}>
-      <PlacementTestPage2026 />
+      <nav aria-label="Choose placement-test language" style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",justifyContent:"center",margin:"18px auto",padding:"0 12px"}}>
+        <strong>Test language:</strong>
+        <a href="/placement-test" aria-current={language==="german"?"page":undefined} style={{padding:"9px 14px",borderRadius:10,background:language==="german"?"#174bbb":"#eff5ff",color:language==="german"?"white":"#174bbb",fontWeight:750}}>German</a>
+        <a href="/placement-test?language=swahili" aria-current={language==="swahili"?"page":undefined} style={{padding:"9px 14px",borderRadius:10,background:language==="swahili"?"#174bbb":"#eff5ff",color:language==="swahili"?"white":"#174bbb",fontWeight:750}}>Kiswahili</a>
+      </nav>
+      <PlacementTestPage2026 key={language} language={language} />
       {mount && result ? createPortal(<PlacementFunnelNextStep result={result} />, mount) : null}
     </div>
   );
