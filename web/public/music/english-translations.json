@@ -3,6 +3,275 @@
   "description": "Editor-authored English for exact recording keys and matching German lines. Course-draft translations are separately bound to draft identity and remain explicitly unverified against the audio.",
   "recordings": [
     {
+      "objectKey": "swahili/music/A1/day-11/Dukani.mp3",
+      "lines": [
+        {
+          "de": "Tunaenda dukani, tunaenda dukani,",
+          "en": "We're going to the shop, we're going to the shop."
+        },
+        {
+          "de": "Tunanunua vitu vingi leo!",
+          "en": "We're buying lots of things today!"
+        },
+        {
+          "de": "Tunaenda dukani, tunaenda dukani,",
+          "en": "We're going to the shop, we're going to the shop."
+        },
+        {
+          "de": "Tunanunua vitu vingi leo!",
+          "en": "We're buying lots of things today!"
+        },
+        {
+          "de": "Hujambo, habari za leo?",
+          "en": "Hello, how are you today?"
+        },
+        {
+          "de": "Sijambo, nzuri sana!",
+          "en": "I'm fine, very well!"
+        },
+        {
+          "de": "Karibu, karibu dukani!",
+          "en": "Welcome, welcome to the shop!"
+        },
+        {
+          "de": "Asante, asante sana!",
+          "en": "Thank you, thank you very much!"
+        },
+        {
+          "de": "Unataka nini leo?",
+          "en": "What would you like today?"
+        },
+        {
+          "de": "Ninataka vitu vizuri!",
+          "en": "I'd like some nice things!"
+        },
+        {
+          "de": "Ninataka kununua,",
+          "en": "I'd like to buy"
+        },
+        {
+          "de": "Vitabu na vikombe!",
+          "en": "books and cups!"
+        },
+        {
+          "de": "Kitabu kimoja, vitabu viwili,",
+          "en": "One book, two books,"
+        },
+        {
+          "de": "Kikombe kimoja, vikombe vitatu!",
+          "en": "one cup, three cups!"
+        },
+        {
+          "de": "Kiti kimoja, viti vinne,",
+          "en": "One chair, four chairs,"
+        },
+        {
+          "de": "Tunanunua vitu vingi dukani!",
+          "en": "we're buying lots of things at the shop!"
+        },
+        {
+          "de": "Kikubwa, vikubwa,",
+          "en": "A big one, big ones,"
+        },
+        {
+          "de": "Kidogo, vidogo,",
+          "en": "a small one, small ones,"
+        },
+        {
+          "de": "Kizuri, vizuri,",
+          "en": "a nice one, nice ones,"
+        },
+        {
+          "de": "Tunanunua vitu vingi dukani!",
+          "en": "we're buying lots of things at the shop!"
+        },
+        {
+          "de": "Ninataka kitabu kizuri,",
+          "en": "I'd like a nice book,"
+        },
+        {
+          "de": "Ninataka vitabu viwili!",
+          "en": "I'd like two books!"
+        },
+        {
+          "de": "Ninataka kikombe kidogo,",
+          "en": "I'd like a small cup,"
+        },
+        {
+          "de": "Ninataka vikombe vitatu!",
+          "en": "I'd like three cups!"
+        },
+        {
+          "de": "Ninataka kiti kikubwa,",
+          "en": "I'd like a big chair,"
+        },
+        {
+          "de": "Ninataka viti viwili!",
+          "en": "I'd like two chairs!"
+        },
+        {
+          "de": "Sitaki kitu kibaya,",
+          "en": "I don't want a bad item,"
+        },
+        {
+          "de": "Ninataka vitu vizuri!",
+          "en": "I'd like some nice things!"
+        },
+        {
+          "de": "Kitabu kimoja, vitabu viwili,",
+          "en": "One book, two books,"
+        },
+        {
+          "de": "Kikombe kimoja, vikombe vitatu!",
+          "en": "one cup, three cups!"
+        },
+        {
+          "de": "Kiti kimoja, viti vinne,",
+          "en": "One chair, four chairs,"
+        },
+        {
+          "de": "Tunanunua vitu vingi dukani!",
+          "en": "we're buying lots of things at the shop!"
+        },
+        {
+          "de": "Kikubwa, vikubwa,",
+          "en": "A big one, big ones,"
+        },
+        {
+          "de": "Kidogo, vidogo,",
+          "en": "a small one, small ones,"
+        },
+        {
+          "de": "Kizuri, vizuri,",
+          "en": "a nice one, nice ones,"
+        },
+        {
+          "de": "Tunanunua vitu vingi dukani!",
+          "en": "we're buying lots of things at the shop!"
+        },
+        {
+          "de": "Kitabu ni shilingi ngapi?",
+          "en": "How many shillings is the book?"
+        },
+        {
+          "de": "Ni shilingi elfu tano!",
+          "en": "It's five thousand shillings!"
+        },
+        {
+          "de": "Vikombe ni shilingi ngapi?",
+          "en": "How many shillings are the cups?"
+        },
+        {
+          "de": "Ni shilingi elfu sita!",
+          "en": "They're six thousand shillings!"
+        },
+        {
+          "de": "Jumla ni shilingi ngapi?",
+          "en": "How much is the total in shillings?"
+        },
+        {
+          "de": "Ni shilingi elfu kumi na moja!",
+          "en": "It's eleven thousand shillings!"
+        },
+        {
+          "de": "Sawa, ninalipa sasa,",
+          "en": "Okay, I'm paying now,"
+        },
+        {
+          "de": "Asante, asante sana!",
+          "en": "Thank you, thank you very much!"
+        },
+        {
+          "de": "Kimoja, viwili, vitatu, vinne!",
+          "en": "One, two, three, four!"
+        },
+        {
+          "de": "Kimoja, viwili, vitatu, vinne!",
+          "en": "One, two, three, four!"
+        },
+        {
+          "de": "Kitabu kizuri, vitabu vizuri,",
+          "en": "A nice book, nice books,"
+        },
+        {
+          "de": "Kikombe kidogo, vikombe vidogo,",
+          "en": "a small cup, small cups,"
+        },
+        {
+          "de": "Kiti kikubwa, viti vikubwa,",
+          "en": "a big chair, big chairs,"
+        },
+        {
+          "de": "Kitu kibaya, vitu vibaya!",
+          "en": "a bad thing, bad things!"
+        },
+        {
+          "de": "Tunaenda dukani, tunaenda dukani,",
+          "en": "We're going to the shop, we're going to the shop."
+        },
+        {
+          "de": "Tunanunua vitu leo!",
+          "en": "We're buying things today!"
+        },
+        {
+          "de": "Kikubwa, vikubwa,",
+          "en": "A big one, big ones,"
+        },
+        {
+          "de": "Kidogo, vidogo,",
+          "en": "a small one, small ones,"
+        },
+        {
+          "de": "Kizuri, vizuri,",
+          "en": "a nice one, nice ones,"
+        },
+        {
+          "de": "Tunanunua dukani leo!",
+          "en": "We're shopping today!"
+        },
+        {
+          "de": "Tunaenda dukani, tunaenda dukani,",
+          "en": "We're going to the shop, we're going to the shop."
+        },
+        {
+          "de": "Tunanunua vitu leo!",
+          "en": "We're buying things today!"
+        },
+        {
+          "de": "Kikubwa, vikubwa,",
+          "en": "A big one, big ones,"
+        },
+        {
+          "de": "Kidogo, vidogo,",
+          "en": "a small one, small ones,"
+        },
+        {
+          "de": "Kizuri, vizuri,",
+          "en": "a nice one, nice ones,"
+        },
+        {
+          "de": "Tunanunua dukani leo!",
+          "en": "We're shopping today!"
+        },
+        {
+          "de": "Nimelipa, nimepata,",
+          "en": "I've paid and I've got what I came for,"
+        },
+        {
+          "de": "Asante, asante sana!",
+          "en": "Thank you, thank you very much!"
+        },
+        {
+          "de": "Kwa heri, kwa heri,",
+          "en": "Goodbye, goodbye,"
+        },
+        {
+          "de": "Karibu tena dukani!",
+          "en": "come back to the shop!"
+        }
+      ]
+    },
+    {
       "objectKey": "swahili/music/A1/day-10/Leo Tunaenda Sokoni.mp3",
       "lines": [
         {

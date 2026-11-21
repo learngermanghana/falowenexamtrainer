@@ -2,6 +2,12 @@
   "version": 1,
   "description": "Bilingual editorial descriptions of song scenarios and learning focus; no unsupported personal songwriter claims.",
   "byObjectKey": {
+    "swahili/music/A1/day-11/Dukani.mp3": {
+      "storyDe": "Mnunuzi anaingia dukani. Anauliza bei ya kitabu na vikombe. Jumla ni shilingi elfu kumi na moja.",
+      "storyEn": "A shopper asks the price of a book and some cups. The book costs five thousand shillings and the cups cost six thousand. The shopper pays eleven thousand shillings in all.",
+      "focusDe": "Linganisha kitabu kimoja na vitabu viwili. Eleza ukubwa wa kikombe na uliza bei yake.",
+      "focusEn": "Compare one book with two books. Describe the size of a cup and ask its price."
+    },
     "swahili/music/A1/day-06/Chakula Kizuri Mgahawani.mp3": {
       "storyDe": "Mgeni anapofika mgahawani, anaomba orodha ya vyakula. Anachagua wali na kuku pamoja na juisi ya embe. Baada ya kula, anaomba bili. Ni shilingi elfu tano.",
       "storyEn": "A guest arrives at a restaurant and asks for the menu. They order rice and chicken with mango juice. After the meal, they ask for the bill. It comes to five thousand shillings.",

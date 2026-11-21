@@ -1639,7 +1639,7 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     },
     "referencePractice": {
       "heading": "Mazoezi ya msamiati · Shopping language warm-up",
-      "instruction": "No Day 11 song has been linked yet. Practise these phrases aloud before starting the speaking and writing tasks.",
+      "instruction": "After listening to “Tunaenda Dukani!”, practise these phrases aloud before starting the speaking and writing tasks.",
       "phrases": [
         {
           "swahili": "Mna maziwa na mkate?",

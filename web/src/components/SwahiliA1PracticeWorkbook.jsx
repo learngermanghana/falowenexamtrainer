@@ -20,6 +20,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
   const { aiLecture, radio, listening } = lesson;
   const lectureHeadingId = `swahili-ai-lecture-${lesson.day}`;
   const grammarSections = lesson.grammarSections || [{ rule: lesson.rule, examples: lesson.examples }];
+  const hasLessonSong = [10, 11].includes(lesson.day);
   const vocabulary = lesson.vocabulary;
   const writingId = "swahili-writing-" + lesson.day;
 
@@ -81,11 +82,12 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
       <section className="swahili-book__card swahili-book__activity" role="tabpanel" tabIndex={-1}>
         {activeTab === "references" && <>
           <h2>Music · Muziki</h2>
-          {lesson.day === 10 ? <WorkbookDayMusic level="A1" day={lesson.day} program="swahili" compact /> : lesson.referencePractice ? <div className="swahili-day2-practice">
+          {hasLessonSong && <WorkbookDayMusic level="A1" day={lesson.day} program="swahili" hideLegacyNotes compact />}
+          {lesson.referencePractice ? <div className="swahili-day2-practice">
             <div className="swahili-day2-practice__header"><h3>{lesson.referencePractice.heading}</h3><p>{lesson.referencePractice.instruction}</p></div>
             <div className="swahili-day2-practice__phrases">{lesson.referencePractice.phrases.map(item => <div key={item.swahili}><strong lang="sw">{item.swahili}</strong><span>{item.english}</span></div>)}</div>
             <button type="button" className="swahili-book__button" onClick={() => selectTab("sprechen")}>Go to Group Practice</button>
-          </div> : <p>No song is available for this chapter yet.</p>}
+          </div> : !hasLessonSong && <p>No song is available for this chapter yet.</p>}
         </>}
         {activeTab === "grammar" && <>
           <h2>Sarufi · {lesson.grammar}</h2>

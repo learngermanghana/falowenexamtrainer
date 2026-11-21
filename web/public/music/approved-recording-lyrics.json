@@ -2,6 +2,348 @@
   "version": 1,
   "recordings": [
     {
+      "trackId": "swahili-a1-day-11",
+      "objectKey": "swahili/music/A1/day-11/Dukani.mp3",
+      "title": "Tunaenda Dukani!",
+      "lyrics": "[Intro]\nTunaenda dukani, tunaenda dukani,\nTunanunua vitu vingi leo!\nTunaenda dukani, tunaenda dukani,\nTunanunua vitu vingi leo!\n[Verse 1]\nHujambo, habari za leo?\nSijambo, nzuri sana!\nKaribu, karibu dukani!\nAsante, asante sana!\nUnataka nini leo?\nNinataka vitu vizuri!\nNinataka kununua,\nVitabu na vikombe!\n[Chorus]\nKitabu kimoja, vitabu viwili,\nKikombe kimoja, vikombe vitatu!\nKiti kimoja, viti vinne,\nTunanunua vitu vingi dukani!\nKikubwa, vikubwa,\nKidogo, vidogo,\nKizuri, vizuri,\nTunanunua vitu vingi dukani!\n[Verse 2]\nNinataka kitabu kizuri,\nNinataka vitabu viwili!\nNinataka kikombe kidogo,\nNinataka vikombe vitatu!\nNinataka kiti kikubwa,\nNinataka viti viwili!\nSitaki kitu kibaya,\nNinataka vitu vizuri!\n[Chorus]\nKitabu kimoja, vitabu viwili,\nKikombe kimoja, vikombe vitatu!\nKiti kimoja, viti vinne,\nTunanunua vitu vingi dukani!\nKikubwa, vikubwa,\nKidogo, vidogo,\nKizuri, vizuri,\nTunanunua vitu vingi dukani!\n[Verse 3]\nKitabu ni shilingi ngapi?\nNi shilingi elfu tano!\nVikombe ni shilingi ngapi?\nNi shilingi elfu sita!\nJumla ni shilingi ngapi?\nNi shilingi elfu kumi na moja!\nSawa, ninalipa sasa,\nAsante, asante sana!\n[Bridge]\nKimoja, viwili, vitatu, vinne!\nKimoja, viwili, vitatu, vinne!\nKitabu kizuri, vitabu vizuri,\nKikombe kidogo, vikombe vidogo,\nKiti kikubwa, viti vikubwa,\nKitu kibaya, vitu vibaya!\n[Final Chorus]\nTunaenda dukani, tunaenda dukani,\nTunanunua vitu leo!\nKikubwa, vikubwa,\nKidogo, vidogo,\nKizuri, vizuri,\nTunanunua dukani leo!\n[Final Chorus · Repeat]\nTunaenda dukani, tunaenda dukani,\nTunanunua vitu leo!\nKikubwa, vikubwa,\nKidogo, vidogo,\nKizuri, vizuri,\nTunanunua dukani leo!\n[Outro]\nNimelipa, nimepata,\nAsante, asante sana!\nKwa heri, kwa heri,\nKaribu tena dukani!",
+      "cues": [
+        {
+          "start": 9.74,
+          "end": 14.56,
+          "text": "Tunaenda dukani, tunaenda dukani,"
+        },
+        {
+          "start": 14.56,
+          "end": 18.5,
+          "text": "Tunanunua vitu vingi leo!"
+        },
+        {
+          "start": 19.72,
+          "end": 24.48,
+          "text": "Tunaenda dukani, tunaenda dukani,"
+        },
+        {
+          "start": 24.48,
+          "end": 28.06,
+          "text": "Tunanunua vitu vingi leo!"
+        },
+        {
+          "start": 28.06,
+          "end": 30.72,
+          "text": "Hujambo, habari za leo?"
+        },
+        {
+          "start": 30.72,
+          "end": 33.6,
+          "text": "Sijambo, nzuri sana!"
+        },
+        {
+          "start": 33.6,
+          "end": 36.02,
+          "text": "Karibu, karibu dukani!"
+        },
+        {
+          "start": 36.02,
+          "end": 38.36,
+          "text": "Asante, asante sana!"
+        },
+        {
+          "start": 38.36,
+          "end": 40.72,
+          "text": "Unataka nini leo?"
+        },
+        {
+          "start": 40.72,
+          "end": 43.1,
+          "text": "Ninataka vitu vizuri!"
+        },
+        {
+          "start": 43.1,
+          "end": 45.68,
+          "text": "Ninataka kununua,"
+        },
+        {
+          "start": 45.68,
+          "end": 47.42,
+          "text": "Vitabu na vikombe!"
+        },
+        {
+          "start": 47.42,
+          "end": 51.6,
+          "text": "Kitabu kimoja, vitabu viwili,"
+        },
+        {
+          "start": 51.6,
+          "end": 56.72,
+          "text": "Kikombe kimoja, vikombe vitatu!"
+        },
+        {
+          "start": 56.72,
+          "end": 60.1,
+          "text": "Kiti kimoja, viti vinne,"
+        },
+        {
+          "start": 60.1,
+          "end": 62.24,
+          "text": "Tunanunua vitu vingi dukani!"
+        },
+        {
+          "start": 62.24,
+          "end": 63.54,
+          "text": "Kikubwa, vikubwa,"
+        },
+        {
+          "start": 63.54,
+          "end": 64.72,
+          "text": "Kidogo, vidogo,"
+        },
+        {
+          "start": 64.72,
+          "end": 66.02,
+          "text": "Kizuri, vizuri,"
+        },
+        {
+          "start": 66.02,
+          "end": 68.7,
+          "text": "Tunanunua vitu vingi dukani!"
+        },
+        {
+          "start": 71.88,
+          "end": 74.8,
+          "text": "Ninataka kitabu kizuri,"
+        },
+        {
+          "start": 74.8,
+          "end": 77.26,
+          "text": "Ninataka vitabu viwili!"
+        },
+        {
+          "start": 77.26,
+          "end": 79.68,
+          "text": "Ninataka kikombe kidogo,"
+        },
+        {
+          "start": 79.68,
+          "end": 82.1,
+          "text": "Ninataka vikombe vitatu!"
+        },
+        {
+          "start": 82.1,
+          "end": 84.54,
+          "text": "Ninataka kiti kikubwa,"
+        },
+        {
+          "start": 84.54,
+          "end": 86.98,
+          "text": "Ninataka viti viwili!"
+        },
+        {
+          "start": 86.98,
+          "end": 89.4,
+          "text": "Sitaki kitu kibaya,"
+        },
+        {
+          "start": 89.4,
+          "end": 91.4,
+          "text": "Ninataka vitu vizuri!"
+        },
+        {
+          "start": 91.48,
+          "end": 95.35,
+          "text": "Kitabu kimoja, vitabu viwili,"
+        },
+        {
+          "start": 95.35,
+          "end": 100.51,
+          "text": "Kikombe kimoja, vikombe vitatu!"
+        },
+        {
+          "start": 100.51,
+          "end": 103.83,
+          "text": "Kiti kimoja, viti vinne,"
+        },
+        {
+          "start": 103.83,
+          "end": 105.99,
+          "text": "Tunanunua vitu vingi dukani!"
+        },
+        {
+          "start": 105.99,
+          "end": 107.23,
+          "text": "Kikubwa, vikubwa,"
+        },
+        {
+          "start": 107.23,
+          "end": 108.41,
+          "text": "Kidogo, vidogo,"
+        },
+        {
+          "start": 108.41,
+          "end": 109.89,
+          "text": "Kizuri, vizuri,"
+        },
+        {
+          "start": 109.89,
+          "end": 112.41,
+          "text": "Tunanunua vitu vingi dukani!"
+        },
+        {
+          "start": 116,
+          "end": 118.5,
+          "text": "Kitabu ni shilingi ngapi?"
+        },
+        {
+          "start": 118.5,
+          "end": 120.94,
+          "text": "Ni shilingi elfu tano!"
+        },
+        {
+          "start": 120.94,
+          "end": 123.38,
+          "text": "Vikombe ni shilingi ngapi?"
+        },
+        {
+          "start": 123.38,
+          "end": 125.94,
+          "text": "Ni shilingi elfu sita!"
+        },
+        {
+          "start": 125.94,
+          "end": 128.24,
+          "text": "Jumla ni shilingi ngapi?"
+        },
+        {
+          "start": 128.24,
+          "end": 130.84,
+          "text": "Ni shilingi elfu kumi na moja!"
+        },
+        {
+          "start": 130.84,
+          "end": 133.32,
+          "text": "Sawa, ninalipa sasa,"
+        },
+        {
+          "start": 133.32,
+          "end": 135.28,
+          "text": "Asante, asante sana!"
+        },
+        {
+          "start": 135.3,
+          "end": 139.4,
+          "text": "Kimoja, viwili, vitatu, vinne!"
+        },
+        {
+          "start": 140.16,
+          "end": 144.68,
+          "text": "Kimoja, viwili, vitatu, vinne!"
+        },
+        {
+          "start": 144.68,
+          "end": 148.84,
+          "text": "Kitabu kizuri, vitabu vizuri,"
+        },
+        {
+          "start": 148.84,
+          "end": 154.54,
+          "text": "Kikombe kidogo, vikombe vidogo,"
+        },
+        {
+          "start": 154.54,
+          "end": 157.2,
+          "text": "Kiti kikubwa, viti vikubwa,"
+        },
+        {
+          "start": 157.2,
+          "end": 159.4,
+          "text": "Kitu kibaya, vitu vibaya!"
+        },
+        {
+          "start": 159.7,
+          "end": 163.15,
+          "text": "Tunaenda dukani, tunaenda dukani,"
+        },
+        {
+          "start": 164.96,
+          "end": 168.86,
+          "text": "Tunanunua vitu leo!"
+        },
+        {
+          "start": 168.86,
+          "end": 170.48,
+          "text": "Kikubwa, vikubwa,"
+        },
+        {
+          "start": 170.48,
+          "end": 171.64,
+          "text": "Kidogo, vidogo,"
+        },
+        {
+          "start": 171.64,
+          "end": 173.06,
+          "text": "Kizuri, vizuri,"
+        },
+        {
+          "start": 173.06,
+          "end": 175.68,
+          "text": "Tunanunua dukani leo!"
+        },
+        {
+          "start": 180.06,
+          "end": 184.54,
+          "text": "Tunaenda dukani, tunaenda dukani,"
+        },
+        {
+          "start": 184.54,
+          "end": 189,
+          "text": "Tunanunua vitu leo!"
+        },
+        {
+          "start": 189,
+          "end": 190.5,
+          "text": "Kikubwa, vikubwa,"
+        },
+        {
+          "start": 190.5,
+          "end": 191.68,
+          "text": "Kidogo, vidogo,"
+        },
+        {
+          "start": 191.68,
+          "end": 192.88,
+          "text": "Kizuri, vizuri,"
+        },
+        {
+          "start": 192.88,
+          "end": 195.34,
+          "text": "Tunanunua dukani leo!"
+        },
+        {
+          "start": 198.32,
+          "end": 201.38,
+          "text": "Nimelipa, nimepata,"
+        },
+        {
+          "start": 201.38,
+          "end": 203.56,
+          "text": "Asante, asante sana!"
+        },
+        {
+          "start": 203.56,
+          "end": 206.24,
+          "text": "Kwa heri, kwa heri,"
+        },
+        {
+          "start": 206.24,
+          "end": 208.66,
+          "text": "Karibu tena dukani!"
+        }
+      ],
+      "duration": 222.192,
+      "recordingSha256": "9f1132d79a3305171ce45aff167fcff2ce742332da23531075a077926b89eaa6",
+      "source": "Teacher-supplied lyrics and MP3 metadata, with estimated line cues aligned to the recording.",
+      "timingStatus": "estimated"
+    },
+    {
       "trackId": "swahili-a1-day-10",
       "objectKey": "swahili/music/A1/day-10/Leo Tunaenda Sokoni.mp3",
       "title": "Leo Tunaenda Sokoni",

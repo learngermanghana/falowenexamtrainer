@@ -20,9 +20,10 @@ test("Day 11 grammar includes actionable rules, examples and a self check", () =
   expect(screen.getByText(/Kuchagua na kulipa/)).toBeTruthy();
 });
 
-test("Day 11 references offers useful practice without inventing music", () => {
+test("Day 11 references pairs music with the shopping warm-up", () => {
   renderDay("references");
-  expect(screen.getByText(/No Day 11 song has been linked yet/)).toBeTruthy();
+  expect(screen.getByRole("heading", { name: /Music · A1 Day 11/ })).toBeTruthy();
+  expect(screen.getByText(/After listening to “Tunaenda Dukani!”/)).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Go to Group Practice" }));
   expect(screen.getByRole("heading", { name: /Mazungumzo dukani/ })).toBeTruthy();
   expect(screen.getByRole("heading", { name: /Chagua bidhaa/ })).toBeTruthy();
