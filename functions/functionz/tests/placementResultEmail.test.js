@@ -48,3 +48,17 @@ describe("Falowen placement email",()=>{
     }
   });
 });
+
+test("Kiswahili result email uses Kiswahili registration rather than German classes",()=>{
+  const {buildPlacementResultEmail}=require("../../../api/placement-result-email");
+  const result=buildPlacementResultEmail({
+    name:"Amina",language:"swahili",
+    score:{a1:9,a2:8,b1:7,total:24,level:"B1"},
+  });
+  expect(result.subject).toMatch(/Kiswahili placement result/);
+  expect(result.text).toMatch(/Kiswahili/);
+  expect(result.html).toContain("program=swahili");
+  expect(result.html).toContain("not an official CEFR certificate");
+  expect(result.html).not.toContain("Goethe");
+  expect(result.html).not.toContain("Explore B1 classes");
+});
