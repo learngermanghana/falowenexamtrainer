@@ -207,10 +207,13 @@ const normalizeBuildPrecacheManifest = (payload = {}) => {
   return { revision, assets, previousAssets };
 };
 
-const readBuildPrecacheManifest = async () => {
-  // The versioned manifest permits a brief HTTP cache, reducing CDN hits.
-  // Offline chunk integrity is still checked before cache pruning.
-  const response = await fetch(BUILD_ASSET_MANIFEST_URL, { cache: "default" });
+const readBuildPrecacheManifest = async ({ force = false } = {}) => {
+  // Routine checks may reuse the short browser cache to save CDN requests.
+  // A newly installing worker MUST bypass it to precache the current build,
+  // even if the previous deployment's manifest remains fresh in HTTP cache.
+  const response = await fetch(BUILD_ASSET_MANIFEST_URL, {
+    cache: force ? "no-store" : "default",
+  });
   if (!response.ok) {
     throw new Error(`Build asset manifest returned ${response.status}`);
   }
@@ -270,7 +273,7 @@ const refreshBuildAssetPrecache = ({ force = false } = {}) => {
 
   buildPrecacheRefreshPromise = (async () => {
     const cache = await caches.open(CACHE_NAME);
-    const manifest = await readBuildPrecacheManifest();
+    const manifest = await readBuildPrecacheManifest({ force });
     const cachedManifest = await readCachedBuildPrecacheManifest(cache);
 
     if (!force && cachedManifest?.revision === manifest.revision) {
