@@ -110,6 +110,12 @@ export const buildPublicFunnelUrl = (path, additions = {}) => {
       url.searchParams.set(key, String(value));
     }
   });
+  // "program" is a signup option, not a marketing attribution key.
+  // Preserve only explicitly requested, supported languages on signup links;
+  // never let stored campaign context silently switch a learner's language.
+  if (/^\/signup\/?$/.test(url.pathname) && ["german", "swahili"].includes(additions.program)) {
+    url.searchParams.set("program", additions.program);
+  }
   return `${url.pathname}${url.search}${url.hash}`;
 };
 
