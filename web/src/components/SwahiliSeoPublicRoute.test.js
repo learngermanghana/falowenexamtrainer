@@ -29,3 +29,13 @@ test("Swahili static route precedes fallback, is sitemap listed and keeps German
   const homepage = fs.readFileSync(path.join(webRoot, "index.html"), "utf8");
   expect(homepage).toContain("Falowen Kiswahili A1 Course");
 });
+
+
+test("existing homepage links directly to the Swahili landing page in navigation and footer", () => {
+  const source = fs.readFileSync(path.join(webRoot, "src/components/LandingPageSimple.js"), "utf8");
+  expect(source).toContain('<a href="/learn-swahili">{copy.navSwahili}</a>');
+  expect(source).toContain('{ href: "/learn-swahili", labelKey: "navSwahili" }');
+  expect(source).toContain('navSwahili: "Learn Swahili"');
+  expect(source).toContain('navSwahili: "Kiswahili lernen"');
+  expect(source).toContain('navSwahili: "Apprendre le swahili"');
+});
