@@ -177,7 +177,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/__tests__/ServiceWorkerBuildAssetSafety.test.js src/__tests__/PublicAuthServiceWorker.test.js
+        run: npx jest --runInBand --runTestsByPath src/__tests__/ServiceWorkerBuildAssetSafety.test.js src/__tests__/PublicAuthServiceWorker.test.js src/serviceWorkerRegistration.test.js
 
       - name: Test Preposition Case Coach
         working-directory: web
