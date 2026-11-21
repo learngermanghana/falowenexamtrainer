@@ -6,8 +6,13 @@ export function buildA1RecordingSubmission({ assignmentKey, submissionText, draf
       const recording = draft?.sections?.[sectionKey]?.recording;
       const transcript = String(recording?.transcript || "").trim();
       const audioUrl = String(recording?.audioUrl || "").trim();
-      if (!transcript || !/^https:\/\//i.test(audioUrl)) return [];
-      return [{ sectionKey, audioUrl, transcript, savedAt: String(recording.savedAt || "") }];
+      if (!transcript) return [];
+      return [{
+        sectionKey,
+        ...( /^https:\/\//i.test(audioUrl) ? { audioUrl } : {}),
+        transcript,
+        savedAt: String(recording.savedAt || ""),
+      }];
     });
     return { recordings, workbookRevision: "a1-5.9-tutor-speaking-v1" };
   }

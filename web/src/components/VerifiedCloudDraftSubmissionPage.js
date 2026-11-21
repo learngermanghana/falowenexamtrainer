@@ -756,12 +756,16 @@ const VerifiedCloudDraftSubmissionPage = ({
       const recordingAttachments = savedSpeaking || buildA1RecordingSubmission({
         assignmentKey, submissionText, draft: readA1WorkbookDraft(assignmentKey),
       });
+      const savedAudioAttachments = (savedSpeaking?.recordings || [])
+        .filter(({ audioUrl }) => /^https:\/\//i.test(String(audioUrl || "")))
+        .map(({ sectionKey, audioUrl }) => ({
+          name: `Teil ${sectionKey.slice(-1)} recording`,
+          url: audioUrl,
+        }));
       const payload = {
         ...recordingAttachments,
         program: "german",
-        ...(savedSpeaking ? { attachments: savedSpeaking.recordings.map(({ sectionKey, audioUrl }) => ({
-          name: `Teil ${sectionKey.slice(-1)} recording`, url: audioUrl,
-        })) } : {}),
+        ...(savedAudioAttachments.length ? { attachments: savedAudioAttachments } : {}),
         submissionId: submissionRef.id,
         path: submissionPath,
         submissionPath,
