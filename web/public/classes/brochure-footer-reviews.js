@@ -44,21 +44,21 @@
     return source
       .map((review) => ({
         name: String(review?.reviewer?.displayName || "Student").trim() || "Student",
-        rating: STAR_RATINGS[String(review?.starRating || "").toUpperCase()] || Number(review?.starRating) || 5,
+        rating: STAR_RATINGS[String(review?.starRating || "").toUpperCase()] || Number(review?.starRating) || 0,
         text: String(review?.comment || "").replace(/\s+/g, " ").trim(),
         createdAt: String(review?.createTime || ""),
       }))
       .filter((review) => review.text)
       .sort((a, b) => {
-        const ratingDifference = b.rating - a.rating;
-        if (ratingDifference) return ratingDifference;
-        return String(b.createdAt).localeCompare(String(a.createdAt));
+        const dateDifference = String(b.createdAt).localeCompare(String(a.createdAt));
+        return dateDifference || b.rating - a.rating;
       })
       .slice(0, 3);
   }
 
   function stars(rating) {
-    const safeRating = Math.max(1, Math.min(5, Number(rating) || 5));
+    if (!rating) return "Rating not recorded";
+    const safeRating = Math.max(1, Math.min(5, Number(rating)));
     return "★★★★★".slice(0, safeRating);
   }
 
