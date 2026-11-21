@@ -18,6 +18,7 @@ const OFFLINE_URL = "/offline.html";
 const VERSIONED_ASSET_PREFIX = "/assets/";
 const BUILD_ASSET_MANIFEST_URL = "/offline-build-assets.json";
 const BUILD_PRECACHE_BATCH_SIZE = 8;
+const BUILD_MANIFEST_RECHECK_MS = 30 * 60 * 1000;
 const DEFAULT_NOTIFICATION_BODY = "Falowen Learning Hub update";
 const DEFAULT_ROUTE = "/";
 const PUBLIC_AUTH_PATHS = [
@@ -207,7 +208,9 @@ const normalizeBuildPrecacheManifest = (payload = {}) => {
 };
 
 const readBuildPrecacheManifest = async () => {
-  const response = await fetch(BUILD_ASSET_MANIFEST_URL, { cache: "no-store" });
+  // The versioned manifest permits a brief HTTP cache, reducing CDN hits.
+  // Offline chunk integrity is still checked before cache pruning.
+  const response = await fetch(BUILD_ASSET_MANIFEST_URL, { cache: "default" });
   if (!response.ok) {
     throw new Error(`Build asset manifest returned ${response.status}`);
   }
@@ -260,6 +263,7 @@ const pruneObsoleteBuildAssets = async (cache, retainedAssets) => {
 };
 
 let buildPrecacheRefreshPromise = null;
+let lastBuildManifestCheckAt = 0;
 
 const refreshBuildAssetPrecache = ({ force = false } = {}) => {
   if (buildPrecacheRefreshPromise) return buildPrecacheRefreshPromise;
@@ -301,12 +305,28 @@ const refreshBuildAssetPrecache = ({ force = false } = {}) => {
   return buildPrecacheRefreshPromise;
 };
 
+// Navigation alone should not force a network manifest lookup every time.
+// The page registration also checks for updates after a tab resumes.
+const refreshBuildPrecacheWhenDue = () => {
+  const now = Date.now();
+  if (now - lastBuildManifestCheckAt < BUILD_MANIFEST_RECHECK_MS) {
+    return Promise.resolve(false);
+  }
+  if (buildPrecacheRefreshPromise) return buildPrecacheRefreshPromise;
+  lastBuildManifestCheckAt = now;
+  return refreshBuildAssetPrecache().catch((error) => {
+    lastBuildManifestCheckAt = 0;
+    throw error;
+  });
+};
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
       await cache.addAll(STATIC_ASSETS);
       await refreshBuildAssetPrecache({ force: true });
+      lastBuildManifestCheckAt = Date.now();
       await self.skipWaiting();
     })()
   );
@@ -405,7 +425,7 @@ self.addEventListener("fetch", (event) => {
     const isAuthNavigation = isPublicAuthPath(requestUrl.pathname);
     if (!isAuthNavigation) {
       event.waitUntil(
-        refreshBuildAssetPrecache().catch((error) => {
+        refreshBuildPrecacheWhenDue().catch((error) => {
           console.error("Failed to refresh build asset precache", error);
         })
       );
