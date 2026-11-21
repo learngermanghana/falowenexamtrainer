@@ -33,8 +33,8 @@ const checks = [
     "message.audioErrorMessage",
   ]],
   ["web/src/components/SpeakingExamIntroPage.js", [
-    'import A1Teil3SpeakingPracticePanel from "./A1Teil3SpeakingPracticePanel"',
-    "<A1Teil3SpeakingPracticePanel />",
+    'import A1ExamObjectPicture from "./A1ExamObjectPicture"',
+    '<A1ExamObjectPicture label={picture} />',
   ]],
   ["web/src/components/A1Teil3SpeakingPracticePanel.js", [
     'lockedLevel="A1"',
