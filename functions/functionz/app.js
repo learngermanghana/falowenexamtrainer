@@ -32,6 +32,7 @@ const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
 const { verifyTeacherApprovedA2Mock3Audio } = require("./a2Mock3PublishedAudio");
 const { verifyA2Mock04Audio } = require("./a2Mock04PublishedAudio");
 const { verifyA2Mock05Audio } = require("./a2Mock05PublishedAudio");
+const { gradeB2Mock03 } = require("./b2Mock03HoerenScore");
 const { gradeA2HoerenOnly } = require("./a2HoerenOnlyScore");
 const { verifyA2Mock06Audio } = require("./a2Mock06PublishedAudio");
 const { verifyA2Mock07Audio } = require("./a2Mock07PublishedAudio");
@@ -1167,6 +1168,26 @@ app.post("/a2-mock/hoeren-practice/score", async (req, res) => {
     return res.json(result);
   } catch (error) {
     console.error("A2 Hören practice scoring failed", error);
+    return res.status(500).json({ error: "Hören practice could not be scored." });
+  }
+});
+
+app.post("/b2-mock-03/hoeren-practice/score", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable." });
+    const profile = await findAuthedStudentProfile(db, authedUser);
+    const blocked = getB2MediaAccessBlockReason({ authedUser, student: profile?.data || null });
+    if (blocked) return res.status(403).json({ error: "B2 Hören access is not available for this account.", code: blocked });
+    let result;
+    try { result = gradeB2Mock03(req.body?.answers); }
+    catch (error) { return res.status(400).json({ error: error.message || "Invalid Hören answers." }); }
+    res.set("Cache-Control", "private, no-store");
+    return res.json(result);
+  } catch (error) {
+    console.error("B2 Hören practice scoring failed", error);
     return res.status(500).json({ error: "Hören practice could not be scored." });
   }
 });

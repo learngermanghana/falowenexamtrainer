@@ -30,6 +30,7 @@ case must remain unchanged; Cloudflare R2 keys are case sensitive.
 | A2 Mock 2 | `a2/mock-horen-2/teil-1.mp3` | Keep |
 | B1 Mock 1 | `b1/mock-hoeren-1/teil-1.mp3` | Keep |
 | B2 Mock 1 | `b2/mock-hoeren-1/teil-1.mp3` | Keep |
+| B2 Mock 03 | `b2/mock-hoeren-1/mock-03/teil-1.mp3` | Exams Room Hören Sample 3 uses four MP3s in this folder |
 | A1 exam sample 2 | `a1/horen-part-2/teil-1.mp3` | Keep (separate sample type) |
 | C1 exam sample | `c1/exam-horen-1/teil-1.mp3` | Keep (separate sample type) |
 | B1 speaking sample | `b1/mock-hoeren-1/sprechen-teil-1.mp3` | Keep (not a new listening part) |
