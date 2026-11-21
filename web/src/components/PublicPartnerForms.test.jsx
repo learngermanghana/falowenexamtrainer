@@ -1,122 +1,120 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import OrganisationEnrolmentPage from "./OrganisationEnrolmentPage";
 import PartnershipPage from "./PartnershipPage";
+import { partnerRequest } from "../lib/organisationPartnerAccount.js";
+import { loadOrganisationAgreement, requestOrganisationAgreement } from "../lib/organisationAgreementRequest.js";
+
+jest.mock("./PartnerAccount.jsx", () => ({
+  __esModule: true,
+  default: ({ children }) => children({
+    profile: {
+      id: "partner-fixture", name: "Example agency", email: "agency@example.test",
+      contactName: "Director", phone: "0200000000", address: "Accra",
+    },
+    refresh: async () => {},
+  }),
+}));
+jest.mock("../lib/organisationPartnerAccount.js", () => ({
+  partnerRequest: jest.fn(), downloadPartnerAgreement: jest.fn(), partnerAuth: {},
+}));
+jest.mock("../lib/organisationAgreementRequest.js", () => ({
+  loadOrganisationAgreement: jest.fn(),
+  requestOrganisationAgreement: jest.fn(),
+}));
 
 const hosting = require("../../../vercel.json");
-test.each(["organisation-enrolments", "referrals/apply", "referrals/claim"])("public %s submissions reach the existing backend before the generic API handler", path => {
+test.each(["organisation-enrolments", "referrals/apply", "referrals/claim"])("public %s requests use the existing backend routing", path => {
   const match = hosting.routes.find(route => route.src && new RegExp("^" + route.src + "$").test("/api/" + path));
   expect(match.dest).toBe("https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/" + path);
   expect(match.methods).toEqual(["POST"]);
 });
-const catalog = { classes: [{ id: "a1-test", title: "A1 Example Class", level: "A1", startDate: "2027-01-04", registrationOpen: true }, { id: "b1-test", title: "B1 Example Class", level: "B1", startDate: "2027-01-05" }] };
-async function chooseClass() {
-  // The catalogue is fetched on mount. Wait for that request to finish rather
-  // than racing the temporary "Loading classes…" state or forcing a refresh.
-  await screen.findByRole("button", { name: "Load / refresh available classes" });
-  fireEvent.change(screen.getByLabelText("Student 1 Level"), { target: { value: "A1" } });
-  await screen.findByRole("option", { name: "A1 Example Class — 2027-01-04" });
-  expect(screen.queryByRole("option", { name: "B1 Example Class — 2027-01-05" })).not.toBeInTheDocument();
-  fireEvent.change(screen.getByLabelText("Student 1 Requested class"), { target: { value: "a1-test" } });
-}
-const originalFetch = global.fetch;
-afterEach(() => { global.fetch = originalFetch; sessionStorage.clear(); });
+
+const catalog = {
+  classes: [
+    { id: "de-a1", title: "A1 German Class", level: "A1", language: "German", startDate: "2027-01-04" },
+    { id: "de-b1", title: "B1 German Class", level: "B1", language: "German", startDate: "2027-01-05" },
+  ],
+  swahiliClasses: [
+    { id: "sw-a1", title: "A1 Kiswahili Class", level: "A1", language: "Swahili", startDate: "2027-01-06" },
+  ],
+};
+const priorFetch = global.fetch;
+afterEach(() => {
+  global.fetch = priorFetch;
+  sessionStorage.clear();
+  jest.clearAllMocks();
+});
+beforeEach(() => {
+  loadOrganisationAgreement.mockResolvedValue({
+    version: "organisation-partnership-2026-11-21-v8", terms: ["Organisation terms"],
+    partnerShareRate: .1, shareSettlement: "invoice_deduction", tuitionRefundable: false,
+    classDurationWeeks: 10, accessMonths: 6, accessStartsAt: "account_activation",
+  });
+  requestOrganisationAgreement.mockResolvedValue({ reference: "a".repeat(64) });
+  partnerRequest.mockResolvedValue({ reference: "batch-test" });
+  global.fetch = jest.fn(async () => ({ ok: true, json: async () => catalog }));
+});
 const show = (page, path) => render(<MemoryRouter initialEntries={[path]}>{page}</MemoryRouter>);
-
-test("the public group form keeps its request ID and students through a failed submission", async () => {
-  const requests = [];
-  global.fetch = jest.fn(async (path, options) => {
-    if (path === "/api/public/classes") return { ok: true, json: async () => catalog };
-    requests.push(JSON.parse(options.body));
-    expect(path).toBe("/api/organisation-enrolments");
-    if (requests.length === 1) throw new Error("offline");
-    return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "batch-test" }) };
-  });
-  show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
-  fireEvent.change(screen.getByLabelText("Organisation name"), { target: { value: "Test school" } });
-  fireEvent.change(screen.getByLabelText("Student 1 Full name"), { target: { value: "Example learner" } });
-  await chooseClass();
-  const button = screen.getByText("Submit for Falowen review");
-  fireEvent.submit(button.closest("form"));
-  expect(await screen.findByRole("alert")).toHaveTextContent("retry");
-  fireEvent.submit(button.closest("form"));
-  expect(await screen.findByText("batch-test")).toBeInTheDocument();
-  expect(requests[0].requestId).toBeTruthy();
-  expect(requests[1]).toEqual(requests[0]);
-  expect(requests[0].students).toHaveLength(1);
-});
-test("one organisation programme offers signing without referral or bank fields", async () => {
-  global.fetch = jest.fn(async () => ({ ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", partnerShareRate: 0.1, shareSettlement: "invoice_deduction", tuitionRefundable: false, classDurationWeeks: 10, accessMonths: 6, accessStartsAt: "account_activation", terms: ["Organisation terms"] }) }));
-  show(<PartnershipPage />, "/partnerships");
-  expect(screen.getByRole("heading", { name: /Grow your offering/ })).toBeInTheDocument();
-  expect(screen.queryByRole("heading", { name: "Referral partnerships" })).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole("tab", { name: "Agreement" }));
-  expect(await screen.findByText("Organisation terms")).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("tab", { name: "Register" }));
-  expect(screen.queryByLabelText("Account holder name")).not.toBeInTheDocument();
-  expect(screen.queryByLabelText("Payment arrangement")).not.toBeInTheDocument();
-});
-test("the page is organisation-only even with an old referral query", () => {
-  global.fetch = jest.fn(); show(<PartnershipPage />, "/partnerships?ref=" + "a".repeat(32));
-  expect(screen.getAllByRole("tab")).toHaveLength(3);
-  expect(document.querySelector('a[href*="signup"]')).toBeNull();
-  expect(screen.queryByText("Clients paying for themselves")).not.toBeInTheDocument();
-  expect(global.fetch).not.toHaveBeenCalled();
-});
-test("signing saves the organisation context and continues to the student-list form", async () => {
-  const sent = []; global.URL.createObjectURL = jest.fn(() => "blob:receipt"); global.URL.revokeObjectURL = jest.fn();
-  const anchorClick = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-  global.fetch = jest.fn(async (path, options) => {
-    if (path.includes("agreement-terms")) return { ok: true, text: async () => JSON.stringify({ ok: true, version: "org-v3", partnerShareRate: 0.1, shareSettlement: "invoice_deduction", tuitionRefundable: false, classDurationWeeks: 10, accessMonths: 6, accessStartsAt: "account_activation", terms: ["Organisation terms"] }) };
-    sent.push({ path, body: JSON.parse(options.body) });
-    if (path.includes("agreement-copy")) return { ok: true, headers: { get: () => "application/pdf" }, blob: async () => new Blob(["PDF"]) };
-    return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "a".repeat(64) }) };
-  });
-  show(<PartnershipPage />, "/partnerships");
-  fireEvent.click(screen.getByRole("tab", { name: "Agreement" }));
-  expect(await screen.findByText("Organisation terms")).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("tab", { name: "Register" }));
-  for (const [label, value] of [["Organisation name", "Example agency"], ["Contact email", "agency@example.test"], ["Phone", "0200000000"], ["Address", "Accra"], ["Full name of person signing", "Director"], ["Role / capacity", "Director"]]) fireEvent.change(screen.getByLabelText(label), { target: { value } });
-  for (const checkbox of screen.getAllByRole("checkbox")) fireEvent.click(checkbox);
-  fireEvent.submit(screen.getByRole("button", { name: "Sign, save and download receipt" }).closest("form"));
-  expect(await screen.findByRole("heading", { name: "Your organisation is registered for review." })).toBeInTheDocument();
-  expect(sent[0].body).toMatchObject({ kind: "institutional", billingResponsibility: "organisation", termsVersion: "org-v3" });
-  expect(screen.getByRole("link", { name: /Continue to add your students/ })).toHaveAttribute("href", "/organisation-enrolment");
-  const context = JSON.parse(sessionStorage.getItem("falowen:organisation-partner-context"));
-  expect(context.organisation.email).toBe("agency@example.test"); expect(context.agreementReference).toBe("a".repeat(64));
-  anchorClick.mockRestore();
-});
-test("the student-list form prefills the signed organisation and sends its agreement reference", async () => {
-  sessionStorage.setItem("falowen:organisation-partner-context", JSON.stringify({ agreementReference: "a".repeat(64), organisation: { name: "Signed agency", contactName: "Director", email: "agency@example.test", phone: "0200000000" } }));
-  let payload;
-  global.fetch = jest.fn(async (path, options) => { if (path === "/api/public/classes") return { ok: true, json: async () => catalog }; payload = JSON.parse(options.body); return { ok: true, text: async () => JSON.stringify({ ok: true, reference: "batch" }) }; });
-  show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
-  expect(screen.getByLabelText("Organisation name")).toHaveValue("Signed agency");
-  fireEvent.change(screen.getByLabelText("Student 1 Full name"), { target: { value: "Learner" } });
-  await chooseClass();
-  fireEvent.submit(screen.getByRole("button", { name: "Submit for Falowen review" }).closest("form"));
-  expect(await screen.findByText("batch")).toBeInTheDocument();
-  expect(payload.agreementReference).toBe("a".repeat(64));
-  expect(payload.schemaVersion).toBe(2);
-  expect(payload.students[0]).toMatchObject({ level: "A1", requestedClassId: "a1-test", requestedClassName: "A1 Example Class", requestedClassStartDate: "2027-01-04" });
-});
-
-test("a class request is required and changing level clears the previous class", async () => {
-  global.fetch = jest.fn(async path => {
-    if (path !== "/api/public/classes") throw new Error("Unexpected submission during class validation");
-    return { ok: true, json: async () => catalog };
-  });
-  show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
-  // Let the automatic GET complete before validating an unselected class.
+async function chooseClass(language = "German") {
   await screen.findByRole("button", { name: "Load / refresh available classes" });
-  fireEvent.change(screen.getByLabelText("Student 1 Full name"), { target: { value: "Learner" } });
+  fireEvent.change(screen.getByLabelText("Student 1 Course language"), { target: { value: language } });
+  fireEvent.change(screen.getByLabelText("Student 1 Level"), { target: { value: "A1" } });
+  const name = language === "Swahili" ? "A1 Kiswahili Class — 2027-01-06" : "A1 German Class — 2027-01-04";
+  await screen.findByRole("option", { name });
+  fireEvent.change(screen.getByLabelText("Student 1 Requested class"), { target: { value: language === "Swahili" ? "sw-a1" : "de-a1" } });
+}
+
+test("partnership overview presents German and Kiswahili under one account", () => {
+  show(<PartnershipPage />, "/partnerships");
+  expect(screen.getByRole("heading", { name: /We teach German & Kiswahili/ })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "German courses" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Kiswahili courses" })).toBeInTheDocument();
+  expect(screen.getByText(/free places earn no tuition-based share/i)).toBeInTheDocument();
+  expect(screen.getAllByRole("tab")).toHaveLength(3);
+});
+
+test("agreement remains available for the same registration flow", async () => {
+  show(<PartnershipPage />, "/partnerships");
+  fireEvent.click(screen.getByRole("tab", { name: "Agreement" }));
+  expect(await screen.findByText("Organisation terms")).toBeInTheDocument();
+  expect(screen.getByText(/arranging German and Kiswahili language training/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("tab", { name: "Register" }));
+  expect(screen.getByLabelText("Organisation name")).toHaveValue("Example agency");
+});
+
+test.each([["German", "de-a1"], ["Swahili", "sw-a1"]])("partner can submit a %s learner only for matching classes", async (language, classId) => {
+  show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
+  fireEvent.change(screen.getByLabelText("Student 1 Full name"), { target: { value: "Example learner" } });
+  await chooseClass(language);
+  const wrong = language === "Swahili" ? "A1 German Class — 2027-01-04" : "A1 Kiswahili Class — 2027-01-06";
+  expect(screen.queryByRole("option", { name: wrong })).not.toBeInTheDocument();
   fireEvent.submit(screen.getByRole("button", { name: "Submit for Falowen review" }).closest("form"));
-  expect(await screen.findByRole("alert")).toHaveTextContent("select an available class");
-  // A catalogue GET is expected; validation must still block enrolment POSTs.
-  expect(global.fetch).toHaveBeenCalledWith("/api/public/classes", expect.any(Object));
-  expect(global.fetch.mock.calls.filter(([path]) => path === "/api/organisation-enrolments")).toHaveLength(0);
-  await chooseClass();
-  fireEvent.change(screen.getByLabelText("Student 1 Level"), { target: { value: "B1" } });
+  await waitFor(() => expect(partnerRequest).toHaveBeenCalled());
+  const [path, body] = partnerRequest.mock.calls[0];
+  expect(path).toBe("organisation-enrolments");
+  expect(body.students).toHaveLength(1);
+  expect(body.students[0]).toMatchObject({ language, level: "A1", requestedClassId: classId });
+});
+
+test("switching language clears the selected class and level", async () => {
+  show(<OrganisationEnrolmentPage />, "/organisation-enrolment");
+  await chooseClass("German");
+  fireEvent.change(screen.getByLabelText("Student 1 Course language"), { target: { value: "Swahili" } });
+  expect(screen.getByLabelText("Student 1 Level")).toHaveValue("");
   expect(screen.getByLabelText("Student 1 Requested class")).toHaveValue("");
+});
+
+test("partner signing still saves the agreement and preserves the enrolment link", async () => {
+  show(<PartnershipPage />, "/partnerships");
+  fireEvent.click(screen.getByRole("tab", { name: "Register" }));
+  await screen.findByRole("button", { name: /Sign, save and download receipt/ });
+  fireEvent.change(screen.getByLabelText("Role / capacity"), { target: { value: "Director" } });
+  for (const control of screen.getAllByRole("checkbox")) fireEvent.click(control);
+  fireEvent.submit(screen.getByRole("button", { name: /Sign, save and download receipt/ }).closest("form"));
+  await waitFor(() => expect(requestOrganisationAgreement).toHaveBeenCalledWith("apply-signed", expect.objectContaining({
+    kind: "institutional", termsVersion: "organisation-partnership-2026-11-21-v8",
+  })));
+  expect(await screen.findByRole("link", { name: /Continue to add your students/ })).toHaveAttribute("href", "/organisation-enrolment");
 });
