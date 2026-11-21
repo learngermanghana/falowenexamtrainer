@@ -40,6 +40,31 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .booking-timezone svg { flex-shrink: 0; color: var(--booking-green); }
 .booking-timezone strong { color: #45584d; }
 .booking-alert { margin: 22px 0; padding: 15px 18px; border-radius: 10px; border: 1px solid #efc7c3; background: #fff1ef; color: #972e27; font-size: 14px; line-height: 1.6; }
+
+/* Lightweight contact-first landing: only an explicit calendar click fetches availability. */
+.booking-contact-options { padding: 33px 0 8px; }
+.booking-choice-eyebrow { color: var(--booking-green); font-size: 11px; font-weight: 800; letter-spacing: .16em; margin: 0 0 9px; }
+.booking-contact-options h2 { font-size: clamp(22px,2.1vw,30px); letter-spacing: -.035em; color: #19372a; margin: 0 0 10px; }
+.booking-choice-description { color: #6b7b70; font-size: 14px; line-height: 1.7; margin: 0 0 24px; max-width: 640px; }
+.booking-contact-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.booking-contact-card { display: flex; flex-direction: column; align-items: flex-start; gap: 13px; min-height: 228px; padding: 24px; border: 1px solid #cdded3; border-radius: 16px; text-align: left; text-decoration: none; font: inherit; cursor: pointer; transition: transform .15s,border-color .15s; }
+.booking-contact-card:hover { transform: translateY(-2px); border-color: #178362; }
+.booking-contact-card strong { font-size: 18px; line-height: 1.3; letter-spacing: -.02em; }
+.booking-contact-card > span:not(.booking-contact-icon):not(.booking-contact-link) { font-size: 13px; line-height: 1.6; opacity: .83; }
+.booking-contact-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 11px; font-size: 22px; }
+.booking-contact-whatsapp { background: #0e6447; border-color: #0e6447; color: #fff; }
+.booking-contact-whatsapp .booking-contact-icon { background: rgba(255,255,255,.15); }
+.booking-contact-calendar { background: #fff; color: #1a392a; }
+.booking-contact-calendar .booking-contact-icon { background: #e8f5ed; color: #0b6b48; }
+.booking-contact-link { margin-top: auto; font-weight: 800; font-size: 13px; }
+.booking-choice-note { margin: 17px 0 0; color: #829188; font-size: 12px; line-height: 1.6; }
+@media (max-width: 580px) {
+  .booking-contact-options { padding-top: 26px; }
+  .booking-contact-grid { grid-template-columns: 1fr; gap: 12px; }
+  .booking-contact-card { min-height: 0; padding: 20px; gap: 10px; }
+  .booking-contact-card strong { font-size: 17px; }
+}
+
 .booking-step { padding-top: 31px; }
 .booking-step-heading { display: flex; align-items: center; gap: 16px; }
 .booking-step-number { width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 14px; background: var(--booking-green); color: #fff; }

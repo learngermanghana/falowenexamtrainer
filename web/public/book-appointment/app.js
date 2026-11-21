@@ -6,7 +6,8 @@
   const MORE_DATES = 5;
   const el = id => document.getElementById(id);
   const ui = {
-    error:el("booking-error"),choose:el("choose-step"),details:el("details-step"),
+    error:el("booking-error"),entry:el("booking-entry"),start:el("show-appointment-times"),
+    choose:el("choose-step"),details:el("details-step"),
     success:el("success-step"),dates:el("booking-dates"),times:el("booking-times"),
     availability:el("availability-content"),loading:el("loading-slots"),
     empty:el("no-availability"),count:el("availability-count"),
@@ -21,7 +22,7 @@
   };
   const state = {
     slots:[],selectedDate:"",selectedSlotId:"",visibleDates:INITIAL_DATES,
-    step:"choose",loading:true,busy:false,confirmation:null
+    step:"choose",availabilityRequested:false,loading:false,loadFailed:false,busy:false,confirmation:null
   };
   const shortDate = new Intl.DateTimeFormat("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric",timeZone:"UTC"});
   const longDate = new Intl.DateTimeFormat("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric",timeZone:"UTC"});
@@ -69,8 +70,9 @@
     return data;
   }
   async function loadSlots() {
-    if (state.loading && state.slots.length) return;
+    if (!state.availabilityRequested || state.loading) return;
     state.loading=true;
+    state.loadFailed=false;
     showError("");
     render();
     try {
@@ -84,6 +86,7 @@
         if (state.step==="details") state.step="choose";
       }
     } catch(error) {
+      state.loadFailed=true;
       showError(error.message || "We couldn't refresh appointment times.");
     } finally {
       state.loading=false;
@@ -143,8 +146,8 @@
     const chosen=selectedSlot();
     ui.summaryCard.replaceChildren();
     if (!chosen && !state.confirmation) {
-      ui.summaryTitle.textContent="Let's find a time that works.";
-      ui.summaryDesc.textContent="Select any available time and we'll take care of the rest.";
+      ui.summaryTitle.textContent=state.availabilityRequested?"Let's find a time that works.":"Connect with Falowen your way.";
+      ui.summaryDesc.textContent=state.availabilityRequested?"Select any available time and we'll take care of the rest.":"Chat with our team or choose a scheduled consultation. The calendar opens only when you ask.";
       const holder=add("div","booking-placeholder");
       const icon=add("span","booking-calendar-icon");
       icon.setAttribute("aria-hidden","true");
@@ -186,13 +189,15 @@
   }
   function render() {
     const chosen=selectedSlot();
-    ui.choose.hidden=state.step!=="choose";
+    ui.entry.hidden=state.availabilityRequested || state.step!=="choose";
+    ui.start.setAttribute("aria-expanded",String(state.availabilityRequested));
+    ui.choose.hidden=state.step!=="choose" || !state.availabilityRequested;
     ui.details.hidden=state.step!=="details";
     ui.success.hidden=state.step!=="success";
     ui.loading.hidden=!state.loading;
     ui.refresh.disabled=state.loading||state.busy;
     ui.availability.hidden=state.loading||!state.slots.length;
-    ui.empty.hidden=state.loading||!!state.slots.length;
+    ui.empty.hidden=state.loading||state.loadFailed||!!state.slots.length||!state.availabilityRequested;
     const dates=getDates();
     ui.count.textContent=state.loading?"Checking availability…":state.slots.length
       +(state.slots.length===1?" time":" times")+" available across "+dates.length
@@ -264,6 +269,11 @@
       render();
     }
   }
+  ui.start.addEventListener("click",()=>{
+    if (state.availabilityRequested) return;
+    state.availabilityRequested=true;
+    loadSlots();
+  });
   ui.more.addEventListener("click",()=>{state.visibleDates+=MORE_DATES;renderDates();});
   ui.refresh.addEventListener("click",loadSlots);
   ui.summaryNext.addEventListener("click",next);
@@ -276,5 +286,6 @@
     showError("");loadSlots();
     window.scrollTo({top:0,behavior:"smooth"});
   });
-  loadSlots();
+  // Keep the public landing page static until a visitor explicitly opens the calendar.
+  render();
 })();

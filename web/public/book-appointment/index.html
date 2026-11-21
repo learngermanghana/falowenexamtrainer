@@ -38,6 +38,30 @@
 
         <div id="booking-error" class="booking-alert" role="alert" hidden></div>
 
+        <section id="booking-entry" class="booking-contact-options" aria-labelledby="contact-choice-title">
+          <p class="booking-choice-eyebrow">TWO WAYS TO CONNECT</p>
+          <h2 id="contact-choice-title">How would you like to reach us?</h2>
+          <p class="booking-choice-description">For quick questions, message our team directly. If you prefer a scheduled meeting, you can view available times.</p>
+          <div class="booking-contact-grid">
+            <a class="booking-contact-card booking-contact-whatsapp"
+              href="https://api.whatsapp.com/send?phone=233205706589&amp;text=Hello%20Learn%20Language%20Education%20Academy%2C%20I%20would%20like%20to%20request%20a%20consultation."
+              target="_blank" rel="noopener noreferrer">
+              <span class="booking-contact-icon" aria-hidden="true">✉</span>
+              <strong>Send us a WhatsApp message</strong>
+              <span>Ask about classes or request a consultation without opening the booking calendar.</span>
+              <span class="booking-contact-link">Open WhatsApp <span aria-hidden="true">↗</span></span>
+            </a>
+            <button id="show-appointment-times" class="booking-contact-card booking-contact-calendar" type="button"
+              aria-controls="choose-step" aria-expanded="false">
+              <span class="booking-contact-icon" aria-hidden="true">▦</span>
+              <strong>See available appointment times</strong>
+              <span>Check our calendar and book an online consultation with confirmation by email.</span>
+              <span class="booking-contact-link">View appointment times <span aria-hidden="true">→</span></span>
+            </button>
+          </div>
+          <p class="booking-choice-note">Checking times is optional. The booking calendar loads only when you select it.</p>
+        </section>
+
         <section id="choose-step" class="booking-step" aria-labelledby="step-heading">
           <div class="booking-step-heading">
             <span class="booking-step-number">1</span>
@@ -46,14 +70,14 @@
           <p class="booking-step-description">Pick a date, then choose one of the available times.</p>
 
           <div class="booking-availability-bar">
-            <span id="availability-count" aria-live="polite">Checking availability…</span>
+            <span id="availability-count" aria-live="polite">Available appointments</span>
             <button id="refresh-times" class="booking-text-button" type="button">
               <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2 6M20 4v7h-7"/></svg>
               Refresh times
             </button>
           </div>
 
-          <div id="loading-slots" class="booking-loading" role="status">
+          <div id="loading-slots" class="booking-loading" role="status" hidden>
             <span class="booking-spinner" aria-hidden="true"></span> Finding available dates…
           </div>
 
@@ -69,7 +93,7 @@
             </div>
             <div id="booking-times" class="booking-times" role="group" aria-labelledby="times-heading"></div>
           </div>
-          <p id="no-availability" class="booking-empty" hidden>No appointment times are available at the moment. Please check back soon.</p>
+          <p id="no-availability" class="booking-empty" hidden>No appointment times are available at the moment. You can contact us on WhatsApp instead.</p>
         </section>
 
         <section id="details-step" class="booking-step" aria-labelledby="details-heading" hidden>
