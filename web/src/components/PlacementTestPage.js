@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import PlacementTestPage2026 from "./PlacementTestPage2026";
 import PlacementFunnelNextStep from "./PlacementFunnelNextStep";
+import "./PlacementTestPage.css";
 import {
   rememberPublicFunnelContext,
   trackPublicFunnelEvent,
@@ -102,12 +103,26 @@ export default function PlacementTestPage() {
   }, [language]);
 
   return (
-    <div ref={rootRef}>
-      <nav aria-label="Choose placement-test language" style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",justifyContent:"center",margin:"18px auto",padding:"0 12px"}}>
-        <strong>Test language:</strong>
-        <a href="/placement-test" aria-current={language==="german"?"page":undefined} style={{padding:"9px 14px",borderRadius:10,background:language==="german"?"#174bbb":"#eff5ff",color:language==="german"?"white":"#174bbb",fontWeight:750}}>German</a>
-        <a href="/placement-test?language=swahili" aria-current={language==="swahili"?"page":undefined} style={{padding:"9px 14px",borderRadius:10,background:language==="swahili"?"#174bbb":"#eff5ff",color:language==="swahili"?"white":"#174bbb",fontWeight:750}}>Kiswahili</a>
-      </nav>
+    <div ref={rootRef} className="falowen-placement-shell" data-placement-theme={language}>
+      <header className="falowen-placement-top">
+        <div className="falowen-placement-top-inner">
+          <a className="falowen-placement-brand" href="/" aria-label="Falowen home">
+            <span className="falowen-placement-brand-badge" aria-hidden="true">{language === "swahili" ? "SW" : "DE"}</span>
+            <span className="falowen-placement-brand-copy">
+              <span className="falowen-placement-brand-name">{language === "swahili" ? "Kiswahili" : "Deutsch"}</span>
+              <span className="falowen-placement-brand-by">by Falowen</span>
+            </span>
+          </a>
+          <span className="falowen-placement-header-label">{language === "swahili" ? "Kiswahili placement test" : "German placement test"}</span>
+          <div className="falowen-placement-top-actions">
+            <nav className="falowen-placement-language-nav" aria-label="Choose placement-test language">
+              <a href="/placement-test" aria-current={language === "german" ? "page" : undefined}>German</a>
+              <a href="/placement-test?language=swahili" aria-current={language === "swahili" ? "page" : undefined}>Kiswahili</a>
+            </nav>
+            <span className="falowen-placement-free">Free · No account required</span>
+          </div>
+        </div>
+      </header>
       <PlacementTestPage2026 key={language} language={language} />
       {mount && result ? createPortal(<PlacementFunnelNextStep result={result} />, mount) : null}
     </div>
