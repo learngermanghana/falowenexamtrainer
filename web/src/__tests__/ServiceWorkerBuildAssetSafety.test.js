@@ -117,6 +117,7 @@ describe("service worker build asset safety", () => {
       manifestSource + "\nreadBuildPrecacheManifest;",
       {
         BUILD_ASSET_MANIFEST_URL: "/offline-build-assets.json",
+        VERSIONED_ASSET_PREFIX: "/assets/",
         fetch: async (url, options) => {
           expect(url).toBe("/offline-build-assets.json");
           modes.push(options.cache);
