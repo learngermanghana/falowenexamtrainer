@@ -140,6 +140,10 @@ const formatAuthErrorMessage = (error, mode = "login") => {
 
   if (!message && mode === "signup") {
     switch (code) {
+      case "auth/duplicate-review-required":
+      case "auth/duplicate-check-unavailable":
+        message = error?.message || "Please contact Falowen admissions to verify your account before registering.";
+        break;
       case "auth/email-already-in-use":
         message = "This email is already registered. Please log in or reset your password.";
         break;
