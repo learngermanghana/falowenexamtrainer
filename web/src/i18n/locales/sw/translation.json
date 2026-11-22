@@ -321,7 +321,9 @@
     "error": "Imeshindikana kuhifadhi ombi. Jaribu tena au wasiliana na timu ya usajili.",
     "signupBoth": "Ningependa pia kujifunza {{course}}.",
     "signupNotice": "Utaanza kozi kuu kwanza. Timu ya usajili itawasiliana nawe kuhusu kozi ya pili; bado hakuna usajili au ada.",
-    "placementPending": "Kozi yako ya pili inasubiri darasa na kiwango. Wasiliana na timu ya usajili."
+    "placementPending": "Kozi yako ya pili inasubiri darasa na kiwango. Wasiliana na timu ya usajili.",
+    "secondaryBillingTitle": "Ada za kozi ya pili",
+    "secondaryBillingNotice": "Ada na malipo ya kozi yako ya pili husimamiwa tofauti na timu ya usajili ya Falowen. Hapa tunaonyesha kiasi kilichothibitishwa pekee; hakuna malipo yanayoanzishwa."
   },
   "resultsOverview": {
     "title": "Matokeo",
