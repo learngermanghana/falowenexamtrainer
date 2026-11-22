@@ -104,7 +104,8 @@ test("checks existing normalized identities and legacy primary phones without br
 });
 
 test("finds a name-plus-emergency match after more than eight shared contacts", async () => {
-  const sharedEmergency = "055 987 6543";
+  // Use a raw legacy format included in legacyPhoneVariants() query values.
+  const sharedEmergency = "0559876543";
   const family = Array.from({ length: 9 }, (_, i) => ({
     id: "family-" + i,
     name: i === 8 ? "Ofori Ama" : "Other Student " + i,
