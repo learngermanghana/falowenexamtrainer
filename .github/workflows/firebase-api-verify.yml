@@ -1,0 +1,42 @@
+name: Firebase API verification (no deployment)
+
+on:
+  pull_request:
+    paths:
+      - "functions/**"
+      - ".github/workflows/deploy-functions.yml"
+      - ".github/workflows/firebase-api-verify.yml"
+  push:
+    branches: [main]
+    paths:
+      - "functions/**"
+      - ".github/workflows/deploy-functions.yml"
+      - ".github/workflows/firebase-api-verify.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - name: Install Firebase function dependencies
+        working-directory: functions
+        run: npm ci --no-audit --no-fund
+      - name: Verify Firebase exports without deploying
+        working-directory: functions
+        run: |
+          node --check index.entry.js
+          node --check classPushLifecycle.js
+          node --check classNotificationCopy.js
+          node -e 'const f=require("./index.entry.js"); for (const key of ["api", "submitAssignmentResubmission", "sendPushTestNotification", "onClassSessionPushLifecycleUpdated"]) if (!f[key]) throw new Error("Missing Firebase export: "+key); console.log("Firebase exports verified");'
+      - name: Test notification translations
+        working-directory: functions
+        run: node --test __tests__/classNotificationLanguage.test.cjs
