@@ -517,14 +517,6 @@ async function requireAuthenticatedUser(req, res, { allowGuest = true } = {}) {
   return authedUser;
 }
 
-// Server-only, identity-bound academic document export; no student identity is accepted from request payloads.
-require("./studentDocuments").registerStudentDocumentRoutes(app, {
-  requireAuthenticatedUser,
-  getFirestoreSafe,
-  findAuthedStudentProfile,
-  enforceUserQuota,
-});
-
 const C2_MEDIA_ACTIVE_STATUSES = new Set([
   "active",
   "paid",
@@ -821,6 +813,15 @@ app.use(
 );
 
 app.use(requireMockTaskVersion);
+
+// Server-only, identity-bound academic document export; no student identity is accepted from request payloads.
+require("./studentDocuments").registerStudentDocumentRoutes(app, {
+  requireAuthenticatedUser,
+  getFirestoreSafe,
+  findAuthedStudentProfile,
+  enforceUserQuota,
+});
+
 
 // Same check is available through the Firebase Cloud Functions API as well as
 // the Vercel payment-aware app; neither endpoint exposes matched student data.
