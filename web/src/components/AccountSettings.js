@@ -36,6 +36,7 @@ const AccountSettings = () => {
   const { user, studentProfile, saveStudentProfile, refreshStudentProfile } = useAuth();
   const { i18n, t } = useTranslation();
   const isSwahili = studentProfile?.program === "swahili";
+  const isSecondaryCourse = studentProfile?.isSecondaryCourse === true;
   const isUniversityRegistration = isHamburgUniversityStudent(studentProfile);
   const hasComplimentaryAccess = isApprovedUniversityStudent(studentProfile);
   const fxQuote = useFalowenUsdGhsRate();
@@ -66,7 +67,7 @@ const AccountSettings = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const requestedTab = new URLSearchParams(location.search).get("tab");
-  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab) && !(isSwahili && ["participation", "upgrade"].includes(requestedTab))
+  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab) && !(isSwahili && ["participation", "upgrade"].includes(requestedTab)) && !(isSecondaryCourse && requestedTab === "upgrade")
     ? requestedTab
     : "studentData";
 
@@ -727,7 +728,7 @@ const AccountSettings = () => {
           { key: "billing", label: t("accountSettings.tabs.billing") },
           { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
           { key: "deleteAccount", label: t("accountOverview.deleteAccount") },
-        ].filter(tab => !isSwahili || tab.key !== "upgrade").map((tab) => (
+        ].filter(tab => tab.key !== "upgrade" || (!isSwahili && !isSecondaryCourse)).map((tab) => (
           <button
             key={tab.key}
             type="button"
@@ -780,7 +781,24 @@ const AccountSettings = () => {
 
       {activeTab === "notifications" ? <NotificationSettingsCard /> : null}
 
-      {activeTab === "billing" && isUniversityRegistration ? (
+      {activeTab === "billing" && isSecondaryCourse ? (
+        <section style={{ ...styles.card, display: "grid", gap: 12, padding: 16 }} aria-label={t("enrollmentRequest.secondaryBillingTitle")}>
+          <h2 style={styles.sectionTitle}>{t("enrollmentRequest.secondaryBillingTitle")}</h2>
+          <p style={styles.helperText}>{t("enrollmentRequest.secondaryBillingNotice")}</p>
+          {studentProfile?.coursePlacementPending ? (
+            <p role="status">{t("enrollmentRequest.placementPending")}</p>
+          ) : (
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={styles.metaRow}><span>{t("accountOverview.tuition")}</span><strong>{studentProfile.tuitionFee == null ? "–" : formatMoney(studentProfile.tuitionFee)}</strong></div>
+              <div style={styles.metaRow}><span>{t("accountOverview.paid")}</span><strong>{studentProfile.paid == null ? "–" : formatMoney(studentProfile.paid)}</strong></div>
+              <div style={styles.metaRow}><span>{t("accountOverview.balance")}</span><strong>{studentProfile.balanceDue == null ? "–" : formatMoney(studentProfile.balanceDue)}</strong></div>
+            </div>
+          )}
+          <a href={supportMailTo} style={{ ...styles.secondaryButton, display: "inline-block", width: "fit-content" }}>
+            {t("accountSettings.profile.requestChange")}
+          </a>
+        </section>
+      ) : activeTab === "billing" && isUniversityRegistration ? (
       <section data-university-course-billing style={{ ...styles.card, display: "grid", gap: 12, padding: 16 }}>
         <h2 style={{ ...styles.sectionTitle, marginBottom: 3 }}>University course access</h2>
         <strong>{hasComplimentaryAccess ? "Complimentary access · Approved" : "Registration awaiting verification"}</strong>
