@@ -1888,7 +1888,9 @@
     "error": "Impossible d'enregistrer la demande. Réessayez ou contactez les admissions.",
     "signupBoth": "Je souhaite aussi étudier {{course}}.",
     "signupNotice": "Votre cours principal commencera d'abord. Les admissions vous contacteront pour le deuxième cours, sans inscription ni paiement immédiat.",
-    "placementPending": "Votre deuxième cours attend l'attribution d'une classe et d'un niveau. Contactez les admissions si nécessaire."
+    "placementPending": "Votre deuxième cours attend l'attribution d'une classe et d'un niveau. Contactez les admissions si nécessaire.",
+    "secondaryBillingTitle": "Frais du deuxième cours",
+    "secondaryBillingNotice": "Les frais et paiements du deuxième cours sont gérés séparément par les admissions Falowen. Seuls les montants confirmés sont affichés ; aucun paiement n'est lancé ici."
   },
   "resultsOverview": {
     "title": "Résultats",
