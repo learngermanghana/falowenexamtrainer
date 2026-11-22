@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { persistInterfaceLanguage } from "../i18n";
+import { changeInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
 import academyProfile from "../data/publicAcademyProfile.json";
 import VisitorQuestionHelper from "./VisitorQuestionHelper";
@@ -142,6 +142,66 @@ const COPY = {
   },
 };
 
+COPY.sw = { ...COPY.en, ...{
+  "language": "Lugha",
+  "login": "Ingia",
+  "signup": "Jisajili",
+  "returning": "Tayari una akaunti?",
+  "navSwahili": "Jifunze Kiswahili",
+  "navPartnerships": "Ushirikiano",
+  "navClasses": "Madarasa yajayo",
+  "navMusic": "Muziki",
+  "navExams": "Mazoezi ya mitihani",
+  "navBooks": "Vitabu",
+  "navHelp": "Kutuhusu",
+  "classScheduleAction": "Tazama ratiba kamili ya madarasa",
+  "eyebrow": "JIFUNZE KIJERUMANI KWA NJIA INAYOKUFAA",
+  "title": "Jifunze Kijerumani kwa njia yako.",
+  "titleAccent": "Endelea mbele na Falowen.",
+  "subtitle": "Kuanzia A1 hadi C2, jifunze katika madarasa ya moja kwa moja au kwa muda wako. Pata video za masomo, vitabu vya mazoezi, mazoezi kwa AI na msaada wa mwalimu mahali pamoja.",
+  "start": "Anza majaribio ya siku 7",
+  "placement": "Fanya mtihani wa kiwango bila malipo",
+  "smallNote": "Hujui pa kuanzia? Tambua kiwango chako kwanza.",
+  "heroPhoto": "Madarasa halisi ya Kijerumani. Msaada wa kweli.",
+  "levels": "A1–C2",
+  "flexible": "Darasani au kwa muda wako",
+  "supported": "AI na msaada wa mwalimu",
+  "featuresEyebrow": "KWA NINI UJIFUNZE NA FALOWEN",
+  "featuresTitle": "Njia nne za kuendelea kujifunza Kijerumani.",
+  "featuresIntro": "Uwe unaanza, unaimarisha ujuzi au unajiandaa kwa mtihani, Falowen inakusaidia.",
+  "supportEyebrow": "JIFUNZE NA FALOWEN",
+  "supportTitle": "Fuata kozi iliyopangwa kwa muda wako",
+  "supportText": "Hudhuria darasa la moja kwa moja au jifunze nyumbani. Tazama masomo yaliyorekodiwa unapopata nafasi.",
+  "supportPractice": "Pata mrejesho wa mwalimu kuhusu kazi zako. Fanya mazoezi kwa muziki, vitabu na Falowen Study Buddy.",
+  "hybridEyebrow": "NJIA MBALIMBALI ZA KUJIFUNZA",
+  "hybridTitle": "Jifunze Kijerumani kwa njia yako.",
+  "hybridIntro": "Chagua namna unayotaka kujifunza kupitia Learn Language Education Academy na Falowen.",
+  "hybridInPersonTitle": "Darasani",
+  "hybridInPersonText": "Hudhuria madarasa yanayoongozwa na mwalimu mjini Accra.",
+  "hybridOnlineTitle": "Moja kwa moja mtandaoni",
+  "hybridOnlineText": "Shiriki katika masomo popote ulipo.",
+  "hybridRecordedTitle": "Masomo yaliyorekodiwa",
+  "hybridRecordedText": "Rudia masomo na ufanye mazoezi kwa muda wako.",
+  "hybridAction": "Chunguza njia za kujifunza",
+  "supportLink": "Kuhusu akademia yetu",
+  "reviewsIntro": "Sikia kutoka kwa wanafunzi wetu",
+  "finalEyebrow": "HATUA YAKO INAYOFUATA",
+  "finalTitle": "Safari yako ya Kijerumani inaanza hapa.",
+  "finalText": "Chagua darasa au jifunze kwa muda wako. Masomo na msaada vyote vipo pamoja.",
+  "footerCourses": "Kozi za Kijerumani A1–C2",
+  "footerMusic": "Muziki",
+  "footerBooks": "Kitabu cha Kijerumani A1",
+  "footerExam": "Mazoezi ya mitihani ya Goethe bila malipo",
+  "footerReviews": "Maoni ya wanafunzi",
+  "footerHelp": "Kutuhusu",
+  "footerChatgpt": "Falowen katika ChatGPT",
+  "footerCourseLevels": "Kozi za Kijerumani kwa kila kiwango",
+  "footerGoetheLevels": "Maandalizi ya Goethe kwa kila kiwango",
+  "contact": "Una maswali? Wasiliana nasi kupitia WhatsApp",
+  "metaTitle": "Falowen | Jifunze Kijerumani na Kiswahili Mtandaoni",
+  "metaDescription": "Jifunze Kijerumani A1–C2 katika madarasa ya moja kwa moja au anza Kiswahili kwa kitabu cha A1 mtandaoni."
+} };
+
 const FOOTER_LINKS = [
   { href: "/learn-swahili", labelKey: "navSwahili" },
   { href: "/courses/", labelKey: "footerCourses" },
@@ -160,6 +220,7 @@ const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
   { value: "de", label: "Deutsch" },
   { value: "fr", label: "Français" },
+  { value: "sw", label: "Kiswahili" },
 ];
 
 
@@ -174,7 +235,7 @@ function MeetOurTeam({ team, language }) {
     de: { kicker: "DIE MENSCHEN HINTER FALOWEN", heading: "Unser Deutsch- und Kiswahili-Team", intro: "Lerne die Lehrkräfte und Berater kennen, die dich begleiten.", about: "Ganzes Profil lesen", less: "Profil schließen", all: "Das gesamte Team kennenlernen", previous: "Vorherige Teammitglieder", next: "Nächste Teammitglieder", pause: "Automatischen Wechsel pausieren", play: "Automatischen Wechsel fortsetzen" },
     fr: { kicker: "L'ÉQUIPE DERRIÈRE FALOWEN", heading: "Notre équipe d'allemand et de kiswahili", intro: "Découvrez les enseignants et conseillers qui vous accompagnent.", about: "Voir le profil", less: "Fermer le profil", all: "Découvrir toute l'équipe", previous: "Membres précédents", next: "Membres suivants", pause: "Mettre le défilement automatique en pause", play: "Reprendre le défilement automatique" },
   };
-  const copy = labels[language] || labels.en;
+  const copy = language === "sw" ? { kicker: "WATU WA FALOWEN", heading: "Timu yetu ya Kijerumani na Kiswahili", intro: "Walimu na washauri wanaosaidia safari yako ya kujifunza.", about: "Soma wasifu", less: "Funga wasifu", all: "Kutana na timu nzima", previous: "Wengine wa timu", next: "Wengine wa timu", pause: "Sitisha mzunguko", play: "Endeleza mzunguko" } : (labels[language] || labels.en);
   const move = (direction) => {
     const track = trackRef.current;
     if (!track) return;
@@ -272,10 +333,9 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
     const next = event.target.value;
     if (!COPY[next]) return;
     setLanguage(next);
-    persistInterfaceLanguage(next);
     document.documentElement.lang = next;
     try {
-      await i18n.changeLanguage(next);
+      await changeInterfaceLanguage(next);
     } catch (error) {
       console.error("Failed to change interface language", error);
     }
