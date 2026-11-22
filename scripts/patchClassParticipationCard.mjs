@@ -120,7 +120,7 @@ const studentDataFooterAfter = `        <p style={{ ...styles.helperText, margin
           </button>
         </div>
       </section>`;
-if (!account.includes("Learning records")) {
+if (!account.includes("Learning records") && !account.includes('t("accountOverview.learningRecords")')) {
   replaceAccountOnce(studentDataFooterBefore, studentDataFooterAfter, "Student Data participation entry point");
 }
 
@@ -147,13 +147,16 @@ const requiredMarkers = [
   'new URLSearchParams(location.search)',
   'navigate(nextUrl, { replace: true })',
   '"participation"',
-  'Learning records',
+  // The Account overview is now localized; its translation key is the stable marker.
   'activeTab === "participation"',
   'Back to Student Data',
   'navigate("/campus/results")',
   'navigate("/campus/attendance")',
   'navigate("/campus/course")',
 ];
+if (!account.includes("Learning records") && !account.includes('t("accountOverview.learningRecords")')) {
+  throw new Error("Class Participation Account learning-records entry point is missing.");
+}
 requiredMarkers.forEach((marker) => {
   if (!account.includes(marker)) throw new Error(`Class Participation Account marker missing: ${marker}`);
 });
