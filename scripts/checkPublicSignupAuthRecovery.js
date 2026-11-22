@@ -25,16 +25,29 @@ expectSource(
     authSource.includes("setLoading(false);\n      return { studentCode, paystackLink: payload.paystackLink }"),
   "AuthContext signup must explicitly finish the authenticated-user handoff.",
 );
+// Student-facing copy is now localized: ensure the component uses those keys
+// and the English fallback retains the original admission safeguards.
+const english = require("../web/src/i18n/locales/en/translation.json");
+const localizedResume = signupSource.includes('t("uiLanguageFlow.resume.description")');
+const localizedOptional = signupSource.includes('t("uiLanguageFlow.resume.whatsappOptional")');
+const localizedWhatsApp = signupSource.includes('t("uiLanguageFlow.resume.whatsapp")');
 expectSource(
-  signupSource.includes("Complete the form below to continue your application."),
+  localizedResume
+    ? english.uiLanguageFlow?.resume?.description?.includes("Complete the form below to continue your application.")
+    : signupSource.includes("Complete the form below to continue your application."),
   "Signup resume copy must tell applicants to continue in the form.",
 );
 expectSource(
-  signupSource.includes("WhatsApp is optional and only for administrative support."),
+  localizedOptional
+    ? english.uiLanguageFlow?.resume?.whatsappOptional?.includes("WhatsApp is optional and only for administrative support.")
+    : signupSource.includes("WhatsApp is optional and only for administrative support."),
   "Signup resume copy must explain that WhatsApp is optional administrative support.",
 );
 expectSource(
-  signupSource.includes("Contact Admissions Support on WhatsApp"),
+  localizedWhatsApp
+    ? english.uiLanguageFlow?.resume?.whatsapp === "Contact Admissions Support on WhatsApp" &&
+      signupSource.includes('aria-label={t("uiLanguageFlow.resume.whatsapp")}')
+    : signupSource.includes("Contact Admissions Support on WhatsApp"),
   "Signup WhatsApp CTA must be labelled as admissions support.",
 );
 expectSource(
