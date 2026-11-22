@@ -1,7 +1,7 @@
 import React from "react";
 
-export function useSwahiliReviewDraft(uid, day, answers, restore) {
-  const key = uid && day ? `falowen:swahili-review:${uid}:day-${day}` : "";
+export function useSwahiliReviewDraft(uid, day, answers, restore, readingVersion = null) {
+  const key = uid && day ? `falowen:swahili-review:${uid}:day-${day}${readingVersion ? `:reading-v${readingVersion}` : ""}` : "";
   const [notice, setNotice] = React.useState("");
   React.useEffect(() => {
     setNotice("");

@@ -686,19 +686,113 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "prompt": "Write a brief introduction with your country and two languages, followed by one question for your partner."
     },
     "reading": {
-      "text": "Fatuma anatoka Tanzania. Anazungumza Kiswahili. David anatoka Kenya na anazungumza Kiswahili na Kiingereza.",
+      "title": "Mazungumzo · Nchi na Lugha",
+      "text": "Amina: Hujambo! Jina lako ni nani?\n\nJohn: Sijambo! Jina langu ni John. Wewe ni nani?\n\nAmina: Mimi ni Amina. John, unatoka nchi gani?\n\nJohn: Ninatoka Uingereza, lakini sasa ninakaa Tanzania. Wewe unatoka wapi?\n\nAmina: Ninatoka Tanzania. Mimi ni Mtanzania. Unasema lugha gani?\n\nJohn: Ninasema Kiingereza na Kifaransa kidogo. Sasa ninajifunza Kiswahili!\n\nAmina: Hongera sana! Kiswahili ni lugha nzuri.\n\nJohn: Asante sana, Amina!",
       "questions": [
         {
-          "question": "Fatuma anatoka wapi?",
-          "id": "read-1"
+          "id": "read-1",
+          "question": "John anatoka nchi gani? (Which country does John come from?)",
+          "choices": [
+            "A) Ufaransa",
+            "B) Uingereza",
+            "C) Tanzania",
+            "D) Marekani"
+          ]
         },
         {
-          "question": "David anatoka wapi?",
-          "id": "read-2"
+          "id": "read-2",
+          "question": "John anasema lugha gani vizuri na lugha gani kidogo? (What language does John speak well and which one a little?)",
+          "choices": [
+            "A) Anasema Kichina na Kiswahili.",
+            "B) Anasema Kiingereza na Kifaransa kidogo.",
+            "C) Anasema Kijerumani na Kiingereza.",
+            "D) Anasema Kiswahili tu."
+          ]
         },
         {
-          "question": "David anazungumza lugha gani?",
-          "id": "read-3"
+          "id": "read-3",
+          "question": "Kiambishi gani kinatumiwa mwanzo wa jina la nchi kuonyesha lugha (k.m. Ufaransa → Kifaransa)? (Which prefix is added to a country's name to indicate language?)",
+          "choices": [
+            "A) M-",
+            "B) Wa-",
+            "C) Ki-",
+            "D) Vi-"
+          ]
+        },
+        {
+          "id": "read-4",
+          "question": "Kama mtu anatoka nchi ya Kenya, utaifa wake ni gani katika uwingi (plural)? (If people come from Kenya, what is their nationality in the plural form?)",
+          "choices": [
+            "A) Mkenya",
+            "B) Wakenya",
+            "C) Kikenya",
+            "D) Vikenya"
+          ]
+        },
+        {
+          "id": "read-5",
+          "question": "Swali gani linatumiwa kuuliza lugha anayozungumza mtu? (Which question is used to ask which language someone speaks?)",
+          "choices": [
+            "A) Unatoka wapi?",
+            "B) Jina lako ni nani?",
+            "C) Unasema lugha gani?",
+            "D) Jumla ni shilingi ngapi?"
+          ]
+        }
+      ]
+    },
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-4/audio-url",
+      "questions": [
+        {
+          "id": "listen-origin-b",
+          "question": "Mtu B anatoka nchi gani? (Which country does speaker B come from?)",
+          "choices": [
+            "A) Tanzania",
+            "B) Kenya",
+            "C) Uingereza",
+            "D) Ufaransa"
+          ]
+        },
+        {
+          "id": "listen-origin-a",
+          "question": "Mtu A anatoka nchi gani? (Which country does speaker A come from?)",
+          "choices": [
+            "A) Kenya",
+            "B) Uganda",
+            "C) Tanzania",
+            "D) Uingereza"
+          ]
+        },
+        {
+          "id": "listen-languages-b",
+          "question": "Mtu B anaongea lugha gani? (Which languages does speaker B speak?)",
+          "choices": [
+            "A) Kiswahili na Kiingereza",
+            "B) Kifaransa na Kiarabu",
+            "C) Kiingereza na Kijerumani",
+            "D) Kiswahili tu"
+          ]
+        },
+        {
+          "id": "listen-learning",
+          "question": "Mtu B anasoma lugha gani kidogo? (Which language is speaker B studying a little?)",
+          "choices": [
+            "A) Kijerumani",
+            "B) Kifaransa",
+            "C) Kiarabu",
+            "D) Kiingereza"
+          ]
+        },
+        {
+          "id": "listen-likes-a",
+          "question": "Mtu A anapenda lugha gani? (Which languages does speaker A like?)",
+          "choices": [
+            "A) Kifaransa na Kiingereza",
+            "B) Kiingereza na Kiarabu",
+            "C) Kiswahili na Kijerumani",
+            "D) Kiswahili na Kiarabu"
+          ]
         }
       ]
     }
