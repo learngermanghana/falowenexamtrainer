@@ -11,7 +11,8 @@
   "interfaceLanguages": {
     "en": "English (EN)",
     "de": "Deutsch (DE)",
-    "fr": "Français (FR)"
+    "fr": "Français (FR)",
+    "sw": "Kiswahili (SW)"
   },
   "programLanguages": {
     "german": "German",
@@ -227,7 +228,7 @@
   "signup": {
     "courseLanguage": "Which language do you want to learn?",
     "swahiliTrial": "Start your 7-day trial with the online Kiswahili A1 workbook.",
-    "interfaceNote": "This programme teaches {{program}}. The interface is available in English.",
+    "interfaceNote": "This programme teaches {{program}}. You can change the app language independently of your course.",
     "programs": {
       "swahili": "Swahili (Kiswahili)",
       "german": "German",
@@ -1819,5 +1820,44 @@
       "session": "Session",
       "pending": "Pending"
     }
+  },
+  "uiLanguageFlow": {
+    "courseLabel": "Course language",
+    "signupLanguageLabel": "App language",
+    "welcome": "Welcome to Falowen",
+    "motivation": "Start strong. Learn with confidence.",
+    "trialIntro": "Three simple steps to get ready. Choose a 7-day trial or pay immediately, then start learning with Falowen.",
+    "universityIntro": "Complimentary Kiswahili A1 access for eligible University of Hamburg course students. No fee or trial required; instructor approval is needed.",
+    "progressLabel": "Signup progress",
+    "steps": [
+      "Your account",
+      "Your learning",
+      "Contact details"
+    ],
+    "stepCount": "Step {{step}} of 3 · All details are collected before your account is created",
+    "headings": [
+      "Let’s create your account",
+      "Choose how you’ll learn",
+      "How can we reach you?"
+    ],
+    "descriptions": [
+      "Use your full name and an email you can access.",
+      "Choose your level, learning mode and class, then select trial or payment.",
+      "We need your contact and emergency details before you begin. Going back keeps your answers."
+    ],
+    "startOption": "How would you like to start?",
+    "back": "Back",
+    "continueLearning": "Continue to your learning",
+    "continueContact": "Continue to contact details",
+    "registerComplimentary": "Register for complimentary course access",
+    "createTrial": "Create account & start 7-day trial",
+    "universityNote": "No payment or trial. Course access is subject to verification by your instructor.",
+    "trialNote": "Start your 7-day trial without payment, or pay immediately after signup if you prefer.",
+    "ready": "Your Falowen account is ready",
+    "start": "Start learning",
+    "terms": "terms",
+    "privacy": "privacy policy",
+    "swahiliSubtitle": "Your Kiswahili learning space",
+    "publishedLessons": "Published lessons"
   }
 }
