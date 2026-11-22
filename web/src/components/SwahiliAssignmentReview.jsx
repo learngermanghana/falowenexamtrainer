@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
+import { isLegacySwahiliDaySevenReading, swahiliReadingDraftVersion } from "../utils/swahiliReadingVersion";
 import SwahiliReviewDraft, { SwahiliFinalSubmit, useSwahiliReviewDraft } from "./SwahiliReviewDraft";
 
 export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestions, listeningQuestions = []) {
@@ -22,7 +23,7 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
     setListeningAnswers(draft.listeningAnswers || {});
   }, []);
   const draft = useSwahiliReviewDraft(canSubmit ? user.uid : null, lesson.day, answers, restoreDraft,
-    lesson.day === 7 ? 2 : null);
+    swahiliReadingDraftVersion(lesson.day));
   const snapshot = JSON.stringify(answers);
   const submitted = submittedAnswers === snapshot;
   const [feedback, setFeedback] = useState("");
@@ -38,7 +39,7 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
         writing: work.writing?.[day === 11 ? "dialogue" : "response"] || "",
         reading: work.readingAnswers || {}, listeningAnswers: work.listeningAnswers || {},
       };
-      const outdatedReading = day === 7 && Number(work.readingVersion || 1) < 2;
+      const outdatedReading = isLegacySwahiliDaySevenReading(day, work);
       if (outdatedReading) {
         // The old picnic reading IDs overlap the new shopping-dialogue IDs.
         // Preserve past Results without restoring unrelated answers or old feedback.
