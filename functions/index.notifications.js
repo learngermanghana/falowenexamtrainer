@@ -4,6 +4,7 @@ const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
 const { absolutePushLink } = require("./pushLinks");
+const { paymentReminderCopy, markedAssignmentCopy, classNoteCopy } = require("./studentNotificationCopy");
 
 const NOTIFICATION_BATCH_SIZE = 500;
 const PAYMENT_REMINDER_DAYS = new Set([15, 7, 3, 1, 0]);
@@ -182,14 +183,13 @@ const findStudentTargetsByCode = async (studentCode = "") => {
   return Array.from(targets.values());
 };
 
-const buildMarkedAssignmentPushPayload = (notificationDoc = {}) => {
+const buildMarkedAssignmentPushPayload = (notificationDoc = {}, language = "en") => {
   const score = Number(notificationDoc.score);
   const scoreLabel = Number.isFinite(score) ? `${score}/100` : "marked";
   const passed = Number.isFinite(score) ? score >= 60 : notificationDoc.status === "passed";
-  const title = notificationDoc.title || "Your assignment has been marked";
-  const body = notificationDoc.body || notificationDoc.message || (passed
-    ? `Score: ${scoreLabel} · Passed. Open Results to read your feedback.`
-    : `Score: ${scoreLabel} · Needs improvement. Open Results and resubmit.`);
+  const fallback = markedAssignmentCopy({ scoreLabel, passed, language });
+  const title = notificationDoc.title || fallback.title;
+  const body = notificationDoc.body || notificationDoc.message || fallback.body;
   const data = toFcmData({
     ...(notificationDoc.data || {}),
     type: "marked_assignment",
@@ -313,10 +313,9 @@ const getPaymentReminderCandidate = ({ docId, student, nowMs }) => {
 
 const buildPaymentReminderPayload = ({ student, balanceDue, daysLeft }) => {
   const amount = formatGhs(balanceDue);
-  const title = daysLeft === 0 ? "Payment reminder: contract ends today" : `Payment reminder: ${daysLeft} day${daysLeft === 1 ? "" : "s"} left`;
-  const body = daysLeft === 0
-    ? `Your Falowen contract ends today. Please clear your balance of ${amount}.`
-    : `Your Falowen contract ends in ${daysLeft} day${daysLeft === 1 ? "" : "s"}. Please clear your balance of ${amount}.`;
+  const { title, body } = paymentReminderCopy({
+    daysLeft, amount, language: student.preferredInterfaceLanguage,
+  });
   const data = toFcmData({
     type: "payment_reminder",
     category: "billing",
