@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
 import NotificationSettingsCard from "./NotificationSettingsCard";
+import AdditionalProgrammeRequest from "./AdditionalProgrammeRequest";
 import ClassParticipationCard from "./ClassParticipationCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
@@ -645,7 +646,7 @@ const AccountSettings = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section
-        aria-label="Account overview"
+        aria-label={t("accountOverview.title")}
         style={{
           ...styles.card,
           border: "1px solid #e2e8f0",
@@ -657,13 +658,13 @@ const AccountSettings = () => {
         <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
           <div style={{ minWidth: 0 }}>
             <p style={{ margin: 0, color: "#64748b", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".05em" }}>
-              My Falowen account
+              {t("accountOverview.title")}
             </p>
             <h2 style={{ margin: "5px 0 3px", color: "#0f172a" }}>
-              {studentProfile?.name || user?.displayName || "Student"}
+              {studentProfile?.name || user?.displayName || t("accountOverview.student")}
             </h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              {[studentProfile?.level, studentProfile?.className].filter(Boolean).join(" · ") || "Course account"}
+              {[studentProfile?.level, studentProfile?.className].filter(Boolean).join(" · ") || t("accountOverview.courseAccount")}
             </p>
           </div>
           <span
@@ -690,14 +691,14 @@ const AccountSettings = () => {
           }}
         >
           <div style={{ minWidth: 0, padding: "11px 12px", borderRight: "1px solid #e2e8f0" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>Student code</span>
+            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>{t("accountOverview.studentCode")}</span>
             <strong style={{ display: "block", marginTop: 3, fontSize: 14, lineHeight: 1.35, overflowWrap: "anywhere" }}>
               {studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "–"}
             </strong>
           </div>
           <div style={{ minWidth: 0, padding: "11px 12px" }}>
             <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>
-              {accountAccess.label === "Trial" ? "Trial access" : "Course access"}
+              {accountAccess.label === "Trial" ? t("accountOverview.trialAccess") : t("accountOverview.courseAccess")}
             </span>
             <strong style={{ display: "block", marginTop: 3, fontSize: 14, lineHeight: 1.35, overflowWrap: "anywhere" }}>
               {accountAccess.detail}
@@ -707,12 +708,12 @@ const AccountSettings = () => {
 
         {activeTab === "studentData" ? (
         <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 12, display: "grid", gap: 8 }}>
-          <strong style={{ color: "#0f172a" }}>Learning records</strong>
+          <strong style={{ color: "#0f172a" }}>{t("accountOverview.learningRecords")}</strong>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/results")}>Results</button>
-            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/attendance")}>Attendance</button>
-            {!isSwahili && <button type="button" style={styles.secondaryButton} onClick={() => selectAccountTab("participation")}>Class Participation</button>}
-            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course")}>Course Book</button>
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/results")}>{t("appNav.tabs.results")}</button>
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/attendance")}>{t("appNav.campusTabs.attendance")}</button>
+            {!isSwahili && <button type="button" style={styles.secondaryButton} onClick={() => selectAccountTab("participation")}>{t("accountOverview.participation")}</button>}
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course")}>{t("homeAccess.courseBook")}</button>
           </div>
         </div>
 
@@ -722,10 +723,10 @@ const AccountSettings = () => {
       <div style={styles.tabList}>
         {[
           { key: "studentData", label: t("accountSettings.tabs.studentData") },
-          { key: "notifications", label: "Notifications" },
+          { key: "notifications", label: t("accountOverview.notifications") },
           { key: "billing", label: t("accountSettings.tabs.billing") },
           { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
-          { key: "deleteAccount", label: "Delete account" },
+          { key: "deleteAccount", label: t("accountOverview.deleteAccount") },
         ].filter(tab => !isSwahili || tab.key !== "upgrade").map((tab) => (
           <button
             key={tab.key}
@@ -752,13 +753,16 @@ const AccountSettings = () => {
           <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.location")}</span><strong>{studentProfile?.emailLocation || studentProfile?.location || studentProfile?.country || "–"}</strong></div>
         </div>
 
+        <AdditionalProgrammeRequest />
+        {studentProfile?.coursePlacementPending && <p role="status" style={{ color: "#92400e" }}>{t("enrollmentRequest.placementPending")}</p>}
+
         <h3 style={{ marginTop: 0 }}>{t("accountSettings.profile.title")}</h3>
         <p style={styles.helperText}>{t("accountSettings.profile.adminManaged")}</p>
         <a href={supportMailTo} style={{ ...styles.secondaryButton, display: "inline-block", textDecoration: "none", marginBottom: 10 }}>
           {t("accountSettings.profile.requestChange")}
         </a>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Biography editing has moved to the Class Members tab so it is easier to find.
+          {t("accountOverview.biographyNotice")}
         </p>
       </section>
       ) : null}
@@ -790,7 +794,7 @@ const AccountSettings = () => {
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
           <div style={{ minWidth: 0 }}>
             <h2 style={{ ...styles.sectionTitle, marginBottom: 3 }}>{t("accountSettings.billing.title")}</h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>Tuition, access and payment in one place.</p>
+            <p style={{ ...styles.helperText, margin: 0 }}>{t("accountOverview.billingIntro")}</p>
           </div>
           <button
             type="button"
@@ -798,7 +802,7 @@ const AccountSettings = () => {
             onClick={handleRefreshPaymentStatus}
             disabled={isRefreshingPayment}
           >
-            {isRefreshingPayment ? "Refreshing..." : "Refresh"}
+            {isRefreshingPayment ? t("accountOverview.refreshing") : t("accountOverview.refresh")}
           </button>
         </div>
 
@@ -814,15 +818,15 @@ const AccountSettings = () => {
           }}
         >
           <div style={{ minWidth: 0, padding: "10px 12px", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>Tuition</span>
+            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>{t("accountOverview.tuition")}</span>
             <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25 }}>{formatMoney(billingSummary.tuitionFee)}{usdBelow(billingSummary.tuitionFee)}</strong>
           </div>
           <div style={{ minWidth: 0, padding: "10px 12px", borderBottom: "1px solid #e2e8f0" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>Paid</span>
+            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>{t("accountOverview.paid")}</span>
             <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25 }}>{formatMoney(paidAmount)}{usdBelow(paidAmount)}</strong>
           </div>
           <div style={{ minWidth: 0, padding: "10px 12px", borderRight: "1px solid #e2e8f0" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>Balance</span>
+            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>{t("accountOverview.balance")}</span>
             <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25, color: balanceDue > 0 ? "#9a3412" : "#166534" }}>
               {formatMoney(balanceDue)}{usdBelow(balanceDue)}
             </strong>
