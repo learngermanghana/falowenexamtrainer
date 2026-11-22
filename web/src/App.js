@@ -243,7 +243,7 @@ import { getTrialLifecycleState } from "./lib/trialAccess";
 import { isApprovedUniversityStudent, isPendingUniversityStudent } from "./lib/universityInvitations";
 import CourseDiscountPage from "./components/CourseDiscountPage";
 import { getPartialPaymentAccessEndMs, hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
-import { persistInterfaceLanguage } from "./i18n";
+import { changeInterfaceLanguage } from "./i18n";
 import { trackAdmissionsEngagement } from "./services/admissionsEngagementService";
 
 const getTabStructure = (t) => {
@@ -757,6 +757,7 @@ const AppShell = ({
       { value: "en", label: t("interfaceLanguages.en") },
       { value: "de", label: t("interfaceLanguages.de") },
       { value: "fr", label: t("interfaceLanguages.fr") },
+      { value: "sw", label: t("interfaceLanguages.sw") },
     ],
     [t]
   );
@@ -770,7 +771,7 @@ const AppShell = ({
       return t("appNav.subtitle.exams");
     }
 
-    return isSwahiliCampus ? "Your Kiswahili learning space" : t("appNav.subtitle.default");
+    return isSwahiliCampus ? t("uiLanguageFlow.swahiliSubtitle") : t("appNav.subtitle.default");
   }, [location.pathname, isSwahiliCampus, t]);
 
   const goHome = () => navigate("/");
@@ -788,8 +789,7 @@ const AppShell = ({
 
   const handleInterfaceLanguageChange = (event) => {
     const nextLanguage = event.target.value;
-    i18n.changeLanguage(nextLanguage);
-    persistInterfaceLanguage(nextLanguage);
+    void changeInterfaceLanguage(nextLanguage);
   };
 
   useEffect(() => {
@@ -855,18 +855,6 @@ const AppShell = ({
       className={isOnboarding ? "onboarding-shell" : "app-shell"}
       style={isOnboarding ? undefined : styles.container}
     >
-      {!isOnboarding && courseOptions?.length === 2 && (
-        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          Course language
-          <select value={getCampusProgram(studentProfile)} onChange={event => {
-            selectCourse(event.target.value);
-            navigate("/campus/course", { replace: true });
-          }}>
-            <option value="german">German</option>
-            <option value="swahili">Swahili</option>
-          </select>
-        </label>
-      )}
       {!isOnboarding ? (
         <header
         className="app-header"
@@ -893,6 +881,24 @@ const AppShell = ({
               notificationStatus={notificationStatus}
               onEnablePush={enableNotifications}
             />
+            {courseOptions?.length > 1 && (
+              <label style={{ display: "grid", gap: 4, fontSize: 12, color: "#374151" }}>
+                {t("uiLanguageFlow.courseLabel")}
+                <select
+                  value={getCampusProgram(studentProfile)}
+                  aria-label={t("uiLanguageFlow.courseLabel")}
+                  onChange={(event) => {
+                    if (!courseOptions.includes(event.target.value)) return;
+                    selectCourse(event.target.value);
+                    navigate("/campus/course", { replace: true });
+                  }}
+                  style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #d1d5db", fontSize: 12 }}
+                >
+                  {courseOptions.includes("german") && <option value="german">{t("signup.programs.german")}</option>}
+                  {courseOptions.includes("swahili") && <option value="swahili">{t("signup.programs.swahili")}</option>}
+                </select>
+              </label>
+            )}
             <label style={{ display: "grid", gap: 4, fontSize: 12, color: "#374151" }}>
               {t("interfaceLanguage.shortLabel")}
               <select
