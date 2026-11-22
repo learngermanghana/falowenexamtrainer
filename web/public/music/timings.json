@@ -208,11 +208,11 @@
         },
         {
           "start": 143.38,
-          "end": 146.0,
+          "end": 146,
           "text": "Familia yako ina watu wangapi?"
         },
         {
-          "start": 146.0,
+          "start": 146,
           "end": 148.26,
           "text": "Sasa ni zamu yako, tuambie!"
         },
@@ -230,7 +230,8 @@
       "timingStatus": "estimated",
       "recordingSha256": "c6339965fd80e7729c5838a36cf4a2083919de852f10138e51b43551efd9a0d1",
       "duration": 177.984,
-      "source": "Swahili Whisper word spans mapped to embedded lyrics; playback review pending"
+      "source": "Swahili Whisper word spans mapped to embedded lyrics; playback review pending",
+      "trackId": "swahili-a1-day-05"
     },
     {
       "trackId": "a2-day-18-bank",
