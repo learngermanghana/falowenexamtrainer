@@ -28,17 +28,38 @@ export const phoneToE164 = (value, country = "") => {
   }
   const calling = getCountryDialCode(country);
   if (!calling) return "";
-  let national = digits;
-  // Accept existing international entries without the '+' where unambiguous.
-  if (digits.startsWith(calling) && digits.length >= calling.length + 8) {
-    national = digits.slice(calling.length);
-  } else if (!SIGNIFICANT_ZERO.has(country)) {
-    national = digits.replace(/^0+/, "");
+
+  // NANP territories have a shared country calling code (+1) and a three-digit
+  // area code. The displayed "+1268", for example, is NOT a four-digit country
+  // calling code. Accept seven-digit local, ten-digit national and eleven-digit
+  // unprefixed international representations without duplicating either code.
+  if (/^1\\d{3}$/.test(calling)) {
+    const areaCode = calling.slice(1);
+    if (digits.length === 7) return "+1" + areaCode + digits;
+    if (digits.length === 10) return "+1" + digits;
+    if (digits.length === 11 && digits.startsWith("1")) return "+" + digits;
+    return "";
   }
+
   const range = VALID_NATIONAL_LENGTHS[country] || [6, 12];
-  const lengthValid = national.length >= range[0] && national.length <= range[1];
-  if (!lengthValid || (calling + national).length > 15) return "";
-  return "+" + calling + national;
+  const isValidNational = number =>
+    number.length >= range[0] && number.length <= range[1] &&
+    (calling + number).length <= 15;
+
+  // A national number may itself begin with the country's calling code.
+  // Give a valid national number priority: 9123456789 is a valid ten-digit
+  // Indian national number, not "+91" followed by an eight-digit number.
+  const national = SIGNIFICANT_ZERO.has(country)
+    ? digits : digits.replace(/^0+/, "");
+  if (isValidNational(national)) return "+" + calling + national;
+
+  // A bare international number (without '+') is accepted only when its
+  // remaining national portion is valid and the input cannot be national.
+  if (digits.startsWith(calling)) {
+    const internationalNational = digits.slice(calling.length);
+    if (isValidNational(internationalNational)) return "+" + calling + internationalNational;
+  }
+  return "";
 };
 
 const examples = {
