@@ -360,5 +360,60 @@
     "reviewed": "Imesahihishwa",
     "awaitingTutor": "Inasubiri mwalimu",
     "revise": "Rekebisha kazi"
+  },
+  "notificationUi": {
+    "title": "Mipangilio ya arifa",
+    "description": "Pokea maswali, alama, taarifa za mahudhurio na matangazo hata kama Falowen imefungwa.",
+    "homeScreen": "Programu kwenye skrini ya kwanza",
+    "yes": "Ndiyo",
+    "no": "Hapana",
+    "browserPermission": "Ruhusa ya kivinjari",
+    "savedDevices": "Vifaa vilivyohifadhiwa",
+    "thisAccount": "Akaunti hii",
+    "settingUp": "Inawekwa...",
+    "refreshDevice": "Sasisha kifaa hiki",
+    "enable": "Washa arifa",
+    "sendingTest": "Inatuma jaribio...",
+    "sendTest": "Tuma arifa ya majaribio",
+    "enabled": "Arifa zimewashwa kwenye kifaa hiki.",
+    "permissionIncomplete": "Ruhusa haijakamilika. Kwa iPhone, fungua Falowen kutoka skrini ya kwanza kisha uwashe arifa tena.",
+    "enableError": "Imeshindikana kuwasha arifa. Jaribu tena.",
+    "refreshFirst": "Sasisha kifaa hiki kwanza ili Falowen iwe na tokeni halali ya arifa.",
+    "testUnavailable": "Jaribio la arifa halipatikani kwenye toleo hili.",
+    "scheduled": "Jaribio limepangwa. Funga skrini sasa. Arifa inatarajiwa baada ya sekunde 8.",
+    "unconfirmed": "Falowen haijathibitisha kutumwa kwa jaribio.",
+    "testSent": "Jaribio limetumwa. Kama hakuna arifa, angalia mipangilio ya arifa na betri.",
+    "testError": "Jaribio la arifa limeshindwa. Sasisha kifaa na ujaribu tena. Ukihitaji msaada, tuma msimbo wa Firebase kwa timu ya usaidizi.",
+    "sessionExpired": "Muda wa kuingia umeisha. Ingia tena ujaribu.",
+    "unlinkedDevice": "Kifaa hiki hakijaunganishwa na akaunti yako. Kisasishe ujaribu tena.",
+    "invalidToken": "Tokeni ya arifa si halali au imeisha muda wake. Sasisha kifaa hiki.",
+    "androidTip": "Android / Chrome: washa arifa na uruhusu kivinjari kuzituma.",
+    "iosTip": "iPhone (iOS 16.4 au mpya): fungua Falowen kwa Safari, gusa Share → Add to Home Screen, kisha fungua programu hiyo na uwashe arifa. Arifa hazifanyi kazi kwenye kichupo cha kawaida cha Safari.",
+    "status": {
+      "granted": {
+        "label": "Zimewashwa kwenye kifaa hiki",
+        "detail": "Ruhusa ya kivinjari na tokeni ya Falowen zinafanya kazi."
+      },
+      "pending": {
+        "label": "Inawekwa...",
+        "detail": "Falowen inaomba au kusasisha tokeni yako."
+      },
+      "blocked": {
+        "label": "Zimezuiwa na kivinjari",
+        "detail": "Ruhusu arifa za Falowen katika mipangilio ya kivinjari."
+      },
+      "stale": {
+        "label": "Sasisho linahitajika",
+        "detail": "Ruhusa au tokeni inahitaji kusasishwa."
+      },
+      "error": {
+        "label": "Mpangilio umeshindwa",
+        "detail": "Jaribu tena au wasiliana na usaidizi."
+      },
+      "idle": {
+        "label": "Bado hazijawashwa",
+        "detail": "Washa arifa za alama, mahudhurio na vikumbusho."
+      }
+    }
   }
 }
