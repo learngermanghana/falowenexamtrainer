@@ -1743,7 +1743,14 @@
     "terms": "Nutzungsbedingungen",
     "privacy": "Datenschutzerklärung",
     "swahiliSubtitle": "Dein Kiswahili-Lernbereich",
-    "publishedLessons": "Veröffentlichte Lektionen"
+    "publishedLessons": "Veröffentlichte Lektionen",
+    "resume": {
+      "title": "Registrierung fortsetzen",
+      "description": "Deine Angaben außer dem Passwort sind auf diesem Gerät gespeichert. Fahre fort oder bitte uns um Hilfe.",
+      "help": "Wobei brauchst du Hilfe? (optional)",
+      "placeholder": "Zum Beispiel: Ich kann keinen Kurs auswählen. Bitte keine Passwörter angeben.",
+      "whatsapp": "Zulassungsberatung per WhatsApp kontaktieren"
+    }
   },
   "homeAccess": {
     "welcomeBack": "Willkommen zurück, {{name}}.",
