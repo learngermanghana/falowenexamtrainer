@@ -1824,6 +1824,7 @@
     "learningMode": "Lernform"
   },
   "signupDetails": {
+    "duplicateProtectionNote": "Schon registriert? Melde dich an, statt eine andere E-Mail-Adresse zu verwenden. Wir prüfen Kontaktnummern, um doppelte Konten zu vermeiden. Familienmitglieder dürfen denselben Notfallkontakt haben.",
     "fullNameHint": "Bitte gib deinen Vor- und Nachnamen ein. Wir verwenden ihn für Zeugnisse und Bescheinigungen.",
     "passwordHint": "Mindestens 8 Zeichen mit Buchstaben und Zahlen",
     "repeatPassword": "Passwort erneut eingeben",
