@@ -6,6 +6,7 @@ const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 const { registerPublicFxRoutes } = require("./publicFxRates");
+const { registerSignupDuplicateReviewRoutes } = require("./signupDuplicateReview");
 const { registerCourseDiscountRoutes, recordDiscountPayment } = require("./courseDiscounts");
 const { registerMockCommerceRoutes, processMockWebhook } = require("./mockCommerce");
 const { registerBookCommerceRoutes, processBookWebhook } = require("./bookCommerce");
@@ -32,6 +33,9 @@ app.use(
     },
   })
 );
+
+// A bounded public check runs before Firebase Auth creates a new student account.
+registerSignupDuplicateReviewRoutes(app, { admin });
 
 // ChatGPT learning companion uses its own scoped, read-only OAuth flow.
 app.use("/chatgpt", makeChatGPTCompanionRouter(admin));
