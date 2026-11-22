@@ -33,11 +33,11 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
 
   return (
     <div className={"falowen-learner-hero" + (isSwahili ? " falowen-learner-hero--single" : "")}>
-      <section className="falowen-learner-hero__welcome" aria-label="Welcome to Falowen">
-        <h1>Welcome back, {studentName}.</h1>
-        <p className="falowen-learner-hero__lead">Your campus is ready. Let’s make progress.</p>
+      <section className="falowen-learner-hero__welcome" aria-label={t("homeAccess.welcomeAria")}>
+        <h1>{t("homeAccess.welcomeBack", { name: studentName })}</h1>
+        <p className="falowen-learner-hero__lead">{t("homeAccess.welcomeLead")}</p>
         <div className="falowen-learner-hero__actions">
-          <button type="button" className="falowen-learner-hero__secondary" onClick={onOpenAccount}>Account</button>
+          <button type="button" className="falowen-learner-hero__secondary" onClick={onOpenAccount}>{t("homeAccess.account")}</button>
           {!isSwahili && (
             <button type="button" className="falowen-learner-hero__zoom" onClick={onJoinZoom}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
@@ -50,8 +50,8 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
         </div>
       </section>
       {!isSwahili && (
-        <section className="falowen-home-class-schedule" aria-label="Your class schedule">
-          <span className="falowen-home-class-schedule__eyebrow">YOUR LIVE CLASS</span>
+        <section className="falowen-home-class-schedule" aria-label={t("homeAccess.scheduleAria")}>
+          <span className="falowen-home-class-schedule__eyebrow">{t("homeAccess.liveClass")}</span>
           <div className="falowen-home-class-schedule__identity">
             <span className="falowen-home-class-schedule__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
@@ -60,15 +60,15 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
                 <path d="M7 3v4M17 3v4M3 10h18" />
               </svg>
             </span>
-            <h2>{hasAssignedClass ? (className || "Your assigned class") : "No live class assigned"}</h2>
+            <h2>{hasAssignedClass ? (className || t("homeAccess.assignedClass")) : t("homeAccess.noLiveClass")}</h2>
           </div>
           <p>{hasAssignedClass
-            ? "Your full timetable includes upcoming lessons, dates and any schedule changes."
-            : "You can continue studying in Campus. Your class schedule will appear after a class is assigned."}</p>
-          {levelKey && <span className="falowen-home-class-schedule__level">{levelKey} German</span>}
+            ? t("homeAccess.assignedScheduleDesc")
+            : t("homeAccess.pendingScheduleDesc")}</p>
+          {levelKey && <span className="falowen-home-class-schedule__level">{t("homeAccess.germanLevel", { level: levelKey })}</span>}
           <button type="button" className="falowen-home-class-schedule__action"
                   onClick={hasAssignedClass ? onViewClassSchedule : onOpenAccount}>
-            <span>{hasAssignedClass ? "View full class schedule" : "Manage class in Account"}</span>
+            <span>{hasAssignedClass ? t("homeAccess.viewSchedule") : t("homeAccess.manageClass")}</span>
             <span aria-hidden="true">→</span>
           </button>
         </section>
@@ -78,10 +78,10 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
 };
 
 const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) => (
-  <section className="falowen-home-spaces" aria-label="Your learning spaces">
+  <section className="falowen-home-spaces" aria-label={t("homeAccess.spaces")}>
     <div className="falowen-home-spaces__heading">
-      <h2>Your learning spaces</h2>
-      <p>{isSwahili ? "Your learning space, ready when you are." : "Two spaces. One step closer to fluent."}</p>
+      <h2>{t("homeAccess.spaces")}</h2>
+      <p>{isSwahili ? t("homeAccess.spacesSw") : t("homeAccess.spacesBoth")}</p>
     </div>
     <div className={"falowen-home-spaces__grid" + (isSwahili ? " falowen-home-spaces__grid--single" : "")}>
       <section className="falowen-home-space-card">
@@ -93,19 +93,19 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) =>
             </svg>
           </span>
           <div className="falowen-home-space-card__heading">
-            <span className="falowen-home-space-card__eyebrow">DAILY WORK</span>
+            <span className="falowen-home-space-card__eyebrow">{t("homeAccess.dailyWork")}</span>
             <h3>Campus</h3>
           </div>
-          <span className="falowen-home-space-card__level">{isSwahili ? "Kiswahili A1" : "Course Book"}</span>
+          <span className="falowen-home-space-card__level">{isSwahili ? "Kiswahili A1" : t("homeAccess.courseBook")}</span>
         </div>
         <div className="falowen-home-space-card__body">
-          <h4>Continue learning</h4>
+          <h4>{t("homeAccess.continueLearning")}</h4>
           <p>{isSwahili
-            ? "Open your Kiswahili Course Book for published lessons, writing and reading tasks, and tutor feedback."
-            : "Open Course Book to see your current lesson and next step, practise, or submit finished workbook answers."}</p>
+            ? t("homeAccess.swBookDesc")
+            : t("homeAccess.gerBookDesc")}</p>
         </div>
         <div className="falowen-home-space-card__bottom">
-          <button style={styles.primaryButton} onClick={openCampus}>Open Course Book <span aria-hidden="true">→</span></button>
+          <button style={styles.primaryButton} onClick={openCampus}>{t("homeAccess.openCourseBook")} <span aria-hidden="true">→</span></button>
         </div>
       </section>
 
@@ -119,16 +119,16 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) =>
               </svg>
             </span>
             <div className="falowen-home-space-card__heading">
-              <span className="falowen-home-space-card__eyebrow falowen-home-space-card__eyebrow--exams">EXAM MODE</span>
-              <h3>Exams Room</h3>
+              <span className="falowen-home-space-card__eyebrow falowen-home-space-card__eyebrow--exams">{t("homeAccess.examMode")}</span>
+              <h3>{t("homeAccess.examsRoom")}</h3>
             </div>
           </div>
           <div className="falowen-home-space-card__body">
-            <h4>Sprechen, Schreiben trainer & resources</h4>
-            <p>Choose an available mock or practise one exam skill; review your results in the Exam Room.</p>
+            <h4>{t("homeAccess.examsSkills")}</h4>
+            <p>{t("homeAccess.examsDesc")}</p>
           </div>
           <div className="falowen-home-space-card__bottom falowen-home-space-card__bottom--exams">
-            <button type="button" style={styles.primaryButton} onClick={openExamsRoom}>Open Exams Room <span aria-hidden="true">→</span></button>
+            <button type="button" style={styles.primaryButton} onClick={openExamsRoom}>{t("homeAccess.openExams")} <span aria-hidden="true">→</span></button>
           </div>
         </section>
       )}
@@ -136,13 +136,13 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) =>
     {!isSwahili && (
       <section className="falowen-home-companion">
         <div>
-          <span className="falowen-home-companion__eyebrow">STUDY WITH AI</span>
+          <span className="falowen-home-companion__eyebrow">{t("homeAccess.studyWithAi")}</span>
           <h3>Falowen Learning Companion</h3>
-          <p>Connect Falowen in ChatGPT to ask questions about your German lessons and get guided practice.</p>
+          <p>{t("homeAccess.companionDescription")}</p>
         </div>
         <a href="https://chatgpt.com/plugins/plugin_asdk_app_6ae7660094648191b3f39f11008ade2a"
            target="_blank" rel="noopener noreferrer">
-          Connect ChatGPT as a study partner <span aria-hidden="true">→</span>
+          {t("homeAccess.connectChatgpt")} <span aria-hidden="true">→</span>
         </a>
       </section>
     )}
@@ -320,8 +320,8 @@ const GeneralHome = ({
         <section style={{ ...styles.card, display: "grid", gap: 10 }}>
           <SectionHeader
             eyebrow="Kiswahili A1"
-            title="Published lessons"
-            subtitle="Start with the alphabet or practise ordering in a restaurant. Only these two workbooks are published."
+            title={t("uiLanguageFlow.publishedLessons")}
+            subtitle={t("homeAccess.publishedDesc")}
           />
           <PrimaryActionBar align="start" wrap>
             <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course/swahili/day-1")}>

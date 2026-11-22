@@ -11,7 +11,7 @@ import { savePreferredLevel } from "../services/levelStorage";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 import LegalFooter from "./LegalFooter";
-import { persistInterfaceLanguage } from "../i18n";
+import { changeInterfaceLanguage } from "../i18n";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const isFullName = (value) => {
@@ -196,14 +196,14 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       { value: "en", label: t("interfaceLanguages.en") },
       { value: "de", label: t("interfaceLanguages.de") },
       { value: "fr", label: t("interfaceLanguages.fr") },
+      { value: "sw", label: t("interfaceLanguages.sw") },
     ],
     [t]
   );
 
   const handleInterfaceLanguageChange = (event) => {
     const nextLanguage = event.target.value;
-    i18n.changeLanguage(nextLanguage);
-    persistInterfaceLanguage(nextLanguage);
+    void changeInterfaceLanguage(nextLanguage);
   };
 
   const handleSubmit = async (event) => {
@@ -389,7 +389,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       <div style={{ ...styles.card, maxWidth: 420, width: "100%", position: "relative" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
           <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>
-            {mode === "login" ? "Login" : "Create account"}
+            {mode === "login" ? t("authUi.login") : t("authUi.create")}
           </h2>
 
           <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
@@ -409,20 +409,20 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
               </select>
             </label>
             {onBack && (
-              <AppBackButton label="Back to overview" fallbackPath="/" onBack={onBack} />
+              <AppBackButton label={t("signupPage.backToOverview")} fallbackPath="/" onBack={onBack} />
             )}
           </div>
         </div>
 
         <p style={styles.helperText}>
-          Connect with your account so we can save your exam progress.
+          {t("authUi.helper")}
         </p>
 
         {mode === "login" && (
           <div style={{ ...styles.uploadCard, background: "#f8fafc", marginBottom: 12 }}>
-            <strong style={{ display: "block", marginBottom: 4 }}>Welcome back</strong>
+            <strong style={{ display: "block", marginBottom: 4 }}>{t("authUi.welcome")}</strong>
             <p style={{ ...styles.helperText, marginBottom: 0 }}>
-              Sign in with your email or student code to continue from where you stopped.
+              {t("authUi.welcomeDesc")}
             </p>
           </div>
         )}
@@ -430,43 +430,43 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
           {mode === "signup" && (
             <>
-              <label style={styles.label}>Name</label>
+              <label style={styles.label}>{t("signupPage.fields.name")}</label>
               <input type="text" required value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
               <p style={{ ...styles.helperText, marginTop: -4 }}>
-                Use your full name (first and last). This is printed on certificates and transcripts.
+                {t("authUi.nameHint")}
               </p>
 
-              <label style={styles.label}>Phone number</label>
+              <label style={styles.label}>{t("authUi.phone")}</label>
               <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} />
 
-              <label style={styles.label}>Location</label>
+              <label style={styles.label}>{t("authUi.location")}</label>
               <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} style={inputStyle} />
 
-              <label style={styles.label}>Address</label>
+              <label style={styles.label}>{t("authUi.address")}</label>
               <input
                 type="text"
                 required
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 style={inputStyle}
-                placeholder="e.g. Madina, Accra (street/area)"
+                placeholder={t("authUi.addressHint")}
               />
 
-              <label style={styles.label}>Learning mode</label>
+              <label style={styles.label}>{t("authUi.learningMode")}</label>
               <select
                 required
                 value={learningMode}
                 onChange={(e) => setLearningMode(e.target.value)}
                 style={{ ...styles.select, height: 44 }}
               >
-                <option value="Online">Online</option>
-                <option value="In-person">In-person</option>
-                <option value="Hybrid">Hybrid</option>
+                <option value="Online">{t("signupPage.options.online")}</option>
+                <option value="In-person">{t("signupPage.options.inPerson")}</option>
+                <option value="Hybrid">{t("signupPage.options.hybrid")}</option>
               </select>
             </>
           )}
 
-          <label style={styles.label}>{mode === "login" ? "Email or student code" : "Email"}</label>
+          <label style={styles.label}>{mode === "login" ? t("authUi.emailOrCode") : t("signupPage.fields.email")}</label>
           <input
             type={mode === "login" ? "text" : "email"}
             required
@@ -477,10 +477,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
               setRecoveryAction(null);
             }}
             style={inputStyle}
-            placeholder={mode === "login" ? "you@email.com or STU12345" : undefined}
+            placeholder={mode === "login" ? t("authUi.emailOrCodeHint") : undefined}
           />
 
-          <label style={styles.label}>Password</label>
+          <label style={styles.label}>{t("signupPage.fields.password")}</label>
           <div style={{ position: "relative" }}>
             <input
               type={showPassword ? "text" : "password"}
@@ -489,7 +489,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={{ ...inputStyle, width: "100%", paddingRight: 72 }}
-              placeholder={mode === "signup" ? "At least 8 characters with letters and numbers" : undefined}
+              placeholder={mode === "signup" ? t("authUi.passwordHint") : undefined}
             />
             <button
               type="button"
@@ -497,7 +497,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
               aria-pressed={showPassword}
               style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", border: 0, background: "transparent", color: "#1d4ed8", fontWeight: 700, cursor: "pointer", padding: "6px 8px" }}
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? t("authUi.hide") : t("authUi.show")}
             </button>
           </div>
 
@@ -506,7 +506,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           {mode === "login" && (
             <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
               <p style={{ margin: 0, fontSize: 12, color: "#6b7280", textAlign: "right" }}>
-                Forgot your password? Use this button, then check your inbox or spam folder.
+                {t("authUi.forgotHint")}
               </p>
               <button
                 type="button"
@@ -514,14 +514,14 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 disabled={resetting || loading}
                 style={{ ...styles.secondaryButton, padding: "6px 10px", fontSize: 13, marginTop: 2 }}
               >
-                {resetting ? "Sending reset email ..." : "Forgot password?"}
+                {resetting ? t("authUi.sendingReset") : t("authUi.forgot")}
               </button>
             </div>
           )}
 
           {mode === "signup" && (
             <>
-              <label style={styles.label}>Your current level</label>
+              <label style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
               <select
                 required
                 value={selectedLevel}
@@ -535,7 +535,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 ))}
               </select>
 
-              <label style={styles.label}>Emergency contact (phone)</label>
+              <label style={styles.label}>{t("authUi.emergency")}</label>
               <input
                 type="tel"
                 required
@@ -544,7 +544,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 style={inputStyle}
               />
 
-              <label style={styles.label}>Class name</label>
+              <label style={styles.label}>{t("authUi.className")}</label>
               <input
                 type="text"
                 value={className}
@@ -556,14 +556,14 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           )}
 
           <button style={styles.primaryButton} type="submit" disabled={loading || googleLoading}>
-            {loading ? "Please wait ..." : mode === "login" ? "Log in" : "Create account & start 7-day trial"}
+            {loading ? t("authUi.pleaseWait") : mode === "login" ? t("authUi.login") : t("uiLanguageFlow.createTrial")}
           </button>
         </form>
 
         {mode === "login" && (
           <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
             <div style={{ display: "grid", placeItems: "center", color: "#6b7280", fontSize: 12 }}>
-              or
+              {t("authUi.or")}
             </div>
             <button
               type="button"
@@ -577,10 +577,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 fontWeight: 600,
               }}
             >
-              {googleLoading ? "Connecting to Google ..." : "Sign in with Google"}
+              {googleLoading ? t("authUi.connectingGoogle") : t("authUi.signInGoogle")}
             </button>
             <p style={{ margin: 0, fontSize: 12, color: "#6b7280", textAlign: "center" }}>
-              Google sign-in is available only for students already listed in our records.
+              {t("authUi.googleLimit")}
             </p>
           </div>
         )}
@@ -589,7 +589,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
         {mode === "login" && recoveryAction ? (
           <section
-            aria-label="Login recovery"
+            aria-label={t("authUi.recovery")}
             style={{
               ...styles.card,
               marginTop: 10,
@@ -609,7 +609,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                   disabled={resetting || loading}
                   style={styles.secondaryButton}
                 >
-                  {resetting ? "Sending reset email ..." : "Reset password"}
+                  {resetting ? t("authUi.sendingReset") : t("authUi.reset")}
                 </button>
               ) : null}
 
@@ -624,7 +624,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                   }}
                   style={styles.secondaryButton}
                 >
-                  Use email login
+                  {t("authUi.useEmail")}
                 </button>
               ) : null}
 
@@ -635,7 +635,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                   rel="noreferrer"
                   style={{ ...styles.primaryButton, display: "inline-flex", textDecoration: "none" }}
                 >
-                  Continue payment
+                  {t("authUi.continuePayment")}
                 </a>
               ) : null}
 
@@ -645,7 +645,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                   onClick={onSwitchToSignup ? onSwitchToSignup : toggleMode}
                   style={styles.secondaryButton}
                 >
-                  Create account
+                  {t("authUi.create")}
                 </button>
               ) : null}
 
@@ -654,7 +654,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                   href="mailto:info@falowen.app?subject=Falowen%20login%20support"
                   style={{ ...styles.secondaryButton, display: "inline-flex", textDecoration: "none" }}
                 >
-                  Contact support
+                  {t("authUi.contact")}
                 </a>
               ) : null}
             </div>
@@ -675,13 +675,13 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         )}
 
         <div style={{ marginTop: 10, fontSize: 13, color: "#4b5563" }}>
-          {mode === "login" ? "New here?" : "Already registered?"}{" "}
+          {mode === "login" ? t("authUi.newHere") : t("authUi.registered")}{" "}
           <button
             type="button"
             onClick={onSwitchToSignup ? onSwitchToSignup : toggleMode}
             style={{ ...styles.secondaryButton, padding: "6px 12px" }}
           >
-            {mode === "login" ? "Create account" : "Go to login"}
+            {mode === "login" ? t("authUi.create") : t("signupPage.actions.goToLogin")}
           </button>
         </div>
         <LegalFooter compact />

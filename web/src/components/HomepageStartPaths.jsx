@@ -24,6 +24,23 @@ const CONTENT = {
   },
 };
 
+CONTENT.sw = { ...CONTENT.en, ...{
+  "heading": "Ungependa kuanza wapi?",
+  "intro": "Chagua njia inayokufaa katika safari yako ya lugha.",
+  "placementTitle": "Unajua Kijerumani au Kiswahili?",
+  "placementText": "Huna uhakika wa kiwango chako? Fanya mtihani bila malipo.",
+  "choose": "Chagua lugha ya mtihani",
+  "german": "Kijerumani",
+  "swahili": "Kiswahili",
+  "placementAction": "Fanya mtihani wa kiwango",
+  "examsTitle": "Unajiandaa kwa mitihani ya Goethe?",
+  "examsText": "Fanya mazoezi kwa mitihani ya mfano ya Kijerumani.",
+  "examsAction": "Jaribu mtihani wa mfano",
+  "beginTitle": "Unaanza bila ujuzi wa awali?",
+  "beginText": "Huhitaji uzoefu. Jisajili na uanze kujifunza.",
+  "beginAction": "Anza kujifunza"
+} };
+
 export default function HomepageStartPaths({ language = "en", onSignUp }) {
   const [testLanguage, setTestLanguage] = useState("german");
   const copy = CONTENT[language] || CONTENT.en;

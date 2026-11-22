@@ -1,5 +1,6 @@
 import { buildApplicationSupportMessage } from "../lib/applicationSupportMessage";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { createPortal } from "react-dom";
 import SignUpPageLegacy from "./SignUpPageLegacy";
 import { resolveUniversityInvitation } from "../lib/universityInvitations";
@@ -228,6 +229,7 @@ const classNameFromQuery = () => {
 };
 
 const ResumePanel = ({ draft, rootRef }) => {
+  const { t } = useTranslation();
   const [problem, setProblem] = useState("");
   const supportUrl = () => {
     const form = rootRef.current?.querySelector("form");
@@ -253,18 +255,22 @@ const ResumePanel = ({ draft, rootRef }) => {
         marginBottom: 12,
       }}
     >
-      <strong>Continue your application</strong>
+      <strong>{t("uiLanguageFlow.resume.title")}</strong>
       <p style={{ margin: 0, color: "#475569", lineHeight: 1.55 }}>
-        Your non-password details are saved on this device. Continue below or ask us to help you finish.
+        {t("uiLanguageFlow.resume.description")}
       </p>
       <label style={{ display: "grid", gap: 6 }}>
-        What do you need help with? (optional)
+        {t("uiLanguageFlow.resume.help")}
         <textarea value={problem} onChange={(event) => setProblem(event.target.value)}
-          maxLength={600} rows={2} placeholder="For example: I cannot choose a class, or Continue does not work. Do not include passwords."
+          maxLength={600} rows={2} placeholder={t("uiLanguageFlow.resume.placeholder")}
           style={{ padding: 10, border: "1px solid #cbd5e1", borderRadius: 8 }} />
       </label>
+      <p style={{ margin: 0, color: "#475569", lineHeight: 1.55, fontSize: 13 }}>
+        {t("uiLanguageFlow.resume.whatsappOptional")}
+      </p>
       <a
         href={`https://wa.me/233205706589?text=${message}`}
+        aria-label={t("uiLanguageFlow.resume.whatsapp")}
         target="_blank"
         rel="noopener noreferrer"
         onClick={(event) => {
@@ -285,7 +291,7 @@ const ResumePanel = ({ draft, rootRef }) => {
           fontWeight: 900,
         }}
       >
-        Contact Admissions Support on WhatsApp
+        {t("uiLanguageFlow.resume.whatsapp")}
       </a>
     </aside>
   );

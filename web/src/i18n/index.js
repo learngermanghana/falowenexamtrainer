@@ -3,11 +3,12 @@ import { initReactI18next } from "react-i18next";
 import de from "./locales/de/translation.json";
 import fr from "./locales/fr/translation.json";
 import en from "./locales/en/translation.json";
+import sw from "./locales/sw/translation.json";
 
 const interfaceLanguageKey = "falowen:interface-language";
 const legacyLanguageKey = "falowen:language";
 
-const SUPPORTED_INTERFACE_LANGUAGES = new Set(["en", "de", "fr"]);
+const SUPPORTED_INTERFACE_LANGUAGES = new Set(["en", "de", "fr", "sw"]);
 
 const normalizeStoredLanguage = (value) => {
   const normalized = String(value || "").trim().toLowerCase().slice(0, 2);
@@ -46,6 +47,7 @@ i18n.use(initReactI18next).init({
     de: { translation: de },
     fr: { translation: fr },
     en: { translation: en },
+    sw: { translation: sw },
   },
   lng: resolvedLanguage,
   fallbackLng: fallbackLanguage,
@@ -63,5 +65,22 @@ export const persistInterfaceLanguage = (language) => {
     // ignore storage errors
   }
 };
+
+// A single interface language preference is shared by public pages, login, signup
+// and the signed-in application. It never changes the enrolled course.
+export const changeInterfaceLanguage = async (language) => {
+  const normalized = normalizeStoredLanguage(language) || "en";
+  persistInterfaceLanguage(normalized);
+  return i18n.changeLanguage(normalized);
+};
+
+if (typeof document !== "undefined") {
+  document.documentElement.lang = normalizeStoredLanguage(i18n.language) || fallbackLanguage;
+  i18n.on("languageChanged", (language) => {
+    const normalized = normalizeStoredLanguage(language) || fallbackLanguage;
+    document.documentElement.lang = normalized;
+    persistInterfaceLanguage(normalized);
+  });
+}
 
 export default i18n;

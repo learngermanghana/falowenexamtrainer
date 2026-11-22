@@ -43,6 +43,21 @@ signupSource = replaceOnce(
 );
 }
 
+// The current signup form uses translated copy and a localized optional
+// WhatsApp explanation. The old string-rewriting patch must not overwrite
+// translated JSX with English text during prebuild.
+const hasLocalizedSignupRecovery = signupSource.includes('t("uiLanguageFlow.resume.description")');
+if (hasLocalizedSignupRecovery) {
+  for (const key of [
+    't("uiLanguageFlow.resume.whatsappOptional")',
+    'aria-label={t("uiLanguageFlow.resume.whatsapp")}',
+    't("uiLanguageFlow.resume.whatsapp")',
+  ]) {
+    if (!signupSource.includes(key)) {
+      throw new Error(`Missing localized signup support safeguard: ${key}`);
+    }
+  }
+} else {
 signupSource = replaceOnce(
   signupSource,
   `        Your non-password details are saved on this device. Continue below or ask us to help you finish.\n`,
@@ -63,6 +78,7 @@ signupSource = replaceOnce(
   `        Contact Admissions Support on WhatsApp\n`,
   "signup WhatsApp button label",
 );
+}
 
 fs.writeFileSync(appPath, appSource, "utf8");
 fs.writeFileSync(authContextPath, authSource, "utf8");

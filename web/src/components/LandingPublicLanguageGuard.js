@@ -1,14 +1,15 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { changeInterfaceLanguage } from "../i18n";
 
-const LANDING_LANGUAGE_KEY = "falowen:landing-interface-language";
 const LANGUAGE_SWITCHER_ID = "falowen-public-language-switcher";
-const SUPPORTED_LANGUAGES = new Set(["en", "de", "fr"]);
+const SUPPORTED_LANGUAGES = new Set(["en", "de", "fr", "sw"]);
 
 const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
   { value: "de", label: "Deutsch" },
   { value: "fr", label: "Français" },
+  { value: "sw", label: "Kiswahili" },
 ];
 
 const normalizeLanguage = (value) => {
@@ -16,26 +17,12 @@ const normalizeLanguage = (value) => {
   return SUPPORTED_LANGUAGES.has(normalized) ? normalized : "";
 };
 
-const readLandingLanguage = () => {
-  try {
-    return normalizeLanguage(window.localStorage.getItem(LANDING_LANGUAGE_KEY));
-  } catch (_error) {
-    return "";
-  }
-};
-
-const writeLandingLanguage = (language) => {
-  try {
-    const normalized = normalizeLanguage(language) || "en";
-    window.localStorage.setItem(LANDING_LANGUAGE_KEY, normalized);
-  } catch (_error) {}
-};
-
 const detectLanguageButton = (text = "") => {
   const normalized = String(text || "").toLowerCase();
   if (normalized.includes("english") || normalized.includes("englisch")) return "en";
   if (normalized.includes("deutsch") || normalized.includes("german")) return "de";
   if (normalized.includes("français") || normalized.includes("francais") || normalized.includes("french") || normalized.includes("französisch")) return "fr";
+  if (normalized.includes("kiswahili") || normalized.includes("swahili")) return "sw";
   return "";
 };
 
@@ -139,19 +126,26 @@ const getLandingRoot = () => {
   return document.querySelector("main") || document.body;
 };
 
+const translatedNodeState = new WeakMap();
+
 const translateStaticTextNodes = (language) => {
   const dictionary = STATIC_TEXT[language];
   const root = getLandingRoot();
-  if (!dictionary || !root || typeof document === "undefined") return;
+  if (!root || typeof document === "undefined") return;
 
   const walker = document.createTreeWalker(root, window.NodeFilter ? window.NodeFilter.SHOW_TEXT : 4);
   const nodes = [];
   while (walker.nextNode()) nodes.push(walker.currentNode);
 
   nodes.forEach((node) => {
-    const current = String(node.nodeValue || "").replace(/\s+/g, " ").trim();
-    const translated = dictionary[current];
-    if (translated) node.nodeValue = String(node.nodeValue || "").replace(current, translated);
+    const current = String(node.nodeValue || "");
+    const previous = translatedNodeState.get(node);
+    const original = previous && current === previous.last ? previous.original : current;
+    const normalized = original.replace(/\s+/g, " ").trim();
+    const translated = dictionary?.[normalized];
+    const next = translated ? original.replace(normalized, translated) : original;
+    translatedNodeState.set(node, { original, last: next });
+    if (current !== next) node.nodeValue = next;
   });
 };
 
@@ -210,7 +204,7 @@ const LandingPublicLanguageGuard = () => {
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
-    let currentLandingLanguage = readLandingLanguage() || "en";
+    let currentLandingLanguage = normalizeLanguage(i18n.resolvedLanguage || i18n.language) || "en";
     let initializedForLanding = false;
 
     const applyLandingLanguage = () => {
@@ -227,8 +221,7 @@ const LandingPublicLanguageGuard = () => {
       translateStaticTextNodes(currentLandingLanguage);
       injectLanguageSwitcher(currentLandingLanguage, (nextLanguage) => {
         currentLandingLanguage = normalizeLanguage(nextLanguage) || "en";
-        writeLandingLanguage(currentLandingLanguage);
-        i18n.changeLanguage(currentLandingLanguage);
+        void changeInterfaceLanguage(currentLandingLanguage);
         window.setTimeout(() => applyLandingLanguage(), 80);
       });
     };
@@ -239,14 +232,14 @@ const LandingPublicLanguageGuard = () => {
       const selectedLanguage = detectLanguageButton(button.textContent || button.getAttribute("aria-label") || "");
       if (selectedLanguage) {
         currentLandingLanguage = selectedLanguage;
-        writeLandingLanguage(selectedLanguage);
+        void changeInterfaceLanguage(selectedLanguage);
         window.setTimeout(() => applyLandingLanguage(), 80);
       }
     };
 
     const handleLanguageChanged = (language) => {
       if (!initializedForLanding && !isPublicLandingPage()) return;
-      currentLandingLanguage = normalizeLanguage(readLandingLanguage() || language) || "en";
+      currentLandingLanguage = normalizeLanguage(language) || "en";
       window.setTimeout(() => applyLandingLanguage(), 80);
     };
 

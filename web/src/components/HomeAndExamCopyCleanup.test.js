@@ -35,7 +35,7 @@ describe("homepage and Exams Room student-facing cleanup", () => {
     expect(access).toContain('<button type="button" style={styles.primaryButton} onClick={openExamsRoom}>');
     expect(access).not.toContain('<button style={styles.secondaryButton} onClick={openExamsRoom}>');
     expect(access).toContain('className="falowen-home-space-card"');
-    expect(access).toContain("Your learning spaces");
+    expect(access).toContain('t("homeAccess.spaces")');
   });
 
   test("signed-in homepage omits duplicate course access and navigation guide", () => {

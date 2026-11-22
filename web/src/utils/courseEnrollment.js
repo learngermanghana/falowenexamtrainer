@@ -15,3 +15,29 @@ export function courseProfile(profile, requested) {
   view.level = placement.level || "A1";
   return view;
 }
+
+const coursePreferenceKey = (uid) => `falowen:course:${uid}`;
+
+// Interface language is stored separately. Course preferences are per Firebase
+// user and validated against the student's current enrolled programmes.
+export function readCoursePreference(uid, allowed = []) {
+  if (!uid || typeof window === "undefined") return null;
+  const key = coursePreferenceKey(uid);
+  try {
+    const selected = window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
+    return allowed.includes(selected) ? selected : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveCoursePreference(uid, course, allowed = []) {
+  if (!uid || !allowed.includes(course) || typeof window === "undefined") return false;
+  try {
+    window.localStorage.setItem(coursePreferenceKey(uid), course);
+    window.sessionStorage.removeItem(coursePreferenceKey(uid));
+    return true;
+  } catch {
+    return false;
+  }
+}

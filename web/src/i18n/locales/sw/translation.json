@@ -1,0 +1,294 @@
+{
+  "common": {
+    "open": "Fungua",
+    "minute_one": "Dakika {{formattedCount}}",
+    "minute_other": "Dakika {{formattedCount}}",
+    "hour_one": "Saa {{formattedCount}}",
+    "hour_other": "Saa {{formattedCount}}",
+    "day_one": "Siku {{formattedCount}}",
+    "day_other": "Siku {{formattedCount}}"
+  },
+  "interfaceLanguages": {
+    "en": "English (EN)",
+    "de": "Deutsch (DE)",
+    "fr": "Français (FR)",
+    "sw": "Kiswahili (SW)"
+  },
+  "programLanguages": {
+    "german": "Kijerumani",
+    "swahili": "Kiswahili",
+    "french": "Kifaransa"
+  },
+  "interfaceLanguage": {
+    "label": "Badilisha lugha ya programu",
+    "shortLabel": "Lugha ya programu",
+    "helper": "Lugha ya menyu ni tofauti na lugha unayojifunza.",
+    "ariaLabel": "Badilisha lugha ya programu",
+    "optionAria": "Badilisha lugha ya programu iwe {{language}}"
+  },
+  "signup": {
+    "courseLanguage": "Unataka kujifunza lugha gani?",
+    "swahiliTrial": "Anza majaribio yako ya siku 7 kwa kitabu cha mazoezi cha Kiswahili A1 mtandaoni.",
+    "interfaceNote": "Programu hii inafundisha {{program}}. Unaweza kubadilisha lugha ya programu bila kubadilisha kozi.",
+    "programs": {
+      "swahili": "Kiswahili",
+      "german": "Kijerumani",
+      "french": "Kifaransa"
+    }
+  },
+  "signupPage": {
+    "title": "Fungua akaunti",
+    "backToOverview": "Rudi kwenye muhtasari",
+    "fields": {
+      "name": "Jina kamili",
+      "email": "Barua pepe",
+      "password": "Nenosiri",
+      "confirmPassword": "Thibitisha nenosiri",
+      "currentLevel": "Kiwango chako cha sasa",
+      "phone": "Nambari ya simu",
+      "address": "Anwani",
+      "location": "Mahali",
+      "learningMode": "Namna ya kujifunza unayopendelea",
+      "emergencyContactPhone": "Simu ya mtu wa dharura",
+      "initialPayment": "Malipo ya awali (GHS)",
+      "classSelection": "Utaingia katika darasa gani la moja kwa moja?"
+    },
+    "options": {
+      "chooseOne": "Chagua moja",
+      "inPerson": "Darasani",
+      "online": "Mtandaoni",
+      "hybrid": "Mchanganyiko",
+      "chooseClass": "Chagua darasa"
+    },
+    "consent": {
+      "agreePrefix": "Ninakubali",
+      "and": "na",
+      "period": ".",
+      "keyPoints": "Mambo muhimu:",
+      "viewSummary": "Tazama muhtasari",
+      "fullDetails": "Soma muhtasari au fungua viungo vya hapo juu bila kuondoka kwenye fomu.",
+      "dialogAria": "Muhtasari wa masharti na faragha",
+      "dialogTitle": "Masharti na faragha",
+      "dialogIntro": "Huu ni muhtasari wa masharti unayokubali.",
+      "readFull": "Soma",
+      "withoutLosingProgress": "wakati wowote bila kupoteza taarifa zako.",
+      "highlights": [
+        "Tunatumia taarifa zako za mawasiliano kufungua na kusaidia akaunti yako na kutuma habari za madarasa.",
+        "Unaweza kuwasiliana na timu ya usaidizi kuhusu mabadiliko ya mkataba kabla ya malipo yanayofuata.",
+        "Malipo yanashughulikiwa kwa usalama; salio la ada linaweza kuathiri ufikiaji wa huduma.",
+        "Hatuuzi taarifa zako binafsi."
+      ]
+    },
+    "actions": {
+      "creating": "Inafungua akaunti...",
+      "signUp": "Jisajili sasa",
+      "close": "Funga",
+      "goToLogin": "Ingia"
+    },
+    "alreadyRegistered": "Tayari una akaunti?"
+  },
+  "appNav": {
+    "title": "Kituo cha Kujifunza cha Falowen",
+    "signedInAs": "Umeingia kama {{email}}",
+    "logout": "Toka",
+    "backHome": "Rudi ukurasa wa mwanzo",
+    "subtitle": {
+      "campus": "Darasa: kitabu, kazi na jumuiya",
+      "exams": "Chumba cha mitihani: kuzungumza, kuandika na rasilimali",
+      "default": "Chagua darasa au chumba cha mitihani"
+    },
+    "tabs": {
+      "course": "Kozi yangu",
+      "ai": "Falowen AI",
+      "results": "Matokeo",
+      "discussion": "Majadiliano",
+      "account": "Akaunti",
+      "attendance": "Mahudhurio",
+      "classMembers": "Wanafunzi wenzangu"
+    },
+    "sections": {
+      "courseBook": "Kitabu cha kozi",
+      "submit": "Wasilisha kazi",
+      "examFile": "Faili la mtihani na tarehe",
+      "grammar": "Uliza swali la sarufi",
+      "writing": "Mazoezi ya kuandika",
+      "speech": "Mazoezi ya kuzungumza",
+      "vocab": "Msamiati",
+      "attendance": "Mahudhurio",
+      "classMembers": "Wanafunzi wenzangu"
+    },
+    "examTabs": {
+      "overview": "Muhtasari",
+      "question": "Swali la leo",
+      "speaking": "Kuzungumza",
+      "writing": "Kuandika",
+      "vocab": "Msamiati",
+      "horen": "Kusikiliza",
+      "lesen": "Kusoma",
+      "resources": "Rasilimali",
+      "file": "Faili la mtihani"
+    },
+    "campusTabs": {
+      "speech": "Mazoezi ya kuzungumza",
+      "account": "Akaunti na malipo"
+    }
+  },
+  "generalHome": {
+    "welcome": {
+      "studentFallback": "mwanafunzi",
+      "joinZoom": "Ingia kwenye darasa la Zoom"
+    },
+    "paymentAlert": {
+      "badge": "Malipo yanahitajika",
+      "cta": "Angalia akaunti yako"
+    }
+  },
+  "uiLanguageFlow": {
+    "courseLabel": "Lugha ya kozi",
+    "signupLanguageLabel": "Lugha ya programu",
+    "welcome": "Karibu Falowen",
+    "motivation": "Anza vizuri. Jifunze kwa kujiamini.",
+    "trialIntro": "Hatua tatu rahisi za kuanza. Chagua majaribio ya siku 7 au ulipe sasa.",
+    "universityIntro": "Ufikiaji wa Kiswahili A1 bila malipo kwa wanafunzi wanaostahiki wa Chuo Kikuu cha Hamburg. Unahitaji idhini ya mwalimu.",
+    "progressLabel": "Hatua za kujisajili",
+    "steps": [
+      "Akaunti yako",
+      "Masomo yako",
+      "Mawasiliano"
+    ],
+    "stepCount": "Hatua ya {{step}} kati ya 3 · Taarifa zote hukusanywa kabla ya kufungua akaunti.",
+    "headings": [
+      "Tufungue akaunti yako",
+      "Chagua namna ya kujifunza",
+      "Tunawezaje kuwasiliana nawe?"
+    ],
+    "descriptions": [
+      "Tumia jina lako kamili na barua pepe unayoweza kufungua.",
+      "Chagua kiwango, namna ya kujifunza na darasa, kisha majaribio au malipo.",
+      "Tunahitaji mawasiliano yako na ya dharura. Unaweza kurudi bila kupoteza majibu."
+    ],
+    "startOption": "Ungependa kuanza vipi?",
+    "back": "Rudi",
+    "continueLearning": "Endelea kwenye masomo yako",
+    "continueContact": "Endelea kwenye mawasiliano",
+    "registerComplimentary": "Jisajili kwa kozi ya bila malipo",
+    "createTrial": "Fungua akaunti na anza majaribio ya siku 7",
+    "universityNote": "Hakuna malipo wala kipindi cha majaribio. Mwalimu atathibitisha ufikiaji wa kozi.",
+    "trialNote": "Anza majaribio ya siku 7 bila malipo, au ulipe baada ya kujisajili.",
+    "ready": "Akaunti yako ya Falowen iko tayari",
+    "start": "Anza kujifunza",
+    "terms": "masharti",
+    "privacy": "sera ya faragha",
+    "swahiliSubtitle": "Nafasi yako ya kujifunza Kiswahili",
+    "publishedLessons": "Masomo yaliyochapishwa",
+    "resume": {
+      "title": "Endelea na usajili wako",
+      "description": "Taarifa zako isipokuwa nenosiri zimehifadhiwa kwenye kifaa hiki. Jaza fomu iliyo hapa chini ili kuendelea na usajili.",
+      "help": "Unahitaji msaada gani? (si lazima)",
+      "placeholder": "Kwa mfano: Siwezi kuchagua darasa. Usiweke nenosiri.",
+      "whatsapp": "Wasiliana na timu ya usajili kupitia WhatsApp",
+      "whatsappOptional": "Unahitaji msaada kuhusu fomu au usajili? WhatsApp ni ya hiari na inatumika kwa msaada wa usajili pekee."
+    }
+  },
+  "homeAccess": {
+    "welcomeBack": "Karibu tena, {{name}}.",
+    "welcomeLead": "Sehemu yako ya masomo iko tayari. Endelea kujifunza!",
+    "account": "Akaunti",
+    "welcomeAria": "Karibu Falowen",
+    "scheduleAria": "Ratiba ya darasa lako",
+    "liveClass": "DARASA LAKO LA MOJA KWA MOJA",
+    "assignedClass": "Darasa ulilopangiwa",
+    "noLiveClass": "Bado hujapangiwa darasa",
+    "assignedScheduleDesc": "Ratiba yako inaonyesha masomo yajayo, tarehe na mabadiliko yoyote.",
+    "pendingScheduleDesc": "Unaweza kuendelea kujifunza. Ratiba itaonekana baada ya kupangiwa darasa.",
+    "germanLevel": "Kijerumani {{level}}",
+    "viewSchedule": "Tazama ratiba kamili",
+    "manageClass": "Dhibiti darasa kwenye Akaunti",
+    "spaces": "Sehemu zako za kujifunza",
+    "spacesSw": "Sehemu yako ya kujifunza iko tayari.",
+    "spacesBoth": "Sehemu mbili za kujifunza. Lengo moja.",
+    "dailyWork": "MAZOEZI YA KILA SIKU",
+    "courseBook": "Kitabu cha kozi",
+    "continueLearning": "Endelea kujifunza",
+    "swBookDesc": "Fungua kitabu chako cha Kiswahili kwa masomo, mazoezi ya kusoma na kuandika na maoni ya mwalimu.",
+    "gerBookDesc": "Fungua kitabu chako cha kozi, fanya mazoezi na uwasilishe kazi ulizomaliza.",
+    "openCourseBook": "Fungua kitabu cha kozi",
+    "examMode": "MAZOEZI YA MTIHANI",
+    "examsRoom": "Chumba cha mitihani",
+    "examsSkills": "Kuzungumza, kuandika na rasilimali",
+    "examsDesc": "Chagua mtihani wa majaribio au fanya zoezi la ujuzi mmoja, kisha tazama matokeo.",
+    "openExams": "Fungua chumba cha mitihani",
+    "studyWithAi": "JIFUNZE KWA AI",
+    "companionDescription": "Unganisha Falowen na ChatGPT ili kuuliza maswali kuhusu masomo yako ya Kijerumani.",
+    "connectChatgpt": "Unganisha ChatGPT kama msaidizi wa masomo",
+    "publishedDesc": "Endelea na somo la Kiswahili lililochapishwa au zoezi la kitabu."
+  },
+  "authUi": {
+    "login": "Ingia",
+    "create": "Fungua akaunti",
+    "back": "Rudi kwenye muhtasari",
+    "helper": "Ingia kwenye akaunti yako ili kuhifadhi maendeleo ya mitihani.",
+    "welcome": "Karibu tena",
+    "welcomeDesc": "Ingia kwa barua pepe au nambari yako ya mwanafunzi ili kuendelea na masomo.",
+    "nameHint": "Andika jina lako kamili. Jina hili litaonekana kwenye vyeti na matokeo.",
+    "addressHint": "mfano Madina, Accra (mtaa/eneo)",
+    "emailOrCode": "Barua pepe au nambari ya mwanafunzi",
+    "emailOrCodeHint": "wewe@email.com au STU12345",
+    "passwordHint": "Angalau herufi 8 pamoja na nambari",
+    "hide": "Ficha",
+    "show": "Onyesha",
+    "forgotHint": "Umesahau nenosiri? Bonyeza hapa na ukague barua pepe yako au folda ya taka.",
+    "sendingReset": "Inatuma barua pepe ya kubadili nenosiri ...",
+    "forgot": "Umesahau nenosiri?",
+    "emergency": "Simu ya mtu wa dharura",
+    "className": "Jina la darasa",
+    "pleaseWait": "Tafadhali subiri ...",
+    "or": "au",
+    "connectingGoogle": "Inaunganisha na Google ...",
+    "signInGoogle": "Ingia kwa Google",
+    "googleLimit": "Kuingia kwa Google kunapatikana kwa wanafunzi waliopo kwenye rekodi zetu pekee.",
+    "recovery": "Msaada wa kuingia",
+    "reset": "Badilisha nenosiri",
+    "useEmail": "Ingia kwa barua pepe",
+    "continuePayment": "Endelea na malipo",
+    "contact": "Wasiliana na usaidizi",
+    "newHere": "Ni mgeni hapa?",
+    "registered": "Tayari umejisajili?",
+    "phone": "Nambari ya simu",
+    "location": "Mahali",
+    "address": "Anwani",
+    "learningMode": "Namna ya kujifunza"
+  },
+  "signupDetails": {
+    "fullNameHint": "Andika jina lako kamili kwa ajili ya vyeti na rekodi za matokeo.",
+    "passwordHint": "Angalau herufi 8 pamoja na nambari",
+    "repeatPassword": "Andika nenosiri tena",
+    "universityInstructor": "Mwalimu: Ruth · Kozi bila malipo",
+    "universityDetails": "Usajili wako utaunganishwa na kundi la chuo kikuu. Ruth atathibitisha ustahiki kabla ya kuruhusu masomo. Huhitaji taarifa za malipo.",
+    "offerTuition": "Ada ya ofa:",
+    "discountOff": "Punguzo la {{amount}}",
+    "offerContinue": "Endelea Paystack baada ya kufungua akaunti.",
+    "matchedTasks": "Tunatoa mazoezi ya kuzungumza na kuandika yanayolingana na kiwango chako.",
+    "placementLink": "Hujui kiwango chako? Fanya mtihani wa kiwango",
+    "chooseClass": "Chagua darasa lako",
+    "startAnytime": "Anza wakati wowote",
+    "scheduleAvailable": "Ratiba inapatikana",
+    "recommended": "Tunapendekeza hili",
+    "selfLearning": "Jifunze mwenyewe · Mtandaoni",
+    "starts": "Linaanza {{date}}",
+    "ghanaTime": "Saa za Ghana (GMT / UTC+0)",
+    "noClass": "Hakuna darasa la {{level}} lililo wazi kwa sasa. Wasiliana na Falowen kwa taarifa za darasa lijalo.",
+    "chooseClassHelp": "Chagua darasa linalolingana na ratiba yako. Tunaonyesha madarasa yaliyo wazi kwa {{level}}.",
+    "loadingClasses": "Inapakia orodha ya madarasa…",
+    "trialTitle": "Anza majaribio ya siku 7",
+    "trialDescription": "Anza kujifunza bila malipo sasa. Unaweza kulipa baadaye kwenye Akaunti na Malipo.",
+    "fullFeeTitle": "Lipa ada yote sasa · {{amount}}",
+    "fullFeeDescription": "Fungua akaunti kisha ulipe salama kupitia Paystack.",
+    "partFeeTitle": "Lipa sehemu ya ada sasa · {{amount}}",
+    "partFeeDescription": "Fungua akaunti kisha ulipe awamu ya kwanza kupitia Paystack.",
+    "tuitionTitle": "Muhtasari wa ada",
+    "tuitionDescription": "Ada ya {{level}} ni {{amount}}. Unaweza kuanza kwa majaribio ya siku 7 au kulipa mara moja kupitia Paystack.",
+    "phonePrivacy": "Tunahifadhi nambari yako ya simu ili kuwasiliana nawe inapohitajika. Mtu wa dharura hujulishwa katika hali za dharura tu.",
+    "addressHint": "Nambari ya nyumba, mtaa, jiji, mkoa"
+  }
+}
