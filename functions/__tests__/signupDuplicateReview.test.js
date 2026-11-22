@@ -62,6 +62,8 @@ test("Ghana mobile variants, Gmail aliases and reordered names normalize", () =>
 test("requires a full name and separate valid contact numbers", () => {
   assert.ok(validatedApplication(applicant));
   assert.equal(validatedApplication({ ...applicant, phone: applicant.emergencyContactPhone }), null);
+  assert.equal(validatedApplication({ ...applicant, emergencyContactPhone: "+233 24 123 4567" }), null);
+  assert.equal(validatedApplication({ ...applicant, emergencyContactPhone: "00233 24 123 4567" }), null);
   assert.equal(validatedApplication({ ...applicant, email: "not-an-email" }), null);
   assert.equal(validatedApplication({ ...applicant, name: "Ama" }), null);
 });
