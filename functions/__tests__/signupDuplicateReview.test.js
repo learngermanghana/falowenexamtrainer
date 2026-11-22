@@ -13,7 +13,7 @@ const applicant = {
   emergencyContactPhone: "+233 55 987 6543",
 };
 
-function fakeDb(records) {
+function fakeDb(records, { onStartAfter = () => {} } = {}) {
   return {
     collection(name) {
       assert.equal(name, "students");
@@ -22,6 +22,7 @@ function fakeDb(records) {
           let afterId = null;
           return {
             startAfter(lastDoc) {
+              onStartAfter(lastDoc);
               afterId = lastDoc.id;
               return this;
             },
@@ -104,7 +105,8 @@ test("checks existing normalized identities and legacy primary phones without br
 });
 
 test("finds a name-plus-emergency match after more than eight shared contacts", async () => {
-  const sharedEmergency = "055 987 6543";
+  // Use the standard stored legacy format so this specifically tests cursors.
+  const sharedEmergency = "0559876543";
   const family = Array.from({ length: 9 }, (_, i) => ({
     id: "family-" + i,
     name: i === 8 ? "Ofori Ama" : "Other Student " + i,
@@ -112,11 +114,28 @@ test("finds a name-plus-emergency match after more than eight shared contacts", 
     phone: "+233201000" + String(i).padStart(3, "0"),
     emergencyContactPhone: sharedEmergency,
   }));
-  // Only the ninth result has the same normalized name as the applicant.
-  assert.equal(await findProbableDuplicate(fakeDb(family), applicant), true);
+  // The ninth record can only be seen if the Firestore query advances to page 2.
+  const cursors = [];
+  assert.equal(await findProbableDuplicate(fakeDb(family, {
+    onStartAfter: (doc) => cursors.push(doc.id),
+  }), applicant), true);
+  assert.ok(cursors.includes("family-7"), "the shared-contact query must fetch page two");
   family[8].name = "Another Student";
   // Shared emergency number alone must never reject a different student.
   assert.equal(await findProbableDuplicate(fakeDb(family), applicant), false);
+});
+
+test("looks up historically spaced Ghana emergency contacts independently of pagination", async () => {
+  const historical = {
+    id: "spaced-emergency",
+    name: "Ofori Ama",
+    email: "different@example.com",
+    phone: "+233201000999",
+    emergencyContactPhone: "055 987 6543",
+  };
+  // A separate case covers older human-formatted phone fields without
+  // conflating variant matching with the cursor pagination regression.
+  assert.equal(await findProbableDuplicate(fakeDb([historical]), applicant), true);
 });
 
 test("paginates normalized emergency identities past the first page", async () => {
