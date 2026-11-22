@@ -1941,6 +1941,7 @@
   "signupDetails": {
     "countryOfResidence": "Country of residence",
     "countryPlaceholder": "Select your country",
+    "cityPlaceholder": "e.g. Accra, Berlin or Nairobi",
     "cityOrTown": "City / Town",
     "countryRequired": "Select your country of residence.",
     "countryHelp": "Choose from the country list. No typing or separate verification needed.",
