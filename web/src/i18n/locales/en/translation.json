@@ -1939,6 +1939,7 @@
     "learningMode": "Learning mode"
   },
   "signupDetails": {
+    "duplicateProtectionNote": "Already registered? Log in instead of using another email. We check contact numbers to prevent duplicate student accounts. Family members may share an emergency contact.",
     "fullNameHint": "Please enter your full name (first and last). We use it to print certificates and transcripts.",
     "passwordHint": "At least 8 characters with letters and numbers",
     "repeatPassword": "Enter password again",

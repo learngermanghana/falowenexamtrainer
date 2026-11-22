@@ -28,6 +28,7 @@ import {
   normalizePhone,
   normalizeWhitespace,
 } from "../lib/signupDataQuality";
+import { canonicalPhone } from "../lib/signupIdentity";
 
 const MIN_INITIAL_PAYMENT = 2000;
 
@@ -325,6 +326,9 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
 
   const interpretSignupError = (error) => {
     const code = error?.code || "";
+    if (code === "auth/duplicate-review-required" || code === "auth/duplicate-check-unavailable") {
+      return { field: null, message: error.message };
+    }
     if (code.includes("email-already-in-use")) {
       return {
         field: "email",
@@ -430,6 +434,9 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
     if (!isLikelyPhoneNumber(cleanedEmergencyPhone)) {
       validationIssues.emergencyContactPhone =
         "Add a valid emergency contact phone number (7–15 digits). This is required for safety.";
+    } else if (canonicalPhone(cleanedPhone) && canonicalPhone(cleanedPhone) === canonicalPhone(cleanedEmergencyPhone)) {
+      validationIssues.emergencyContactPhone =
+        "Your emergency contact should be someone else. Enter a different phone number.";
     }
 
     if (!learningMode) {
@@ -1037,7 +1044,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
               setAuthError("");
             }}
             style={inputStyle}
-            placeholder="0176 12345678"
+            placeholder="024 123 4567 or +233 24 123 4567"
           />
           {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
 
@@ -1099,11 +1106,14 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
               setAuthError("");
             }}
             style={inputStyle}
-            placeholder="0176 98765432"
+            placeholder="055 987 6543 or +233 55 987 6543"
           />
           {fieldErrors.emergencyContactPhone ? (
             <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
           ) : null}
+          <p style={{ ...styles.helperText, marginTop: -4 }}>
+            {t("signupDetails.duplicateProtectionNote")}
+          </p>
 
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
             <input

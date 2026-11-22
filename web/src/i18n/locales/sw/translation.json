@@ -261,6 +261,7 @@
     "learningMode": "Namna ya kujifunza"
   },
   "signupDetails": {
+    "duplicateProtectionNote": "Umeshasajiliwa? Ingia kwenye akaunti yako badala ya kutumia barua pepe nyingine. Tunakagua nambari za mawasiliano ili kuzuia akaunti zinazojirudia. Wanafamilia wanaweza kutumia nambari ileile ya dharura.",
     "fullNameHint": "Andika jina lako kamili kwa ajili ya vyeti na rekodi za matokeo.",
     "passwordHint": "Angalau herufi 8 pamoja na nambari",
     "repeatPassword": "Andika nenosiri tena",
