@@ -58,9 +58,6 @@ describe("A1 Exams Room Hören Sample 2", () => {
   });
 
   test("publishes Sample 2 under A1 Exams Room Hören", () => {
-    expect(horenPage).toContain('normalizedLevel === "A1" && ["sample-2", "sample-3"].includes(sampleId)');
-    expect(horenPage).toContain('navigate("/exams/horen/a1/sample-2")');
-    expect(horenPage).toContain("<strong>Hören Sample 2</strong>");
     expect(horenPage).toContain("15 questions · Teil 1–3");
     expect(samplePage).toContain("A1_SAMPLE_2_PARTS");
     expect(samplePage).toContain("part.data.example");

@@ -28,7 +28,7 @@ function PracticeAttempt({mockNumber,idToken,uid}){
     if(!idToken){setError("Please sign in again to check your Hören answers.");return;}
     setBusy(true);setError("");
     try{
-      const graded=await scoreA2HoerenOnly({mockId,answers,idToken});
+      const graded=await scoreA2HoerenOnly({mockId:mockId.slice(3),answers,idToken});
       if(graded?.total!==20||typeof graded.correct!=="number")throw new Error("Could not verify this Hören result.");
       setResult(graded);
       setSaveStatus("saving");
@@ -74,7 +74,7 @@ function PracticeAttempt({mockNumber,idToken,uid}){
 }
 export default function A2MockListeningPractice({mockNumber}){
   const {user,idToken}=useAuth();
-  if(![4,5,6,7].includes(mockNumber))return <p role="alert">This A2 Hören sample is not available.</p>;
+  if(![4,5,6,7,8].includes(mockNumber))return <p role="alert">This A2 Hören sample is not available.</p>;
   return <PracticeAttempt key={`${user?.uid||"guest"}-${mockNumber}`}
     mockNumber={mockNumber} idToken={idToken} uid={user?.uid||null}/>;
 }

@@ -129,7 +129,7 @@ const answerKeyForPart = (level, part) => {
   }));
 };
 
-const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken, freeTrial = false }) => {
+export const SampleAudio = ({ mockAudioId = "mock-01", level, sampleId, part, objectKey, plays, idToken, freeTrial = false }) => {
   const [audioUrl, setAudioUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -171,7 +171,7 @@ const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken, freeTri
                 idToken,
               })
             : await (level === "A2" ? fetchA2MockAudioPlaybackUrl : fetchA1MockAudioPlaybackUrl)({
-                mockId: level === "A2" && sampleId === "sample-2" ? "mock-02" : "mock-01",
+                mockId: level === "A2" && sampleId === "sample-2" ? "mock-02" : mockAudioId,
                 part,
                 key: objectKey,
                 idToken,
