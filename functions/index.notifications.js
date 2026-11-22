@@ -53,25 +53,35 @@ const tokensFromStudent = (student = {}) => {
   return Array.from(tokens).filter(Boolean);
 };
 
-const findClassTargets = async ({ level, className, excludeUid = "" } = {}) => {
+const findClassTargets = async ({ level, className, excludeUid = "", program = "" } = {}) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const normalizedClassName = String(className || "").trim();
   if (!normalizedLevel || !normalizedClassName) return [];
 
-  const variants = Array.from(new Set([normalizedClassName, normalizedClassName.toLowerCase(), normalizedClassName.toUpperCase()])).filter(Boolean);
-  const snapshots = await Promise.all(
-    variants.map((variant) => db().collection("students").where("level", "==", normalizedLevel).where("className", "==", variant).get())
-  );
-
+  const variants = [...new Set([normalizedClassName, normalizedClassName.toLowerCase(), normalizedClassName.toUpperCase()])];
+  const normalizedProgram = ["german", "swahili"].includes(normalize(program)) ? normalize(program) : "";
+  const snapshots = await Promise.all(variants.flatMap((variant) => [
+    db().collection("students").where("level", "==", normalizedLevel).where("className", "==", variant).get(),
+    ...(normalizedProgram
+      ? [db().collection("students").where(`coursePlacements.${normalizedProgram}.className`, "==", variant).get()]
+      : []),
+  ]));
   const targets = new Map();
-  snapshots.forEach((snapshot) => {
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data() || {};
-      if (excludeUid && data.uid === excludeUid) return;
+  snapshots.forEach((snapshot) => snapshot.forEach((docSnap) => {
+    const data = docSnap.data() || {};
+    if (excludeUid && data.uid === excludeUid) return;
+    const primaryMatch = (!normalizedProgram || normalize(data.program || "german") === normalizedProgram)
+      && variants.includes(String(data.className || ""))
+      && String(data.level || "").trim().toUpperCase() === normalizedLevel;
+    const placement = normalizedProgram ? data.coursePlacements?.[normalizedProgram] || {} : {};
+    const secondaryMatch = normalizedProgram && normalize(data.secondaryProgram) === normalizedProgram
+      && variants.includes(String(placement.className || ""))
+      && String(placement.level || "").trim().toUpperCase() === normalizedLevel;
+    if (primaryMatch || secondaryMatch) {
       targets.set(docSnap.id, { docId: docSnap.id, data, tokens: tokensFromStudent(data) });
-    });
-  });
-  return Array.from(targets.values());
+    }
+  }));
+  return [...targets.values()];
 };
 
 const toFcmData = (data = {}) =>
