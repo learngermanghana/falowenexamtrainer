@@ -11,7 +11,8 @@
   "interfaceLanguages": {
     "en": "English (EN)",
     "de": "Deutsch (DE)",
-    "fr": "Français (FR)"
+    "fr": "Français (FR)",
+    "sw": "Kiswahili (SW)"
   },
   "programLanguages": {
     "german": "Deutsch",
@@ -233,7 +234,7 @@
   "signup": {
     "courseLanguage": "Welche Sprache möchtest du lernen?",
     "swahiliTrial": "Beginne deine siebentägige Testphase mit dem Kiswahili-Online-Arbeitsbuch für A1.",
-    "interfaceNote": "Dieses Programm unterrichtet {{program}}. Die Benutzeroberfläche ist auf Englisch verfügbar.",
+    "interfaceNote": "Dieses Programm unterrichtet {{program}}. Die App-Sprache kannst du unabhängig von der Kurssprache ändern.",
     "programs": {
       "swahili": "Swahili (Kiswahili)",
       "german": "Deutsch",
@@ -1704,5 +1705,44 @@
       "session": "Sitzung",
       "pending": "Ausstehend"
     }
+  },
+  "uiLanguageFlow": {
+    "courseLabel": "Kurs-Sprache",
+    "signupLanguageLabel": "App-Sprache",
+    "welcome": "Willkommen bei Falowen",
+    "motivation": "Starte stark. Lerne mit Selbstvertrauen.",
+    "trialIntro": "Drei einfache Schritte zum Start. Wähle eine siebentägige Testphase oder zahle direkt.",
+    "universityIntro": "Kostenloser Kiswahili-A1-Zugang für berechtigte Studierende der Universität Hamburg. Eine Freigabe durch die Lehrkraft ist erforderlich.",
+    "progressLabel": "Registrierungsfortschritt",
+    "steps": [
+      "Dein Konto",
+      "Dein Lernen",
+      "Kontaktdaten"
+    ],
+    "stepCount": "Schritt {{step}} von 3 · Alle Angaben werden vor der Kontoerstellung erfasst",
+    "headings": [
+      "Erstelle dein Konto",
+      "Wähle deine Lernform",
+      "Wie erreichen wir dich?"
+    ],
+    "descriptions": [
+      "Gib deinen vollständigen Namen und eine erreichbare E-Mail-Adresse ein.",
+      "Wähle Niveau, Lernform und Kurs und danach Testphase oder Zahlung.",
+      "Wir benötigen deine Kontakt- und Notfalldaten. Beim Zurückgehen bleiben deine Angaben erhalten."
+    ],
+    "startOption": "Wie möchtest du beginnen?",
+    "back": "Zurück",
+    "continueLearning": "Weiter zum Lernen",
+    "continueContact": "Weiter zu Kontaktdaten",
+    "registerComplimentary": "Für kostenlosen Kurszugang anmelden",
+    "createTrial": "Konto erstellen & 7 Tage testen",
+    "universityNote": "Keine Zahlung oder Testphase. Die Lehrkraft bestätigt den Kurszugang.",
+    "trialNote": "Starte die siebentägige Testphase ohne Zahlung oder zahle nach der Registrierung.",
+    "ready": "Dein Falowen-Konto ist bereit",
+    "start": "Jetzt lernen",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzerklärung",
+    "swahiliSubtitle": "Dein Kiswahili-Lernbereich",
+    "publishedLessons": "Veröffentlichte Lektionen"
   }
 }
