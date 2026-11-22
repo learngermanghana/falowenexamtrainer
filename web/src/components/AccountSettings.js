@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
+import StudentDocumentsPanel from "./StudentDocumentsPanel";
 import NotificationSettingsCard from "./NotificationSettingsCard";
 import AdditionalProgrammeRequest from "./AdditionalProgrammeRequest";
 import ClassParticipationCard from "./ClassParticipationCard";
@@ -67,7 +68,7 @@ const AccountSettings = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const requestedTab = new URLSearchParams(location.search).get("tab");
-  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab) && !(isSwahili && ["participation", "upgrade"].includes(requestedTab)) && !(isSecondaryCourse && requestedTab === "upgrade")
+  const activeTab = (["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab) || requestedTab === "documents") && !(isSwahili && ["participation", "upgrade"].includes(requestedTab)) && !(isSecondaryCourse && requestedTab === "upgrade")
     ? requestedTab
     : "studentData";
 
@@ -745,6 +746,7 @@ const AccountSettings = () => {
           { key: "studentData", label: t("accountSettings.tabs.studentData") },
           { key: "notifications", label: t("accountOverview.notifications") },
           { key: "billing", label: t("accountSettings.tabs.billing") },
+          { key: "documents", label: "Documents" },
           { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
           { key: "deleteAccount", label: t("accountOverview.deleteAccount") },
         ].filter(tab => tab.key !== "upgrade" || (!isSwahili && !isSecondaryCourse)).map((tab) => (
@@ -994,6 +996,8 @@ const AccountSettings = () => {
         </details>
       </section>
       ) : null}
+
+      {activeTab === "documents" ? <StudentDocumentsPanel user={user} studentProfile={studentProfile} /> : null}
 
       {activeTab === "deleteAccount" ? <AccountDeletionCard /> : null}
       {activeTab === "upgrade" ? (
