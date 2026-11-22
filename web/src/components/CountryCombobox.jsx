@@ -11,6 +11,7 @@ export default function CountryCombobox({
 }) {
   const listId = useId();
   const root = useRef(null);
+  const editingRef = useRef(false);
   const [isOpen, setOpen] = useState(false);
   const [query, setQuery] = useState(() => getCountryName(value, locale));
   const [active, setActive] = useState(0);
@@ -23,11 +24,13 @@ export default function CountryCombobox({
   }, [query, options]);
 
   useEffect(() => {
-    setQuery(getCountryName(value, locale));
+    if (!editingRef.current || value) setQuery(getCountryName(value, locale));
+    editingRef.current = false;
   }, [value, locale]);
   useEffect(() => { setActive(0); }, [query]);
 
   const choose = (country) => {
+    editingRef.current = false;
     onChange(country.code);
     setQuery(country.label);
     setOpen(false);
@@ -68,6 +71,7 @@ export default function CountryCombobox({
           if (!root.current?.contains(event.relatedTarget)) setOpen(false);
         }}
         onChange={(event) => {
+          editingRef.current = true;
           setQuery(event.target.value);
           if (value) onChange("");
           setOpen(true);
