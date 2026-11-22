@@ -22,14 +22,15 @@ import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { resolveUniversityInvitation } from "../lib/universityInvitations";
 import {
   isFullName,
-  isLikelyPhoneNumber,
   normalizeEmail,
   normalizePersonName,
-  normalizePhone,
   normalizeWhitespace,
 } from "../lib/signupDataQuality";
 import { canonicalPhone } from "../lib/signupIdentity";
-import { getCountryOptions, getCountryName, isValidCountryCode } from "../data/countries";
+import { getCountryName, isValidCountryCode } from "../data/countries";
+import CountryCombobox from "./CountryCombobox";
+import { getCountryDialCode, getNationalPhonePlaceholder, phoneToE164, formatNationalPhone } from "../data/phoneCountries";
+import { suggestEmailCorrection } from "../lib/signupEmailHints";
 
 const MIN_INITIAL_PAYMENT = 2000;
 
@@ -98,7 +99,7 @@ const staticClassOptions = (now) => Object.keys(classCatalog)
     source: "static",
   }));
 
-const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitationCode = "", courseDiscount = null }) => {
+const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitationCode = "", courseDiscount = null, initialDraft = null }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { i18n, t } = useTranslation();
   const fxQuote = useFalowenUsdGhsRate();
@@ -112,8 +113,14 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   const now = useMemo(() => new Date(), []);
   const [step, setStep] = useState(1);
   const stepHeadingRef = useRef(null);
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
+  const originalNameParts = normalizeWhitespace(initialDraft?.name || "").split(" ").filter(Boolean);
+  const [email, setEmail] = useState(initialDraft?.email || "");
+  const [firstName, setFirstName] = useState(initialDraft?.firstName || originalNameParts[0] || "");
+  const [middleName, setMiddleName] = useState(initialDraft?.middleName || originalNameParts.slice(1, -1).join(" ") || "");
+  const [lastName, setLastName] = useState(initialDraft?.lastName || (originalNameParts.length > 1 ? originalNameParts[originalNameParts.length - 1] : ""));
+  const [nameConfirmed, setNameConfirmed] = useState(false);
+  const name = normalizePersonName([firstName, middleName, lastName].filter(Boolean).join(" "));
+  const suggestedEmail = suggestEmailCorrection(email);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPasswords, setShowPasswords] = useState(false);
@@ -130,13 +137,12 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   const [germanLevel, setSelectedLevel] = useState(
     requestedSignup.level || "A1"
   );
-  const [phone, setPhone] = useState("");
-  const [location, setLocation] = useState("");
-  const [countryCode, setCountryCode] = useState("");
-  const countryOptions = useMemo(() => getCountryOptions(locale), [locale]);
-  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState(initialDraft?.phone || "");
+  const [location, setLocation] = useState(initialDraft?.location || "");
+  const [countryCode, setCountryCode] = useState(initialDraft?.countryCode || "");
+  const [address, setAddress] = useState(initialDraft?.address || "");
   const [germanMode, setLearningMode] = useState("");
-  const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState(initialDraft?.emergencyContactPhone || "");
   const [germanPayment, setPaymentOption] = useState("trial");
   const [germanClass, setSelectedClass] = useState(loadPreferredClass() || "");
   const selectedLevel = universityInvitation?.level || courseDiscount?.level || (isSwahili ? "A1" : germanLevel);
@@ -290,7 +296,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
     }
   };
 
-  const stepForField = (field) => ["name", "email", "password", "confirmPassword"].includes(field)
+  const stepForField = (field) => ["name", "firstName", "lastName", "nameConfirmed", "email", "password", "confirmPassword"].includes(field)
     ? 1 : ["selectedLevel", "learningMode", "selectedClass", "initialPaymentAmount"].includes(field) ? 2 : 3;
 
   const showStepError = (issues) => {
@@ -305,7 +311,10 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
 
   const accountIssues = () => {
     const issues = {};
-    if (!isFullName(name)) issues.name = "Enter your first and last name for your certificates.";
+    if (normalizePersonName(firstName).length < 2) issues.firstName = t("signupDetails.firstNameRequired");
+    if (normalizePersonName(lastName).length < 2) issues.lastName = t("signupDetails.lastNameRequired");
+    if (!isFullName(name) && !issues.firstName && !issues.lastName) issues.firstName = t("signupDetails.legalNameRequired");
+    if (!nameConfirmed) issues.nameConfirmed = t("signupDetails.confirmNameRequired");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) issues.email = "Enter a valid email address.";
     if (password.length < 8 || !/[a-z]/i.test(password) || !/[0-9]/.test(password)) issues.password = "Use at least 8 characters, including a letter and a number.";
     if (!confirmPassword || password !== confirmPassword) issues.confirmPassword = "Passwords do not match. Please check both fields.";
@@ -390,11 +399,11 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
     const numericInitialPayment = Number(initialPaymentAmount);
     const cleanedName = normalizePersonName(name);
     const cleanedEmail = normalizeEmail(email);
-    const cleanedPhone = normalizePhone(phone);
+    const cleanedPhone = phoneToE164(phone, countryCode);
     const cleanedAddress = normalizeWhitespace(address);
     const cleanedLocation = normalizeWhitespace(location);
     const cleanedCountryCode = countryCode.toUpperCase();
-    const cleanedEmergencyPhone = normalizePhone(emergencyContactPhone);
+    const cleanedEmergencyPhone = phoneToE164(emergencyContactPhone, countryCode);
 
     const validationIssues = accountIssues();
 
@@ -415,16 +424,15 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
     }
 
     if (!isFullName(name)) {
-      validationIssues.name =
-        "Use your full name (first and last). This will appear on certificates and transcripts.";
+      validationIssues.firstName = t("signupDetails.legalNameRequired");
     }
 
     if (!isSwahili && !selectedClass) {
       validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
     }
 
-    if (!isLikelyPhoneNumber(cleanedPhone)) {
-      validationIssues.phone = "Enter a valid contact phone number (7–15 digits) so we can reach you.";
+    if (!cleanedPhone) {
+      validationIssues.phone = t("signupDetails.phoneCountryInvalid");
     }
 
     if (!cleanedAddress) {
@@ -438,7 +446,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
       validationIssues.countryCode = t("signupDetails.countryRequired");
     }
 
-    if (!isLikelyPhoneNumber(cleanedEmergencyPhone)) {
+    if (!cleanedEmergencyPhone) {
       validationIssues.emergencyContactPhone =
         "Add a valid emergency contact phone number (7–15 digits). This is required for safety.";
     } else if (canonicalPhone(cleanedPhone) && canonicalPhone(cleanedPhone) === canonicalPhone(cleanedEmergencyPhone)) {
@@ -510,6 +518,10 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
         studentCode,
         className: selectedClass,
         phone: cleanedPhone,
+        firstName: normalizePersonName(firstName),
+        middleName: normalizePersonName(middleName),
+        lastName: normalizePersonName(lastName),
+        certificateNameConfirmed: true,
         location: cleanedLocation,
         countryCode: cleanedCountryCode,
         country: getCountryName(cleanedCountryCode, "en"),
@@ -673,28 +685,36 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             <p style={{ margin: "8px 0 0", color: "#475569", lineHeight: 1.6 }}>{t("uiLanguageFlow.descriptions", { returnObjects: true })[step - 1]}</p>
           </div>
           <fieldset aria-label={t("uiLanguageFlow.steps", { returnObjects: true })[0]} disabled={step !== 1 || loading} hidden={step !== 1} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 1 ? "grid" : "none", gap: 12 }}>
-          <label htmlFor="signup-name" style={styles.label}>{t("signupPage.fields.name")}</label>
-          <input
-            type="text"
-            required
-            autoComplete="name"
-            id="signup-name"
-            ref={(element) => {
-              fieldRefs.current.name = element;
-            }}
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              clearFieldError("name");
-              setAuthError("");
-            }}
-            style={inputStyle}
-            placeholder="Abigail Mensah"
-          />
-          {fieldErrors.name ? <p style={styles.fieldError}>{fieldErrors.name}</p> : null}
-          <p style={{ ...styles.helperText, marginTop: -4 }}>
-            {t("signupDetails.fullNameHint")}
-          </p>
+          <label htmlFor="signup-firstName" style={styles.label}>{t("signupDetails.firstName")}</label>
+          <input type="text" required autoComplete="given-name" id="signup-firstName" name="firstName"
+            ref={(element) => { fieldRefs.current.firstName = element; }}
+            value={firstName} onChange={(event) => { setFirstName(event.target.value); setNameConfirmed(false); clearFieldError("firstName"); clearFieldError("nameConfirmed"); setAuthError(""); }}
+            style={inputStyle} placeholder="Abigail" />
+          {fieldErrors.firstName ? <p style={styles.fieldError}>{fieldErrors.firstName}</p> : null}
+
+          <label htmlFor="signup-middleName" style={styles.label}>{t("signupDetails.middleName")}</label>
+          <input type="text" autoComplete="additional-name" id="signup-middleName" name="middleName"
+            value={middleName} onChange={(event) => { setMiddleName(event.target.value); setNameConfirmed(false); clearFieldError("nameConfirmed"); }}
+            style={inputStyle} placeholder={t("signupDetails.middleNameOptional")} />
+
+          <label htmlFor="signup-lastName" style={styles.label}>{t("signupDetails.lastName")}</label>
+          <input type="text" required autoComplete="family-name" id="signup-lastName" name="lastName"
+            ref={(element) => { fieldRefs.current.lastName = element; }}
+            value={lastName} onChange={(event) => { setLastName(event.target.value); setNameConfirmed(false); clearFieldError("lastName"); clearFieldError("nameConfirmed"); setAuthError(""); }}
+            style={inputStyle} placeholder="Mensah" />
+          {fieldErrors.lastName ? <p style={styles.fieldError}>{fieldErrors.lastName}</p> : null}
+
+          <div style={{ background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, display: "grid", gap: 7 }}>
+            <span style={{ fontSize: 13, color: "#475569" }}>{t("signupDetails.certificatePreview")}</span>
+            <strong style={{ fontSize: 17, color: "#0f172a" }}>{name || "—"}</strong>
+            <label style={{ display: "flex", gap: 9, alignItems: "flex-start", color: "#334155", fontSize: 13 }}>
+              <input type="checkbox" id="signup-nameConfirmed" checked={nameConfirmed}
+                ref={(element) => { fieldRefs.current.nameConfirmed = element; }}
+                onChange={(event) => { setNameConfirmed(event.target.checked); clearFieldError("nameConfirmed"); }} />
+              {t("signupDetails.confirmOfficialName")}
+            </label>
+            {fieldErrors.nameConfirmed ? <p style={styles.fieldError}>{fieldErrors.nameConfirmed}</p> : null}
+          </div>
 
           <label htmlFor="signup-email" style={styles.label}>{t("signupPage.fields.email")}</label>
           <input
@@ -706,6 +726,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
               fieldRefs.current.email = element;
             }}
             value={email}
+            onBlur={() => setEmail(current => normalizeEmail(current))}
             onChange={(e) => {
               setEmail(e.target.value);
               clearFieldError("email");
@@ -715,6 +736,15 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             placeholder="you@example.com"
           />
           {fieldErrors.email ? <p style={styles.fieldError}>{fieldErrors.email}</p> : null}
+          {suggestedEmail ? (
+            <p style={{ ...styles.helperText, marginTop: -4 }}>
+              {t("signupDetails.emailDidYouMean")} <strong>{suggestedEmail}</strong>{" "}
+              <button type="button" onClick={() => { setEmail(suggestedEmail); clearFieldError("email"); }}
+                style={{ color: "#1d4ed8", background: "none", border: 0, cursor: "pointer", textDecoration: "underline", fontWeight: 700 }}>
+                {t("signupDetails.useSuggestedEmail")}
+              </button>
+            </p>
+          ) : null}
 
           <label htmlFor="signup-password" style={styles.label}>{t("signupPage.fields.password")}</label>
           <div style={{ position: "relative" }}>
@@ -1039,52 +1069,35 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
 
           </fieldset>
           <fieldset aria-label={t("uiLanguageFlow.steps", { returnObjects: true })[2]} disabled={step !== 3 || loading} hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 3 ? "grid" : "none", gap: 12 }}>
-          <label htmlFor="signup-phone" style={styles.label}>{t("signupPage.fields.phone")}</label>
-          <input
-            type="tel"
-            required
-            autoComplete="tel"
-            id="signup-phone"
-            ref={(element) => {
-              fieldRefs.current.phone = element;
-            }}
-            value={phone}
-            onChange={(e) => {
-              setPhone(e.target.value);
-              clearFieldError("phone");
-              setAuthError("");
-            }}
-            style={inputStyle}
-            placeholder="024 123 4567 or +233 24 123 4567"
-          />
-          {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
-
-          <p style={{ ...styles.helperText, marginTop: -4 }}>
-            {t("signupDetails.phonePrivacy")}
-          </p>
-
           <label htmlFor="signup-country" style={styles.label}>{t("signupDetails.countryOfResidence")}</label>
-          <select
-            required
-            autoComplete="country"
-            id="signup-country"
-            name="countryCode"
-            ref={(element) => { fieldRefs.current.countryCode = element; }}
-            value={countryCode}
-            onChange={(event) => {
-              setCountryCode(event.target.value);
-              clearFieldError("countryCode");
-              setAuthError("");
-            }}
-            style={styles.select}
-          >
-            <option value="" disabled>{t("signupDetails.countryPlaceholder")}</option>
-            {countryOptions.map(({ code, label }) => (
-              <option key={code} value={code}>{label}</option>
-            ))}
-          </select>
+          <CountryCombobox
+            id="signup-country" label={t("signupDetails.countryOfResidence")}
+            value={countryCode} locale={locale}
+            onChange={(value) => { setCountryCode(value); clearFieldError("countryCode"); setAuthError(""); }}
+            inputRef={(element) => { fieldRefs.current.countryCode = element; }}
+            inputStyle={inputStyle} error={fieldErrors.countryCode || ""}
+            placeholder={t("signupDetails.searchCountry")}
+          />
           {fieldErrors.countryCode ? <p style={styles.fieldError}>{fieldErrors.countryCode}</p> : null}
           <p style={{ ...styles.helperText, marginTop: -4 }}>{t("signupDetails.countryHelp")}</p>
+
+          <label htmlFor="signup-phone" style={styles.label}>{t("signupPage.fields.phone")}</label>
+          <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+            <span style={{ display: "flex", alignItems: "center", border: "1px solid #cbd5e1", background: "#f8fafc", padding: "0 12px", borderRadius: 10, whiteSpace: "nowrap", fontWeight: 700, color: "#334155" }}>
+              {getCountryDialCode(countryCode) ? `+${getCountryDialCode(countryCode)}` : "+"}
+            </span>
+            <input type="tel" required autoComplete="tel" id="signup-phone"
+              ref={(element) => { fieldRefs.current.phone = element; }}
+              value={phone}
+              onChange={(event) => { setPhone(event.target.value); clearFieldError("phone"); setAuthError(""); }}
+              onBlur={() => setPhone(current => formatNationalPhone(current, countryCode))}
+              style={{ ...inputStyle, flex: 1, minWidth: 0 }}
+              placeholder={getNationalPhonePlaceholder(countryCode)}
+            />
+          </div>
+          {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
+          <p style={{ ...styles.helperText, marginTop: -4 }}>{t("signupDetails.phoneCountryHint")}</p>
+          <p style={{ ...styles.helperText, marginTop: -4 }}>{t("signupDetails.phonePrivacy")}</p>
 
           <label htmlFor="signup-location" style={styles.label}>{t("signupDetails.cityOrTown")}</label>
           <input
@@ -1134,13 +1147,14 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
               fieldRefs.current.emergencyContactPhone = element;
             }}
             value={emergencyContactPhone}
+            onBlur={() => setEmergencyContactPhone(current => formatNationalPhone(current, countryCode))}
             onChange={(e) => {
               setEmergencyContactPhone(e.target.value);
               clearFieldError("emergencyContactPhone");
               setAuthError("");
             }}
             style={inputStyle}
-            placeholder="055 987 6543 or +233 55 987 6543"
+            placeholder={getNationalPhonePlaceholder(countryCode)}
           />
           {fieldErrors.emergencyContactPhone ? (
             <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>

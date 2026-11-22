@@ -12,7 +12,11 @@ import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 import LegalFooter from "./LegalFooter";
 import { changeInterfaceLanguage } from "../i18n";
-import { getCountryOptions, getCountryName, isValidCountryCode } from "../data/countries";
+import { getCountryName, isValidCountryCode } from "../data/countries";
+import CountryCombobox from "./CountryCombobox";
+import { getCountryDialCode, phoneToE164, formatNationalPhone, getNationalPhonePlaceholder } from "../data/phoneCountries";
+import { suggestEmailCorrection } from "../lib/signupEmailHints";
+import { normalizePersonName } from "../lib/signupDataQuality";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const isFullName = (value) => {
@@ -179,7 +183,12 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   // signup-only fields
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [nameConfirmed, setNameConfirmed] = useState(false);
+  const name = normalizePersonName([firstName, middleName, lastName].filter(Boolean).join(" "));
+  const suggestedEmail = mode === "signup" ? suggestEmailCorrection(email) : "";
   const [selectedLevel, setSelectedLevel] = useState("A1");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
@@ -197,7 +206,6 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
   const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
-  const countryOptions = useMemo(() => getCountryOptions(resolvedInterfaceLanguage), [resolvedInterfaceLanguage]);
   const interfaceLanguageOptions = useMemo(
     () => [
       { value: "en", label: t("interfaceLanguages.en") },
@@ -241,19 +249,35 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           setLoading(false);
           return;
         }
+        if (!nameConfirmed) {
+          setAuthError(t("signupDetails.confirmNameRequired"));
+          setLoading(false);
+          return;
+        }
+        const formattedPhone = phoneToE164(phone, countryCode);
+        const formattedEmergency = phoneToE164(emergencyContactPhone, countryCode);
+        if (!formattedPhone || !formattedEmergency || formattedPhone === formattedEmergency) {
+          setAuthError(t("signupDetails.phoneCountryInvalid"));
+          setLoading(false);
+          return;
+        }
         const studentCode = generateStudentCode({ name });
 
         await signup(email, password, {
           name,
+          firstName: normalizePersonName(firstName),
+          middleName: normalizePersonName(middleName),
+          lastName: normalizePersonName(lastName),
+          certificateNameConfirmed: true,
           level: selectedLevel,
           studentCode,
-          phone,
+          phone: formattedPhone,
           location,
           countryCode,
           country: getCountryName(countryCode, "en"),
           address, // ✅ NEW
           learningMode,
-          emergencyContactPhone,
+          emergencyContactPhone: formattedEmergency,
           className,
           contractTermMonths: 6,
         });
@@ -445,29 +469,43 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
           {mode === "signup" && (
             <>
-              <label style={styles.label}>{t("signupPage.fields.name")}</label>
-              <input type="text" required value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
-              <p style={{ ...styles.helperText, marginTop: -4 }}>
-                {t("authUi.nameHint")}
-              </p>
-
-              <label style={styles.label}>{t("authUi.phone")}</label>
-              <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} />
+              <label htmlFor="auth-first-name" style={styles.label}>{t("signupDetails.firstName")}</label>
+              <input type="text" required autoComplete="given-name" id="auth-first-name" value={firstName}
+                onChange={(event) => { setFirstName(event.target.value); setNameConfirmed(false); }} style={inputStyle} />
+              <label htmlFor="auth-middle-name" style={styles.label}>{t("signupDetails.middleName")}</label>
+              <input type="text" autoComplete="additional-name" id="auth-middle-name" value={middleName}
+                onChange={(event) => { setMiddleName(event.target.value); setNameConfirmed(false); }} style={inputStyle} />
+              <label htmlFor="auth-last-name" style={styles.label}>{t("signupDetails.lastName")}</label>
+              <input type="text" required autoComplete="family-name" id="auth-last-name" value={lastName}
+                onChange={(event) => { setLastName(event.target.value); setNameConfirmed(false); }} style={inputStyle} />
+              <div style={{ padding: 12, borderRadius: 10, background: "#f8fafc", border: "1px solid #cbd5e1" }}>
+                <p style={{ margin: "0 0 6px" }}>{t("signupDetails.certificatePreview")}: <strong>{name || "—"}</strong></p>
+                <label style={{ display: "flex", gap: 8, fontSize: 13 }}>
+                  <input type="checkbox" required checked={nameConfirmed} onChange={(event) => setNameConfirmed(event.target.checked)} />
+                  {t("signupDetails.confirmOfficialName")}
+                </label>
+              </div>
 
               <label htmlFor="auth-signup-country" style={styles.label}>{t("signupDetails.countryOfResidence")}</label>
-              <select
-                id="auth-signup-country"
-                autoComplete="country"
-                required
-                value={countryCode}
-                onChange={(event) => setCountryCode(event.target.value)}
-                style={{ ...styles.select, height: 44 }}
-              >
-                <option value="" disabled>{t("signupDetails.countryPlaceholder")}</option>
-                {countryOptions.map(({ code, label }) => (
-                  <option key={code} value={code}>{label}</option>
-                ))}
-              </select>
+              <CountryCombobox
+                id="auth-signup-country" label={t("signupDetails.countryOfResidence")}
+                locale={resolvedInterfaceLanguage} value={countryCode} onChange={setCountryCode}
+                placeholder={t("signupDetails.searchCountry")}
+                inputStyle={{ ...styles.select, height: 44 }}
+              />
+
+              <label htmlFor="auth-phone" style={styles.label}>{t("authUi.phone")}</label>
+              <div style={{ display: "flex", alignItems: "stretch", gap: 8 }}>
+                <span style={{ display: "flex", alignItems: "center", padding: "0 12px", background: "#f8fafc", borderRadius: 10, border: "1px solid #cbd5e1" }}>
+                  {getCountryDialCode(countryCode) ? `+${getCountryDialCode(countryCode)}` : "+"}
+                </span>
+                <input type="tel" required id="auth-phone" autoComplete="tel" value={phone}
+                  onChange={(event) => setPhone(event.target.value)}
+                  onBlur={() => setPhone(current => formatNationalPhone(current, countryCode))}
+                  placeholder={getNationalPhonePlaceholder(countryCode)}
+                  style={{ ...inputStyle, flex: 1, minWidth: 0 }} />
+              </div>
+
               <label style={styles.label}>{t("signupDetails.cityOrTown")}</label>
               <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} style={inputStyle} />
 
@@ -500,6 +538,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             type={mode === "login" ? "text" : "email"}
             required
             value={email}
+            onBlur={() => { if (mode === "signup") setEmail(current => current.trim().toLowerCase()); }}
             onChange={(e) => {
               setEmail(e.target.value);
               setAuthError("");
@@ -508,6 +547,15 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             style={inputStyle}
             placeholder={mode === "login" ? t("authUi.emailOrCodeHint") : undefined}
           />
+          {mode === "signup" && suggestedEmail ? (
+            <p style={styles.helperText}>
+              {t("signupDetails.emailDidYouMean")} <strong>{suggestedEmail}</strong>{" "}
+              <button type="button" onClick={() => setEmail(suggestedEmail)}
+                style={{ border: 0, background: "none", color: "#1d4ed8", textDecoration: "underline", cursor: "pointer" }}>
+                {t("signupDetails.useSuggestedEmail")}
+              </button>
+            </p>
+          ) : null}
 
           <label style={styles.label}>{t("signupPage.fields.password")}</label>
           <div style={{ position: "relative" }}>
@@ -568,6 +616,8 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
               <input
                 type="tel"
                 required
+                onBlur={() => setEmergencyContactPhone(current => formatNationalPhone(current, countryCode))}
+                placeholder={getNationalPhonePlaceholder(countryCode)}
                 value={emergencyContactPhone}
                 onChange={(e) => setEmergencyContactPhone(e.target.value)}
                 style={inputStyle}

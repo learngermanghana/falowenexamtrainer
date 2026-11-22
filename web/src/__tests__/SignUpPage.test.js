@@ -60,7 +60,9 @@ jest.mock("../services/publicClassCatalogService", () => ({
 }));
 
 const fillAccount = async () => {
-  await userEvent.type(screen.getByPlaceholderText("Abigail Mensah"), "Test Learner");
+  await userEvent.type(screen.getByLabelText("First name (given name)"), "Test");
+  await userEvent.type(screen.getByLabelText("Surname / family name"), "Learner");
+  await userEvent.click(screen.getByRole("checkbox", { name: /I confirm this is the correct spelling/ }));
   await userEvent.type(screen.getByPlaceholderText("you@example.com"), "learner@example.com");
   await userEvent.type(screen.getByPlaceholderText("At least 8 characters with letters and numbers"), "password123");
   await userEvent.type(screen.getByPlaceholderText("Enter password again"), "password123");
@@ -75,7 +77,8 @@ const fillContact = async () => {
   await userEvent.type(screen.getByLabelText("Phone number"), "+233241234567");
   await userEvent.type(screen.getByLabelText("Address"), "12 Test Street");
   await userEvent.type(screen.getByLabelText("City / Town"), "Accra");
-  await userEvent.selectOptions(screen.getByLabelText("Country of residence"), "GH");
+  await userEvent.type(screen.getByLabelText("Country of residence"), "Ghana");
+  await userEvent.click(screen.getByRole("option", { name: "Ghana" }));
 };
 
 describe("three-step signup", () => {
@@ -87,7 +90,7 @@ describe("three-step signup", () => {
     expect(screen.queryByRole("textbox", { name: "Phone number" })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /Continue to your learning/ }));
     expect(screen.getByText(/Step 1 of 3/)).toBeVisible();
-    expect(screen.getByText("Enter your first and last name for your certificates.")).toBeVisible();
+    expect(screen.getByText("Enter your first name.")).toBeVisible();
     expect(mockSignup).not.toHaveBeenCalled();
   });
   it("keeps answers when moving back and never creates an account on Continue", async () => {
@@ -98,7 +101,8 @@ describe("three-step signup", () => {
     await userEvent.click(screen.getByRole("button", { name: "Back", exact: true }));
     expect(screen.getByLabelText("Preferred learning mode")).toHaveValue("Online");
     await userEvent.click(screen.getByRole("button", { name: "Back", exact: true }));
-    expect(screen.getByPlaceholderText("Abigail Mensah")).toHaveValue("Test Learner");
+    expect(screen.getByLabelText("First name (given name)")).toHaveValue("Test");
+    expect(screen.getByLabelText("Surname / family name")).toHaveValue("Learner");
     expect(screen.getByPlaceholderText("Enter password again")).toHaveValue("password123");
     expect(mockSignup).not.toHaveBeenCalled();
   });
@@ -111,17 +115,60 @@ describe("three-step signup", () => {
     await userEvent.type(screen.getByLabelText("City / Town"), "Accra");
     const picker = screen.getByLabelText("Country of residence");
     expect(picker).toHaveValue("");
+    await userEvent.click(picker);
     expect(screen.getByRole("option", { name: "Ghana" })).toBeInTheDocument();
+    await userEvent.type(picker, "Ger");
     expect(screen.getByRole("option", { name: "Germany" })).toBeInTheDocument();
+    await userEvent.clear(picker);
     await userEvent.type(screen.getByLabelText("Emergency contact phone"), "+233209876543");
     await userEvent.click(screen.getByRole("checkbox"));
     await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
     expect(await screen.findByText(/Select your country of residence/)).toBeVisible();
     expect(mockSignup).not.toHaveBeenCalled();
-    await userEvent.selectOptions(picker, "GH");
+    await userEvent.type(picker, "Ghana");
+    await userEvent.click(screen.getByRole("option", { name: "Ghana" }));
     await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
     await waitFor(() => expect(mockSignup).toHaveBeenCalledWith(
       "learner@example.com", "password123", expect.objectContaining({ countryCode: "GH", country: "Ghana" }),
+    ));
+  });
+
+  it("shows an official-name preview and clears confirmation after a spelling edit", async () => {
+    render(<SignUpPage />);
+    await userEvent.type(screen.getByLabelText("First name (given name)"), "Ama");
+    await userEvent.type(screen.getByLabelText("Surname / family name"), "Mensah");
+    expect(screen.getByText("Ama Mensah")).toBeVisible();
+    await userEvent.click(screen.getByRole("checkbox", { name: /I confirm this is the correct spelling/ }));
+    expect(screen.getByRole("checkbox", { name: /I confirm this is the correct spelling/ })).toBeChecked();
+    await userEvent.type(screen.getByLabelText("Surname / family name"), "a");
+    expect(screen.getByRole("checkbox", { name: /I confirm this is the correct spelling/ })).not.toBeChecked();
+  });
+
+  it("suggests a common email typo but only changes the address when accepted", async () => {
+    render(<SignUpPage />);
+    const email = screen.getByPlaceholderText("you@example.com");
+    await userEvent.type(email, "student@gmial.com");
+    expect(email).toHaveValue("student@gmial.com");
+    expect(screen.getByText("student@gmail.com")).toBeVisible();
+    await userEvent.click(screen.getByRole("button", { name: "Use this email" }));
+    expect(email).toHaveValue("student@gmail.com");
+  });
+
+  it("converts Nigerian local phone numbers to the correct country code", async () => {
+    render(<SignUpPage />);
+    await fillAccount(); await advanceLearning();
+    await userEvent.type(screen.getByLabelText("Country of residence"), "Nigeria");
+    await userEvent.click(screen.getByRole("option", { name: "Nigeria" }));
+    expect(screen.getByText("+234")).toBeVisible();
+    await userEvent.type(screen.getByLabelText("Phone number"), "0803 123 4567");
+    await userEvent.type(screen.getByLabelText("City / Town"), "Lagos");
+    await userEvent.type(screen.getByLabelText("Address"), "10 Marina");
+    await userEvent.type(screen.getByLabelText("Emergency contact phone"), "0902 123 4567");
+    await userEvent.click(screen.getByRole("checkbox"));
+    await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
+    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith(
+      "learner@example.com", "password123",
+      expect.objectContaining({ countryCode: "NG", phone: "+2348031234567", emergencyContactPhone: "+2349021234567" }),
     ));
   });
 

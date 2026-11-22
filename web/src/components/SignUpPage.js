@@ -101,13 +101,11 @@ const applyMobileFieldEnhancements = (form) => {
   if (!form) return;
   form.setAttribute("autocomplete", "on");
 
-  const nameInput = form.querySelector('[autocomplete="name"]');
-  setAttributes(nameInput, {
-    name: "fullName",
-    inputmode: "text",
-    autocapitalize: "words",
-    enterkeyhint: "next",
-  });
+  for (const [autocomplete, key] of [["given-name", "firstName"], ["additional-name", "middleName"], ["family-name", "lastName"]]) {
+    setAttributes(form.querySelector(`[autocomplete="${autocomplete}"]`), {
+      name: key, inputmode: "text", autocapitalize: "words", enterkeyhint: "next",
+    });
+  }
 
   const emailInput = form.querySelector('[autocomplete="email"]');
   setAttributes(emailInput, {
@@ -177,12 +175,19 @@ const findLevelSelect = (form) =>
 
 const readFormDraft = (form) => ({
   program: form.elements.namedItem("program")?.value || "german",
-  name: form.querySelector('[autocomplete="name"]')?.value || "",
+  name: [
+    form.querySelector('[autocomplete="given-name"]')?.value,
+    form.querySelector('[autocomplete="additional-name"]')?.value,
+    form.querySelector('[autocomplete="family-name"]')?.value,
+  ].filter(Boolean).join(" "),
+  firstName: form.querySelector('[autocomplete="given-name"]')?.value || "",
+  middleName: form.querySelector('[autocomplete="additional-name"]')?.value || "",
+  lastName: form.querySelector('[autocomplete="family-name"]')?.value || "",
   email: form.querySelector('[autocomplete="email"]')?.value || "",
   phone: form.querySelector('[autocomplete="tel"]')?.value || "",
   address: form.querySelector('[autocomplete="street-address"]')?.value || "",
   location: form.querySelector('[autocomplete="address-level2"]')?.value || "",
-  countryCode: form.querySelector('[autocomplete="country"]')?.value || "",
+  countryCode: form.elements.namedItem("countryCode")?.value || "",
   learningMode:
     Array.from(form.querySelectorAll("select")).find((select) =>
       Array.from(select.options).some((option) => option.value === "Hybrid")
@@ -196,12 +201,13 @@ const readFormDraft = (form) => ({
 
 const restoreDraft = (form, draft) => {
   if (!draft) return;
-  setControlValue(form.querySelector('[autocomplete="name"]'), draft.name);
+  setControlValue(form.querySelector('[autocomplete="given-name"]'), draft.firstName);
+  setControlValue(form.querySelector('[autocomplete="additional-name"]'), draft.middleName);
+  setControlValue(form.querySelector('[autocomplete="family-name"]'), draft.lastName);
   setControlValue(form.querySelector('[autocomplete="email"]'), draft.email);
   setControlValue(form.querySelector('[autocomplete="tel"]'), draft.phone);
   setControlValue(form.querySelector('[autocomplete="street-address"]'), draft.address);
   setControlValue(form.querySelector('[autocomplete="address-level2"]'), draft.location);
-  setControlValue(form.querySelector('[autocomplete="country"]'), draft.countryCode);
   setControlValue(
     form.querySelector('[autocomplete="tel-national"]'),
     draft.emergencyContactPhone
@@ -461,7 +467,7 @@ export default function SignUpPage(props) {
   return (
     <div ref={rootRef} className="signup-page-mobile-safe">
       <style>{MOBILE_INPUT_CSS}</style>
-      <SignUpPageLegacy key={universityInvitation?.code || "public-signup"} {...props} initialProgram={initialProgram} invitationCode={universityInvitation?.code || ""} onAccountCreated={handleAccountCreated} />
+      <SignUpPageLegacy key={universityInvitation?.code || "public-signup"} {...props} initialDraft={draft} initialProgram={initialProgram} invitationCode={universityInvitation?.code || ""} onAccountCreated={handleAccountCreated} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} rootRef={rootRef} />, mount) : null}
       <LegalFooter />
     </div>
