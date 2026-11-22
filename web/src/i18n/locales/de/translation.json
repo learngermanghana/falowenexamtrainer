@@ -1884,7 +1884,9 @@
     "error": "Die Anfrage konnte nicht gespeichert werden. Versuche es erneut oder kontaktiere das Team.",
     "signupBoth": "Ich möchte auch {{course}} lernen.",
     "signupNotice": "Dein Hauptkurs beginnt zuerst. Das Team meldet sich wegen des zweiten Kurses; noch keine Anmeldung oder Gebühr.",
-    "placementPending": "Für deinen zweiten Kurs fehlen noch Klasse und Niveau. Bitte kontaktiere die Anmeldung."
+    "placementPending": "Für deinen zweiten Kurs fehlen noch Klasse und Niveau. Bitte kontaktiere die Anmeldung.",
+    "secondaryBillingTitle": "Gebühren für den zweiten Kurs",
+    "secondaryBillingNotice": "Kursgebühren und Zahlungen des zweiten Kurses verwaltet das Falowen-Team getrennt. Hier stehen nur bestätigte Zahlen; es wird keine Zahlung gestartet."
   },
   "resultsOverview": {
     "title": "Ergebnisse",
