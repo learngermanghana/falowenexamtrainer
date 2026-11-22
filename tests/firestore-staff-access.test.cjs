@@ -1,7 +1,7 @@
 const { test, before, after } = require('node:test');
 const fs = require('node:fs');
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require('@firebase/rules-unit-testing');
-const { collection, collectionGroup, doc, getDoc, getDocs, setDoc, deleteDoc } = require('firebase/firestore');
+const { collection, collectionGroup, query, where, doc, getDoc, getDocs, setDoc, deleteDoc } = require('firebase/firestore');
 let env;
 before(async () => {
   env = await initializeTestEnvironment({
@@ -151,4 +151,22 @@ test('profile preferences are owner-only; enrollment and billing grants remain s
     secondaryProgram: 'swahili',
     coursePlacements: { swahili: { level: 'B1', className: 'Swahili-B1' } },
   }, { merge: true }));
+});
+
+test('shared dictionary page queries respect staff language and page assignments', async () => {
+  const notes = context => collection(context.firestore(), 'sharedLanguageDictionary');
+  const assigned = { staff: true, staffPages: ['shared-dictionary'], staffLanguages: ['swahili'] };
+  const swahiliNotes = context => query(notes(context), where('language', 'in', ['swahili']));
+  await assertSucceeds(getDocs(notes(env.authenticatedContext('dictionary-admin', { admin: true }))));
+  const staff = env.authenticatedContext('dictionary-staff', assigned);
+  await assertSucceeds(getDocs(swahiliNotes(staff)));
+  await assertFails(getDocs(notes(staff)));
+  await assertFails(getDocs(query(notes(staff), where('language', 'in', ['german']))));
+  for (const context of [
+    env.authenticatedContext('other-staff', { ...assigned, staffPages: [] }),
+    env.authenticatedContext('learner', { role: 'student' }),
+    env.unauthenticatedContext(),
+  ]) {
+    await assertFails(getDocs(swahiliNotes(context)));
+  }
 });
