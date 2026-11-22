@@ -2001,7 +2001,9 @@
     "signupNotice": "Your main course will start first. Admissions will contact you about the second course; it is not enrolled or charged yet.",
     "placementPending": "Your second course is awaiting an assigned class and level. Contact admissions if this remains unresolved.",
     "secondaryBillingTitle": "Second-course fees",
-    "secondaryBillingNotice": "Tuition and payment details for your second course are managed separately by Falowen admissions. This screen shows confirmed course figures only; no payment is initiated here."
+    "secondaryBillingNotice": "Tuition and payment details for your second course are managed separately by Falowen admissions. This screen shows confirmed course figures only; no payment is initiated here.",
+    "placementPendingLabel": "Awaiting placement",
+    "secondaryAccessLabel": "Second course"
   },
   "resultsOverview": {
     "title": "Results",
