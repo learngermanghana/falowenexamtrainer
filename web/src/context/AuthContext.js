@@ -1,4 +1,4 @@
-import { courseProfile, enrolledCourses } from "../utils/courseEnrollment";
+import { courseProfile, enrolledCourses, readCoursePreference, saveCoursePreference } from "../utils/courseEnrollment";
 import { ReadingStudentContext } from "../services/savedReadingPhrases";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -1184,17 +1184,18 @@ export const AuthProvider = ({ children }) => {
   const [selection, setSelection] = useState(null);
   const linkedCourse = typeof window !== "undefined" && /^#swahili-day-/.test(window.location.hash)
     && window.location.pathname === "/campus/results" && courseOptions.includes("swahili") ? "swahili" : null;
-  const preferred = linkedCourse || (selection?.key === courseKey ? selection.program :
-    typeof window !== "undefined" && window.sessionStorage.getItem(courseKey));
+  const storedCourse = readCoursePreference(user?.uid, courseOptions);
+  const preferred = linkedCourse || (selection?.key === courseKey && courseOptions.includes(selection.program)
+    ? selection.program : storedCourse);
   useEffect(() => {
-    if (linkedCourse && user?.uid) window.sessionStorage.setItem(courseKey, linkedCourse);
-  }, [linkedCourse, user?.uid, courseKey]);
+    if (linkedCourse && user?.uid) saveCoursePreference(user.uid, linkedCourse, courseOptions);
+  }, [linkedCourse, user?.uid, courseOptions]);
   const activeProfile = useMemo(() => courseProfile(studentProfile, preferred), [studentProfile, preferred]);
   const selectCourse = useCallback(program => {
-    if (!courseOptions.includes(program)) return;
-    window.sessionStorage.setItem(courseKey, program);
+    if (!courseOptions.includes(program) || !user?.uid) return;
+    saveCoursePreference(user.uid, program, courseOptions);
     setSelection({ key: courseKey, program });
-  }, [courseKey, courseOptions]);
+  }, [courseKey, courseOptions, user?.uid]);
 
   const value = useMemo(
     () => ({
