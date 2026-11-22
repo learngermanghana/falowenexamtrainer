@@ -46,6 +46,8 @@ export function courseProfile(profile, requested) {
   }
   view.level = placement.level || "";
   view.className = placement.className || "";
+  view.primaryProgram = primaryCourse(profile);
+  view.isSecondaryCourse = true;
   view.coursePlacementPending = !placement.level;
   return view;
 }
