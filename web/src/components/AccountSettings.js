@@ -108,6 +108,14 @@ const AccountSettings = () => {
   const paymentCleared = normalizedPaymentStatus === "paid" || hasClearedBalance(balanceDue);
 
   const billingState = useMemo(() => {
+    if (isSecondaryCourse) {
+      return {
+        key: "secondary", label: t("enrollmentRequest.secondaryBillingTitle"),
+        title: t("enrollmentRequest.secondaryBillingTitle"),
+        body: t("enrollmentRequest.secondaryBillingNotice"),
+        tone: "#1e40af", background: "#eff6ff", border: "#93c5fd",
+      };
+    }
     if (isUniversityRegistration) {
       return {
         key: hasComplimentaryAccess ? "complimentary" : "verification-pending",
@@ -207,9 +215,19 @@ const AccountSettings = () => {
       background: "#fff7ed",
       border: "#fdba74",
     };
-  }, [balanceDue, formatMoney, normalizedPaymentStatus, paidAmount, paymentAttempt, paymentCleared, trialLifecycle.key, trialLifecycle.daysRemaining, trialLifecycle.retentionDaysRemaining, isUniversityRegistration, hasComplimentaryAccess]);
+  }, [balanceDue, formatMoney, normalizedPaymentStatus, paidAmount, paymentAttempt, paymentCleared, trialLifecycle.key, trialLifecycle.daysRemaining, trialLifecycle.retentionDaysRemaining, isUniversityRegistration, hasComplimentaryAccess, isSecondaryCourse, t]);
 
   const accountAccess = useMemo(() => {
+    if (isSecondaryCourse) {
+      return {
+        label: studentProfile?.coursePlacementPending
+          ? t("enrollmentRequest.placementPendingLabel") : t("enrollmentRequest.secondaryAccessLabel"),
+        detail: studentProfile?.coursePlacementPending
+          ? t("enrollmentRequest.placementPending") : t("enrollmentRequest.secondaryBillingNotice"),
+        daysRemaining: null,
+        tone: "#1e40af", background: "#eff6ff", border: "#93c5fd",
+      };
+    }
     if (isUniversityRegistration) {
       return {
         label: hasComplimentaryAccess ? "Active" : "Verification pending",
@@ -286,6 +304,7 @@ const AccountSettings = () => {
     billingState.body,
     billingState.border,
     billingState.tone,
+    isSecondaryCourse, studentProfile?.coursePlacementPending, t,
     paymentCleared,
     isUniversityRegistration,
     hasComplimentaryAccess,
