@@ -1830,6 +1830,7 @@
   "signupDetails": {
     "countryOfResidence": "Pays de résidence",
     "countryPlaceholder": "Sélectionnez votre pays",
+    "cityPlaceholder": "p. ex. Accra, Berlin ou Nairobi",
     "cityOrTown": "Ville / Commune",
     "countryRequired": "Sélectionnez votre pays de résidence.",
     "countryHelp": "Choisissez dans la liste des pays. Aucune vérification supplémentaire n’est nécessaire.",
