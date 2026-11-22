@@ -10,6 +10,13 @@ on:
       - "web/src/components/SignUpPage.js"
       - "web/src/components/SignUpPageLegacy.js"
       - "web/src/lib/signupAuthRecovery.js"
+      - "web/src/lib/signupIdentity.js"
+      - "web/src/lib/signupDuplicateCheck.js"
+      - "web/src/lib/signupIdentity.test.js"
+      - "web/src/lib/signupDuplicateCheck.test.js"
+      - "functions/functionz/signupDuplicateReview.js"
+      - "functions/functionz/paymentAwareApp.js"
+      - "functions/__tests__/signupDuplicateReview.test.js"
       - "web/src/lib/publicFunnelTracking.js"
       - "web/src/__tests__/signupAuthRecovery.test.js"
       - "web/src/__tests__/SignUpPage.test.js"
@@ -26,6 +33,8 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - name: Verify backend duplicate review without Firebase credentials
+        run: node --test functions/__tests__/signupDuplicateReview.test.js
       - name: Apply signup auth recovery safeguards
         run: node scripts/patchPublicSignupAuthRecovery.mjs
       - name: Verify signup auth and WhatsApp support contracts
@@ -35,7 +44,7 @@ jobs:
         run: npm install --legacy-peer-deps --no-audit --no-fund
       - name: Test interrupted signup recovery and application form
         working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/__tests__/signupAuthRecovery.test.js src/__tests__/SignUpPage.test.js
+        run: npx jest --runInBand --runTestsByPath src/__tests__/signupAuthRecovery.test.js src/__tests__/SignUpPage.test.js src/lib/signupIdentity.test.js src/lib/signupDuplicateCheck.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
