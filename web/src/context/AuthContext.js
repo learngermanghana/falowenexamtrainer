@@ -5,6 +5,7 @@ import {
   auth,
   createUserWithEmailAndPassword,
   onIdTokenChanged,
+  sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -753,6 +754,14 @@ export const AuthProvider = ({ children }) => {
         provider: "password",
         meta: { isSignup: true },
       });
+      // Send verification after the student profile has been saved. Email
+      // delivery must never turn a successfully enrolled student into a failed signup.
+      // Learners can resend from Account → Documents if delivery is throttled.
+      if (credential.user.email && !credential.user.emailVerified) {
+        sendEmailVerification(credential.user, getActionCodeSettings()).catch((error) => {
+          console.warn("Learner verification email could not be sent", error?.code || error?.message);
+        });
+      }
       return { studentCode, paystackLink: payload.paystackLink };
     },
     [logLoginSession]
