@@ -1063,25 +1063,6 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             {t("signupDetails.phonePrivacy")}
           </p>
 
-          <label htmlFor="signup-address" style={styles.label}>{t("signupPage.fields.address")}</label>
-          <textarea
-            required
-            autoComplete="street-address"
-            id="signup-address"
-            ref={(element) => {
-              fieldRefs.current.address = element;
-            }}
-            value={address}
-            onChange={(event) => {
-              setAddress(event.target.value);
-              clearFieldError("address");
-              setAuthError("");
-            }}
-            style={{ ...styles.textArea, minHeight: 80 }}
-            placeholder={t("signupDetails.addressHint")}
-          />
-          {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
-
           <label htmlFor="signup-country" style={styles.label}>{t("signupDetails.countryOfResidence")}</label>
           <select
             required
@@ -1120,9 +1101,28 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
               clearFieldError("location");
             }}
             style={inputStyle}
-            placeholder="Berlin"
+            placeholder={t("signupDetails.cityPlaceholder")}
           />
           {fieldErrors.location ? <p style={styles.fieldError}>{fieldErrors.location}</p> : null}
+
+          <label htmlFor="signup-address" style={styles.label}>{t("signupPage.fields.address")}</label>
+          <textarea
+            required
+            autoComplete="street-address"
+            id="signup-address"
+            ref={(element) => {
+              fieldRefs.current.address = element;
+            }}
+            value={address}
+            onChange={(event) => {
+              setAddress(event.target.value);
+              clearFieldError("address");
+              setAuthError("");
+            }}
+            style={{ ...styles.textArea, minHeight: 80 }}
+            placeholder={t("signupDetails.addressHint")}
+          />
+          {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
 
           <label htmlFor="signup-emergencyContactPhone" style={styles.label}>{t("signupPage.fields.emergencyContactPhone")}</label>
           <input
