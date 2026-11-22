@@ -20,6 +20,9 @@ on:
       - "web/src/components/CountryCombobox.jsx"
       - "web/src/lib/signupEmailHints.js"
       - "web/src/lib/signupEmailHints.test.js"
+      - "web/src/lib/signupContactValidation.js"
+      - "web/src/lib/signupContactValidation.test.js"
+      - "docs/student-self-service-documents.md"
       - "web/src/i18n/locales/**"
       - "web/src/lib/signupAuthRecovery.js"
       - "web/src/lib/signupIdentity.js"
@@ -56,7 +59,7 @@ jobs:
         run: npm install --legacy-peer-deps --no-audit --no-fund
       - name: Test interrupted signup recovery and application form
         working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/__tests__/signupAuthRecovery.test.js src/__tests__/SignUpPage.test.js src/lib/signupIdentity.test.js src/lib/signupDuplicateCheck.test.js src/data/countries.test.js src/data/phoneCountries.test.js src/lib/signupEmailHints.test.js
+        run: npx jest --runInBand --runTestsByPath src/__tests__/signupAuthRecovery.test.js src/__tests__/SignUpPage.test.js src/lib/signupIdentity.test.js src/lib/signupDuplicateCheck.test.js src/data/countries.test.js src/data/phoneCountries.test.js src/lib/signupEmailHints.test.js src/lib/signupContactValidation.test.js
       - name: Test learner document email verification UI
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/components/StudentDocumentsPanel.test.jsx

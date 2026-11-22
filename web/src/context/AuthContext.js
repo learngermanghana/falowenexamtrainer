@@ -41,6 +41,7 @@ import {
 import { getBackendUrl } from "../services/backendUrl";
 import { createOrResumeSignupAccount } from "../lib/signupAuthRecovery";
 import { checkSignupDuplicate } from "../lib/signupDuplicateCheck";
+import { areSameContactNumber } from "../lib/signupContactValidation";
 import { canonicalEmail, canonicalName, canonicalPhone } from "../lib/signupIdentity";
 import { isUniversityInvitationOpen, resolveUniversityInvitation } from "../lib/universityInvitations";
 import { getDocFromServer } from "firebase/firestore";
@@ -612,6 +613,14 @@ export const AuthProvider = ({ children }) => {
       }
 
       const normalizedEmail = email.trim().toLowerCase();
+      // Enforce the same rule here even if a signup UI is bypassed. Comparing
+      // the E.164 forms catches 024... versus +23324... and + versus 00.
+      // Do this before the network duplicate check or creating an Auth user.
+      if (areSameContactNumber(profile.phone, profile.emergencyContactPhone, profile.countryCode)) {
+        const error = new Error("Use a different emergency contact phone number from your own.");
+        error.code = "auth/emergency-contact-matches-student";
+        throw error;
+      }
       // Fail closed before making a new Firebase Auth user, so an alternate email
       // cannot silently create another student profile using the same phone.
       await checkSignupDuplicate({
