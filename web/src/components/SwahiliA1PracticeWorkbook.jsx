@@ -55,7 +55,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
         <h1>{lesson.chapter} · {lesson.title}</h1>
         <p>{lesson.objective}</p>
       </header>
-      {aiLecture && (
+      {aiLecture && aiLecture.placement !== "grammar" && (
         <section className="swahili-book__tile" aria-labelledby={lectureHeadingId}>
           <h2 id={lectureHeadingId}>{aiLecture.title}</h2>
           <iframe title={aiLecture.title} loading="lazy" allowFullScreen
@@ -91,6 +91,13 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
         </>}
         {activeTab === "grammar" && <>
           <h2>Sarufi · {lesson.grammar}</h2>
+          {aiLecture?.placement === "grammar" && <section className="swahili-book__tile" aria-labelledby={lectureHeadingId}>
+            <h3 id={lectureHeadingId}>{aiLecture.title}</h3>
+            <iframe title={aiLecture.title} loading="lazy" allowFullScreen
+              style={{ width: "100%", aspectRatio: "16 / 9", border: 0 }}
+              src={`https://www.youtube-nocookie.com/embed/${aiLecture.youtubeId}`} />
+            <a href={`https://youtu.be/${aiLecture.youtubeId}`} target="_blank" rel="noreferrer">Tazama kwenye YouTube</a>
+          </section>}
           {grammarSections.map(({ title, rule, examples }) => (
             <section key={title || rule} className="swahili-book__activity">
               {title && <h3>{title}</h3>}

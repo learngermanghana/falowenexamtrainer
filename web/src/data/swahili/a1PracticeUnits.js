@@ -1382,6 +1382,17 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 11,
     "chapter": "Somo la 11",
     "title": "Dukani",
+    "aiLecture": {
+      "title": "Video ya AI · Dukani",
+      "youtubeId": "4DpZGme4Bu4",
+      "placement": "grammar"
+    },
+    "radio": {
+      "resourceRole": "falowenRadio",
+      "youtubeId": "_eSAXWecsgY",
+      "title": "Falowen Radio · Dukani",
+      "instruction": "Sikiliza kipindi kuhusu kununua dukani. This podcast is separate from the Teil 4 listening recording."
+    },
     "objective": "Ask what is in stock, choose a product and pay at a shop counter.",
     "grammar": "Stock questions, Ki-/Vi- agreement and paying",
     "practiceOnly": false,
