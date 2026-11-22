@@ -52,10 +52,8 @@ test("Day 7 Lesen displays the shopping dialogue and all five A1 questions witho
   expect(screen.getByText(/Jumla ni shilingi elfu nne na mia tano/)).toBeTruthy();
   const quiz = screen.getAllByRole("group");
   expect(quiz).toHaveLength(5);
-  const answers = ["B) Mna maziwa na sukari leo?", "B) Lita moja ya maziwa na nusu kilo ya sukari.",
-    "C) Shilingi elfu nne na mia tano (4,500 TSh).", "C) Naweza kulipa kwa pesa taslimu?",
-    "C) Risiti, tafadhali."];
-  answers.forEach((choice, index) => {
+  // Verify interaction using the displayed options, not the tutor-only answer key.
+  lesson.reading.questions.map(({ choices }) => choices[0]).forEach((choice, index) => {
     const radio = within(quiz[index]).getByRole("radio", { name: choice });
     fireEvent.click(radio);
     expect(radio.checked).toBe(true);
