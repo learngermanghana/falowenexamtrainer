@@ -4,7 +4,7 @@
 // Never return matched names, emails, phone numbers, codes, or record counts.
 const REVIEW_MESSAGE = "We need to verify these registration details before creating a new account. If you already study with Falowen, log in or recover your password. Otherwise, contact admissions at info@falowen.app. If your family shares a number, admissions can review it.";
 const WINDOW_MS = 15 * 60 * 1000;
-const MAX_REQUESTS = 12;
+const MAX_REQUESTS = 30;
 const attemptsByIp = new Map();
 
 function digits(value) {
@@ -66,7 +66,7 @@ function matchesExisting(application, student) {
   const existing = student || {};
   const email = canonicalEmail(application.email);
   const primary = canonicalPhone(application.phone);
-  const emergency = canonicalPhone(application.emergency);
+  const emergency = canonicalPhone(application.emergency || application.emergencyContactPhone);
   const name = canonicalName(application.name);
   const studentEmail = canonicalEmail(existing.email || existing.authEmail || existing.emailIdentity);
   const studentPhone = canonicalPhone(existing.phone || existing.phoneNumber || existing.mobile || existing.phoneIdentity);
