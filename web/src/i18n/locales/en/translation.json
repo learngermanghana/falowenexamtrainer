@@ -1858,7 +1858,14 @@
     "terms": "terms",
     "privacy": "privacy policy",
     "swahiliSubtitle": "Your Kiswahili learning space",
-    "publishedLessons": "Published lessons"
+    "publishedLessons": "Published lessons",
+    "resume": {
+      "title": "Continue your application",
+      "description": "Your non-password details are saved on this device. Continue below or ask us to help you finish.",
+      "help": "What do you need help with? (optional)",
+      "placeholder": "For example: I cannot choose a class, or Continue does not work. Do not include passwords.",
+      "whatsapp": "Contact Admissions Support on WhatsApp"
+    }
   },
   "homeAccess": {
     "welcomeBack": "Welcome back, {{name}}.",
