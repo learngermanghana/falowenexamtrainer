@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { loadSwahiliSubmissions } from "../utils/swahiliSubmissions";
 import { Link, useLocation } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
@@ -16,6 +17,7 @@ const lessons = [
 ];
 
 export default function SwahiliResults({ uid }) {
+  const { t } = useTranslation();
   const { hash } = useLocation();
   const [rows, setRows] = useState(null);
   const [failed, setFailed] = useState(false);
@@ -63,23 +65,23 @@ export default function SwahiliResults({ uid }) {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>Results</h2>
-        {failed && <p role="alert">Could not load your results. Refresh the page to try again.</p>}
-        {!rows && !failed && <p role="status">Loading your results…</p>}
-        {rows && <p style={styles.helperText}>{results.length} marked · {passed} passed · {pending.length} awaiting a score</p>}
+        <h2 style={styles.sectionTitle}>{t("resultsOverview.title")}</h2>
+        {failed && <p role="alert">{t("resultsOverview.refreshError")}</p>}
+        {!rows && !failed && <p role="status">{t("resultsOverview.loading")}</p>}
+        {rows && <p style={styles.helperText}>{t("resultsOverview.swSummary", { marked: results.length, passed, pending: pending.length })}</p>}
         {results.length > 0 && <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 12, padding: "12px 14px" }}>
-          <strong>Your marked-work overview</strong>
-          <p style={styles.helperText}>Average score: {Math.round(results.reduce((total, item) => total + item.score, 0) / results.length)}% · Pass mark: {PASS_MARK}%</p>
+          <strong>{t("resultsOverview.overview")}</strong>
+          <p style={styles.helperText}>{t("resultsOverview.swAverage", { average: Math.round(results.reduce((total, item) => total + item.score, 0) / results.length), passMark: PASS_MARK })}</p>
         </div>}
-        {rows?.length === 0 && <p>Your submitted workbooks will appear here.</p>}
+        {rows?.length === 0 && <p>{t("resultsOverview.swEmpty")}</p>}
       </section>
       {results.length > 0 && <ResultHistory results={results} focusedResultId={hash.slice(1)} />}
       {pending.map(({ day, title, review }) => (
         <article id={day === 28 ? "swahili-b1-day-28" : `swahili-day-${day}`} key={day} style={styles.resultCard}>
-          <h3>Day {day} · {title}</h3>
-          <p>{review?.status === "needs_revision" ? "Revision needed" : review ? "Reviewed" : "Awaiting tutor review"}</p>
+          <h3>{t("resultsOverview.day", { day })} · {title}</h3>
+          <p>{review?.status === "needs_revision" ? t("resultsOverview.revisionNeeded") : review ? t("resultsOverview.reviewed") : t("resultsOverview.awaitingTutor")}</p>
           {review?.feedback && <p style={{ whiteSpace: "pre-wrap" }}>{review.feedback}</p>}
-          {review?.status === "needs_revision" && <Link to={`/campus/course/swahili/${day === 28 ? "b1/day-28" : `day-${day}`}?view=submit`}>Revise submission</Link>}
+          {review?.status === "needs_revision" && <Link to={`/campus/course/swahili/${day === 28 ? "b1/day-28" : `day-${day}`}?view=submit`}>{t("resultsOverview.revise")}</Link>}
         </article>
       ))}
     </div>
