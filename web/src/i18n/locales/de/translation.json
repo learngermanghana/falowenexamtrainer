@@ -1826,6 +1826,7 @@
   "signupDetails": {
     "countryOfResidence": "Wohnsitzland",
     "countryPlaceholder": "Land auswählen",
+    "cityPlaceholder": "z. B. Accra, Berlin oder Nairobi",
     "cityOrTown": "Stadt / Ort",
     "countryRequired": "Bitte wähle dein Wohnsitzland aus.",
     "countryHelp": "Wähle ein Land aus der Liste. Keine zusätzliche Verifizierung erforderlich.",
