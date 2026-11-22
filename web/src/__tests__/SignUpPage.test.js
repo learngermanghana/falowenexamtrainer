@@ -74,7 +74,8 @@ const advanceLearning = async () => {
 const fillContact = async () => {
   await userEvent.type(screen.getByLabelText("Phone number"), "+233241234567");
   await userEvent.type(screen.getByLabelText("Address"), "12 Test Street");
-  await userEvent.type(screen.getByLabelText("Location"), "Accra");
+  await userEvent.type(screen.getByLabelText("City / Town"), "Accra");
+  await userEvent.selectOptions(screen.getByLabelText("Country of residence"), "GH");
 };
 
 describe("three-step signup", () => {
@@ -101,6 +102,29 @@ describe("three-step signup", () => {
     expect(screen.getByPlaceholderText("Enter password again")).toHaveValue("password123");
     expect(mockSignup).not.toHaveBeenCalled();
   });
+  it("requires choosing a country and provides offline country options", async () => {
+    render(<SignUpPage />);
+    await fillAccount();
+    await advanceLearning();
+    await userEvent.type(screen.getByLabelText("Phone number"), "+233241234567");
+    await userEvent.type(screen.getByLabelText("Address"), "12 Test Street");
+    await userEvent.type(screen.getByLabelText("City / Town"), "Accra");
+    const picker = screen.getByLabelText("Country of residence");
+    expect(picker).toHaveValue("");
+    expect(screen.getByRole("option", { name: "Ghana" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Germany" })).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText("Emergency contact phone"), "+233209876543");
+    await userEvent.click(screen.getByRole("checkbox"));
+    await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
+    expect(await screen.findByText(/Select your country of residence/)).toBeVisible();
+    expect(mockSignup).not.toHaveBeenCalled();
+    await userEvent.selectOptions(picker, "GH");
+    await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
+    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith(
+      "learner@example.com", "password123", expect.objectContaining({ countryCode: "GH", country: "Ghana" }),
+    ));
+  });
+
   it("requires emergency contact before creating the trial", async () => {
     render(<SignUpPage />);
     await fillAccount(); await advanceLearning(); await fillContact();
@@ -110,7 +134,7 @@ describe("three-step signup", () => {
     expect(mockSignup).not.toHaveBeenCalled();
     await userEvent.type(screen.getByLabelText("Emergency contact phone"), "+233209876543");
     await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
-    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith("learner@example.com", "password123", expect.objectContaining({ program: "german", className: "A1 Test Class", phone: "+233241234567", address: "12 Test Street", location: "Accra", learningMode: "Online", emergencyContactPhone: "+233209876543", paymentStatus: "pending", initialPaymentAmount: 0, trialStatus: "active" })));
+    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith("learner@example.com", "password123", expect.objectContaining({ program: "german", className: "A1 Test Class", phone: "+233241234567", address: "12 Test Street", location: "Accra", countryCode: "GH", country: "Ghana", learningMode: "Online", emergencyContactPhone: "+233209876543", paymentStatus: "pending", initialPaymentAmount: 0, trialStatus: "active" })));
   });
   it("recognizes Hamburg invitation and registers without trial, payment or a manual code", async () => {
     window.history.replaceState({}, "", "/signup?invite=UH-KISWAHILI-A1&program=german&level=B1");
