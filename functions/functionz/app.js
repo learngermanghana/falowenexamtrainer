@@ -517,6 +517,14 @@ async function requireAuthenticatedUser(req, res, { allowGuest = true } = {}) {
   return authedUser;
 }
 
+// Server-only, identity-bound academic document export; no student identity is accepted from request payloads.
+require("./studentDocuments").registerStudentDocumentRoutes(app, {
+  requireAuthenticatedUser,
+  getFirestoreSafe,
+  findAuthedStudentProfile,
+  enforceUserQuota,
+});
+
 const C2_MEDIA_ACTIVE_STATUSES = new Set([
   "active",
   "paid",
