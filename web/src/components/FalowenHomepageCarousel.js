@@ -29,11 +29,82 @@ const WORDING = {
   ]
 };
 
+const SW_CAROUSEL_COPY = [
+  {
+    "kicker": "JIFUNZE LUGHA MTANDAONI",
+    "title": "Jifunze Kijerumani na Kiswahili",
+    "accent": "kupitia Falowen.",
+    "desc": "Hudhuria darasa la Kijerumani au anza Kiswahili kwa kitabu cha A1 mtandaoni. Chagua lugha unayojifunza unapojisajili.",
+    "action": "Jisajili",
+    "support": "Tazama madarasa ya Kijerumani"
+  },
+  {
+    "kicker": "MUZIKI WA FALOWEN",
+    "title": "Jifunze kwa",
+    "accent": "muziki.",
+    "desc": "Sikiliza nyimbo za Kijerumani na Kiswahili. Fuata maneno na ufanye mazoezi ya matamshi.",
+    "action": "Nyimbo za Kijerumani",
+    "support": "Nyimbo za Kiswahili"
+  },
+  {
+    "kicker": "MTIHANI WA KIWANGO BILA MALIPO",
+    "title": "Tambua",
+    "accent": "kiwango chako.",
+    "desc": "Unajua Kijerumani au Kiswahili kidogo? Chagua lugha na fanya mtihani wa kiwango A1–B1 bila malipo.",
+    "action": "Fanya mtihani wa kiwango"
+  },
+  {
+    "kicker": "MAZOEZI YA MITIHANI YA GOETHE",
+    "title": "Jiandae kwa",
+    "accent": "mtihani wa Kijerumani.",
+    "desc": "Fanya mazoezi ya kusoma, kusikiliza, kuandika na kuzungumza kwa mitihani ya mfano yenye mrejesho wa AI.",
+    "action": "Tazama mazoezi ya mitihani"
+  },
+  {
+    "kicker": "VITABU VYA FALOWEN",
+    "title": "Jifunze zaidi kwa",
+    "accent": "vitabu vya Kijerumani.",
+    "desc": "Chunguza vitabu vya mazoezi vya Falowen vya kidijitali au vilivyochapishwa.",
+    "action": "Tazama vitabu vya Kijerumani"
+  },
+  {
+    "kicker": "FALOWEN KATIKA CHATGPT",
+    "title": "Jifunze Kijerumani",
+    "accent": "kwa ChatGPT.",
+    "desc": "Unganisha akaunti yako ya Falowen ili upate msaada wa kazi, mrejesho na maandalizi ya darasa lijalo.",
+    "action": "Tumia Falowen na ChatGPT"
+  }
+];
+WORDING.sw = WORDING.en.map((slide, index) => ({ ...slide, ...SW_CAROUSEL_COPY[index] }));
+
 const CLASS_COPY = {
   en: { title:"Find your next class", label:"NEXT INTAKE", generic:"Start your German journey", desc:"A clear foundation. A tutor to guide you.", date:"Next intake", schedule:"Class schedule", format:"Learning format", online:"Live online classes", zone:"Time zone", pending:"See available classes", times:"View meeting times", cta:"View class details & register", other:"Already learning German?", explore:"Explore classes", loading:"Loading upcoming classes…", benefits:["Live online lessons","Lesson recordings","Structured workbooks"] },
   de: { title:"Finde deinen nächsten Kurs", label:"NÄCHSTER KURSSTART", generic:"Starte deine Deutschreise", desc:"Eine klare Grundlage. Begleitung durch eine Lehrkraft.", date:"Kursstart", schedule:"Unterrichtszeiten", format:"Unterrichtsform", online:"Live-Online-Unterricht", zone:"Zeitzone", pending:"Verfügbare Kurse ansehen", times:"Unterrichtszeiten ansehen", cta:"Kursdetails & Anmeldung", other:"Du lernst bereits Deutsch?", explore:"Kurse entdecken", loading:"Kurse werden geladen…", benefits:["Live-Online-Unterricht","Aufzeichnungen","Arbeitsbücher"] },
   fr: { title:"Trouvez votre prochain cours", label:"PROCHAINE RENTRÉE", generic:"Commencez votre parcours en allemand", desc:"Des bases solides. Un enseignant pour vous guider.", date:"Début du cours", schedule:"Horaires", format:"Format", online:"Cours en direct en ligne", zone:"Fuseau horaire", pending:"Voir les cours disponibles", times:"Voir les horaires", cta:"Détails du cours et inscription", other:"Vous apprenez déjà l’allemand ?", explore:"Explorer les cours", loading:"Chargement des cours…", benefits:["Cours en direct","Enregistrements","Cahiers structurés"] },
 };
+
+CLASS_COPY.sw = { ...CLASS_COPY.en, ...{
+  "title": "Tafuta darasa lako lijalo",
+  "label": "DARASA LIJALO",
+  "generic": "Anza kujifunza Kijerumani",
+  "desc": "Msingi mzuri. Mwalimu atakayekuongoza.",
+  "date": "Tarehe ya kuanza",
+  "schedule": "Ratiba ya darasa",
+  "format": "Njia ya kujifunza",
+  "online": "Madarasa ya moja kwa moja mtandaoni",
+  "zone": "Saa za eneo",
+  "pending": "Tazama madarasa yaliyopo",
+  "times": "Tazama saa za masomo",
+  "cta": "Tazama taarifa na ujisajili",
+  "other": "Tayari unajifunza Kijerumani?",
+  "explore": "Chunguza madarasa",
+  "loading": "Inapakia madarasa...",
+  "benefits": [
+    "Masomo ya moja kwa moja",
+    "Video za masomo",
+    "Vitabu vya mazoezi"
+  ]
+} };
 
 function UpcomingClassCard({ language }) {
   const [classes, setClasses] = useState(null);
