@@ -392,7 +392,7 @@ const GermanResults = () => {
               {leaderboard && myLeaderboardEntry
                 ? t("resultsOverview.rankExplanation", { score: myLeaderboardEntry.totalScore ?? "–", completed: myLeaderboardEntry.completedCount || 0, total: leaderboardTotal, minimum: qualificationMinimum })
                 : leaderboard
-                ? `You need at least ${qualificationMinimum} completed assignments to qualify for ranking.`
+                ? t("resultsOverview.qualification", { count: qualificationMinimum })
                 : t("resultsOverview.leaderboardPending")}
             </p>
           </>
