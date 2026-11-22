@@ -1746,10 +1746,11 @@
     "publishedLessons": "Veröffentlichte Lektionen",
     "resume": {
       "title": "Registrierung fortsetzen",
-      "description": "Deine Angaben außer dem Passwort sind auf diesem Gerät gespeichert. Fahre fort oder bitte uns um Hilfe.",
+      "description": "Deine Angaben außer dem Passwort sind auf diesem Gerät gespeichert. Fülle das Formular unten aus, um deine Anmeldung fortzusetzen.",
       "help": "Wobei brauchst du Hilfe? (optional)",
       "placeholder": "Zum Beispiel: Ich kann keinen Kurs auswählen. Bitte keine Passwörter angeben.",
-      "whatsapp": "Zulassungsberatung per WhatsApp kontaktieren"
+      "whatsapp": "Zulassungsberatung per WhatsApp kontaktieren",
+      "whatsappOptional": "Hilfe bei Formular oder Anmeldung? WhatsApp ist freiwillig und nur für administrative Unterstützung gedacht."
     }
   },
   "homeAccess": {
