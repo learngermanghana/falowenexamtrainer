@@ -1939,6 +1939,7 @@
     "learningMode": "Learning mode"
   },
   "signupDetails": {
+    "emergencyMustDiffer": "Your emergency contact must have a different phone number from yours. Please enter another person's number.",
     "firstName": "First name (given name)",
     "middleName": "Middle name (optional)",
     "lastName": "Surname / family name",
