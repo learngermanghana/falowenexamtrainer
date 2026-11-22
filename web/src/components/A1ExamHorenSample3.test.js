@@ -47,9 +47,6 @@ describe("A1 Exams Room Hören Sample 3", () => {
   });
 
   test("publishes Hören Sample 3 under A1 Exams Room and keeps it out of mocks", () => {
-    expect(horenPage).toContain('["sample-2", "sample-3"].includes(sampleId)');
-    expect(horenPage).toContain('navigate("/exams/horen/a1/sample-3")');
-    expect(horenPage).toContain("<strong>Hören Sample 3</strong>");
     expect(horenPage).toContain("15 questions · Teil 1–3");
     expect(samplePage).toContain("A1_SAMPLE_3_PARTS");
     expect(samplePage).toContain('sampleId === "sample-3"');

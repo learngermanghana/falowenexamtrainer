@@ -6,6 +6,7 @@ const keys=Object.freeze({
   "mock-04":require("./a2Mock04HoerenKeys"),
   "mock-05":require("./a2Mock05HoerenKeys"),
   "mock-06":require("./a2Mock06HoerenKeys"),
+  "mock-08":require("./a2Mock08HoerenKeys"),
   "mock-07":require("./a2Mock07HoerenKeys"),
 });
 function gradeA2HoerenOnly({mockId,answers}={}){

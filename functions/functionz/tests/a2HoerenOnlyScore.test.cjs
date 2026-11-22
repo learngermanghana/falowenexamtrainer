@@ -7,6 +7,7 @@ const keys={
   "mock-04":require("../a2Mock04HoerenKeys"),
   "mock-05":require("../a2Mock05HoerenKeys"),
   "mock-06":require("../a2Mock06HoerenKeys"),
+  "mock-08":require("../a2Mock08HoerenKeys"),
   "mock-07":require("../a2Mock07HoerenKeys"),
 };
 for(const [mockId,answers] of Object.entries(keys)){
@@ -23,7 +24,7 @@ for(const [mockId,answers] of Object.entries(keys)){
   });
 }
 test("Unpublished mock IDs, malformed keys and values do not receive scores",()=>{
-  assert.throws(()=>gradeA2HoerenOnly({mockId:"mock-08",answers:keys["mock-07"]}),/Unknown/);
+  assert.throws(()=>gradeA2HoerenOnly({mockId:"mock-09",answers:keys["mock-07"]}),/Unknown/);
   assert.throws(()=>gradeA2HoerenOnly({mockId:"mock-05",answers:{...keys["mock-05"],extra:"a"}}),/20/);
   assert.throws(()=>gradeA2HoerenOnly({mockId:"mock-05",answers:{...keys["mock-05"],1:"__proto__"}}),/Invalid/);
 });
