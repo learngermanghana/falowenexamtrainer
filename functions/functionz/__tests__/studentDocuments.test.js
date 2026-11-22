@@ -51,6 +51,17 @@ describe("student-only document download API", () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
+  test("rejects unverified learner tokens even when the student record matches", async () => {
+    const handler = makeHandler({
+      authenticated: { uid: "uid-1", email: "student@example.com", email_verified: false },
+    });
+    const res = makeResponse();
+    await handler({ params: { kind: "transcript" }, body: { level: "A1" } }, res);
+    expect(res.code).toBe(403);
+    expect(res.payload.error).toMatch(/verify.*email/i);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
   test("the browser cannot choose another person's student code or email", async () => {
     const handler = makeHandler();
     global.fetch.mockResolvedValue({
