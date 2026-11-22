@@ -16,6 +16,7 @@ import { getCountryName, isValidCountryCode } from "../data/countries";
 import CountryCombobox from "./CountryCombobox";
 import { getCountryDialCode, phoneToE164, formatNationalPhone, getNationalPhonePlaceholder } from "../data/phoneCountries";
 import { suggestEmailCorrection } from "../lib/signupEmailHints";
+import { areSameContactNumber } from "../lib/signupContactValidation";
 import { normalizePersonName } from "../lib/signupDataQuality";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
@@ -196,6 +197,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [address, setAddress] = useState(""); // ✅ NEW
   const [learningMode, setLearningMode] = useState("Online"); // Online | In-person | Hybrid
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
+  const duplicateContactNumber = areSameContactNumber(phone, emergencyContactPhone, countryCode);
   const [className, setClassName] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -256,8 +258,15 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         }
         const formattedPhone = phoneToE164(phone, countryCode);
         const formattedEmergency = phoneToE164(emergencyContactPhone, countryCode);
-        if (!formattedPhone || !formattedEmergency || formattedPhone === formattedEmergency) {
+        if (!formattedPhone || !formattedEmergency) {
           setAuthError(t("signupDetails.phoneCountryInvalid"));
+          setLoading(false);
+          return;
+        }
+        if (duplicateContactNumber) {
+          const errorMessage = t("signupDetails.emergencyMustDiffer");
+          setAuthError(errorMessage);
+          showToast(errorMessage, "error");
           setLoading(false);
           return;
         }
@@ -622,6 +631,11 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 onChange={(e) => setEmergencyContactPhone(e.target.value)}
                 style={inputStyle}
               />
+              {duplicateContactNumber ? (
+                <p role="alert" style={{ ...styles.helperText, marginTop: -4, color: "#b91c1c" }}>
+                  {t("signupDetails.emergencyMustDiffer")}
+                </p>
+              ) : null}
 
               <label style={styles.label}>{t("authUi.className")}</label>
               <input
