@@ -323,7 +323,9 @@
     "signupNotice": "Utaanza kozi kuu kwanza. Timu ya usajili itawasiliana nawe kuhusu kozi ya pili; bado hakuna usajili au ada.",
     "placementPending": "Kozi yako ya pili inasubiri darasa na kiwango. Wasiliana na timu ya usajili.",
     "secondaryBillingTitle": "Ada za kozi ya pili",
-    "secondaryBillingNotice": "Ada na malipo ya kozi yako ya pili husimamiwa tofauti na timu ya usajili ya Falowen. Hapa tunaonyesha kiasi kilichothibitishwa pekee; hakuna malipo yanayoanzishwa."
+    "secondaryBillingNotice": "Ada na malipo ya kozi yako ya pili husimamiwa tofauti na timu ya usajili ya Falowen. Hapa tunaonyesha kiasi kilichothibitishwa pekee; hakuna malipo yanayoanzishwa.",
+    "placementPendingLabel": "Inasubiri kupangiwa darasa",
+    "secondaryAccessLabel": "Kozi ya pili"
   },
   "resultsOverview": {
     "title": "Matokeo",
