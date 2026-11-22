@@ -1824,6 +1824,7 @@
     "learningMode": "Lernform"
   },
   "signupDetails": {
+    "emergencyMustDiffer": "Die Notfallkontaktperson muss eine andere Telefonnummer als du haben. Bitte gib die Nummer einer anderen Person ein.",
     "firstName": "Vorname",
     "middleName": "Zweiter Vorname (optional)",
     "lastName": "Nachname / Familienname",
