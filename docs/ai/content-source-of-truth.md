@@ -36,6 +36,10 @@ Run `node scripts/checkAiDocumentation.mjs`. It validates required sources, inte
 
 ## Kiswahili Course Book layout
 
+Kiswahili A1 Day 4 (**Nchi na Lugha**) replaces its old three-question short-answer Lesen with the instructor-supplied Amina–John countries/languages dialogue and five four-option multiple-choice questions. Hören now has five four-option questions based on the teacher-provided Kenya–Tanzania conversation and reads the private R2 key `swahili/A1/day-04/day-04.mp3` only through the existing Firebase-authenticated, fixed-key signed-audio endpoint `/api/course-media/swahili/a1/day-4/audio-url`. The learner workbook contains question prompts and options but no correct-answer key or public audio object URL. New Day 4 submissions use `readingVersion: 2`, so Admin applies the revised tutor key and includes listening; existing unversioned submissions retain the old three-question reading reference and no listening requirement. The learner review identifies older submissions rather than showing them under the new questions, and Day 4 revision drafts use a separate local key. The teacher-provided transcript is the basis for the five Hören questions; verify that the uploaded recording matches it before releasing to students. This does not change other lessons.
+
+
+
 Kiswahili A1 Day 11 uses the signed recording `swahili/A1/day-11/day-11.mp3` in Teil 4. Day 11 sends the learner’s writing and five reading and five listening choices to the tutor through Review & Submit. Admin owns the reference answers.
 
 Kiswahili A1 Day 7 uses the private R2 recording `swahili/A1/day-07/day-07.mp3` via the existing signed-audio flow. Its five listening questions are included in the tutor submission. The Grammar tab covers present-tense preferences, polite requests, hunger and thirst, and food and drink vocabulary.
