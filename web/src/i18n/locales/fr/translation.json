@@ -11,7 +11,8 @@
   "interfaceLanguages": {
     "en": "English (EN)",
     "de": "Deutsch (DE)",
-    "fr": "Français (FR)"
+    "fr": "Français (FR)",
+    "sw": "Kiswahili (SW)"
   },
   "programLanguages": {
     "german": "Allemand",
@@ -236,7 +237,7 @@
   "signup": {
     "courseLanguage": "Quelle langue souhaitez-vous apprendre ?",
     "swahiliTrial": "Commencez votre essai de 7 jours avec le cahier de kiswahili A1 en ligne.",
-    "interfaceNote": "Ce programme enseigne le {{program}}. L’interface est disponible en anglais.",
+    "interfaceNote": "Ce programme enseigne {{program}}. Vous pouvez changer la langue de l’application sans changer de cours.",
     "programs": {
       "swahili": "Swahili (kiswahili)",
       "german": "allemand",
@@ -1708,5 +1709,44 @@
       "session": "Séance",
       "pending": "En attente"
     }
+  },
+  "uiLanguageFlow": {
+    "courseLabel": "Langue du cours",
+    "signupLanguageLabel": "Langue de l’application",
+    "welcome": "Bienvenue chez Falowen",
+    "motivation": "Commencez sur de bonnes bases. Apprenez en confiance.",
+    "trialIntro": "Trois étapes simples pour commencer. Choisissez un essai de 7 jours ou payez immédiatement.",
+    "universityIntro": "Accès gratuit au kiswahili A1 pour les étudiants éligibles de l’Université de Hambourg, sous réserve de validation par l’enseignante.",
+    "progressLabel": "Étapes d’inscription",
+    "steps": [
+      "Votre compte",
+      "Votre apprentissage",
+      "Coordonnées"
+    ],
+    "stepCount": "Étape {{step}} sur 3 · Toutes les informations sont recueillies avant la création du compte",
+    "headings": [
+      "Créons votre compte",
+      "Choisissez votre apprentissage",
+      "Comment vous contacter ?"
+    ],
+    "descriptions": [
+      "Indiquez votre nom complet et une adresse e-mail accessible.",
+      "Choisissez le niveau, le mode de cours et la classe, puis l’essai ou le paiement.",
+      "Nous avons besoin de vos coordonnées et d’un contact d’urgence. Vos réponses sont conservées si vous revenez en arrière."
+    ],
+    "startOption": "Comment souhaitez-vous commencer ?",
+    "back": "Retour",
+    "continueLearning": "Continuer vers l’apprentissage",
+    "continueContact": "Continuer vers les coordonnées",
+    "registerComplimentary": "S’inscrire au cours gratuit",
+    "createTrial": "Créer un compte et commencer l’essai de 7 jours",
+    "universityNote": "Aucun paiement ni essai. L’accès est soumis à la validation de l’enseignante.",
+    "trialNote": "Commencez l’essai de 7 jours sans payer ou payez directement après l’inscription.",
+    "ready": "Votre compte Falowen est prêt",
+    "start": "Commencer à apprendre",
+    "terms": "conditions d’utilisation",
+    "privacy": "politique de confidentialité",
+    "swahiliSubtitle": "Votre espace d’apprentissage du kiswahili",
+    "publishedLessons": "Leçons publiées"
   }
 }
