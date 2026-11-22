@@ -68,9 +68,12 @@ const AccountSettings = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const requestedTab = new URLSearchParams(location.search).get("tab");
-  const activeTab = (["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab) || requestedTab === "documents") && !(isSwahili && ["participation", "upgrade"].includes(requestedTab)) && !(isSecondaryCourse && requestedTab === "upgrade")
-    ? requestedTab
-    : "studentData";
+  // Keep the canonical Router tab expression stable for the Account sync
+  // scripts, and handle the additional Documents tab as a separate fallback.
+  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab)
+    ? (isSwahili && ["participation", "upgrade"].includes(requestedTab)) || (isSecondaryCourse && requestedTab === "upgrade")
+      ? "studentData" : requestedTab
+    : requestedTab === "documents" ? "documents" : "studentData";
 
   const selectAccountTab = (tabKey) => {
     const params = new URLSearchParams(location.search);
