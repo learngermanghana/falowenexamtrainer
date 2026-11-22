@@ -1747,7 +1747,14 @@
     "terms": "conditions d’utilisation",
     "privacy": "politique de confidentialité",
     "swahiliSubtitle": "Votre espace d’apprentissage du kiswahili",
-    "publishedLessons": "Leçons publiées"
+    "publishedLessons": "Leçons publiées",
+    "resume": {
+      "title": "Poursuivre votre inscription",
+      "description": "Vos informations, sauf le mot de passe, sont enregistrées sur cet appareil. Continuez ou demandez notre aide.",
+      "help": "De quoi avez-vous besoin ? (facultatif)",
+      "placeholder": "Par exemple : je ne peux pas choisir une classe. N’indiquez aucun mot de passe.",
+      "whatsapp": "Contacter le service des admissions sur WhatsApp"
+    }
   },
   "homeAccess": {
     "welcomeBack": "Bon retour, {{name}}.",
