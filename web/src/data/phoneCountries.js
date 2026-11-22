@@ -33,7 +33,7 @@ export const phoneToE164 = (value, country = "") => {
   // area code. The displayed "+1268", for example, is NOT a four-digit country
   // calling code. Accept seven-digit local, ten-digit national and eleven-digit
   // unprefixed international representations without duplicating either code.
-  if (/^1\\d{3}$/.test(calling)) {
+  if (calling.length === 4 && calling.startsWith("1")) {
     const areaCode = calling.slice(1);
     if (digits.length === 7) return "+1" + areaCode + digits;
     if (digits.length === 10) return "+1" + digits;
