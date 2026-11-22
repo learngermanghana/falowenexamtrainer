@@ -52,6 +52,18 @@ describe("offline international signup phone formatting", () => {
     expect(phoneToE164("126855501234", "AG")).toBe("");
   });
 
+  it("never duplicates NANP territory area codes for any configured territory", () => {
+    for (const { code } of getCountryOptions("en")) {
+      const dial = getCountryDialCode(code);
+      if (!dial.startsWith("1") || dial.length !== 4) continue;
+      const area = dial.slice(1);
+      const expected = `+1${area}5550123`;
+      expect(phoneToE164("5550123", code)).toBe(expected);
+      expect(phoneToE164(`${area}5550123`, code)).toBe(expected);
+      expect(phoneToE164(`1${area}5550123`, code)).toBe(expected);
+    }
+  });
+
   it("rejects malformed and impossible-length national inputs", () => {
     expect(phoneToE164("0123", "GH")).toBe("");
     expect(phoneToE164("abc 0241234567", "GH")).toBe("");
