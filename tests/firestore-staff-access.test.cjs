@@ -124,3 +124,31 @@ test('Hamburg signup requires an administrator-configured, unexpired invitation'
     setDoc(doc(context.firestore(), path), {expiresAt: new Date(0)}));
   await assertFails(setDoc(doc(studentDb, 'students/invite-expired'), profile));
 });
+
+test('profile preferences are owner-only; enrollment and billing grants remain staff-controlled', async () => {
+  const path = 'students/stu-owner-code';
+  const owner = env.authenticatedContext('profile-owner', { email: 'owner@academy.example', role: 'student' }).firestore();
+  const stranger = env.authenticatedContext('profile-other', { email: 'other@academy.example', role: 'student' }).firestore();
+  const staff = env.authenticatedContext('profile-staff', { role: 'staff' }).firestore();
+  await env.withSecurityRulesDisabled(async context =>
+    setDoc(doc(context.firestore(), path), {
+      uid: 'profile-owner', email: 'owner@academy.example',
+      program: 'german', level: 'A2', className: 'A2-group',
+      studentCode: 'stu-owner-code',
+    }));
+
+  await assertSucceeds(setDoc(doc(owner, path), {
+    preferredInterfaceLanguage: 'sw',
+    additionalProgrammeInterest: 'swahili',
+  }, { merge: true }));
+  await assertFails(setDoc(doc(stranger, path), { preferredInterfaceLanguage: 'fr' }, { merge: true }));
+  await assertFails(setDoc(doc(stranger, path), { additionalProgrammeInterest: 'german' }, { merge: true }));
+  await assertFails(setDoc(doc(owner, path), { program: 'swahili' }, { merge: true }));
+  await assertFails(setDoc(doc(owner, path), { secondaryProgram: 'swahili' }, { merge: true }));
+  await assertFails(setDoc(doc(owner, path), { coursePlacements: { swahili: { level: 'B1' } } }, { merge: true }));
+
+  await assertSucceeds(setDoc(doc(staff, path), {
+    secondaryProgram: 'swahili',
+    coursePlacements: { swahili: { level: 'B1', className: 'Swahili-B1' } },
+  }, { merge: true }));
+});
