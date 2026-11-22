@@ -183,10 +183,11 @@
     "publishedLessons": "Masomo yaliyochapishwa",
     "resume": {
       "title": "Endelea na usajili wako",
-      "description": "Taarifa zako isipokuwa nenosiri zimehifadhiwa kwenye kifaa hiki. Endelea au omba msaada.",
+      "description": "Taarifa zako isipokuwa nenosiri zimehifadhiwa kwenye kifaa hiki. Jaza fomu iliyo hapa chini ili kuendelea na usajili.",
       "help": "Unahitaji msaada gani? (si lazima)",
       "placeholder": "Kwa mfano: Siwezi kuchagua darasa. Usiweke nenosiri.",
-      "whatsapp": "Wasiliana na timu ya usajili kupitia WhatsApp"
+      "whatsapp": "Wasiliana na timu ya usajili kupitia WhatsApp",
+      "whatsappOptional": "Unahitaji msaada kuhusu fomu au usajili? WhatsApp ni ya hiari na inatumika kwa msaada wa usajili pekee."
     }
   },
   "homeAccess": {
