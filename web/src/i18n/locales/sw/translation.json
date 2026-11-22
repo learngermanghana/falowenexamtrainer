@@ -263,6 +263,7 @@
   "signupDetails": {
     "countryOfResidence": "Nchi unayoishi",
     "countryPlaceholder": "Chagua nchi yako",
+    "cityPlaceholder": "mf. Accra, Berlin au Nairobi",
     "cityOrTown": "Jiji / Mji",
     "countryRequired": "Chagua nchi unayoishi.",
     "countryHelp": "Chagua nchi kutoka kwenye orodha. Hakuna uthibitishaji wa ziada unaohitajika.",
