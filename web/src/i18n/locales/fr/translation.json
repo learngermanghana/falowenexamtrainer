@@ -1828,6 +1828,7 @@
     "learningMode": "Mode d’apprentissage"
   },
   "signupDetails": {
+    "emergencyMustDiffer": "Votre contact d’urgence doit avoir un numéro différent du vôtre. Saisissez le numéro d’une autre personne.",
     "firstName": "Prénom",
     "middleName": "Deuxième prénom (facultatif)",
     "lastName": "Nom de famille",
