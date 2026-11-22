@@ -39,6 +39,8 @@ import {
 } from "../utils/devicePushTokens";
 import { getBackendUrl } from "../services/backendUrl";
 import { createOrResumeSignupAccount } from "../lib/signupAuthRecovery";
+import { checkSignupDuplicate } from "../lib/signupDuplicateCheck";
+import { canonicalEmail, canonicalName, canonicalPhone } from "../lib/signupIdentity";
 import { isUniversityInvitationOpen, resolveUniversityInvitation } from "../lib/universityInvitations";
 import { getDocFromServer } from "firebase/firestore";
 
@@ -609,6 +611,14 @@ export const AuthProvider = ({ children }) => {
       }
 
       const normalizedEmail = email.trim().toLowerCase();
+      // Fail closed before making a new Firebase Auth user, so an alternate email
+      // cannot silently create another student profile using the same phone.
+      await checkSignupDuplicate({
+        name: profile.name || profile.firstName || "",
+        email: normalizedEmail,
+        phone: profile.phone || "",
+        emergencyContactPhone: profile.emergencyContactPhone || "",
+      });
       // A previous attempt may have created Firebase Auth successfully but failed
       // before writing students/{studentCode}. Only the correct existing password
       // may resume that incomplete account; existing profiles are never overwritten.
@@ -648,6 +658,10 @@ export const AuthProvider = ({ children }) => {
         fullName: profile.name || profile.firstName || "",
         email: normalizedEmail,
         authEmail: normalizedEmail,
+        emailIdentity: canonicalEmail(normalizedEmail),
+        nameIdentity: canonicalName(profile.name || profile.firstName || ""),
+        phoneIdentity: canonicalPhone(profile.phone || ""),
+        emergencyContactPhoneIdentity: canonicalPhone(profile.emergencyContactPhone || ""),
         role: "student",
         studentCode: studentId,
         about: "",
