@@ -65,7 +65,7 @@ export default function CountryCombobox({
         ref={inputRef}
         required={required}
         value={query}
-        onFocus={() => setOpen(true)}
+        onFocus={(event) => { if (value) event.target.select(); setOpen(true); }}
         onKeyDown={keyDown}
         onBlur={(event) => {
           if (!root.current?.contains(event.relatedTarget)) setOpen(false);
