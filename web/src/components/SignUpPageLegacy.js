@@ -28,6 +28,7 @@ import {
   normalizePhone,
   normalizeWhitespace,
 } from "../lib/signupDataQuality";
+import { canonicalPhone } from "../lib/signupIdentity";
 
 const MIN_INITIAL_PAYMENT = 2000;
 
@@ -325,6 +326,9 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
 
   const interpretSignupError = (error) => {
     const code = error?.code || "";
+    if (code === "auth/duplicate-review-required" || code === "auth/duplicate-check-unavailable") {
+      return { field: null, message: error.message };
+    }
     if (code.includes("email-already-in-use")) {
       return {
         field: "email",
@@ -430,6 +434,9 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
     if (!isLikelyPhoneNumber(cleanedEmergencyPhone)) {
       validationIssues.emergencyContactPhone =
         "Add a valid emergency contact phone number (7–15 digits). This is required for safety.";
+    } else if (canonicalPhone(cleanedPhone) && canonicalPhone(cleanedPhone) === canonicalPhone(cleanedEmergencyPhone)) {
+      validationIssues.emergencyContactPhone =
+        "Your emergency contact should be someone else. Enter a different phone number.";
     }
 
     if (!learningMode) {
