@@ -7,6 +7,9 @@ on:
       - "scripts/checkPublicSignupAuthRecovery.js"
       - "web/src/App.js"
       - "web/src/context/AuthContext.js"
+      - "web/src/components/StudentDocumentsPanel.jsx"
+      - "web/src/components/StudentDocumentsPanel.test.jsx"
+      - "functions/functionz/__tests__/studentDocuments.test.js"
       - "web/src/components/SignUpPage.js"
       - "web/src/components/SignUpPageLegacy.js"
       - "web/src/components/AuthGate.js"
@@ -54,6 +57,9 @@ jobs:
       - name: Test interrupted signup recovery and application form
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/__tests__/signupAuthRecovery.test.js src/__tests__/SignUpPage.test.js src/lib/signupIdentity.test.js src/lib/signupDuplicateCheck.test.js src/data/countries.test.js src/data/phoneCountries.test.js src/lib/signupEmailHints.test.js
+      - name: Test learner document email verification UI
+        working-directory: web
+        run: npx jest --runInBand --runTestsByPath src/components/StudentDocumentsPanel.test.jsx
       - name: Build production web app
         working-directory: web
         run: npm run build

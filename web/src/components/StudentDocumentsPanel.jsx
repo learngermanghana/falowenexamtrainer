@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getBackendUrl } from "../services/backendUrl";
+import { getActionCodeSettings, reload, sendEmailVerification } from "../firebase";
 
 const LEVELS = ["A1", "A2", "B1"];
 
@@ -10,14 +11,65 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [verifiedEmail, setVerifiedEmail] = useState(Boolean(user?.emailVerified));
+  const [verificationBusy, setVerificationBusy] = useState("");
+  const [verificationNotice, setVerificationNotice] = useState("");
+
+  useEffect(() => {
+    setVerifiedEmail(Boolean(user?.emailVerified));
+    setVerificationNotice("");
+  }, [user?.uid, user?.emailVerified]);
+
+  async function resendVerificationEmail() {
+    if (!user?.email || verificationBusy || verifiedEmail) return;
+    setVerificationBusy("send");
+    setError("");
+    setVerificationNotice("");
+    try {
+      await sendEmailVerification(user, getActionCodeSettings());
+      setVerificationNotice(`Verification email sent to ${user.email}. Check your inbox or spam folder, then return here.`);
+    } catch (err) {
+      setError(err?.code === "auth/too-many-requests"
+        ? "Too many verification emails have been requested. Please try again later."
+        : "We could not send a verification email. Please try again or contact Falowen.");
+    } finally {
+      setVerificationBusy("");
+    }
+  }
+
+  async function refreshEmailVerification() {
+    if (!user || verificationBusy) return;
+    setVerificationBusy("refresh");
+    setError("");
+    setVerificationNotice("");
+    try {
+      // Firebase updates emailVerified on reload; a forced ID token refresh
+      // makes the server's email_verified claim reflect the new verification.
+      await reload(user);
+      await user.getIdToken(true);
+      const isVerified = user.emailVerified === true;
+      setVerifiedEmail(isVerified);
+      setVerificationNotice(isVerified
+        ? "Email verified. You can now request your school documents."
+        : "Your email is not verified yet. Open the verification link, then check again.");
+    } catch (_err) {
+      setError("Could not refresh verification. Check your connection and try again.");
+    } finally {
+      setVerificationBusy("");
+    }
+  }
 
   async function download(kind) {
-    if (busy || !user) return;
+    if (busy || !user || verificationBusy) return;
+    if (!verifiedEmail) {
+      setError("Verify your account email first using the controls above.");
+      return;
+    }
     setBusy(kind);
     setError("");
     setNotice("");
     try {
-      const token = await user.getIdToken();
+      const token = await user.getIdToken(true);
       const response = await fetch(`${getBackendUrl()}/students/me/documents/${kind}`, {
         method: "POST",
         headers: {
@@ -70,6 +122,26 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
         </p>
       </div>
 
+      {!verifiedEmail && user ? (
+        <div style={{ border: "1px solid #fbd38d", background: "#fffbeb", borderRadius: 12, padding: 16, display: "grid", gap: 10 }}>
+          <strong>Verify your account email</strong>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
+            To protect your academic records, verify {user.email || "your email address"} before downloading a transcript or certificate.
+            We send a verification link by email; no SMS is required.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            <button type="button" onClick={resendVerificationEmail} disabled={Boolean(verificationBusy) || Boolean(busy)}>
+              {verificationBusy === "send" ? "Sending…" : "Send verification email"}
+            </button>
+            <button type="button" onClick={refreshEmailVerification} disabled={Boolean(verificationBusy) || Boolean(busy)}>
+              {verificationBusy === "refresh" ? "Checking…" : "I've verified my email — check again"}
+            </button>
+          </div>
+        </div>
+      ) : null}
+      {verifiedEmail ? <p style={{ margin: 0, color: "#166534", fontSize: 13 }}>Email verified — school documents are available subject to eligibility.</p> : null}
+      {verificationNotice ? <p role="status" style={{ margin: 0, color: "#334155", fontSize: 13 }}>{verificationNotice}</p> : null}
+
       <label style={{ display: "grid", gap: 6, maxWidth: 280, fontSize: 14, fontWeight: 650 }}>
         German course level
         <select aria-label="German course level" value={level} disabled={Boolean(busy)}
@@ -86,7 +158,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
             A PDF of your verified scores for the selected course. Available as soon as results are recorded.
             Unfinished work appears as incomplete.
           </p>
-          <button type="button" disabled={Boolean(busy) || !user} onClick={() => download("transcript")}
+          <button type="button" disabled={Boolean(busy) || Boolean(verificationBusy) || !user || !verifiedEmail} onClick={() => download("transcript")}
             style={{ border: "1px solid #3158e7", borderRadius: 9, background: "#eef2ff", color: "#244cda", padding: 11, cursor: "pointer", fontWeight: 700 }}>
             {busy === "transcript" ? "Preparing transcript…" : "Download transcript PDF"}
           </button>
@@ -98,7 +170,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
             The signed course certificate is available only after every required marked task
             and the official final assessment have passed verification.
           </p>
-          <button type="button" disabled={Boolean(busy) || !user} onClick={() => download("certificate")}
+          <button type="button" disabled={Boolean(busy) || Boolean(verificationBusy) || !user || !verifiedEmail} onClick={() => download("certificate")}
             style={{ border: "1px solid #3158e7", borderRadius: 9, background: "#3158e7", color: "#fff", padding: 11, cursor: "pointer", fontWeight: 700 }}>
             {busy === "certificate" ? "Checking eligibility…" : "Check & download certificate"}
           </button>
