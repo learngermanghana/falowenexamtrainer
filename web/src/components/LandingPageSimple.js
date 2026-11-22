@@ -43,12 +43,12 @@ const COPY = {
     finalEyebrow: "YOUR NEXT STEP",
     finalTitle: "Your German journey starts here.",
     finalText: "Choose a class or learn at your own pace. We bring your lessons, practice and support together.",
-    footerCourses: "German courses A1–C2", footerMusic: "Music", footerBooks: "German A1 coursebook", footerExam: "Free Goethe exam practice", footerReviews: "Student reviews", footerHelp: "About us", footerChatgpt: "Falowen in ChatGPT",
+    footerGhana: "German language school in Ghana", footerCourses: "German courses A1–C2", footerMusic: "Music", footerBooks: "German A1 coursebook", footerExam: "Free Goethe exam practice", footerReviews: "Student reviews", footerHelp: "About us", footerChatgpt: "Falowen in ChatGPT",
     footerCourseLevels: "German courses by level", footerGoetheLevels: "Goethe-style preparation by level",
     contact: "Questions? Chat with us on WhatsApp",
     featureCopy: {},
     metaTitle: "Falowen | Learn German and Swahili Online",
-    metaDescription: "Learn German A1–C2 with live classes and exam practice, or start Swahili with the online A1 Course Book. Choose your language when you sign up for Falowen.",
+    metaDescription: "Learn German in Ghana with Falowen: German classes in Accra or online, A1–C2 courses and exam practice, plus Swahili courses on the Falowen app.",
   },
   de: {
     language: "Sprache", login: "Anmelden", signup: "Registrieren", returning: "Schon registriert?",
@@ -83,7 +83,7 @@ const COPY = {
     finalEyebrow: "DEIN NÄCHSTER SCHRITT",
     finalTitle: "Dein Deutschweg beginnt hier.",
     finalText: "Wähle einen Live-Kurs oder lerne selbstständig. Falowen verbindet Unterricht, Übungen und Unterstützung.",
-    footerCourses: "Deutschkurse A1–C2", footerMusic: "Musik", footerBooks: "A1 Kursbuch", footerExam: "Goethe-Prüfungsübungen", footerReviews: "Bewertungen", footerHelp: "Über uns", footerChatgpt: "Falowen mit ChatGPT",
+    footerGhana: "Deutschschule in Ghana", footerCourses: "Deutschkurse A1–C2", footerMusic: "Musik", footerBooks: "A1 Kursbuch", footerExam: "Goethe-Prüfungsübungen", footerReviews: "Bewertungen", footerHelp: "Über uns", footerChatgpt: "Falowen mit ChatGPT",
     footerCourseLevels: "Deutschkurse nach Niveau", footerGoetheLevels: "Goethe-Prüfungsvorbereitung nach Niveau",
     contact: "Fragen? Schreib uns auf WhatsApp",
     featureCopy: {
@@ -128,7 +128,7 @@ const COPY = {
     finalEyebrow: "VOTRE PROCHAINE ÉTAPE",
     finalTitle: "Votre apprentissage commence ici.",
     finalText: "Choisissez un cours en direct ou apprenez à votre rythme. Falowen réunit les cours, exercices et aides.",
-    footerCourses: "Cours A1–C2", footerMusic: "Musique", footerBooks: "Livre d’allemand A1", footerExam: "Examens de type Goethe", footerReviews: "Avis des élèves", footerHelp: "À propos", footerChatgpt: "Falowen dans ChatGPT",
+    footerGhana: "École d’allemand au Ghana", footerCourses: "Cours A1–C2", footerMusic: "Musique", footerBooks: "Livre d’allemand A1", footerExam: "Examens de type Goethe", footerReviews: "Avis des élèves", footerHelp: "À propos", footerChatgpt: "Falowen dans ChatGPT",
     footerCourseLevels: "Cours d’allemand par niveau", footerGoetheLevels: "Préparation Goethe par niveau",
     contact: "Des questions ? Contactez-nous sur WhatsApp",
     featureCopy: {
@@ -188,6 +188,7 @@ COPY.sw = { ...COPY.en, ...{
   "finalEyebrow": "HATUA YAKO INAYOFUATA",
   "finalTitle": "Safari yako ya Kijerumani inaanza hapa.",
   "finalText": "Chagua darasa au jifunze kwa muda wako. Masomo na msaada vyote vipo pamoja.",
+  "footerGhana": "Shule ya Kijerumani nchini Ghana",
   "footerCourses": "Kozi za Kijerumani A1–C2",
   "footerMusic": "Muziki",
   "footerBooks": "Kitabu cha Kijerumani A1",
@@ -205,6 +206,7 @@ COPY.sw = { ...COPY.en, ...{
 const FOOTER_LINKS = [
   { href: "/learn-swahili", labelKey: "navSwahili" },
   { href: "/courses/", labelKey: "footerCourses" },
+  { href: "/learn-german-ghana", labelKey: "footerGhana" },
   { href: "/books", labelKey: "footerBooks" },
   { href: "https://music.falowen.app/", labelKey: "footerMusic" },
   { href: "/exam-practice", labelKey: "footerExam" },
