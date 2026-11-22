@@ -59,7 +59,8 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
       await setDoc(doc(db, "users", user.uid, "swahiliLessons", `day-${lesson.day}`), {
         studentId: user.uid, userId: user.uid, program: "swahili", level: "A1",
         day: lesson.day, lessonId: `swahili-day-${lesson.day}`, title: lesson.title,
-        status: "submitted", writing: { [lesson.day === 11 ? "dialogue" : "response"]: writing.trim() }, readingAnswers: reading,
+        status: "submitted", writing: { [lesson.day === 11 ? "dialogue" : "response"]: writing.trim() },
+        ...(lesson.day === 7 ? { readingVersion: 2 } : {}), readingAnswers: reading,
         listeningAnswers, listeningTeacherLed: false, submittedAt: serverTimestamp(),
         studentName: studentProfile?.name || studentProfile?.displayName || user.displayName || "",
         studentEmail: user.email || "",
