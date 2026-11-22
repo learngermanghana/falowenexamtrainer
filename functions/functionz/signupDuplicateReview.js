@@ -46,7 +46,15 @@ function legacyPhoneVariants(value) {
   if (!id) return [];
   const variants = [String(value || "").trim(), id, "+" + id];
   if (id.startsWith("233") && id.length === 12) {
-    variants.push("0" + id.slice(3), id.slice(3));
+    const local = "0" + id.slice(3);
+    const national = id.slice(3);
+    variants.push(
+      local,
+      national,
+      // Older enrolment sheets often store grouped Ghana mobile numbers.
+      local.slice(0, 3) + " " + local.slice(3, 6) + " " + local.slice(6),
+      "+233 " + national.slice(0, 2) + " " + national.slice(2, 5) + " " + national.slice(5)
+    );
   }
   return [...new Set(variants.filter(Boolean))].slice(0, 10);
 }
