@@ -1923,5 +1923,60 @@
     "reviewed": "Bewertet",
     "awaitingTutor": "Wartet auf Lehrkraft",
     "revise": "Abgabe überarbeiten"
+  },
+  "notificationUi": {
+    "title": "Benachrichtigungen einrichten",
+    "description": "Erhalte Fragen, Bewertungen, Anwesenheitsupdates und Ankündigungen, auch wenn Falowen geschlossen ist.",
+    "homeScreen": "Startbildschirm-App",
+    "yes": "Ja",
+    "no": "Nein",
+    "browserPermission": "Browser-Berechtigung",
+    "savedDevices": "Gespeicherte Geräte",
+    "thisAccount": "Dieses Konto",
+    "settingUp": "Wird eingerichtet ...",
+    "refreshDevice": "Gerät aktualisieren",
+    "enable": "Benachrichtigungen aktivieren",
+    "sendingTest": "Test wird gesendet ...",
+    "sendTest": "Testbenachrichtigung senden",
+    "enabled": "Benachrichtigungen sind für dieses Gerät aktiv.",
+    "permissionIncomplete": "Die Berechtigung wurde nicht abgeschlossen. Öffne Falowen auf dem iPhone über den Startbildschirm und versuche es erneut.",
+    "enableError": "Benachrichtigungen konnten nicht aktiviert werden. Bitte erneut versuchen.",
+    "refreshFirst": "Aktualisiere dieses Gerät, damit Falowen einen gültigen Push-Token hat.",
+    "testUnavailable": "Push-Tests sind in dieser Version nicht verfügbar.",
+    "scheduled": "Test geplant. Sperre jetzt den Bildschirm. Die Nachricht sollte in etwa 8 Sekunden eintreffen.",
+    "unconfirmed": "Falowen hat den Testversand nicht bestätigt.",
+    "testSent": "Test versendet. Wenn nichts ankommt, prüfe Benachrichtigungen und Akku-Einstellungen.",
+    "testError": "Der Benachrichtigungstest ist fehlgeschlagen. Aktualisiere das Gerät und versuche es erneut. Teile dem Support bei Bedarf den Firebase-Code mit.",
+    "sessionExpired": "Deine Sitzung ist abgelaufen. Melde dich erneut an.",
+    "unlinkedDevice": "Dieses Gerät ist nicht mit deinem Konto verknüpft. Aktualisiere es und versuche es erneut.",
+    "invalidToken": "Dein Push-Token ist ungültig oder abgelaufen. Aktualisiere das Gerät.",
+    "androidTip": "Android / Chrome: Benachrichtigungen aktivieren und die Browser-Berechtigung erlauben.",
+    "iosTip": "iPhone (iOS 16.4 oder neuer): Öffne Falowen in Safari, tippe auf Teilen → Zum Home-Bildschirm und aktiviere Benachrichtigungen in dieser App. Im normalen Safari-Tab funktionieren sie nicht.",
+    "status": {
+      "granted": {
+        "label": "Auf diesem Gerät aktiviert",
+        "detail": "Browser-Berechtigung und Falowen-Push-Token sind aktiv."
+      },
+      "pending": {
+        "label": "Wird eingerichtet ...",
+        "detail": "Falowen fordert den Token an oder aktualisiert ihn."
+      },
+      "blocked": {
+        "label": "Im Browser blockiert",
+        "detail": "Erlaube Benachrichtigungen für Falowen in den Browser-Einstellungen."
+      },
+      "stale": {
+        "label": "Aktualisierung nötig",
+        "detail": "Browser-Berechtigung oder Token muss aktualisiert werden."
+      },
+      "error": {
+        "label": "Einrichtung fehlgeschlagen",
+        "detail": "Versuche es erneut oder kontaktiere den Support."
+      },
+      "idle": {
+        "label": "Noch nicht aktiviert",
+        "detail": "Aktiviere Benachrichtigungen für Bewertungen, Anwesenheit und Erinnerungen."
+      }
+    }
   }
 }
