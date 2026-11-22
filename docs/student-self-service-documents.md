@@ -15,6 +15,40 @@ chooses **Download transcript PDF** or **Check & download certificate**.
   email. The existing graduation email worker remains the source of automatic
   delivery.
 
+## Learner email verification and document access
+
+To protect academic records, **the learner must verify the email linked to
+their Firebase account before either PDF download is enabled**. The verification
+link is free of SMS; no phone verification or SMS code is required.
+
+1. **New learner:** After a successful email/password signup and student-profile
+   save, Falowen automatically requests a verification email to the registered
+   address. If sending fails or is rate-limited, **signup still succeeds**;
+   students can request the link again under **Account → Documents**.
+2. **Existing unverified learner:** Sign in with the original Falowen account,
+   then open **Account → Documents**. The panel shows **Verify your account
+   email** with the account email address. **Download transcript PDF** and
+   **Check & download certificate** are disabled until verification succeeds.
+3. **Resend:** Click **Send verification email**, then check the inbox and spam
+   folder for the verification link. This may be throttled by Firebase if used
+   repeatedly; wait and retry rather than creating another student account.
+4. **Complete verification:** Open the link in the email. Return to the
+   **Account → Documents** panel in the signed-in account and click **I've
+   verified my email — check again**. The app reloads the Firebase user,
+   forces a fresh ID token and confirms that `emailVerified` is true before
+   enabling document actions. If the page says the email remains unverified,
+   finish the link first and check again.
+5. **Download only if eligible:** After verification, choose a German A1, A2
+   or B1 level and request the applicable transcript or certificate. Email
+   verification **unlocks the request**, not the award: eligibility and score
+   rules still apply, and the API requires the Firebase `email_verified` claim.
+
+A previously enrolled learner who has not verified their email can still sign
+in; their **document downloads** remain locked until the verification succeeds.
+Verification is not a password reset, does not alter scores or attendance, and
+does not automatically issue a certificate. Students who do not receive the
+email after checking spam can use the resend button or contact Falowen support.
+
 ## Security
 The student-facing API route is `POST /api/students/me/documents/:kind`. It:
 1. Authenticates the Firebase ID token and requires a verified email.
@@ -60,9 +94,15 @@ chat. Rebuild/redeploy the learner site after updating its server configuration.
 3. Check an incomplete A1 student: the certificate is denied, even with a
    passing practice attempt.
 4. Check another student code passed in the browser body: the server ignores it.
-5. Check an unverified login: denied; no document returned.
-6. Check Swahili-only students: no falsely labelled German certificate.
-7. Check production logs and that no PDF body, private token, or student scores
+5. Check a new unverified signup: a verification email is requested after
+   profile creation; a mail delivery failure does not roll back signup.
+6. Check an existing unverified login: both download buttons are disabled, the
+   resend control sends a link, and an unverified API request is denied.
+7. Click the verification link and **I've verified my email — check again**:
+   a user reload and fresh Firebase token enable document actions without
+   relaxing the existing transcript/certificate eligibility rules.
+8. Check Swahili-only students: no falsely labelled German certificate.
+9. Check production logs and that no PDF body, private token, or student scores
    are logged.
 
 No manual score override, class-name substitution, or eligibility bypass occurs
