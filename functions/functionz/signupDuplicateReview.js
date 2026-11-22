@@ -46,7 +46,15 @@ function legacyPhoneVariants(value) {
   if (!id) return [];
   const variants = [String(value || "").trim(), id, "+" + id];
   if (id.startsWith("233") && id.length === 12) {
-    variants.push("0" + id.slice(3), id.slice(3));
+    const local = "0" + id.slice(3);
+    const national = id.slice(3);
+    variants.push(
+      local,
+      national,
+      // Older enrolment sheets often store grouped Ghana mobile numbers.
+      local.slice(0, 3) + " " + local.slice(3, 6) + " " + local.slice(6),
+      "+233 " + national.slice(0, 2) + " " + national.slice(2, 5) + " " + national.slice(5)
+    );
   }
   return [...new Set(variants.filter(Boolean))].slice(0, 10);
 }
@@ -90,23 +98,57 @@ async function findProbableDuplicate(db, rawApplication) {
   const email = canonicalEmail(application.email);
   const variants = legacyPhoneVariants(application.phone);
   const emergencyVariants = legacyPhoneVariants(application.emergency);
-  // Bounded indexed queries; never scan all student records on every signup.
-  const queries = [
+  // Strong email and primary-phone matches can be checked with short indexed
+  // lookups. Prefer these before touching shared emergency contact numbers.
+  const directQueries = [
     students.where("phoneIdentity", "==", phone).limit(8),
     students.where("phone", "in", variants).limit(8),
     students.where("emailIdentity", "==", email).limit(8),
     students.where("email", "==", String(application.email).toLowerCase()).limit(8),
-    students.where("emergencyContactPhoneIdentity", "==", emergency).limit(8),
-    students.where("emergencyContactPhone", "in", emergencyVariants).limit(8),
   ];
-  const results = await Promise.all(queries.map(query => query.get()));
   const encountered = new Set();
-  for (const snapshot of results) {
+  const checkSnapshot = (snapshot) => {
     for (const record of snapshot.docs || []) {
       if (encountered.has(record.id)) continue;
       encountered.add(record.id);
       if (matchesExisting(application, record.data())) return true;
     }
+    return false;
+  };
+  for (const snapshot of await Promise.all(directQueries.map(query => query.get()))) {
+    if (checkSnapshot(snapshot)) return true;
+  }
+
+  // The same emergency contact can be shared by a large family or an
+  // institution. A limit(8) result is NOT proof of no duplicate: the ninth
+  // record might be the one with the applicant's normalized name.
+  //
+  // Scan only indexed emergency-number candidates, in small cursor pages.
+  // Older profiles may have the raw emergency phone but no nameIdentity, so
+  // filtering only on the newer normalized fields would miss them.
+  // A safety cap prevents unbounded reads; exhaustion MUST fail closed rather
+  // than return CLEAR and accidentally issue a second trial.
+  const PAGE_SIZE = 8;
+  const MAX_EMERGENCY_PAGES = 32;
+  const emergencyQueries = [
+    students.where("emergencyContactPhoneIdentity", "==", emergency),
+    students.where("emergencyContactPhone", "in", emergencyVariants),
+  ];
+  for (const query of emergencyQueries) {
+    let cursor = null;
+    let exhausted = false;
+    for (let page = 0; page < MAX_EMERGENCY_PAGES; page += 1) {
+      const paged = (cursor ? query.startAfter(cursor) : query).limit(PAGE_SIZE);
+      const snapshot = await paged.get();
+      const docs = snapshot.docs || [];
+      if (checkSnapshot(snapshot)) return true;
+      if (docs.length < PAGE_SIZE) {
+        exhausted = true;
+        break;
+      }
+      cursor = docs[docs.length - 1];
+    }
+    if (!exhausted) throw new Error("signup_emergency_lookup_limit");
   }
   return false;
 }
