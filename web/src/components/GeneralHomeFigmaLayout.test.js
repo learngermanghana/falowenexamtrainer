@@ -10,15 +10,15 @@ describe("Figma-inspired signed-in learner homepage", () => {
 
   test("has accessible welcome, class timetable card and two learning cards", () => {
     expect(home).toContain('className="falowen-learner-hero__welcome"');
-    expect(home).toContain("YOUR LIVE CLASS");
-    expect(home).toContain("View full class schedule");
-    expect(home).toContain("Manage class in Account");
+    expect(home).toContain('t("homeAccess.liveClass")');
+    expect(home).toContain('t("homeAccess.viewSchedule")');
+    expect(home).toContain('t("homeAccess.manageClass")');
     expect(home).not.toContain("<ExamReadinessBadge");
-    expect(home).toContain("Your learning spaces");
-    expect(home).toContain("Welcome back, {studentName}.");
-    expect(home).toContain("<h3>Exams Room</h3>");
-    expect(home).toContain("Open Course Book");
-    expect(home).toContain("Open Exams Room");
+    expect(home).toContain('t("homeAccess.spaces")');
+    expect(home).toContain('t("homeAccess.welcomeBack", { name: studentName })');
+    expect(home).toContain('<h3>{t("homeAccess.examsRoom")}</h3>');
+    expect(home).toContain('t("homeAccess.openCourseBook")');
+    expect(home).toContain('t("homeAccess.openExams")');
     expect(home).toContain("onJoinZoom={joinZoom}");
   });
 
