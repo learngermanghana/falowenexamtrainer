@@ -29,6 +29,7 @@ import {
   normalizeWhitespace,
 } from "../lib/signupDataQuality";
 import { canonicalPhone } from "../lib/signupIdentity";
+import { getCountryOptions, getCountryName, isValidCountryCode } from "../data/countries";
 
 const MIN_INITIAL_PAYMENT = 2000;
 
@@ -131,6 +132,8 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   );
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
+  const [countryCode, setCountryCode] = useState("");
+  const countryOptions = useMemo(() => getCountryOptions(locale), [locale]);
   const [address, setAddress] = useState("");
   const [germanMode, setLearningMode] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
@@ -390,6 +393,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
     const cleanedPhone = normalizePhone(phone);
     const cleanedAddress = normalizeWhitespace(address);
     const cleanedLocation = normalizeWhitespace(location);
+    const cleanedCountryCode = countryCode.toUpperCase();
     const cleanedEmergencyPhone = normalizePhone(emergencyContactPhone);
 
     const validationIssues = accountIssues();
@@ -428,7 +432,10 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
     }
 
     if (!cleanedLocation) {
-      validationIssues.location = "Add your current location so we can keep accurate enrollment records.";
+      validationIssues.location = "Add your city or town so we can keep accurate enrollment records.";
+    }
+    if (!isValidCountryCode(cleanedCountryCode)) {
+      validationIssues.countryCode = t("signupDetails.countryRequired");
     }
 
     if (!isLikelyPhoneNumber(cleanedEmergencyPhone)) {
@@ -504,6 +511,8 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
         className: selectedClass,
         phone: cleanedPhone,
         location: cleanedLocation,
+        countryCode: cleanedCountryCode,
+        country: getCountryName(cleanedCountryCode, "en"),
         address: cleanedAddress,
         learningMode,
         emergencyContactPhone: cleanedEmergencyPhone,
@@ -529,6 +538,8 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
         await onAccountCreated?.({
           studentCode: signupReceipt?.studentCode || studentCode,
           name: cleanedName, email: cleanedEmail, phone: cleanedPhone,
+          countryCode: cleanedCountryCode,
+          country: getCountryName(cleanedCountryCode, "en"),
           level: selectedLevel, className: selectedClass, learningMode, program,
           universityInvitation: Boolean(universityInvitation),
           registrationSource: universityInvitation?.registrationSource || "",
@@ -1071,7 +1082,30 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           />
           {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
 
-          <label htmlFor="signup-location" style={styles.label}>{t("signupPage.fields.location")}</label>
+          <label htmlFor="signup-country" style={styles.label}>{t("signupDetails.countryOfResidence")}</label>
+          <select
+            required
+            autoComplete="country"
+            id="signup-country"
+            name="countryCode"
+            ref={(element) => { fieldRefs.current.countryCode = element; }}
+            value={countryCode}
+            onChange={(event) => {
+              setCountryCode(event.target.value);
+              clearFieldError("countryCode");
+              setAuthError("");
+            }}
+            style={styles.select}
+          >
+            <option value="" disabled>{t("signupDetails.countryPlaceholder")}</option>
+            {countryOptions.map(({ code, label }) => (
+              <option key={code} value={code}>{label}</option>
+            ))}
+          </select>
+          {fieldErrors.countryCode ? <p style={styles.fieldError}>{fieldErrors.countryCode}</p> : null}
+          <p style={{ ...styles.helperText, marginTop: -4 }}>{t("signupDetails.countryHelp")}</p>
+
+          <label htmlFor="signup-location" style={styles.label}>{t("signupDetails.cityOrTown")}</label>
           <input
             type="text"
             required
