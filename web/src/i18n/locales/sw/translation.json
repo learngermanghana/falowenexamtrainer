@@ -261,6 +261,7 @@
     "learningMode": "Namna ya kujifunza"
   },
   "signupDetails": {
+    "emergencyMustDiffer": "Nambari ya simu ya mtu wa dharura lazima iwe tofauti na yako. Weka nambari ya mtu mwingine.",
     "firstName": "Jina la kwanza",
     "middleName": "Jina la kati (si lazima)",
     "lastName": "Jina la ukoo",
