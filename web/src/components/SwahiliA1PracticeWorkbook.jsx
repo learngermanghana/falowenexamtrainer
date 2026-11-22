@@ -20,7 +20,7 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
   const { aiLecture, radio, listening } = lesson;
   const lectureHeadingId = `swahili-ai-lecture-${lesson.day}`;
   const grammarSections = lesson.grammarSections || [{ rule: lesson.rule, examples: lesson.examples }];
-  const hasLessonSong = [10, 11].includes(lesson.day);
+  const hasLessonSong = [2, 10, 11].includes(lesson.day);
   const vocabulary = lesson.vocabulary;
   const writingId = "swahili-writing-" + lesson.day;
 

@@ -1,6 +1,19 @@
 {
   "tracks": [
     {
+      "id": "swahili-a1-day-02",
+      "title": "Salamu, Salamu",
+      "level": "A1",
+      "day": 2,
+      "topic": "Salamu · Greetings",
+      "language": "Swahili",
+      "type": "Lesson song",
+      "coursebook": true,
+      "featured": true,
+      "objectKey": "swahili/music/A1/day-02/Salamu, Salamu.mp3",
+      "audioUrl": "https://www.falowen.app/api/music?track=swahili-a1-day-02"
+    },
+    {
       "id": "swahili-a1-day-11",
       "title": "Tunaenda Dukani!",
       "level": "A1",

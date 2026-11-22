@@ -2,6 +2,278 @@
   "version": 1,
   "recordings": [
     {
+      "trackId": "swahili-a1-day-02",
+      "objectKey": "swahili/music/A1/day-02/Salamu, Salamu.mp3",
+      "title": "Salamu, Salamu",
+      "lyrics": "[Intro]\nSalamu, salamu, salamu!\nTunasalimiana kila siku!\nSalamu, salamu, salamu!\nTunasalimiana kwa furaha!\n[Verse 1]\nHabari za asubuhi? Njema sana!\nUmeamkaje? Nimeamka salama!\nUmelalaje? Salama kabisa!\nHabari za asubuhi? Nzuri tu!\nHabari za mchana? Salama!\nUmeshindaje? Salama kabisa!\nHabari za jioni? Nzuri sana!\nSiku yako ilikuwaje? Njema kabisa!\n[Chorus]\nHabari yako? Nzuri!\nHabari zenu? Salama!\nHabari za leo? Njema!\nHabari za sasa? Nzuri tu!\nNzuri, salama, njema,\nSalama kabisa, njema sana!\nTunasalimiana kila siku,\nKwa heshima na furaha!\n[Verse 2]\nHujambo? Sijambo!\nHamjambo? Hatujambo!\nYeye hajambo? Hajambo!\nWao hawajambo? Hawajambo!\nHabari gani? Nzuri sana!\nNa wewe je? Salama!\nHabari za nyumbani? Njema!\nWote wazima? Wazima!\n[Verse 3]\nShikamoo mama! Marahaba!\nShikamoo baba! Marahaba!\nShikamoo mwalimu! Marahaba!\nShikamoo bibi! Marahaba!\nMambo? Poa!\nVipi? Safi!\nSasa? Freshi!\nNiaje? Shwari!\n[Final Chorus]\nHabari za asubuhi? Njema!\nHabari za mchana? Salama!\nHabari za jioni? Nzuri!\nHabari za leo? Salama kabisa!\nHujambo? Sijambo!\nHamjambo? Hatujambo!\nShikamoo! Marahaba!\nMambo? Poa!\nTunasalimiana kila siku,\nKwa heshima na furaha!\n[Outro]\nKiswahili, Kiswahili,\nTunajifunza kila siku!\nAsante sana, kwa heri!\nKwa heri, tutaonana!\nAsante sana, karibu tena!\nTutaonana tena!",
+      "cues": [
+        {
+          "start": 9.26,
+          "end": 13.94,
+          "text": "Salamu, salamu, salamu!"
+        },
+        {
+          "start": 13.94,
+          "end": 17.54,
+          "text": "Tunasalimiana kila siku!"
+        },
+        {
+          "start": 17.54,
+          "end": 22.22,
+          "text": "Salamu, salamu, salamu!"
+        },
+        {
+          "start": 22.22,
+          "end": 25.42,
+          "text": "Tunasalimiana kwa furaha!"
+        },
+        {
+          "start": 34.42,
+          "end": 38.64,
+          "text": "Habari za asubuhi? Njema sana!"
+        },
+        {
+          "start": 39.28,
+          "end": 43.16,
+          "text": "Umeamkaje? Nimeamka salama!"
+        },
+        {
+          "start": 43.16,
+          "end": 47.56,
+          "text": "Umelalaje? Salama kabisa!"
+        },
+        {
+          "start": 48.08,
+          "end": 51.92,
+          "text": "Habari za asubuhi? Nzuri tu!"
+        },
+        {
+          "start": 52.48,
+          "end": 56.86,
+          "text": "Habari za mchana? Salama!"
+        },
+        {
+          "start": 56.86,
+          "end": 61.1,
+          "text": "Umeshindaje? Salama kabisa!"
+        },
+        {
+          "start": 61.1,
+          "end": 65.62,
+          "text": "Habari za jioni? Nzuri sana!"
+        },
+        {
+          "start": 65.62,
+          "end": 70.18,
+          "text": "Siku yako ilikuwaje? Njema kabisa!"
+        },
+        {
+          "start": 70.18,
+          "end": 72.52,
+          "text": "Habari yako? Nzuri!"
+        },
+        {
+          "start": 72.52,
+          "end": 75,
+          "text": "Habari zenu? Salama!"
+        },
+        {
+          "start": 75,
+          "end": 77.02,
+          "text": "Habari za leo? Njema!"
+        },
+        {
+          "start": 77.02,
+          "end": 79.44,
+          "text": "Habari za sasa? Nzuri tu!"
+        },
+        {
+          "start": 79.44,
+          "end": 81.4,
+          "text": "Nzuri, salama, njema,"
+        },
+        {
+          "start": 81.4,
+          "end": 84.16,
+          "text": "Salama kabisa, njema sana!"
+        },
+        {
+          "start": 84.16,
+          "end": 85.58,
+          "text": "Tunasalimiana kila siku,"
+        },
+        {
+          "start": 85.58,
+          "end": 88.36,
+          "text": "Kwa heshima na furaha!"
+        },
+        {
+          "start": 89.58,
+          "end": 91.74,
+          "text": "Hujambo? Sijambo!"
+        },
+        {
+          "start": 91.74,
+          "end": 93.32,
+          "text": "Hamjambo? Hatujambo!"
+        },
+        {
+          "start": 93.32,
+          "end": 95.56,
+          "text": "Yeye hajambo? Hajambo!"
+        },
+        {
+          "start": 95.56,
+          "end": 98,
+          "text": "Wao hawajambo? Hawajambo!"
+        },
+        {
+          "start": 98,
+          "end": 99.58,
+          "text": "Habari gani? Nzuri sana!"
+        },
+        {
+          "start": 99.58,
+          "end": 100.88,
+          "text": "Na wewe je? Salama!"
+        },
+        {
+          "start": 101.58,
+          "end": 103.4,
+          "text": "Habari za nyumbani? Njema!"
+        },
+        {
+          "start": 103.4,
+          "end": 105.58,
+          "text": "Wote wazima? Wazima!"
+        },
+        {
+          "start": 106.62,
+          "end": 109.96,
+          "text": "Shikamoo mama! Marahaba!"
+        },
+        {
+          "start": 109.96,
+          "end": 113.58,
+          "text": "Shikamoo baba! Marahaba!"
+        },
+        {
+          "start": 115.58,
+          "end": 119.32,
+          "text": "Shikamoo mwalimu! Marahaba!"
+        },
+        {
+          "start": 119.32,
+          "end": 123.58,
+          "text": "Shikamoo bibi! Marahaba!"
+        },
+        {
+          "start": 124.16,
+          "end": 126.98,
+          "text": "Mambo? Poa!"
+        },
+        {
+          "start": 127.58,
+          "end": 129.28,
+          "text": "Vipi? Safi!"
+        },
+        {
+          "start": 129.28,
+          "end": 131.68,
+          "text": "Sasa? Freshi!"
+        },
+        {
+          "start": 131.68,
+          "end": 133.68,
+          "text": "Niaje? Shwari!"
+        },
+        {
+          "start": 135.94,
+          "end": 138.04,
+          "text": "Habari za asubuhi? Njema!"
+        },
+        {
+          "start": 139.6,
+          "end": 142.04,
+          "text": "Habari za mchana? Salama!"
+        },
+        {
+          "start": 143.94,
+          "end": 147.2,
+          "text": "Habari za jioni? Nzuri!"
+        },
+        {
+          "start": 147.2,
+          "end": 152.18,
+          "text": "Habari za leo? Salama kabisa!"
+        },
+        {
+          "start": 152.18,
+          "end": 153.75,
+          "text": "Hujambo? Sijambo!"
+        },
+        {
+          "start": 153.75,
+          "end": 155.3,
+          "text": "Hamjambo? Hatujambo!"
+        },
+        {
+          "start": 155.3,
+          "end": 157.04,
+          "text": "Shikamoo! Marahaba!"
+        },
+        {
+          "start": 157.74,
+          "end": 160.44,
+          "text": "Mambo? Poa!"
+        },
+        {
+          "start": 161.04,
+          "end": 165.5,
+          "text": "Tunasalimiana kila siku,"
+        },
+        {
+          "start": 165.5,
+          "end": 169.46,
+          "text": "Kwa heshima na furaha!"
+        },
+        {
+          "start": 170.5,
+          "end": 174.44,
+          "text": "Kiswahili, Kiswahili,"
+        },
+        {
+          "start": 174.44,
+          "end": 179.24,
+          "text": "Tunajifunza kila siku!"
+        },
+        {
+          "start": 179.24,
+          "end": 182.4,
+          "text": "Asante sana, kwa heri!"
+        },
+        {
+          "start": 182.4,
+          "end": 185.5,
+          "text": "Kwa heri, tutaonana!"
+        },
+        {
+          "start": 185.5,
+          "end": 187.12,
+          "text": "Asante sana, karibu tena!"
+        },
+        {
+          "start": 187.12,
+          "end": 189.52,
+          "text": "Tutaonana tena!"
+        }
+      ],
+      "recordingSha256": "765058b69a50e6202673a0b57348ad9204160d8c8dd7ed42848f4758a0960d0f",
+      "duration": 213.624,
+      "timingStatus": "estimated",
+      "timingMethod": "Locally generated Whisper small word timestamps, matched against the supplied recording; teacher listening review recommended"
+    },
+    {
       "trackId": "swahili-a1-day-11",
       "objectKey": "swahili/music/A1/day-11/Dukani.mp3",
       "title": "Tunaenda Dukani!",
@@ -527,7 +799,7 @@
           "text": "Nzuri, asante! Karibu!"
         },
         {
-          "start": 19.0,
+          "start": 19,
           "end": 20.84,
           "text": "Nikuhudumie nini?"
         },
@@ -2794,7 +3066,7 @@
         },
         {
           "start": 75.08,
-          "end": 77.0,
+          "end": 77,
           "text": "Ninazima taa na vifaa."
         },
         {
@@ -2874,7 +3146,7 @@
         },
         {
           "start": 122.78,
-          "end": 125.0,
+          "end": 125,
           "text": "Karatasi, chupa na plastiki."
         },
         {
@@ -2948,7 +3220,7 @@
           "text": "Tunaweza kuleta mabadiliko."
         },
         {
-          "start": 159.0,
+          "start": 159,
           "end": 160.84,
           "text": "Okoa maji, okoa umeme,"
         },
@@ -3053,11 +3325,11 @@
         },
         {
           "start": 42.04,
-          "end": 45.0,
+          "end": 45,
           "text": "Ich tanze zu der Musik,"
         },
         {
-          "start": 45.0,
+          "start": 45,
           "end": 48.08,
           "text": "meine Freunde lachen auch."
         },
@@ -3151,37 +3423,37 @@
         },
         {
           "start": 4.55,
-          "end": 8.0,
+          "end": 8,
           "text": "der Kellner fragt: „Was möchten Sie?“"
         },
         {
           "start": 8.19,
-          "end": 12.0,
+          "end": 12,
           "text": "Ich sage: „Eine Suppe, bitte,"
         },
         {
-          "start": 12.0,
-          "end": 14.0,
+          "start": 12,
+          "end": 14,
           "text": "aber kein Fleisch für mich.“"
         },
         {
-          "start": 14.0,
+          "start": 14,
           "end": 17.98,
           "text": "Er nickt und schreibt die Bestellung auf,"
         },
         {
           "start": 17.98,
-          "end": 22.0,
+          "end": 22,
           "text": "zeigt freundlich auf das Tagesgericht."
         },
         {
           "start": 22.19,
-          "end": 25.0,
+          "end": 25,
           "text": "Ich frage noch: „Ist Reis dabei?“"
         },
         {
-          "start": 25.0,
-          "end": 28.0,
+          "start": 25,
+          "end": 28,
           "text": "Er sagt: „Natürlich, das geht.“"
         },
         {
@@ -3191,17 +3463,17 @@
         },
         {
           "start": 30.53,
-          "end": 32.0,
+          "end": 32,
           "text": "keinen Fisch."
         },
         {
-          "start": 32.0,
-          "end": 34.0,
+          "start": 32,
+          "end": 34,
           "text": "Ich trinke Wasser,"
         },
         {
           "start": 34.39,
-          "end": 36.0,
+          "end": 36,
           "text": "keinen Saft."
         },
         {
@@ -3211,7 +3483,7 @@
         },
         {
           "start": 39.4,
-          "end": 43.0,
+          "end": 43,
           "text": "ganz einfach und entspannt."
         },
         {
@@ -3231,7 +3503,7 @@
         },
         {
           "start": 49.24,
-          "end": 51.0,
+          "end": 51,
           "text": "noch mit dazu."
         },
         {
@@ -3246,32 +3518,32 @@
         },
         {
           "start": 59.19,
-          "end": 63.0,
+          "end": 63,
           "text": "Mir schmecken Reis und Gemüse,"
         },
         {
-          "start": 63.0,
-          "end": 66.0,
+          "start": 63,
+          "end": 66,
           "text": "sie möchte heute keinen Kuchen."
         },
         {
           "start": 66.19,
-          "end": 70.0,
+          "end": 70,
           "text": "Der Kellner bringt uns unser Essen,"
         },
         {
-          "start": 70.0,
-          "end": 72.0,
+          "start": 70,
+          "end": 72,
           "text": "wir sagen: „Vielen Dank!“"
         },
         {
-          "start": 72.0,
+          "start": 72,
           "end": 75.31,
           "text": "Die Teller duften, alles ist warm,"
         },
         {
           "start": 75.31,
-          "end": 79.0,
+          "end": 79,
           "text": "wir nehmen uns die Zeit."
         },
         {
@@ -3281,7 +3553,7 @@
         },
         {
           "start": 82.31,
-          "end": 86.0,
+          "end": 86,
           "text": "und lächelt: „Das schmeckt fein.“"
         },
         {
@@ -3301,7 +3573,7 @@
         },
         {
           "start": 93.48,
-          "end": 95.0,
+          "end": 95,
           "text": "keinen Saft."
         },
         {
@@ -3311,7 +3583,7 @@
         },
         {
           "start": 99.39,
-          "end": 104.0,
+          "end": 104,
           "text": "ganz einfach und entspannt."
         },
         {
@@ -3331,7 +3603,7 @@
         },
         {
           "start": 108.69,
-          "end": 110.0,
+          "end": 110,
           "text": "noch mit dazu."
         },
         {
@@ -3351,7 +3623,7 @@
         },
         {
           "start": 121.29,
-          "end": 125.0,
+          "end": 125,
           "text": "Ich sage: „Ja, es schmeckt sehr gut!“"
         },
         {
@@ -3361,12 +3633,12 @@
         },
         {
           "start": 128.57,
-          "end": 131.0,
+          "end": 131,
           "text": "und etwas Brot dazu.“"
         },
         {
-          "start": 131.0,
-          "end": 133.0,
+          "start": 131,
+          "end": 133,
           "text": "Sie nimmt noch einen Kaffee,"
         },
         {
@@ -3376,11 +3648,11 @@
         },
         {
           "start": 134.37,
-          "end": 136.0,
+          "end": 136,
           "text": "Wir sitzen hier zusammen,"
         },
         {
-          "start": 136.0,
+          "start": 136,
           "end": 137.9,
           "text": "der Abend ist so schön."
         },
@@ -3391,7 +3663,7 @@
         },
         {
           "start": 140.06,
-          "end": 142.0,
+          "end": 142,
           "text": "und draußen wird es still."
         },
         {
@@ -3411,7 +3683,7 @@
         },
         {
           "start": 146.2,
-          "end": 148.0,
+          "end": 148,
           "text": "„Zusammen oder getrennt?“"
         },
         {
@@ -3421,7 +3693,7 @@
         },
         {
           "start": 150.02,
-          "end": 152.0,
+          "end": 152,
           "text": "Der Kellner lächelt nett."
         },
         {
@@ -3431,27 +3703,27 @@
         },
         {
           "start": 153.98,
-          "end": 156.0,
+          "end": 156,
           "text": "und sagen: „Auf Wiedersehn!“"
         },
         {
           "start": 156.17,
-          "end": 158.0,
+          "end": 158,
           "text": "„Das Essen war sehr lecker,"
         },
         {
           "start": 158.19,
-          "end": 161.0,
+          "end": 161,
           "text": "wir werden wiederkomm’n.“"
         },
         {
-          "start": 161.0,
+          "start": 161,
           "end": 162.66,
           "text": "Ich möchte Suppe,"
         },
         {
           "start": 162.89,
-          "end": 164.0,
+          "end": 164,
           "text": "keinen Fisch."
         },
         {
@@ -3466,22 +3738,22 @@
         },
         {
           "start": 168.75,
-          "end": 173.0,
+          "end": 173,
           "text": "So bestelle ich mein Essen,"
         },
         {
           "start": 173.19,
-          "end": 176.0,
+          "end": 176,
           "text": "ganz einfach und entspannt."
         },
         {
-          "start": 176.0,
+          "start": 176,
           "end": 177.66,
           "text": "Ich möchte Suppe,"
         },
         {
           "start": 177.89,
-          "end": 179.0,
+          "end": 179,
           "text": "keinen Fisch."
         },
         {
@@ -3491,12 +3763,12 @@
         },
         {
           "start": 181.35,
-          "end": 183.0,
+          "end": 183,
           "text": "noch mit dazu."
         },
         {
-          "start": 183.0,
-          "end": 188.0,
+          "start": 183,
+          "end": 188,
           "text": "So bestelle ich mein Essen,"
         },
         {
@@ -3511,7 +3783,7 @@
         },
         {
           "start": 192.88,
-          "end": 194.0,
+          "end": 194,
           "text": "keinen Fisch."
         },
         {
@@ -3521,22 +3793,22 @@
         },
         {
           "start": 197.35,
-          "end": 199.0,
+          "end": 199,
           "text": "keinen Saft."
         },
         {
-          "start": 199.0,
-          "end": 203.0,
+          "start": 199,
+          "end": 203,
           "text": "So bestelle ich mein Essen,"
         },
         {
           "start": 203.19,
-          "end": 207.0,
+          "end": 207,
           "text": "ganz einfach und entspannt."
         },
         {
-          "start": 207.0,
-          "end": 211.0,
+          "start": 207,
+          "end": 211,
           "text": "Das Essen schmeckt uns sehr,"
         },
         {
@@ -3546,22 +3818,22 @@
         },
         {
           "start": 214.11,
-          "end": 218.0,
+          "end": 218,
           "text": "Mit Deutsch kann ich beim Essen"
         },
         {
           "start": 218.19,
-          "end": 221.0,
+          "end": 221,
           "text": "bestellen immer besser."
         },
         {
-          "start": 221.0,
-          "end": 226.0,
+          "start": 221,
+          "end": 226,
           "text": "Hmm … Essen bestellen …"
         },
         {
           "start": 226.19,
-          "end": 228.0,
+          "end": 228,
           "text": "Oh … auf Wiedersehen."
         }
       ],
@@ -3579,12 +3851,12 @@
       "cues": [
         {
           "start": 11.2,
-          "end": 13.0,
+          "end": 13,
           "text": "Mein Bruder hat einen Traum,"
         },
         {
           "start": 13.36,
-          "end": 16.0,
+          "end": 16,
           "text": "er möchte Krankenpfleger sein."
         },
         {
@@ -3608,13 +3880,13 @@
           "text": "die Zukunft liegt vor ihm."
         },
         {
-          "start": 29.0,
+          "start": 29,
           "end": 31.52,
           "text": "Oh, oh, ein neuer Anfang,"
         },
         {
           "start": 31.81,
-          "end": 35.0,
+          "end": 35,
           "text": "sein großer Traum beginnt."
         },
         {
@@ -3638,7 +3910,7 @@
           "text": "und glaube fest daran."
         },
         {
-          "start": 48.0,
+          "start": 48,
           "end": 51.44,
           "text": "Oh, oh, mein Traumberuf,"
         },
@@ -3668,7 +3940,7 @@
           "text": "er fragt, was er dafür braucht."
         },
         {
-          "start": 67.0,
+          "start": 67,
           "end": 69.51,
           "text": "Er schreibt die Bewerbung,"
         },
@@ -3754,7 +4026,7 @@
         },
         {
           "start": 119.65,
-          "end": 123.0,
+          "end": 123,
           "text": "über meinen Beruf zu sprechen."
         }
       ],
