@@ -11,7 +11,7 @@ import { savePreferredLevel } from "../services/levelStorage";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 import LegalFooter from "./LegalFooter";
-import { persistInterfaceLanguage } from "../i18n";
+import { changeInterfaceLanguage } from "../i18n";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const isFullName = (value) => {
@@ -196,14 +196,14 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       { value: "en", label: t("interfaceLanguages.en") },
       { value: "de", label: t("interfaceLanguages.de") },
       { value: "fr", label: t("interfaceLanguages.fr") },
+      { value: "sw", label: t("interfaceLanguages.sw") },
     ],
     [t]
   );
 
   const handleInterfaceLanguageChange = (event) => {
     const nextLanguage = event.target.value;
-    i18n.changeLanguage(nextLanguage);
-    persistInterfaceLanguage(nextLanguage);
+    void changeInterfaceLanguage(nextLanguage);
   };
 
   const handleSubmit = async (event) => {
