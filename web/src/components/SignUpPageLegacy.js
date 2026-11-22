@@ -1044,7 +1044,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
               setAuthError("");
             }}
             style={inputStyle}
-            placeholder="0176 12345678"
+            placeholder="024 123 4567 or +233 24 123 4567"
           />
           {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
 
@@ -1106,11 +1106,14 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
               setAuthError("");
             }}
             style={inputStyle}
-            placeholder="0176 98765432"
+            placeholder="055 987 6543 or +233 55 987 6543"
           />
           {fieldErrors.emergencyContactPhone ? (
             <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
           ) : null}
+          <p style={{ ...styles.helperText, marginTop: -4 }}>
+            {t("signupDetails.duplicateProtectionNote")}
+          </p>
 
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
             <input
