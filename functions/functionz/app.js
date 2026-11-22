@@ -10,6 +10,7 @@
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
+const { registerSignupDuplicateReviewRoutes } = require("./signupDuplicateReview");
 const crypto = require("crypto");
 const multer = require("multer");
 const fs = require("fs");
@@ -812,6 +813,10 @@ app.use(
 );
 
 app.use(requireMockTaskVersion);
+
+// Same check is available through the Firebase Cloud Functions API as well as
+// the Vercel payment-aware app; neither endpoint exposes matched student data.
+registerSignupDuplicateReviewRoutes(app, { admin });
 
 app.get("/", (_req, res) => res.send("OK"));
 app.get("/health", (_req, res) =>
