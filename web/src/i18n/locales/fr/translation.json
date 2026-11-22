@@ -1828,6 +1828,11 @@
     "learningMode": "Mode d’apprentissage"
   },
   "signupDetails": {
+    "countryOfResidence": "Pays de résidence",
+    "countryPlaceholder": "Sélectionnez votre pays",
+    "cityOrTown": "Ville / Commune",
+    "countryRequired": "Sélectionnez votre pays de résidence.",
+    "countryHelp": "Choisissez dans la liste des pays. Aucune vérification supplémentaire n’est nécessaire.",
     "duplicateProtectionNote": "Déjà inscrit(e) ? Connectez-vous plutôt que d’utiliser une autre adresse e-mail. Nous vérifions les numéros de contact pour éviter les comptes en double. Les membres d’une famille peuvent partager un contact d’urgence.",
     "fullNameHint": "Indiquez votre prénom et votre nom complets pour les certificats et les relevés.",
     "passwordHint": "Au moins 8 caractères avec lettres et chiffres",
