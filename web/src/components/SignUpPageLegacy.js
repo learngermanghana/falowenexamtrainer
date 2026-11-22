@@ -26,7 +26,7 @@ import {
   normalizePersonName,
   normalizeWhitespace,
 } from "../lib/signupDataQuality";
-import { canonicalPhone } from "../lib/signupIdentity";
+import { areSameContactNumber } from "../lib/signupContactValidation";
 import { getCountryName, isValidCountryCode } from "../data/countries";
 import CountryCombobox from "./CountryCombobox";
 import { getCountryDialCode, getNationalPhonePlaceholder, phoneToE164, formatNationalPhone } from "../data/phoneCountries";
@@ -143,6 +143,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   const [address, setAddress] = useState(initialDraft?.address || "");
   const [germanMode, setLearningMode] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState(initialDraft?.emergencyContactPhone || "");
+  const duplicateContactNumber = areSameContactNumber(phone, emergencyContactPhone, countryCode);
   const [germanPayment, setPaymentOption] = useState("trial");
   const [germanClass, setSelectedClass] = useState(loadPreferredClass() || "");
   const selectedLevel = universityInvitation?.level || courseDiscount?.level || (isSwahili ? "A1" : germanLevel);
@@ -449,9 +450,8 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
     if (!cleanedEmergencyPhone) {
       validationIssues.emergencyContactPhone =
         "Add a valid emergency contact phone number (7–15 digits). This is required for safety.";
-    } else if (canonicalPhone(cleanedPhone) && canonicalPhone(cleanedPhone) === canonicalPhone(cleanedEmergencyPhone)) {
-      validationIssues.emergencyContactPhone =
-        "Your emergency contact should be someone else. Enter a different phone number.";
+    } else if (duplicateContactNumber) {
+      validationIssues.emergencyContactPhone = t("signupDetails.emergencyMustDiffer");
     }
 
     if (!learningMode) {
@@ -1157,7 +1157,9 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             placeholder={getNationalPhonePlaceholder(countryCode)}
           />
           {fieldErrors.emergencyContactPhone ? (
-            <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
+            <p role="alert" style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
+          ) : duplicateContactNumber ? (
+            <p role="alert" style={styles.fieldError}>{t("signupDetails.emergencyMustDiffer")}</p>
           ) : null}
           <p style={{ ...styles.helperText, marginTop: -4 }}>
             {t("signupDetails.duplicateProtectionNote")}
