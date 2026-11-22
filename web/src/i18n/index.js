@@ -66,12 +66,36 @@ export const persistInterfaceLanguage = (language) => {
   }
 };
 
-// A single interface language preference is shared by public pages, login, signup
-// and the signed-in application. It never changes the enrolled course.
-export const changeInterfaceLanguage = async (language) => {
+// The public selector is shared. Signed-in users also have a separate scoped
+// preference, so a student on a shared device never inherits someone else's UI.
+const accountLanguageKey = (uid) => `falowen:interface-language:${uid}`;
+
+export const readAccountInterfaceLanguage = (uid, serverLanguage = "") => {
+  if (!uid) return "";
+  const fromServer = normalizeStoredLanguage(serverLanguage);
+  if (fromServer) return fromServer;
+  try {
+    return typeof window === "undefined" ? "" :
+      normalizeStoredLanguage(window.localStorage.getItem(accountLanguageKey(uid)));
+  } catch {
+    return "";
+  }
+};
+
+// App language does not change enrollment, class, results or the course switcher.
+export const changeInterfaceLanguage = async (language, uid = "") => {
   const normalized = normalizeStoredLanguage(language) || "en";
   persistInterfaceLanguage(normalized);
+  if (uid && typeof window !== "undefined") {
+    try { window.localStorage.setItem(accountLanguageKey(uid), normalized); } catch { /* optional storage */ }
+  }
   return i18n.changeLanguage(normalized);
+};
+
+export const restoreAccountInterfaceLanguage = async (uid, serverLanguage = "") => {
+  const language = readAccountInterfaceLanguage(uid, serverLanguage);
+  if (language) await changeInterfaceLanguage(language, uid);
+  return language;
 };
 
 if (typeof document !== "undefined") {
