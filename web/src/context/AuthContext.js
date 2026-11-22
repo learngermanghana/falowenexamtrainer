@@ -669,6 +669,8 @@ export const AuthProvider = ({ children }) => {
         className: universityInvitation ? "" : profile.className || "",
         phone: profile.phone || "",
         location: profile.location || "",
+        countryCode: profile.countryCode || "",
+        country: profile.country || "",
         program,
         // Admissions interest is never an active secondaryProgram. Staff must
         // approve placement and tuition before enabling the second course.
