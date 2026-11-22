@@ -1886,7 +1886,9 @@
     "signupNotice": "Dein Hauptkurs beginnt zuerst. Das Team meldet sich wegen des zweiten Kurses; noch keine Anmeldung oder Gebühr.",
     "placementPending": "Für deinen zweiten Kurs fehlen noch Klasse und Niveau. Bitte kontaktiere die Anmeldung.",
     "secondaryBillingTitle": "Gebühren für den zweiten Kurs",
-    "secondaryBillingNotice": "Kursgebühren und Zahlungen des zweiten Kurses verwaltet das Falowen-Team getrennt. Hier stehen nur bestätigte Zahlen; es wird keine Zahlung gestartet."
+    "secondaryBillingNotice": "Kursgebühren und Zahlungen des zweiten Kurses verwaltet das Falowen-Team getrennt. Hier stehen nur bestätigte Zahlen; es wird keine Zahlung gestartet.",
+    "placementPendingLabel": "Kurszuweisung ausstehend",
+    "secondaryAccessLabel": "Zweiter Kurs"
   },
   "resultsOverview": {
     "title": "Ergebnisse",
