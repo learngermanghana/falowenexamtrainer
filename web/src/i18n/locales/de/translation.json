@@ -1824,6 +1824,11 @@
     "learningMode": "Lernform"
   },
   "signupDetails": {
+    "countryOfResidence": "Wohnsitzland",
+    "countryPlaceholder": "Land auswählen",
+    "cityOrTown": "Stadt / Ort",
+    "countryRequired": "Bitte wähle dein Wohnsitzland aus.",
+    "countryHelp": "Wähle ein Land aus der Liste. Keine zusätzliche Verifizierung erforderlich.",
     "duplicateProtectionNote": "Schon registriert? Melde dich an, statt eine andere E-Mail-Adresse zu verwenden. Wir prüfen Kontaktnummern, um doppelte Konten zu vermeiden. Familienmitglieder dürfen denselben Notfallkontakt haben.",
     "fullNameHint": "Bitte gib deinen Vor- und Nachnamen ein. Wir verwenden ihn für Zeugnisse und Bescheinigungen.",
     "passwordHint": "Mindestens 8 Zeichen mit Buchstaben und Zahlen",
