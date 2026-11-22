@@ -22,10 +22,8 @@ import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { resolveUniversityInvitation } from "../lib/universityInvitations";
 import {
   isFullName,
-  isLikelyPhoneNumber,
   normalizeEmail,
   normalizePersonName,
-  normalizePhone,
   normalizeWhitespace,
 } from "../lib/signupDataQuality";
 import { canonicalPhone } from "../lib/signupIdentity";
@@ -315,7 +313,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
     const issues = {};
     if (normalizePersonName(firstName).length < 2) issues.firstName = t("signupDetails.firstNameRequired");
     if (normalizePersonName(lastName).length < 2) issues.lastName = t("signupDetails.lastNameRequired");
-    if (!isFullName(name)) issues.firstName = t("signupDetails.legalNameRequired");
+    if (!isFullName(name) && !issues.firstName && !issues.lastName) issues.firstName = t("signupDetails.legalNameRequired");
     if (!nameConfirmed) issues.nameConfirmed = t("signupDetails.confirmNameRequired");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) issues.email = "Enter a valid email address.";
     if (password.length < 8 || !/[a-z]/i.test(password) || !/[0-9]/.test(password)) issues.password = "Use at least 8 characters, including a letter and a number.";
