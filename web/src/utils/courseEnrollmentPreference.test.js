@@ -23,6 +23,42 @@ describe("enrolled course switching", () => {
     expect(courseProfile({ program: "german" }, "swahili")).toEqual({ program: "german" });
   });
 
+  test("does not leak tuition, trial or access from German to Swahili", () => {
+    const source = {
+      ...student,
+      tuitionFee: 3000, balanceDue: 1200, paid: 1800,
+      paymentStatus: "partial", paystackLink: "https://pay.example/german",
+      trialEndsAt: "2030-01-01", accessType: "invitation_pending",
+      institutionId: "german-partner", courseProgress: { completed: 12 },
+      coursePlacements: {
+        swahili: { level: "B1", className: "Kiswahili B1", tuitionFee: 700, balanceDue: 700, paymentStatus: "pending" },
+      },
+    };
+    const switched = courseProfile(source, "swahili");
+    expect(switched).toEqual(expect.objectContaining({
+      level: "B1", className: "Kiswahili B1", tuitionFee: 700,
+      balanceDue: 700, paymentStatus: "pending",
+    }));
+    for (const field of ["paid", "paystackLink", "trialEndsAt", "accessType", "institutionId", "courseProgress"]) {
+      expect(switched).not.toHaveProperty(field);
+    }
+    expect(source.tuitionFee).toBe(3000);
+  });
+
+  test("missing secondary placement does not manufacture A1 entitlement", () => {
+    const result = courseProfile({ ...student, tuitionFee: 3000, coursePlacements: {} }, "swahili");
+    expect(result.level).toBe("");
+    expect(result.className).toBe("");
+    expect(result.coursePlacementPending).toBe(true);
+    expect(result).not.toHaveProperty("tuitionFee");
+  });
+
+  test("only official enrollment permits a course, not an admissions interest", () => {
+    expect(enrolledCourses({ program: "german", additionalProgrammeInterest: "swahili" })).toEqual(["german"]);
+    expect(enrolledCourses({ program: "german", secondaryProgram: "Swahili" })).toEqual(["german", "swahili"]);
+    expect(enrolledCourses({ program: "unknown", secondaryProgram: "swahili" })).toEqual([]);
+  });
+
   test("remembers only a permitted course for this account, not another account", () => {
     const allowed = enrolledCourses(student);
     expect(saveCoursePreference("student-a", "swahili", allowed)).toBe(true);
