@@ -547,6 +547,15 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             style={inputStyle}
             placeholder={mode === "login" ? t("authUi.emailOrCodeHint") : undefined}
           />
+          {mode === "signup" && suggestedEmail ? (
+            <p style={styles.helperText}>
+              {t("signupDetails.emailDidYouMean")} <strong>{suggestedEmail}</strong>{" "}
+              <button type="button" onClick={() => setEmail(suggestedEmail)}
+                style={{ border: 0, background: "none", color: "#1d4ed8", textDecoration: "underline", cursor: "pointer" }}>
+                {t("signupDetails.useSuggestedEmail")}
+              </button>
+            </p>
+          ) : null}
 
           <label style={styles.label}>{t("signupPage.fields.password")}</label>
           <div style={{ position: "relative" }}>
