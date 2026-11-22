@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { changeInterfaceLanguage } from "../i18n";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
@@ -593,6 +594,19 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             </button>
           )}
         </div>
+        <label style={{ display: "grid", justifyItems: "start", gap: 4, color: "#374151", fontSize: 13 }}>
+          {t("uiLanguageFlow.signupLanguageLabel")}
+          <select
+            aria-label={t("interfaceLanguage.ariaLabel")}
+            value={String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2)}
+            onChange={(event) => { void changeInterfaceLanguage(event.target.value); }}
+            style={{ ...styles.select, maxWidth: 220 }}
+          >
+            {["en", "de", "fr", "sw"].map((code) => (
+              <option key={code} value={code}>{t(`interfaceLanguages.${code}`)}</option>
+            ))}
+          </select>
+        </label>
         <p style={{ ...styles.helperText, marginTop: -2 }}>
           {t("signup.interfaceNote", { program: t(`signup.programs.${program}`) })}
         </p>
@@ -615,27 +629,27 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
         >
           <div style={{ padding: 16, background: "linear-gradient(0deg, rgba(2,6,23,0.55), rgba(2,6,23,0.05))", width: "100%" }}>
             <p style={{ margin: 0, fontSize: 12, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.95 }}>
-              Welcome to Falowen
+              {t("uiLanguageFlow.welcome")}
             </p>
-            <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>Start strong. Learn with confidence.</h3>
+            <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>{t("uiLanguageFlow.motivation")}</h3>
             <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
-              {universityInvitation ? "Complimentary Kiswahili A1 access for eligible University of Hamburg course students. No fee or trial required; instructor approval is needed." : isSwahili ? t("signup.swahiliTrial") : "Three simple steps to get ready. Choose a 7-day trial or pay immediately, then start learning with Falowen."}
+              {universityInvitation ? t("uiLanguageFlow.universityIntro") : isSwahili ? t("signup.swahiliTrial") : t("uiLanguageFlow.trialIntro")}
             </p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} noValidate data-signup-step={step} data-signup-error={authError} style={{ display: "grid", gap: 16 }}>
-          <nav aria-label="Signup progress">
+          <nav aria-label={t("uiLanguageFlow.progressLabel")}>
             <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
-              {["Your account", "Your learning", "Contact details"].map((label, index) => <li key={label} aria-current={step === index + 1 ? "step" : undefined} style={{ borderTop: `4px solid ${step >= index + 1 ? "#2563eb" : "#e2e8f0"}`, paddingTop: 10, color: step === index + 1 ? "#1d4ed8" : "#64748b", fontSize: 13, fontWeight: step === index + 1 ? 700 : 500 }}>{index + 1}. {label}</li>)}
+              {t("uiLanguageFlow.steps", { returnObjects: true }).map((label, index) => <li key={label} aria-current={step === index + 1 ? "step" : undefined} style={{ borderTop: `4px solid ${step >= index + 1 ? "#2563eb" : "#e2e8f0"}`, paddingTop: 10, color: step === index + 1 ? "#1d4ed8" : "#64748b", fontSize: 13, fontWeight: step === index + 1 ? 700 : 500 }}>{index + 1}. {label}</li>)}
             </ol>
           </nav>
           <div>
-            <p style={{ margin: "0 0 6px", color: "#64748b", fontSize: 13 }}>Step {step} of 3 · All details are collected before your account is created</p>
-            <h3 ref={stepHeadingRef} tabIndex={-1} style={{ margin: 0, color: "#0f172a", fontSize: 23 }}>{["Let’s create your account", "Choose how you’ll learn", "How can we reach you?"][step - 1]}</h3>
-            <p style={{ margin: "8px 0 0", color: "#475569", lineHeight: 1.6 }}>{["Use your full name and an email you can access.", "Choose your level, learning mode and class, then select trial or payment.", "We need your contact and emergency details before you begin. Going back keeps your answers."][step - 1]}</p>
+            <p style={{ margin: "0 0 6px", color: "#64748b", fontSize: 13 }}>{t("uiLanguageFlow.stepCount", { step })}</p>
+            <h3 ref={stepHeadingRef} tabIndex={-1} style={{ margin: 0, color: "#0f172a", fontSize: 23 }}>{t("uiLanguageFlow.headings", { returnObjects: true })[step - 1]}</h3>
+            <p style={{ margin: "8px 0 0", color: "#475569", lineHeight: 1.6 }}>{t("uiLanguageFlow.descriptions", { returnObjects: true })[step - 1]}</p>
           </div>
-          <fieldset aria-label="Your account" disabled={step !== 1 || loading} hidden={step !== 1} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 1 ? "grid" : "none", gap: 12 }}>
+          <fieldset aria-label={t("uiLanguageFlow.steps", { returnObjects: true })[0]} disabled={step !== 1 || loading} hidden={step !== 1} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 1 ? "grid" : "none", gap: 12 }}>
           <label htmlFor="signup-name" style={styles.label}>{t("signupPage.fields.name")}</label>
           <input
             type="text"
@@ -744,7 +758,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           {fieldErrors.confirmPassword ? <p style={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
 
           </fieldset>
-          <fieldset aria-label="Your learning" disabled={step !== 2 || loading} hidden={step !== 2} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 2 ? "grid" : "none", gap: 12 }}>
+          <fieldset aria-label={t("uiLanguageFlow.steps", { returnObjects: true })[1]} disabled={step !== 2 || loading} hidden={step !== 2} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 2 ? "grid" : "none", gap: 12 }}>
           {universityInvitation ? (
             <div data-university-invitation style={{ padding: 14, border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 12, display: "grid", gap: 5 }}>
               <strong>University of Hamburg · Kiswahili A1</strong>
@@ -909,7 +923,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           </p>
 
           {!courseDiscount && <>
-          <label style={styles.label}>How would you like to start?</label>
+          <label style={styles.label}>{t("uiLanguageFlow.startOption")}</label>
           <div
             ref={(element) => {
               fieldRefs.current.initialPaymentAmount = element;
@@ -992,7 +1006,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           </>}
 
           </fieldset>
-          <fieldset aria-label="Contact details" disabled={step !== 3 || loading} hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 3 ? "grid" : "none", gap: 12 }}>
+          <fieldset aria-label={t("uiLanguageFlow.steps", { returnObjects: true })[2]} disabled={step !== 3 || loading} hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 3 ? "grid" : "none", gap: 12 }}>
           <label htmlFor="signup-phone" style={styles.label}>{t("signupPage.fields.phone")}</label>
           <input
             type="tel"
@@ -1102,7 +1116,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
                 rel="noreferrer"
                 style={{ color: "#1d4ed8", fontWeight: 600 }}
               >
-                terms
+                {t("uiLanguageFlow.terms")}
               </a>
               {" "}
               {t("signupPage.consent.and")}
@@ -1113,7 +1127,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
                 rel="noreferrer"
                 style={{ color: "#1d4ed8", fontWeight: 600 }}
               >
-                privacy policy
+                {t("uiLanguageFlow.privacy")}
               </a>
               {t("signupPage.consent.period")}
             </span>
@@ -1150,15 +1164,15 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
 
           </fieldset>
           <div style={{ display: "flex", gap: 12, justifyContent: "space-between", flexWrap: "wrap" }}>
-            {step > 1 ? <button type="button" style={styles.secondaryButton} disabled={loading} onClick={() => { setAuthError(""); setStep((current) => current - 1); }}>Back</button> : null}
-            {step < 3 ? <button type="submit" style={{ ...styles.primaryButton, flex: 1 }} disabled={loading}>Continue to {step === 1 ? "your learning" : "contact details"} →</button> : null}
+            {step > 1 ? <button type="button" style={styles.secondaryButton} disabled={loading} onClick={() => { setAuthError(""); setStep((current) => current - 1); }}>{t("uiLanguageFlow.back")}</button> : null}
+            {step < 3 ? <button type="submit" style={{ ...styles.primaryButton, flex: 1 }} disabled={loading}>{step === 1 ? t("uiLanguageFlow.continueLearning") : t("uiLanguageFlow.continueContact")} →</button> : null}
           </div>
           {step === 3 ? <>
           <button style={styles.primaryButton} type="submit" disabled={loading}>
-            {loading ? t("signupPage.actions.creating") : universityInvitation ? "Register for complimentary course access" : "Create account & start 7-day trial"}
+            {loading ? t("signupPage.actions.creating") : universityInvitation ? t("uiLanguageFlow.registerComplimentary") : t("uiLanguageFlow.createTrial")}
           </button>
           <p style={{ ...styles.helperText, margin: "-4px 0 0", textAlign: "center" }}>
-            {universityInvitation ? "No payment or trial. Course access is subject to verification by your instructor." : isSwahili ? t("signup.swahiliTrial") : "Start your 7-day trial without payment, or pay immediately after signup if you prefer."}
+            {universityInvitation ? t("uiLanguageFlow.universityNote") : isSwahili ? t("signup.swahiliTrial") : t("uiLanguageFlow.trialNote")}
           </p>
           </> : null}
         </form>
@@ -1217,7 +1231,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
                   rel="noreferrer"
                   style={{ color: "#1d4ed8", fontWeight: 600 }}
                 >
-                  terms
+                  {t("uiLanguageFlow.terms")}
                 </a>
                 {" "}
                 {t("signupPage.consent.and")}
@@ -1228,7 +1242,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
                   rel="noreferrer"
                   style={{ color: "#1d4ed8", fontWeight: 600 }}
                 >
-                  privacy policy
+                  {t("uiLanguageFlow.privacy")}
                 </a>
                 {" "}
                 {t("signupPage.consent.withoutLosingProgress")}
@@ -1240,14 +1254,14 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
         {authError && <div style={styles.errorBox}>{authError}</div>}
         {message && (
           <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#166534", borderColor: "#22c55e", display: "grid", gap: 12 }}>
-            <strong style={{ fontSize: 16 }}>Your Falowen account is ready</strong>
+            <strong style={{ fontSize: 16 }}>{t("uiLanguageFlow.ready")}</strong>
             <span>{message}</span>
             <button
               type="button"
               onClick={() => { window.location.href = "/campus"; }}
               style={{ ...styles.primaryButton, width: "100%" }}
             >
-              Start learning
+              {t("uiLanguageFlow.start")}
             </button>
           </div>
         )}
