@@ -656,6 +656,12 @@ export const AuthProvider = ({ children }) => {
         phone: profile.phone || "",
         location: profile.location || "",
         program,
+        // Admissions interest is never an active secondaryProgram. Staff must
+        // approve placement and tuition before enabling the second course.
+        additionalProgrammeInterest: ["german", "swahili"].includes(profile.additionalProgrammeInterest)
+          && profile.additionalProgrammeInterest !== program ? profile.additionalProgrammeInterest : "",
+        preferredInterfaceLanguage: ["en", "de", "fr", "sw"].includes(profile.preferredInterfaceLanguage)
+          ? profile.preferredInterfaceLanguage : "en",
 
         learningMode: profile.learningMode || "", // already there ✅
         address: profile.address || "",            // ✅ NEW FIELD
