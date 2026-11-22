@@ -1,6 +1,7 @@
 const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
 const admin = require("firebase-admin");
 const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { languageForStudent, classCopy, classActionLabel } = require("./classNotificationCopy");
 
 const REGION = "europe-west1";
 const TIME_ZONE = "Africa/Accra";
@@ -104,23 +105,44 @@ const findClassTargets = async (session = {}) => {
   const className = getClassName(session);
   if (!className) return [];
   const variants = [...new Set([className, className.toLowerCase(), className.toUpperCase()])];
-  const level = getLevel(session);
-  const snapshots = await Promise.all(variants.map((variant) => {
-    let query = db().collection("students").where("className", "==", variant);
-    if (level) query = query.where("level", "==", level);
-    return query.get();
-  }));
+  const level = String(getLevel(session) || "").toUpperCase();
+  const program = normalize(session.program || session.courseProgram || session.language);
+  const supportedProgram = ["german", "swahili"].includes(program) ? program : "";
+  // A single-field query for secondary placements avoids a new composite index.
+  // Filter both level and authorised programme in memory before sending.
+  const queries = variants.flatMap((variant) => {
+    const primary = db().collection("students").where("className", "==", variant).get();
+    return supportedProgram
+      ? [primary, db().collection("students").where(`coursePlacements.${supportedProgram}.className`, "==", variant).get()]
+      : [primary];
+  });
+  const snapshots = await Promise.all(queries);
   const targets = new Map();
-  snapshots.forEach((snapshot) => snapshot.forEach((docSnap) => targets.set(docSnap.id, { id: docSnap.id, data: docSnap.data() || {} })));
+  snapshots.forEach((snapshot) => snapshot.forEach((docSnap) => {
+    const data = docSnap.data() || {};
+    const primary = normalize(data.program || "german");
+    const placement = supportedProgram && data.coursePlacements?.[supportedProgram] || {};
+    const primaryMatch = (!supportedProgram || primary === supportedProgram)
+      && variants.includes(String(data.className || ""))
+      && (!level || String(data.level || "").toUpperCase() === level);
+    const secondaryMatch = supportedProgram && normalize(data.secondaryProgram) === supportedProgram
+      && variants.includes(String(placement.className || ""))
+      && (!level || String(placement.level || "").toUpperCase() === level);
+    if (primaryMatch || secondaryMatch) targets.set(docSnap.id, { id: docSnap.id, data });
+  }));
   return [...targets.values()];
 };
 
 const toFcmData = (data = {}) => Object.fromEntries(Object.entries(data).map(([key, value]) => [key, value == null ? "" : String(value)]));
 
-const sendToStudent = async ({ target, notificationId, title, body, type, route, data = {} }) => {
+const sendToStudent = async ({ target, notificationId, title, body, type, route, data = {}, copyForLanguage }) => {
   const current = await currentNotificationStudent(db(), target.id);
   if (!current) return { success: 0 };
   target = { ...target, data: current };
+  const language = languageForStudent(current.preferredInterfaceLanguage);
+  const localized = typeof copyForLanguage === "function" ? copyForLanguage(language) : null;
+  title = localized?.title || title;
+  body = localized?.body || body;
   const payloadData = toFcmData({ ...data, notificationId, type, category: "class", route, url: absoluteLink(route), title, body, timestamp: Date.now() });
   await db().collection("students").doc(target.id).collection("notifications").doc(notificationId).set({
     type: "Class",
@@ -147,7 +169,7 @@ const sendToStudent = async ({ target, notificationId, title, body, type, route,
       notification: {
         icon: "/logo192.png",
         badge: "/favicon.ico",
-        actions: [{ action: "open", title: type === "class_checkin_open" ? "Check in" : "Open class" }],
+        actions: [{ action: "open", title: classActionLabel(type, language) }],
         data: payloadData,
       },
       fcmOptions: { link: absoluteLink(route) },
@@ -182,16 +204,12 @@ const markEvent = (eventId, state, extra = {}) => db().collection("classPushRemi
   ...(state === "sent" ? { sentAt: getAdmin().firestore.FieldValue.serverTimestamp() } : {}),
 }, { merge: true });
 
-const buildReminder = (kind, session = {}) => {
-  const label = getSessionLabel(session);
-  const className = getClassName(session);
+const buildReminder = (kind, session = {}, language = "en") => {
+  const copy = classCopy({ kind, sessionLabel: getSessionLabel(session), className: getClassName(session), language });
+  if (!copy) return null;
   const route = kind === "checkin-open" ? checkinRoute(session) : classRoute(session);
-  const suffix = className ? ` · ${className}` : "";
-  if (kind === "tomorrow") return { route, type: "class_tomorrow", title: "Class tomorrow", body: `${label}${suffix}. Open Falowen to see the class details.` };
-  if (kind === "one-hour") return { route, type: "class_one_hour", title: "Class starts in 1 hour", body: `${label}${suffix}. Get ready for class.` };
-  if (kind === "fifteen-minutes") return { route, type: "class_fifteen_minutes", title: "Class starts in 15 minutes", body: `${label}${suffix}. Open the class details now.` };
-  if (kind === "checkin-open") return { route, type: "class_checkin_open", title: "Check-in is open", body: `${label}${suffix}. Open attendance now.` };
-  return null;
+  const types = { tomorrow: "class_tomorrow", "one-hour": "class_one_hour", "fifteen-minutes": "class_fifteen_minutes", "checkin-open": "class_checkin_open" };
+  return { route, type: types[kind], ...copy };
 };
 
 const deleteOldReminderNotifications = async ({ sessionId, session, oldSession }) => {
@@ -227,6 +245,7 @@ const sendClassLifecycleNotification = async ({ sessionId, session, kind }) => {
         body: reminder.body,
         type: reminder.type,
         route: reminder.route,
+        copyForLanguage: (language) => buildReminder(kind, session, language),
         data: { sessionId, className: getClassName(session), level: getLevel(session), sessionLabel: getSessionLabel(session), reminderKind: kind, sessionStartMs: getSessionStartMs(session) || "" },
       });
       pushes += result.success;
@@ -246,10 +265,7 @@ const sendImmediateClassChange = async ({ sessionId, session, oldSession, kind }
   const label = getSessionLabel(current);
   const route = classRoute(current);
   const cancelled = kind === "cancelled";
-  const title = cancelled ? "Class cancelled" : "Class rescheduled";
-  const body = cancelled
-    ? `${label}${className ? ` · ${className}` : ""} has been cancelled. Previous reminders were removed.`
-    : `${label}${className ? ` · ${className}` : ""} has a new date or time. Open the updated class details.`;
+  const { title, body } = classCopy({ kind, sessionLabel: label, className, language: "en" });
   const eventId = safeId(`${sessionId}-${startKey(current)}-${kind}`);
   if (!await claimEvent(eventId, { sessionId, kind, className })) return;
   const targets = await findClassTargets(current);
@@ -262,6 +278,7 @@ const sendImmediateClassChange = async ({ sessionId, session, oldSession, kind }
       body,
       type: cancelled ? "class_cancelled" : "class_rescheduled",
       route,
+      copyForLanguage: (language) => classCopy({ kind, sessionLabel: label, className, language }),
       data: { sessionId, className, level: getLevel(current), sessionLabel: label, previousStartMs: getSessionStartMs(oldSession || {}) || "", sessionStartMs: getSessionStartMs(session || {}) || "" },
     });
     pushes += result.success;
