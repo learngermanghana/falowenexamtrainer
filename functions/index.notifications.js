@@ -215,73 +215,48 @@ const notifyMarkedAssignmentCreated = async ({ notificationId, notificationDoc =
     return null;
   }
 
-  const { notification, data } = buildMarkedAssignmentPushPayload(notificationDoc);
-
-  await Promise.all(targets.map((target) => persistInAppNotification({
-    studentDocId: target.docId,
-    notificationId,
-    notification,
-    data,
-    type: "Scores",
-  })));
-
-  const tokens = new Set();
-  const tokenOwners = new Map();
-  targets.forEach((target) => {
-    target.tokens.forEach((token) => {
-      tokens.add(token);
-      tokenOwners.set(token, target.docId);
+  // Do not broadcast a single student's preferred language to other accounts.
+  await Promise.all(targets.map(async (target) => {
+    const { notification, data } = buildMarkedAssignmentPushPayload(notificationDoc, target.data?.preferredInterfaceLanguage);
+    await persistInAppNotification({
+      studentDocId: target.docId,
+      notificationId, notification, data, type: "Scores",
     });
-  });
-
-  if (!tokens.size) {
-    console.log("Marked assignment notification saved without push tokens", { notificationId, studentCode, targets: targets.length });
-    return null;
-  }
-
-  await sendPush({ tokens: Array.from(tokens), notification, data, tokenOwners });
-  console.log("Marked assignment push sent", { notificationId, studentCode, tokens: tokens.size });
+    if (!target.tokens.length) return;
+    await sendPush({
+      tokens: target.tokens,
+      notification, data,
+      tokenOwners: new Map(target.tokens.map((token) => [token, target.docId])),
+    });
+  }));
   return null;
 };
 
 const notifyClassNoteCreated = async ({ level, className, lessonId, noteId, note = {} }) => {
-  const targets = await findClassTargets({ level, className, excludeUid: note.createdByUid || "" });
+  const targets = await findClassTargets({ level, className, excludeUid: note.createdByUid || "", program: note.program });
   if (!targets.length) return null;
 
   const isTutorPost = ["tutor", "admin"].includes(normalize(note.createdByRole));
-  const title = note.title || "Class update";
-  const notification = {
-    title: isTutorPost ? `New class note: ${truncate(title, 48)}` : `New class question: ${truncate(title, 48)}`,
-    body: truncate(note.body || `${note.createdBy || "Someone"} added an update for ${note.lessonTitle || "this lesson"}.`, 140),
-  };
-  const data = toFcmData({
-    type: "class_note",
-    category: "class_notes",
-    level,
-    className,
-    lessonId,
-    noteId,
-    authorName: note.createdBy || "",
-    authorRole: note.createdByRole || "student",
-    route: note.route || "/campus/course",
-    title: notification.title,
-    body: notification.body,
-  });
-
-  await Promise.all(targets.map((target) => persistInAppNotification({ studentDocId: target.docId, notificationId: `class-note-${noteId}`, notification, data, type: "Class notes" })));
-
-  const tokens = new Set();
-  const tokenOwners = new Map();
-  targets.forEach((target) => {
-    target.tokens.forEach((token) => {
-      tokens.add(token);
-      tokenOwners.set(token, target.docId);
+  await Promise.all(targets.map(async (target) => {
+    const notification = classNoteCopy({
+      note, isTutorPost, language: target.data?.preferredInterfaceLanguage, truncate,
     });
-  });
-
-  if (tokens.size) {
-    await sendPush({ tokens: Array.from(tokens), notification, data, tokenOwners });
-  }
+    const data = toFcmData({
+      type: "class_note", category: "class_notes", level, className, lessonId, noteId,
+      authorName: note.createdBy || "", authorRole: note.createdByRole || "student",
+      route: note.route || "/campus/course",
+      title: notification.title, body: notification.body,
+    });
+    await persistInAppNotification({
+      studentDocId: target.docId, notificationId: `class-note-${noteId}`,
+      notification, data, type: "Class notes",
+    });
+    if (!target.tokens.length) return;
+    await sendPush({
+      tokens: target.tokens, notification, data,
+      tokenOwners: new Map(target.tokens.map((token) => [token, target.docId])),
+    });
+  }));
   return null;
 };
 
