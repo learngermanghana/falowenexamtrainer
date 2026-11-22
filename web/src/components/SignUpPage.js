@@ -265,8 +265,12 @@ const ResumePanel = ({ draft, rootRef }) => {
           maxLength={600} rows={2} placeholder={t("uiLanguageFlow.resume.placeholder")}
           style={{ padding: 10, border: "1px solid #cbd5e1", borderRadius: 8 }} />
       </label>
+      <p style={{ margin: 0, color: "#475569", lineHeight: 1.55, fontSize: 13 }}>
+        {t("uiLanguageFlow.resume.whatsappOptional")}
+      </p>
       <a
         href={`https://wa.me/233205706589?text=${message}`}
+        aria-label={t("uiLanguageFlow.resume.whatsapp")}
         target="_blank"
         rel="noopener noreferrer"
         onClick={(event) => {
