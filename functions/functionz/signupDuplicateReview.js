@@ -68,13 +68,13 @@ function matchesExisting(application, student) {
   const primary = canonicalPhone(application.phone);
   const emergency = canonicalPhone(application.emergency);
   const name = canonicalName(application.name);
-  const studentEmail = canonicalEmail(existing.emailIdentity || existing.email || existing.authEmail);
-  const studentPhone = canonicalPhone(existing.phoneIdentity || existing.phone || existing.phoneNumber || existing.mobile);
+  const studentEmail = canonicalEmail(existing.email || existing.authEmail || existing.emailIdentity);
+  const studentPhone = canonicalPhone(existing.phone || existing.phoneNumber || existing.mobile || existing.phoneIdentity);
   const studentEmergency = canonicalPhone(
-    existing.emergencyContactPhoneIdentity || existing.emergencyContactPhone ||
-    existing.emergencyContactPhoneNumber || existing.emergencyPhone || existing.guardianPhone
+    existing.emergencyContactPhone || existing.emergencyContactPhoneNumber ||
+    existing.emergencyPhone || existing.guardianPhone || existing.emergencyContactPhoneIdentity
   );
-  const studentName = canonicalName(existing.nameIdentity || existing.name || existing.fullName);
+  const studentName = canonicalName(existing.name || existing.fullName || existing.nameIdentity);
   // An emergency number is routinely shared by siblings. It cannot block alone.
   return Boolean((email && studentEmail === email) ||
     (primary && studentPhone === primary) ||
