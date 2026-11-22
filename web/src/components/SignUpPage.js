@@ -182,6 +182,7 @@ const readFormDraft = (form) => ({
   phone: form.querySelector('[autocomplete="tel"]')?.value || "",
   address: form.querySelector('[autocomplete="street-address"]')?.value || "",
   location: form.querySelector('[autocomplete="address-level2"]')?.value || "",
+  countryCode: form.querySelector('[autocomplete="country"]')?.value || "",
   learningMode:
     Array.from(form.querySelectorAll("select")).find((select) =>
       Array.from(select.options).some((option) => option.value === "Hybrid")
@@ -200,6 +201,7 @@ const restoreDraft = (form, draft) => {
   setControlValue(form.querySelector('[autocomplete="tel"]'), draft.phone);
   setControlValue(form.querySelector('[autocomplete="street-address"]'), draft.address);
   setControlValue(form.querySelector('[autocomplete="address-level2"]'), draft.location);
+  setControlValue(form.querySelector('[autocomplete="country"]'), draft.countryCode);
   setControlValue(
     form.querySelector('[autocomplete="tel-national"]'),
     draft.emergencyContactPhone
@@ -432,6 +434,8 @@ export default function SignUpPage(props) {
       name: details.name,
       email: details.email,
       phone: details.phone,
+      countryCode: details.countryCode || "",
+      country: details.country || "",
       level: details.level,
       program: details.program,
       className: details.className,

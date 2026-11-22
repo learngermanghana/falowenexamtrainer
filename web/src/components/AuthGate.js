@@ -12,6 +12,7 @@ import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 import LegalFooter from "./LegalFooter";
 import { changeInterfaceLanguage } from "../i18n";
+import { getCountryOptions, getCountryName, isValidCountryCode } from "../data/countries";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const isFullName = (value) => {
@@ -182,6 +183,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [selectedLevel, setSelectedLevel] = useState("A1");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
+  const [countryCode, setCountryCode] = useState("");
   const [address, setAddress] = useState(""); // ✅ NEW
   const [learningMode, setLearningMode] = useState("Online"); // Online | In-person | Hybrid
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
@@ -195,6 +197,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
   const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
+  const countryOptions = useMemo(() => getCountryOptions(resolvedInterfaceLanguage), [resolvedInterfaceLanguage]);
   const interfaceLanguageOptions = useMemo(
     () => [
       { value: "en", label: t("interfaceLanguages.en") },
@@ -232,6 +235,12 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           return;
         }
 
+        if (!isValidCountryCode(countryCode)) {
+          setAuthError(t("signupDetails.countryRequired"));
+          showToast(t("signupDetails.countryRequired"), "error");
+          setLoading(false);
+          return;
+        }
         const studentCode = generateStudentCode({ name });
 
         await signup(email, password, {
@@ -240,6 +249,8 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           studentCode,
           phone,
           location,
+          countryCode,
+          country: getCountryName(countryCode, "en"),
           address, // ✅ NEW
           learningMode,
           emergencyContactPhone,
@@ -443,7 +454,21 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
               <label style={styles.label}>{t("authUi.phone")}</label>
               <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} />
 
-              <label style={styles.label}>{t("authUi.location")}</label>
+              <label htmlFor="auth-signup-country" style={styles.label}>{t("signupDetails.countryOfResidence")}</label>
+              <select
+                id="auth-signup-country"
+                autoComplete="country"
+                required
+                value={countryCode}
+                onChange={(event) => setCountryCode(event.target.value)}
+                style={{ ...styles.select, height: 44 }}
+              >
+                <option value="" disabled>{t("signupDetails.countryPlaceholder")}</option>
+                {countryOptions.map(({ code, label }) => (
+                  <option key={code} value={code}>{label}</option>
+                ))}
+              </select>
+              <label style={styles.label}>{t("signupDetails.cityOrTown")}</label>
               <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} style={inputStyle} />
 
               <label style={styles.label}>{t("authUi.address")}</label>

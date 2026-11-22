@@ -1939,6 +1939,12 @@
     "learningMode": "Learning mode"
   },
   "signupDetails": {
+    "countryOfResidence": "Country of residence",
+    "countryPlaceholder": "Select your country",
+    "cityPlaceholder": "e.g. Accra, Berlin or Nairobi",
+    "cityOrTown": "City / Town",
+    "countryRequired": "Select your country of residence.",
+    "countryHelp": "Choose from the country list. No typing or separate verification needed.",
     "duplicateProtectionNote": "Already registered? Log in instead of using another email. We check contact numbers to prevent duplicate student accounts. Family members may share an emergency contact.",
     "fullNameHint": "Please enter your full name (first and last). We use it to print certificates and transcripts.",
     "passwordHint": "At least 8 characters with letters and numbers",

@@ -9,6 +9,10 @@ on:
       - "web/src/context/AuthContext.js"
       - "web/src/components/SignUpPage.js"
       - "web/src/components/SignUpPageLegacy.js"
+      - "web/src/components/AuthGate.js"
+      - "web/src/data/countries.js"
+      - "web/src/data/countries.test.js"
+      - "web/src/i18n/locales/**"
       - "web/src/lib/signupAuthRecovery.js"
       - "web/src/lib/signupIdentity.js"
       - "web/src/lib/signupDuplicateCheck.js"
@@ -44,7 +48,7 @@ jobs:
         run: npm install --legacy-peer-deps --no-audit --no-fund
       - name: Test interrupted signup recovery and application form
         working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/__tests__/signupAuthRecovery.test.js src/__tests__/SignUpPage.test.js src/lib/signupIdentity.test.js src/lib/signupDuplicateCheck.test.js
+        run: npx jest --runInBand --runTestsByPath src/__tests__/signupAuthRecovery.test.js src/__tests__/SignUpPage.test.js src/lib/signupIdentity.test.js src/lib/signupDuplicateCheck.test.js src/data/countries.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
