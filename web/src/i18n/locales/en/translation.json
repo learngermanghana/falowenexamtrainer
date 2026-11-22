@@ -1861,10 +1861,11 @@
     "publishedLessons": "Published lessons",
     "resume": {
       "title": "Continue your application",
-      "description": "Your non-password details are saved on this device. Continue below or ask us to help you finish.",
+      "description": "Your non-password details are saved on this device. Complete the form below to continue your application.",
       "help": "What do you need help with? (optional)",
       "placeholder": "For example: I cannot choose a class, or Continue does not work. Do not include passwords.",
-      "whatsapp": "Contact Admissions Support on WhatsApp"
+      "whatsapp": "Contact Admissions Support on WhatsApp",
+      "whatsappOptional": "Need help with the form or admissions? WhatsApp is optional and only for administrative support."
     }
   },
   "homeAccess": {
