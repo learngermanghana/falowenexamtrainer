@@ -27,7 +27,7 @@ describe("Class Participation navigation", () => {
     expect(source).toContain("const navigate = useNavigate();");
     expect(source).toContain('new URLSearchParams(location.search).get("tab")');
     expect(source).toContain('activeTab === "participation"');
-    expect(source).toContain("Learning records");
+    expect(source).toContain('t("accountOverview.learningRecords")');
     expect(source).toContain('selectAccountTab("participation")');
     expect(source).toContain('navigate("/campus/results")');
     expect(source).toContain('navigate("/campus/attendance")');

@@ -23,7 +23,8 @@
     "shortLabel": "Langue de l’interface",
     "helper": "Les menus et les consignes restent dans la langue choisie, indépendamment de la langue étudiée.",
     "ariaLabel": "Changer la langue de l’interface",
-    "optionAria": "Passer l’interface en {{language}}"
+    "optionAria": "Passer l’interface en {{language}}",
+    "saveFailed": "Langue modifiée sur cet appareil, mais impossible de l'enregistrer dans votre compte."
   },
   "appStatus": {
     "authLoading": "L’application se charge…"
@@ -1857,5 +1858,133 @@
     "tuitionDescription": "Les frais pour {{level}} sont de {{amount}}. Vous pouvez commencer par l’essai de 7 jours ou payer immédiatement avec Paystack.",
     "phonePrivacy": "Nous conservons votre numéro pour vous contacter si nécessaire. Le contact d’urgence n’est prévenu qu’en cas de situation urgente.",
     "addressHint": "Numéro, rue, ville, région"
+  },
+  "accountOverview": {
+    "title": "Mon compte Falowen",
+    "student": "Étudiant",
+    "courseAccount": "Compte de cours",
+    "studentCode": "Code étudiant",
+    "trialAccess": "Accès d'essai",
+    "courseAccess": "Accès au cours",
+    "learningRecords": "Suivi de formation",
+    "participation": "Participation aux cours",
+    "notifications": "Notifications",
+    "deleteAccount": "Supprimer le compte",
+    "biographyNotice": "Vous pouvez modifier votre biographie dans l'onglet Membres de la classe.",
+    "billingIntro": "Frais, accès et paiements au même endroit.",
+    "refresh": "Actualiser",
+    "refreshing": "Actualisation...",
+    "tuition": "Frais de cours",
+    "paid": "Payé",
+    "balance": "Solde"
+  },
+  "enrollmentRequest": {
+    "title": "Étudier une deuxième langue",
+    "description": "Vous souhaitez ajouter {{course}} à votre compte ? Envoyez une demande au service des admissions.",
+    "action": "Demander {{course}}",
+    "saving": "Envoi de la demande...",
+    "pending": "Votre demande pour {{course}} attend la confirmation des admissions.",
+    "notice": "Cette demande n'inscrit pas au cours et ne prélève aucun frais. L'équipe doit confirmer la classe, le niveau, les frais et les dossiers séparés.",
+    "error": "Impossible d'enregistrer la demande. Réessayez ou contactez les admissions.",
+    "signupBoth": "Je souhaite aussi étudier {{course}}.",
+    "signupNotice": "Votre cours principal commencera d'abord. Les admissions vous contacteront pour le deuxième cours, sans inscription ni paiement immédiat.",
+    "placementPending": "Votre deuxième cours attend l'attribution d'une classe et d'un niveau. Contactez les admissions si nécessaire.",
+    "secondaryBillingTitle": "Frais du deuxième cours",
+    "secondaryBillingNotice": "Les frais et paiements du deuxième cours sont gérés séparément par les admissions Falowen. Seuls les montants confirmés sont affichés ; aucun paiement n'est lancé ici.",
+    "placementPendingLabel": "Affectation en attente",
+    "secondaryAccessLabel": "Deuxième cours"
+  },
+  "resultsOverview": {
+    "title": "Résultats",
+    "readiness": "Votre niveau de préparation repose sur la progression enregistrée dans le cours.",
+    "loading": "Chargement des résultats...",
+    "error": "Impossible de charger les résultats.",
+    "refreshError": "Impossible de charger les résultats. Actualisez la page pour réessayer.",
+    "empty": "Aucun résultat noté pour le moment. Vos notes et commentaires s'afficheront après correction.",
+    "count": "Vous avez {{count}} résultats enregistrés{{average}}",
+    "average": " · Moyenne : {{average}}",
+    "overview": "Bilan de vos travaux notés",
+    "latest": "Dernière note enregistrée : {{score}} %{{assignment}}.",
+    "belowPass": "{{count}} résultats sont en dessous du seuil de réussite de {{passMark}} %. Consultez les commentaires dans l'historique.",
+    "allPassed": "Les {{count}} résultats notés atteignent le seuil de réussite de {{passMark}} %. Consultez les commentaires pour progresser.",
+    "milestoneDone": "Objectif atteint : ce niveau est terminé 🎉",
+    "milestoneFirst": "Prochain objectif : terminer votre premier devoir.",
+    "milestoneRemaining": "Prochain objectif : terminer {{count}} devoirs supplémentaires en {{level}}.",
+    "retry": "Reprendre {{count}} devoirs sous {{passMark}} %.",
+    "complete": "{{percent}} % terminé",
+    "completionInfo": "Seuls les devoirs réussis comptent (note ≥ {{passMark}} %).",
+    "retryCount": "{{count}} sont à reprendre.",
+    "leaderboardPosition": "Classement :",
+    "rank": "{{rank}} sur {{total}} ({{level}})",
+    "level": "Niveau",
+    "unranked": "Pas encore classé ({{level}})",
+    "unavailable": "Pas encore disponible",
+    "qualification": "Vous devez terminer au moins {{count}} devoirs pour figurer au classement.",
+    "leaderboardPending": "Votre position apparaîtra lorsque suffisamment de notes seront disponibles.",
+    "rankExplanation": "Votre total ({{score}}) et vos devoirs terminés ({{completed}}) sont comparés aux {{total}} étudiants qualifiés. Le classement dépend d'abord des notes, puis du nombre de devoirs. Au moins {{minimum}} devoirs sont requis.",
+    "noFeedback": "Aucun commentaire n'a encore été enregistré pour votre code étudiant.",
+    "swSummary": "{{marked}} notés · {{passed}} réussis · {{pending}} en attente de note",
+    "swAverage": "Moyenne : {{average}} % · Seuil : {{passMark}} %",
+    "swEmpty": "Vos cahiers d'exercices remis apparaîtront ici.",
+    "day": "Jour {{day}}",
+    "revisionNeeded": "Révision nécessaire",
+    "reviewed": "Corrigé",
+    "awaitingTutor": "En attente de correction",
+    "revise": "Réviser le devoir"
+  },
+  "notificationUi": {
+    "title": "Configuration des notifications",
+    "description": "Recevez des questions, notes, mises à jour de présence et annonces même lorsque Falowen est fermé.",
+    "homeScreen": "Application sur l'écran d'accueil",
+    "yes": "Oui",
+    "no": "Non",
+    "browserPermission": "Autorisation du navigateur",
+    "savedDevices": "Appareils enregistrés",
+    "thisAccount": "Ce compte",
+    "settingUp": "Configuration...",
+    "refreshDevice": "Actualiser cet appareil",
+    "enable": "Activer les notifications",
+    "sendingTest": "Envoi du test...",
+    "sendTest": "Envoyer une notification test",
+    "enabled": "Les notifications sont activées sur cet appareil.",
+    "permissionIncomplete": "L'autorisation n'a pas été terminée. Sur iPhone, ouvrez Falowen depuis l'écran d'accueil, puis réessayez.",
+    "enableError": "Impossible d'activer les notifications. Réessayez.",
+    "refreshFirst": "Actualisez cet appareil pour obtenir un jeton de notification valide.",
+    "testUnavailable": "Le test de notification n'est pas disponible dans cette version.",
+    "scheduled": "Test programmé. Verrouillez l'écran. La notification devrait arriver dans environ 8 secondes.",
+    "unconfirmed": "Falowen n'a pas confirmé l'envoi du test.",
+    "testSent": "Test envoyé. Si rien n'apparaît, vérifiez les notifications et la batterie.",
+    "testError": "Le test a échoué. Actualisez l'appareil et réessayez. Communiquez le code Firebase au support si nécessaire.",
+    "sessionExpired": "Votre session a expiré. Reconnectez-vous puis réessayez.",
+    "unlinkedDevice": "Cet appareil n'est pas associé à votre compte. Actualisez-le puis réessayez.",
+    "invalidToken": "Le jeton est invalide ou expiré. Actualisez cet appareil.",
+    "androidTip": "Android / Chrome : activez les notifications et autorisez-les dans le navigateur.",
+    "iosTip": "iPhone (iOS 16.4 ou plus récent) : ouvrez Falowen dans Safari, touchez Partager → Sur l'écran d'accueil, puis activez les notifications dans cette application. Elles ne fonctionnent pas dans un onglet Safari normal.",
+    "status": {
+      "granted": {
+        "label": "Activées sur cet appareil",
+        "detail": "L'autorisation et le jeton Falowen sont actifs."
+      },
+      "pending": {
+        "label": "Configuration...",
+        "detail": "Falowen demande ou actualise le jeton."
+      },
+      "blocked": {
+        "label": "Bloquées par le navigateur",
+        "detail": "Autorisez les notifications Falowen dans les paramètres du navigateur."
+      },
+      "stale": {
+        "label": "Actualisation nécessaire",
+        "detail": "L'autorisation ou le jeton doit être actualisé."
+      },
+      "error": {
+        "label": "Échec de la configuration",
+        "detail": "Réessayez ou contactez le support."
+      },
+      "idle": {
+        "label": "Pas encore activées",
+        "detail": "Activez-les pour les notes, présences et rappels."
+      }
+    }
   }
 }

@@ -4,6 +4,7 @@ const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
 const { absolutePushLink } = require("./pushLinks");
+const { paymentReminderCopy, markedAssignmentCopy, classNoteCopy } = require("./studentNotificationCopy");
 
 const NOTIFICATION_BATCH_SIZE = 500;
 const PAYMENT_REMINDER_DAYS = new Set([15, 7, 3, 1, 0]);
@@ -52,25 +53,35 @@ const tokensFromStudent = (student = {}) => {
   return Array.from(tokens).filter(Boolean);
 };
 
-const findClassTargets = async ({ level, className, excludeUid = "" } = {}) => {
+const findClassTargets = async ({ level, className, excludeUid = "", program = "" } = {}) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const normalizedClassName = String(className || "").trim();
   if (!normalizedLevel || !normalizedClassName) return [];
 
-  const variants = Array.from(new Set([normalizedClassName, normalizedClassName.toLowerCase(), normalizedClassName.toUpperCase()])).filter(Boolean);
-  const snapshots = await Promise.all(
-    variants.map((variant) => db().collection("students").where("level", "==", normalizedLevel).where("className", "==", variant).get())
-  );
-
+  const variants = [...new Set([normalizedClassName, normalizedClassName.toLowerCase(), normalizedClassName.toUpperCase()])];
+  const normalizedProgram = ["german", "swahili"].includes(normalize(program)) ? normalize(program) : "";
+  const snapshots = await Promise.all(variants.flatMap((variant) => [
+    db().collection("students").where("level", "==", normalizedLevel).where("className", "==", variant).get(),
+    ...(normalizedProgram
+      ? [db().collection("students").where(`coursePlacements.${normalizedProgram}.className`, "==", variant).get()]
+      : []),
+  ]));
   const targets = new Map();
-  snapshots.forEach((snapshot) => {
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data() || {};
-      if (excludeUid && data.uid === excludeUid) return;
+  snapshots.forEach((snapshot) => snapshot.forEach((docSnap) => {
+    const data = docSnap.data() || {};
+    if (excludeUid && data.uid === excludeUid) return;
+    const primaryMatch = (!normalizedProgram || normalize(data.program || "german") === normalizedProgram)
+      && variants.includes(String(data.className || ""))
+      && String(data.level || "").trim().toUpperCase() === normalizedLevel;
+    const placement = normalizedProgram ? data.coursePlacements?.[normalizedProgram] || {} : {};
+    const secondaryMatch = normalizedProgram && normalize(data.secondaryProgram) === normalizedProgram
+      && variants.includes(String(placement.className || ""))
+      && String(placement.level || "").trim().toUpperCase() === normalizedLevel;
+    if (primaryMatch || secondaryMatch) {
       targets.set(docSnap.id, { docId: docSnap.id, data, tokens: tokensFromStudent(data) });
-    });
-  });
-  return Array.from(targets.values());
+    }
+  }));
+  return [...targets.values()];
 };
 
 const toFcmData = (data = {}) =>
@@ -182,14 +193,13 @@ const findStudentTargetsByCode = async (studentCode = "") => {
   return Array.from(targets.values());
 };
 
-const buildMarkedAssignmentPushPayload = (notificationDoc = {}) => {
+const buildMarkedAssignmentPushPayload = (notificationDoc = {}, language = "en") => {
   const score = Number(notificationDoc.score);
   const scoreLabel = Number.isFinite(score) ? `${score}/100` : "marked";
   const passed = Number.isFinite(score) ? score >= 60 : notificationDoc.status === "passed";
-  const title = notificationDoc.title || "Your assignment has been marked";
-  const body = notificationDoc.body || notificationDoc.message || (passed
-    ? `Score: ${scoreLabel} · Passed. Open Results to read your feedback.`
-    : `Score: ${scoreLabel} · Needs improvement. Open Results and resubmit.`);
+  const fallback = markedAssignmentCopy({ scoreLabel, passed, language });
+  const title = notificationDoc.title || fallback.title;
+  const body = notificationDoc.body || notificationDoc.message || fallback.body;
   const data = toFcmData({
     ...(notificationDoc.data || {}),
     type: "marked_assignment",
@@ -215,73 +225,48 @@ const notifyMarkedAssignmentCreated = async ({ notificationId, notificationDoc =
     return null;
   }
 
-  const { notification, data } = buildMarkedAssignmentPushPayload(notificationDoc);
-
-  await Promise.all(targets.map((target) => persistInAppNotification({
-    studentDocId: target.docId,
-    notificationId,
-    notification,
-    data,
-    type: "Scores",
-  })));
-
-  const tokens = new Set();
-  const tokenOwners = new Map();
-  targets.forEach((target) => {
-    target.tokens.forEach((token) => {
-      tokens.add(token);
-      tokenOwners.set(token, target.docId);
+  // Do not broadcast a single student's preferred language to other accounts.
+  await Promise.all(targets.map(async (target) => {
+    const { notification, data } = buildMarkedAssignmentPushPayload(notificationDoc, target.data?.preferredInterfaceLanguage);
+    await persistInAppNotification({
+      studentDocId: target.docId,
+      notificationId, notification, data, type: "Scores",
     });
-  });
-
-  if (!tokens.size) {
-    console.log("Marked assignment notification saved without push tokens", { notificationId, studentCode, targets: targets.length });
-    return null;
-  }
-
-  await sendPush({ tokens: Array.from(tokens), notification, data, tokenOwners });
-  console.log("Marked assignment push sent", { notificationId, studentCode, tokens: tokens.size });
+    if (!target.tokens.length) return;
+    await sendPush({
+      tokens: target.tokens,
+      notification, data,
+      tokenOwners: new Map(target.tokens.map((token) => [token, target.docId])),
+    });
+  }));
   return null;
 };
 
 const notifyClassNoteCreated = async ({ level, className, lessonId, noteId, note = {} }) => {
-  const targets = await findClassTargets({ level, className, excludeUid: note.createdByUid || "" });
+  const targets = await findClassTargets({ level, className, excludeUid: note.createdByUid || "", program: note.program });
   if (!targets.length) return null;
 
   const isTutorPost = ["tutor", "admin"].includes(normalize(note.createdByRole));
-  const title = note.title || "Class update";
-  const notification = {
-    title: isTutorPost ? `New class note: ${truncate(title, 48)}` : `New class question: ${truncate(title, 48)}`,
-    body: truncate(note.body || `${note.createdBy || "Someone"} added an update for ${note.lessonTitle || "this lesson"}.`, 140),
-  };
-  const data = toFcmData({
-    type: "class_note",
-    category: "class_notes",
-    level,
-    className,
-    lessonId,
-    noteId,
-    authorName: note.createdBy || "",
-    authorRole: note.createdByRole || "student",
-    route: note.route || "/campus/course",
-    title: notification.title,
-    body: notification.body,
-  });
-
-  await Promise.all(targets.map((target) => persistInAppNotification({ studentDocId: target.docId, notificationId: `class-note-${noteId}`, notification, data, type: "Class notes" })));
-
-  const tokens = new Set();
-  const tokenOwners = new Map();
-  targets.forEach((target) => {
-    target.tokens.forEach((token) => {
-      tokens.add(token);
-      tokenOwners.set(token, target.docId);
+  await Promise.all(targets.map(async (target) => {
+    const notification = classNoteCopy({
+      note, isTutorPost, language: target.data?.preferredInterfaceLanguage, truncate,
     });
-  });
-
-  if (tokens.size) {
-    await sendPush({ tokens: Array.from(tokens), notification, data, tokenOwners });
-  }
+    const data = toFcmData({
+      type: "class_note", category: "class_notes", level, className, lessonId, noteId,
+      authorName: note.createdBy || "", authorRole: note.createdByRole || "student",
+      route: note.route || "/campus/course",
+      title: notification.title, body: notification.body,
+    });
+    await persistInAppNotification({
+      studentDocId: target.docId, notificationId: `class-note-${noteId}`,
+      notification, data, type: "Class notes",
+    });
+    if (!target.tokens.length) return;
+    await sendPush({
+      tokens: target.tokens, notification, data,
+      tokenOwners: new Map(target.tokens.map((token) => [token, target.docId])),
+    });
+  }));
   return null;
 };
 
@@ -313,10 +298,9 @@ const getPaymentReminderCandidate = ({ docId, student, nowMs }) => {
 
 const buildPaymentReminderPayload = ({ student, balanceDue, daysLeft }) => {
   const amount = formatGhs(balanceDue);
-  const title = daysLeft === 0 ? "Payment reminder: contract ends today" : `Payment reminder: ${daysLeft} day${daysLeft === 1 ? "" : "s"} left`;
-  const body = daysLeft === 0
-    ? `Your Falowen contract ends today. Please clear your balance of ${amount}.`
-    : `Your Falowen contract ends in ${daysLeft} day${daysLeft === 1 ? "" : "s"}. Please clear your balance of ${amount}.`;
+  const { title, body } = paymentReminderCopy({
+    daysLeft, amount, language: student.preferredInterfaceLanguage,
+  });
   const data = toFcmData({
     type: "payment_reminder",
     category: "billing",

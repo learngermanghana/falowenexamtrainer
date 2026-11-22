@@ -196,12 +196,12 @@ const GermanResults = () => {
     return {
       total: scored.length,
       belowPass: belowPass.length,
-      latest: mostRecent ? `Latest recorded score: ${mostRecent.numericScore}%${recentLabel ? ` · ${recentLabel}` : ""}.` : "",
+      latest: mostRecent ? t("resultsOverview.latest", { score: mostRecent.numericScore, assignment: recentLabel ? ` · ${recentLabel}` : "" }) : "",
       guidance: belowPass.length
-        ? `${belowPass.length} recorded result${belowPass.length === 1 ? " is" : "s are"} below the ${PASS_MARK}% course pass mark. Open the result history below to review the feedback for those assignments.`
-        : `All ${scored.length} recorded numeric score${scored.length === 1 ? " meets" : "s meet"} the ${PASS_MARK}% course pass mark. Review individual feedback below for specific improvements.`,
+        ? t("resultsOverview.belowPass", { count: belowPass.length, passMark: PASS_MARK })
+        : t("resultsOverview.allPassed", { count: scored.length, passMark: PASS_MARK }),
     };
-  }, [visibleResults]);
+  }, [visibleResults, t]);
 
   const assignmentProgress = useMemo(() => {
     const merged = mergeAssignmentProgress({
@@ -228,17 +228,17 @@ const GermanResults = () => {
 
       let milestoneCopy;
       if (remaining === 0) {
-        milestoneCopy = "Milestone reached: this level is complete 🎉";
+        milestoneCopy = t("resultsOverview.milestoneDone");
       } else if (safeCompleted === 0) {
-        milestoneCopy = "Next milestone: complete your first assignment.";
+        milestoneCopy = t("resultsOverview.milestoneFirst");
       } else if (remaining <= 3) {
-        milestoneCopy = `Next milestone: ${remaining} more assignment${remaining === 1 ? "" : "s"} to finish ${label}.`;
+        milestoneCopy = t("resultsOverview.milestoneRemaining", { count: remaining, level: label });
       } else {
-        milestoneCopy = `Next milestone: complete ${Math.min(5, remaining)} more assignment${Math.min(5, remaining) === 1 ? "" : "s"} in ${label}.`;
+        milestoneCopy = t("resultsOverview.milestoneRemaining", { count: Math.min(5, remaining), level: label });
       }
 
       if (failed > 0) {
-        milestoneCopy += ` Retry ${failed} assignment${failed === 1 ? "" : "s"} below ${PASS_MARK}%.`;
+        milestoneCopy += ` ${t("resultsOverview.retry", { count: failed, passMark: PASS_MARK })}`;
       }
 
       return {
@@ -259,7 +259,7 @@ const GermanResults = () => {
         assignmentProgress.failed
       ),
     ];
-  }, [assignmentProgress, trackedLevel]);
+  }, [assignmentProgress, trackedLevel, t]);
 
   const leaderboardRows = useMemo(() => leaderboard?.rows || [], [leaderboard]);
   const qualificationMinimum = Number(leaderboard?.qualificationMinimum || 3);
@@ -299,7 +299,7 @@ const GermanResults = () => {
             {t("examReadiness.certificate.title")}
           </h3>
           <p style={{ ...styles.helperText, margin: 0, color: "#dbeafe" }}>
-            Your readiness status is based on your recorded course progress.
+            {t("resultsOverview.readiness")}
           </p>
         </div>
         <div style={{ padding: "0 18px 16px" }}>
@@ -307,23 +307,21 @@ const GermanResults = () => {
         </div>
       </section>
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>Results</h2>
+        <h2 style={styles.sectionTitle}>{t("resultsOverview.title")}</h2>
 
         <p style={styles.helperText}>
           {loading
-            ? "Loading your results..."
+            ? t("resultsOverview.loading")
             : error
-            ? "Could not load results."
+            ? t("resultsOverview.error")
             : summary.count === 0
-            ? "No marked results yet. Once your work is graded, your scores and feedback will appear here."
-            : `You have ${summary.count} recorded result${summary.count === 1 ? "" : "s"}${
-                summary.avg !== null ? ` · Avg score: ${summary.avg}` : ""
-              }`}
+            ? t("resultsOverview.empty")
+            : t("resultsOverview.count", { count: summary.count, average: summary.avg !== null ? t("resultsOverview.average", { average: summary.avg }) : "" })}
         </p>
 
         {!loading && !error && scoreInsight ? (
           <div role="status" style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 12, padding: "12px 14px", marginTop: 8 }}>
-            <strong>Your marked-work overview</strong>
+            <strong>{t("resultsOverview.overview")}</strong>
             {scoreInsight.latest ? <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{scoreInsight.latest}</p> : null}
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{scoreInsight.guidance}</p>
           </div>
@@ -369,11 +367,11 @@ const GermanResults = () => {
                   />
                 </div>
                 <p style={{ ...styles.helperText, margin: "8px 0 0 0" }}>
-                  {item.percent}% complete · {item.milestoneCopy}
+                  {t("resultsOverview.complete", { percent: item.percent })} · {item.milestoneCopy}
                 </p>
                 <p style={{ ...styles.helperText, margin: "6px 0 0 0", color: "#6b7280" }}>
-                  Completion counts passed assignments (score ≥ {PASS_MARK}%).
-                  {item.failed > 0 ? ` ${item.failed} need${item.failed === 1 ? "s" : ""} a retry.` : ""}
+                  {t("resultsOverview.completionInfo", { passMark: PASS_MARK })}
+                  {item.failed > 0 ? ` ${t("resultsOverview.retryCount", { count: item.failed })}` : ""}
                 </p>
               </div>
             ))}
@@ -383,21 +381,19 @@ const GermanResults = () => {
         {!loading && !error ? (
           <>
             <p style={{ ...styles.helperText, marginTop: 12 }}>
-              <strong>Leaderboard position:</strong>{" "}
+              <strong>{t("resultsOverview.leaderboardPosition")}</strong>{" "}
               {myLeaderboardEntry?.rank
-                ? `${myLeaderboardEntry.rank} of ${leaderboardTotal} (${leaderboard?.level || studentLevel || "Level"})`
+                ? t("resultsOverview.rank", { rank: myLeaderboardEntry.rank, total: leaderboardTotal, level: leaderboard?.level || studentLevel || t("resultsOverview.level") })
                 : leaderboard
-                ? `Not ranked yet (${leaderboard?.level || studentLevel || "Level"})`
-                : "Not available yet"}
+                ? t("resultsOverview.unranked", { level: leaderboard?.level || studentLevel || t("resultsOverview.level") })
+                : t("resultsOverview.unavailable")}
             </p>
             <p style={{ ...styles.helperText, marginTop: 4 }}>
               {leaderboard && myLeaderboardEntry
-                ? `This compares your total score${
-                    myLeaderboardEntry.totalScore !== null ? ` (${myLeaderboardEntry.totalScore})` : ""
-                  } and completed assignments (${myLeaderboardEntry.completedCount || 0}) with ${leaderboardTotal} qualified students. Rank is based on total marks first, then completed assignments as tie-breaker. Minimum ${qualificationMinimum} completed assignments are required to qualify.`
+                ? t("resultsOverview.rankExplanation", { score: myLeaderboardEntry.totalScore ?? "–", completed: myLeaderboardEntry.completedCount || 0, total: leaderboardTotal, minimum: qualificationMinimum })
                 : leaderboard
-                ? `You need at least ${qualificationMinimum} completed assignments to qualify for ranking.`
-                : "We’ll show your leaderboard position once we have enough class scores to compare."}
+                ? t("resultsOverview.qualification", { count: qualificationMinimum })
+                : t("resultsOverview.leaderboardPending")}
             </p>
           </>
         ) : null}
@@ -407,12 +403,12 @@ const GermanResults = () => {
 
       {loading && visibleResults.length === 0 ? (
         <section style={styles.card}>
-          <p style={{ margin: 0 }}>Loading...</p>
+          <p style={{ margin: 0 }}>{t("resultsOverview.loading")}</p>
         </section>
       ) : summary.count === 0 ? (
         <section style={styles.card}>
           <p style={{ margin: 0 }}>
-            No feedback has been recorded for your student code yet.
+            {t("resultsOverview.noFeedback")}
           </p>
         </section>
       ) : (

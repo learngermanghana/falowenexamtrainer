@@ -348,7 +348,14 @@ service cloud.firestore {
           && !request.resource.data.keys().hasAny(['trialEndsAt', 'trialPurgeAt', 'contractEnd'])
         ))));
       allow update: if signedIn() && (isStaff() || (
-        (request.auth.token.get('examOnly', false) != true || resource.data.uid == request.auth.uid)
+        // Only the profile owner can change non-academic account preferences.
+        // Without this check any signed-in student could previously update a
+        // different student's profile by student-code document ID.
+        (resource.data.get('uid', '') == request.auth.uid
+          || studentId == request.auth.uid
+          || (resource.data.get('uid', '') == '' && resource.data.get('email', '') == request.auth.token.email))
+        && (request.auth.token.get('examOnly', false) != true || resource.data.get('uid', '') == request.auth.uid)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'role', 'studentCode', 'studentcode', 'program'])
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements',
           'institutionId', 'institutionName', 'cohortId', 'instructorName', 'registrationSource', 'universityInvitationCode', 'institutionVerification', 'accessType', 'courseDiscount', 'courseCheckoutStartedAt'])
         && (resource.data.get('courseDiscount', null) == null || resource.data.get('paymentStatus', '') == 'paid' ||

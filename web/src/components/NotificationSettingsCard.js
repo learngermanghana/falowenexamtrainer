@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { functions, getPushEnvironment, httpsCallable } from "../firebase";
 import { styles } from "../styles";
@@ -13,37 +14,9 @@ const getBrowserPermission = () => {
   return Notification.permission || "default";
 };
 
-const statusCopy = {
-  granted: {
-    label: "Enabled on this device",
-    detail: "Browser permission and the Falowen push token are active on this device.",
-    tone: "success",
-  },
-  pending: {
-    label: "Setting up...",
-    detail: "Falowen is requesting or refreshing your notification token.",
-    tone: "info",
-  },
-  blocked: {
-    label: "Blocked in browser settings",
-    detail: "Notifications are blocked. Open your browser/site settings and allow notifications for Falowen.",
-    tone: "error",
-  },
-  stale: {
-    label: "Needs refresh",
-    detail: "This device had a saved token before, but the browser permission needs to be refreshed.",
-    tone: "warning",
-  },
-  error: {
-    label: "Setup failed",
-    detail: "Something went wrong while enabling notifications. Try again or contact support.",
-    tone: "error",
-  },
-  idle: {
-    label: "Not enabled yet",
-    detail: "Enable notifications to receive score updates, attendance updates and important reminders.",
-    tone: "info",
-  },
+const statusTone = {
+  granted: "success", pending: "info", blocked: "error",
+  stale: "warning", error: "error", idle: "info",
 };
 
 // Only show short Firebase error identifiers. Never expose push tokens, auth
@@ -60,28 +33,13 @@ const withFirebaseCode = (message, error) => {
   return codes ? `${message} (Firebase: ${codes})` : message;
 };
 
-const getPushTestErrorMessage = (error) => {
+const getPushTestErrorMessage = (error, t) => {
   const code = String(error?.code || "").toLowerCase();
-  const message = String(error?.message || "").trim();
-  const normalizedMessage = message.toLowerCase();
-  let guidance = message || "Could not send the background push test. Refresh this device and try again.";
-
-  if (code.includes("unauthenticated")) {
-    guidance = "Your session expired. Sign in again, then retry the test notification.";
-  } else if (code.includes("permission-denied")) {
-    guidance = "This device is not linked to the signed-in account. Tap Refresh this device, then try again.";
-  } else if (code.includes("failed-precondition")) {
-    guidance = message || "The push token is invalid or expired. Refresh this device and try again.";
-  } else if (
-    normalizedMessage === "internal" ||
-    code.includes("internal") ||
-    code.includes("not-found") ||
-    code.includes("unavailable")
-  ) {
-    guidance = "The Firebase notification test failed. Refresh this device and retry. If it continues, share the Firebase error code with support.";
-  }
-
-  return withFirebaseCode(guidance, error);
+  let key = "notificationUi.testError";
+  if (code.includes("unauthenticated")) key = "notificationUi.sessionExpired";
+  else if (code.includes("permission-denied")) key = "notificationUi.unlinkedDevice";
+  else if (code.includes("failed-precondition")) key = "notificationUi.invalidToken";
+  return withFirebaseCode(t(key), error);
 };
 
 const getToneStyle = (tone) => {
@@ -92,6 +50,7 @@ const getToneStyle = (tone) => {
 };
 
 const NotificationSettingsCard = () => {
+  const { t } = useTranslation();
   const { enableNotifications, notificationStatus, studentProfile, messagingToken } = useAuth();
   const [isEnabling, setIsEnabling] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
@@ -100,8 +59,8 @@ const NotificationSettingsCard = () => {
   const [browserPermission, setBrowserPermission] = useState(getBrowserPermission);
   const pushEnvironment = getPushEnvironment();
 
-  const copy = statusCopy[notificationStatus] || statusCopy.idle;
-  const toneStyle = getToneStyle(copy.tone);
+  const statusKey = Object.prototype.hasOwnProperty.call(statusTone, notificationStatus) ? notificationStatus : "idle";
+  const toneStyle = getToneStyle(statusTone[statusKey]);
   const deviceCount = useMemo(() => {
     const tokens = Array.isArray(studentProfile?.messagingTokens) ? studentProfile.messagingTokens : [];
     const unique = new Set(tokens.map((entry) => entry?.token).filter(Boolean));
@@ -117,12 +76,12 @@ const NotificationSettingsCard = () => {
       setBrowserPermission(getBrowserPermission());
       setMessage(
         token
-          ? "Notifications are enabled for this device."
-          : "Notification permission was not completed. On iPhone, open Falowen from the Home Screen app icon first, then tap Enable notifications again."
+          ? t("notificationUi.enabled")
+          : t("notificationUi.permissionIncomplete")
       );
     } catch (error) {
       setBrowserPermission(getBrowserPermission());
-      setMessage(withFirebaseCode(error instanceof Error ? error.message : "Could not enable notifications. Please try again.", error));
+      setMessage(withFirebaseCode(t("notificationUi.enableError"), error));
     } finally {
       setIsEnabling(false);
     }
@@ -132,32 +91,32 @@ const NotificationSettingsCard = () => {
     setTestMessage("");
 
     if (notificationStatus !== "granted" || !messagingToken) {
-      setTestMessage("Refresh this device first so Falowen has a current push token.");
+      setTestMessage(t("notificationUi.refreshFirst"));
       return;
     }
 
     if (!functions) {
-      setTestMessage("Falowen push testing is not available on this deployment.");
+      setTestMessage(t("notificationUi.testUnavailable"));
       return;
     }
 
     setIsTesting(true);
     setTestMessage(
-      "Test scheduled. Lock your screen now. The notification should arrive in about 8 seconds."
+      t("notificationUi.scheduled")
     );
 
     try {
       const sendTestPush = httpsCallable(functions, "sendPushTestNotification");
       const result = await sendTestPush({ token: messagingToken, delaySeconds: 8 });
       if (!result?.data?.ok) {
-        throw new Error("Falowen did not confirm the test push.");
+        throw new Error(t("notificationUi.unconfirmed"));
       }
       setTestMessage(
-        "Test sent. If the screen was locked, you should receive a normal Falowen phone notification. If nothing appears, check Android notification and battery settings."
+        t("notificationUi.testSent")
       );
     } catch (error) {
       console.error("Falowen push test failed", { firebaseCode: getFirebaseErrorCodes(error) || "unavailable" });
-      setTestMessage(getPushTestErrorMessage(error));
+      setTestMessage(getPushTestErrorMessage(error, t));
     } finally {
       setIsTesting(false);
     }
@@ -165,31 +124,31 @@ const NotificationSettingsCard = () => {
 
   return (
     <section style={styles.card}>
-      <h2 style={styles.sectionTitle}>Notification setup</h2>
+      <h2 style={styles.sectionTitle}>{t("notificationUi.title")}</h2>
       <p style={styles.helperText}>
-        Turn this on to receive student questions, score updates, attendance updates and announcements even when Falowen is not open.
+        {t("notificationUi.description")}
       </p>
 
       <div style={{ border: `1px solid ${toneStyle.border}`, background: toneStyle.background, color: toneStyle.color, borderRadius: 12, padding: 12, display: "grid", gap: 6 }}>
-        <strong>{copy.label}</strong>
-        <span>{copy.detail}</span>
+        <strong>{t(`notificationUi.status.${statusKey}.label`)}</strong>
+        <span>{t(`notificationUi.status.${statusKey}.detail`)}</span>
       </div>
 
       <div style={{ ...styles.card, margin: "10px 0 0", background: "#f8fafc" }}>
         {pushEnvironment.ios ? (
           <div style={styles.metaRow}>
-            <span>Home Screen app</span>
-            <strong>{pushEnvironment.standalone ? "Yes" : "No"}</strong>
+            <span>{t("notificationUi.homeScreen")}</span>
+            <strong>{pushEnvironment.standalone ? t("notificationUi.yes") : t("notificationUi.no")}</strong>
           </div>
         ) : null}
-        <div style={styles.metaRow}><span>Browser permission</span><strong>{browserPermission}</strong></div>
-        <div style={styles.metaRow}><span>Saved devices</span><strong>{deviceCount}</strong></div>
-        <div style={styles.metaRow}><span>This account</span><strong>{studentProfile?.email || studentProfile?.studentCode || "Student"}</strong></div>
+        <div style={styles.metaRow}><span>{t("notificationUi.browserPermission")}</span><strong>{browserPermission}</strong></div>
+        <div style={styles.metaRow}><span>{t("notificationUi.savedDevices")}</span><strong>{deviceCount}</strong></div>
+        <div style={styles.metaRow}><span>{t("notificationUi.thisAccount")}</span><strong>{studentProfile?.email || studentProfile?.studentCode || t("accountOverview.student")}</strong></div>
       </div>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
         <button type="button" style={styles.primaryButton} onClick={handleEnable} disabled={isEnabling || notificationStatus === "pending"}>
-          {isEnabling || notificationStatus === "pending" ? "Setting up..." : notificationStatus === "granted" ? "Refresh this device" : "Enable notifications"}
+          {isEnabling || notificationStatus === "pending" ? t("notificationUi.settingUp") : notificationStatus === "granted" ? t("notificationUi.refreshDevice") : t("notificationUi.enable")}
         </button>
         <button
           type="button"
@@ -197,7 +156,7 @@ const NotificationSettingsCard = () => {
           onClick={handleTestPush}
           disabled={isTesting || notificationStatus !== "granted" || !messagingToken}
         >
-          {isTesting ? "Sending test..." : "Send test notification"}
+          {isTesting ? t("notificationUi.sendingTest") : t("notificationUi.sendTest")}
         </button>
       </div>
 
@@ -205,9 +164,9 @@ const NotificationSettingsCard = () => {
       {testMessage ? <p style={{ ...styles.helperText, marginTop: 8 }}><strong>{testMessage}</strong></p> : null}
 
       <div style={{ display: "grid", gap: 8, marginTop: 12, lineHeight: 1.6 }}>
-        <p style={{ margin: 0 }}><strong>Android / Chrome:</strong> tap Enable notifications and allow the browser permission.</p>
+        <p style={{ margin: 0 }}>{t("notificationUi.androidTip")}</p>
         <p style={{ margin: 0 }}>
-          <strong>iPhone (iOS 16.4 or newer):</strong> push notifications do not work in a normal Safari tab. Open <strong>www.falowen.app</strong> in Safari, tap Share → Add to Home Screen, then open that icon and tap Enable notifications. If “Web Push unavailable” still appears, check your iOS version and reinstall the Home Screen app.
+          {t("notificationUi.iosTip")}
         </p>
       </div>
     </section>

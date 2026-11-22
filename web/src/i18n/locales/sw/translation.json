@@ -24,7 +24,8 @@
     "shortLabel": "Lugha ya programu",
     "helper": "Lugha ya menyu ni tofauti na lugha unayojifunza.",
     "ariaLabel": "Badilisha lugha ya programu",
-    "optionAria": "Badilisha lugha ya programu iwe {{language}}"
+    "optionAria": "Badilisha lugha ya programu iwe {{language}}",
+    "saveFailed": "Lugha imebadilishwa kwenye kifaa hiki, lakini imeshindikana kuihifadhi kwenye akaunti."
   },
   "signup": {
     "courseLanguage": "Unataka kujifunza lugha gani?",
@@ -290,5 +291,133 @@
     "tuitionDescription": "Ada ya {{level}} ni {{amount}}. Unaweza kuanza kwa majaribio ya siku 7 au kulipa mara moja kupitia Paystack.",
     "phonePrivacy": "Tunahifadhi nambari yako ya simu ili kuwasiliana nawe inapohitajika. Mtu wa dharura hujulishwa katika hali za dharura tu.",
     "addressHint": "Nambari ya nyumba, mtaa, jiji, mkoa"
+  },
+  "accountOverview": {
+    "title": "Akaunti yangu ya Falowen",
+    "student": "Mwanafunzi",
+    "courseAccount": "Akaunti ya kozi",
+    "studentCode": "Nambari ya mwanafunzi",
+    "trialAccess": "Ufikiaji wa majaribio",
+    "courseAccess": "Ufikiaji wa kozi",
+    "learningRecords": "Rekodi za masomo",
+    "participation": "Ushiriki darasani",
+    "notifications": "Arifa",
+    "deleteAccount": "Futa akaunti",
+    "biographyNotice": "Unaweza kuhariri wasifu kwenye sehemu ya Wanadarasa.",
+    "billingIntro": "Ada, ufikiaji na malipo katika sehemu moja.",
+    "refresh": "Onyesha upya",
+    "refreshing": "Inaonyesha upya...",
+    "tuition": "Ada ya masomo",
+    "paid": "Imelipwa",
+    "balance": "Salio"
+  },
+  "enrollmentRequest": {
+    "title": "Jifunze lugha ya pili",
+    "description": "Ungependa kuongeza {{course}} kwenye akaunti yako? Tuma ombi kwa timu ya usajili.",
+    "action": "Omba kozi ya {{course}}",
+    "saving": "Inatuma ombi...",
+    "pending": "Ombi lako la {{course}} linasubiri uthibitisho wa usajili.",
+    "notice": "Ombi hili halikuandikishi wala kukutoza ada. Wafanyakazi watathibitisha darasa, kiwango, ada na rekodi tofauti za kozi.",
+    "error": "Imeshindikana kuhifadhi ombi. Jaribu tena au wasiliana na timu ya usajili.",
+    "signupBoth": "Ningependa pia kujifunza {{course}}.",
+    "signupNotice": "Utaanza kozi kuu kwanza. Timu ya usajili itawasiliana nawe kuhusu kozi ya pili; bado hakuna usajili au ada.",
+    "placementPending": "Kozi yako ya pili inasubiri darasa na kiwango. Wasiliana na timu ya usajili.",
+    "secondaryBillingTitle": "Ada za kozi ya pili",
+    "secondaryBillingNotice": "Ada na malipo ya kozi yako ya pili husimamiwa tofauti na timu ya usajili ya Falowen. Hapa tunaonyesha kiasi kilichothibitishwa pekee; hakuna malipo yanayoanzishwa.",
+    "placementPendingLabel": "Inasubiri kupangiwa darasa",
+    "secondaryAccessLabel": "Kozi ya pili"
+  },
+  "resultsOverview": {
+    "title": "Matokeo",
+    "readiness": "Utayari wako unatokana na maendeleo ya kozi yaliyorekodiwa.",
+    "loading": "Inapakia matokeo...",
+    "error": "Imeshindikana kupakia matokeo.",
+    "refreshError": "Imeshindikana kupakia matokeo. Onyesha upya ukurasa ujaribu tena.",
+    "empty": "Bado hakuna matokeo yaliyopimwa. Alama na maoni yataonekana baada ya kazi kusahihishwa.",
+    "count": "Una matokeo {{count}} yaliyorekodiwa{{average}}",
+    "average": " · Wastani: {{average}}",
+    "overview": "Muhtasari wa kazi zilizopimwa",
+    "latest": "Alama ya hivi karibuni: {{score}}%{{assignment}}.",
+    "belowPass": "Matokeo {{count}} yako chini ya alama ya ufaulu ya {{passMark}}%. Soma maoni kwenye historia ya matokeo.",
+    "allPassed": "Matokeo yote {{count}} yanakidhi alama ya ufaulu ya {{passMark}}%. Soma maoni kwa maboresho.",
+    "milestoneDone": "Lengo limetimia: kiwango hiki kimekamilika 🎉",
+    "milestoneFirst": "Lengo linalofuata: kamilisha zoezi lako la kwanza.",
+    "milestoneRemaining": "Lengo linalofuata: kamilisha mazoezi {{count}} zaidi ya {{level}}.",
+    "retry": "Rudia mazoezi {{count}} yaliyo chini ya {{passMark}}%.",
+    "complete": "{{percent}}% imekamilika",
+    "completionInfo": "Mazoezi yaliyofaulu pekee ndiyo huhesabiwa (alama ≥ {{passMark}}%).",
+    "retryCount": "{{count}} yanahitaji kurudiwa.",
+    "leaderboardPosition": "Nafasi kwenye orodha:",
+    "rank": "Nafasi ya {{rank}} kati ya {{total}} ({{level}})",
+    "level": "Kiwango",
+    "unranked": "Bado huna nafasi ({{level}})",
+    "unavailable": "Bado haipatikani",
+    "qualification": "Unahitaji kukamilisha angalau mazoezi {{count}} ili kuingia kwenye orodha.",
+    "leaderboardPending": "Nafasi yako itaonekana baada ya kupatikana alama za kutosha za darasa.",
+    "rankExplanation": "Alama zako ({{score}}) na mazoezi uliyokamilisha ({{completed}}) hulinganishwa na wanafunzi {{total}}. Alama huangaliwa kwanza, kisha idadi ya mazoezi. Unahitaji angalau mazoezi {{minimum}}.",
+    "noFeedback": "Bado hakuna maoni yaliyorekodiwa kwa nambari yako ya mwanafunzi.",
+    "swSummary": "{{marked}} yamepimwa · {{passed}} yamefaulu · {{pending}} yanasubiri alama",
+    "swAverage": "Wastani: {{average}}% · Ufaulu: {{passMark}}%",
+    "swEmpty": "Vitabu vyako vya mazoezi ulivyowasilisha vitaonekana hapa.",
+    "day": "Siku ya {{day}}",
+    "revisionNeeded": "Marekebisho yanahitajika",
+    "reviewed": "Imesahihishwa",
+    "awaitingTutor": "Inasubiri mwalimu",
+    "revise": "Rekebisha kazi"
+  },
+  "notificationUi": {
+    "title": "Mipangilio ya arifa",
+    "description": "Pokea maswali, alama, taarifa za mahudhurio na matangazo hata kama Falowen imefungwa.",
+    "homeScreen": "Programu kwenye skrini ya kwanza",
+    "yes": "Ndiyo",
+    "no": "Hapana",
+    "browserPermission": "Ruhusa ya kivinjari",
+    "savedDevices": "Vifaa vilivyohifadhiwa",
+    "thisAccount": "Akaunti hii",
+    "settingUp": "Inawekwa...",
+    "refreshDevice": "Sasisha kifaa hiki",
+    "enable": "Washa arifa",
+    "sendingTest": "Inatuma jaribio...",
+    "sendTest": "Tuma arifa ya majaribio",
+    "enabled": "Arifa zimewashwa kwenye kifaa hiki.",
+    "permissionIncomplete": "Ruhusa haijakamilika. Kwa iPhone, fungua Falowen kutoka skrini ya kwanza kisha uwashe arifa tena.",
+    "enableError": "Imeshindikana kuwasha arifa. Jaribu tena.",
+    "refreshFirst": "Sasisha kifaa hiki kwanza ili Falowen iwe na tokeni halali ya arifa.",
+    "testUnavailable": "Jaribio la arifa halipatikani kwenye toleo hili.",
+    "scheduled": "Jaribio limepangwa. Funga skrini sasa. Arifa inatarajiwa baada ya sekunde 8.",
+    "unconfirmed": "Falowen haijathibitisha kutumwa kwa jaribio.",
+    "testSent": "Jaribio limetumwa. Kama hakuna arifa, angalia mipangilio ya arifa na betri.",
+    "testError": "Jaribio la arifa limeshindwa. Sasisha kifaa na ujaribu tena. Ukihitaji msaada, tuma msimbo wa Firebase kwa timu ya usaidizi.",
+    "sessionExpired": "Muda wa kuingia umeisha. Ingia tena ujaribu.",
+    "unlinkedDevice": "Kifaa hiki hakijaunganishwa na akaunti yako. Kisasishe ujaribu tena.",
+    "invalidToken": "Tokeni ya arifa si halali au imeisha muda wake. Sasisha kifaa hiki.",
+    "androidTip": "Android / Chrome: washa arifa na uruhusu kivinjari kuzituma.",
+    "iosTip": "iPhone (iOS 16.4 au mpya): fungua Falowen kwa Safari, gusa Share → Add to Home Screen, kisha fungua programu hiyo na uwashe arifa. Arifa hazifanyi kazi kwenye kichupo cha kawaida cha Safari.",
+    "status": {
+      "granted": {
+        "label": "Zimewashwa kwenye kifaa hiki",
+        "detail": "Ruhusa ya kivinjari na tokeni ya Falowen zinafanya kazi."
+      },
+      "pending": {
+        "label": "Inawekwa...",
+        "detail": "Falowen inaomba au kusasisha tokeni yako."
+      },
+      "blocked": {
+        "label": "Zimezuiwa na kivinjari",
+        "detail": "Ruhusu arifa za Falowen katika mipangilio ya kivinjari."
+      },
+      "stale": {
+        "label": "Sasisho linahitajika",
+        "detail": "Ruhusa au tokeni inahitaji kusasishwa."
+      },
+      "error": {
+        "label": "Mpangilio umeshindwa",
+        "detail": "Jaribu tena au wasiliana na usaidizi."
+      },
+      "idle": {
+        "label": "Bado hazijawashwa",
+        "detail": "Washa arifa za alama, mahudhurio na vikumbusho."
+      }
+    }
   }
 }

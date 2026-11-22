@@ -23,7 +23,8 @@
     "shortLabel": "Interface language",
     "helper": "Menus and instructions stay in the interface language, separate from what you study.",
     "ariaLabel": "Change interface language",
-    "optionAria": "Change interface language to {{language}}"
+    "optionAria": "Change interface language to {{language}}",
+    "saveFailed": "Language changed on this device, but could not be saved to your account."
   },
   "appStatus": {
     "authLoading": "Loading the app…"
@@ -1968,5 +1969,133 @@
     "tuitionDescription": "For {{level}} tuition is {{amount}}. You may begin with the 7-day trial or choose immediate Paystack payment above.",
     "phonePrivacy": "We keep your phone number on file to contact you directly when necessary. Your emergency contact is only notified in urgent safety situations.",
     "addressHint": "House number, street, city, region"
+  },
+  "accountOverview": {
+    "title": "My Falowen account",
+    "student": "Student",
+    "courseAccount": "Course account",
+    "studentCode": "Student code",
+    "trialAccess": "Trial access",
+    "courseAccess": "Course access",
+    "learningRecords": "Learning records",
+    "participation": "Class Participation",
+    "notifications": "Notifications",
+    "deleteAccount": "Delete account",
+    "biographyNotice": "Biography editing is available in the Class Members tab.",
+    "billingIntro": "Tuition, access and payment in one place.",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "tuition": "Tuition",
+    "paid": "Paid",
+    "balance": "Balance"
+  },
+  "enrollmentRequest": {
+    "title": "Study a second language",
+    "description": "Interested in adding {{course}} to your account? Send a request to admissions.",
+    "action": "Request {{course}}",
+    "saving": "Sending request...",
+    "pending": "Your request for {{course}} is awaiting admissions confirmation.",
+    "notice": "This does not enroll you or charge tuition. Staff will confirm the class, level, fees and separate course records first.",
+    "error": "Could not save your request. Please try again or contact admissions.",
+    "signupBoth": "I also want to study {{course}}.",
+    "signupNotice": "Your main course will start first. Admissions will contact you about the second course; it is not enrolled or charged yet.",
+    "placementPending": "Your second course is awaiting an assigned class and level. Contact admissions if this remains unresolved.",
+    "secondaryBillingTitle": "Second-course fees",
+    "secondaryBillingNotice": "Tuition and payment details for your second course are managed separately by Falowen admissions. This screen shows confirmed course figures only; no payment is initiated here.",
+    "placementPendingLabel": "Awaiting placement",
+    "secondaryAccessLabel": "Second course"
+  },
+  "resultsOverview": {
+    "title": "Results",
+    "readiness": "Your readiness status is based on your recorded course progress.",
+    "loading": "Loading your results...",
+    "error": "Could not load results.",
+    "refreshError": "Could not load your results. Refresh the page to try again.",
+    "empty": "No marked results yet. Once your work is graded, your scores and feedback will appear here.",
+    "count": "You have {{count}} recorded results{{average}}",
+    "average": " · Avg score: {{average}}",
+    "overview": "Your marked-work overview",
+    "latest": "Latest recorded score: {{score}}%{{assignment}}.",
+    "belowPass": "{{count}} recorded results are below the {{passMark}}% course pass mark. Open the result history to review feedback.",
+    "allPassed": "All {{count}} recorded numeric scores meet the {{passMark}}% course pass mark. Review individual feedback for improvements.",
+    "milestoneDone": "Milestone reached: this level is complete 🎉",
+    "milestoneFirst": "Next milestone: complete your first assignment.",
+    "milestoneRemaining": "Next milestone: complete {{count}} more assignments in {{level}}.",
+    "retry": "Retry {{count}} assignments below {{passMark}}%.",
+    "complete": "{{percent}}% complete",
+    "completionInfo": "Completion counts passed assignments (score ≥ {{passMark}}%).",
+    "retryCount": "{{count}} need a retry.",
+    "leaderboardPosition": "Leaderboard position:",
+    "rank": "{{rank}} of {{total}} ({{level}})",
+    "level": "Level",
+    "unranked": "Not ranked yet ({{level}})",
+    "unavailable": "Not available yet",
+    "qualification": "You need at least {{count}} completed assignments to qualify for ranking.",
+    "leaderboardPending": "We'll show your leaderboard position once enough class scores are available.",
+    "rankExplanation": "Your total score ({{score}}) and completed assignments ({{completed}}) are compared with {{total}} qualified students. Rank uses total marks first, then completed assignments. At least {{minimum}} completed assignments are required.",
+    "noFeedback": "No feedback has been recorded for your student code yet.",
+    "swSummary": "{{marked}} marked · {{passed}} passed · {{pending}} awaiting a score",
+    "swAverage": "Average score: {{average}}% · Pass mark: {{passMark}}%",
+    "swEmpty": "Your submitted workbooks will appear here.",
+    "day": "Day {{day}}",
+    "revisionNeeded": "Revision needed",
+    "reviewed": "Reviewed",
+    "awaitingTutor": "Awaiting tutor review",
+    "revise": "Revise submission"
+  },
+  "notificationUi": {
+    "title": "Notification setup",
+    "description": "Receive student questions, score updates, attendance updates and announcements even when Falowen is closed.",
+    "homeScreen": "Home Screen app",
+    "yes": "Yes",
+    "no": "No",
+    "browserPermission": "Browser permission",
+    "savedDevices": "Saved devices",
+    "thisAccount": "This account",
+    "settingUp": "Setting up...",
+    "refreshDevice": "Refresh this device",
+    "enable": "Enable notifications",
+    "sendingTest": "Sending test...",
+    "sendTest": "Send test notification",
+    "enabled": "Notifications are enabled for this device.",
+    "permissionIncomplete": "Permission was not completed. On iPhone, open the Falowen Home Screen app, then enable notifications again.",
+    "enableError": "Could not enable notifications. Please try again.",
+    "refreshFirst": "Refresh this device first so Falowen has a current push token.",
+    "testUnavailable": "Falowen push testing is not available on this deployment.",
+    "scheduled": "Test scheduled. Lock your screen now. The notification should arrive in about 8 seconds.",
+    "unconfirmed": "Falowen did not confirm the test push.",
+    "testSent": "Test sent. If nothing appears, check your phone's notification and battery settings.",
+    "testError": "The notification test failed. Refresh this device and retry. If it continues, share the Firebase error code with support.",
+    "sessionExpired": "Your session expired. Sign in again and retry.",
+    "unlinkedDevice": "This device is not linked to your account. Refresh this device and retry.",
+    "invalidToken": "Your push token is invalid or expired. Refresh this device and retry.",
+    "androidTip": "Android / Chrome: enable notifications and allow the browser permission.",
+    "iosTip": "iPhone (iOS 16.4 or newer): open Falowen in Safari, tap Share → Add to Home Screen, then launch that icon and enable notifications. Notifications do not work in a normal Safari tab.",
+    "status": {
+      "granted": {
+        "label": "Enabled on this device",
+        "detail": "Browser permission and Falowen push token are active."
+      },
+      "pending": {
+        "label": "Setting up...",
+        "detail": "Falowen is requesting or refreshing your token."
+      },
+      "blocked": {
+        "label": "Blocked in browser settings",
+        "detail": "Allow notifications for Falowen in browser/site settings."
+      },
+      "stale": {
+        "label": "Needs refresh",
+        "detail": "Your browser permission or token needs refreshing."
+      },
+      "error": {
+        "label": "Setup failed",
+        "detail": "Try again or contact support."
+      },
+      "idle": {
+        "label": "Not enabled yet",
+        "detail": "Enable notifications for scores, attendance and reminders."
+      }
+    }
   }
 }

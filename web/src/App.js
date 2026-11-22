@@ -11,7 +11,7 @@ import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
 import { MOCK_EXAM_CATALOG } from "./data/mockExamCatalog";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ExamProvider, useExam } from "./context/ExamContext";
@@ -243,7 +243,7 @@ import { getTrialLifecycleState } from "./lib/trialAccess";
 import { isApprovedUniversityStudent, isPendingUniversityStudent } from "./lib/universityInvitations";
 import CourseDiscountPage from "./components/CourseDiscountPage";
 import { getPartialPaymentAccessEndMs, hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
-import { changeInterfaceLanguage } from "./i18n";
+import { changeInterfaceLanguage, restoreAccountInterfaceLanguage } from "./i18n";
 import { trackAdmissionsEngagement } from "./services/admissionsEngagementService";
 
 const getTabStructure = (t) => {
@@ -787,9 +787,24 @@ const AppShell = ({
     }
   };
 
+  const restoredLanguageForUid = useRef("");
+  useEffect(() => {
+    // Wait for the server's student profile: restoring from a shared-device
+    // setting before the profile arrives would ignore the saved account choice.
+    if (!user?.uid || !studentProfile || restoredLanguageForUid.current === user.uid) return;
+    restoredLanguageForUid.current = user.uid;
+    void restoreAccountInterfaceLanguage(user.uid, studentProfile.preferredInterfaceLanguage);
+  }, [user?.uid, studentProfile, studentProfile?.preferredInterfaceLanguage]);
+
   const handleInterfaceLanguageChange = (event) => {
     const nextLanguage = event.target.value;
-    void changeInterfaceLanguage(nextLanguage);
+    void changeInterfaceLanguage(nextLanguage, user?.uid);
+    // Persist only deliberate changes. The login restore must never write on
+    // every render or switch a student's German/Swahili course.
+    if (user?.uid && studentProfile?.preferredInterfaceLanguage !== nextLanguage) {
+      void saveStudentProfile({ preferredInterfaceLanguage: nextLanguage })
+        .catch(() => showToast(t("interfaceLanguage.saveFailed"), "error"));
+    }
   };
 
   useEffect(() => {

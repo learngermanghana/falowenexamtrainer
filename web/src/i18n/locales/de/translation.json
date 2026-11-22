@@ -23,7 +23,8 @@
     "shortLabel": "Interface-Sprache",
     "helper": "Menüs und Anleitungen bleiben in der gewählten Sprache, unabhängig von deiner Lernsprache.",
     "ariaLabel": "Interface-Sprache ändern",
-    "optionAria": "Interface-Sprache auf {{language}} umstellen"
+    "optionAria": "Interface-Sprache auf {{language}} umstellen",
+    "saveFailed": "Sprache auf diesem Gerät geändert, konnte aber nicht im Konto gespeichert werden."
   },
   "appStatus": {
     "authLoading": "Die App wird geladen…"
@@ -1853,5 +1854,133 @@
     "tuitionDescription": "Für {{level}} beträgt die Gebühr {{amount}}. Du kannst sieben Tage testen oder oben direkt mit Paystack zahlen.",
     "phonePrivacy": "Wir speichern deine Telefonnummer, um dich bei Bedarf zu kontaktieren. Den Notfallkontakt benachrichtigen wir nur in dringenden Sicherheitsfällen.",
     "addressHint": "Hausnummer, Straße, Stadt, Region"
+  },
+  "accountOverview": {
+    "title": "Mein Falowen-Konto",
+    "student": "Lernende Person",
+    "courseAccount": "Kurskonto",
+    "studentCode": "Schülernummer",
+    "trialAccess": "Testzugang",
+    "courseAccess": "Kurszugang",
+    "learningRecords": "Lernunterlagen",
+    "participation": "Kursteilnahme",
+    "notifications": "Benachrichtigungen",
+    "deleteAccount": "Konto löschen",
+    "biographyNotice": "Dein Profil kannst du im Bereich „Kursteilnehmer“ bearbeiten.",
+    "billingIntro": "Kursgebühren, Zugang und Zahlungen an einem Ort.",
+    "refresh": "Aktualisieren",
+    "refreshing": "Wird aktualisiert ...",
+    "tuition": "Kursgebühr",
+    "paid": "Bezahlt",
+    "balance": "Restbetrag"
+  },
+  "enrollmentRequest": {
+    "title": "Eine zweite Sprache lernen",
+    "description": "Möchtest du {{course}} zu deinem Konto hinzufügen? Sende eine Anfrage an die Anmeldung.",
+    "action": "{{course}} anfragen",
+    "saving": "Anfrage wird gesendet ...",
+    "pending": "Deine Anfrage für {{course}} wartet auf Bestätigung.",
+    "notice": "Dies ist noch keine Anmeldung und keine Zahlung. Das Team prüft Kurs, Niveau, Gebühren und getrennte Kursdaten.",
+    "error": "Die Anfrage konnte nicht gespeichert werden. Versuche es erneut oder kontaktiere das Team.",
+    "signupBoth": "Ich möchte auch {{course}} lernen.",
+    "signupNotice": "Dein Hauptkurs beginnt zuerst. Das Team meldet sich wegen des zweiten Kurses; noch keine Anmeldung oder Gebühr.",
+    "placementPending": "Für deinen zweiten Kurs fehlen noch Klasse und Niveau. Bitte kontaktiere die Anmeldung.",
+    "secondaryBillingTitle": "Gebühren für den zweiten Kurs",
+    "secondaryBillingNotice": "Kursgebühren und Zahlungen des zweiten Kurses verwaltet das Falowen-Team getrennt. Hier stehen nur bestätigte Zahlen; es wird keine Zahlung gestartet.",
+    "placementPendingLabel": "Kurszuweisung ausstehend",
+    "secondaryAccessLabel": "Zweiter Kurs"
+  },
+  "resultsOverview": {
+    "title": "Ergebnisse",
+    "readiness": "Dein Vorbereitungsstand basiert auf deinem dokumentierten Kursfortschritt.",
+    "loading": "Ergebnisse werden geladen ...",
+    "error": "Ergebnisse konnten nicht geladen werden.",
+    "refreshError": "Ergebnisse konnten nicht geladen werden. Bitte lade die Seite neu.",
+    "empty": "Noch keine bewerteten Ergebnisse. Sobald deine Arbeiten bewertet sind, erscheinen Punkte und Feedback hier.",
+    "count": "Du hast {{count}} erfasste Ergebnisse{{average}}",
+    "average": " · Durchschnitt: {{average}}",
+    "overview": "Übersicht deiner Bewertungen",
+    "latest": "Letzte Bewertung: {{score}}%{{assignment}}.",
+    "belowPass": "{{count}} Ergebnisse liegen unter der Bestehensgrenze von {{passMark}}%. Prüfe das Feedback im Ergebnisverlauf.",
+    "allPassed": "Alle {{count}} erfassten Ergebnisse erreichen die Bestehensgrenze von {{passMark}}%. Sieh dir das Feedback an.",
+    "milestoneDone": "Ziel erreicht: Dieses Niveau ist abgeschlossen 🎉",
+    "milestoneFirst": "Nächstes Ziel: Schließe deine erste Aufgabe ab.",
+    "milestoneRemaining": "Nächstes Ziel: Noch {{count}} Aufgaben auf Niveau {{level}} abschließen.",
+    "retry": "Wiederhole {{count}} Aufgaben unter {{passMark}}%.",
+    "complete": "{{percent}}% abgeschlossen",
+    "completionInfo": "Nur bestandene Aufgaben zählen (Punktzahl ≥ {{passMark}}%).",
+    "retryCount": "{{count}} müssen wiederholt werden.",
+    "leaderboardPosition": "Rangliste:",
+    "rank": "Platz {{rank}} von {{total}} ({{level}})",
+    "level": "Niveau",
+    "unranked": "Noch kein Rang ({{level}})",
+    "unavailable": "Noch nicht verfügbar",
+    "qualification": "Für die Rangliste sind mindestens {{count}} abgeschlossene Aufgaben erforderlich.",
+    "leaderboardPending": "Dein Rang erscheint, sobald genügend Kursergebnisse vorliegen.",
+    "rankExplanation": "Deine Punkte ({{score}}) und abgeschlossenen Aufgaben ({{completed}}) werden mit {{total}} qualifizierten Lernenden verglichen. Entscheidend sind zuerst Punkte, dann Aufgaben. Mindestens {{minimum}} Aufgaben sind nötig.",
+    "noFeedback": "Für deine Schülernummer liegt noch kein Feedback vor.",
+    "swSummary": "{{marked}} bewertet · {{passed}} bestanden · {{pending}} warten auf Punkte",
+    "swAverage": "Durchschnitt: {{average}}% · Bestehensgrenze: {{passMark}}%",
+    "swEmpty": "Deine abgegebenen Arbeitshefte erscheinen hier.",
+    "day": "Tag {{day}}",
+    "revisionNeeded": "Überarbeitung nötig",
+    "reviewed": "Bewertet",
+    "awaitingTutor": "Wartet auf Lehrkraft",
+    "revise": "Abgabe überarbeiten"
+  },
+  "notificationUi": {
+    "title": "Benachrichtigungen einrichten",
+    "description": "Erhalte Fragen, Bewertungen, Anwesenheitsupdates und Ankündigungen, auch wenn Falowen geschlossen ist.",
+    "homeScreen": "Startbildschirm-App",
+    "yes": "Ja",
+    "no": "Nein",
+    "browserPermission": "Browser-Berechtigung",
+    "savedDevices": "Gespeicherte Geräte",
+    "thisAccount": "Dieses Konto",
+    "settingUp": "Wird eingerichtet ...",
+    "refreshDevice": "Gerät aktualisieren",
+    "enable": "Benachrichtigungen aktivieren",
+    "sendingTest": "Test wird gesendet ...",
+    "sendTest": "Testbenachrichtigung senden",
+    "enabled": "Benachrichtigungen sind für dieses Gerät aktiv.",
+    "permissionIncomplete": "Die Berechtigung wurde nicht abgeschlossen. Öffne Falowen auf dem iPhone über den Startbildschirm und versuche es erneut.",
+    "enableError": "Benachrichtigungen konnten nicht aktiviert werden. Bitte erneut versuchen.",
+    "refreshFirst": "Aktualisiere dieses Gerät, damit Falowen einen gültigen Push-Token hat.",
+    "testUnavailable": "Push-Tests sind in dieser Version nicht verfügbar.",
+    "scheduled": "Test geplant. Sperre jetzt den Bildschirm. Die Nachricht sollte in etwa 8 Sekunden eintreffen.",
+    "unconfirmed": "Falowen hat den Testversand nicht bestätigt.",
+    "testSent": "Test versendet. Wenn nichts ankommt, prüfe Benachrichtigungen und Akku-Einstellungen.",
+    "testError": "Der Benachrichtigungstest ist fehlgeschlagen. Aktualisiere das Gerät und versuche es erneut. Teile dem Support bei Bedarf den Firebase-Code mit.",
+    "sessionExpired": "Deine Sitzung ist abgelaufen. Melde dich erneut an.",
+    "unlinkedDevice": "Dieses Gerät ist nicht mit deinem Konto verknüpft. Aktualisiere es und versuche es erneut.",
+    "invalidToken": "Dein Push-Token ist ungültig oder abgelaufen. Aktualisiere das Gerät.",
+    "androidTip": "Android / Chrome: Benachrichtigungen aktivieren und die Browser-Berechtigung erlauben.",
+    "iosTip": "iPhone (iOS 16.4 oder neuer): Öffne Falowen in Safari, tippe auf Teilen → Zum Home-Bildschirm und aktiviere Benachrichtigungen in dieser App. Im normalen Safari-Tab funktionieren sie nicht.",
+    "status": {
+      "granted": {
+        "label": "Auf diesem Gerät aktiviert",
+        "detail": "Browser-Berechtigung und Falowen-Push-Token sind aktiv."
+      },
+      "pending": {
+        "label": "Wird eingerichtet ...",
+        "detail": "Falowen fordert den Token an oder aktualisiert ihn."
+      },
+      "blocked": {
+        "label": "Im Browser blockiert",
+        "detail": "Erlaube Benachrichtigungen für Falowen in den Browser-Einstellungen."
+      },
+      "stale": {
+        "label": "Aktualisierung nötig",
+        "detail": "Browser-Berechtigung oder Token muss aktualisiert werden."
+      },
+      "error": {
+        "label": "Einrichtung fehlgeschlagen",
+        "detail": "Versuche es erneut oder kontaktiere den Support."
+      },
+      "idle": {
+        "label": "Noch nicht aktiviert",
+        "detail": "Aktiviere Benachrichtigungen für Bewertungen, Anwesenheit und Erinnerungen."
+      }
+    }
   }
 }

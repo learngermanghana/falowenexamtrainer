@@ -120,8 +120,11 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   const requestedSignup = useMemo(() => signupQueryContext(), []);
   const universityInvitation = useMemo(() => resolveUniversityInvitation(invitationCode), [invitationCode]);
   const [selectedProgram, setProgram] = useState(initialProgram === "swahili" ? "swahili" : "german");
+  const [requestBothPrograms, setRequestBothPrograms] = useState(false);
   const program = universityInvitation?.program || courseDiscount?.program || selectedProgram;
   const isSwahili = program === "swahili";
+  const additionalProgrammeInterest = requestBothPrograms && !universityInvitation && !courseDiscount
+    ? (isSwahili ? "german" : "swahili") : "";
   const [germanLevel, setSelectedLevel] = useState(
     requestedSignup.level || "A1"
   );
@@ -498,6 +501,8 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
         learningMode,
         emergencyContactPhone: cleanedEmergencyPhone,
         program,
+        additionalProgrammeInterest,
+        preferredInterfaceLanguage: String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2),
         initialPaymentAmount: paidAmount,
         tuitionFee,
         balanceDue,
@@ -773,6 +778,15 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             {!universityInvitation && courseDiscount?.program !== "swahili" && <option value="german">{t("signup.programs.german")}</option>}
             {courseDiscount?.program !== "german" && <option value="swahili">{t("signup.programs.swahili")}</option>}
           </select>
+          {!universityInvitation && !courseDiscount && (
+            <label style={{ ...styles.label, display: "flex", gap: 9, alignItems: "flex-start" }}>
+              <input type="checkbox" checked={requestBothPrograms} onChange={(event) => setRequestBothPrograms(event.target.checked)} />
+              <span>{t("enrollmentRequest.signupBoth", { course: t(`signup.programs.${isSwahili ? "german" : "swahili"}`) })}</span>
+            </label>
+          )}
+          {requestBothPrograms && !universityInvitation && !courseDiscount && (
+            <p style={styles.helperText} role="status">{t("enrollmentRequest.signupNotice")}</p>
+          )}
           {isSwahili ? (
             universityInvitation ? null : <p style={styles.helperText}>{t("signup.swahiliTrial")}</p>
           ) : <>
