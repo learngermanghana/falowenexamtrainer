@@ -19,17 +19,26 @@ function fakeDb(records) {
       assert.equal(name, "students");
       return {
         where(field, operator, value) {
+          let afterId = null;
           return {
+            startAfter(lastDoc) {
+              afterId = lastDoc.id;
+              return this;
+            },
             limit(n) {
               assert.ok(n <= 8);
               return {
                 async get() {
                   const rows = records.filter(row => operator === "in"
                     ? value.includes(row[field]) : row[field] === value);
-                  return { docs: rows.slice(0, n).map((row, i) => ({
+                  const candidates = rows.map(row => ({
                     id: row.id || "student-" + records.indexOf(row),
                     data: () => row,
-                  })) };
+                  }));
+                  const position = afterId === null ? 0
+                    : candidates.findIndex(doc => doc.id === afterId) + 1;
+                  assert.ok(position >= 0, "pagination cursor must be valid");
+                  return { docs: candidates.slice(position, position + n) };
                 },
               };
             },
@@ -72,7 +81,10 @@ test("shared emergency contact alone never blocks a different student", () => {
     emergencyContactPhone: "055 987 6543", email: "kofi@example.com",
   };
   assert.equal(matchesExisting(applicant, existing), false);
-  assert.equal(matchesExisting({ ...applicant, name: "Ofori Ama" }, {
+  // Production passes validatedApplication() to matchesExisting().
+  const normalized = validatedApplication({ ...applicant, name: "Ofori Ama" });
+  assert.ok(normalized);
+  assert.equal(matchesExisting(normalized, {
     ...existing, name: "Ama Ofori",
   }), true);
 });
@@ -87,6 +99,47 @@ test("checks existing normalized identities and legacy primary phones without br
   assert.equal(await findProbableDuplicate(fakeDb([
     { name: "Ama Ofori", emailIdentity: "ama@gmail.com", phoneIdentity: "233201111111" },
   ]), { ...applicant, email: "a.ma+new@gmail.com" }), true);
+});
+
+test("finds a name-plus-emergency match after more than eight shared contacts", async () => {
+  const sharedEmergency = "055 987 6543";
+  const family = Array.from({ length: 9 }, (_, i) => ({
+    id: "family-" + i,
+    name: i === 8 ? "Ofori Ama" : "Other Student " + i,
+    email: "different-" + i + "@example.com",
+    phone: "+233201000" + String(i).padStart(3, "0"),
+    emergencyContactPhone: sharedEmergency,
+  }));
+  // Only the ninth result has the same normalized name as the applicant.
+  assert.equal(await findProbableDuplicate(fakeDb(family), applicant), true);
+  family[8].name = "Another Student";
+  // Shared emergency number alone must never reject a different student.
+  assert.equal(await findProbableDuplicate(fakeDb(family), applicant), false);
+});
+
+test("paginates normalized emergency identities past the first page", async () => {
+  const family = Array.from({ length: 17 }, (_, i) => ({
+    id: "contact-" + i,
+    name: i === 16 ? "Ama Ofori" : "Different Student " + i,
+    email: "other-" + i + "@example.org",
+    phoneIdentity: "233201111" + String(i).padStart(3, "0"),
+    emergencyContactPhoneIdentity: "233559876543",
+  }));
+  assert.equal(await findProbableDuplicate(fakeDb(family), applicant), true);
+});
+
+test("does not return CLEAR if shared emergency candidates exceed the safe scan cap", async () => {
+  const family = Array.from({ length: 257 }, (_, i) => ({
+    id: "institution-" + i,
+    name: "Different Student " + i,
+    email: "other-" + i + "@example.edu",
+    phoneIdentity: "23320999" + String(i).padStart(4, "0"),
+    emergencyContactPhoneIdentity: "233559876543",
+  }));
+  await assert.rejects(
+    findProbableDuplicate(fakeDb(family), applicant),
+    /signup_emergency_lookup_limit/
+  );
 });
 
 test("public review endpoint returns only a generic response without student details", async () => {
