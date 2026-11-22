@@ -789,10 +789,12 @@ const AppShell = ({
 
   const restoredLanguageForUid = useRef("");
   useEffect(() => {
-    if (!user?.uid || restoredLanguageForUid.current === user.uid) return;
+    // Wait for the server's student profile: restoring from a shared-device
+    // setting before the profile arrives would ignore the saved account choice.
+    if (!user?.uid || !studentProfile || restoredLanguageForUid.current === user.uid) return;
     restoredLanguageForUid.current = user.uid;
-    void restoreAccountInterfaceLanguage(user.uid, studentProfile?.preferredInterfaceLanguage);
-  }, [user?.uid, studentProfile?.preferredInterfaceLanguage]);
+    void restoreAccountInterfaceLanguage(user.uid, studentProfile.preferredInterfaceLanguage);
+  }, [user?.uid, studentProfile, studentProfile?.preferredInterfaceLanguage]);
 
   const handleInterfaceLanguageChange = (event) => {
     const nextLanguage = event.target.value;
