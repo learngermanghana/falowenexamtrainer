@@ -729,19 +729,58 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "prompt": "Write a short picnic message. Say what you like, decline one drink politely, and say what you will bring."
     },
     "reading": {
-      "text": "Hassan na Amina wanapanga kula pamoja baada ya darasa. Hassan anapenda chapati na chai. Amina hapendi chai. Anapenda juisi ya embe. Hassan ataleta chapati na Amina ataleta juisi.",
+      "title": "Hati ya Mazungumzo · Maziwa na Sukari",
+      "text": "Mteja: Hujambo! Mna maziwa na sukari leo?\n\nMuuzaji: Sijambo, karibu! Ndiyo, tuna maziwa na sukari.\n\nMteja: Safi sana. Naomba lita moja ya maziwa na nusu kilo ya sukari, tafadhali.\n\nMuuzaji: Haya hapa. Unahitaji kitu kingine?\n\nMteja: Hapana, asante. Maziwa ni shilingi ngapi?\n\nMuuzaji: Maziwa ni shilingi 2,000, na sukari ni shilingi 2,500. Jumla ni shilingi elfu nne na mia tano.\n\nMteja: Haya, naweza kulipa kwa pesa taslimu?\n\nMuuzaji: Ndiyo, inawezekana.\n\nMteja: Chukua pesa. Risiti, tafadhali.\n\nMuuzaji: Asante sana! Karibu tena.",
       "questions": [
         {
-          "question": "Hassan anapenda kinywaji gani?",
-          "id": "read-1"
+          "id": "read-1",
+          "question": "Je, mteja anatumia muundo gani kuuliza kama duka lina maziwa na sukari? (Which structure does the customer use to ask if the store has milk and sugar?)",
+          "choices": [
+            "A) Naomba maziwa na sukari.",
+            "B) Mna maziwa na sukari leo?",
+            "C) Sitaki maziwa na sukari.",
+            "D) Jumla ni shilingi ngapi?"
+          ]
         },
         {
-          "question": "Amina anapenda juisi gani?",
-          "id": "read-2"
+          "id": "read-2",
+          "question": "Mteja aliagiza kiasi gani cha maziwa na sukari? (How much milk and sugar did the customer order?)",
+          "choices": [
+            "A) Lita mbili ya maziwa na kilo moja ya sukari.",
+            "B) Lita moja ya maziwa na nusu kilo ya sukari.",
+            "C) Kikombe kimoja cha maziwa na sukari nyingi.",
+            "D) Lita moja ya maziwa na madaftari miwili."
+          ]
         },
         {
-          "question": "Nani ataleta chapati?",
-          "id": "read-3"
+          "id": "read-3",
+          "question": "Jumla ya gharama ya bidhaa zote ilikuwa shilingi ngapi? (How much was the total cost of all items?)",
+          "choices": [
+            "A) Shilingi elfu mbili (2,000 TSh).",
+            "B) Shilingi elfu tano (5,000 TSh).",
+            "C) Shilingi elfu nne na mia tano (4,500 TSh).",
+            "D) Shilingi elfu kumi (10,000 TSh)."
+          ]
+        },
+        {
+          "id": "read-4",
+          "question": "Mteja aliuliza vipi kuhusu njia ya kulipa? (How did the customer ask about the payment method?)",
+          "choices": [
+            "A) Naomba bili, tafadhali.",
+            "B) Bei gani leo?",
+            "C) Naweza kulipa kwa pesa taslimu?",
+            "D) Risiti ni shilingi ngapi?"
+          ]
+        },
+        {
+          "id": "read-5",
+          "question": "Mteja alisema nini ili kuomba uthibitisho wa malipo baada ya kulipa? (What did the customer say to request proof of payment after paying?)",
+          "choices": [
+            "A) Karibu tena!",
+            "B) Hatuna pesa.",
+            "C) Risiti, tafadhali.",
+            "D) Hujambo muuzaji!"
+          ]
         }
       ]
     },

@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
+import { isLegacySwahiliDaySevenReading, swahiliReadingDraftVersion } from "../utils/swahiliReadingVersion";
 import SwahiliReviewDraft, { SwahiliFinalSubmit, useSwahiliReviewDraft } from "./SwahiliReviewDraft";
 
 export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestions, listeningQuestions = []) {
@@ -14,13 +15,15 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
   const [listeningAnswers, setListeningAnswers] = useState({});
   const [submission, setSubmission] = useState("idle");
   const [submittedAnswers, setSubmittedAnswers] = useState("");
+  const [legacyReadingSubmission, setLegacyReadingSubmission] = useState(false);
   const answers = { writing, reading, listeningAnswers };
   const restoreDraft = useCallback(draft => {
     setWriting(typeof draft.writing === "string" ? draft.writing : "");
     setReading(draft.reading || {});
     setListeningAnswers(draft.listeningAnswers || {});
   }, []);
-  const draft = useSwahiliReviewDraft(canSubmit ? user.uid : null, lesson.day, answers, restoreDraft);
+  const draft = useSwahiliReviewDraft(canSubmit ? user.uid : null, lesson.day, answers, restoreDraft,
+    swahiliReadingDraftVersion(lesson.day));
   const snapshot = JSON.stringify(answers);
   const submitted = submittedAnswers === snapshot;
   const [feedback, setFeedback] = useState("");
@@ -36,6 +39,18 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
         writing: work.writing?.[day === 11 ? "dialogue" : "response"] || "",
         reading: work.readingAnswers || {}, listeningAnswers: work.listeningAnswers || {},
       };
+      const outdatedReading = isLegacySwahiliDaySevenReading(day, work);
+      if (outdatedReading) {
+        // The old picnic reading IDs overlap the new shopping-dialogue IDs.
+        // Preserve past Results without restoring unrelated answers or old feedback.
+        setLegacyReadingSubmission(true);
+        setSubmittedAnswers("");
+        setFeedback("");
+        setWriting(value => value || previous.writing);
+        setListeningAnswers(value => ({ ...previous.listeningAnswers, ...value }));
+        return;
+      }
+      setLegacyReadingSubmission(false);
       setWriting(value => value || previous.writing);
       setReading(value => ({ ...previous.reading, ...value }));
       setListeningAnswers(value => ({ ...previous.listeningAnswers, ...value }));
@@ -59,12 +74,14 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
       await setDoc(doc(db, "users", user.uid, "swahiliLessons", `day-${lesson.day}`), {
         studentId: user.uid, userId: user.uid, program: "swahili", level: "A1",
         day: lesson.day, lessonId: `swahili-day-${lesson.day}`, title: lesson.title,
-        status: "submitted", writing: { [lesson.day === 11 ? "dialogue" : "response"]: writing.trim() }, readingAnswers: reading,
+        status: "submitted", writing: { [lesson.day === 11 ? "dialogue" : "response"]: writing.trim() },
+        ...(lesson.day === 7 ? { readingVersion: 2 } : {}), readingAnswers: reading,
         listeningAnswers, listeningTeacherLed: false, submittedAt: serverTimestamp(),
         studentName: studentProfile?.name || studentProfile?.displayName || user.displayName || "",
         studentEmail: user.email || "",
       });
       setFeedback("");
+      setLegacyReadingSubmission(false);
       setSubmittedAnswers(snapshot);
       setSubmission("idle");
     } catch {
@@ -73,14 +90,16 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
   }
 
   return { writing, setWriting, reading, setReading, listeningAnswers, setListeningAnswers,
-    readingQuestions, listeningQuestions, draft, canSubmit, complete, submission, submitted, feedback, submitWork };
+    readingQuestions, listeningQuestions, draft, canSubmit, complete, submission, submitted, feedback,
+    legacyReadingSubmission, submitWork };
 }
 
 export default function SwahiliAssignmentReview({ assignment }) {
   const { writing, reading, listeningAnswers, readingQuestions, listeningQuestions,
-    draft, canSubmit, complete, submission, submitted, feedback, submitWork } = assignment;
+    draft, canSubmit, complete, submission, submitted, feedback, legacyReadingSubmission, submitWork } = assignment;
   return <>
     <h2>Review &amp; Submit · Wasilisha</h2>
+    {legacyReadingSubmission && <p role="status">You submitted an earlier Day 7 reading exercise. Your previous result remains in <Link to="/campus/results">Campus Results</Link>. This lesson now has a different five-question reading task. Complete the updated questions and submit a new version for tutor review.</p>}
     <SwahiliReviewDraft writing={{ Kuandika: writing }} questions={readingQuestions}
       reading={reading} listening={listeningAnswers} listeningQuestions={listeningQuestions}
       draft={canSubmit ? draft : null} />
