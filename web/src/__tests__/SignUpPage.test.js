@@ -172,6 +172,29 @@ describe("three-step signup", () => {
     ));
   });
 
+  it("refuses the same emergency number even in a different Ghana format", async () => {
+    render(<SignUpPage />);
+    await fillAccount();
+    await advanceLearning();
+    await fillContact();
+    const emergency = screen.getByLabelText("Emergency contact phone");
+    await userEvent.type(emergency, "024 123 4567");
+    expect(screen.getByText(/emergency contact must have a different phone number/i)).toBeVisible();
+    await userEvent.click(screen.getByRole("checkbox"));
+    await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
+    expect(mockSignup).not.toHaveBeenCalled();
+    await userEvent.clear(emergency);
+    await userEvent.type(emergency, "+233209876543");
+    expect(screen.queryByText(/emergency contact must have a different phone number/i)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
+    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith(
+      "learner@example.com", "password123",
+      expect.objectContaining({
+        phone: "+233241234567", emergencyContactPhone: "+233209876543",
+      }),
+    ));
+  });
+
   it("requires emergency contact before creating the trial", async () => {
     render(<SignUpPage />);
     await fillAccount(); await advanceLearning(); await fillContact();
