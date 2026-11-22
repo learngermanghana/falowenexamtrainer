@@ -180,7 +180,14 @@
     "terms": "masharti",
     "privacy": "sera ya faragha",
     "swahiliSubtitle": "Nafasi yako ya kujifunza Kiswahili",
-    "publishedLessons": "Masomo yaliyochapishwa"
+    "publishedLessons": "Masomo yaliyochapishwa",
+    "resume": {
+      "title": "Endelea na usajili wako",
+      "description": "Taarifa zako isipokuwa nenosiri zimehifadhiwa kwenye kifaa hiki. Endelea au omba msaada.",
+      "help": "Unahitaji msaada gani? (si lazima)",
+      "placeholder": "Kwa mfano: Siwezi kuchagua darasa. Usiweke nenosiri.",
+      "whatsapp": "Wasiliana na timu ya usajili kupitia WhatsApp"
+    }
   },
   "homeAccess": {
     "welcomeBack": "Karibu tena, {{name}}.",
