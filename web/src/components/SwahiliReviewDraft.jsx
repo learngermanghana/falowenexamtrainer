@@ -1,6 +1,6 @@
 import React from "react";
 
-export function useSwahiliReviewDraft(uid, day, answers, restore, readingVersion = null) {
+export function useSwahiliReviewDraft(uid, day, answers, restore, readingVersion = null, canMigrateUnversionedDraft = null) {
   const key = uid && day ? `falowen:swahili-review:${uid}:day-${day}${readingVersion ? `:reading-v${readingVersion}` : ""}` : "";
   const [notice, setNotice] = React.useState("");
   React.useEffect(() => {
@@ -8,11 +8,22 @@ export function useSwahiliReviewDraft(uid, day, answers, restore, readingVersion
     if (!key) return;
     try {
       const draft = JSON.parse(localStorage.getItem(key) || "null");
-      if (draft) restore(draft);
+      if (draft) {
+        restore(draft);
+      } else if (readingVersion && typeof canMigrateUnversionedDraft === "function") {
+        // A short-lived replacement Day 8 workbook saved to the old key.
+        // Only migrate an identifiable new-task draft; preserve old drafts.
+        const oldKey = `falowen:swahili-review:${uid}:day-${day}`;
+        const oldDraft = JSON.parse(localStorage.getItem(oldKey) || "null");
+        if (oldDraft && canMigrateUnversionedDraft(oldDraft)) {
+          localStorage.setItem(key, JSON.stringify(oldDraft));
+          restore(oldDraft);
+        }
+      }
     } catch {
       // An unavailable or malformed local draft must not block the workbook.
     }
-  }, [key, restore]);
+  }, [key, restore, readingVersion, uid, day, canMigrateUnversionedDraft]);
 
   function saveDraft() {
     if (!key) return;
