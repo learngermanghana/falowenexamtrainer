@@ -147,6 +147,7 @@ export default function ExamsOverviewPage() {
         <div className="exam-room-skills-grid">
           {EXAM_SKILLS.map((skill) => {
             const last = coach.latestBySection[skill.key];
+            const trend = coach.skillTrends[skill.key];
             const suggested = coach.focus.key === skill.key;
             return (
               <button
@@ -167,6 +168,16 @@ export default function ExamsOverviewPage() {
                 <span className="exam-room-skill-bottom">
                   <span>{last ? "Latest: " + last.percent + "%" : "Not yet practised"}</span>
                   <span className="exam-room-arrow" aria-hidden="true">→</span>
+                {trend.count ? (
+                  <span className="exam-room-skill-trend">
+                    <span>{trend.count} scored attempt{trend.count === 1 ? "" : "s"} · Average {trend.average}%</span>
+                    {trend.change !== null ? (
+                      <span className="exam-room-skill-change" aria-label={`Change from previous attempt: ${trend.change > 0 ? "up " : trend.change < 0 ? "down " : "unchanged "}${Math.abs(trend.change)} percentage points`}>
+                        {trend.change > 0 ? "↑ +" : trend.change < 0 ? "↓ " : "→ "}{trend.change} pp vs previous
+                      </span>
+                    ) : null}
+                  </span>
+                ) : null}
                 </span>
               </button>
             );
