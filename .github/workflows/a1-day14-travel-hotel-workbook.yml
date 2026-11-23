@@ -1,0 +1,37 @@
+name: A1 Day 14 train and hotel workbook
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A1Day14ModalVerbsWorkbookCorePage.js"
+      - "web/src/components/A1Day14TravelHotelWorkbookPage.js"
+      - "web/src/components/A1Day14TravelHotelWorkbookPage.css"
+      - "web/src/data/a1Day14TravelHotelWorkbook.js"
+      - "web/src/components/A1Day14ModalVerbsWorkbookPage.test.js"
+      - ".github/workflows/a1-day14-travel-hotel-workbook.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/components/A1Day14ModalVerbsWorkbookCorePage.js"
+      - "web/src/components/A1Day14TravelHotelWorkbookPage.js"
+      - "web/src/data/a1Day14TravelHotelWorkbook.js"
+      - ".github/workflows/a1-day14-travel-hotel-workbook.yml"
+  workflow_dispatch:
+
+jobs:
+  workbook-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install student app dependencies
+        run: npm ci
+      - name: Verify Day 14 train and hotel workbook
+        run: npx jest --runInBand --runTestsByPath src/components/A1Day14ModalVerbsWorkbookPage.test.js
