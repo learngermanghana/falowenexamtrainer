@@ -12,6 +12,7 @@ import ClassParticipationCard from "./ClassParticipationCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
+import { shouldOfferTuitionPayment } from "../utils/tuitionPaymentVisibility";
 import { formatCurrency } from "../lib/formatters";
 import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { getNextLevel, getTuitionFeeForLevel } from "../data/levelFees";
@@ -120,7 +121,7 @@ const AccountSettings = () => {
   const normalizedPaymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
   const paymentCleared = normalizedPaymentStatus === "paid" || hasClearedBalance(balanceDue);
   // Payment actions require a real amount due and must never prompt an already-paid learner.
-  const hasOutstandingTuition = Number(balanceDue) > 0 && !paymentCleared;
+  const hasOutstandingTuition = shouldOfferTuitionPayment({ balanceDue, paymentCleared });
 
   const billingState = useMemo(() => {
     if (isSecondaryCourse) {
