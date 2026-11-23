@@ -4,6 +4,13 @@ import { getActionCodeSettings, reload, sendEmailVerification } from "../firebas
 
 const LEVELS = ["A1", "A2", "B1"];
 
+const REGISTRATION_DOCUMENTS = {
+  enrollment: "Enrollment letter",
+  agreement: "Payment agreement",
+  receipt: "Latest issued payment receipt",
+  residence: "Issued residence-permit support letter",
+};
+
 export default function StudentDocumentsPanel({ user, studentProfile }) {
   const initialLevel = LEVELS.includes(String(studentProfile?.level || "").toUpperCase())
     ? String(studentProfile.level).toUpperCase() : "A1";
@@ -69,6 +76,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
     setError("");
     setNotice("");
     try {
+      const registrationLabel = REGISTRATION_DOCUMENTS[kind];
       const token = await user.getIdToken(true);
       const response = await fetch(`${getBackendUrl()}/students/me/documents/${kind}`, {
         method: "POST",
@@ -76,7 +84,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ level }), // Never send a student code or email.
+        body: JSON.stringify(registrationLabel ? {} : { level }), // Never send a student code or email.
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
@@ -87,7 +95,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
         throw new Error("Falowen returned an invalid document.");
       }
       const disposition = response.headers.get("Content-Disposition") || "";
-      const fallbackName = `Falowen_${kind}_${level}.pdf`;
+      const fallbackName = registrationLabel ? `Falowen_${kind}.pdf` : `Falowen_${kind}_${level}.pdf`;
       const suggestedName = disposition.match(/filename="([^"]+)"/i)?.[1] || fallbackName;
       const filename = suggestedName.replace(/[^a-z0-9._-]/gi, "_");
       const url = URL.createObjectURL(pdf);
@@ -98,7 +106,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
         document.body.appendChild(anchor);
         anchor.click();
         anchor.remove();
-        setNotice(`Your ${level} ${kind === "certificate" ? "certificate" : "score transcript"} has been prepared for download.`);
+        setNotice(registrationLabel ? `${registrationLabel} is ready to download.` : `Your ${level} ${kind === "certificate" ? "certificate" : "score transcript"} has been prepared for download.`);
       } finally {
         window.setTimeout(() => URL.revokeObjectURL(url), 2000);
       }
@@ -118,7 +126,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
         <h2 id="student-documents-heading" style={{ margin: "0 0 6px", fontSize: 20 }}>My school documents</h2>
         <p style={{ margin: 0, color: "#475569", fontSize: 14, lineHeight: 1.5 }}>
           Request your own official Falowen document and download it immediately.
-          Only verified scores and approved course completions are used.
+
         </p>
       </div>
 
@@ -126,7 +134,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
         <div style={{ border: "1px solid #fbd38d", background: "#fffbeb", borderRadius: 12, padding: 16, display: "grid", gap: 10 }}>
           <strong>Verify your account email</strong>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
-            To protect your academic records, verify {user.email || "your email address"} before downloading a transcript or certificate.
+            To protect your academic records, verify {user.email || "your email address"} before downloading documents.
             We send a verification link by email; no SMS is required.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
@@ -178,9 +186,19 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
       </div>
 
       <p style={{ margin: 0, color: "#64748b", fontSize: 12, lineHeight: 1.5 }}>
-        German A1–B1 documents are supported first. Kiswahili documents require their own
+        Academic downloads cover German A1–B1. Kiswahili documents require their own
         approved certificate template. If an expected score is missing, contact your tutor.
       </p>
+      <section aria-label="Enrollment and payment documents" style={{ display: "grid", gap: 10 }}>
+        <h3 style={{ margin: 0 }}>Enrollment and payment documents</h3>
+        <p style={{ margin: 0 }}>These documents use your registered student record. Receipts and residence letters are available once issued to your registered email by Student Docs. For online payment receipts, open <a href="/campus/account?tab=billing">Billing history</a>.</p>
+        {Object.entries(REGISTRATION_DOCUMENTS).map(([kind, label]) => (
+          <button type="button" key={kind} disabled={Boolean(busy) || Boolean(verificationBusy) || !user || !verifiedEmail}
+            onClick={() => download(kind)}>
+            {busy === kind ? "Preparing PDF…" : `Download ${label.toLowerCase()} PDF`}
+          </button>
+        ))}
+      </section>
       {error ? <p role="alert" style={{ color: "#991b1b", margin: 0 }}>{error}</p> : null}
       {notice ? <p role="status" style={{ color: "#166534", margin: 0 }}>{notice}</p> : null}
     </section>
