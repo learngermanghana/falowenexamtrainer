@@ -996,56 +996,276 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "day": 8,
     "chapter": "Somo la 8",
     "title": "Namba na Umri",
-    "objective": "Confirm a phone number and classroom number, and use age as a short review.",
-    "grammar": "Compound numbers, digit-by-digit confirmation and age review",
+    "objective": "Ask and answer ages, say how many siblings or children people have, and recognise numbers in a family conversation.",
+    "grammar": "Namba, umri, miaka na mwaka mmoja",
     "practiceOnly": false,
-    "rule": "Use na to join tens and units in numbers such as ishirini na moja. Read a phone number one digit at a time, including the opening zero. For age, use nina miaka followed by the number of years.",
+    "rule": "Ask Una umri gani? to find someone's age. Use Nina miaka ... for two or more years and Nina mwaka mmoja for one year. Ask Una watoto wangapi? for the number of children and use mmoja/wawili with the correct noun.",
     "examples": [
       {
-        "swahili": "Darasa letu ni namba ishirini na moja.",
-        "english": "Our classroom is number twenty-one."
+        "swahili": "Una umri gani? — Nina miaka ishirini na tano.",
+        "english": "How old are you? — I am 25 years old."
       },
       {
-        "swahili": "0725: sifuri, saba, mbili, tano.",
-        "english": "0725: zero, seven, two, five."
+        "swahili": "Ndugu yako ana umri gani? — Ana miaka kumi na minne.",
+        "english": "How old is your sibling? — He or she is 14."
       },
       {
-        "swahili": "Tafadhali, rudia namba ya simu.",
-        "english": "Please repeat the phone number."
+        "swahili": "Una watoto wangapi? — Nina watoto wawili.",
+        "english": "How many children do you have? — I have two children."
       },
       {
-        "swahili": "Nina miaka ishirini na tatu.",
-        "english": "I am twenty-three years old."
+        "swahili": "Mtoto wa kwanza ana miaka mitatu.",
+        "english": "The first child is three years old."
+      },
+      {
+        "swahili": "Mtoto wa pili ana mwaka mmoja.",
+        "english": "The second child is one year old."
+      }
+    ],
+    "grammarSections": [
+      {
+        "title": "Kuuliza umri · Asking about age",
+        "rule": "Ask Una umri gani? or Ana umri gani? Answer with nina miaka or ana miaka and the number in words.",
+        "examples": [
+          {
+            "swahili": "Una umri gani? — Nina miaka ishirini na tano.",
+            "english": "How old are you? — I am 25."
+          },
+          {
+            "swahili": "Ana umri gani? — Ana miaka kumi na minne.",
+            "english": "How old is he or she? — He or she is 14."
+          }
+        ]
+      },
+      {
+        "title": "Mwaka mmoja na miaka · One year versus several years",
+        "rule": "Use mwaka mmoja for exactly one year, but miaka for other ages. Combine tens and units using na: ishirini na mbili = 22.",
+        "examples": [
+          {
+            "swahili": "Ana mwaka mmoja.",
+            "english": "He or she is one year old."
+          },
+          {
+            "swahili": "Ana miaka mitatu.",
+            "english": "He or she is three years old."
+          },
+          {
+            "swahili": "Nina miaka ishirini na miwili.",
+            "english": "I am 22 years old."
+          }
+        ]
+      },
+      {
+        "title": "Familia na idadi · Family and quantities",
+        "rule": "Use Nina or Ana to say how many siblings or children someone has. Use wangapi for a how-many question about children or relatives.",
+        "examples": [
+          {
+            "swahili": "Una watoto wangapi? — Nina watoto wawili.",
+            "english": "How many children do you have? — I have two."
+          },
+          {
+            "swahili": "Nina ndugu watatu.",
+            "english": "I have three siblings."
+          },
+          {
+            "swahili": "Familia yangu ina watu watano.",
+            "english": "My family has five people."
+          }
+        ]
       }
     ],
     "check": {
-      "question": "What is ishirini na tatu?",
+      "question": "How do you say that a child is one year old?",
       "options": [
-        "13",
-        "23",
-        "32"
+        "Ana miaka mmoja.",
+        "Ana mwaka mmoja.",
+        "Ana miaka moja."
       ],
       "answer": 1,
-      "why": "Ishirini is twenty and tatu adds three."
+      "why": "For exactly one year, say mwaka mmoja; use miaka with larger ages."
     },
-    "speaking": "One learner reads a fictional phone number and a classroom number. Their partner writes both down, asks for a repeat, and reads them back to confirm. Swap roles.",
+    "speaking": "Work with a partner. Greet each other, ask about ages, ask how many siblings or children you have, then say how old two family members are. Use invented information if you prefer; swap roles.",
+    "groupPractice": {
+      "heading": "Kuuliza umri na familia · Speaking",
+      "intro": "Teil 1 · Work in pairs. Ask and answer with short Kiswahili sentences; you may use fictional names and ages.",
+      "stages": [
+        {
+          "title": "Salamu · Greeting",
+          "instruction": "Mwanafunzi A aseme Hujambo? Mwanafunzi B ajibu Sijambo. Habari gani?"
+        },
+        {
+          "title": "Umri · Ages",
+          "instruction": "Ask Una umri gani? and Ndugu yako ana umri gani? Answer using Nina miaka… and Ana miaka…"
+        },
+        {
+          "title": "Familia · How many?",
+          "instruction": "Ask Una ndugu wangapi? or Una watoto wangapi? Say the number and give the ages of two family members; use mwaka mmoja for a one-year-old."
+        },
+        {
+          "title": "Badilisheni · Switch",
+          "instruction": "Thank your partner, say Kwaheri, then change roles and use different ages."
+        }
+      ],
+      "phrases": [
+        {
+          "swahili": "Hujambo? — Sijambo.",
+          "english": "Hello. — I am fine."
+        },
+        {
+          "swahili": "Una umri gani?",
+          "english": "How old are you?"
+        },
+        {
+          "swahili": "Nina miaka ishirini na tano.",
+          "english": "I am 25."
+        },
+        {
+          "swahili": "Una watoto wangapi?",
+          "english": "How many children do you have?"
+        },
+        {
+          "swahili": "Nina watoto wawili.",
+          "english": "I have two children."
+        },
+        {
+          "swahili": "Mtoto ana mwaka mmoja.",
+          "english": "The child is one year old."
+        }
+      ],
+      "challenge": "With your partner, speak for 45–60 seconds. Ask at least three questions, mention two different ages and one family quantity, then swap roles."
+    },
     "writing": {
-      "prompt": "Write a short message giving a classroom number in words and a four-digit fictional contact code in digits and in words."
+      "prompt": "Teil 2 · Write 5–7 short sentences about your age and family. Say your name, how old you are, how many siblings or children there are, and the ages of two relatives. You may invent the details.",
+      "guide": {
+        "heading": "Kuandika · Umri na familia",
+        "steps": [
+          "Introduce yourself: Jina langu ni…",
+          "Say your age using Nina miaka…",
+          "Say how many siblings or children you have.",
+          "Write the ages of two family members (use mwaka mmoja for age one).",
+          "Finish with a simple sentence about your family."
+        ],
+        "phrases": [
+          "Jina langu ni…",
+          "Nina miaka…",
+          "Nina ndugu wawili.",
+          "Nina watoto wawili.",
+          "Ana miaka mitatu.",
+          "Ana mwaka mmoja.",
+          "Familia yangu ni…"
+        ],
+        "minimumLines": 5,
+        "placeholder": "Jina langu ni…\nNina miaka…\nNina ndugu…\n… ana miaka…\n… ana mwaka mmoja.\nFamilia yangu ni…"
+      }
     },
     "reading": {
-      "text": "Amina anasoma Kiswahili katika darasa namba ishirini na moja. Msimbo wa kuingia ni 0725. Juma anauliza, “Tafadhali, rudia msimbo.” Amina anasema, “Sifuri, saba, mbili, tano.”",
+      "title": "Familia ya Neema · Umri na idadi",
+      "text": "Mimi ni Neema. Nina miaka ishirini na miwili. Nina ndugu watatu: Baraka, Asha na Salma.\n\nBaraka ana miaka kumi na sita. Asha ana miaka kumi. Salma ana miaka minne. Mama yetu ana miaka arobaini.\n\nKatika familia yetu kuna watu watano.",
       "questions": [
         {
-          "question": "Darasa lina namba gani?",
-          "id": "read-1"
+          "id": "read-1",
+          "question": "Neema ana umri gani?",
+          "choices": [
+            "Miaka ishirini na miwili",
+            "Miaka kumi na sita",
+            "Miaka ishirini na tano",
+            "Miaka kumi"
+          ]
         },
         {
-          "question": "Msimbo wa kuingia ni upi?",
-          "id": "read-2"
+          "id": "read-2",
+          "question": "Neema ana ndugu wangapi?",
+          "choices": [
+            "Wawili",
+            "Watatu",
+            "Wanne",
+            "Mmoja"
+          ]
         },
         {
-          "question": "Msimbo unaanza na namba gani?",
-          "id": "read-3"
+          "id": "read-3",
+          "question": "Baraka ana miaka mingapi?",
+          "choices": [
+            "Miaka kumi",
+            "Miaka kumi na sita",
+            "Miaka minne",
+            "Miaka arobaini"
+          ]
+        },
+        {
+          "id": "read-4",
+          "question": "Salma ana umri gani?",
+          "choices": [
+            "Miaka kumi",
+            "Mwaka mmoja",
+            "Miaka minne",
+            "Miaka kumi na sita"
+          ]
+        },
+        {
+          "id": "read-5",
+          "question": "Katika familia ya Neema kuna watu wangapi?",
+          "choices": [
+            "Watu watatu",
+            "Watu sita",
+            "Watu wanne",
+            "Watu watano"
+          ]
+        }
+      ]
+    },
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-8/audio-url",
+      "questions": [
+        {
+          "id": "listen-age-b",
+          "question": "Mtu B ana umri gani?",
+          "choices": [
+            "Miaka ishirini",
+            "Miaka ishirini na tano",
+            "Miaka kumi na tano",
+            "Miaka thelathini"
+          ]
+        },
+        {
+          "id": "listen-sibling-age",
+          "question": "Ndugu wa B ana umri gani?",
+          "choices": [
+            "Miaka kumi na minne",
+            "Miaka minne",
+            "Miaka ishirini na tano",
+            "Miaka kumi na mitano"
+          ]
+        },
+        {
+          "id": "listen-children",
+          "question": "Mtu B ana watoto wangapi?",
+          "choices": [
+            "Mtoto mmoja",
+            "Watoto watatu",
+            "Watoto wawili",
+            "Watoto wanne"
+          ]
+        },
+        {
+          "id": "listen-first-child",
+          "question": "Mtoto wa kwanza ana umri gani?",
+          "choices": [
+            "Miaka miwili",
+            "Miaka mitatu",
+            "Mwaka mmoja",
+            "Miaka minne"
+          ]
+        },
+        {
+          "id": "listen-second-child",
+          "question": "Mtoto wa pili ana umri gani?",
+          "choices": [
+            "Miaka miwili",
+            "Miaka mitatu",
+            "Miaka minne",
+            "Mwaka mmoja"
+          ]
         }
       ]
     }
