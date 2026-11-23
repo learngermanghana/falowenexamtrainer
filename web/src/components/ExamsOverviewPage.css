@@ -442,3 +442,17 @@
   .exam-room-mock-copy .exam-room-mock-action { width: 100%; justify-content: center; text-align: center; }
   .exam-room-skills-heading { padding: 12px; }
 }
+
+/* Add trends to the existing skill cards without a second progress dashboard. */
+.exam-room-skill-trend {
+  display: grid;
+  gap: 3px;
+  color: #475569;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: -4px;
+}
+.exam-room-skill-change {
+  font-weight: 700;
+  color: #1e40af;
+}
