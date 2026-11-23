@@ -146,6 +146,7 @@ if (!app.includes("const CampusPrimaryNavigation =")) {
   { key: "results", label: "Results", route: "/campus/results", enabled: Boolean(allowedSections.results) },
   { key: "vocab", label: "Vocab", route: "/campus/vocab", enabled: Boolean(allowedSections.vocab) },
   { key: "classMembers", label: "Class Members", route: "/campus/classMembers", enabled: Boolean(allowedSections.classMembers) },
+  { key: "account", label: "Account", route: "/campus/account", enabled: true },
   { key: "home", label: "Falowen Home", route: "/", enabled: true },
 ].filter((item) => item.enabled);
 
@@ -157,6 +158,7 @@ const isCampusNavigationItemActive = (item, location) => {
   if (item.key === "results") return location.pathname.startsWith("/campus/results");
   if (item.key === "vocab") return location.pathname.startsWith("/campus/vocab");
   if (item.key === "classMembers") return location.pathname.startsWith("/campus/classMembers") || new URLSearchParams(location.search || "").get("classMembers") === "1";
+  if (item.key === "account") return location.pathname.startsWith("/campus/account");
   return location.pathname === "/";
 };
 
@@ -192,7 +194,7 @@ const CampusMobileBottomNav = ({ allowedSections }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const moreItems = getCampusNavigationItems(allowedSections).filter((item) =>
-    ["vocab", "books", "classMembers", "home"].includes(item.key)
+    ["vocab", "books", "classMembers", "account", "home"].includes(item.key)
   );
   const moreActive = moreItems.some((item) => isCampusNavigationItemActive(item, location));
 
@@ -248,6 +250,25 @@ const CampusQuickNavigation = ({ allowedSections }) => <CampusPrimaryNavigation 
 `;
   app = `${app.slice(0, start)}${navigationHelpers}${app.slice(end)}`;
 }
+
+// Add Account on both first-run and already-patched Campus navigation. The
+// generator above runs once, but prebuild re-runs this script on patched trees.
+if (!app.includes('{ key: "account", label: "Account", route: "/campus/account", enabled: true }')) {
+  app = app.replace(
+    '{ key: "home", label: "Falowen Home", route: "/", enabled: true },',
+    '{ key: "account", label: "Account", route: "/campus/account", enabled: true },\\n  { key: "home", label: "Falowen Home", route: "/", enabled: true },',
+  );
+}
+if (!app.includes('if (item.key === "account") return location.pathname.startsWith("/campus/account");')) {
+  app = app.replace(
+    '  return location.pathname === "/";',
+    '  if (item.key === "account") return location.pathname.startsWith("/campus/account");\\n  return location.pathname === "/";',
+  );
+}
+app = app.replaceAll(
+  '["vocab", "books", "classMembers", "home"].includes(item.key)',
+  '["vocab", "books", "classMembers", "account", "home"].includes(item.key)',
+);
 
 // Migrate the old Exam File Campus nav to vocabulary on already-patched worktrees.
 // The complete Exam File remains available under /exams/file.
