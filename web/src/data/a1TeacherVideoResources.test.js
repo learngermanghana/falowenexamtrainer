@@ -229,7 +229,7 @@ test("A1 Day 4 chapter 2 uses the assigned teacher lecture without changing the 
   expect(getCanonicalA1TeacherVideoResource(4, "2")).toEqual(
     expect.objectContaining({
       topic: "German Numbers",
-      url: "https://youtu.be/XFZbjeKFgxw",
+      url: "https://youtu.be/31pCzRKQ7aA",
     })
   );
 
@@ -241,13 +241,13 @@ test("A1 Day 4 chapter 2 uses the assigned teacher lecture without changing the 
   expect(lesson.resources.teacherVideo).toEqual(
     expect.objectContaining({
       chapter: "2",
-      url: "https://youtu.be/XFZbjeKFgxw",
+      url: "https://youtu.be/31pCzRKQ7aA",
     })
   );
   expect(lesson.resources.videos.filter((video) =>
     /teacher/i.test(`${video.key} ${video.title}`)
-  ).map((video) => video.url)).toEqual(["https://youtu.be/XFZbjeKFgxw"]);
-  expect(lesson.resources.aiVideo?.url).not.toBe("https://youtu.be/XFZbjeKFgxw");
+  ).map((video) => video.url)).toEqual(["https://youtu.be/31pCzRKQ7aA"]);
+  expect(lesson.resources.aiVideo?.url).not.toBe("https://youtu.be/31pCzRKQ7aA");
   expect(lesson.resources.videos.map(({ url }) => url)).not.toContain(
     "https://youtu.be/lN7xxSbkPZ4"
   );

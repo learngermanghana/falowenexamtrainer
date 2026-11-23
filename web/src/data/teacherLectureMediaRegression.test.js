@@ -13,7 +13,7 @@ describe("teacher lecture media regressions", () => {
       lesen_hören: { chapter: "2" },
     });
     expect(lesson.resources.teacherVideo).toEqual(
-      expect.objectContaining({ url: "https://youtu.be/XFZbjeKFgxw", chapter: "2" }),
+      expect.objectContaining({ url: "https://youtu.be/31pCzRKQ7aA", chapter: "2" }),
     );
     expect(lesson.resources.videos.map((video) => video.url)).not.toContain(
       "https://youtu.be/lN7xxSbkPZ4",
