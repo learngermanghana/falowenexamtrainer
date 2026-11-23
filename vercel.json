@@ -501,6 +501,13 @@
       "dest": "/index.html"
     },
     {
+      "src": "/learn-german-ghana/?",
+      "dest": "/__seo/german-ghana.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/learn-swahili/?",
       "dest": "/__seo/swahili.html",
       "headers": {
