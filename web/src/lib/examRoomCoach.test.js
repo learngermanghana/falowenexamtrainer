@@ -166,3 +166,30 @@ describe("final mocks and synced Lesen details", () => {
     })).toEqual([]);
   });
 });
+
+
+describe("per-skill dashboard trends", () => {
+  it("compares the two most recent scores for each skill and keeps levels separate", () => {
+    const coach = buildExamRoomCoach({ level: "A2", cloudResults: [
+      { id: "old", level: "A2", section: "lesen", percent: 40, completedAt: "2026-11-01" },
+      { id: "new", level: "A2", section: "lesen", percent: 80, completedAt: "2026-11-02" },
+      { id: "other", level: "A1", section: "lesen", percent: 0, completedAt: "2026-11-03" },
+    ] });
+    expect(coach.skillTrends.lesen).toEqual({ count: 2, latest: 80, previous: 40, change: 40, average: 60 });
+    expect(coach.skillTrends.hoeren).toEqual({ count: 0, latest: null, previous: null, change: null, average: null });
+  });
+
+  it("includes full mock skill breakdowns without inflating the number of exams", () => {
+    const coach = buildExamRoomCoach({ level: "A1", cloudResults: [
+      { id: "reading", level: "A1", section: "lesen", percent: 50, completedAt: "2026-11-01" },
+      { id: "mock", level: "A1", section: "mixed", resultType: "final_mock", percent: 70,
+        completedAt: "2026-11-02", scoreBreakdown: [
+          { key: "lesen", score: 20, maxScore: 25 },
+          { key: "hoeren", score: 15, maxScore: 25 },
+        ] },
+    ] });
+    expect(coach.attempts).toHaveLength(2);
+    expect(coach.skillTrends.lesen).toEqual({ count: 2, latest: 80, previous: 50, change: 30, average: 65 });
+    expect(coach.skillTrends.hoeren).toEqual({ count: 1, latest: 60, previous: null, change: null, average: 60 });
+  });
+});
