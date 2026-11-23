@@ -35,6 +35,8 @@ describe("student-only document download API", () => {
   afterEach(() => {
     delete process.env.ANNOUNCEMENT_WEBHOOK_URL;
     delete process.env.ANNOUNCEMENT_WEBHOOK_TOKEN;
+    delete process.env.STUDENT_DOCS_WEBHOOK_URL;
+    delete process.env.STUDENT_DOCS_WEBHOOK_TOKEN;
     delete global.fetch;
   });
 
@@ -81,6 +83,23 @@ describe("student-only document download API", () => {
     expect(payload.action).toBe("exportStudentDocumentFromScores");
     expect(res.headers["Cache-Control"]).toContain("no-store");
     expect(res.headers["Content-Type"]).toBe("application/pdf");
+  });
+
+  test.each(["enrollment", "agreement", "receipt", "residence"])("routes %s to Student Docs with the verified identity", async kind => {
+    process.env.STUDENT_DOCS_WEBHOOK_URL = "https://script.google.com/macros/s/student-docs/exec";
+    process.env.STUDENT_DOCS_WEBHOOK_TOKEN = "registration-secret";
+    global.fetch.mockResolvedValue({ ok: true, json: async () => ({
+      ok: true, kind, mime_type: "application/pdf", data_base64: Buffer.from("%PDF-copy").toString("base64"),
+    }) });
+    const res = makeResponse();
+    await makeHandler()({ params: { kind }, body: { email: "another@example.com", level: "A2" } }, res);
+    expect(res.code).toBe(200);
+    const [url, options] = global.fetch.mock.calls[0];
+    expect(url).toBe(process.env.STUDENT_DOCS_WEBHOOK_URL);
+    expect(JSON.parse(options.body)).toEqual({
+      token: "registration-secret", action: "exportStudentAccountDocument", source: "falowen-student-account", kind,
+      row: { student_code: "STU123", email: "student@example.com" },
+    });
   });
 
   test("does not issue a PDF when canonical certificate verification refuses", async () => {
