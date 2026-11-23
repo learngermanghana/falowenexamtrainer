@@ -6,13 +6,11 @@ import {
   DAY14_MODAL_FORMS,
   DAY14_TRAIN_WORDS,
   DAY14_HOTEL_WORDS,
-  DAY14_GUIDED_CHECKS,
   DAY14_WRITTEN_TASKS,
   DAY14_DEPARTURES,
   DAY14_HOTEL_CONFIRMATION,
   DAY14_HOTEL_DIALOGUE,
   DAY14_KNOWLEDGE_QUESTIONS,
-  DAY14_FINAL_TASKS,
   normalizeDay14Sentence,
 } from "../data/a1Day14TravelHotelWorkbook";
 import "./A1Day14TravelHotelWorkbookPage.css";
@@ -36,20 +34,23 @@ function Pattern({ label, words }) {
 
 function Vocabulary({ title, entries, separableNote = "" }) {
   const [open, setOpen] = useState({});
+  const cards = (items) => items.map((entry) => <article className="a1d14w-vocab-card" key={entry.word}>
+    <span className="a1d14w-vocab-icon" aria-hidden="true">{entry.icon}</span>
+    <strong lang="de">{entry.word}</strong>
+    <small>{entry.en}</small>
+    <button type="button" aria-expanded={Boolean(open[entry.word])}
+      onClick={() => setOpen(current => ({ ...current, [entry.word]: !current[entry.word] }))}>
+      {open[entry.word] ? "Hide example" : "Show example"}
+    </button>
+    {open[entry.word] ? <p className="a1d14w-vocab-model" lang="de">{entry.example}</p> : null}
+  </article>);
   return <div className="a1d14w-vocab">
     <h3>{title}</h3>
-    <div className="a1d14w-vocab-grid">
-      {entries.map((entry) => <article className="a1d14w-vocab-card" key={entry.word}>
-        <span className="a1d14w-vocab-icon" aria-hidden="true">{entry.icon}</span>
-        <strong lang="de">{entry.word}</strong>
-        <small>{entry.en}</small>
-        <button type="button" aria-expanded={Boolean(open[entry.word])}
-          onClick={() => setOpen(current => ({ ...current, [entry.word]: !current[entry.word] }))}>
-          {open[entry.word] ? "Hide example" : "Show example"}
-        </button>
-        {open[entry.word] ? <p className="a1d14w-vocab-model" lang="de">{entry.example}</p> : null}
-      </article>)}
-    </div>
+    <div className="a1d14w-vocab-grid">{cards(entries.slice(0, 4))}</div>
+    {entries.length > 4 ? <details className="a1d14w-details a1d14w-extra-vocab">
+      <summary>More vocabulary ({entries.length - 4} words)</summary>
+      <div className="a1d14w-vocab-grid">{cards(entries.slice(4))}</div>
+    </details> : null}
     {separableNote ? <p className="a1d14w-hint">{separableNote}</p> : null}
   </div>;
 }
@@ -94,29 +95,6 @@ function ModalPractice() {
       </details>
     </div>
   </>;
-}
-
-function GuidedPractice() {
-  const [answers, setAnswers] = useState({});
-  return <div className="a1d14w-exercises" data-a1-day14-guided="true">
-    <p className="a1d14w-lead">Select the correct form. Practise saying the whole finished German sentence out loud.</p>
-    {DAY14_GUIDED_CHECKS.map((item, i) => {
-      const current = answers[item.id];
-      return <fieldset className="a1d14w-task" key={item.id}>
-        <legend>Aufgabe {i + 1}: <strong>{item.prompt}</strong></legend>
-        <div className="a1d14w-choice-row">
-          {item.options.map(option => <button type="button" key={option}
-            aria-pressed={current === option}
-            className={current === option ? "selected" : ""}
-            onClick={() => setAnswers(previous => ({ ...previous, [item.id]: option }))}>{option}</button>)}
-        </div>
-        {current ? <p className={current === item.answer ? "a1d14w-correct" : "a1d14w-try"} role="status">
-          <strong>{current === item.answer ? "Richtig!" : "Versuch es noch einmal."}</strong>
-          {current === item.answer ? " " + item.note : " Check the conjugated modal and the final infinitive."}
-        </p> : <small>Choose one answer to receive feedback.</small>}
-      </fieldset>;
-    })}
-  </div>;
 }
 
 function WrittenPractice() {
@@ -219,9 +197,9 @@ function KnowledgeCheck() {
   const readingQuestions = DAY14_KNOWLEDGE_QUESTIONS.filter(q => q.category === "Reading");
   const grammar = grammarQuestions.filter(q => answers[q.id] === q.answer).length;
   const reading = readingQuestions.filter(q => answers[q.id] === q.answer).length;
-  const passed = correct >= 6;
+  const passed = correct >= 4;
   return <div className="a1d14w-exercises" data-a1-day14-knowledge-check="true">
-    <p>Eight short questions: six about grammar and two about the train timetable and hotel confirmation above. Answer all eight before checking.</p>
+    <p>Five short questions: three on grammar and two on the train timetable and hotel confirmation. Answer all five before checking.</p>
     <p className="a1d14w-progress" role="status">{answered} of {total} questions answered</p>
     <progress aria-label="Knowledge test completion" max={total} value={answered} />
     {DAY14_KNOWLEDGE_QUESTIONS.map((q, i) => <fieldset key={q.id} className="a1d14w-task">
@@ -248,66 +226,21 @@ function KnowledgeCheck() {
       <strong>Score: {correct} / {total}</strong>
       <p>Grammar: {grammar} / {grammarQuestions.length} · Reading: {reading} / {readingQuestions.length}</p>
       <p>{passed
-        ? "Good work. Review any mistakes before the independent speaking and writing task."
+        ? "Good work. Review any mistakes before the hotel conversation."
         : "Revise modal position two, complete infinitives and hotel phrases, then reset and try again."}</p>
       <small>This is an unscored local self-check. It does not submit an official Falowen assignment.</small>
     </div> : null}
   </div>;
 }
 
-function ExitPractice() {
-  const [answers, setAnswers] = useState({});
-  const [dialogue, setDialogue] = useState("");
-  const [showModels, setShowModels] = useState(false);
-  const completed = DAY14_FINAL_TASKS.filter(q => String(answers[q.id] || "").trim()).length;
-  const allReady = completed === DAY14_FINAL_TASKS.length && Boolean(dialogue.trim());
-  return <div className="a1d14w-exercises" data-a1-day14-independent-practice="true">
-    <p className="a1d14w-lead">Imagine travelling to Germany and staying in a hotel. Write five original sentences, then plan a very short hotel conversation. Say your answers aloud as well.</p>
-    {DAY14_FINAL_TASKS.map(q => <div className="a1d14w-task" key={q.id}>
-      <label className="a1d14w-label" htmlFor={"a1d14w-exit-" + q.id}>
-        <strong>{q.label}</strong><span>{q.prompt}</span>
-      </label>
-      <textarea id={"a1d14w-exit-" + q.id} rows={2}
-        value={answers[q.id] || ""} onChange={e => {
-          setAnswers(current => ({ ...current, [q.id]: e.target.value }));
-          setShowModels(false);
-        }} placeholder="Mein Satz ..." />
-      {showModels ? <div className="a1d14w-result"><strong>Example:</strong> {q.model}</div> : null}
-    </div>)}
-    <div className="a1d14w-task">
-      <label className="a1d14w-label" htmlFor="a1d14w-exit-dialogue">
-        <strong>Hotelreservierung · Dialog</strong>
-        <span>Write both sides of a conversation: greeting, room request, number of nights and thanks.</span>
-      </label>
-      <textarea id="a1d14w-exit-dialogue" rows={4} value={dialogue}
-        onChange={e => {setDialogue(e.target.value);setShowModels(false);}}
-        placeholder="Gast: Guten Tag, ich möchte ...\nRezeption: ..." />
-      {showModels ? <div className="a1d14w-result">
-        <strong>Possible dialogue:</strong>
-        {DAY14_HOTEL_DIALOGUE.map((line, i) => <p key={i}>{line.speaker}: {line.text}</p>)}
-      </div> : null}
-    </div>
-    <p className="a1d14w-progress">{completed} of 5 sentences written · {dialogue.trim() ? "Dialogue entered" : "Dialogue not entered"}</p>
-    <div className="a1d14w-actions">
-      <button type="button" className="a1d14w-primary" disabled={!allReady}
-        aria-expanded={showModels} onClick={() => setShowModels(x => !x)}>
-        {showModels ? "Hide example answers" : "Compare with example answers"}
-      </button>
-      <button type="button" onClick={() => {setAnswers({});setDialogue("");setShowModels(false);}}>Start again</button>
-    </div>
-    <p className="a1d14w-hint"><b>Self-check:</b> Is your modal conjugated? Is it in position two? Does the infinitive stay at the end? Did you include train and hotel language? Did you ask a question? Other natural correct A1 answers are welcome.</p>
-  </div>;
-}
-
 export default function A1Day14TravelHotelWorkbookPage() {
   const learningLinks = useMemo(() => [
-    ["Wiederholung", "#a1d14w-review"],
     ["Wortschatz", "#a1d14w-vocab"],
     ["Modalverben", "#a1d14w-modals"],
     ["Satzbau", "#a1d14w-satzbau"],
     ["Übungen", "#a1d14w-practice"],
     ["Hotel", "#a1d14w-hotel"],
-    ["Abschluss", "#a1d14w-exit"],
+    ["Kurztest", "#a1d14w-test"],
   ], []);
   return <main className="a1d14w" style={styles.container} data-a1-day14-travel-hotel-workbook="true">
     <header className="a1d14w-hero">
@@ -325,35 +258,18 @@ export default function A1Day14TravelHotelWorkbookPage() {
       {learningLinks.map(([label, href]) => <a key={href} href={href}>{label}</a>)}
     </nav>
 
-    <Section id="a1d14w-review" eyebrow="Teil 1 · Wiederholung" title="Statements and separable verbs">
-      <p className="a1d14w-lead">You already know that the conjugated verb takes position two in a German statement. Let's use that rule for travel.</p>
-      <Pattern label="Normal statement" words={[
-        { text: "Ich", role: "subject" }, { text: "fahre", role: "finite" },
-        { text: "morgen nach Berlin.", role: "detail" },
-      ]} />
-      <Pattern label="Time-first statement" words={[
-        { text: "Morgen", role: "detail" }, { text: "fahre", role: "finite" },
-        { text: "ich nach Berlin.", role: "subject" },
-      ]} />
-      <Pattern label="Separable verb: without a modal" words={[
-        { text: "Ich", role: "subject" }, { text: "steige", role: "finite" },
-        { text: "in den Zug", role: "detail" }, { text: "ein.", role: "infinitive" },
-      ]} />
-      <p className="a1d14w-hint">Say a new sentence with <b>aussteigen</b> or <b>umsteigen</b> before moving on. Example: Ich steige in Hamburg um.</p>
-    </Section>
-
-    <Section id="a1d14w-vocab" eyebrow="Teil 2 · Wortschatz" title="Travel and hotel vocabulary">
+    <Section id="a1d14w-vocab" eyebrow="Teil 1 · Wortschatz" title="Travel and hotel vocabulary">
       <Vocabulary title="Am Bahnhof · At the station" entries={DAY14_TRAIN_WORDS}
         separableNote="einsteigen, aussteigen and umsteigen are separable. For example: Ich steige in Berlin aus." />
       <Vocabulary title="Im Hotel · At the hotel" entries={DAY14_HOTEL_WORDS}
         separableNote="übernachten, buchen and reservieren are not separable. Example: Ich möchte im Hotel übernachten." />
     </Section>
 
-    <Section id="a1d14w-modals" eyebrow="Teil 3 · Grammatik" title="Four modal verbs for A1">
+    <Section id="a1d14w-modals" eyebrow="Teil 2 · Grammatik" title="Four modal verbs for A1">
       <ModalPractice />
     </Section>
 
-    <Section id="a1d14w-satzbau" eyebrow="Teil 4 · Satzbau" title="Modal verb + complete infinitive">
+    <Section id="a1d14w-satzbau" eyebrow="Teil 3 · Satzbau" title="Modal verb + complete infinitive">
       <p className="a1d14w-lead">The modal verb is conjugated and takes position two. The action verb goes to the end in the infinitive without zu. A separable infinitive stays together.</p>
       <Pattern label="No modal · separable verb" words={[
         { text: "Ich", role: "subject" }, { text: "steige", role: "finite" },
@@ -376,25 +292,19 @@ export default function A1Day14TravelHotelWorkbookPage() {
       <p className="a1d14w-hint">Compare: <s>Ich kann steige ein.</s> → <b>Ich kann einsteigen.</b> · <s>Heute ich muss umsteigen.</s> → <b>Heute muss ich umsteigen.</b></p>
     </Section>
 
-    <Section id="a1d14w-practice" eyebrow="Teil 5 · Übung" title="Train and hotel sentence practice">
-      <h3>5A · Choose the correct word</h3>
-      <GuidedPractice />
-      <h3>5B · Write complete sentences and questions</h3>
+    <Section id="a1d14w-practice" eyebrow="Teil 4 · Übung" title="Train and hotel sentence practice">
       <WrittenPractice />
     </Section>
 
-    <Section id="a1d14w-hotel" eyebrow="Teil 6 · Alltag" title="A train journey and hotel reservation">
+    <Section id="a1d14w-hotel" eyebrow="Teil 5 · Alltag" title="A train journey and hotel reservation">
       <TravelReading />
       <h3>Ein Zimmer reservieren · Speaking with a hotel receptionist</h3>
       <HotelDialogue />
     </Section>
 
-    <Section id="a1d14w-test" eyebrow="Teil 7 · Wissenstest" title="Knowledge check: 8 questions">
+    <Section id="a1d14w-test" eyebrow="Teil 6 · Kurztest" title="Quick check: 5 questions">
       <KnowledgeCheck />
     </Section>
 
-    <Section id="a1d14w-exit" eyebrow="Teil 8 · Abschluss" title="Deine Reise nach Deutschland">
-      <ExitPractice />
-    </Section>
   </main>;
 }
