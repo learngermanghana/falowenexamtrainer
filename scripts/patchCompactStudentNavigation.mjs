@@ -256,13 +256,13 @@ const CampusQuickNavigation = ({ allowedSections }) => <CampusPrimaryNavigation 
 if (!app.includes('{ key: "account", label: "Account", route: "/campus/account", enabled: true }')) {
   app = app.replace(
     '{ key: "home", label: "Falowen Home", route: "/", enabled: true },',
-    '{ key: "account", label: "Account", route: "/campus/account", enabled: true },\\n  { key: "home", label: "Falowen Home", route: "/", enabled: true },',
+    '{ key: "account", label: "Account", route: "/campus/account", enabled: true },\n  { key: "home", label: "Falowen Home", route: "/", enabled: true },',
   );
 }
 if (!app.includes('if (item.key === "account") return location.pathname.startsWith("/campus/account");')) {
   app = app.replace(
     '  return location.pathname === "/";',
-    '  if (item.key === "account") return location.pathname.startsWith("/campus/account");\\n  return location.pathname === "/";',
+    '  if (item.key === "account") return location.pathname.startsWith("/campus/account");\n  return location.pathname === "/";',
   );
 }
 app = app.replaceAll(
@@ -287,12 +287,19 @@ app = app
   )
   .replaceAll(
     '["books", "examFile", "classMembers", "home"].includes(item.key)',
-    '["vocab", "books", "classMembers", "home"].includes(item.key)',
+    '["vocab", "books", "classMembers", "account", "home"].includes(item.key)',
   )
   .replaceAll(
     '["music", "books", "classMembers", "home"].includes(item.key)',
-    '["vocab", "books", "classMembers", "home"].includes(item.key)',
+    '["vocab", "books", "classMembers", "account", "home"].includes(item.key)',
   );
+
+// Earlier Campus builds may still be running the previous mobile More list.
+// Run this after all vocabulary migrations so Account is not dropped.
+app = app.replaceAll(
+  '["vocab", "books", "classMembers", "home"].includes(item.key)',
+  '["vocab", "books", "classMembers", "account", "home"].includes(item.key)',
+);
 
 // Keep the generated Music destination correct on already-patched worktrees.
 // prestart/prebuild rerun this patch after CampusPrimaryNavigation already exists,
