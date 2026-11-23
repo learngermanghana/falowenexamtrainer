@@ -108,6 +108,19 @@ describe("standardized A1 teacher videos", () => {
     );
   });
 
+  test("Day 14 Chapter 3.6 uses the approved modal-verbs teacher lecture only", () => {
+    const lectures = getA1TeacherVideoResources(14, "3.6");
+    expect(lectures).toHaveLength(1);
+    expect(lectures[0]).toMatchObject({
+      key: "a1-day14-chapter-3-6-teacher-video",
+      title: "Modal Verbs · Teacher lecture",
+      url: "https://youtu.be/fTPhyeHwf68",
+    });
+    expect(A1_TEACHER_VIDEO_RESOURCES.map(({ url }) => url)).not.toContain(
+      "https://youtu.be/0zps4OYwShg"
+    );
+  });
+
   test("Day 21 Chapter 13 uses the current Weather teacher lecture", () => {
     const configuredVideo = getCanonicalA1TeacherVideoResource(21, "13");
 
