@@ -207,6 +207,8 @@ const CLASSROOM_RECORDINGS = Object.freeze({
   'A2-4': Object.freeze({ id: 'a2-day4-meeting-classroom', key: 'a2/day-04/wo-mochten-wir-uns-treffen.mp3' }),
   'A2-5': Object.freeze({ id: 'a2-day5-freizeit-classroom', key: 'a2/day-05/was-machst-du-in-deiner-freizeit.mp3' }),
   'A2-7': Object.freeze({ id: 'a2-day7-wohnung-suchen-classroom', key: 'a2/day-07/eine-wohnung-suchen.mp3' }),
+  // Exact owner-uploaded Day 8 restaurant dialogue; authenticated teacher playback only.
+  'A2-8': Object.freeze({ id: 'a2-day8-restaurant-classroom', key: 'a2/day-08/im-restaurant-bestellen-und-reagieren.mp3' }),
   'A2-18': Object.freeze({ id: 'a2-day18-bank-telephone', key: 'a2/day-18/bank-telefonat.mp3' }),
   'A2-20': Object.freeze({ id: 'a2-day20-complaint', key: 'a2/day-20/reklamation-falsches-hemd.mp3' }),
   'A2-19': Object.freeze({ id: 'a2-day19-shopping', key: 'a2/day-19/einkaufen-wo-und-wie.mp3' }),
