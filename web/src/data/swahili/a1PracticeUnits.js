@@ -2392,24 +2392,230 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "answer": 2,
       "why": "Nyuma ya puts something behind a place."
     },
-    "speaking": "Draw a simple home plan. Describe where two rooms are while your partner follows on the drawing.",
+    "speaking": "Describe an imaginary home and its rooms. Ask and answer where the kitchen, bedroom and furniture are, then change roles.",
     "writing": {
-      "prompt": "Write four sentences about an imaginary home. Include one room and two location phrases."
+      "prompt": "Andika kuhusu nyumba ya kufikirika. Write 5–7 sentences about an imaginary home, its rooms and where things are.",
+      "guide": {
+        "heading": "Kuandika · Nyumba yangu",
+        "steps": [
+          "Say how many bedrooms your imaginary home has.",
+          "Name three rooms or objects.",
+          "Describe two locations using karibu na, mbele ya, nyuma ya or upande wa kulia.",
+          "Say what you like about the house."
+        ],
+        "phrases": [
+          "Nyumba yangu ina …",
+          "Hiki ni chumba cha …",
+          "Meza iko karibu na …",
+          "Bafu liko …",
+          "Ninapenda …"
+        ],
+        "placeholder": "Nyumba yangu ina …\nHiki ni …",
+        "minimumLines": 5
+      }
     },
     "reading": {
       "text": "Nyumba ya Nia ina vyumba viwili. Bafu liko karibu na jiko. Bustani iko mbele ya nyumba.",
       "questions": [
         {
+          "id": "read-1",
           "question": "Nyumba ina vyumba vingapi?",
-          "id": "read-1"
+          "choices": [
+            "Kimoja",
+            "Viwili",
+            "Vitatu"
+          ]
         },
         {
+          "id": "read-2",
           "question": "Bafu liko wapi?",
-          "id": "read-2"
+          "choices": [
+            "Karibu na jiko",
+            "Nyuma ya bustani",
+            "Mbele ya mlango"
+          ]
         },
         {
+          "id": "read-3",
           "question": "Bustani iko wapi?",
-          "id": "read-3"
+          "choices": [
+            "Nyuma ya nyumba",
+            "Mbele ya nyumba",
+            "Ndani ya jiko"
+          ]
+        }
+      ],
+      "title": "Nyumba ya Nia"
+    },
+    "grammarSections": [
+      {
+        "title": "Mahali · Places",
+        "rule": "Nyumbani means at home and jikoni means in the kitchen. Ask wapi? to ask where something is.",
+        "examples": [
+          {
+            "swahili": "Niko nyumbani.",
+            "english": "I am at home."
+          },
+          {
+            "swahili": "Jikoni iko wapi?",
+            "english": "Where is the kitchen?"
+          }
+        ]
+      },
+      {
+        "title": "Kueleza mahali · Locations",
+        "rule": "Karibu na means near, mbele ya in front of, nyuma ya behind, and upande wa kulia on the right. Location forms agree with the noun: meza iko, chumba kiko, bafu liko.",
+        "examples": [
+          {
+            "swahili": "Meza iko karibu na dirisha.",
+            "english": "The table is near the window."
+          },
+          {
+            "swahili": "Chumba kiko mbele ya nyumba.",
+            "english": "The room is in front of the house."
+          },
+          {
+            "swahili": "Bafu liko karibu na mlango.",
+            "english": "The bathroom is near the door."
+          }
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "sw": "nyumba",
+        "en": "house"
+      },
+      {
+        "sw": "nyumbani",
+        "en": "at home"
+      },
+      {
+        "sw": "chumba cha wageni",
+        "en": "living room"
+      },
+      {
+        "sw": "chumba cha kulala",
+        "en": "bedroom"
+      },
+      {
+        "sw": "jikoni",
+        "en": "in the kitchen"
+      },
+      {
+        "sw": "bafu",
+        "en": "bathroom"
+      },
+      {
+        "sw": "meza",
+        "en": "table"
+      },
+      {
+        "sw": "kiti",
+        "en": "chair"
+      },
+      {
+        "sw": "dirisha",
+        "en": "window"
+      },
+      {
+        "sw": "mlango",
+        "en": "door"
+      },
+      {
+        "sw": "karibu na",
+        "en": "near"
+      }
+    ],
+    "groupPractice": {
+      "heading": "Kuzungumza · Nyumbani",
+      "intro": "Work in pairs. One learner welcomes a visitor; the other asks about the home. Then swap roles.",
+      "stages": [
+        {
+          "title": "Karibu nyumbani",
+          "instruction": "Greet the visitor and welcome them into an imaginary home."
+        },
+        {
+          "title": "Vyumba na vitu",
+          "instruction": "Ask where the kitchen, bedroom and table are. Answer with location phrases."
+        },
+        {
+          "title": "Idadi ya vyumba",
+          "instruction": "Ask how many bedrooms there are and answer in a complete sentence."
+        }
+      ],
+      "phrases": [
+        {
+          "swahili": "Karibu nyumbani kwangu.",
+          "english": "Welcome to my home."
+        },
+        {
+          "swahili": "Chumba cha kulala kiko wapi?",
+          "english": "Where is the bedroom?"
+        },
+        {
+          "swahili": "Meza iko karibu na dirisha.",
+          "english": "The table is near the window."
+        },
+        {
+          "swahili": "Ina vyumba vitatu vya kulala.",
+          "english": "It has three bedrooms."
+        }
+      ],
+      "challenge": "Draw an imaginary home and describe three rooms and two locations to a partner. Swap roles."
+    },
+    "listening": {
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-13/audio-url",
+      "questions": [
+        {
+          "id": "listen-room",
+          "question": "A anamwonyesha B chumba gani kwanza?",
+          "choices": [
+            "Chumba cha wageni",
+            "Chumba cha kulala",
+            "Bafu",
+            "Jikoni"
+          ]
+        },
+        {
+          "id": "listen-table",
+          "question": "Meza iko wapi?",
+          "choices": [
+            "Karibu na dirisha",
+            "Nyuma ya nyumba",
+            "Jikoni",
+            "Karibu na bafu"
+          ]
+        },
+        {
+          "id": "listen-kitchen",
+          "question": "Jikoni iko upande gani?",
+          "choices": [
+            "Upande wa kushoto",
+            "Upande wa kulia",
+            "Nyuma ya nyumba",
+            "Mbele ya mlango"
+          ]
+        },
+        {
+          "id": "listen-bedrooms",
+          "question": "Nyumba ina vyumba vingapi vya kulala?",
+          "choices": [
+            "Kimoja",
+            "Viwili",
+            "Vitatu",
+            "Vinne"
+          ]
+        },
+        {
+          "id": "listen-bathroom",
+          "question": "Bafu liko wapi?",
+          "choices": [
+            "Karibu na mlango mkuu",
+            "Karibu na dirisha",
+            "Upande wa kushoto",
+            "Nyuma ya meza"
+          ]
         }
       ]
     }
