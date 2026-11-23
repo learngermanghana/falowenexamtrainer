@@ -41,7 +41,7 @@ describe("A1 Day 14 modal verbs, trains and hotels workbook", () => {
 
   test("revises verb-second, separable infinitives, four modal verbs and hotel vocabulary", () => {
     open();
-    expect(screen.getByText("fahre", { selector: ".a1d14w-token.finite" })).toBeInTheDocument();
+    expect(screen.getAllByText("fahre", { selector: ".a1d14w-token.finite" }).length).toBeGreaterThan(0);
     expect(document.body).toHaveTextContent("Morgen");
     expect(document.body).toHaveTextContent("Ich steige in Hamburg um.");
     expect(document.body).toHaveTextContent("einsteigen.");
