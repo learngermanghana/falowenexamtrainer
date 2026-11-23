@@ -204,7 +204,6 @@ COPY.sw = { ...COPY.en, ...{
 } };
 
 const FOOTER_LINKS = [
-  { href: "/learn-swahili", labelKey: "navSwahili" },
   { href: "/courses/", labelKey: "footerCourses" },
   { href: "/learn-german-ghana", labelKey: "footerGhana" },
   { href: "/books", labelKey: "footerBooks" },
@@ -358,7 +357,6 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
             </span>
           </a>
           <div className="falowen-home-nav-links">
-            <a href="/learn-swahili">{copy.navSwahili}</a>
             <a href="/classes">{copy.navClasses}</a>
             <a href="https://music.falowen.app/">{copy.navMusic}</a>
             <a href="https://exams.falowen.app/">{copy.navExams}</a>
