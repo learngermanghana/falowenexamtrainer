@@ -145,6 +145,7 @@
     }
   },
   "uiLanguageFlow": {
+    "menu": "Menyu",
     "courseLabel": "Lugha ya kozi",
     "signupLanguageLabel": "Lugha ya programu",
     "welcome": "Karibu Falowen",
