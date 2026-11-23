@@ -64,6 +64,7 @@ export const analyzeAudio = async ({
   idToken,
   timeoutMs = null,
   transcriptionOnly = false,
+  mockId,
   persistAudio = true,
 }) => {
   const numericTimeoutMs = Number(timeoutMs);
@@ -103,6 +104,7 @@ export const analyzeAudio = async ({
         userId: userId || "guest",
         audioUrl,
         transcriptionOnly,
+        mockId,
       };
 
       const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, payload, {
@@ -121,6 +123,7 @@ export const analyzeAudio = async ({
       const filename = audioBlob?.name || "recording.webm";
       formData.append("audio", audioBlob, filename);
       formData.append("teil", teil);
+      if (mockId) formData.append("mockId", mockId);
       if (transcriptionOnly) formData.append("transcriptionOnly", "true");
       formData.append("level", level);
       formData.append("userId", userId || "guest");

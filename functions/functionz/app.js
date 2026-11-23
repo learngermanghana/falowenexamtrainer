@@ -157,6 +157,7 @@ async function findAuthedStudentProfile(db, authedUser) {
   const direct = await studentsRef.doc(authedUser.uid).get();
   if (direct.exists) return { snap: direct, data: direct.data() || {} };
   const queries = [
+    studentsRef.where("uid", "==", authedUser.uid).limit(1),
     studentsRef.where("studentCode", "==", authedUser.uid).limit(1),
     authedUser.email ? studentsRef.where("email", "==", String(authedUser.email).toLowerCase()).limit(1) : null,
   ].filter(Boolean);
@@ -169,6 +170,7 @@ async function findAuthedStudentProfile(db, authedUser) {
 
 
 async function getAuthedUser(req) {
+  if (req.verifiedPracticeUser) return req.verifiedPracticeUser;
   const authHeader = req.headers?.authorization || "";
   const match = authHeader.match(/^Bearer (.+)$/i);
   if (!match) return null;
@@ -814,6 +816,30 @@ app.use(
   })
 );
 
+const { trialRestriction, allowsTrialRequest } = require("./trialPractice");
+const limitedPracticePath = /^\/(?:[ab][12]-mock|course-media|writing|speaking|exam-room)(?:[-/]|$)/i;
+async function enforceTrialPractice(req, res, next) {
+  if (!req.headers.authorization || !limitedPracticePath.test(req.path)) return next();
+  try {
+    const identity = await getAuthedUser(req);
+    if (!identity) return res.status(401).json({ error: "Sign in again." });
+    req.verifiedPracticeUser = identity;
+    const db = getFirestoreSafe();
+    const profile = (await findAuthedStudentProfile(db, identity))?.data || {};
+    const courseMedia = /^\/course-media\/(?:studio|[abc][12]\/audio-url)/i.test(req.path);
+    const trial = await trialRestriction(db, identity, profile, courseMedia);
+    if (!trial) return next();
+    if (req.path === "/speaking/analyze") {
+      req.practiceTrial = trial;
+      return next(); // Validate multipart fields after parsing the recording.
+    }
+    if (await allowsTrialRequest(req, trial, db, identity.uid)) return next();
+    return res.status(403).json({ error: "This practice is outside your trial." });
+  } catch (error) {
+    return res.status(503).json({ error: "Could not verify trial access." });
+  }
+}
+app.use(enforceTrialPractice);
 app.use(requireMockTaskVersion);
 
 // Server-only, identity-bound academic document export; no student identity is accepted from request payloads.
@@ -6687,6 +6713,9 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
+    if (req.practiceTrial && !await allowsTrialRequest(req, req.practiceTrial, getFirestoreSafe(), authedUser.uid)) {
+      return res.status(403).json({ error: "This speaking task is outside your trial." });
+    }
     const { teil, level = "A2", contextType, question, interactionMode, userId = "guest", audioUrl = "" } = req.body || {};
 
     const validationError =

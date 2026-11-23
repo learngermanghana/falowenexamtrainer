@@ -33,3 +33,7 @@ A2 Mocks 1–3 distinguish local writing, server submission, AI marking and Resu
 A2 Kombi Mocks 4–8 use the same attempt-bound Sprechen receipts and submission diagnostics. When a timer expires, Lesen, Hören where present, and Schreiben use the same server checkpoint as manual submission. A failed checkpoint can be retried from the next module. Mock 8 still has three modules and is scored out of 75 points.
 
 For A2 Kombi Mocks 4–8, new Sprechen Teil 3 sessions use the published scenario and its four planning points for the preview, examiner dialogue and AI feedback. All four agreements are required to end early, and the existing turn limit still permits a partial plan to receive feedback. Previously started live sessions retain the task they were shown.
+
+### Seven-day practice trials
+
+New exam-only registrations at A1 through C1 receive seven days from signup at their registered level. The designated catalogue entries are A1 Mock 2, A2 Mock 1, B1 Mock 1, B2 Mock 1, and C1 Reading Sample 1. C1 is a reading trial. A1 Day 23 remains a graded Course Book final. German course trials include Day 1 and the same designated exam. Monthly exam access unlocks the level's published exam practice. Course enrolment is separate.

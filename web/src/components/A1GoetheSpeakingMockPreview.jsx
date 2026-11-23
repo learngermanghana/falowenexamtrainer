@@ -302,6 +302,7 @@ export default function A1GoetheSpeakingMockPreview({
 
     try {
       const response = await analyzeAudio({
+        mockId,
         audioBlob: attempt.audioBlob,
         teil: task.teil,
         level: "A1",

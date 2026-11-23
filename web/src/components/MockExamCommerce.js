@@ -7,6 +7,8 @@ import { MOCK_EXAM_CATALOG } from "../data/mockExamCatalog";
 import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
 
+import { TrialExamPage } from "./TrialPractice";
+
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const safeLevels = new Set(LEVELS);
 const isMockPortal = () => ["exams.falowen.app", "www.exams.falowen.app"].includes(
@@ -37,7 +39,7 @@ export function MockExamSignupPage() {
   const [level, setLevel] = useState(new URLSearchParams(window.location.search).get("level")?.toUpperCase() || "A1");
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
-  if (user && studentProfile) return <Navigate to="/mock/checkout" replace />;
+  if (user && studentProfile && !working) return <Navigate to={studentProfile.examTrialStartedAt ? "/exams/mocks" : "/mock/checkout"} replace />;
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!safeLevels.has(level) || name.trim().split(/\s+/).length < 2 || password.length < 8) {
@@ -50,20 +52,21 @@ export function MockExamSignupPage() {
         ? { user }
         : await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       const token = await credential.user.getIdToken();
-      await api("/mock/register", { method: "POST", token, body: { name: name.trim(), level } });
+      const registration = await api("/mock/register", { method: "POST", token, body: { name: name.trim(), level } });
       await credential.user.getIdToken(true); // reload server-issued examOnly claim
       await refreshStudentProfile?.().catch(() => {});
-      navigate("/mock/checkout", { replace: true });
+      navigate(registration.trial ? "/exams/mocks" : "/mock/checkout", { replace: true });
     } catch (err) {
       setError(err?.code === "auth/email-already-in-use"
         ? "This email already has a Falowen account. Sign in instead."
         : err.message || "Could not create your exam account.");
-    } finally { setWorking(false); }
+      setWorking(false);
+    }
   };
   return <main style={card}>
     <a href="/" style={{ color: "#0b776e" }}>← Falowen Exams</a>
     <h1>Exam-only registration</h1>
-    <p>Create one Falowen account for German mock exam practice, without enrolling in a full course. Your exam access begins only after a confirmed purchase.</p>
+    <p>Create one Falowen account for German mock exam practice, without enrolling in a full course. At A1–B2, try one complete mock for seven days. At C1, try one reading paper. Monthly access unlocks all published practice.</p>
     <form onSubmit={handleSubmit}>
       <label style={field}>Full name<input style={input} required value={name} onChange={e => setName(e.target.value)} /></label>
       {!user && <>
@@ -71,7 +74,7 @@ export function MockExamSignupPage() {
         <label style={field}>Password<input type="password" minLength={8} style={input} required value={password} onChange={e => setPassword(e.target.value)} /></label>
       </>}
       <label style={field}>Exam level<select style={input} value={level} onChange={e => setLevel(e.target.value)}>{LEVELS.map(x=><option key={x}>{x}</option>)}</select></label>
-      <p style={{ fontSize: 13, color: "#64748b" }}>You will not receive access to Falowen course lessons or a course trial.</p>
+      <p style={{ fontSize: 13, color: "#64748b" }}>Exam registration is for German exam preparation only.</p>
       {error && <p role="alert" style={{ color: "#b42318" }}>{error}</p>}
       <button type="submit" disabled={working} style={button}>{working ? "Creating account…" : "Create exam account"}</button>
     </form>
@@ -120,8 +123,8 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
     <h1>{paymentReturn ? "Monthly access confirmation" : "Your monthly exam subscription"}</h1>
     {paymentReturn && <p>Paystack has returned you to Falowen. Access appears below only after the signed payment notification is confirmed. Refresh this page if the payment is still processing.</p>}
     {access.length > 0 && <div style={{ padding: 14, background:"#e6f8f0", borderRadius:10 }}>
-      <strong>Your active level subscriptions</strong>
-      {access.map(row=><p key={row.id}>{row.level} · All published mock exams and skill practice · expires {new Date(row.expiresAtMs).toLocaleDateString()}</p>)}
+      <strong>Your exam access</strong>
+      {access.map(row=><p key={row.id}>{row.level} · {row.scope === "trial" ? "Seven-day exam trial" : "All published mock exams and skill practice"} · expires {new Date(row.expiresAtMs).toLocaleDateString()}</p>)}
       <a href="/exams/overview" style={{ ...button, display:"inline-block", textDecoration:"none" }}>Open Exams Room →</a>
     </div>}
     <p>Choose one German level and practise all available mocks, Lesen, Hören, Schreiben and Sprechen in any order for 30 days. No separate Teil purchases.</p>
@@ -146,7 +149,7 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
   </main>;
 }
 
-export function MockExamOnlyGate({ children }) {
+export function MockExamOnlyGate({ children, courseTrialState }) {
   const { user, studentProfile } = useAuth();
   const location = useLocation();
   const [state, setState] = useState({ loading: true, active: [] });
@@ -159,9 +162,25 @@ export function MockExamOnlyGate({ children }) {
       .catch(()=> {if(subscribed)setState({loading:false,active:[]});});
     return ()=>{subscribed=false;};
   }, [user, location.pathname]);
+  const [clock, setClock] = useState(Date.now);
+  const expiry = Math.min(...[...state.active.map(row => row.expiresAtMs), courseTrialState?.endsAtMs]
+    .filter(value => Number.isFinite(value) && value > clock));
+  useEffect(() => {
+    if (!Number.isFinite(expiry) || expiry <= clock) return undefined;
+    const timer = setTimeout(() => setClock(Date.now()), Math.min(2147483647, Math.max(1, expiry - Date.now())));
+    return () => clearTimeout(timer);
+  }, [expiry, clock]);
   if (state.loading) return <div style={card} role="status">Checking your purchased mock access…</div>;
-  const active = state.active;
+  const active = state.active.filter(row => !row.expiresAtMs || row.expiresAtMs > Date.now());
+  if (courseTrialState && !active.some(row => row.scope !== "trial" && row.level === studentProfile.level)) {
+    if (!courseTrialState.active || courseTrialState.endsAtMs <= Date.now()) return <Navigate to="/mock/checkout" replace />;
+    return <TrialExamPage level={studentProfile.level} path={location.pathname.replace(/\/+$/, "")}>{children}</TrialExamPage>;
+  }
   if (!active.length) return <Navigate to="/mock/checkout" replace />;
+  const trial = active.find(row => row.scope === "trial" && row.expiresAtMs > Date.now());
+  if (trial && !active.some(row => row.scope !== "trial" && row.level === trial.level)) {
+    return <TrialExamPage level={trial.level} path={location.pathname.replace(/\/+$/, "") || "/"}>{children}</TrialExamPage>;
+  }
   if (location.pathname === "/") return <Navigate to="/exams/overview" replace />;
   const examArea = /^\/exams\/(overview|mocks|file|lesen|horen|writing|speaking|question|vocab)(?:\/.*)?$/.test(location.pathname);
   const allowedMockRoutes = Object.values(MOCK_EXAM_CATALOG)

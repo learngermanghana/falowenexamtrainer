@@ -294,6 +294,7 @@ export default function B2FinalMockSpeaking({
 
     try {
       const response = await analyzeAudio({
+        mockId: "b2-mock-01",
         audioBlob: attempt.audioBlob,
         teil: task.id.replace("teil", ""),
         level: "B2",

@@ -14,6 +14,7 @@ const READY_MOCKS = Object.freeze({
 const PACKAGES = Object.freeze({
   monthly: { id: "monthly", priceGhs: 99, days: 30, scope: "level" },
 });
+const trialExams = require("./trialExams.json");
 const LEVELS = Object.keys(READY_MOCKS);
 const euros = (n) => Math.round(Number(n) * 100);
 const isReady = (level, pkg) => LEVELS.includes(level) && pkg?.id === "monthly";
@@ -68,15 +69,25 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
         return res.status(403).json({ error: "Staff accounts must use the standard Falowen login." });
       }
       await admin.auth().setCustomUserClaims(uid, { ...existingClaims, examOnly: true });
-      await studentRef.create({
+      const batch = db().batch();
+      batch.create(studentRef, {
         uid, name, fullName: name, email: user.email.toLowerCase(), authEmail: user.email.toLowerCase(),
         studentCode: uid, role: "student", accountType: "exam_only",
         level, program: "german", className: "", status: "registered",
+        ...(trialExams[level] ? { examTrialStartedAt: admin.firestore.FieldValue.serverTimestamp() } : {}),
         paymentStatus: "pending", trialStatus: "not_applicable",
         onboardingCompleted: true, createdAt: admin.firestore.FieldValue.serverTimestamp(),
         updated_at: admin.firestore.FieldValue.serverTimestamp()
       });
-      return res.status(201).json({ ok: true, accountType: "exam_only" });
+      const trial = trialExams[level];
+      if (trial) {
+        batch.create(db().collection("mockSubscriptions").doc(uid + "_trial"), {
+          uid, level, scope: "trial", status: "active", expiresAtMs: Date.now() + 7 * 86400000,
+          mockIds: [trial.catalogId],
+        });
+      }
+      await batch.commit();
+      return res.status(201).json({ ok: true, accountType: "exam_only", trial: Boolean(trial) });
     } catch (error) {
       console.error("Mock register failed", error);
       return res.status(500).json({ error: "Could not finish exam-only registration." });
@@ -151,8 +162,8 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
       if (!user) return;
       const active = await activeSubscriptionsFor(db(), user.uid);
       res.set("Cache-Control", "private, no-store");
-      return res.json({ ok: true, active: active.map(({ id, level, packageId, expiresAtMs }) =>
-        ({ id, level, packageId, expiresAtMs, scope: "level", mockIds: [...READY_MOCKS[level]] })) });
+      return res.json({ ok: true, active: active.map(({ id, level, packageId, expiresAtMs, scope }) =>
+        ({ id, level, packageId, expiresAtMs, scope: scope === "trial" ? "trial" : "level", mockIds: scope === "trial" ? [trialExams[level]?.catalogId] : [...READY_MOCKS[level]] })) });
     } catch (error) {
       console.error("Mock access lookup error", error);
       return res.status(500).json({ error: "Could not confirm mock access." });
