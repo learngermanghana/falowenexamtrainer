@@ -19,6 +19,7 @@ import { clearPaymentAttempt, getPaymentAttempt } from "../lib/paymentAttempt";
 import { getTrialLifecycleState } from "../lib/trialAccess";
 import { isApprovedUniversityStudent, isHamburgUniversityStudent } from "../lib/universityInvitations";
 import useCourseCompletionProgress from "../hooks/useCourseCompletionProgress";
+import "./AccountSettings.css";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -67,7 +68,7 @@ const AccountSettings = () => {
   });
   const location = useLocation();
   const navigate = useNavigate();
-  const requestedTab = new URLSearchParams(location.search).get("tab");
+  const requestedTab = new URLSearchParams(location.search).get("tab") || "billing";
   // Keep the canonical Router tab expression stable for the Account sync
   // scripts, and handle the additional Documents tab as a separate fallback.
   const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab)
@@ -77,7 +78,7 @@ const AccountSettings = () => {
 
   const selectAccountTab = (tabKey) => {
     const params = new URLSearchParams(location.search);
-    if (tabKey === "studentData") params.delete("tab");
+    if (tabKey === "billing") params.delete("tab");
     else params.set("tab", tabKey);
     const nextSearch = params.toString();
     const nextUrl =
@@ -667,84 +668,30 @@ const AccountSettings = () => {
     studentProfile?.contractEnd ||
     (Number.isFinite(trialLifecycle.endsAtMs) ? trialLifecycle.endsAtMs : null);
 
+  const displayName = studentProfile?.name || user?.displayName || t("accountOverview.student");
+  const initials = displayName.trim().split(/\s+/).slice(0, 2).map(word => word.charAt(0)).join("").toUpperCase();
+
   return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <section
-        aria-label={t("accountOverview.title")}
-        style={{
-          ...styles.card,
-          border: "1px solid #e2e8f0",
-          background: "#ffffff",
-          display: "grid",
-          gap: 12,
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
-          <div style={{ minWidth: 0 }}>
-            <p style={{ margin: 0, color: "#64748b", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".05em" }}>
-              {t("accountOverview.title")}
-            </p>
-            <h2 style={{ margin: "5px 0 3px", color: "#0f172a" }}>
-              {studentProfile?.name || user?.displayName || t("accountOverview.student")}
-            </h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              {[studentProfile?.level, studentProfile?.className].filter(Boolean).join(" · ") || t("accountOverview.courseAccount")}
-            </p>
-          </div>
-          <span
-            style={{
-              ...styles.badge,
-              color: accountAccess.tone,
-              background: accountAccess.background,
-              border: `1px solid ${accountAccess.border}`,
-              fontWeight: 900,
-            }}
-          >
-            {accountAccess.label}
-          </span>
+    <div className="fw-account">
+      <header className="fw-account-header">
+        <small>Falowen Campus　/　{t("accountOverview.title")}</small>
+        <h1>{t("accountOverview.myAccount", "My Falowen account")}</h1>
+      </header>
+      <div className="fw-account-layout">
+      <aside className="fw-account-profile" aria-label={t("accountOverview.title")}>
+        <div className="fw-account-identity">
+          <span className="fw-account-avatar" aria-hidden="true">{initials}</span>
+          <h2>{displayName}</h2>
+          <p>{[studentProfile?.level, studentProfile?.className].filter(Boolean).join(" · ") || t("accountOverview.courseAccount")}</p>
+          <span className="fw-account-pill" style={{color: accountAccess.tone, background: accountAccess.background}}>{accountAccess.label}</span>
         </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            border: "1px solid #e2e8f0",
-            borderRadius: 12,
-            overflow: "hidden",
-            background: "#ffffff",
-          }}
-        >
-          <div style={{ minWidth: 0, padding: "11px 12px", borderRight: "1px solid #e2e8f0" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>{t("accountOverview.studentCode")}</span>
-            <strong style={{ display: "block", marginTop: 3, fontSize: 14, lineHeight: 1.35, overflowWrap: "anywhere" }}>
-              {studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "–"}
-            </strong>
-          </div>
-          <div style={{ minWidth: 0, padding: "11px 12px" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>
-              {accountAccess.label === "Trial" ? t("accountOverview.trialAccess") : t("accountOverview.courseAccess")}
-            </span>
-            <strong style={{ display: "block", marginTop: 3, fontSize: 14, lineHeight: 1.35, overflowWrap: "anywhere" }}>
-              {accountAccess.detail}
-            </strong>
-          </div>
-        </div>
-
-        {activeTab === "studentData" ? (
-        <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 12, display: "grid", gap: 8 }}>
-          <strong style={{ color: "#0f172a" }}>{t("accountOverview.learningRecords")}</strong>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/results")}>{t("appNav.tabs.results")}</button>
-            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/attendance")}>{t("appNav.campusTabs.attendance")}</button>
-            {!isSwahili && <button type="button" style={styles.secondaryButton} onClick={() => selectAccountTab("participation")}>{t("accountOverview.participation")}</button>}
-            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course")}>{t("homeAccess.courseBook")}</button>
-          </div>
-        </div>
-
-        ) : null}
-      </section>
-
-      <div style={styles.tabList}>
+        <dl className="fw-account-meta">
+          <dt>{t("accountOverview.studentCode")}</dt>
+          <dd>{studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "–"}</dd>
+          <dt>{accountAccess.label === "Trial" ? t("accountOverview.trialAccess") : t("accountOverview.courseAccess")}</dt>
+          <dd>{accountAccess.detail}</dd>
+        </dl>
+        <nav className="fw-account-nav" aria-label={t("accountOverview.title")}>
         {[
           { key: "studentData", label: t("accountSettings.tabs.studentData") },
           { key: "notifications", label: t("accountOverview.notifications") },
@@ -757,13 +704,14 @@ const AccountSettings = () => {
             key={tab.key}
             type="button"
             onClick={() => selectAccountTab(tab.key)}
-            style={activeTab === tab.key ? styles.tabButtonActive : styles.tabButton}
+            aria-current={activeTab === tab.key ? "page" : undefined}
           >
-            {tab.label}
+            {tab.label}<span aria-hidden="true">›</span>
           </button>
         ))}
-      </div>
-
+        </nav>
+      </aside>
+      <div className="fw-account-content">
       {activeTab === "studentData" ? (
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>{t("accountSettings.studentData.title")}</h2>
@@ -832,7 +780,7 @@ const AccountSettings = () => {
           : "Your instructor will verify your eligibility. No payment details or tuition amount are required."}</p>
       </section>
       ) : activeTab === "billing" ? (
-      <section style={{ ...styles.card, display: "grid", gap: 12, padding: 16 }}>
+      <section className="fw-account-billing">
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
           <div style={{ minWidth: 0 }}>
             <h2 style={{ ...styles.sectionTitle, marginBottom: 3 }}>{t("accountSettings.billing.title")}</h2>
@@ -848,39 +796,45 @@ const AccountSettings = () => {
           </button>
         </div>
 
-        <div
-          data-account-billing-summary
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            border: "1px solid #e2e8f0",
-            borderRadius: 14,
-            overflow: "hidden",
-            background: "#ffffff",
-          }}
-        >
-          <div style={{ minWidth: 0, padding: "10px 12px", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>{t("accountOverview.tuition")}</span>
-            <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25 }}>{formatMoney(billingSummary.tuitionFee)}{usdBelow(billingSummary.tuitionFee)}</strong>
-          </div>
-          <div style={{ minWidth: 0, padding: "10px 12px", borderBottom: "1px solid #e2e8f0" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>{t("accountOverview.paid")}</span>
-            <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25 }}>{formatMoney(paidAmount)}{usdBelow(paidAmount)}</strong>
-          </div>
-          <div style={{ minWidth: 0, padding: "10px 12px", borderRight: "1px solid #e2e8f0" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>{t("accountOverview.balance")}</span>
-            <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25, color: balanceDue > 0 ? "#9a3412" : "#166534" }}>
-              {formatMoney(balanceDue)}{usdBelow(balanceDue)}
-            </strong>
-          </div>
-          <div style={{ minWidth: 0, padding: "10px 12px" }}>
-            <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>
-              {trialLifecycle.key === "active" || trialLifecycle.key === "ending_soon" ? "Trial ends" : "Access until"}
-            </span>
-            <strong style={{ display: "block", marginTop: 2, fontSize: 15, lineHeight: 1.3 }}>{formatDate(accessUntil)}</strong>
+        <div className="fw-account-tuition" data-account-billing-summary>
+          <header><span>{t("accountOverview.tuitionOverview", "Tuition overview")}</span><span className="fw-account-pill" style={{color: billingState.tone, background: billingState.background}}>{billingState.label}</span></header>
+          <div className="fw-account-amounts">
+            <div><span>{t("accountOverview.tuition")}</span><strong>{formatMoney(billingSummary.tuitionFee)}</strong>{usdBelow(billingSummary.tuitionFee)}</div>
+            <div><span>{t("accountOverview.paid")}</span><strong>{formatMoney(paidAmount)}</strong>{usdBelow(paidAmount)}</div>
+            <div><span>{t("accountOverview.balance")}</span><strong style={{color: balanceDue > 0 ? "#98451b" : "#20674c"}}>{formatMoney(balanceDue)}</strong>{usdBelow(balanceDue)}</div>
           </div>
         </div>
-
+        <div className="fw-account-access">
+          <small>{t("accountOverview.courseAccess")}</small>
+          <strong>{accessUntil ? formatDate(accessUntil) : accountAccess.label}</strong>
+          <span>{accountAccess.detail}</span>
+        {studentProfile?.contractStart || studentProfile?.contractEnd ? (
+          <details>
+            <summary style={{ cursor: "pointer", fontWeight: 750, color: "#0f172a", fontSize: 14 }}>
+              Course access details
+            </summary>
+            <div style={{ display: "grid", gap: 7, marginTop: 10 }}>
+              {studentProfile?.contractStart ? (
+                <div style={styles.metaRow}><span>Contract start</span><strong>{formatDate(studentProfile.contractStart)}</strong></div>
+              ) : null}
+              {studentProfile?.contractEnd ? (
+                <div style={styles.metaRow}><span>Contract end</span><strong>{formatDate(studentProfile.contractEnd)}</strong></div>
+              ) : null}
+              {subscription.renewalDays !== null ? (
+                <div style={styles.metaRow}>
+                  <span>{t("accountSettings.billing.countdown")}</span>
+                  <strong>
+                    {subscription.renewalDays > 0
+                      ? t("accountSettings.billing.inDays", { count: subscription.renewalDays })
+                      : t("accountSettings.billing.dueNow")}
+                  </strong>
+                </div>
+              ) : null}
+              <div style={styles.metaRow}><span>Payment method</span><strong>{subscription.paymentMethod}</strong></div>
+            </div>
+          </details>
+        ) : null}
+        </div>
         {billingState.key !== "paid" ? (
           <div
             style={{
@@ -942,35 +896,7 @@ const AccountSettings = () => {
             />
           </div>
         ) : null}
-
-        {studentProfile?.contractStart || studentProfile?.contractEnd ? (
-          <details style={{ borderTop: "1px solid #e2e8f0", paddingTop: 10 }}>
-            <summary style={{ cursor: "pointer", fontWeight: 750, color: "#0f172a", fontSize: 14 }}>
-              Course access details
-            </summary>
-            <div style={{ display: "grid", gap: 7, marginTop: 10 }}>
-              {studentProfile?.contractStart ? (
-                <div style={styles.metaRow}><span>Contract start</span><strong>{formatDate(studentProfile.contractStart)}</strong></div>
-              ) : null}
-              {studentProfile?.contractEnd ? (
-                <div style={styles.metaRow}><span>Contract end</span><strong>{formatDate(studentProfile.contractEnd)}</strong></div>
-              ) : null}
-              {subscription.renewalDays !== null ? (
-                <div style={styles.metaRow}>
-                  <span>{t("accountSettings.billing.countdown")}</span>
-                  <strong>
-                    {subscription.renewalDays > 0
-                      ? t("accountSettings.billing.inDays", { count: subscription.renewalDays })
-                      : t("accountSettings.billing.dueNow")}
-                  </strong>
-                </div>
-              ) : null}
-              <div style={styles.metaRow}><span>Payment method</span><strong>{subscription.paymentMethod}</strong></div>
-            </div>
-          </details>
-        ) : null}
-
-        <details style={{ borderTop: "1px solid #e2e8f0", paddingTop: 10 }}>
+        <details className="fw-account-history">
           <summary style={{ cursor: "pointer", fontWeight: 750, color: "#0f172a", fontSize: 14 }}>
             Transaction history{transactionHistory.length > 0 ? ` (${transactionHistory.length})` : ""}
           </summary>
@@ -1134,6 +1060,8 @@ const AccountSettings = () => {
         )}
       </section>
       ) : null}
+      </div>
+      </div>
     </div>
   );
 };
