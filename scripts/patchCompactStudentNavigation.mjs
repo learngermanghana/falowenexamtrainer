@@ -93,8 +93,9 @@ if (!app.includes('className="app-header app-header--compact"')) {
               onEnablePush={enableNotifications}
             />
             <details className="profile-menu">
-              <summary className="profile-menu__trigger" aria-label="Open profile menu">
+              <summary className="profile-menu__trigger">
                 <span aria-hidden="true">{profileInitials}</span>
+                <span>{t("uiLanguageFlow.menu")}</span>
               </summary>
               <div className="profile-menu__panel">
                 <div className="profile-menu__identity">
@@ -115,6 +116,7 @@ if (!app.includes('className="app-header app-header--compact"')) {
                     ))}
                   </select>
                 </label>
+                {courseSelector}
                 <button type="button" className="profile-menu__action" onClick={() => navigate("/campus/account")}>
                   Account settings
                 </button>
@@ -662,11 +664,12 @@ ${appCssMarker}
 }
 
 .profile-menu__trigger {
-  width: 44px;
+  padding-inline: 12px;
   height: 44px;
   box-sizing: border-box;
-  display: grid;
-  place-items: center;
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
   border: 1px solid #bfdbfe;
   border-radius: 999px;
   background: #eff6ff;
