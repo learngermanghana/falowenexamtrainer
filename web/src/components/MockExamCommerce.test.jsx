@@ -97,3 +97,11 @@ test("an active A2 student can enter the protected Exam Room", async () => {
   openPage("/exams/overview");
   expect(await screen.findByRole("heading", { name: "Exam overview" })).toBeVisible();
 });
+
+test("a signed-in student with a profile goes straight from registration to checkout", async () => {
+  mockApi();
+  useAuth.mockReturnValue({ user: student, studentProfile: profile });
+  openPage("/mock/register");
+  expect(await screen.findByRole("heading", { name: "Your monthly exam subscription" })).toBeVisible();
+  expect(createUserWithEmailAndPassword).not.toHaveBeenCalled();
+});
