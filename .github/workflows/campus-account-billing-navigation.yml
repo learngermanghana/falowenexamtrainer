@@ -1,0 +1,36 @@
+name: Campus Account navigation and billing visibility
+
+on:
+  pull_request:
+    paths:
+      - "scripts/patchCompactStudentNavigation.mjs"
+      - "web/public/falowen-navigation.json"
+      - "web/src/components/AccountSettings.js"
+      - "web/src/utils/tuitionPaymentVisibility.js"
+      - "web/src/utils/tuitionPaymentVisibility.test.js"
+      - "web/src/__tests__/CampusAccountNavigationBilling.test.js"
+      - ".github/workflows/campus-account-billing-navigation.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Validate navigation patch syntax
+        run: node --check scripts/patchCompactStudentNavigation.mjs
+      - name: Test Campus Account link and tuition checkout visibility
+        working-directory: web
+        env:
+          CI: true
+        run: |
+          ./node_modules/.bin/jest --runInBand --runTestsByPath \
+            src/__tests__/CampusAccountNavigationBilling.test.js \
+            src/utils/tuitionPaymentVisibility.test.js
