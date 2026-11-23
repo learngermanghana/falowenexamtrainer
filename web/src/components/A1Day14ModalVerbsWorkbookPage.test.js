@@ -6,10 +6,8 @@ import { getA1TeacherVideoResources } from "../data/a1TeacherVideoResources";
 import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
 import { buildA1WorkbookVideoModel } from "./A1WorkbookVideoHeader";
 import {
-  DAY14_GUIDED_CHECKS,
   DAY14_WRITTEN_TASKS,
   DAY14_KNOWLEDGE_QUESTIONS,
-  DAY14_FINAL_TASKS,
 } from "../data/a1Day14TravelHotelWorkbook";
 import A1Day14ModalVerbsWorkbookPage, { isSharedA2Day17Context } from "./A1Day14ModalVerbsWorkbookPage";
 
@@ -41,7 +39,7 @@ describe("A1 Day 14 modal verbs, trains and hotels workbook", () => {
 
   test("revises verb-second, separable infinitives, four modal verbs and hotel vocabulary", () => {
     open();
-    expect(screen.getAllByText("fahre", { selector: ".a1d14w-token.finite" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("möchte", { selector: ".a1d14w-token.finite" }).length).toBeGreaterThan(0);
     expect(document.body).toHaveTextContent("Morgen");
     expect(document.body).toHaveTextContent("Ich steige in Hamburg um.");
     expect(document.body).toHaveTextContent("einsteigen.");
@@ -63,16 +61,16 @@ describe("A1 Day 14 modal verbs, trains and hotels workbook", () => {
     expect(screen.getByRole("table", { name: "Modal verb conjugation table" })).toBeVisible();
   });
 
-  test("guides four choices with feedback only after selecting an answer", () => {
+  test("has six focused lesson sections and no duplicate exercise or exit blocks", () => {
     const { container } = open();
-    const guided = container.querySelector('[data-a1-day14-guided="true"]');
-    const questions = guided.querySelectorAll("fieldset");
-    expect(questions).toHaveLength(4);
-    expect(within(questions[0]).queryByText("Richtig!")).not.toBeInTheDocument();
-    DAY14_GUIDED_CHECKS.forEach((q, i) => {
-      fireEvent.click(within(questions[i]).getByRole("button", { name: q.answer }));
-      expect(within(questions[i]).getByText(/Richtig!/)).toBeVisible();
-    });
+    expect(container.querySelectorAll(".a1d14w-section")).toHaveLength(6);
+    expect(container.querySelector('[data-a1-day14-guided="true"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-a1-day14-independent-practice="true"]')).not.toBeInTheDocument();
+    expect(container.querySelector("#a1d14w-review")).not.toBeInTheDocument();
+    const links = [...container.querySelectorAll(".a1d14w-nav a")];
+    expect(links).toHaveLength(6);
+    links.forEach(link => expect(container.querySelector(link.getAttribute("href"))).toBeInTheDocument());
+    expect(container.querySelectorAll(".a1d14w-extra-vocab")).toHaveLength(2);
   });
 
   test("checks five written statements and questions without requiring punctuation or capitals", () => {
@@ -110,48 +108,27 @@ describe("A1 Day 14 modal verbs, trains and hotels workbook", () => {
     expect(document.querySelectorAll(".a1d14w-dialogue-lines p")).toHaveLength(5);
   });
 
-  test("requires all eight final answers and reports six grammar and two reading questions", () => {
+  test("checks five questions: three grammar and two reading", () => {
     const { container } = open();
     const quiz = container.querySelector('[data-a1-day14-knowledge-check="true"]');
     const check = within(quiz).getByRole("button", { name: "Check knowledge test" });
     const fieldsets = quiz.querySelectorAll("fieldset");
-    expect(fieldsets).toHaveLength(8);
+    expect(fieldsets).toHaveLength(5);
     expect(check).toBeDisabled();
     fireEvent.click(within(fieldsets[0]).getByRole("radio", { name: DAY14_KNOWLEDGE_QUESTIONS[0].answer }));
-    expect(quiz).toHaveTextContent("1 of 8 questions answered");
+    expect(quiz).toHaveTextContent("1 of 5 questions answered");
     expect(within(fieldsets[0]).queryByText(/Correct answer:/)).not.toBeInTheDocument();
     DAY14_KNOWLEDGE_QUESTIONS.slice(1).forEach((q, i) => {
       fireEvent.click(within(fieldsets[i + 1]).getByRole("radio", { name: q.answer }));
     });
     expect(check).toBeEnabled();
     fireEvent.click(check);
-    expect(quiz).toHaveTextContent("Score: 8 / 8");
-    expect(quiz).toHaveTextContent("Grammar: 6 / 6");
+    expect(quiz).toHaveTextContent("Score: 5 / 5");
+    expect(quiz).toHaveTextContent("Grammar: 3 / 3");
     expect(quiz).toHaveTextContent("Reading: 2 / 2");
     fireEvent.click(within(quiz).getByRole("button", { name: "Reset test" }));
-    expect(quiz).toHaveTextContent("0 of 8 questions answered");
+    expect(quiz).toHaveTextContent("0 of 5 questions answered");
     expect(check).toBeDisabled();
-  });
-
-  test("accepts five original sentences and a hotel dialogue before revealing models", () => {
-    const { container } = open();
-    const exit = container.querySelector('[data-a1-day14-independent-practice="true"]');
-    const compare = within(exit).getByRole("button", { name: "Compare with example answers" });
-    expect(compare).toBeDisabled();
-    const inputs = exit.querySelectorAll("textarea");
-    expect(inputs).toHaveLength(6);
-    DAY14_FINAL_TASKS.forEach((task, i) => {
-      fireEvent.change(inputs[i], { target: { value: "Ich möchte mit dem Zug nach Berlin fahren." } });
-    });
-    expect(compare).toBeDisabled();
-    fireEvent.change(inputs[5], { target: { value: "Gast: Ich möchte ein Zimmer buchen." } });
-    expect(compare).toBeEnabled();
-    fireEvent.click(compare);
-    expect(exit).toHaveTextContent("Example: Ich kann morgen mit dem Zug fahren.");
-    expect(exit).toHaveTextContent("Possible dialogue:");
-    expect(exit).toHaveTextContent("Other natural correct A1 answers are welcome");
-    fireEvent.click(within(exit).getByRole("button", { name: "Start again" }));
-    expect(exit).toHaveTextContent("0 of 5 sentences written");
   });
 
   test("keeps A2 Day 17 on the existing shared A2-only route", () => {

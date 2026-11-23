@@ -44,38 +44,6 @@ export const DAY14_HOTEL_WORDS = Object.freeze([
   { word: "die Nacht", en: "night", icon: "🌃", example: "Wir bleiben zwei Nächte." },
 ]);
 
-// Model solutions are kept separately from inputs and never displayed before checking.
-export const DAY14_GUIDED_CHECKS = Object.freeze([
-  {
-    id: "wish",
-    prompt: "Ich ___ ein Einzelzimmer buchen.",
-    options: ["möchte", "möchten", "muss"],
-    answer: "möchte",
-    note: "ich möchte expresses a polite wish. The infinitive buchen stays at the end.",
-  },
-  {
-    id: "must-change",
-    prompt: "Wir ___ in Hamburg umsteigen.",
-    options: ["muss", "müssen", "musst"],
-    answer: "müssen",
-    note: "wir müssen: the modal is conjugated for wir; umsteigen remains one infinitive.",
-  },
-  {
-    id: "get-off",
-    prompt: "Du kannst in Berlin ___.",
-    options: ["steigst aus", "aussteigen", "aus steigst"],
-    answer: "aussteigen",
-    note: "After kannst, use the complete infinitive aussteigen, not a split verb.",
-  },
-  {
-    id: "time-first",
-    prompt: "Morgen ___ ich nach Berlin fahren.",
-    options: ["will", "ich will", "wollen"],
-    answer: "will",
-    note: "When Morgen comes first, the conjugated modal will still stands second.",
-  },
-]);
-
 export const DAY14_WRITTEN_TASKS = Object.freeze([
   {
     id: "train-board",
@@ -151,60 +119,24 @@ export const DAY14_KNOWLEDGE_QUESTIONS = Object.freeze([
     explanation: "The conjugated verb comes second, even when Morgen is first.",
   },
   {
-    id: "separable-before",
-    category: "Grammar",
-    prompt: "Which sentence correctly uses the separable verb einsteigen without a modal?",
-    options: [
-      "Ich steige in den Zug ein.",
-      "Ich einsteige in den Zug.",
-      "Ich steige ein in den Zug ein.",
-    ],
-    answer: "Ich steige in den Zug ein.",
-    explanation: "Without a modal, steige is conjugated and ein moves to the end.",
-  },
-  {
     id: "infinitive-modal",
     category: "Grammar",
-    prompt: "Ich muss in Hamburg ___.",
-    options: ["steige um", "umsteigen", "umsteige"],
-    answer: "umsteigen",
-    explanation: "After muss, use the complete infinitive umsteigen.",
-  },
-  {
-    id: "hotel-modal",
-    category: "Grammar",
-    prompt: "Choose the correct polite hotel request.",
-    options: [
-      "Ich will ein Zimmer buche.",
-      "Ich möchte buchen ein Zimmer.",
-      "Ich möchte ein Zimmer buchen.",
-    ],
-    answer: "Ich möchte ein Zimmer buchen.",
-    explanation: "möchte + object + final infinitive buchen is the useful polite pattern.",
+    prompt: "Wir wollen am Bahnhof ___.",
+    options: ["steigen aus", "aussteigen", "aussteige"],
+    answer: "aussteigen",
+    explanation: "After wollen, the whole separable infinitive aussteigen stays together.",
   },
   {
     id: "question",
     category: "Grammar",
-    prompt: "Change Du kannst morgen fahren into a yes/no question.",
+    prompt: "Which question politely asks whether you can reserve a room?",
     options: [
-      "Kannst du morgen fahren?",
-      "Du kannst morgen fahren?",
-      "Kannst morgen du fahren?",
+      "Können Sie ein Zimmer für mich reservieren?",
+      "Sie können ein Zimmer für mich reservieren?",
+      "Können ein Zimmer Sie für mich reservieren?",
     ],
-    answer: "Kannst du morgen fahren?",
-    explanation: "The conjugated modal comes first in a yes/no question.",
-  },
-  {
-    id: "time-first-modal",
-    category: "Grammar",
-    prompt: "Which sentence has correct modal-verb word order?",
-    options: [
-      "Heute ich will nach Berlin fahren.",
-      "Heute will ich nach Berlin fahren.",
-      "Heute will nach Berlin fahren ich.",
-    ],
-    answer: "Heute will ich nach Berlin fahren.",
-    explanation: "Heute takes the first position, will is still position two, fahren is last.",
+    answer: "Können Sie ein Zimmer für mich reservieren?",
+    explanation: "In a yes/no question, Können comes first, followed by Sie.",
   },
   {
     id: "train-reading",
@@ -222,14 +154,6 @@ export const DAY14_KNOWLEDGE_QUESTIONS = Object.freeze([
     answer: "Für zwei Nächte",
     explanation: "The confirmation says 18.–20. Juli, that is two nights.",
   },
-]);
-
-export const DAY14_FINAL_TASKS = Object.freeze([
-  { id: "ability", label: "1 · können", prompt: "Say what you can do on a train journey.", model: "Ich kann morgen mit dem Zug fahren." },
-  { id: "wish", label: "2 · möchten", prompt: "Say which hotel room you would like to book.", model: "Ich möchte ein Einzelzimmer buchen." },
-  { id: "intention", label: "3 · wollen", prompt: "Say which city you want to visit.", model: "Ich will nach Berlin fahren." },
-  { id: "necessity", label: "4 · müssen", prompt: "Say where you have to change trains.", model: "Ich muss in Hamburg umsteigen." },
-  { id: "separable", label: "5 · Trennbares Verb", prompt: "Say where or when you get on or off a train without a modal.", model: "Ich steige am Hauptbahnhof aus." },
 ]);
 
 export const normalizeDay14Sentence = (value) =>

@@ -149,3 +149,7 @@
 @media (prefers-reduced-motion: reduce) {
   .a1d14w, .a1d14w * { scroll-behavior: auto; }
 }
+
+/* Keep optional vocabulary available without making the default workbook long. */
+.a1d14w-extra-vocab { display: grid; gap: 10px; }
+.a1d14w-extra-vocab > .a1d14w-vocab-grid { margin-top: 10px; }
