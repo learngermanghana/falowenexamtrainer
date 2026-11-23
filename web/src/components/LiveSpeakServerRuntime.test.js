@@ -51,6 +51,8 @@ function setup(overrides = {}, authOverride = {}) {
       if(name==="crypto")return {randomUUID:()=>"unique-session-id"};
       if(name==="openai")return {toFile:async(_data,name)=>({name})};
       if(name==="./chatModelConfig")return require("../../../functions/functionz/chatModelConfig");
+      if(name==="./trialPractice")return require("../../../functions/functionz/trialPractice");
+      if(name==="./trialExams.json")return require("../../../functions/functionz/trialExams.json");
       if(name==="./goetheExaminerFlow")return require("../../../functions/functionz/goetheExaminerFlow");
       if(name==="./courseSpeakingMock")return {requireCourseSpeakingAttempt:async()=>({status:"in_progress"})};
       if(name==="./courseSpeakingSessionClock")return require("../../../functions/functionz/courseSpeakingSessionClock");
@@ -72,7 +74,7 @@ function setup(overrides = {}, authOverride = {}) {
     const fn=routes.get(method+" "+route);
     if(!fn)throw new Error("Missing route "+route);
     const res={code:200,payload:null,status(n){this.code=n;return this},json(p){this.payload=p;return this}};
-    await fn({body,query:method === "GET" ? body : {},headers:{authorization:"Bearer test"}},res);
+    await fn({path:route,method,body,query:method === "GET" ? body : {},headers:{authorization:"Bearer test"}},res);
     return res;
   };
   return {call,db,docs,routes,fakeClient};
