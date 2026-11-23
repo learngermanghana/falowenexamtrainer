@@ -137,6 +137,7 @@ const SWAHILI_DAY_TWELVE_LISTENING = Object.freeze({
   id: 'swahili-a1-day12-listening',
   key: 'swahili/A1/day-12/day-12.mp3',
 });
+const SWAHILI_DAY_THIRTEEN_LISTENING = Object.freeze({ id: 'swahili-a1-day13-listening', key: 'swahili/A1/day-13/day-13.mp3' });
 const SWAHILI_DAY_ELEVEN_LISTENING = Object.freeze({
   id: 'swahili-a1-day11-listening',
   key: 'swahili/A1/day-11/day-11.mp3',
@@ -193,6 +194,9 @@ function createSwahiliDayTenAudioHandler(options) {
 }
 function createSwahiliDayTwelveAudioHandler(options) {
   return createSwahiliListeningHandler(SWAHILI_DAY_TWELVE_LISTENING, options);
+}
+function createSwahiliDayThirteenAudioHandler(options) {
+  return createSwahiliListeningHandler(SWAHILI_DAY_THIRTEEN_LISTENING, options);
 }
 function createSwahiliDayElevenAudioHandler(options) {
   return createSwahiliListeningHandler(SWAHILI_DAY_ELEVEN_LISTENING, options);
@@ -261,4 +265,4 @@ function createClassroomBankAudioHandler(options = {}) {
     return signObject(recording, env);
   } });
 }
-module.exports = { createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayThreeAudioHandler, createSwahiliDayFourAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayEightAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
+module.exports = { createSwahiliDayThirteenAudioHandler, createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayThreeAudioHandler, createSwahiliDayFourAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayEightAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
