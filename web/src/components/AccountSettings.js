@@ -35,7 +35,7 @@ const formatDate = (value) => {
 const COURSE_COMPLETION_UPGRADE_LEVELS = new Set(["A1", "A2", "B1"]);
 
 const AccountSettings = () => {
-  const { user, studentProfile, saveStudentProfile, refreshStudentProfile } = useAuth();
+  const { user, studentProfile, idToken, refreshStudentProfile } = useAuth();
   const { i18n, t } = useTranslation();
   const isSwahili = studentProfile?.program === "swahili";
   const isSecondaryCourse = studentProfile?.isSecondaryCourse === true;
@@ -89,6 +89,14 @@ const AccountSettings = () => {
   };
 
   const billingSummary = useMemo(() => {
+    const upgradeStatus = String(studentProfile?.upgradeStatus || "").toLowerCase();
+    if (upgradeStatus === "pending") {
+      const tuition = Math.max(Number(studentProfile?.upgradeTuitionFee || 0) || 0, 0);
+      const paid = Math.max(Number(studentProfile?.upgradePaid || 0) || 0, 0);
+      const balanceDue = Math.max(Number(studentProfile?.upgradeBalanceDue ?? Math.max(tuition - paid, 0)) || 0, 0);
+      return { paidAmount: paid, tuitionFee: tuition, balanceDue, isUpgrade: true };
+    }
+
     const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);
     const tuition = Math.max(Number(studentProfile?.tuitionFee ?? (studentProfile?.program === "swahili" ? 0 : getTuitionFeeForLevel(studentProfile?.level))) || 0, 0);
     const explicitBalanceRaw = studentProfile?.balanceDue ?? studentProfile?.balance;
@@ -101,7 +109,7 @@ const AccountSettings = () => {
     const balanceDue = explicitBalance === null || derivedBalance === null
       ? explicitBalance ?? derivedBalance
       : Math.min(explicitBalance, derivedBalance);
-    return { paidAmount: paid, tuitionFee: tuition, balanceDue };
+    return { paidAmount: paid, tuitionFee: tuition, balanceDue, isUpgrade: false };
   }, [studentProfile]);
 
   const paidAmount = billingSummary.paidAmount;
@@ -435,8 +443,10 @@ const AccountSettings = () => {
     };
   }, [balanceDue, formatMoney, numberFormatter, studentProfile?.contractEnd, t]);
 
+  const upgradeStatus = String(studentProfile?.upgradeStatus || "").trim().toLowerCase();
   const queuedUpgradeLevel = String(studentProfile?.upgradeToLevel || "").toUpperCase();
-  const hasQueuedUpgrade = Boolean(queuedUpgradeLevel);
+  const upgradeBalanceDue = Math.max(Number(studentProfile?.upgradeBalanceDue || 0) || 0, 0);
+  const hasOpenUpgrade = ["awaiting_payment", "pending", "expired"].includes(upgradeStatus) && Boolean(queuedUpgradeLevel) && upgradeBalanceDue > 0;
 
   const levelUpgrade = useMemo(() => {
     const currentLevel = String(studentProfile?.level || "").toUpperCase();
@@ -455,7 +465,7 @@ const AccountSettings = () => {
       !requiresCourseCompletion ||
       (completionVerified && courseCompletion.courseWorkCompleted === true && awaitingReview === 0);
 
-    if (hasQueuedUpgrade) {
+    if (hasOpenUpgrade) {
       return {
         currentLevel,
         nextLevel: queuedUpgradeLevel,
@@ -563,91 +573,53 @@ const AccountSettings = () => {
     courseCompletion,
     courseCompletionError,
     courseCompletionLoading,
-    hasQueuedUpgrade,
+    hasOpenUpgrade,
     queuedUpgradeLevel,
     studentProfile?.level,
     t,
   ]);
 
-  const handleUpgradeToNextLevel = async () => {
-    if (hasQueuedUpgrade || !levelUpgrade?.canUpgrade || !levelUpgrade?.courseCompleted || !levelUpgrade?.nextLevel) return;
+  const postUpgradeAction = async (path, body = {}) => {
+    if (!idToken) throw new Error("Your login session is missing. Please refresh and try again.");
+    const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "";
+    if (!studentCode) throw new Error("Missing student code. Please re-login or contact support.");
+    const response = await fetch(`/api/paystack/${path}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ studentCode, ...body }),
+    });
+    const json = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(json?.error || "Could not update the level upgrade.");
+    await refreshStudentProfile();
+  };
 
+  const handleUpgradeToNextLevel = async () => {
+    if (hasOpenUpgrade || !levelUpgrade?.canUpgrade || !levelUpgrade?.courseCompleted || !levelUpgrade?.nextLevel) return;
     setIsUpgradingLevel(true);
     setStatus("");
-
     try {
       const nextLevel = levelUpgrade.nextLevel;
-      const nextTuitionFee = levelUpgrade.nextTuitionFee || 0;
-      const nowIso = new Date().toISOString();
-      const carryoverUntil = studentProfile?.contractEnd || "";
-
-      await saveStudentProfile({
-        paymentIntentAmount: nextTuitionFee,
-        tuitionFee: nextTuitionFee,
-        balanceDue: nextTuitionFee,
-        paymentStatus: "pending",
-        upgradeFromLevel: levelUpgrade.currentLevel,
-        upgradeToLevel: nextLevel,
-        upgradeQueuedAt: nowIso,
-        contractMergeMode: carryoverUntil ? "append_after_active_contract" : "",
-        upgradeCarryoverUntil: carryoverUntil,
-        upgradeSnapshot: {
-          level: studentProfile?.level || "",
-          className: studentProfile?.className || "",
-          paid: studentProfile?.paid ?? null,
-          initialPaymentAmount: studentProfile?.initialPaymentAmount ?? null,
-          tuitionFee: studentProfile?.tuitionFee ?? null,
-          balanceDue: studentProfile?.balanceDue ?? null,
-          paymentStatus: studentProfile?.paymentStatus || "",
-          paymentIntentAmount: studentProfile?.paymentIntentAmount ?? null,
-          contractTermMonths: studentProfile?.contractTermMonths ?? null,
-          contractStart: studentProfile?.contractStart || "",
-          contractEnd: studentProfile?.contractEnd || "",
-          contractMergeMode: studentProfile?.contractMergeMode || "",
-          upgradeCarryoverUntil: studentProfile?.upgradeCarryoverUntil || "",
-        },
-      });
-
-      setStatus(t("accountSettings.upgrade.queued", { level: nextLevel }));
+      await postUpgradeAction("prepare-upgrade", { targetLevel: nextLevel });
+      setStatus(`${nextLevel} upgrade prepared. Pay the full fee for a 6-month extension, or make a partial payment to start 1 month of temporary access.`);
     } catch (error) {
-      const message = error instanceof Error ? error.message : t("accountSettings.upgrade.error");
-      setStatus(message);
+      setStatus(error instanceof Error ? error.message : t("accountSettings.upgrade.error"));
     } finally {
       setIsUpgradingLevel(false);
     }
   };
 
   const handleCancelQueuedUpgrade = async () => {
-    if (!hasQueuedUpgrade) return;
-
+    if (upgradeStatus !== "awaiting_payment") return;
     setIsUpgradingLevel(true);
     setStatus("");
-
     try {
-      const snapshot = studentProfile?.upgradeSnapshot || {};
-      await saveStudentProfile({
-        level: snapshot.level || studentProfile?.level || "",
-        className: snapshot.className || studentProfile?.className || "",
-        paid: snapshot.paid ?? studentProfile?.paid ?? null,
-        initialPaymentAmount: snapshot.initialPaymentAmount ?? studentProfile?.initialPaymentAmount ?? null,
-        tuitionFee: snapshot.tuitionFee ?? studentProfile?.tuitionFee ?? null,
-        balanceDue: snapshot.balanceDue ?? studentProfile?.balanceDue ?? null,
-        paymentStatus: snapshot.paymentStatus || studentProfile?.paymentStatus || "pending",
-        paymentIntentAmount: snapshot.paymentIntentAmount ?? studentProfile?.paymentIntentAmount ?? null,
-        contractTermMonths: snapshot.contractTermMonths ?? studentProfile?.contractTermMonths ?? null,
-        contractStart: snapshot.contractStart || studentProfile?.contractStart || "",
-        contractEnd: snapshot.contractEnd || studentProfile?.contractEnd || "",
-        contractMergeMode: snapshot.contractMergeMode || "",
-        upgradeCarryoverUntil: snapshot.upgradeCarryoverUntil || "",
-        upgradeSnapshot: null,
-        upgradeFromLevel: "",
-        upgradeToLevel: "",
-        upgradeQueuedAt: "",
-      });
+      await postUpgradeAction("cancel-upgrade");
       setStatus(t("accountSettings.upgrade.cancelled"));
     } catch (error) {
-      const message = error instanceof Error ? error.message : t("accountSettings.upgrade.error");
-      setStatus(message);
+      setStatus(error instanceof Error ? error.message : t("accountSettings.upgrade.error"));
     } finally {
       setIsUpgradingLevel(false);
     }
@@ -940,7 +912,55 @@ const AccountSettings = () => {
           </p>
         </div>
 
-        {levelUpgrade.nextLevel ? (
+        {hasOpenUpgrade ? (
+          <>
+            <p style={styles.helperText}>{levelUpgrade.reason}</p>
+            {upgradeStatus === "pending" ? (
+              <div style={{ ...styles.errorBox, background: "#eff6ff", borderColor: "#93c5fd", color: "#1e3a8a", marginBottom: 10 }}>
+                <strong>1-month temporary {queuedUpgradeLevel} access is active.</strong>
+                <p style={{ ...styles.helperText, margin: "4px 0 0", color: "#1e3a8a" }}>
+                  Complete the remaining {formatMoney(upgradeBalanceDue)} by {formatDate(studentProfile?.upgradeGraceEnd)}. Additional partial payments do not restart the one-month period.
+                </p>
+              </div>
+            ) : null}
+            {upgradeStatus === "expired" ? (
+              <div style={{ ...styles.errorBox, marginBottom: 10 }}>
+                Temporary access has ended. A partial payment now reduces the balance but does not grant another month. Full payment reactivates {queuedUpgradeLevel} and adds 6 months.
+              </div>
+            ) : null}
+            {upgradeStatus === "awaiting_payment" ? (
+              <div style={{ ...styles.card, margin: "0 0 10px", background: "#f8fafc" }}>
+                <strong>No access has changed yet.</strong>
+                <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+                  Full payment immediately activates {queuedUpgradeLevel} and adds 6 months. A partial payment starts one month of temporary {queuedUpgradeLevel} access.
+                </p>
+              </div>
+            ) : null}
+
+            <TuitionStatusCard
+              level={queuedUpgradeLevel}
+              paidAmount={Math.max(Number(studentProfile?.upgradePaid || 0) || 0, 0)}
+              balanceDue={upgradeBalanceDue}
+              tuitionFee={Math.max(Number(studentProfile?.upgradeTuitionFee || getTuitionFeeForLevel(queuedUpgradeLevel)) || 0, 0)}
+              checkoutAmountOverride={upgradeBalanceDue}
+              paymentPurpose="level_upgrade"
+              title={`${queuedUpgradeLevel} upgrade payment`}
+              description={`Remaining upgrade balance. Your previous paid contract stays protected until this upgrade is fully paid.`}
+            />
+
+            {upgradeStatus === "awaiting_payment" ? (
+              <button
+                type="button"
+                style={{ ...styles.secondaryButton, marginTop: 8 }}
+                onClick={handleCancelQueuedUpgrade}
+                disabled={isUpgradingLevel}
+              >
+                {t("accountSettings.upgrade.cancel")}
+              </button>
+            ) : null}
+            {status ? <p style={{ ...styles.helperText, marginTop: 8 }}>{status}</p> : null}
+          </>
+        ) : levelUpgrade.nextLevel ? (
           <>
             <div
               data-upgrade-eligibility
@@ -1041,17 +1061,6 @@ const AccountSettings = () => {
                 ? t("accountSettings.upgrade.upgrading")
                 : t("accountSettings.upgrade.button", { nextLevel: levelUpgrade.nextLevel })}
             </button>
-
-            {hasQueuedUpgrade ? (
-              <button
-                type="button"
-                style={{ ...styles.secondaryButton, marginTop: -4 }}
-                onClick={handleCancelQueuedUpgrade}
-                disabled={isUpgradingLevel}
-              >
-                {t("accountSettings.upgrade.cancel")}
-              </button>
-            ) : null}
 
             {status ? <p style={{ ...styles.helperText, margin: 0 }}>{status}</p> : null}
           </>
