@@ -211,6 +211,8 @@ const CLASSROOM_RECORDINGS = Object.freeze({
   'A2-8': Object.freeze({ id: 'a2-day8-restaurant-classroom', key: 'a2/day-08/im-restaurant-bestellen-und-reagieren.mp3' }),
   // Teacher-supplied Day 9 holiday recording; do not replace the learner workbook audio.
   'A2-9': Object.freeze({ id: 'a2-day9-urlaub-classroom', key: 'a2/day-09/urlaub.mp3' }),
+  // Day 10 classroom city conversation is distinct from the graded learner workbook track.
+  'A2-10': Object.freeze({ id: 'a2-day10-stadt-classroom', key: 'a2/day-10/eine-stadt-entdecken-und-etwas-erleben.mp3' }),
   'A2-18': Object.freeze({ id: 'a2-day18-bank-telephone', key: 'a2/day-18/bank-telefonat.mp3' }),
   'A2-20': Object.freeze({ id: 'a2-day20-complaint', key: 'a2/day-20/reklamation-falsches-hemd.mp3' }),
   'A2-19': Object.freeze({ id: 'a2-day19-shopping', key: 'a2/day-19/einkaufen-wo-und-wie.mp3' }),
