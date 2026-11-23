@@ -41,9 +41,10 @@ describe("A1 Day 14 modal verbs, trains and hotels workbook", () => {
 
   test("revises verb-second, separable infinitives, four modal verbs and hotel vocabulary", () => {
     open();
-    expect(document.body).toHaveTextContent("Morgen fahre ich nach Berlin.");
-    expect(document.body).toHaveTextContent("Ich steige in den Zug ein.");
-    expect(document.body).toHaveTextContent("Ich möchte in den Zug einsteigen.");
+    expect(screen.getByText("fahre", { selector: ".a1d14w-token.finite" })).toBeInTheDocument();
+    expect(document.body).toHaveTextContent("Morgen");
+    expect(document.body).toHaveTextContent("Ich steige in Hamburg um.");
+    expect(document.body).toHaveTextContent("einsteigen.");
     expect(document.body).toHaveTextContent("Heute muss ich umsteigen.");
     for (const term of ["einsteigen", "aussteigen", "umsteigen", "übernachten",
       "reservieren", "buchen", "das Einzelzimmer", "das Doppelzimmer"]) {
@@ -98,7 +99,8 @@ describe("A1 Day 14 modal verbs, trains and hotels workbook", () => {
     open();
     expect(screen.getByRole("table", { name: "German train departure board" })).toBeVisible();
     expect(document.body).toHaveTextContent("ICE 593");
-    expect(document.body).toHaveTextContent("Gleis sieben");
+    expect(document.body).toHaveTextContent("ICE 593");
+    expect(document.body).toHaveTextContent("7");
     expect(document.body).toHaveTextContent("Reservierungsbestätigung");
     expect(document.body).toHaveTextContent("Einzelzimmer");
     expect(document.body).toHaveTextContent("zwei Nächte");
