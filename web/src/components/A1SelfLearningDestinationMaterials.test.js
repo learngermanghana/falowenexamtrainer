@@ -12,7 +12,7 @@ describe("A1 canonical self-learning destination materials", () => {
 
     const resources = getA1SelfLearningJourneyResources(day14);
     expect(resources.radio?.youtubeId).toBe("GeHygJE7Hww");
-    expect(resources.teacherVideo?.url).toBe("https://youtu.be/0zps4OYwShg");
+    expect(resources.teacherVideo?.url).toBe("https://youtu.be/fTPhyeHwf68");
     expect(resources.aiVideo?.url).toBeTruthy();
     expect(resources.aiVideo?.url).not.toBe(resources.teacherVideo?.url);
   });

@@ -25,7 +25,7 @@ describe("A1 Day 14 modal verbs, trains and hotels workbook", () => {
     expect(screen.getByRole("heading", { name: /Day 14 Workbook · Modal Verbs with Separable Verbs/i })).toBeVisible();
     expect(document.querySelector(".a1d14w-notice")).toHaveTextContent("This is a self-practice workbook");
     expect(getA1TeacherVideoResources(14)).toEqual([
-      expect.objectContaining({ chapter: "3.6", url: "https://youtu.be/0zps4OYwShg" }),
+      expect.objectContaining({ chapter: "3.6", url: "https://youtu.be/fTPhyeHwf68" }),
     ]);
     expect(buildA1WorkbookVideoModel({ pathname: route })).toEqual(
       expect.objectContaining({ lessonId: "A1-3.6", assessmentLabel: "Self-practice", youtubeId: "Wkj1-TnNUxY" }),
