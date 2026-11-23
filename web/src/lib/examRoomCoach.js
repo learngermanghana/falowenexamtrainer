@@ -149,6 +149,28 @@ export const buildExamRoomCoach = ({
     });
   });
 
+  // Derive trends from verified, scored history already loaded for this level.
+  // Full mocks contribute their per-section results once, not as four extra attempts.
+  const historyBySection = Object.fromEntries(EXAM_SKILLS.map((skill) => [skill.key, []]));
+  attempts.forEach((attempt) => {
+    const entries = attempt.section === "mixed" ? mockSectionPercents(attempt) : [attempt];
+    entries.forEach((entry) => {
+      if (historyBySection[entry.section]) historyBySection[entry.section].push(entry.percent);
+    });
+  });
+  const skillTrends = Object.fromEntries(EXAM_SKILLS.map((skill) => {
+    const scores = historyBySection[skill.key]; // newest first
+    const latestScore = scores[0] ?? null;
+    const previousScore = scores[1] ?? null;
+    return [skill.key, {
+      count: scores.length,
+      latest: latestScore,
+      previous: previousScore,
+      change: previousScore === null ? null : latestScore - previousScore,
+      average: scores.length ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : null,
+    }];
+  }));
+
   const coveredSkills = EXAM_SKILLS.filter((skill) => latestBySection[skill.key]).length;
   const latest = attempts[0] || null;
   const scored = EXAM_SKILLS.map((skill) => latestBySection[skill.key]).filter(Boolean);
@@ -177,6 +199,7 @@ export const buildExamRoomCoach = ({
     attempts,
     latest,
     latestBySection,
+    skillTrends,
     coveredSkills,
     coveragePercent: Math.round((coveredSkills / EXAM_SKILLS.length) * 100),
     focus: {
