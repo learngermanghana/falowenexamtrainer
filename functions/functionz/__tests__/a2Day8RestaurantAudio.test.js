@@ -43,6 +43,8 @@ test('approved A2 Day 8 recording signs only for authenticated teaching staff', 
   expect(result.body.url).toContain('X-Amz-Signature=');
   expect(result.body.track).toBe('a2-day8-restaurant-classroom');
   expect(validateA2AudioKey({ day: 8, key: AUDIO_KEY })).toEqual({ day: 8, key: AUDIO_KEY });
+  // The existing graded workbook recording stays available after this addition.
+  expect(validateA2AudioKey({ day: 8, key: 'a2/day-08/day-08.mp3' })).toEqual({ day: 8, key: 'a2/day-08/day-08.mp3' });
 });
 
 test('the classroom signer rejects wrong key, wrong day, and requests without a token', async () => {
