@@ -233,6 +233,22 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       error(res, 403, "student_mismatch", "This student profile does not belong to your account.");
       return null;
     }
+    const { trialRestriction } = require("./trialPractice");
+    const trial = await trialRestriction(db(), auth, profile);
+    if (trial) {
+      const exam = require("./trialExams.json")[trial.level];
+      let permitted = Boolean(exam?.engineId && ["/live-speak/status", "/live-speak/pilot/claim"].includes(req.path));
+      if (exam?.engineId && req.path.startsWith("/live-speak/session/")) {
+        const start = req.path.endsWith("/start");
+        const session = start ? req.body : (await (await sessionReference(auth.uid, req)).get()).data();
+        permitted = session?.level === trial.level && [1, 2, 3].some(part =>
+          session?.examTask?.id === exam.engineId + "-speaking-teil-" + part);
+      }
+      if (!permitted) {
+        error(res, 403, "trial_limit", "Open the speaking section inside your included trial mock.");
+        return null;
+      }
+    }
     return { auth, profile };
   };
   const requireEnabled = (res) => {

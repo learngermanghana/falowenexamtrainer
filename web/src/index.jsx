@@ -1,3 +1,6 @@
+import { courseTrial, TrialCoursePage } from "./components/TrialPractice";
+import { MockExamOnlyGate } from "./components/MockExamCommerce";
+import { MOCK_EXAM_CATALOG } from "./data/mockExamCatalog";
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
@@ -61,6 +64,21 @@ const AppMountedSignal = () => {
 };
 
 // Some German workbook routes mount directly, outside App's normal route guard.
+function CourseTrialBoundary({ children }) {
+  const { studentProfile, loading } = useAuth();
+  const { pathname, state, search } = useLocation();
+  const path = pathname.replace(/\/+$/, "");
+  const exam = /^\/exams(?:\/|$)/i.test(path) || Object.values(MOCK_EXAM_CATALOG).some(mock => mock.route === path);
+  const course = /^\/campus\/course(?:\/|$)/i.test(path);
+  if (!course && !exam) return children;
+  if (loading) return null;
+  const trial = courseTrial(studentProfile);
+  if (!trial) return children;
+  if (exam) return <MockExamOnlyGate courseTrialState={trial}>{children}</MockExamOnlyGate>;
+  if (/\/lesson\//i.test(path) && state) return <Navigate to={pathname + search} replace state={null} />;
+  return <TrialCoursePage level={studentProfile.level} path={path} active={trial.active} endsAtMs={trial.endsAtMs}>{children}</TrialCoursePage>;
+}
+
 function CourseRouteBoundary({ children }) {
   const { studentProfile, loading } = useAuth();
   const { pathname } = useLocation();
@@ -79,7 +97,7 @@ const AuthenticatedAppRoutes = () => (
     <PublicAuthMobileRecovery />
     <A1Day13RevisionNumberCleanup />
     <AuthProvider>
-      <CourseRouteBoundary>
+      <CourseTrialBoundary><CourseRouteBoundary>
       <ToastProvider>
         <A1ChapterSpecificLessonRouteBoundary>
           <RouteScopedAppServices />
@@ -129,7 +147,7 @@ const AuthenticatedAppRoutes = () => (
           </Routes></MockOnlyRouteBoundary>
         </A1ChapterSpecificLessonRouteBoundary>
       </ToastProvider>
-      </CourseRouteBoundary>
+      </CourseRouteBoundary></CourseTrialBoundary>
     </AuthProvider>
   </>
 );

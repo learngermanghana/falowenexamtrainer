@@ -1,0 +1,7 @@
+{
+  "A1": {"catalogId":"a1-final-02","engineId":"a1-mock-02"},
+  "A2": {"catalogId":"a2-final-01","engineId":"a2-mock-01"},
+  "B1": {"catalogId":"b1-final-01","engineId":"b1-mock-01"},
+  "B2": {"catalogId":"b2-final-01","engineId":"b2-mock-01"},
+  "C1": {"catalogId":"c1-reading-practice-01","resultId":"c1-reading-sample-01"}
+}
