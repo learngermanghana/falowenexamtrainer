@@ -124,6 +124,11 @@ const SWAHILI_DAY_SEVEN_LISTENING = Object.freeze({
   key: 'swahili/A1/day-07/day-07.mp3',
 });
 
+const SWAHILI_DAY_EIGHT_LISTENING = Object.freeze({
+  id: 'swahili-a1-day08-listening',
+  key: 'swahili/A1/day-08/day-08.mp3',
+});
+
 const SWAHILI_DAY_TEN_LISTENING = Object.freeze({
   id: 'swahili-a1-day10-listening',
   key: 'swahili/A1/day-10/day-10.mp3',
@@ -179,6 +184,9 @@ function createSwahiliDaySixAudioHandler(options) {
 }
 function createSwahiliDaySevenAudioHandler(options) {
   return createSwahiliListeningHandler(SWAHILI_DAY_SEVEN_LISTENING, options);
+}
+function createSwahiliDayEightAudioHandler(options) {
+  return createSwahiliListeningHandler(SWAHILI_DAY_EIGHT_LISTENING, options);
 }
 function createSwahiliDayTenAudioHandler(options) {
   return createSwahiliListeningHandler(SWAHILI_DAY_TEN_LISTENING, options);
@@ -253,4 +261,4 @@ function createClassroomBankAudioHandler(options = {}) {
     return signObject(recording, env);
   } });
 }
-module.exports = { createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayThreeAudioHandler, createSwahiliDayFourAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
+module.exports = { createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayThreeAudioHandler, createSwahiliDayFourAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayEightAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
