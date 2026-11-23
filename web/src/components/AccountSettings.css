@@ -1,0 +1,53 @@
+.fw-account {
+  --ink: #193e34;
+  --muted: #64756e;
+  --line: #dde6e0;
+  background: #f5f8f6;
+  color: var(--ink);
+  border-radius: 18px;
+  padding: clamp(16px, 3vw, 40px);
+  container-type: inline-size;
+}
+.fw-account-header { margin-bottom: 28px; }
+.fw-account-header small, .fw-account-profile p, .fw-account-meta dt,
+.fw-account-amounts span { color: var(--muted); }
+.fw-account-header h1 { font-size: clamp(27px, 3vw, 40px); margin: 16px 0 0; line-height: 1.15; }
+.fw-account-layout { display: grid; grid-template-columns: minmax(205px, 27%) minmax(0, 1fr); gap: clamp(18px, 3vw, 40px); align-items: start; }
+.fw-account-profile, .fw-account-tuition, .fw-account-history {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: clamp(16px, 2vw, 28px);
+}
+.fw-account-avatar { display: inline-grid; place-items: center; background: #e4eee3; color: #21654c; width: 58px; height: 58px; border-radius: 16px; font-size: 22px; font-weight: 700; }
+.fw-account-identity h2 { margin: 20px 0 6px; overflow-wrap: anywhere; }
+.fw-account-identity p { margin: 0 0 12px; }
+.fw-account-pill { display: inline-block; border-radius: 20px; padding: 5px 12px; font-size: 13px; font-weight: 600; }
+.fw-account-meta { margin: 22px 0 12px; padding: 18px 0; border-block: 1px solid var(--line); }
+.fw-account-meta dt { font-size: 13px; }
+.fw-account-meta dd { margin: 6px 0 16px; overflow-wrap: anywhere; }
+.fw-account-meta dd:last-child { margin-bottom: 0; }
+.fw-account-nav { display: grid; gap: 4px; }
+.fw-account-nav button { display: flex; align-items: center; justify-content: space-between; padding: 12px; min-height: 44px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font: inherit; text-align: start; cursor: pointer; }
+.fw-account-nav button:hover, .fw-account-nav button[aria-current] { background: #edf4ee; color: #196446; }
+.fw-account-nav button span { visibility: hidden; }
+.fw-account-nav button[aria-current] span { visibility: visible; }
+.fw-account-content { min-width: 0; overflow-wrap: anywhere; }
+.fw-account-billing { display: grid; gap: 22px; }
+.fw-account-tuition header { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.fw-account-tuition header > :first-child, .fw-account-access small { text-transform: uppercase; font-size: 12px; font-weight: 650; letter-spacing: .035em; }
+.fw-account-amounts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 26px; }
+.fw-account-amounts > div { padding-inline: 14px; border-inline-start: 1px solid var(--line); }
+.fw-account-amounts > div:first-child { padding-inline-start: 0; border: none; }
+.fw-account-amounts strong { display: block; font-size: clamp(20px, 2.5vw, 34px); margin: 8px 0; line-height: 1.15; }
+.fw-account-access { padding: 22px; border-radius: 16px; background: #e7f0e5; display: grid; gap: 6px; }
+.fw-account-access > strong { font-size: 23px; }
+.fw-account-access details { margin-top: 10px; }
+@container (max-width: 710px) {
+  .fw-account-layout { grid-template-columns: minmax(0, 1fr); }
+  .fw-account-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (max-width: 440px) {
+  .fw-account-amounts { grid-template-columns: 1fr; gap: 12px; margin-top: 16px; }
+  .fw-account-amounts > div, .fw-account-amounts > div:first-child { padding: 10px 0 0; border: 0; border-top: 1px solid var(--line); }
+}
