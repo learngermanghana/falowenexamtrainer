@@ -762,6 +762,25 @@ const AppShell = ({
     [t]
   );
 
+  const courseSelector = courseOptions?.length > 1 && (
+    <label className="profile-menu__language">
+      {t("uiLanguageFlow.courseLabel")}
+      <select
+        value={getCampusProgram(studentProfile)}
+        aria-label={t("uiLanguageFlow.courseLabel")}
+        onChange={(event) => {
+          if (!courseOptions.includes(event.target.value)) return;
+          selectCourse(event.target.value);
+          navigate("/campus/course", { replace: true });
+        }}
+        style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #d1d5db", fontSize: 12 }}
+      >
+        {courseOptions.includes("german") && <option value="german">{t("signup.programs.german")}</option>}
+        {courseOptions.includes("swahili") && <option value="swahili">{t("signup.programs.swahili")}</option>}
+      </select>
+    </label>
+  );
+
   const subtitle = useMemo(() => {
     if (location.pathname.startsWith("/campus")) {
       return isSwahiliCampus ? "Kitabu cha Kiswahili · Tutor-guided learning" : t("appNav.subtitle.campus");
@@ -896,24 +915,7 @@ const AppShell = ({
               notificationStatus={notificationStatus}
               onEnablePush={enableNotifications}
             />
-            {courseOptions?.length > 1 && (
-              <label style={{ display: "grid", gap: 4, fontSize: 12, color: "#374151" }}>
-                {t("uiLanguageFlow.courseLabel")}
-                <select
-                  value={getCampusProgram(studentProfile)}
-                  aria-label={t("uiLanguageFlow.courseLabel")}
-                  onChange={(event) => {
-                    if (!courseOptions.includes(event.target.value)) return;
-                    selectCourse(event.target.value);
-                    navigate("/campus/course", { replace: true });
-                  }}
-                  style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #d1d5db", fontSize: 12 }}
-                >
-                  {courseOptions.includes("german") && <option value="german">{t("signup.programs.german")}</option>}
-                  {courseOptions.includes("swahili") && <option value="swahili">{t("signup.programs.swahili")}</option>}
-                </select>
-              </label>
-            )}
+            {courseSelector}
             <label style={{ display: "grid", gap: 4, fontSize: 12, color: "#374151" }}>
               {t("interfaceLanguage.shortLabel")}
               <select

@@ -1708,6 +1708,7 @@
     }
   },
   "uiLanguageFlow": {
+    "menu": "Menü",
     "courseLabel": "Kurs-Sprache",
     "signupLanguageLabel": "App-Sprache",
     "welcome": "Willkommen bei Falowen",

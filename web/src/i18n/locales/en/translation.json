@@ -1823,6 +1823,7 @@
     }
   },
   "uiLanguageFlow": {
+    "menu": "Menu",
     "courseLabel": "Course language",
     "signupLanguageLabel": "App language",
     "welcome": "Welcome to Falowen",
