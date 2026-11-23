@@ -195,6 +195,18 @@
       ]
     },
     {
+      "id": "account",
+      "label": "Account",
+      "route": "/campus/account",
+      "purpose": "Open your student account to view your profile, billing and receipts, documents, and notifications",
+      "requiresLogin": true,
+      "aliases": [
+        "my account",
+        "account settings",
+        "student account"
+      ]
+    },
+    {
       "id": "student-data",
       "label": "Account → Student Data",
       "route": "/campus/account?tab=studentData",
