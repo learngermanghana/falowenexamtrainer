@@ -107,3 +107,21 @@ chat. Rebuild/redeploy the learner site after updating its server configuration.
 
 No manual score override, class-name substitution, or eligibility bypass occurs
 from clicking a download button.
+
+## Enrollment and payment documents
+
+Account → Documents also offers the enrollment letter, payment agreement, latest
+available issued receipt and issued residence-permit support letter. These use
+the registration sheet, independent of the German academic level selector.
+Organisation-managed financial documents remain with Falowen Admin.
+
+Deploy the updated bound Student Docs Apps Script as a web app running as its
+owner. Configure the production Vercel server variables
+`STUDENT_DOCS_WEBHOOK_URL` (its deployed /exec URL) and
+`STUDENT_DOCS_WEBHOOK_TOKEN` (the value of that script’s
+`ANNOUNCEMENT_WEBHOOK_TOKEN` Script Property). Redeploy Vercel after saving.
+The existing Announcements deployment continues to serve academic documents.
+
+The Student Docs email templates link learners to Account → Documents. Receipt
+and residence downloads return matching issued attachments from the sending
+mailbox. If an original is unavailable, the learner can contact Falowen.
