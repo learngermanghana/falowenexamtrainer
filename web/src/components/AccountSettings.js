@@ -12,6 +12,7 @@ import ClassParticipationCard from "./ClassParticipationCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
+import { shouldOfferTuitionPayment } from "../utils/tuitionPaymentVisibility";
 import { formatCurrency } from "../lib/formatters";
 import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { getNextLevel, getTuitionFeeForLevel } from "../data/levelFees";
@@ -119,6 +120,8 @@ const AccountSettings = () => {
   const trialLifecycle = useMemo(() => getTrialLifecycleState(studentProfile), [studentProfile]);
   const normalizedPaymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
   const paymentCleared = normalizedPaymentStatus === "paid" || hasClearedBalance(balanceDue);
+  // Payment actions require a real amount due and must never prompt an already-paid learner.
+  const hasOutstandingTuition = shouldOfferTuitionPayment({ balanceDue, paymentCleared });
 
   const billingState = useMemo(() => {
     if (isSecondaryCourse) {
@@ -838,7 +841,7 @@ const AccountSettings = () => {
 
         {paymentAlert ? <div style={{ ...styles.errorBox, margin: 0 }}>{paymentAlert.message}</div> : null}
 
-        {balanceDue > 0 ? (
+        {hasOutstandingTuition ? (
           <div style={{ display: "grid", gap: 7, borderTop: "1px solid #e2e8f0", paddingTop: 12 }}>
             <div>
               <h3 style={{ margin: 0, fontSize: 18 }}>Pay tuition</h3>
