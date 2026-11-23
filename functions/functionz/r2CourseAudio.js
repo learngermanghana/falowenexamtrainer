@@ -115,9 +115,10 @@ const validateCourseAudioKey = ({ level, day, key }) => {
   }
   // Day 18 bank audio is a curated teaching upload, not a general new
   // permission to sign arbitrary objects from this directory.
-  // Only the teacher-approved Day 8 restaurant recording may be signed.
+  // Preserve the original graded Day 8 recording and the separate approved
+  // classroom restaurant dialogue. Never authorize arbitrary files in this folder.
   if (normalizedLevel === "A2" && normalizedDay === 8
-    && normalizedKey !== "a2/day-08/im-restaurant-bestellen-und-reagieren.mp3") return null;
+    && !["a2/day-08/day-08.mp3", "a2/day-08/im-restaurant-bestellen-und-reagieren.mp3"].includes(normalizedKey)) return null;
   if (normalizedLevel === "A2" && normalizedDay === 18
     && normalizedKey !== "a2/day-18/bank-telefonat.mp3") return null;
   if (normalizedLevel === "A2" && normalizedDay === 20
