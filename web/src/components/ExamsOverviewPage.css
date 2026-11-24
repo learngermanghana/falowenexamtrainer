@@ -1,490 +1,76 @@
-.exam-room-overview {
-  display: grid;
-  gap: 16px;
-  min-width: 0;
-}
-
-.exam-room-summary {
-  border-radius: 16px;
-  padding: 18px 20px;
-  color: #fff;
-  background: linear-gradient(125deg, #0f172a, #1e40af);
-}
-
-.exam-room-summary-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.exam-room-eyebrow {
-  margin: 0 0 5px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.exam-room-summary h2 {
-  margin: 0;
-  font-size: clamp(20px, 3vw, 26px);
-  line-height: 1.2;
-}
-
-.exam-room-summary-intro {
-  margin: 6px 0 0;
-  font-size: 13px;
-  line-height: 1.45;
-  opacity: 0.9;
-}
-
-.exam-room-level {
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 9px;
-  padding: 6px 9px;
-  font-weight: 800;
-}
-
-.exam-room-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px;
-  margin-top: 15px;
-}
-
-.exam-room-metric {
-  padding: 11px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.exam-room-metric strong {
-  display: block;
-  font-size: clamp(18px, 3vw, 23px);
-}
-
-.exam-room-metric span {
-  display: block;
-  margin-top: 2px;
-  font-size: 11px;
-  line-height: 1.35;
-}
-
-.exam-room-coverage {
-  margin-top: 13px;
-}
-
-.exam-room-coverage-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-
-.exam-room-coverage-track {
-  overflow: hidden;
-  height: 7px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.24);
-}
-
-.exam-room-coverage-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: #93c5fd;
-}
-
-.exam-room-coverage-note {
-  margin: 6px 0 0;
-  opacity: 0.85;
-  font-size: 11px;
-}
-
-.exam-room-mock-entry,
-.exam-room-skill,
-.exam-room-text-action {
-  font: inherit;
-  cursor: pointer;
-}
-
-.exam-room-mock-entry {
-  box-sizing: border-box;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 17px;
-  text-align: left;
-  color: #172554;
-  background: linear-gradient(125deg, #eff6ff 0%, #dbeafe 100%);
-  border: 2px solid #2563eb;
-  border-radius: 18px;
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.10);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.exam-room-mock-entry:hover {
-  background: #dbeafe;
-  box-shadow: 0 9px 25px rgba(37, 99, 235, 0.16);
-  transform: translateY(-1px);
-}
-
-.exam-room-mock-entry:focus-visible,
-.exam-room-skill:focus-visible {
-  outline: 3px solid #1d4ed8;
-  outline-offset: 3px;
-}
-
-.exam-room-mock-icon {
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  flex-shrink: 0;
-  border-radius: 11px;
-  background: #1d4ed8;
-  color: white;
-  font-size: 22px;
-}
-
-.exam-room-mock-copy {
-  min-width: 0;
-  display: grid;
-  gap: 4px;
-  flex: 1;
-}
-
-.exam-room-mock-copy strong {
-  font-size: clamp(20px, 3vw, 25px);
-  color: #1e3a8a;
-}
-
-.exam-room-mock-copy .exam-room-mock-eyebrow,
-.exam-room-skills-eyebrow {
-  color: #1d4ed8;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.exam-room-mock-copy .exam-room-mock-action {
-  box-sizing: border-box;
-  min-width: 0;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  justify-self: start;
-  margin-top: 8px;
-  padding: 9px 13px;
-  border-radius: 10px;
-  background: #1d4ed8;
-  color: white;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.exam-room-skills-heading {
-  padding: 14px 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  background: #f8fafc;
-}
-
-.exam-room-mock-copy span {
-  color: #334155;
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.exam-room-arrow {
-  flex-shrink: 0;
-  font-size: 23px;
-  font-weight: 700;
-}
-
-.exam-room-skills-heading h3,
-.exam-room-activity h3 {
-  margin: 0 0 4px;
-  color: #0f172a;
-  font-size: 19px;
-}
-
-.exam-room-skills-heading p,
-.exam-room-activity p {
-  margin: 0;
-  color: #475569;
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-.exam-room-skills-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 11px;
-}
-
-.exam-room-skill {
-  min-width: 0;
-  display: grid;
-  align-content: space-between;
-  gap: 11px;
-  padding: 13px;
-  text-align: left;
-  color: #0f172a;
-  background: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 12px;
-  transition: border-color 0.15s, background-color 0.15s;
-}
-
-.exam-room-skill:hover {
-  background: #f8fafc;
-  border-color: #64748b;
-}
-
-.exam-room-skill-recommended {
-  border-color: #2563eb;
-}
-
-.exam-room-skill-top,
-.exam-room-skill-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 6px;
-}
-
-.exam-room-skill-icon {
-  font-size: 23px;
-}
-
-.exam-room-skill-suggested {
-  color: #1d4ed8;
-  font-weight: 700;
-  font-size: 10px;
-  text-align: right;
-}
-
-.exam-room-skill-title {
-  display: block;
-  margin-top: 8px;
-  font-weight: 800;
-  font-size: 16px;
-}
-
-.exam-room-skill-description,
-.exam-room-skill-bottom {
-  font-size: 12px;
-  color: #475569;
-}
-
-.exam-room-skill-description {
-  display: block;
-  margin-top: 2px;
-}
-
-.exam-room-skill-bottom .exam-room-arrow {
-  color: #1d4ed8;
-  font-size: 18px;
-}
-
-.exam-room-suggestion {
-  margin: 10px 0 0;
-  color: #475569;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.exam-room-activity {
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 15px;
-  background: #fff;
-}
-
-.exam-room-warmup {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.exam-room-warmup-icon {
-  font-size: 22px;
-}
-
-.exam-room-warmup-copy {
-  flex: 1;
-  min-width: 0;
-}
-
-.exam-room-warmup-copy strong {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 2px;
-}
-
-.exam-room-text-action {
-  flex-shrink: 0;
-  border: 0;
-  padding: 8px 2px;
-  background: transparent;
-  color: #1d4ed8;
-  font-weight: 800;
-  font-size: 12px;
-  text-align: right;
-}
-
-.exam-room-text-action:hover {
-  text-decoration: underline;
-}
-
-.exam-room-mock-entry:focus-visible,
-.exam-room-skill:focus-visible,
-.exam-room-text-action:focus-visible {
-  outline: 3px solid #2563eb;
-  outline-offset: 3px;
-}
-
-.exam-room-recent-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.exam-room-recent-list {
-  list-style: none;
-  margin: 12px 0 0;
-  padding: 0;
-  display: grid;
-  gap: 7px;
-}
-
-.exam-room-recent-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  border-radius: 9px;
-  padding: 10px;
-  background: #f8fafc;
-}
-
-.exam-room-recent-item strong {
-  color: #0f172a;
-  font-size: 13px;
-}
-
-.exam-room-recent-item p {
-  overflow-wrap: anywhere;
-}
-
-.exam-room-recent-score {
-  flex-shrink: 0;
-  font-size: 15px !important;
-}
-
-.exam-room-status {
-  margin-top: 10px !important;
-}
-
-@media (min-width: 800px) {
-  .exam-room-skills-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 410px) {
-  .exam-room-summary {
-    padding: 15px;
-  }
-  .exam-room-metric {
-    padding: 9px 7px;
-  }
-  .exam-room-mock-entry {
-    padding: 13px;
-    gap: 10px;
-  }
-  .exam-room-mock-icon {
-    width: 39px;
-    height: 39px;
-  }
-  .exam-room-skill {
-    padding: 11px;
-  }
-  .exam-room-warmup {
-    flex-wrap: wrap;
-  }
-  .exam-room-warmup .exam-room-text-action {
-    margin-left: 33px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .exam-room-skill {
-    transition: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .exam-room-mock-entry { padding: 15px 12px; gap: 10px; align-items: flex-start; }
-  .exam-room-mock-icon { width: 38px; height: 38px; font-size: 19px; }
-  .exam-room-mock-copy .exam-room-mock-action { width: 100%; justify-content: center; text-align: center; }
-  .exam-room-skills-heading { padding: 12px; }
-}
-
-/* Add trends to the existing skill cards without a second progress dashboard. */
-.exam-room-skill-trend {
-  display: grid;
-  gap: 3px;
-  color: #475569;
-  font-size: 11px;
-  line-height: 1.4;
-  margin-top: -4px;
-}
-.exam-room-skill-change {
-  font-weight: 700;
-  color: #1e40af;
-}
-
-
-/* Performance, booked exam date and recommendations use the existing overview. */
-.exam-room-performance {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 18px;
-  margin-top: 16px;
-  padding: 16px;
-  border: 1px solid #dbe4ee;
-  background: #fff;
-  border-radius: 12px;
-}
-.exam-room-performance h3, .exam-room-countdown h3 { margin: 0 0 6px; font-size: 16px; color: #0f172a; }
-.exam-room-overall-score { display:block; font-size: 32px; line-height: 1.2; color:#0f172a; font-variant-numeric:tabular-nums; }
-.exam-room-performance p, .exam-room-countdown p { margin: 6px 0; font-size: 13px; color:#475569; }
-.exam-room-performance small, .exam-room-countdown small { color: #475569; font-size: 11px; }
-.exam-room-performance-skills { display:grid; gap: 9px; align-content:center; }
-.exam-room-performance-skill { display:grid; grid-template-columns:1fr auto; gap:5px; font-size:12px; color:#334155; }
-.exam-room-performance-track { grid-column:1 / -1; height:6px; border-radius:6px; background:#e2e8f0; overflow:hidden; }
-.exam-room-performance-track > div { height:100%; background:#2563eb; border-radius:6px; }
-.exam-room-countdown { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-top:12px; padding:14px; border:1px solid #dbe4ee; border-radius:12px; background:#fff; }
-.exam-room-date-control { display:flex; flex-wrap:wrap; align-items:end; gap:8px; }
-.exam-room-date-control label { display:grid; gap:5px; font-size:12px; font-weight:700; color:#334155; }
-.exam-room-date-control input { min-height:40px; max-width:100%; font:inherit; padding:6px; border:1px solid #94a3b8; border-radius:8px; color:#0f172a; background:#fff; }
-.exam-room-next-activity { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px 12px; }
+.exam-room-overview { display:grid; gap:14px; min-width:0; color:#0f172a; }
+.exam-room-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; }
+.exam-room-heading h2 { margin:0; font-size:clamp(20px,2.5vw,25px); line-height:1.3; }
+.exam-room-mock-entry,.exam-room-skill,.exam-room-text-action { font:inherit; cursor:pointer; }
+.exam-room-mock-entry { width:100%; box-sizing:border-box; display:flex; align-items:center; gap:12px; padding:14px 16px; text-align:left; color:#fff; background:#1e40af; border:1px solid #1e40af; border-radius:12px; }
+.exam-room-mock-entry:hover { background:#1e3a8a; }
+.exam-room-mock-icon { font-size:24px; flex-shrink:0; }
+.exam-room-mock-copy { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:4px 14px; flex:1; min-width:0; }
+.exam-room-mock-copy strong { grid-column:1; font-size:19px; }
+.exam-room-mock-copy > span:not(.exam-room-mock-action) { grid-column:1; font-size:13px; color:#e0e7ff; line-height:1.4; }
+.exam-room-mock-action { grid-column:2; grid-row:1 / span 2; padding:9px 12px; border-radius:8px; background:#fff; color:#1e40af; font-size:13px; font-weight:700; text-align:center; }
+.exam-room-skills-heading h3,.exam-room-activity h3,.exam-room-performance h3 { margin:0; font-size:16px; font-weight:700; }
+.exam-room-skills-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:8px; }
+.exam-room-skill { min-width:0; display:grid; align-content:space-between; gap:9px; padding:12px; text-align:left; color:#0f172a; background:#fff; border:1px solid #cbd5e1; border-radius:10px; }
+.exam-room-skill:hover { background:#f8fafc; border-color:#64748b; }
+.exam-room-skill-recommended { border-color:#2563eb; }
+.exam-room-skill-top,.exam-room-skill-bottom { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.exam-room-skill-icon { font-size:20px; }
+.exam-room-skill-suggested { color:#1d4ed8; font-size:10px; font-weight:700; text-align:right; }
+.exam-room-skill-title { display:block; font-size:16px; font-weight:700; margin-top:4px; }
+.exam-room-skill-description,.exam-room-skill-bottom,.exam-room-skill-reason { font-size:12px; color:#475569; line-height:1.4; }
+.exam-room-skill-description,.exam-room-skill-reason { display:block; }
+.exam-room-skill-reason { margin-top:5px; }
+.exam-room-arrow { flex-shrink:0; color:#1d4ed8; font-size:18px; font-weight:700; }
+.exam-room-summary,.exam-room-activity { border:1px solid #e2e8f0; border-radius:12px; padding:14px; background:#fff; min-width:0; }
+.exam-room-performance { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; gap:14px; }
+.exam-room-overall-score { display:block; font-size:28px; font-weight:800; line-height:1.2; margin-top:5px; font-variant-numeric:tabular-nums; }
+.exam-room-performance p,.exam-room-activity p { margin:4px 0; color:#475569; font-size:12px; line-height:1.45; }
+.exam-room-performance small,.exam-room-countdown small { color:#475569; font-size:11px; line-height:1.4; }
+.exam-room-performance-skills { display:grid; gap:8px; }
+.exam-room-performance-skill { display:grid; grid-template-columns:1fr auto; gap:4px; font-size:12px; color:#334155; }
+.exam-room-performance-track,.exam-room-coverage-track { height:5px; grid-column:1 / -1; border-radius:999px; background:#e2e8f0; overflow:hidden; }
+.exam-room-performance-track > div,.exam-room-coverage-fill { height:100%; background:#2563eb; border-radius:999px; }
+.exam-room-skill-detail { grid-column:1 / -1; }
+.exam-room-metrics { display:flex; flex-wrap:wrap; gap:7px 18px; margin-top:12px; padding-top:10px; border-top:1px solid #e2e8f0; }
+.exam-room-metric { display:flex; align-items:baseline; gap:5px; }
+.exam-room-metric strong { font-size:14px; font-variant-numeric:tabular-nums; }
+.exam-room-metric span { font-size:12px; color:#475569; }
+.exam-room-coverage { margin-top:9px; }
+.exam-room-coverage-heading { display:flex; justify-content:space-between; gap:8px; font-size:12px; color:#475569; margin-bottom:4px; }
+.exam-room-coverage-note { margin:4px 0 0; color:#475569; font-size:11px; }
+.exam-room-countdown { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin:0; }
+.exam-room-countdown h3 { margin:0; font-size:14px; color:#0f172a; }
+.exam-room-countdown p { margin:3px 0; font-size:12px; color:#475569; }
+.exam-room-countdown--compact { gap:5px 10px; }
+.exam-room-countdown--compact > div:first-child { min-width:0; }
+.exam-room-date-control { display:flex; flex-wrap:wrap; align-items:end; gap:6px; }
+.exam-room-date-control label { display:grid; gap:3px; font-size:11px; color:#334155; font-weight:600; }
+.exam-room-date-control input { min-height:36px; box-sizing:border-box; max-width:100%; font:inherit; padding:5px 7px; color:#0f172a; background:#fff; border:1px solid #94a3b8; border-radius:6px; }
+.exam-room-date-picker-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 16px; }
+.exam-room-date-picker-row .exam-room-countdown { flex:0 1 auto; }
+.exam-room-suggestion { margin:8px 0 0; color:#475569; font-size:12px; line-height:1.4; }
+.exam-room-next-activity,.exam-room-recent-heading,.exam-room-warmup { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px 12px; }
 .exam-room-next-activity p { margin:0; flex:1 1 220px; }
-@media (max-width:600px) {
-  .exam-room-performance { grid-template-columns:1fr; padding:12px; }
-  .exam-room-countdown { align-items:flex-start; }
-  .exam-room-next-activity .exam-room-text-action { text-align:left; }
+.exam-room-text-action { flex-shrink:0; border:0; padding:5px 2px; background:transparent; color:#1d4ed8; font-size:12px; font-weight:700; text-align:right; }
+.exam-room-text-action:hover { text-decoration:underline; }
+.exam-room-mock-entry:focus-visible,.exam-room-skill:focus-visible,.exam-room-text-action:focus-visible { outline:3px solid #2563eb; outline-offset:3px; }
+.exam-room-recent-list { list-style:none; margin:7px 0 0; padding:0; display:grid; }
+.exam-room-recent-item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-top:1px solid #e2e8f0; }
+.exam-room-recent-item strong { font-size:13px; color:#0f172a; }
+.exam-room-recent-item p { overflow-wrap:anywhere; margin:2px 0 0; }
+.exam-room-recent-score { flex-shrink:0; font-variant-numeric:tabular-nums; }
+.exam-room-status { margin-top:7px!important; }
+.exam-room-warmup-icon { font-size:20px; }
+.exam-room-warmup-copy { flex:1; min-width:0; }
+.exam-room-warmup-copy strong { font-size:14px; }
+.exam-room-warmup-copy p { margin:2px 0 0; }
+@media(min-width:800px) { .exam-room-skills-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+@media(max-width:600px) {
+  .exam-room-overview { gap:12px; }
+  .exam-room-performance { grid-template-columns:1fr; }
+  .exam-room-mock-copy { grid-template-columns:1fr; }
+  .exam-room-mock-action { grid-column:1; grid-row:auto; justify-self:start; margin-top:3px; }
+  .exam-room-date-picker-row .exam-room-countdown { width:100%; padding-top:8px; border-top:1px solid #e2e8f0; }
 }
+@media(max-width:360px) { .exam-room-skill { padding:9px; } .exam-room-countdown--compact { align-items:flex-start; } }
