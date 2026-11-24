@@ -141,6 +141,450 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Server-issued grants bind the authenticated owner, assignment level, live
+    // profile and independent enrollment version. Expired grants cannot write.
+    function matchingProfile(p, f) {
+      return p.get('status', null) == f.get('status', null) &&
+        p.get('program', null) == f.get('program', null) &&
+        p.get('level', null) == f.get('level', null) &&
+        p.get('paymentStatus', null) == f.get('paymentStatus', null) &&
+        p.get('paid', null) == f.get('paid', null) &&
+        p.get('paidAmount', null) == f.get('paidAmount', null) &&
+        p.get('balanceDue', null) == f.get('balanceDue', null) &&
+        p.get('balance', null) == f.get('balance', null) &&
+        p.get('contractStart', null) == f.get('contractStart', null) &&
+        p.get('contractEnd', null) == f.get('contractEnd', null) &&
+        p.get('trialStatus', null) == f.get('trialStatus', null) &&
+        p.get('trialStartedAt', null) == f.get('trialStartedAt', null) &&
+        p.get('trialEndsAt', null) == f.get('trialEndsAt', null) &&
+        p.get('accountType', null) == f.get('accountType', null) &&
+        p.get('coursePlacements', null) == f.get('coursePlacements', null) &&
+        p.get('secondaryProgram', null) == f.get('secondaryProgram', null);
+    }
+    function enrollmentVersionMatches(g, level) {
+      let id = 'german-' + level;
+      let ref = /databases/$(database)/documents/students/$(g.profileId)/levelEnrollments/$(id);
+      let version = g.get('enrollmentVersions', {}).get(level, 0);
+      return exists(ref) ? get(ref).data.get('sheetVersion', 1) == version : version == 0;
+    }
+    function validWorkGrant(g, data, timed) {
+      let profileRef = /databases/$(database)/documents/students/$(g.profileId);
+      let p = get(profileRef).data;
+      let level = data.get('level', '');
+      let key = data.get('assignmentKey', '');
+      return g.uid == request.auth.uid && g.expiresAtMs > request.time.toMillis() &&
+        p.get('uid', '') == request.auth.uid && matchingProfile(p, g.profileFields) &&
+        level in ['A1','A2','B1','B2','C1','C2'] && level in g.levels &&
+        enrollmentVersionMatches(g, level) &&
+        key is string && key.upper().matches('^' + level + '([-._ ].*)?
+    // Students can save/retrieve their own drafts, submissions, and one-time submission locks.
+    // Staff can read/write for support and grading workflows.
+    match /submissionDrafts/{draftId} {
+      allow create: if (canWriteCourseWork(request.resource.data, false) && ownsStudentIncoming()) || isStaff();
+      allow read: if ownsStudentResource() || isStaff();
+      allow update: if (canWriteCourseWork(request.resource.data, false) && ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow delete: if ownsStudentResource() || isStaff();
+    }
+
+    // Scores and marking decisions are server/staff-owned even on student submissions.
+    function hasNoMarkingFields() {
+      return !request.resource.data.keys().hasAny([
+        'markingStatus', 'finalScore', 'aiFeedback', 'feedbackSentToStudent',
+        'automaticMarking', 'resultUrl', 'markingUpdatedAt'
+      ]);
+    }
+    function markingFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'markingStatus', 'finalScore', 'aiFeedback', 'feedbackSentToStudent',
+        'automaticMarking', 'resultUrl', 'markingUpdatedAt'
+      ]);
+    }
+    match /submissions/{submissionId} {
+      allow create: if (canWriteCourseWork(request.resource.data, false) && ownsStudentIncoming() && hasNoMarkingFields()) || isStaff();
+      allow read: if ownsStudentResource() || isStaff();
+      allow update: if (canWriteCourseWork(request.resource.data, false) && ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged() && markingFieldsUnchanged()) || isStaff();
+      allow delete: if isStaff();
+    }
+
+    match /submissionLocks/{lockId} {
+      allow create: if (canWriteCourseWork(request.resource.data, request.resource.data.get("timerRecord",false)) && ownsStudentIncoming()) || isStaff();
+      // The timed-assignment UI listens to a student's deterministic lock ID
+      // before the first attempt exists. An absent document has no resource.data
+      // for ownsStudentResource() to check; permit only this owner's missing lock.
+      // Existing lock contents remain subject to the ownership check below.
+      allow get: if signedIn()
+        && resource == null
+        && lockId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+$');
+      allow read: if ownsStudentResource() || isStaff();
+      allow update: if (canWriteCourseWork(request.resource.data, request.resource.data.get("timerRecord",false)) && ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow delete: if isStaff();
+    }
+
+    // Timed assignment attempts are one-use student records.
+    // Students may create their own attempt and move it forward only.
+    // Staff may delete an attempt to explicitly reset it.
+    match /timedAssignmentAttempts/{attemptId} {
+      allow create: if canWriteCourseWork(request.resource.data, true) && ownsStudentIncoming()
+        && request.resource.data.status == 'active'
+        && request.resource.data.startedAt == request.time
+        && request.resource.data.durationSeconds is int
+        && request.resource.data.durationSeconds > 0
+        && request.resource.data.durationSeconds <= 7200;
+
+      // A missing first attempt has no owner fields: allow only own ID.
+      allow get: if signedIn()
+        && resource == null
+        && attemptId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+');
+      allow read: if ownsStudentResource() || isStaff();
+
+      allow update: if isStaff() || (
+        canWriteCourseWork(request.resource.data, true) && ownsStudentResource()
+        && ownsStudentIncoming()
+        && ownershipFieldsUnchanged()
+        && request.resource.data.assignmentKey == resource.data.assignmentKey
+        && request.resource.data.level == resource.data.level
+        && request.resource.data.durationSeconds == resource.data.durationSeconds
+        && request.resource.data.startedAt == resource.data.startedAt
+        && request.resource.data.clientStartedAt == resource.data.clientStartedAt
+        && (
+          (resource.data.status == 'active' && request.resource.data.status in ['active', 'expired', 'submitted'])
+          || (resource.data.status == 'expired' && request.resource.data.status in ['expired', 'submitted'])
+          || (resource.data.status == 'submitted' && request.resource.data.status == 'submitted')
+        )
+      );
+
+      allow delete: if isStaff();
+    }
+
+    // Shared, canonical A1-C1 course progress snapshot.
+    // Students own their own snapshot; staff can read it for Admin/email/reporting.
+    match /courseCompletionSnapshots/{snapshotId} {
+      allow create: if ownsStudentIncoming() || isStaff();
+      allow read: if ownsStudentResource() || isStaff();
+      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow delete: if ownsStudentResource() || isStaff();
+    }
+
+    match /writingReferences/{docId} {
+      allow create: if ownsIncoming();
+      allow read: if ownsResource() || isStaff();
+      allow update: if ownsResource() && ownsIncoming() && ownershipFieldsUnchanged();
+      allow delete: if ownsResource();
+    }
+
+    match /savedWriting/{docId} {
+      allow create: if ownsIncoming();
+      allow read: if ownsResource() || isStaff();
+      allow update: if ownsResource() && ownsIncoming() && ownershipFieldsUnchanged();
+      allow delete: if ownsResource();
+    }
+
+    match /writingFeedback/{docId} {
+      allow create: if ownsIncoming();
+      allow read: if ownsResource() || isStaff();
+      allow update: if ownsResource() && ownsIncoming() && ownershipFieldsUnchanged();
+      allow delete: if ownsResource();
+    }
+
+    // Live, ungraded classroom multiple-choice responses.
+    // Signed-in users may read class responses. Students may only create/update
+    // their own response document; staff may manage them for classroom support.
+    match /classResponses/{responseId} {
+      allow read: if signedIn();
+      allow create: if ownsStudentIncoming() || isStaff();
+      allow update: if (
+        ownsStudentResource() &&
+        ownsStudentIncoming() &&
+        ownershipFieldsUnchanged()
+      ) || isStaff();
+      allow delete: if ownsStudentResource() || isStaff();
+    }
+
+    // Canonical live-class records are readable by signed-in students.
+    // Only admins and tutors can change scheduling and communication records.
+    match /classes/{document=**} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+    match /classSessions/{document=**} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+    match /zoomProfiles/{document=**} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+    match /calendarFeeds/{document=**} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+    match /auditLogs/{document=**} {
+      allow read, write: if isStaff();
+    }
+    match /emailQueue/{document=**} {
+      allow read, write: if isStaff();
+    }
+
+    // Existing Falowen collections that previously used the authenticated
+    // fallback are listed explicitly so they cannot override private writing
+    // and user-document rules.
+    match /aiAuditLogs/{document=**} { allow read, write: if courseUser(); }
+    match /announcements/{document=**} { allow read, write: if courseUser(); }
+    match /archived/{document=**} { allow read, write: if courseUser(); }
+    match /assignmentProgress/{document=**} { allow read, write: if courseUser(); }
+    match /attendance/{document=**} { allow read, write: if courseUser(); }
+    match /class_board/{document=**} { allow read, write: if courseUser(); }
+    match /class_lesson_notes/{document=**} { allow read, write: if courseUser(); }
+    match /grammarQuestions/{document=**} { allow read, write: if courseUser(); }
+    match /group_discussion/{document=**} { allow read, write: if courseUser(); }
+    match /language/{document=**} { allow read, write: if courseUser(); }
+    match /leadCaptures/{document=**} { allow read, write: if courseUser(); }
+    match /lessonProgress/{document=**} { allow read, write: if courseUser(); }
+    match /loginSessions/{document=**} { allow read, write: if signedIn(); }
+    match /notifications/{document=**} { allow read, write: if signedIn(); }
+    match /paystackInitRequests/{document=**} { allow read, write: if courseUser(); }
+    match /paystackWebhookEvents/{document=**} { allow read, write: if courseUser(); }
+    match /presentationSessions/{document=**} { allow read, write: if courseUser(); }
+    match /qa_posts/{document=**} { allow read, write: if courseUser(); }
+    match /publishedAnswerReferences/{referenceId} {
+      allow get: if isStaff() || (courseUser() && resource.data.studentId == request.auth.uid);
+      allow create: if isStaff();
+    }
+    match /scores/{document=**} { allow read: if courseUser(); allow write: if isStaff(); }
+    match /sessions/{document=**} { allow read, write: if courseUser(); }
+    match /studentActivityEvents/{document=**} { allow read, write: if courseUser(); }
+    match /studentNotifications/{document=**} { allow read, write: if courseUser(); }
+    match /accountDeletionRequests/{uid} {
+      allow read: if isStaff() || (request.auth != null && request.auth.uid == uid);
+      allow write: if false;
+    }
+    function hamburgInvitationOpen() {
+      let invitation = /databases/$(database)/documents/universityInvitations/UH-KISWAHILI-A1;
+      return exists(invitation)
+        && get(invitation).data.get('expiresAt', null) is timestamp
+        && request.time < get(invitation).data.expiresAt;
+    }
+
+    match /universityInvitations/UH-KISWAHILI-A1 {
+      allow get: if true;
+      allow create, update: if signedIn()
+        && (request.auth.token.get('admin', false) == true
+          || request.auth.token.get('role', '') == 'admin'
+          || (request.auth.token.get('email_verified', false) == true
+            && request.auth.token.get('email', '') == 'moxflex@gmail.com'))
+        && request.resource.data.keys().hasOnly(['expiresAt'])
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time;
+    }
+
+    match /students/{studentId} {
+      // Recovery may look up a missing UID document before querying the legacy
+      // student-code profile. Only the root profile is readable while paused.
+      allow read: if courseUser() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
+      allow create: if signedIn() && (isStaff() || (!isExamOnly() && request.resource.data.get('courseType', 'full_course') == 'full_course' && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'courseEnrollmentPreserved', 'secondaryProgram', 'coursePlacements', 'courseDiscount', 'courseCheckoutStartedAt'])
+        && request.resource.data.get('uid', '') == request.auth.uid
+        && request.resource.data.get('role', 'student') == 'student'
+        && request.resource.data.get('isTutor', false) == false
+        && request.resource.data.get('paymentStatus', 'pending') in ['pending', 'exempt_pending']
+        && request.resource.data.get('paid', 0) == 0
+        && request.resource.data.get('paidAmount', 0) == 0
+        && request.resource.data.get('initialPaymentAmount', 0) == 0
+        && (request.resource.data.get('balanceDue', null) == null || request.resource.data.balanceDue > 0)
+        && (request.resource.data.get('balance', null) == null || request.resource.data.balance > 0)
+        && request.resource.data.get('institutionVerification', 'pending') == 'pending'
+        && request.resource.data.get('accessType', 'invitation_pending') == 'invitation_pending'
+        && (request.resource.data.get('registrationSource', '') != 'university-invite' || (
+          request.resource.data.get('universityInvitationCode', '') == 'UH-KISWAHILI-A1'
+          && hamburgInvitationOpen()
+          && request.resource.data.get('program', '') == 'swahili'
+          && request.resource.data.get('level', '') == 'A1'
+          && request.resource.data.get('className', '') == ''
+          && !request.resource.data.keys().hasAny(['classId', 'classRecordId', 'assignedClassId', 'contractStart', 'contractTermMonths'])
+          && request.resource.data.get('institutionId', '') == 'university-hamburg'
+          && request.resource.data.get('cohortId', '') == 'university-hamburg-kiswahili-a1'
+          && request.resource.data.get('status', '') == 'registered'
+          && request.resource.data.get('paymentStatus', '') == 'exempt_pending'
+          && request.resource.data.get('trialStatus', '') == 'not_applicable'
+          && !request.resource.data.keys().hasAny(['trialEndsAt', 'trialPurgeAt', 'contractEnd'])
+        ))));
+      allow update: if signedIn() && (isStaff() || (
+        // Only the profile owner can change non-academic account preferences.
+        // Without this check any signed-in student could previously update a
+        // different student's profile by student-code document ID.
+        (resource.data.get('uid', '') == request.auth.uid
+          || studentId == request.auth.uid
+          || (resource.data.get('uid', '') == '' && resource.data.get('email', '') == request.auth.token.email))
+        && (!isExamOnly() || resource.data.get('uid', '') == request.auth.uid)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'role', 'studentCode', 'studentcode', 'program'])
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'courseType', 'courseEnrollmentPreserved', 'secondaryProgram', 'coursePlacements',
+          'institutionId', 'institutionName', 'cohortId', 'instructorName', 'registrationSource', 'universityInvitationCode', 'institutionVerification', 'accessType', 'courseDiscount', 'courseCheckoutStartedAt'])
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'status', 'isTutor', 'paymentStatus', 'paid', 'paidAmount', 'initialPaymentAmount', 'balanceDue', 'balance', 'tuitionFee', 'tuitionCurrency',
+          'contractStart', 'contractEnd', 'contractTermMonths', 'trialStatus', 'trialStartedAt', 'trialUsedAt', 'trialEndsAt', 'trialPurgeAt',
+          'joined_at', 'joinedAt', 'level', 'levelId', 'className', 'classId', 'classRecordId', 'assignedClassId', 'paystackReference'
+        ])
+        && (resource.data.get('courseDiscount', null) == null || resource.data.get('paymentStatus', '') == 'paid' ||
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'tuitionFee', 'tuitionCurrency', 'balanceDue', 'balance', 'paid', 'paidAmount', 'initialPaymentAmount',
+          'paymentStatus', 'contractStart', 'contractEnd', 'contractTermMonths', 'program', 'level', 'levelId'
+        ]))
+        && (resource.data.get('registrationSource', '') != 'university-invite' ||
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'status', 'paymentStatus', 'paid', 'balanceDue', 'tuitionFee',
+            'trialStatus', 'trialStartedAt', 'trialEndsAt', 'trialPurgeAt',
+            'contractStart', 'contractEnd', 'contractTermMonths', 'program', 'level', 'levelId',
+            'className', 'classId', 'classRecordId', 'assignedClassId'
+          ]))
+        && (resource.data.get('secondaryProgram', null) == null || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['program']))
+        && (resource.data.get('accountType', '') != 'exam_only' || (
+          resource.data.uid == request.auth.uid
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'role', 'uid', 'studentCode', 'className', 'program', 'level', 'levelId', 'status', 'paymentStatus',
+            'paid', 'paidAmount', 'initialPaymentAmount', 'balanceDue', 'balance', 'tuitionFee', 'tuitionCurrency',
+            'contractStart', 'contractEnd', 'contractTermMonths', 'paystackReference', 'classId', 'classRecordId', 'assignedClassId',
+            'onboardingCompleted', 'trialStatus', 'trialStartedAt', 'trialEndsAt', 'trialUsedAt', 'trialPurgeAt'
+          ])
+        ))
+      ));
+      allow delete: if isStaff();
+      // Financial enrollment records are server-owned. No broader legacy grant may overlap.
+      match /levelEnrollments/{enrollmentId} {
+        allow read: if isStaff() || (signedIn() && get(/databases/$(database)/documents/students/$(studentId)).data.get("uid", "") == request.auth.uid);
+        allow write: if false;
+        match /{nested=**} { allow read: if isStaff(); allow write: if false; }
+      }
+      match /{collectionId}/{documentId}/{nested=**} {
+        allow read, write: if collectionId != "levelEnrollments" && (courseUser() || (signedIn() && studentId == request.auth.uid));
+      }
+    }
+    // Goethe Speaking practice history is private to the signed-in learner.
+    // No wildcard access: only the authenticated owner's progress may be read
+    // or updated, regardless of the legacy student-code-based document ID.
+    match /speakingProgress/{progressId} {
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, delete: if signedIn() && resource.data.userId == request.auth.uid;
+      allow update: if signedIn() && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
+    }
+    match /studyBuddyUsage/{document=**} { allow read, write: if courseUser(); }
+    match /usageQuotas/{document=**} { allow read, write: if signedIn(); }
+    match /writingScoreStats/{document=**} { allow read, write: if courseUser(); }
+    match /writingSubmissions/{document=**} { allow read, write: if courseUser(); }
+
+
+    // Admin and staff marking/dashboard access, including collection-group queries.
+    // These grants do not change students' existing ownership permissions.
+    match /{path=**}/submissions/{submissionId} {
+      allow read, write: if isStaff();
+    }
+    match /{path=**}/posts/{postId} {
+      allow read, write: if isStaff();
+    }
+    match /examTutorReviewQueue/{document=**} { allow read, write: if isStaff(); }
+    match /ai_issue_reports/{document=**} { allow read, write: if isStaff(); }
+    match /automaticScoreSync/{document=**} { allow read, write: if isStaff(); }
+    match /markingJobs/{document=**} { allow read, write: if isStaff(); }
+    // Generated AI marking drafts are private staff records, not student scores.
+    // The Admin marking screen writes these before a teacher approves the result.
+    match /markingResults/{document=**} { allow read, write: if isStaff(); }
+    match /aiMarkingAudit/{document=**} { allow read, write: if isStaff(); }
+    // Staff-only mock authoring records. Never grant student access or allow
+    // a browser to mark a draft as a published full examination.
+    match /mockFactoryDrafts/{draftId} {
+      allow read: if isStaff();
+      allow create: if isStaff()
+        && request.resource.data.id == draftId
+        && request.resource.data.level in ['A1','A2','B1','B2','C1','C2']
+        && request.resource.data.status in ['draft','review'];
+      allow update: if isStaff()
+        && resource.data.id == draftId
+        && request.resource.data.id == draftId
+        && request.resource.data.level == resource.data.level
+        && request.resource.data.status in ['draft','review'];
+      allow delete: if false;
+    }
+
+    match /answerKeyRegistry/{document=**} { allow read, write: if isStaff(); }
+    match /answerKeySyncRuns/{document=**} { allow read, write: if isStaff(); }
+
+    match /verifiedTutorSpeakingAssessments/{assessmentId} {
+      allow read: if isStaff();
+      allow write: if false;
+    }
+
+    // Shared, staff-only German and Swahili course text and notes.
+    function canUseSharedDictionary() {
+      return signedIn() && (
+        request.auth.token.get('admin', false) == true ||
+        request.auth.token.get('role', '') == 'admin' ||
+        (request.auth.token.get('email_verified', false) == true &&
+          request.auth.token.get('email', '') == 'moxflex@gmail.com') ||
+        (request.auth.token.get('staff', false) == true &&
+          'shared-dictionary' in request.auth.token.get('staffPages', []))
+      );
+    }
+
+    function isDictionaryAdmin() {
+      return request.auth.token.get('admin', false) == true ||
+        request.auth.token.get('role', '') == 'admin' ||
+        (request.auth.token.get('email_verified', false) == true &&
+          request.auth.token.get('email', '') == 'moxflex@gmail.com');
+    }
+
+    function validSharedDictionaryItem() {
+      return request.resource.data.keys().hasOnly([
+          'language', 'courseLevel', 'courseDay', 'chapterId', 'resourceType', 'title', 'content', 'note', 'authorUid', 'authorName', 'createdAt', 'updatedAt'
+        ]) &&
+        request.resource.data.language in ['german', 'swahili'] &&
+        request.resource.data.get('courseLevel', '') in ['', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2'] &&
+        request.resource.data.get('courseDay', 0) is int &&
+        request.resource.data.get('courseDay', 0) >= 0 &&
+        request.resource.data.get('courseDay', 0) <= 60 &&
+        (request.resource.data.language != 'swahili' || request.resource.data.get('courseLevel', '') in ['', 'A1', 'A2', 'B1']) &&
+        request.resource.data.get('chapterId', '') is string &&
+        request.resource.data.get('chapterId', '').size() <= 80 &&
+        request.resource.data.get('resourceType', 'lesson') in ['radio', 'music', 'grammar', 'vocabulary', 'speaking', 'lesson', 'answers', 'other'] &&
+        request.resource.data.title is string && request.resource.data.title.size() > 0 &&
+        request.resource.data.title.size() <= 160 &&
+        request.resource.data.content is string && request.resource.data.content.size() <= 100000 &&
+        request.resource.data.note is string && request.resource.data.note.size() <= 10000 &&
+        request.resource.data.authorUid is string &&
+        request.resource.data.authorName is string && request.resource.data.authorName.size() <= 120;
+    }
+
+    match /sharedLanguageDictionary/{itemId} {
+      allow read: if canUseSharedDictionary() &&
+        (isDictionaryAdmin() ||
+         resource.data.language in request.auth.token.get('staffLanguages', []));
+      allow create: if canUseSharedDictionary() && validSharedDictionaryItem() &&
+        request.resource.data.authorUid == request.auth.uid &&
+        (isDictionaryAdmin() ||
+         request.resource.data.language in request.auth.token.get('staffLanguages', []));
+      allow update: if canUseSharedDictionary() && validSharedDictionaryItem() &&
+        (isDictionaryAdmin() || (resource.data.authorUid == request.auth.uid &&
+          resource.data.language in request.auth.token.get('staffLanguages', []) &&
+          request.resource.data.authorUid == request.auth.uid &&
+          request.resource.data.language == resource.data.language));
+      allow delete: if canUseSharedDictionary() &&
+        (isDictionaryAdmin() || (resource.data.authorUid == request.auth.uid &&
+          resource.data.language in request.auth.token.get('staffLanguages', [])));
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+) &&
+        data.get('assignmentId', key) == key && data.get('assignment_id', key) == key &&
+        data.get('canonicalAssignmentKey', key) == key &&
+        (g.mode == 'full' || (!timed && g.mode == 'trial' && key in g.day1Keys));
+    }
+    function canWriteCourseWork(data, timed) {
+      let ref = /databases/$(database)/documents/courseSubmissionAccess/$(request.auth.uid);
+      return courseUser() && exists(ref) && validWorkGrant(get(ref).data, data, timed);
+    }
+
     // Assignment submission persistence.
     // Students can save/retrieve their own drafts, submissions, and one-time submission locks.
     // Staff can read/write for support and grading workflows.

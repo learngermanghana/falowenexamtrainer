@@ -247,3 +247,16 @@ test('students cannot create a forged paid profile',async()=>{
  const db=env.authenticatedContext(uid).firestore();
  await assertFails(setDoc(doc(db,'students',uid),{uid,role:'student',program:'german',paymentStatus:'paid',balanceDue:0}));
 });
+
+test('independent ledger privacy and version changes protect direct work writes',async()=>{
+ const uid='level-ledger-owner';await seedAccess(uid,'A2');
+ const owner=env.authenticatedContext(uid).firestore();const other=env.authenticatedContext('another-ledger-user').firestore();
+ const a2='students/'+uid+'/levelEnrollments/german-A2',a1='students/'+uid+'/levelEnrollments/german-A1';
+ const data={studentId:uid,level:'A2',assignmentKey:'A2-1.1'};
+ await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();await setDoc(doc(db,a2),{program:'german',level:'A2',balanceDue:1000,sheetVersion:2});await setDoc(doc(db,a1),{program:'german',level:'A1',balanceDue:0,sheetVersion:1});await setDoc(doc(db,'courseSubmissionAccess',uid),{enrollmentVersions:{A1:1,A2:2}},{merge:true});});
+ await assertSucceeds(getDoc(doc(owner,a2)));await assertFails(getDoc(doc(other,a2)));await assertFails(setDoc(doc(owner,a2),{balanceDue:0},{merge:true}));
+ await assertSucceeds(setDoc(doc(owner,'submissionDrafts','ledger-before'),data));
+ await env.withSecurityRulesDisabled(async ctx=>{await setDoc(doc(ctx.firestore(),a2),{sheetVersion:3,status:'expired'},{merge:true});});
+ await assertFails(setDoc(doc(owner,'submissionDrafts','ledger-after'),data));
+ await assertSucceeds(setDoc(doc(owner,'submissionDrafts','ledger-a1'),{...data,level:'A1',assignmentKey:'A1-1.1'}));
+});
