@@ -8,7 +8,7 @@ const publicRoute = new RegExp(`^/swahili(?:/(${A1_DAY_SEGMENT}))?/?$`);
 const campusLessonRoute = new RegExp(`^/campus/course/swahili/${A1_DAY_SEGMENT}$`);
 
 export const matchSwahiliPreview = (pathname) => String(pathname).match(publicRoute);
-export const isSwahiliCampusLesson = (pathname) => campusLessonRoute.test(pathname) || pathname === "/campus/course/swahili/b1/day-28";
+export const isSwahiliCampusLesson = (pathname) => campusLessonRoute.test(pathname) || /^\/campus\/course\/swahili\/b1\/day-(26|28)$/.test(pathname);
 
 export const getSwahiliCampusRoute = ({ pathname = "", search = "", user, studentProfile } = {}) => {
   if (!user || String(studentProfile?.program || "").trim().toLowerCase() !== "swahili") {
