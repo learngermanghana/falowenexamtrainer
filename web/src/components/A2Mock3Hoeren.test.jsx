@@ -75,3 +75,21 @@ test("four-part answers are isolated between students and remain a practice resu
   expect(screen.queryByText(/keine vollständige A2-Prüfung/i)).not.toBeInTheDocument();
   expect(screen.getByRole("note").textContent).toMatch(/kein offizielles/i);
 });
+
+test("submitted Mock 3 Hören points out every wrong answer and shows its correction", () => {
+  const { container } = mount();
+  for (let part = 1; part <= 4; part += 1) {
+    if (part > 1) fireEvent.click(screen.getByRole("button", { name: new RegExp(`Teil ${part}`) }));
+    for (const [index, fieldset] of Array.from(container.querySelectorAll("fieldset")).entries()) {
+      const radios = fieldset.querySelectorAll('input[type="radio"]');
+      fireEvent.click(radios[part === 1 && index === 0 ? 1 : 0]);
+    }
+  }
+  fireEvent.click(screen.getByRole("button", { name: /Antworten zu allen vier Teilen prüfen/i }));
+
+  expect(screen.getAllByText("Incorrect", { selector: "p" }).length).toBeGreaterThan(0);
+  expect(screen.getByText(/Correct answer: Die Buslinie 45 nutzen/)).toBeInTheDocument();
+  expect(screen.getByText(/Listening clue: Bitte nutzen Sie alternativ die Buslinie 45/)).toBeInTheDocument();
+  expect(container.querySelectorAll(".a2-mock3-hoeren-review article")).toHaveLength(20);
+  expect(container.querySelectorAll(".a2-mock3-hoeren-review article.is-incorrect").length).toBeGreaterThan(0);
+});

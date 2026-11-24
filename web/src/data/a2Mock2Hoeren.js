@@ -321,4 +321,19 @@ export const A2_MOCK_2_HOEREN = Object.freeze([
     "audioObjectKey": "a2/mock-horen-2/teil-4.mp3"
   }
 ]);
+
+// Teil 3 uses illustrated answer cards for questions 11–15. Keep the full
+// answer text in the option for screen readers and for the written exam cue.
+const A2_MOCK_2_HOEREN_ILLUSTRATED_QUESTIONS = new Set([11, 12, 13, 14, 15]);
+for (const part of A2_MOCK_2_HOEREN) {
+  if (part.id !== "teil-3") continue;
+  for (const question of part.questions) {
+    if (!A2_MOCK_2_HOEREN_ILLUSTRATED_QUESTIONS.has(question.number)) continue;
+    question.options.forEach((option, index) => {
+      option.imagePath = `/exams/a2/mock-02/teil-3/q${question.number}-${String.fromCharCode(97 + index)}.svg`;
+      option.imageAlt = `${option.label} illustration`;
+    });
+  }
+}
+
 export const A2_MOCK_2_HOEREN_QUESTIONS = A2_MOCK_2_HOEREN.flatMap(part => part.questions);

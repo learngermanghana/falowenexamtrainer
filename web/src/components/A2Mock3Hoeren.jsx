@@ -16,6 +16,11 @@ const PARTS = [
   { id: "teil-4", number: 4, label: "Karriere im Alltag", data: { ...teil4, questions: teil4.questions.map((q, i) => ({ ...q, number: 16 + i })) } },
 ];
 const answersKey = uid => `falowen:a2:mock-03:hoeren-teile-3-4:${uid || "guest"}:v1`;
+const answerLabel = (question, answer) => {
+  if (!answer) return "No answer";
+  if (question.options) return question.options.find(option => option.id === answer)?.label || answer;
+  return answer.toLowerCase() === "richtig" ? "Richtig" : answer.toLowerCase() === "falsch" ? "Falsch" : answer;
+};
 const restore = uid => {
   if (!uid) return {};
   try { return JSON.parse(localStorage.getItem(answersKey(uid)) || "{}") || {}; }
@@ -177,9 +182,28 @@ export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewRele
           <section aria-live="polite">
             <h2>{embedded ? "Hören abgegeben" : `Hören-Übungsergebnis: ${score}/20`}</h2>
             <p>{embedded ? "Der Hören-Score wird mit den anderen drei Modulen durch den Server geprüft." : "Dies ist ausschließlich die lokale Hören-Übungsauswertung für vier Teile, keine verifizierte viermodulige Mock-Prüfungsnote."}</p>
-            {!embedded ? <button type="button" onClick={() => {
-              setAnswers({}); setSubmitted(false); setStarted({}); setAudioUrl("");
-            }}>Neu üben</button> : null}
+            {!embedded ? <>
+              <div className="a2-mock3-hoeren-review" aria-label="Question by question review">
+                {PARTS.map(item => <section key={item.id}>
+                  <h3>Teil {item.number} · {item.label}</h3>
+                  {item.data.questions.map(question => {
+                    const expected = String(question.answer).toLowerCase();
+                    const selected = String(answers[question.number] || "").toLowerCase();
+                    const isCorrect = selected === expected;
+                    return <article key={question.number} className={isCorrect ? "is-correct" : "is-incorrect"}>
+                      <strong>{question.number}. {question.question}</strong>
+                      <p role="status">{isCorrect ? "Correct" : "Incorrect"}</p>
+                      <p>Your answer: {answerLabel(question, answers[question.number])}</p>
+                      {!isCorrect ? <p>Correct answer: {answerLabel(question, question.answer)}</p> : null}
+                      {question.evidence ? <small>Listening clue: {question.evidence}</small> : null}
+                    </article>;
+                  })}
+                </section>)}
+              </div>
+              <button type="button" onClick={() => {
+                setAnswers({}); setSubmitted(false); setStarted({}); setAudioUrl("");
+              }}>Neu üben</button>
+            </> : null}
           </section>
         )}
       </section>

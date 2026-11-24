@@ -1,1 +1,8 @@
 .a2-mock2-audio{background:#eef6f1;border:1px solid #cbded2;border-radius:14px;padding:18px;margin:18px 0}.a2-mock2-audio button{padding:10px 16px;border-radius:10px;background:#176b45;color:white;border:none;cursor:pointer}.a2-mock2-audio button:disabled{opacity:.6;cursor:default}.a2-mock2-audio span{display:block;margin-top:10px}.a2-mock2-image-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.a2-mock2-image-grid article{background:#fafbf9;border:1px solid #d8e8dc;border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}.a2-mock2-pictogram{display:flex;align-items:center;justify-content:center;min-height:75px;font-size:3rem}.a2-mock2-question select{width:100%;max-width:330px;border:1px solid #b4cbbb;border-radius:9px;padding:12px;margin-top:10px}@media(max-width:500px){.a2-mock2-image-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.a2-mock2-choice-image{display:block;width:min(220px,100%);height:auto;aspect-ratio:5/3;object-fit:cover;border-radius:10px;margin:8px 0}
+.a2-mock3-hoeren-review{display:grid;gap:18px;margin:20px 0}
+.a2-mock3-hoeren-review>section{border:1px solid #d8e8dc;border-radius:14px;padding:16px}
+.a2-mock3-hoeren-review article{margin:12px 0;padding:12px;border:1px solid #cbded2;border-left:5px solid #15803d;border-radius:10px;background:#f7fbf8}
+.a2-mock3-hoeren-review article.is-incorrect{border-color:#fecaca;border-left-color:#dc2626;background:#fff7f7}
+.a2-mock3-hoeren-review article p{margin:6px 0}
+.a2-mock3-hoeren-review article small{display:block;color:#475569;margin-top:8px}
