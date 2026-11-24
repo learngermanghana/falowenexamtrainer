@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
+import { db, doc, getDoc } from "../firebase";
+import { saveSwahiliWorkbook } from "../services/swahiliWorkbookService";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import MgahawaniGrammar from "./MgahawaniGrammar";
 import MgahawaniSong from "./MgahawaniSong";
@@ -139,7 +140,7 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
     setSubmitting(true);
     setSubmissionResult(null);
     try {
-      await setDoc(doc(db, "users", user.uid, "swahiliLessons", "day-6"), {
+      await saveSwahiliWorkbook(user, {
         studentId: user.uid,
         userId: user.uid,
         program: "swahili",
@@ -154,8 +155,8 @@ export default function SwahiliDaySixWorkbook({ basePath = "/swahili", preview =
         listeningTeacherLed: false,
         studentName: studentProfile?.name || studentProfile?.displayName || user.displayName || "",
         studentEmail: user.email || "",
-        submittedAt: serverTimestamp(),
-      }, { merge: true });
+        
+      });
       setPreviouslySubmitted(true);
       setTeacherReview(null);
       setSubmissionVersion((version) => version + 1);
