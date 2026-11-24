@@ -38,7 +38,7 @@ function germanSubmissionAccess(profile, now = Date.now(), authCreatedAt = null)
   const start = dateMillis(placement.trialStartedAt || placement.trialUsedAt || placement.joined_at || placement.joinedAt);
   const created = dateMillis(authCreatedAt);
   const expires = Math.min(end ?? 0,Number.isFinite(start)?start+7*86400000:0,Number.isFinite(created)?created+7*86400000:0);
-  if (expires <= now) return null;
+  if (!Number.isFinite(expires) || expires <= now) return null;
   const day1Keys = getLessonsByLevel(level).filter(item=>item.day===1 && item.submissionRequired !== false).map(item=>item.assignmentId);
   if (!day1Keys.length) return null;
   return {mode:"trial",level,levels:[level],endsAtMs:expires,day1Keys};
@@ -48,7 +48,7 @@ function assignmentAllowed(access,level,key) {
     (access.mode === "full" || access.day1Keys.includes(String(key || "").toUpperCase())));
 }
 async function verifyGermanSubmissionAccess(db,auth,identity,now=Date.now()) {
-  if (!identity?.uid || identity.examOnly === true) return null;
+  if (!identity?.uid) return null;
   const uid=identity.uid;
   const students=db.collection("students");
   const [matches,account,partner,deletion,policy]=await Promise.all([
@@ -58,7 +58,7 @@ async function verifyGermanSubmissionAccess(db,auth,identity,now=Date.now()) {
     db.collection("accountDeletionRequests").doc(uid).get(),
     db.collection("courseAccountAccess").doc(uid).get()
   ]);
-  if (account.disabled || matches.size !== 1 || policy.data()?.examOnly === true ||
+  if (account.disabled || matches.size !== 1 || (policy.exists ? policy.data()?.examOnly === true : identity.examOnly === true) ||
       (partner.exists && partner.data()?.courseAccessAllowed !== true) ||
       ["pending","processing","completed"].includes(deletion.data()?.status)) return null;
   const record=matches.docs[0];
