@@ -130,3 +130,18 @@ test("trial recommendation opens only the designated mock", () => {
   fireEvent.click(screen.getByRole("button",{name:"Open trial practice →"}));
   expect(mockNavigate).toHaveBeenLastCalledWith(trial.route);
 });
+
+
+test("locked warm-up and Exam File show explanations without navigating", () => {
+  mockLevel = "A2";
+  mockNavigate.mockClear();
+  render(<TrialExam.Provider value={{locked:true,id:null,level:"A2"}}><ExamsOverviewPage /></TrialExam.Provider>);
+  fireEvent.click(screen.getByRole("button",{name:"🔒 Locked"}));
+  expect(screen.getByRole("dialog",{name:"Locked: Daily warm-up"})).toBeInTheDocument();
+  expect(mockNavigate).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button",{name:"Keep browsing"}));
+  fireEvent.click(screen.getByRole("button",{name:"🔒 Exam File"}));
+  expect(screen.getByRole("dialog",{name:"Locked: Exam File"})).toBeInTheDocument();
+  expect(mockNavigate).not.toHaveBeenCalled();
+  expect(screen.getByRole("link",{name:"View plans"})).toHaveAttribute("href","/mock/payment");
+});
