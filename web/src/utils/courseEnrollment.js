@@ -21,7 +21,9 @@ export function enrolledCourses(profile, now = Date.now()) {
   const secondary = normalizeProgram(profile?.secondaryProgram);
   if (!COURSE_PROGRAMS.includes(primary)) return [];
   const expiry = secondaryAccessExpiry(profile);
-  return secondary !== primary && COURSE_PROGRAMS.includes(secondary) && (expiry === null || expiry > now) ? [primary, secondary] : [primary];
+  const startValue = profile?.coursePlacements?.[secondary]?.contractStart;
+  const startsAt = typeof startValue?.toMillis === "function" ? startValue.toMillis() : typeof startValue?.seconds === "number" ? startValue.seconds * 1000 : Date.parse(startValue || "");
+  return secondary !== primary && COURSE_PROGRAMS.includes(secondary) && (expiry === null || expiry > now) && (!Number.isFinite(startsAt) || startsAt <= now) ? [primary, secondary] : [primary];
 }
 
 export const COURSE_PLACEMENT_FIELDS = [
