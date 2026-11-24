@@ -135,7 +135,12 @@ test("unsubscribed exam-only students can browse all mock cards but cannot start
   expect(await screen.findByRole("heading", { name: "A2 Mock Exams" })).toBeVisible();
   const locked = await screen.findAllByRole("button", { name: /Locked/ });
   expect(locked.length).toBeGreaterThan(0);
-  locked.forEach(button => expect(button).toBeDisabled());
+  locked.forEach(button => expect(button).toBeEnabled());
+  fireEvent.click(locked[0]);
+  expect(screen.getByRole("dialog")).toBeInTheDocument();
+  expect(screen.getByRole("link",{name:"View plans"})).toHaveAttribute("href","/mock/payment");
+  fireEvent.click(screen.getByRole("button",{name:"Keep browsing"}));
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(screen.queryByRole("heading", { name: "Choose how to continue" })).toBeNull();
 });
 
