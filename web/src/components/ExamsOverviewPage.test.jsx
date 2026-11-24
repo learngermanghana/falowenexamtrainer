@@ -47,6 +47,8 @@ describe("simplified Exam Room overview", () => {
     expect(screen.getByText(/Coverage records practice, not an exam pass/i)).toBeInTheDocument();
 
     const mock = screen.getByRole("button", { name: "Start or resume a full mock exam" });
+    expect(mock).toHaveTextContent("Start Mock Test");
+    expect(mock).toHaveTextContent("Choose a mock");
     const progress = screen.getByRole("region", { name: "Exam room progress" });
     expect(mock.compareDocumentPosition(progress) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole("button", { name: "Practise Sprechen" }).compareDocumentPosition(progress) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -125,6 +127,12 @@ test("trial recommendation opens only the designated mock", () => {
   mockLevel = "A2";
   const trial = {id:"a2-final-01",route:"/campus/course/a2-final-mock-exam"};
   render(<TrialExam.Provider value={trial}><ExamsOverviewPage /></TrialExam.Provider>);
+  const mockEntry = screen.getByRole("button", { name: "Browse available exam practice" });
+  expect(mockEntry).toHaveTextContent("Start Mock Test");
+  expect(mockEntry).toHaveTextContent("Choose an available mock exam.");
+  expect(mockEntry).not.toHaveTextContent("Browse practice");
+  fireEvent.click(mockEntry);
+  expect(mockNavigate).toHaveBeenLastCalledWith("/exams/mocks");
   fireEvent.click(screen.getByRole("button",{name:"Open trial practice →"}));
   expect(mockNavigate).toHaveBeenLastCalledWith(trial.route);
 });
