@@ -1614,94 +1614,118 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       "instruction": "Sikiliza kipindi kuhusu kununua dukani. This podcast is separate from the Teil 4 listening recording."
     },
     "objective": "Ask what is in stock, choose a product and pay at a shop counter.",
-    "grammar": "Stock questions, Ki-/Vi- agreement and paying",
+    "grammar": "Buying from the Shop + Numbers · Nambari na kununua dukani",
     "practiceOnly": false,
     "grammarSections": [
       {
-        "title": "Kuuliza bidhaa dukani · Asking what is in stock",
-        "rule": "Use Mna …? when asking a seller ‘Do you have …?’ Tuna … means ‘We have …’ and Hatuna … means ‘We do not have …’. Use Naomba …, tafadhali to request an item politely.",
+        "title": "Nambari · Numbers",
+        "rule": "Count aloud before using numbers with shop items. These are the basic forms for 1–10; some numbers change to agree with the noun.",
         "examples": [
           {
-            "swahili": "Mna madaftari makubwa?",
-            "english": "Do you have large notebooks?"
+            "swahili": "moja · mbili · tatu · nne · tano",
+            "english": "one · two · three · four · five"
           },
           {
-            "swahili": "Hatuna madaftari makubwa. Tuna madaftari madogo.",
-            "english": "We don't have large notebooks. We have small notebooks."
-          },
-          {
-            "swahili": "Naomba daftari moja, tafadhali.",
-            "english": "One notebook, please."
+            "swahili": "sita · saba · nane · tisa · kumi",
+            "english": "six · seven · eight · nine · ten"
           }
         ]
       },
       {
-        "title": "Ngeli ya Ki-/Vi- · Singular and plural agreement",
-        "rule": "Many nouns in the Ki-/Vi- class change ki- to vi- in the plural. The demonstratives and numbers agree: kitabu hiki / vitabu hivi, kitabu kimoja / vitabu viwili. Do not use vi- with unrelated nouns such as daftari or kalamu.",
+        "title": "Bidhaa na idadi · Items and quantities",
+        "rule": "Place the quantity after the item. The handout’s examples use nouns whose forms stay the same in the singular and plural: sahani, saa, kofia, simu, kalamu, redio and nyanya. Do not add vi- to their numbers. Other noun classes have their own agreement.",
         "examples": [
           {
-            "swahili": "kitabu → vitabu",
-            "english": "book → books"
+            "swahili": "sahani tatu · saa moja · kofia tatu",
+            "english": "three plates · one clock/watch · three hats"
           },
           {
-            "swahili": "kiti → viti",
-            "english": "chair → chairs"
+            "swahili": "simu tatu · kalamu nne",
+            "english": "three phones · four pens"
           },
           {
-            "swahili": "Kitabu hiki ni kizuri.",
-            "english": "This book is good."
-          },
-          {
-            "swahili": "Vitabu hivi ni vizuri.",
-            "english": "These books are good."
-          },
-          {
-            "swahili": "Naomba vitabu viwili.",
-            "english": "I'd like two books."
+            "swahili": "redio moja · nyanya nne",
+            "english": "one radio · four tomatoes"
           }
         ]
       },
       {
-        "title": "Bei na kiasi · Prices and quantities",
-        "rule": "Ask ‘Bei gani?’ or ‘Ni shilingi ngapi?’ to find out the price. Use lita moja ya …, kilo moja ya … and nusu kilo ya … with suitable products. Jumla is the total.",
+        "title": "Nitanunua … · I will buy …",
+        "rule": "In nitanunua, ni- means I, -ta- marks the future, and -nunua means buy. Put the item and quantity after the verb.",
         "examples": [
           {
-            "swahili": "Maziwa ni shilingi ngapi?",
-            "english": "How much is the milk?"
-          },
-          {
-            "swahili": "Naomba lita moja ya maziwa.",
-            "english": "I'd like one litre of milk."
-          },
-          {
-            "swahili": "Naomba nusu kilo ya sukari.",
-            "english": "I'd like half a kilogram of sugar."
-          },
-          {
-            "swahili": "Jumla ni shilingi elfu nne na mia tano.",
-            "english": "The total is 4,500 shillings."
+            "swahili": "Nitanunua kalamu kumi.",
+            "english": "I will buy ten pens."
           }
         ]
       },
       {
-        "title": "Kuchagua na kulipa · Choosing and paying",
-        "rule": "Nitachukua … means ‘I'll take …’. Naweza kulipa kwa …? asks if you can pay using a method. Say Risiti, tafadhali to ask for a receipt, and Asante / Karibu to thank and reply.",
+        "title": "Ni shilingi ngapi? · Asking the price",
+        "rule": "Use Ni shilingi ngapi? to ask the price in shillings. Mia means hundred: mia tano is 500 and mia nne is 400. The dialogue gives the total for ten pens, not the price of each pen.",
         "examples": [
           {
-            "swahili": "Nitachukua daftari dogo na kalamu mbili.",
-            "english": "I'll take a small notebook and two pens."
+            "swahili": "Ni shilingi ngapi?",
+            "english": "How many shillings is it?"
           },
           {
-            "swahili": "Naweza kulipa kwa simu?",
-            "english": "Can I pay by phone?"
+            "swahili": "Kalamu kumi ni shilingi mia tano.",
+            "english": "Ten pens cost 500 shillings."
+          }
+        ]
+      },
+      {
+        "title": "Tafadhali punguza bei · Bargaining and paying",
+        "rule": "Tafadhali makes a request polite. Punguza bei means lower the price; lipa means pay. In the handout, the seller reduces the total from 500 to 400 shillings.",
+        "examples": [
+          {
+            "swahili": "Tafadhali punguza bei.",
+            "english": "Please lower the price."
           },
           {
-            "swahili": "Naweza kulipa kwa pesa taslimu?",
-            "english": "Can I pay in cash?"
+            "swahili": "Sawa, lipa shilingi mia nne.",
+            "english": "Okay, pay 400 shillings."
+          }
+        ]
+      },
+      {
+        "title": "Mazungumzo dukani · Shop dialogue",
+        "rule": "Mteja is the customer and muuzaji is the seller. Greet, name the item and quantity, ask the price, bargain, then thank the seller and say goodbye.",
+        "examples": [
+          {
+            "swahili": "Mteja: Habari?",
+            "english": "Customer: How are you?"
           },
           {
-            "swahili": "Risiti, tafadhali. — Karibu tena!",
-            "english": "A receipt, please. — Come again!"
+            "swahili": "Muuzaji: Nzuri. Karibu.",
+            "english": "Seller: Fine. Welcome."
+          },
+          {
+            "swahili": "Mteja: Asante. Nitanunua kalamu kumi. Ni shilingi ngapi?",
+            "english": "Customer: Thank you. I will buy ten pens. How much is it?"
+          },
+          {
+            "swahili": "Muuzaji: Kalamu kumi ni shilingi mia tano.",
+            "english": "Seller: Ten pens cost 500 shillings."
+          },
+          {
+            "swahili": "Mteja: Tafadhali punguza bei.",
+            "english": "Customer: Please lower the price."
+          },
+          {
+            "swahili": "Muuzaji: Sawa, lipa shilingi mia nne.",
+            "english": "Seller: Okay, pay 400 shillings."
+          },
+          {
+            "swahili": "Mteja: Asante sana.",
+            "english": "Customer: Thank you very much."
+          },
+          {
+            "swahili": "Muuzaji: Karibu tena.",
+            "english": "Seller: Come again."
+          },
+          {
+            "swahili": "Mteja: Asante. Kwaheri.",
+            "english": "Customer: Thank you. Goodbye."
           }
         ]
       }
