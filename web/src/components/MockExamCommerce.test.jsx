@@ -110,6 +110,9 @@ test.each([
   openPage("/exams/mocks");
   const included = await screen.findByRole("button", {name: /Start or resume mock|Open practice section/});
   expect(screen.getAllByRole("article")).toHaveLength(screen.queryAllByRole("button", {name: /Locked/}).length + 1);
+  expect(screen.getByText("Included in your free trial")).toBeVisible();
+  expect(screen.getByText(/No payment is required to start or resume it/)).toBeVisible();
+  expect(screen.queryByRole("link", {name:"Choose a payment option"})).toBeNull();
   fireEvent.click(included);
   expect(await screen.findByText(route)).toBeVisible();
 });
@@ -175,4 +178,18 @@ test("exam-only students can navigate to the Course Book without an exam subscri
   render(<MemoryRouter initialEntries={["/campus/course"]}><MockOnlyRouteBoundary><MockExamOnlyGate><h1>Course Book preview</h1></MockExamOnlyGate></MockOnlyRouteBoundary></MemoryRouter>);
   expect(await screen.findByRole("heading",{name:"Course Book preview"})).toBeVisible();
   expect(screen.queryByRole("heading",{name:"Choose how to continue"})).toBeNull();
+});
+
+test("failed access lookup never demands payment and can be retried", async () => {
+  jest.spyOn(global,"fetch").mockRejectedValueOnce(new Error("offline")).mockResolvedValue({
+    ok:true,json:async()=>({active:[{level:"A2",scope:"trial",expiresAtMs:Date.now()+60000}]})
+  });
+  useAuth.mockReturnValue({user:student,studentProfile:profile});
+  openPage("/exams/mocks");
+  expect(await screen.findByText(/could not verify your exam access/i)).toBeVisible();
+  expect(screen.queryByRole("link",{name:"Choose a payment option"})).toBeNull();
+  expect(screen.queryByRole("button",{name:"Start or resume mock"})).toBeNull();
+  fireEvent.click(screen.getByRole("button",{name:"Retry access check"}));
+  expect(await screen.findByRole("button",{name:"Start or resume mock"})).toBeEnabled();
+  expect(screen.queryByRole("link",{name:"Choose a payment option"})).toBeNull();
 });
