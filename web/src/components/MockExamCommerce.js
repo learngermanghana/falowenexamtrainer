@@ -37,7 +37,7 @@ export function PaymentNavigation() {
   const examOnly = studentProfile?.accountType === "exam_only";
   return <nav aria-label="Student navigation" style={{display: "flex", flexWrap: "wrap", gap: "8px 18px", marginBottom: 20}}>
     {isMockPortal() ? <a href="https://www.falowen.app/">Home</a> : <Link to="/">Home</Link>}
-    {!examOnly && (isMockPortal() ? <a href="https://www.falowen.app/campus/course">Course Book</a> : <Link to="/campus/course">Course Book</Link>)}
+    {isMockPortal() ? <a href="https://www.falowen.app/campus/course">Course Book</a> : <Link to="/campus/course">Course Book</Link>}
     <Link to="/exams/overview">Exams Room</Link>
     {!examOnly && isMockPortal() ? <a href="https://www.falowen.app/campus/account?tab=billing">Account</a>
       : <Link to={examOnly ? "/mock/account" : "/campus/account?tab=billing"}>Account</Link>}
