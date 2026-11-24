@@ -136,13 +136,80 @@ service cloud.firestore {
       }
     }
 
+    // An authenticated API issues a short-lived permission for the verified
+    // enrollment. Neither the grant nor the financial/trial fields can be
+    // edited by students. Compare the current profile so revocation or a
+    // course switch cannot leave an old grant usable.
+    match /courseSubmissionAccess/{uid} {
+      allow read, write: if false;
+    }
+
+    function sameSubmissionAccessFields(profile, issued) {
+      return profile.get('accountType', null) == issued.get('accountType', null)
+        && profile.get('program', null) == issued.get('program', null)
+        && profile.get('secondaryProgram', null) == issued.get('secondaryProgram', null)
+        && profile.get('coursePlacements', null) == issued.get('coursePlacements', null)
+        && profile.get('level', null) == issued.get('level', null)
+        && profile.get('status', null) == issued.get('status', null)
+        && profile.get('role', null) == issued.get('role', null)
+        && profile.get('isTutor', null) == issued.get('isTutor', null)
+        && profile.get('paymentStatus', null) == issued.get('paymentStatus', null)
+        && profile.get('paid', null) == issued.get('paid', null)
+        && profile.get('paidAmount', null) == issued.get('paidAmount', null)
+        && profile.get('balanceDue', null) == issued.get('balanceDue', null)
+        && profile.get('balance', null) == issued.get('balance', null)
+        && profile.get('accessType', null) == issued.get('accessType', null)
+        && profile.get('institutionVerification', null) == issued.get('institutionVerification', null)
+        && profile.get('contractEnd', null) == issued.get('contractEnd', null)
+        && profile.get('trialStatus', null) == issued.get('trialStatus', null)
+        && profile.get('trialStartedAt', null) == issued.get('trialStartedAt', null)
+        && profile.get('trialUsedAt', null) == issued.get('trialUsedAt', null)
+        && profile.get('trialEndsAt', null) == issued.get('trialEndsAt', null)
+        && profile.get('joined_at', null) == issued.get('joined_at', null)
+        && profile.get('joinedAt', null) == issued.get('joinedAt', null);
+    }
+
+    function trialAssignmentAllowed(data, permit) {
+      let key = data.get('assignmentKey', data.get('canonicalAssignmentKey', ''));
+      return key in permit.day1Keys
+        && data.get('canonicalAssignmentKey', key) == key
+        && data.get('assignmentId', key) == key
+        && data.get('assignment_id', key) == key
+        && data.get('day', 1) == 1
+        && (data.get('answerKeySource', null) == null ||
+            data.answerKeySource.get('assignmentKey', key) == key);
+    }
+
+    function permitsSubmission(data, permit) {
+      let profile = get(/databases/$(database)/documents/students/$(permit.profileId)).data;
+      return permit.uid == request.auth.uid
+        && permit.expiresAtMs > request.time.toMillis()
+        && profile.uid == request.auth.uid
+        && sameSubmissionAccessFields(profile, permit.profileFields)
+        && data.get('program', 'german') == 'german'
+        && data.get('level', '') in permit.levels
+        && (permit.mode == 'full' || (permit.mode == 'trial' && trialAssignmentAllowed(data, permit)));
+    }
+
+    function canWriteCourseAssignment(data) {
+      let path = /databases/$(database)/documents/courseSubmissionAccess/$(request.auth.uid);
+      return courseUser() && exists(path) && permitsSubmission(data, get(path).data);
+    }
+
+    function assignmentIdentityUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'program', 'level', 'day', 'assignmentKey', 'canonicalAssignmentKey',
+        'assignmentId', 'assignment_id', 'chapter', 'chapterKey', 'assignmentTitle'
+      ]);
+    }
+
     // Assignment submission persistence.
     // Students can save/retrieve their own drafts, submissions, and one-time submission locks.
     // Staff can read/write for support and grading workflows.
     match /submissionDrafts/{draftId} {
-      allow create: if (courseUser() && ownsStudentIncoming()) || isStaff();
+      allow create: if (canWriteCourseAssignment(request.resource.data) && ownsStudentIncoming()) || isStaff();
       allow read: if ownsStudentResource() || isStaff();
-      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow update: if (canWriteCourseAssignment(request.resource.data) && ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged() && assignmentIdentityUnchanged()) || isStaff();
       allow delete: if ownsStudentResource() || isStaff();
     }
 
@@ -160,14 +227,14 @@ service cloud.firestore {
       ]);
     }
     match /submissions/{submissionId} {
-      allow create: if (courseUser() && ownsStudentIncoming() && hasNoMarkingFields()) || isStaff();
+      allow create: if (canWriteCourseAssignment(request.resource.data) && ownsStudentIncoming() && hasNoMarkingFields()) || isStaff();
       allow read: if ownsStudentResource() || isStaff();
-      allow update: if (courseUser() && ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged() && markingFieldsUnchanged()) || isStaff();
+      allow update: if (canWriteCourseAssignment(request.resource.data) && ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged() && assignmentIdentityUnchanged() && markingFieldsUnchanged()) || isStaff();
       allow delete: if isStaff();
     }
 
     match /submissionLocks/{lockId} {
-      allow create: if (courseUser() && ownsStudentIncoming()) || isStaff();
+      allow create: if (canWriteCourseAssignment(request.resource.data) && ownsStudentIncoming()) || isStaff();
       // The timed-assignment UI listens to a student's deterministic lock ID
       // before the first attempt exists. An absent document has no resource.data
       // for ownsStudentResource() to check; permit only this owner's missing lock.
@@ -176,7 +243,7 @@ service cloud.firestore {
         && resource == null
         && lockId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+$');
       allow read: if ownsStudentResource() || isStaff();
-      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow update: if (canWriteCourseAssignment(request.resource.data) && ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged() && assignmentIdentityUnchanged()) || isStaff();
       allow delete: if isStaff();
     }
 
@@ -184,7 +251,7 @@ service cloud.firestore {
     // Students may create their own attempt and move it forward only.
     // Staff may delete an attempt to explicitly reset it.
     match /timedAssignmentAttempts/{attemptId} {
-      allow create: if courseUser() && ownsStudentIncoming()
+      allow create: if canWriteCourseAssignment(request.resource.data) && ownsStudentIncoming()
         && request.resource.data.status == 'active'
         && request.resource.data.startedAt == request.time
         && request.resource.data.durationSeconds is int
@@ -201,6 +268,8 @@ service cloud.firestore {
         ownsStudentResource()
         && ownsStudentIncoming()
         && ownershipFieldsUnchanged()
+        && canWriteCourseAssignment(request.resource.data)
+        && assignmentIdentityUnchanged()
         && request.resource.data.assignmentKey == resource.data.assignmentKey
         && request.resource.data.level == resource.data.level
         && request.resource.data.durationSeconds == resource.data.durationSeconds
@@ -342,6 +411,15 @@ service cloud.firestore {
       // student-code profile. Only the root profile is readable while paused.
       allow read: if courseUser() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
       allow create: if signedIn() && (isStaff() || (!isExamOnly() && request.resource.data.get('courseType', 'full_course') == 'full_course' && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'courseEnrollmentPreserved', 'secondaryProgram', 'coursePlacements', 'courseDiscount', 'courseCheckoutStartedAt'])
+        && request.resource.data.get('uid', '') == request.auth.uid
+        && request.resource.data.get('role', 'student') == 'student'
+        && request.resource.data.get('isTutor', false) == false
+        && request.resource.data.get('paymentStatus', 'pending') in ['pending', 'exempt_pending']
+        && request.resource.data.get('paid', 0) == 0
+        && request.resource.data.get('paidAmount', 0) == 0
+        && request.resource.data.get('initialPaymentAmount', 0) == 0
+        && (request.resource.data.get('balanceDue', null) == null || request.resource.data.balanceDue > 0)
+        && (request.resource.data.get('balance', null) == null || request.resource.data.balance > 0)
         && request.resource.data.get('institutionVerification', 'pending') == 'pending'
         && request.resource.data.get('accessType', 'invitation_pending') == 'invitation_pending'
         && (request.resource.data.get('registrationSource', '') != 'university-invite' || (
@@ -369,6 +447,11 @@ service cloud.firestore {
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'role', 'studentCode', 'studentcode', 'program'])
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'courseType', 'courseEnrollmentPreserved', 'secondaryProgram', 'coursePlacements',
           'institutionId', 'institutionName', 'cohortId', 'instructorName', 'registrationSource', 'universityInvitationCode', 'institutionVerification', 'accessType', 'courseDiscount', 'courseCheckoutStartedAt'])
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'status', 'isTutor', 'paymentStatus', 'paid', 'paidAmount', 'initialPaymentAmount', 'balanceDue', 'balance', 'tuitionFee', 'tuitionCurrency',
+          'contractStart', 'contractEnd', 'contractTermMonths', 'trialStatus', 'trialStartedAt', 'trialUsedAt', 'trialEndsAt', 'trialPurgeAt',
+          'joined_at', 'joinedAt', 'level', 'levelId', 'className', 'classId', 'classRecordId', 'assignedClassId', 'paystackReference'
+        ])
         && (resource.data.get('courseDiscount', null) == null || resource.data.get('paymentStatus', '') == 'paid' ||
           !request.resource.data.diff(resource.data).affectedKeys().hasAny([
           'tuitionFee', 'tuitionCurrency', 'balanceDue', 'balance', 'paid', 'paidAmount', 'initialPaymentAmount',
@@ -392,7 +475,7 @@ service cloud.firestore {
           ])
         ))
       ));
-      allow delete: if isStaff() || (courseUser() && resource.data.uid == request.auth.uid && resource.data.get('accountType', '') != 'exam_only');
+      allow delete: if isStaff();
       match /{collectionId}/{documentId}/{nested=**} {
         allow read, write: if courseUser() || (signedIn() && studentId == request.auth.uid);
       }
