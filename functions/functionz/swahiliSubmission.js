@@ -42,10 +42,6 @@ function registerSwahiliSubmissionRoute(app,{admin,getAuthedUser}) {
         if(!access.allowed || identity.examOnly === true) return false;
         const profile=access.profile;
         const ref=db.collection("users").doc(identity.uid).collection("swahiliLessons").doc(work.id);
-        if (work.data.contentVersion === 3) {
-          const previous = await tx.get(ref);
-          if (previous.exists && previous.data()?.status === "submitted" && previous.data()?.contentVersion !== 3) return false;
-        }
         tx.set(ref,{...work.data,studentId:identity.uid,userId:identity.uid,
           studentName:String(profile.name || profile.fullName || "").slice(0,150),
           studentEmail:String(identity.email || "").slice(0,254),

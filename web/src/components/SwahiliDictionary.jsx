@@ -5,10 +5,10 @@ import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
 
 // The emailed "HATUA YA AWALI (Kiswahili A1 and A2)" is a teaching syllabus,
 // not a translation dictionary. Topics are sourced from its 20-topic outline.
-// Vocabulary comes from the pronunciation, restaurant, market and shop lessons.
+// Vocabulary comes from pronunciation, restaurant, shopping, calendar and daily routine lessons.
 export const SWAHILI_DICTIONARY_TOPICS = [
   "Salamu", "Utambulisho", "Familia", "Mgahawani", "Sokoni",
-  "Dukani", "Siku, Miezi na Tarehe", "Kutaja Saa na Shughuli za Kila Siku", "Mapishi ya Kitanzania", "Nyumbani", "Shughuli za Kila Siku",
+  "Dukani", "Siku, Miezi na Tarehe", "Kutaja Saa na Shughuli za Kila Siku", "Shughuli za Kila Siku",
   "Hospitalini", "Kusafiri", "Safari ya Kitalii", "Hali ya Hewa na Majira",
   "Watu na Taaluma Zao", "Ofisini", "Sikukuu na Matukio Mbalimbali",
   "Huduma za Malazi", "Kutoa Taarifa za Matukio", "Mawasiliano ya Kirafiki",
