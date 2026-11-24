@@ -2,7 +2,8 @@ import WorkbookDayMusic from "./WorkbookDayMusic";
 import React, { useState, useEffect } from "react";
 import SwahiliB1Day28Listening, { listeningQuestions } from "./SwahiliB1Day28Listening";
 import { useAuth } from "../context/AuthContext";
-import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
+import { db, doc, getDoc } from "../firebase";
+import { saveSwahiliWorkbook } from "../services/swahiliWorkbookService";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import SwahiliB1Day28Reading, { readingQuestions } from "./SwahiliB1Day28Reading";
 import { Link } from "react-router-dom";
@@ -148,11 +149,11 @@ export default function SwahiliB1Day28Workbook({ uid }) {
     setSaving(true);
     setNotice("");
     try {
-      await setDoc(doc(db, "users", uid, "swahiliLessons", "b1-day-28"), {
+      await saveSwahiliWorkbook(user, {
         studentId: uid, userId: uid, studentName: studentProfile?.name || user.displayName || "",
         studentEmail: user.email || "", program: "swahili", level: "B1", day: 28,
         lessonId: "swahili-b1-day-28", title: "Kutunza Mazingira katika Maisha ya Kila Siku",
-        status: "submitted", submittedAt: serverTimestamp(), writing: { email: writing.trim() },
+        status: "submitted",  writing: { email: writing.trim() },
         readingAnswers: reading, listeningAnswers: listening,
       });
       setSubmitted(true);
