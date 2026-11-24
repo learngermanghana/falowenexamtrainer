@@ -76,7 +76,7 @@ function CourseTrialBoundary({ children }) {
   if (!course && !exam) return children;
   if (loading) return null;
   const trial = restrictTrialWithServer(localTrial, snapshot);
-  if (course && studentProfile?.accountType === "exam_only") {
+  if (course && !exam && studentProfile?.accountType === "exam_only") {
     return <TrialCoursePage level={studentProfile.level} path={path} active previewOnly>{children}</TrialCoursePage>;
   }
   if (!trial) return children;
