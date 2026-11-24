@@ -66,6 +66,7 @@ describe('upsertStudentToSheet paid field sync', () => {
             'ContractEnd',
             'StudentCode',
             'Email',
+            'CourseType', 'AccountType',
           ]],
         },
       })
@@ -105,7 +106,7 @@ describe('upsertStudentToSheet paid field sync', () => {
     mockValuesGet
       .mockResolvedValueOnce({ data: { values: [[
         'Name', 'Phone', 'Location', 'Level', 'Paid', 'Balance',
-        'ContractStart', 'ContractEnd', 'StudentCode', 'Email',
+        'ContractStart', 'ContractEnd', 'StudentCode', 'Email', 'CourseType', 'AccountType',
       ]] } })
       .mockResolvedValueOnce({ data: { values: [['ORG-example-internal-key']] } })
       .mockResolvedValueOnce({ data: { values: [['learner@example.test']] } });
@@ -141,7 +142,7 @@ describe('upsertStudentToSheet paid field sync', () => {
       'ContractStart', 'ContractEnd', 'StudentCode', 'Email',
       'BillingResponsibility', 'OrganisationName', 'OrganisationPaymentReference',
       'OrganisationRetainedShare', 'OrganisationNetTuition', 'OrganisationPaymentGross',
-      'OrganisationSubmissionId', 'OrganisationId', 'OrganisationBillingEmail',
+      'OrganisationSubmissionId', 'OrganisationId', 'OrganisationBillingEmail', 'CourseType', 'AccountType',
     ];
     mockValuesGet
       .mockResolvedValueOnce({ data: { values: [headers] } })
@@ -173,7 +174,7 @@ describe('upsertStudentToSheet paid field sync', () => {
   });
 
   it('does not clear organisation metadata when legacy student source omits those fields', async () => {
-    const headers = ['Name','StudentCode','Email','BillingResponsibility','OrganisationPaymentReference'];
+    const headers = ['Name','StudentCode','Email','BillingResponsibility','OrganisationPaymentReference','CourseType','AccountType'];
     mockValuesGet
       .mockResolvedValueOnce({ data: { values: [headers] } })
       .mockResolvedValueOnce({ data: { values: [['Legacy123']] } })
@@ -197,7 +198,7 @@ describe('upsertStudentToSheet paid field sync', () => {
       'ContractStart',
       'ContractEnd',
       'StudentCode',
-      'Email',
+      'Email', 'CourseType', 'AccountType',
     ];
     const trialHeaders = [
       ...baseHeaders,
@@ -234,7 +235,7 @@ describe('upsertStudentToSheet paid field sync', () => {
     expect(mockUpdate.mock.calls[0][0]).toEqual(
       expect.objectContaining({
         spreadsheetId: 'sheet-123',
-        range: 'students!K1:O1',
+        range: 'students!M1:Q1',
         valueInputOption: 'RAW',
         requestBody: {
           values: [[
@@ -252,23 +253,23 @@ describe('upsertStudentToSheet paid field sync', () => {
     expect(write).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          range: 'students!K2',
-          values: [['2026-09-21T10:00:00.000Z']],
-        }),
-        expect.objectContaining({
-          range: 'students!L2',
-          values: [['2026-09-28T10:00:00.000Z']],
-        }),
-        expect.objectContaining({
           range: 'students!M2',
-          values: [['2026-10-28T10:00:00.000Z']],
+          values: [['2026-09-21T10:00:00.000Z']],
         }),
         expect.objectContaining({
           range: 'students!N2',
-          values: [['2026-09-21T10:00:00.000Z']],
+          values: [['2026-09-28T10:00:00.000Z']],
         }),
         expect.objectContaining({
           range: 'students!O2',
+          values: [['2026-10-28T10:00:00.000Z']],
+        }),
+        expect.objectContaining({
+          range: 'students!P2',
+          values: [['2026-09-21T10:00:00.000Z']],
+        }),
+        expect.objectContaining({
+          range: 'students!Q2',
           values: [['2026-09-22T10:00:00.000Z']],
         }),
       ])
@@ -290,6 +291,7 @@ describe('upsertStudentToSheet paid field sync', () => {
             'ContractEnd',
             'StudentCode',
             'Email',
+            'CourseType', 'AccountType',
           ]],
         },
       })

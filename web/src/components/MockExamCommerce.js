@@ -7,7 +7,7 @@ import { MOCK_EXAM_CATALOG } from "../data/mockExamCatalog";
 import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
 
-import { TrialExamPage } from "./TrialPractice";
+import { courseTrial, TrialExamPage } from "./TrialPractice";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const safeLevels = new Set(LEVELS);
@@ -30,6 +30,35 @@ const input = { padding: 12, border: "1px solid #bfcbd8", borderRadius: 8, font:
 const button = { border: 0, background: "#0b776e", color: "white", padding: "13px 19px", borderRadius: 9, font: "inherit", cursor: "pointer", fontWeight: 800 };
 const format = (amount) => `GH₵${amount}`;
 
+export function PaymentOptionsPage() {
+  const { user, studentProfile, loading } = useAuth();
+  if (loading) return <p role="status">Loading your account…</p>;
+  if (!user) return <Navigate to="/login/" replace />;
+  if (!studentProfile) return <p role="status">Loading your student account…</p>;
+  const examOnly = studentProfile.accountType === "exam_only";
+  const switchToExam = !examOnly && Boolean(courseTrial(studentProfile));
+  const fullCourseLink = examOnly ? "/mock/account?choice=full_course" : "/campus/account?tab=billing";
+  const examLink = switchToExam ? "/mock/account?choice=exam_preparation" : "/mock/checkout";
+  return <main style={card}>
+    <h1>Choose how to continue</h1>
+    <p>Choose the access that suits your learning. You can review the price before paying.</p>
+    <section style={{...card, margin: "16px 0", padding: 20}}>
+      <h2>Full Course</h2>
+      <p>Continue your course with lessons, course materials and exam preparation at your enrolled level.</p>
+      <p>Your existing tuition payments and balance remain on your account.</p>
+      {isMockPortal() && !examOnly
+        ? <a href="https://www.falowen.app/campus/account?tab=billing">Continue to course billing</a>
+        : <Link to={fullCourseLink}>Continue to course billing</Link>}
+    </section>
+    <section style={{...card, margin: "16px 0", padding: 20}}>
+      <h2>Exam Preparation</h2>
+      <p>Practise available mock exams and the four skills at your selected level for 30 days.</p>
+      <p>Exam subscriptions and course tuition are separate payments.</p>
+      <Link to={examLink}>Continue to exam preparation</Link>
+    </section>
+  </main>;
+}
+
 export function MockExamSignupPage() {
   const { user, studentProfile, refreshStudentProfile } = useAuth();
   const navigate = useNavigate();
@@ -39,7 +68,7 @@ export function MockExamSignupPage() {
   const [level, setLevel] = useState(new URLSearchParams(window.location.search).get("level")?.toUpperCase() || "A1");
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
-  if (user && studentProfile && !working) return <Navigate to={studentProfile.examTrialStartedAt ? "/exams/mocks" : "/mock/checkout"} replace />;
+  if (user && studentProfile && !working) return <Navigate to={studentProfile.examTrialStartedAt ? "/exams/mocks" : "/mock/payment"} replace />;
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!safeLevels.has(level) || name.trim().split(/\s+/).length < 2 || (!user && password.length < 8)) {
@@ -55,7 +84,7 @@ export function MockExamSignupPage() {
       const registration = await api("/mock/register", { method: "POST", token, body: { name: name.trim(), level } });
       await credential.user.getIdToken(true); // reload server-issued examOnly claim
       await refreshStudentProfile?.().catch(() => {});
-      navigate(registration.trial ? "/exams/mocks" : "/mock/checkout", { replace: true });
+      navigate(registration.trial ? "/exams/mocks" : "/mock/payment", { replace: true });
     } catch (err) {
       setError(err?.code === "auth/email-already-in-use"
         ? "This email already has a Falowen account. Sign in instead."
@@ -120,7 +149,7 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
   if (!user) return <Navigate to="/login/" replace />;
   return <main style={card}>
     <a href="/" style={{ color: "#0b776e" }}>← Falowen Exams</a>
-    <p><Link to="/mock/account">Manage course type</Link></p>
+    <p><Link to="/mock/payment">Compare payment options</Link> · <Link to="/mock/account">Manage course type</Link></p>
     <h1>{paymentReturn ? "Monthly access confirmation" : "Your monthly exam subscription"}</h1>
     {paymentReturn && <p>Paystack has returned you to Falowen. Access appears below only after the signed payment notification is confirmed. Refresh this page if the payment is still processing.</p>}
     {access.length > 0 && <div style={{ padding: 14, background:"#e6f8f0", borderRadius:10 }}>
@@ -174,10 +203,10 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
   if (state.loading) return <div style={card} role="status">Checking your purchased mock access…</div>;
   const active = state.active.filter(row => !row.expiresAtMs || row.expiresAtMs > Date.now());
   if (courseTrialState && !active.some(row => row.scope !== "trial" && row.level === studentProfile.level)) {
-    if (!courseTrialState.active || courseTrialState.endsAtMs <= Date.now()) return <Navigate to="/mock/checkout" replace />;
+    if (!courseTrialState.active || courseTrialState.endsAtMs <= Date.now()) return <Navigate to="/mock/payment" replace />;
     return <TrialExamPage level={studentProfile.level} path={location.pathname.replace(/\/+$/, "")}>{children}</TrialExamPage>;
   }
-  if (!active.length) return <Navigate to="/mock/checkout" replace />;
+  if (!active.length) return <Navigate to="/mock/payment" replace />;
   const trial = active.find(row => row.scope === "trial" && row.expiresAtMs > Date.now());
   if (trial && !active.some(row => row.scope !== "trial" && (studentProfile?.courseEnrollmentPreserved || row.level === trial.level))) {
     return <TrialExamPage level={trial.level} path={location.pathname.replace(/\/+$/, "") || "/"}>
@@ -199,7 +228,7 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
     ? subscribedLevels : subscribedLevels.filter(level => level === registeredLevel);
   if (examArea && (!allowedLevels.length || (safeLevels.has(location.pathname.split("/")[3]?.toUpperCase()) &&
       !allowedLevels.includes(location.pathname.split("/")[3].toUpperCase())))) {
-    return <Navigate to="/mock/checkout" replace />;
+    return <Navigate to="/mock/payment" replace />;
   }
   return typeof children === "function" ? children(allowedLevels) : children;
 }

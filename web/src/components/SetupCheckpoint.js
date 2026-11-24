@@ -201,6 +201,7 @@ const SetupCheckpoint = () => {
             >
               Pay tuition
             </button>
+            {getCampusProgram(studentProfile) !== "swahili" && <Link to="/mock/payment">Compare course and exam payment options</Link>}
           </div>
         </div>
 

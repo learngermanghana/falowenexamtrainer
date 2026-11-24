@@ -11,7 +11,7 @@ describe("Exams Room level selector across all sections", () => {
 
   it("shows one unlocked lower-level selector in the shared Exams Room shell", () => {
     expect(app).toContain('role="group" aria-label="Choose exam practice level"');
-    expect(app).toContain("accessibleLevels.map((option)");
+    expect(app).toContain("visibleLevels.map((option)");
     expect(app).toContain('aria-pressed={level === option}');
     expect(app).toContain('if (sampleId) navigate(`/exams/${examSection}`)');
     expect(app).toContain("Your Course Book level stays unchanged");

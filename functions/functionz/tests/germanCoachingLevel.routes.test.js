@@ -3,6 +3,7 @@ let mockStudent;
 const mockDb = {
   collection(name) {
     if (name === "students") return {
+      doc: () => ({ get: async () => ({ exists: true, data: () => mockStudent }) }),
       where(field, op, uid) {
         expect([field, op, uid]).toEqual(["uid", "==", "learner"]);
         return { limit: () => ({ get: async () => ({ empty: false, docs: [{ data: () => mockStudent }] }) }) };

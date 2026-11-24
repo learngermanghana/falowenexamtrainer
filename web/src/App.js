@@ -28,7 +28,7 @@ import CampusBooksPage from "./components/CampusBooksPage";
 import ExamGuideComingSoon from "./components/ExamGuideComingSoon";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
-import { MockExamSignupPage, MockExamCheckoutPage, MockExamOnlyGate, isMockPortal } from "./components/MockExamCommerce";
+import { MockExamSignupPage, MockExamCheckoutPage, MockExamOnlyGate, PaymentOptionsPage, isMockPortal } from "./components/MockExamCommerce";
 import LandingPage from "./components/LandingPage";
 import HealthIndicator from "./components/HealthIndicator";
 import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
@@ -619,6 +619,7 @@ function App() {
   }
 
   if (location.pathname === "/mock/free-hoeren") return <ListeningPracticeSamplePage level="A1" sampleId="sample-1" freeTrial />;
+  if (location.pathname === "/mock/payment") return <PaymentOptionsPage />;
   if (location.pathname === "/mock/account") return <CourseTypeSettings />;
   if (location.pathname === "/mock/register") return <MockExamSignupPage />;
   if (location.pathname === "/mock/checkout" || location.pathname === "/mock/complete") {
