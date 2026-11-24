@@ -25,7 +25,7 @@ const { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt, requireMockTa
 const { isA2SpeakingAttemptBindingSafe } = require("./a2MockSpeakingAttemptIdentity");
 const { validateA1MockId, resolveA1MarkingSet, getA1MockSet, scoreA1Mock2Form, scoreA1Mock3Form, scoreA1KombiForm } = require("./a1MockSets");
 const { createMockAssessment } = require("./mockAssessment");
-const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
+const { A2_WRITING_GUIDANCE, pointAssessmentShape, canonicalizeA2WritingAssessment, validateA2WritingEvidence } = require("./a2WritingAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { saveTutorSpeakingAssessment, genericTutorTask, genericTutorPrompt, parseGenericTutorScore } = require("./verifiedTutorSpeaking");
 const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = require("./a1TutorSpeakingScore");
@@ -2966,26 +2966,18 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "", mockId = "a2-mock-01" 
   "TEIL 2 — E-Mail, 15 points:",
   "Scoring emphasis: task completion is essential. If one required point is missing, Teil 2 may score at most 11/15; if two are missing, at most 7/15; if all three are missing, at most 3/15.",
   "Use the canonical word target. The email should use an appropriate greeting and closing. Missing both greeting and closing prevents a top-band score.",
-  "For each Teil, return required_points_met as exactly three booleans in the same order as the required points, plus missing_required_points as short English labels.",
+  "For each Teil, return exactly three point_assessments in canonical task order. Return the independent rubric components and format flags; the server derives the remaining scores and flags.",
   "",
   mockTaskPrompt("A2", "writing", undefined, mockId),
   "Return JSON only, no markdown, using exactly this shape:",
   JSON.stringify({
-    score: 0,
-    maxScore: 25,
-    passed: false,
     level_mismatch: false,
     overall_feedback_en: "Short English feedback.",
     parts: {
       teil1: {
-        score: 0,
-        maxScore: 10,
-        content_score: 0,
         language_score: 0,
         appropriateness_score: 0,
         point_assessments: pointAssessmentShape(),
-        required_points_met: [false, false, false],
-        missing_required_points: [],
         feedback_en: "English feedback.",
         corrections: [
           {
@@ -2996,17 +2988,12 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "", mockId = "a2-mock-01" 
         ]
       },
       teil2: {
-        score: 0,
-        maxScore: 15,
-        content_score: 0,
         structure_score: 0,
         language_score: 0,
         cohesion_score: 0,
         greeting_ok: false,
         closing_ok: false,
         point_assessments: pointAssessmentShape(),
-        required_points_met: [false, false, false],
-        missing_required_points: [],
         feedback_en: "English feedback.",
         corrections: [
           {
@@ -4852,6 +4839,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
         { partKeys: ["teil1", "teil2"], pointCounts: { teil1: 3, teil2: 3 }, formatPart: "teil2",
+          prepareResult: (assessment) => canonicalizeA2WritingAssessment(assessment, { sms, email }),
           validateResult: (assessment) => validateA2WritingEvidence(assessment, { sms, email }) },
       );
 
