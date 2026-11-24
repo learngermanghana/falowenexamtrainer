@@ -5,8 +5,11 @@ const primaryCourse = profile => normalizeProgram(profile?.program) || "german";
 // Only server-issued programme enrollment grants access. A locally stored
 // preference or an admissions interest request never creates an enrollment.
 export function secondaryAccessExpiry(profile) {
-  const placement = profile?.coursePlacements?.swahili;
-  if (primaryCourse(profile) !== "german" || normalizeProgram(profile?.secondaryProgram) !== "swahili" || placement?.accessType !== "complimentary") return null;
+  const secondary = normalizeProgram(profile?.secondaryProgram);
+  if (!COURSE_PROGRAMS.includes(secondary) || primaryCourse(profile) === secondary) return null;
+  const placement = profile?.coursePlacements?.[secondary];
+  if (["pending","invitation_pending"].includes(placement?.accessType)) return 0;
+  if (placement?.accessType !== "complimentary" && !placement?.contractEnd) return null;
   const value = placement.contractEnd;
   const end = typeof value?.toMillis === "function" ? value.toMillis() : typeof value?.seconds === "number" ? value.seconds * 1000 : Date.parse(value || "");
   return Number.isFinite(end) ? end : 0;
@@ -18,7 +21,9 @@ export function enrolledCourses(profile, now = Date.now()) {
   const secondary = normalizeProgram(profile?.secondaryProgram);
   if (!COURSE_PROGRAMS.includes(primary)) return [];
   const expiry = secondaryAccessExpiry(profile);
-  return secondary !== primary && COURSE_PROGRAMS.includes(secondary) && (expiry === null || expiry > now) ? [primary, secondary] : [primary];
+  const startValue = profile?.coursePlacements?.[secondary]?.contractStart;
+  const startsAt = typeof startValue?.toMillis === "function" ? startValue.toMillis() : typeof startValue?.seconds === "number" ? startValue.seconds * 1000 : Date.parse(startValue || "");
+  return secondary !== primary && COURSE_PROGRAMS.includes(secondary) && (expiry === null || expiry > now) && (!Number.isFinite(startsAt) || startsAt <= now) ? [primary, secondary] : [primary];
 }
 
 export const COURSE_PLACEMENT_FIELDS = [
