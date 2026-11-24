@@ -5,7 +5,7 @@ const { courseExpiry, trialRestriction } = require("./entitlementService");
 const { getLessonsByLevel } = require("../data/lessonCatalog");
 
 async function allowsTrialRequest(req, restriction, db, uid) {
-  const {level, course, preview} = restriction;
+  const {level, course = false, preview = false} = restriction;
   const exam = exams[level];
   if (!exam) return false;
   const path = req.path.toLowerCase().replace(/\/+$/, "");
