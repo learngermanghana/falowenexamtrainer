@@ -265,3 +265,11 @@ test("A1 Day 4 chapter 2 uses the assigned teacher lecture without changing the 
     "https://youtu.be/lN7xxSbkPZ4"
   );
 });
+
+
+test("Day 5 chapter 1.3 exposes only the approved teacher lecture", () => {
+  expect(getA1TeacherVideoResources(5, "1.3").map(video => video.url)).toEqual(["https://youtu.be/emYqxezL9_U"]);
+  const lesson = normalizeLesson({ day: 5, chapter: "1.3", schreiben_sprechen: { chapter: "1.3", video: "https://youtu.be/KuGq_0r0FCY", youtube_link: "https://youtu.be/KuGq_0r0FCY" } }, "A1");
+  expect(lesson.resources.teacherVideo?.url).toBe("https://youtu.be/emYqxezL9_U");
+  expect(lesson.resources.videos.filter(video => /teacher/i.test(video.key + " " + video.title)).map(video => video.url)).toEqual(["https://youtu.be/emYqxezL9_U"]);
+});
