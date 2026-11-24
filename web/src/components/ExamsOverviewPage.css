@@ -74,3 +74,15 @@
   .exam-room-date-picker-row .exam-room-countdown { width:100%; padding-top:8px; border-top:1px solid #e2e8f0; }
 }
 @media(max-width:360px) { .exam-room-skill { padding:9px; } .exam-room-countdown--compact { align-items:flex-start; } }
+
+/* Make the entire card a clearly labelled action without adding a nested button. */
+.exam-room-skills-heading p { margin:4px 0 0; font-size:13px; color:#475569; }
+.exam-room-skill { padding:14px; gap:12px; }
+.exam-room-skill-bottom { flex-wrap:wrap; }
+.exam-room-skill-action { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; box-sizing:border-box; padding:9px 10px; border-radius:7px; background:#eff6ff; color:#1e40af; font-size:13px; font-weight:700; }
+.exam-room-skill:hover .exam-room-skill-action { background:#dbeafe; }
+.exam-room-skill[aria-label^="Locked:"] .exam-room-skill-action { background:#f1f5f9; color:#475569; }
+.exam-room-progress-title { margin:0; font-size:16px; }
+.exam-room-summary .exam-room-metrics { margin-top:8px; padding-top:0; border-top:0; }
+.exam-room-file-link { display:flex; justify-content:flex-end; }
+@media(max-width:360px) { .exam-room-skill { padding:9px; } .exam-room-skill-action { padding:8px 6px; font-size:12px; } }
