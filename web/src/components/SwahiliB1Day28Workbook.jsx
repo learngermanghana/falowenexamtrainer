@@ -7,22 +7,14 @@ import { saveSwahiliWorkbook } from "../services/swahiliWorkbookService";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import SwahiliB1Day28Reading, { readingQuestions } from "./SwahiliB1Day28Reading";
 import { Link } from "react-router-dom";
-import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
+import { SWAHILI_B1_WORKBOOK_TABS, useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { WorkbookTabNav } from "./StandardWorkbookComponents";
 import SwahiliReviewDraft, { SwahiliFinalSubmit } from "./SwahiliReviewDraft";
 import "./SwahiliCourseBook.css";
 
-const tabs = [
-  { key: "references", label: "Muziki" },
-  { key: "grammar", label: "Sarufi na msamiati" },
-  { key: "sprechen", label: "1 · Kuzungumza" },
-  { key: "schreiben", label: "2 · Kuandika" },
-  { key: "lesen", label: "3 · Kusoma" },
-  { key: "hoeren", label: "4 · Kusikiliza" },
-  { key: "submit", label: "Kagua na uwasilishe" },
-];
+const tabs = [{ key: "references", label: "Muziki" }, ...SWAHILI_B1_WORKBOOK_TABS];
 
 const musicQuestions = [
   [

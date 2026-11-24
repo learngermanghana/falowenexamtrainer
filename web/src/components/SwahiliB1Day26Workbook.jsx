@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db, doc, getDoc } from "../firebase";
 import { saveSwahiliWorkbook } from "../services/swahiliWorkbookService";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import { WorkbookTabNav } from "./StandardWorkbookComponents";
-import { SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
+import { SWAHILI_B1_WORKBOOK_TABS, useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import { title, readingPassage, listeningDialogue, readingQuestions, listeningQuestions } from "../data/swahili/b1Day26";
 import { Day26Grammar, Day26Speaking, Day26Writing } from "./SwahiliB1Day26Learning";
+import SwahiliReviewDraft, { SwahiliFinalSubmit } from "./SwahiliReviewDraft";
 import "./SwahiliCourseBook.css";
 
-const tabs = [{key:"grammar",label:"Sarufi na msamiati"},{key:"sprechen",label:"1 · Kuzungumza"},{key:"schreiben",label:"2 · Kuandika"},{key:"lesen",label:"3 · Kusoma"},{key:"hoeren",label:"4 · Kusikiliza"},{key:"submit",label:"Kagua na uwasilishe"}];
+const tabs = SWAHILI_B1_WORKBOOK_TABS;
 function Questions({questions, answers, update, review = false}) {
   return <ol>{questions.map(({id,prompt,english}) => <li key={id}>
     <label htmlFor={review ? undefined : id}>{prompt}</label>
@@ -22,9 +23,7 @@ function Questions({questions, answers, update, review = false}) {
 export default function SwahiliB1Day26Workbook({uid}) {
   const {user,studentProfile} = useAuth();
   const canSubmit = canSubmitSwahiliWorkbook({user,studentProfile}) && uid === user?.uid;
-  const [params,setParams] = useSearchParams();
-  const activeTab = tabs.some(tab => tab.key === params.get("view")) ? params.get("view") : "grammar";
-  function selectTab(key) { const next = new URLSearchParams(params); next.set("view",key); setParams(next,{replace:true}); }
+  const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
   const draftKey = uid && "swahili-b1-day-26:" + uid;
   const [draft,setDraft] = useState(() => {
     try { return (draftKey && JSON.parse(sessionStorage.getItem(draftKey))) || {writing:{essay:""},reading:{},listening:{}}; }
@@ -33,7 +32,7 @@ export default function SwahiliB1Day26Workbook({uid}) {
   const [loading,setLoading] = useState(true);
   const [saving,setSaving] = useState(false);
   const [submitted,setSubmitted] = useState(false);
-  const [confirmed,setConfirmed] = useState(false);
+  const [confirmationVersion,setConfirmationVersion] = useState(0);
   const [notice,setNotice] = useState("");
   const [audio,setAudio] = useState({url:"",loading:false,error:""});
   async function loadAudio() {
@@ -64,15 +63,15 @@ export default function SwahiliB1Day26Workbook({uid}) {
   },[uid,canSubmit]);
   function update(section,id,value) {
     const next = {...draft,[section]:{...draft[section],[id]:value}};
-    setDraft(next); setConfirmed(false); setNotice("");
+    setDraft(next); setConfirmationVersion(version=>version+1); setNotice("");
     try { if(draftKey) sessionStorage.setItem(draftKey,JSON.stringify(next)); } catch { /* keep in memory */ }
   }
   async function submit() {
-    if (!canSubmit || !db || loading || saving || !complete || !confirmed) return;
+    if (!canSubmit || !db || loading || saving || !complete) return;
     setSaving(true); setNotice("");
     try {
       await saveSwahiliWorkbook(user,{program:"swahili",level:"B1",day:26,lessonId:"swahili-b1-day-26",title,writing:{essay:essay.trim()},readingAnswers:draft.reading,listeningAnswers:draft.listening});
-      setSubmitted(true); setConfirmed(false); setNotice("Kazi yako imewasilishwa kwa mwalimu.");
+      setSubmitted(true); setConfirmationVersion(version=>version+1); setNotice("Kazi yako imewasilishwa kwa mwalimu.");
     } catch { setNotice("Imeshindikana kuwasilisha kazi. Jaribu tena."); }
     finally { setSaving(false); }
   }
@@ -96,12 +95,11 @@ export default function SwahiliB1Day26Workbook({uid}) {
         <h3>Maswali 5 ya Kusikiliza</h3><Questions questions={listeningQuestions} answers={draft.listening || {}} update={(id,value)=>update("listening",id,value)} /></>}
       {activeTab==="submit" && <><h2>Kagua na uwasilishe kazi</h2>
         {submitted && <p>Kazi iliyowasilishwa awali inaweza kusasishwa.</p>}
-        <h3>2 · Kuandika</h3><p style={{whiteSpace:"pre-wrap"}}>{essay || "Hakuna jibu"}</p>
-        <h3>3 · Kusoma</h3><Questions questions={readingQuestions} answers={draft.reading || {}} review />
-        <h3>4 · Kusikiliza</h3><Questions questions={listeningQuestions} answers={draft.listening || {}} review />
+        <SwahiliReviewDraft writing={{"Insha au ripoti":essay}} questions={readingQuestions} reading={draft.reading || {}} listeningQuestions={listeningQuestions} listening={draft.listening || {}} />
         {!complete && <p>Kamilisha insha na ujibu maswali yote 10 kabla ya kuwasilisha.</p>}
-        <label><input type="checkbox" checked={confirmed} disabled={!complete || saving} onChange={event=>setConfirmed(event.target.checked)} /> Nimekagua majibu yangu yote.</label>
-        <button type="button" className="swahili-book__button" disabled={!canSubmit || loading || saving || !complete || !confirmed} onClick={submit}>{saving ? "Inawasilishwa…" : submitted ? "Wasilisha marekebisho" : "Wasilisha kwa mwalimu"}</button>
+        <SwahiliFinalSubmit key={confirmationVersion} requireListening disabled={!canSubmit || !db || loading || saving || !complete} onSubmit={submit}>
+          {saving ? "Inawasilishwa…" : submitted ? "Wasilisha marekebisho" : "Wasilisha kwa mwalimu"}
+        </SwahiliFinalSubmit>
         {notice && <p role="status">{notice}</p>}
       </>}
     </section>
