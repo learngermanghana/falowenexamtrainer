@@ -6,7 +6,6 @@ import { TrialExam } from "../context/TrialCatalogContext";
 const mockNavigate = jest.fn();
 let mockLevel = "B1";
 let mockReadingHistory = [];
-let mockDaily = { practised: false, hasDraft: false };
 
 jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
@@ -26,8 +25,6 @@ jest.mock("../services/readingPracticeHistory", () => ({
 }));
 
 jest.mock("../services/examRoomDashboardService", () => ({
-  getLocalDailyWarmup: () => mockDaily,
-  loadDailyWarmupProgress: jest.fn(),
   loadExamRoomResults: jest.fn(),
 }));
 
@@ -36,7 +33,6 @@ describe("simplified Exam Room overview", () => {
     mockNavigate.mockClear();
     mockLevel = "B1";
     mockReadingHistory = [];
-    mockDaily = { practised: false, hasDraft: false };
   });
 
   it("keeps real progress metrics and makes the mock and four skills direct choices", () => {
@@ -55,7 +51,10 @@ describe("simplified Exam Room overview", () => {
     expect(mock.compareDocumentPosition(progress) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole("button", { name: "Practise Sprechen" }).compareDocumentPosition(progress) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.queryByText(/Option [12]/)).not.toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "Recent results" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Practise individual exam sections" })).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Recent results" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Daily warm-up" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Not yet practised")).not.toBeInTheDocument();
     fireEvent.click(mock);
     expect(mockNavigate).toHaveBeenLastCalledWith("/exams/mocks");
 
@@ -65,7 +64,9 @@ describe("simplified Exam Room overview", () => {
       ["Schreiben", "/exams/writing"],
       ["Sprechen", "/exams/speaking"],
     ].forEach(([title, path]) => {
-      fireEvent.click(screen.getByRole("button", { name: "Practise " + title }));
+      const card = screen.getByRole("button", { name: "Practise " + title });
+      expect(card).toHaveTextContent("Practise " + title);
+      fireEvent.click(card);
       expect(mockNavigate).toHaveBeenLastCalledWith(path);
     });
   });
@@ -84,33 +85,24 @@ describe("simplified Exam Room overview", () => {
     },
   );
 
-  it("keeps the warm-up, recommendation, reading result and Exam File accessible", () => {
+  it("keeps the recommendation, latest score and Exam File accessible without a history panel", () => {
     mockLevel = "A2";
-    mockDaily = { practised: false, hasDraft: true };
     mockReadingHistory = [{
       id: "read-1", level: "A2", score: 8, total: 15,
       completedAt: "2026-10-08T10:00:00Z", title: "A2 Lesen sample",
     }];
     render(<ExamsOverviewPage />);
 
-    expect(screen.getByText("Warm-up in progress")).toBeInTheDocument();
-    expect(screen.getByText(/A2 Lesen sample/)).toBeInTheDocument();
-    expect(screen.getAllByText("53%").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Warm-up in progress")).not.toBeInTheDocument();
+    expect(screen.queryByText(/A2 Lesen sample/)).not.toBeInTheDocument();
+    expect(screen.getByText("Latest: 53%")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Practise Lesen" })).toHaveTextContent("Suggested next");
 
-    fireEvent.click(screen.getByRole("button", { name: "Continue →" }));
-    expect(mockNavigate).toHaveBeenLastCalledWith("/exams/question");
     fireEvent.click(screen.getByRole("button", { name: "Exam File →" }));
     expect(mockNavigate).toHaveBeenLastCalledWith("/exams/file");
   });
 
-  it("preserves a completed warm-up state without another prominent card", () => {
-    mockDaily = { practised: true, hasDraft: false };
-    render(<ExamsOverviewPage />);
-    expect(screen.getByText("Warm-up completed")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Review →" }));
-    expect(mockNavigate).toHaveBeenCalledWith("/exams/question");
-  });
+
 });
 
 
@@ -138,14 +130,13 @@ test("trial recommendation opens only the designated mock", () => {
 });
 
 
-test("locked warm-up and Exam File show explanations without navigating", () => {
+test("locked Exam File shows an explanation and trial overview omits history and warm-up", () => {
   mockLevel = "A2";
   mockNavigate.mockClear();
   render(<TrialExam.Provider value={{locked:true,id:null,level:"A2"}}><ExamsOverviewPage /></TrialExam.Provider>);
-  fireEvent.click(screen.getByRole("button",{name:"🔒 Locked"}));
-  expect(screen.getByRole("dialog",{name:"Locked: Daily warm-up"})).toBeInTheDocument();
-  expect(mockNavigate).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole("button",{name:"Keep browsing"}));
+  expect(screen.queryByRole("region", { name: "Daily warm-up" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("region", { name: "Exam room progress" })).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Locked: Lesen" })).toHaveTextContent("Locked");
   fireEvent.click(screen.getByRole("button",{name:"🔒 Exam File"}));
   expect(screen.getByRole("dialog",{name:"Locked: Exam File"})).toBeInTheDocument();
   expect(mockNavigate).not.toHaveBeenCalled();
