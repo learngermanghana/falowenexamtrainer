@@ -11,6 +11,7 @@ import ExamReadinessBadge from "./ExamReadinessBadge";
 import AutomaticMarkingStatus from "./AutomaticMarkingStatus";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
+import { courseTrial } from "./TrialPractice";
 import { courseSchedules } from "../data/courseSchedule";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { mergeAssignmentProgress } from "../utils/assignmentProgress";
@@ -613,6 +614,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const location = useLocation();
   const { showToast } = useToast();
   const { user, studentProfile } = useAuth();
+  const trial = courseTrial(studentProfile);
+  const trialLevel = trial ? String(studentProfile.level || "").toUpperCase() : "";
   const timedAssignment = useTimedAssignment();
   const [badgeRefreshToken, setBadgeRefreshToken] = useState(0);
   const [openedFeedbackId, setOpenedFeedbackId] = useState(null);
@@ -632,8 +635,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   );
   const requestedSubmitLevel = normalizeCourseLevel(workbookSubmissionContext.level);
   const accessibleSubmitLevels = useMemo(
-    () => getAccessibleLevels(preferredLevel, Object.keys(courseSchedules)),
-    [preferredLevel]
+    () => trialLevel ? [trialLevel] : getAccessibleLevels(preferredLevel, Object.keys(courseSchedules)),
+    [preferredLevel, trialLevel]
   );
   const [selectedSubmitLevel, setSelectedSubmitLevel] = useState(() => preferredLevel);
   const [hasManualSubmitLevelSelection, setHasManualSubmitLevelSelection] = useState(false);
@@ -765,9 +768,9 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
           });
         }
 
-        return dictionaryEntries;
+        return trialLevel ? dictionaryEntries.filter(entry => entry.day === 1 && entry.level === trialLevel) : dictionaryEntries;
       }),
-    [selectedSubmitLevel]
+    [selectedSubmitLevel, trialLevel]
   );
 
   const assignmentRequiredDaysLabel = useMemo(() => {
@@ -1170,8 +1173,14 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     ]
   );
 
+  const canSubmitSelected = useCallback(() => {
+    if (studentProfile?.accountType === "exam_only") return false;
+    const currentTrial = courseTrial(studentProfile);
+    return !currentTrial || (currentTrial.active && currentTrial.endsAtMs > Date.now() && selectedAssignmentDay === 1 && selectedAssignmentLevel === studentProfile.level);
+  }, [studentProfile, selectedAssignmentDay, selectedAssignmentLevel]);
   const persistSubmission = useCallback(
     async ({ statusLabel = "submitted" } = {}) => {
+      if (!canSubmitSelected()) throw new Error("Only Day 1 submissions are available during an active Full Course trial. Exam-only accounts cannot submit course assignments.");
       const trimmedText = form.submissionText.trim();
       if (!form.assignmentTitle || !trimmedText || !db || !user?.uid) return { ok: false, reason: "missing" };
 
@@ -1253,6 +1262,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     [
       buildChapterKey,
       buildSubmissionPayload,
+      canSubmitSelected,
       draftsByAssignment,
       form.assignmentTitle,
       form.submissionText,
@@ -2048,6 +2058,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!canSubmitSelected()) { setStatus({ loading: false, error: "Course submission access is restricted.", success: "" }); return; }
     setStatus({ loading: true, error: "", success: "" });
 
     if (!form.assignmentTitle || !form.submissionText.trim()) {
@@ -2356,6 +2367,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   };
 
   const handleSaveResubmissionDraft = async () => {
+    if (!canSubmitSelected()) { setResubmissionStatus({ loading: false, error: "Course submission access is restricted.", success: "" }); return; }
     setResubmissionStatus({ loading: true, error: "", success: "" });
 
     const correctedText = resubmissionText.trim();
@@ -2462,6 +2474,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   };
 
   const handleResubmit = async () => {
+    if (!canSubmitSelected()) { setResubmissionStatus({ loading: false, error: "Course submission access is restricted.", success: "" }); return; }
     setResubmissionStatus({ loading: true, error: "", success: "" });
 
     // Resubmissions must come only from React state bound to the textarea.
@@ -3271,4 +3284,8 @@ export const __TESTING__ = {
   buildSubmissionFingerprint,
 };
 
-export default AssignmentSubmissionPage;
+export default function AssignmentSubmissionAccess(props) {
+  const { studentProfile } = useAuth();
+  if (studentProfile?.accountType === "exam_only") return <section style={styles.card}><h3>Course assignments are locked</h3><p>Explore the Day 1 lesson. Submitting work requires Full Course access.</p><a href="/mock/payment">View plans</a></section>;
+  return <AssignmentSubmissionPage {...props} />;
+}

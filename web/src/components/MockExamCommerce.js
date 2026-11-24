@@ -211,7 +211,7 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
   const renderShell = levels => typeof children === "function" ? children(levels) : children;
   // Navigation is not an entitlement. Only these exact catalog paths can
   // render without a verified grant; direct practice URLs remain blocked.
-  if (home) return renderShell([displayLevel]);
+  if (home || (studentProfile?.accountType === "exam_only" && (path === "/campus/course" || path.startsWith("/campus/course/")) && !Object.values(MOCK_EXAM_CATALOG).some(mock => mock.route === path))) return renderShell([displayLevel]);
   const catalog = ["/exams/overview", "/exams/mocks"].includes(path);
   if (state.loading) return <div style={card} role="status">Checking your exam access…</div>;
   if (!paidLevels.length) {

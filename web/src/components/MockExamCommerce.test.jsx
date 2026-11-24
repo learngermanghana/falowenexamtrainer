@@ -163,3 +163,11 @@ test('a verified expired entitlement is not reopened by a stale local course tri
   await screen.findByRole('heading',{name:'A2 Mock Exams'});
   expect(screen.queryByRole('button',{name:'Start or resume mock'})).toBeNull();
 });
+
+test("exam-only students can navigate to the Course Book without an exam subscription", async () => {
+  mockApi();
+  useAuth.mockReturnValue({user:student,studentProfile:profile});
+  render(<MemoryRouter initialEntries={["/campus/course"]}><MockOnlyRouteBoundary><MockExamOnlyGate><h1>Course Book preview</h1></MockExamOnlyGate></MockOnlyRouteBoundary></MemoryRouter>);
+  expect(await screen.findByRole("heading",{name:"Course Book preview"})).toBeVisible();
+  expect(screen.queryByRole("heading",{name:"Choose how to continue"})).toBeNull();
+});

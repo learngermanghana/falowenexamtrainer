@@ -25,6 +25,8 @@ export default function MockOnlyRouteBoundary({ children }) {
     if (examOnly) return <MockExamOnlyGate>{children}</MockExamOnlyGate>;
     return children;
   }
+  if (examOnly && /^\/campus\/course(?:\/|$)/.test(route)) return children;
+  if (examOnly && /^\/campus\/?$/.test(route)) return <Navigate to="/campus/course" replace />;
   // Keep the public exam storefront at the subdomain root; redirect other
   // authenticated app URLs to the existing Exams Room.
   return <Navigate to="/exams/overview" replace />;

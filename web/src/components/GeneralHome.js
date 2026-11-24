@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { toDateMs } from "../lib/dateUtils";
+import { getTrialLifecycleState } from "../lib/trialAccess";
 import { ZOOM_DETAILS } from "../data/classCatalog";
 import ClassCalendarCard from "./ClassCalendarCard";
 import OnboardingChecklist from "./OnboardingChecklist";
@@ -77,7 +78,7 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
   );
 };
 
-const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false, examOnly = false }) => (
+const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) => (
   <section className="falowen-home-spaces" aria-label={t("homeAccess.spaces")}>
     <div className="falowen-home-spaces__heading">
       <h2>{t("homeAccess.spaces")}</h2>
@@ -105,7 +106,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false, exam
             : t("homeAccess.gerBookDesc")}</p>
         </div>
         <div className="falowen-home-space-card__bottom">
-          <button style={styles.primaryButton} onClick={openCampus} disabled={examOnly}>{examOnly ? "🔒 Full Course required" : t("homeAccess.openCourseBook")} <span aria-hidden="true">→</span></button>
+          <button style={styles.primaryButton} onClick={openCampus}>{t("homeAccess.openCourseBook")} <span aria-hidden="true">→</span></button>
         </div>
       </section>
 
@@ -155,6 +156,7 @@ const GeneralHome = ({
   notificationStatus,
   onEnableNotifications,
   onSaveOnboarding,
+  browseOnly = false,
 }) => {
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
@@ -175,7 +177,7 @@ const GeneralHome = ({
   const isSwahiliCampus = getCampusProgram(studentProfile) === "swahili";
   const firstLessonPath = isSwahiliCampus ? "/campus/course/swahili/day-1" : levelKey ? `/campus/course/lesson/${levelKey}/1` : "/campus/course";
   const examOnly = studentProfile?.accountType === "exam_only";
-  const onboardingCompleted = examOnly || Boolean(studentProfile?.onboardingCompleted);
+  const onboardingCompleted = browseOnly || examOnly || Boolean(studentProfile?.onboardingCompleted);
   const assignedClassLevel = classLevelFromName(preferredClass);
   const metricsStudentProfile = useMemo(
     () => assignedClassLevel
@@ -215,9 +217,11 @@ const GeneralHome = ({
   }, [onSelectArea, playOpenFeedback]);
 
   const joinZoom = useCallback(() => {
+    const lifecycle = getTrialLifecycleState(studentProfile);
+    if (examOnly || browseOnly || ["expired_retained", "retention_ending_soon", "purge_due"].includes(lifecycle.key) || (lifecycle.active && !preferredClass && !preferredClassId)) return;
     playOpenFeedback();
     window.open(ZOOM_DETAILS.url, "_blank", "noreferrer");
-  }, [playOpenFeedback]);
+  }, [playOpenFeedback, examOnly, browseOnly, studentProfile, preferredClass, preferredClassId]);
 
   const paymentAlert = useMemo(() => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
@@ -340,12 +344,12 @@ const GeneralHome = ({
 
   return (
     <div className="falowen-home-dashboard">
-      {!examOnly && new URLSearchParams(location.search).get("welcome") === "1" ? (
+      {!examOnly && !browseOnly && new URLSearchParams(location.search).get("welcome") === "1" ? (
         <OnboardingStudyBuddyStart firstLessonPath={firstLessonPath} />
       ) : null}
       <WelcomeHero
         studentProfile={studentProfile}
-        examOnly={examOnly}
+        examOnly={examOnly || browseOnly}
         className={preferredClass}
         classId={preferredClassId}
         onViewClassSchedule={openFullClassSchedule}
@@ -377,9 +381,9 @@ const GeneralHome = ({
         </section>
       ) : null}
 
-      <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} examOnly={examOnly} />
-      {examOnly && <section style={styles.card}><h3>Exam preparation access</h3><p>Browse your exam room. Subscribe when you are ready to unlock practice.</p><button style={styles.secondaryButton} onClick={() => navigate("/mock/payment")}>Payment options</button></section>}
-      {!examOnly && <div className="falowen-home-section-break falowen-home-section-break--highlights">
+      <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
+      {examOnly && <section style={styles.card}><h3>Exam preparation access</h3><p>Explore Campus Day 1 and browse your exam room. Subscribe when you are ready to unlock more practice.</p><button style={styles.secondaryButton} onClick={() => navigate("/mock/payment")}>Payment options</button></section>}
+      {!examOnly && !browseOnly && <div className="falowen-home-section-break falowen-home-section-break--highlights">
         <HomepageHighlights
           className={preferredClass}
           classId={preferredClassId}

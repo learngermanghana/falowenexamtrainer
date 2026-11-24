@@ -70,3 +70,21 @@ test('unknown legacy or institutional course access is not mistaken for a confir
   expect(resolveEntitlements({profile:{level:'A1',accountType:'course'},now})).toMatchObject({course:{day1:null,day2Plus:null,trial:false}});
   expect(resolveEntitlements({profile:{program:'swahili',level:'A1'},now})).toMatchObject({course:{day1:null,day2Plus:null}});
 });
+
+test('course preview is independent of exam subscription and never grants course submissions or classes', async () => {
+  const profile = { accountType:'exam_only', level:'A2' };
+  const { resolveEntitlements } = require('../entitlementService');
+  const snapshot = resolveEntitlements({profile,grants:[active('A2','level')],now});
+  expect(snapshot).toMatchObject({campus:true,examsRoom:true,course:{day1Preview:true,day1:false,day2Plus:false,liveClasses:false,day1Submission:false,day2PlusSubmission:false}});
+  const restriction = await trialRestriction(dbFor([]), {uid:'u'}, profile, true);
+  const { allowsTrialRequest } = require('../trialPractice');
+  expect(await allowsTrialRequest({path:'/course-media/a2/audio-url',method:'GET',query:{day:1}},restriction)).toBe(true);
+  expect(await allowsTrialRequest({path:'/course-media/a2/audio-url',method:'GET',query:{day:2}},restriction)).toBe(false);
+  expect(await allowsTrialRequest({path:'/course-media/studio/score',method:'POST',body:{assignmentKey:'A2-1.1'}},restriction)).toBe(false);
+});
+test('Full Course trial allows Day 1 submissions and live classes until the original expiry', () => {
+  const {resolveEntitlements}=require('../entitlementService');
+  const profile={accountType:'course',level:'A2',trialEndsAt:new Date(now+60000).toISOString()};
+  expect(resolveEntitlements({profile,now})).toMatchObject({course:{day1:true,liveClasses:true,day1Submission:true,day2PlusSubmission:false}});
+  expect(resolveEntitlements({profile,now:now+60000})).toMatchObject({campus:true,examsRoom:true,course:{day1:false,liveClasses:false,day1Submission:false,day2PlusSubmission:false}});
+});

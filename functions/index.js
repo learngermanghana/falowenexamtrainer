@@ -2035,6 +2035,25 @@ exports.submitAssignmentResubmission = onCall(
       }
 
       const db = getAdmin().firestore();
+      const policy = (await db.collection("courseAccountAccess").doc(authUid).get()).data();
+      if (policy?.examOnly ?? request.auth?.token?.examOnly === true) {
+        throw new HttpsError("permission-denied", "Exam-only accounts cannot submit course assignments.");
+      }
+      const students = db.collection("students");
+      const direct = await students.doc(authUid).get();
+      const linked = direct.exists ? direct : (await students.where("uid", "==", authUid).limit(2).get()).docs[0];
+      const profile = linked?.data();
+      if (profile?.accountType === "exam_only") throw new HttpsError("permission-denied", "Exam-only accounts cannot submit course assignments.");
+      if (profile) {
+        const end = require("./functionz/entitlementService").courseExpiry(profile);
+        if (end !== null) {
+          const eligible = require("./data/lessonCatalog").getLessonsByLevel(profile.level)
+            .some(item => item.day === 1 && item.assignmentId === canonicalAssignmentKey);
+          if (end <= Date.now() || level !== profile.level || !eligible) {
+            throw new HttpsError("permission-denied", "Only Day 1 assignments can be resubmitted during the active Full Course trial.");
+          }
+        }
+      }
       const counterRef = db.collection("submissionAttemptCounters").doc(
         buildAttemptCounterId({ studentId: authUid, canonicalAssignmentKey })
       );

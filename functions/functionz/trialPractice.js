@@ -5,7 +5,7 @@ const { courseExpiry, trialRestriction } = require("./entitlementService");
 const { getLessonsByLevel } = require("../data/lessonCatalog");
 
 async function allowsTrialRequest(req, restriction, db, uid) {
-  const {level, course} = restriction;
+  const {level, course, preview} = restriction;
   const exam = exams[level];
   if (!exam) return false;
   const path = req.path.toLowerCase().replace(/\/+$/, "");
@@ -14,9 +14,9 @@ async function allowsTrialRequest(req, restriction, db, uid) {
   const query = req.query || {};
   if (path === "/course-media/studio/lesson" || path === "/course-media/studio/score") {
     const key = req.method === "GET" ? query.assignmentKey : body.assignmentKey;
-    return course && getLessonsByLevel(level).some(item => item.day === 1 && item.assignmentId === key);
+    return (course || (preview && path === "/course-media/studio/lesson" && req.method === "GET")) && getLessonsByLevel(level).some(item => item.day === 1 && item.assignmentId === key);
   }
-  if (path === "/course-media/" + prefix + "/audio-url") return course && Number(query.day) === 1;
+  if (path === "/course-media/" + prefix + "/audio-url") return (course || (preview && req.method === "GET")) && Number(query.day) === 1;
   if (path === "/exam-room/results") {
     if (req.method === "GET") return true;
     return body.level === level && ((level === "C1" && body.setId === exam.resultId && body.section === "lesen") ||

@@ -16,7 +16,7 @@ import { expandCourseBookEntries } from "../utils/courseBookEntries";
 import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
 import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";
 import { persistCourseCompletionSnapshot } from "../services/courseCompletionSnapshotService";
-import { TrialCourseLevel } from "../context/TrialCatalogContext";
+import { TrialCourseLevel, TrialCourseDay1 } from "../context/TrialCatalogContext";
 import CourseBookLevelSelector from "./CourseBookLevelSelector";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
@@ -571,6 +571,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   }, [isFrenchProgram]);
 
   const trialLevel = React.useContext(TrialCourseLevel);
+  const day1Available = React.useContext(TrialCourseDay1);
   const levels = useMemo(() => {
     if (trialLevel) return [trialLevel];
     const baseLevels = Object.keys(schedules);
@@ -736,7 +737,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const progressPercent = isC2CourseBook
     ? (courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0)
     : (courseCompletion?.completionPercent || 0);
-  const nextLesson = trialLevel ? courseLessons.find(entry => Number(entry.day) === 1) : isC2CourseBook
+  const nextLesson = trialLevel ? (day1Available ? courseLessons.find(entry => Number(entry.day) === 1) : null) : isC2CourseBook
     ? getNextCourseBookEntry(courseLessons, effectivePracticeProgress)
     : findCourseBookEntryForRequirement(courseLessons, courseCompletion?.next);
   const nextLessonIndex = nextLesson ? courseLessons.findIndex((entry) => entry.assignmentKey === nextLesson.assignmentKey) : -1;
@@ -1199,7 +1200,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       ? (canonicalSelfLearningComplete ? ASSIGNMENT_STATUSES.milestoneComplete : ASSIGNMENT_STATUSES.inProgress)
                       : (practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly);
                     const instruction = formatCourseBookInstruction(entry.instruction);
-                    const locked = Boolean(trialLevel && Number(entry.day) !== 1);
+                    const locked = Boolean(trialLevel && (!day1Available || Number(entry.day) !== 1));
                     return (
                       <React.Fragment key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`}>
                         {isA1CourseBook && timedPhase && Number(getCourseBookDisplayDay(entry)) === timedPhase.startDay ? (
@@ -1303,7 +1304,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               </>
                             ) : null}
                             {locked ? (
-                              <button type="button" disabled style={styles.primaryButton}>🔒 Locked</button>
+                              <a href="/mock/payment" style={{ ...styles.secondaryButton, textDecoration: "none" }} aria-label={"Locked: " + getCourseBookEntryTitle(entry) + " — view plans"}>🔒 Locked · View plans</a>
                             ) : (<a
                               href={getLessonHref(entry)}
                               style={{ ...styles.primaryButton, textDecoration: "none" }}

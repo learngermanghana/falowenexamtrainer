@@ -663,11 +663,23 @@ function App() {
   if (isExamOnlyAccount) {
     return <MockExamOnlyGate>{(entitledLevels) => <ExamProvider entitledLevels={entitledLevels}><AppShell
       isStaff={isStaff}
-      allowedSections={{ ...allowedSections, course: false, attendance: false, discussion: false, classMembers: false }}
-      availableTabs={[]} defaultCampusSection="account" enableNotifications={enableNotifications}
+      allowedSections={{ course: true, account: true, attendance: false, discussion: false, classMembers: false, submit: false }}
+      availableTabs={tabStructure.filter(tab => isTabAvailable(tab, { course: true, account: true }))} defaultCampusSection="course" enableNotifications={enableNotifications}
       saveStudentProfile={saveStudentProfile} logout={logout} notificationStatus={notificationStatus}
       studentProfile={studentProfile} tabStructure={tabStructure} tabStorageKey={tabStorageKey} user={user}
     /></ExamProvider>}</MockExamOnlyGate>;
+  }
+
+  if (awaitingPayment && campusProgram === "german" && !universityPending && !universityContractEnded && ["expired_retained", "retention_ending_soon", "purge_due"].includes(trialLifecycle.key)) {
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    const browseSections = { course: true, account: true, results: true };
+    const examPath = /^\/exams(?:\/|$)/.test(path) || Object.values(MOCK_EXAM_CATALOG).some(mock => mock.route === path);
+    if (!examPath && !["/", "/campus", "/campus/course", "/campus/account", "/campus/results"].includes(path)) return <Navigate to="/campus/course" replace />;
+    return <ExamProvider><AppShell browseOnly isStaff={false} allowedSections={browseSections}
+      availableTabs={tabStructure.filter(tab => isTabAvailable(tab, browseSections))} defaultCampusSection="course"
+      enableNotifications={enableNotifications} saveStudentProfile={saveStudentProfile} logout={logout}
+      notificationStatus={notificationStatus} studentProfile={studentProfile} tabStructure={tabStructure}
+      tabStorageKey={tabStorageKey} user={user} /></ExamProvider>;
   }
 
   if (awaitingPayment) {
@@ -731,6 +743,7 @@ const AppShell = ({
   availableTabs,
   defaultCampusSection,
   hasActiveTrial = false,
+  browseOnly = false,
   enableNotifications,
   saveStudentProfile,
   logout,
@@ -753,6 +766,7 @@ const AppShell = ({
   const directSwahiliTrial = isSwahiliCampus && hasActiveTrial;
   const requiresOnboarding =
     studentProfile?.accountType !== "exam_only" &&
+    !browseOnly &&
     !directSwahiliTrial &&
     !["admin", "tutor"].includes(onboardingRole) &&
     !Boolean(studentProfile?.isTutor) &&
@@ -971,6 +985,7 @@ const AppShell = ({
             path="/"
             element={
               <GeneralHome
+                browseOnly={browseOnly}
                 onSelectArea={handleAreaSelect}
                 studentProfile={studentProfile}
                 notificationStatus={notificationStatus}
@@ -1734,7 +1749,7 @@ const CampusArea = ({
       {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
       {resolvedSection === "discussion" && allowedSections.discussion && getCampusProgram(campusStudentProfile) !== "swahili" ? <ClassDiscussionPage /> : null}
       {resolvedSection === "account" && allowedSections.account ? <AccountSettings /> : null}
-      {getCampusProgram(campusStudentProfile) !== "swahili" && <AttendanceCheckinCard />}
+      {allowedSections.attendance && getCampusProgram(campusStudentProfile) !== "swahili" && <AttendanceCheckinCard />}
       {resolvedSection === "tutor-marking" && allowedSections["tutor-marking"] ? <TutorMarkingPage /> : null}
     </>
   );

@@ -5,7 +5,7 @@ import { getMockExam } from "../data/mockExamCatalog";
 import { getLessonsByLevel } from "../data/lessonCatalog";
 import { getTrialLifecycleState } from "../lib/trialAccess";
 
-import { TrialCourseLevel, TrialExam } from "../context/TrialCatalogContext";
+import { TrialCourseLevel, TrialCourseDay1, TrialExam } from "../context/TrialCatalogContext";
 
 export function courseTrial(profile) {
   if (!profile || profile.accountType === "exam_only" || profile.program === "swahili" ||
@@ -35,7 +35,7 @@ function firstDayRoutes(level) {
   return routes;
 }
 
-export function TrialCoursePage({ level, path, active, endsAtMs, children }) {
+export function TrialCoursePage({ level, path, active, endsAtMs, previewOnly = false, children }) {
   const [clock, setClock] = React.useState(Date.now);
   React.useEffect(() => {
     if (!active || !Number.isFinite(endsAtMs) || endsAtMs <= clock) return undefined;
@@ -44,14 +44,14 @@ export function TrialCoursePage({ level, path, active, endsAtMs, children }) {
   }, [active, endsAtMs, clock]);
   active = active && (!Number.isFinite(endsAtMs) || Date.now() < endsAtMs);
   if (active && firstDayRoutes(level).has(path)) return children;
-  if (active && path === "/campus/course") {
-    return <TrialCourseLevel.Provider value={level}>{children}</TrialCourseLevel.Provider>;
+  if (path === "/campus/course") {
+    return <TrialCourseLevel.Provider value={level}><TrialCourseDay1.Provider value={active}>{children}</TrialCourseDay1.Provider></TrialCourseLevel.Provider>;
   }
   return <main style={{ padding: 24 }}>
     <h1>Unlock the full course</h1>
     {active && <p><Link to={["B2", "C1"].includes(level) ? "/campus/course/" + level.toLowerCase() + "-self-learning/day-1" : "/campus/course/lesson/" + level + "/1"}>Open Day 1</Link></p>}
-    <p>{active ? "Your trial includes Day 1. Join the full course for Day 2 onward." : "Your course trial has ended."}</p>
-    <Link to="/mock/payment">Choose a payment option</Link>
+    <p>{previewOnly ? "Day 1 is a preview. Full Course access is needed for assignments, live classes and later lessons." : active ? "Your trial includes Day 1. Join the full course for Day 2 onward." : "Your course trial has ended."}</p>
+    <Link to="/campus/course">Back to Course Book</Link>{" · "}<Link to="/mock/payment">Choose a payment option</Link>
   </main>;
 }
 
