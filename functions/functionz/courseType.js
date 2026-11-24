@@ -17,6 +17,7 @@ function ownsStudent(snapshot, user) {
 }
 
 function registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling }) {
+  registerAdminCourseTypeRoute(app, { admin, normalizeStudentBilling });
   app.post("/account/course-type", async (req, res) => {
     try {
       const user = await getAuthedUser(req);
@@ -172,4 +173,85 @@ async function processCourseTypeWebhook({ admin, data, addMonths, normalizeStude
   });
 }
 
-module.exports = { PRODUCT, accessRef, registerCourseTypeRoutes, processCourseTypeWebhook };
+
+function adminCourseTypeTransition(student, policy, courseType, normalizeStudentBilling) {
+  const examOnly = policy?.examOnly ?? (student.accountType === "exam_only");
+  const canRestoreCourse = !examOnly || policy?.canRestoreCourse === true;
+  if (courseType === "full_course" && !canRestoreCourse) {
+    return { status: 409, error: "No preserved course enrollment. Student must use the full-course enrollment checkout." };
+  }
+  const paid = normalizeStudentBilling(student).paidSoFar > 0;
+  const keepCourse = courseType === "full_course" || (canRestoreCourse && (paid ||
+    student.accessType === "complimentary" || student.institutionVerification === "approved" ||
+    String(student.paymentStatus || "").trim().toLowerCase() === "paid"));
+  return {
+    updates: { courseType, accountType: keepCourse ? "course" : "exam_only", courseEnrollmentPreserved: canRestoreCourse },
+    policy: { examOnly: !keepCourse, canRestoreCourse },
+  };
+}
+
+function registerAdminCourseTypeRoute(app, { admin, normalizeStudentBilling }) {
+  app.post("/students/:studentId/course-type", async (req, res) => {
+    try {
+      const bearer = String(req.headers?.authorization || "").match(/^Bearer (\S+)$/i);
+      if (!bearer) return res.status(401).json({ error: "Sign in to Falowen Admin." });
+      let actor;
+      try { actor = await admin.auth().verifyIdToken(bearer[1], true); }
+      catch { return res.status(401).json({ error: "Sign in again." }); }
+      if (actor.email_verified !== true || String(actor.email || "").toLowerCase() !== "moxflex@gmail.com") {
+        return res.status(403).json({ error: "Verified owner access required." });
+      }
+      const id = req.params.studentId;
+      const { courseType, expectedCourseType, reason } = req.body || {};
+      const types = ["full_course", "exam_preparation"];
+      if (typeof id !== "string" || !id || id.length > 200 || id.includes("/") ||
+          !types.includes(courseType) || !types.includes(expectedCourseType) || courseType === expectedCourseType ||
+          typeof reason !== "string" || !reason.trim() || reason.trim().length > 500) {
+        return res.status(400).json({ error: "Valid student, new course type and reason required." });
+      }
+      const db = admin.firestore();
+      const ref = db.collection("students").doc(id);
+      const audit = db.collection("studentCourseTypeAudit").doc();
+      const result = await db.runTransaction(async tx => {
+        const snap = await tx.get(ref);
+        if (!snap.exists) return { status: 404, error: "Student not found." };
+        const student = snap.data();
+        if (student.role && student.role !== "student" ||
+            String(student.program || "german").toLowerCase() !== "german" ||
+            student.secondaryProgram === "swahili" || student.institutionVerification === "approved" ||
+            ["archived", "deleted", "inactive", "withdrawn"].includes(String(student.status || "").toLowerCase())) {
+          return { status: 409, error: "This enrollment needs individual review." };
+        }
+        const uid = student.uid;
+        if (typeof uid !== "string" || !uid || uid.includes("/")) return { status: 409, error: "Link the existing student login first." };
+        const access = accessRef(db, uid);
+        const policy = (await tx.get(access)).data();
+        const deletion = (await tx.get(db.collection("accountDeletionRequests").doc(uid))).data();
+        const order = (await tx.get(orderRef(db, uid))).data();
+        if (["pending", "processing", "completed"].includes(deletion?.status) || order?.status === "pending") {
+          return { status: 409, error: "Resolve the pending account deletion or tuition checkout first." };
+        }
+        const matches = await tx.get(db.collection("students").where("uid", "==", uid).limit(2));
+        if (matches.size !== 1 || matches.docs[0].id !== id) return { status: 409, error: "Duplicate or ambiguous login link. Review student identity." };
+        const current = student.courseType || ((policy?.examOnly ?? (student.accountType === "exam_only")) ? "exam_preparation" : "full_course");
+        if (current !== expectedCourseType) return { status: 409, error: "Course type has changed. Refresh the student profile." };
+        const transition = adminCourseTypeTransition(student, policy, courseType, normalizeStudentBilling);
+        if (transition.error) return transition;
+        const timestamp = admin.firestore.FieldValue.serverTimestamp();
+        tx.set(access, transition.policy, { merge: true });
+        tx.update(ref, { ...transition.updates, updated_at: timestamp });
+        tx.create(audit, { studentId: id, uid, actorUid: actor.uid, previousCourseType: current,
+          previousAccountType: student.accountType || "course", ...transition.updates,
+          reason: reason.trim(), createdAt: timestamp });
+        return { updates: transition.updates, sheetSync: "queued", auditId: audit.id };
+      });
+      if (result.error) return res.status(result.status).json({ error: result.error });
+      return res.json({ ok: true, ...result });
+    } catch (error) {
+      console.error("Admin course type change failed", error?.code || error?.name);
+      return res.status(500).json({ error: "Could not change course type. Refresh before retrying." });
+    }
+  });
+}
+
+module.exports = { PRODUCT, accessRef, registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition };
