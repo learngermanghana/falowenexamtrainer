@@ -1,6 +1,7 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import ExamsOverviewPage from "./ExamsOverviewPage";
+import { TrialExam } from "../context/TrialCatalogContext";
 
 const mockNavigate = jest.fn();
 let mockLevel = "B1";
@@ -104,4 +105,21 @@ describe("simplified Exam Room overview", () => {
     fireEvent.click(screen.getByRole("button", { name: "Review →" }));
     expect(mockNavigate).toHaveBeenCalledWith("/exams/question");
   });
+});
+
+
+test("locked catalogue does not recommend a paid skill", () => {
+  mockLevel = "A2";
+  render(<TrialExam.Provider value={{locked:true,id:null,level:"A2"}}><ExamsOverviewPage /></TrialExam.Provider>);
+  expect(screen.getByRole("button",{name:"Locked: Lesen"})).toBeDisabled();
+  expect(screen.queryByRole("button",{name:"Practise recommended skill →"})).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button",{name:"Browse exams →"}));
+  expect(mockNavigate).toHaveBeenLastCalledWith("/exams/mocks");
+});
+test("trial recommendation opens only the designated mock", () => {
+  mockLevel = "A2";
+  const trial = {id:"a2-final-01",route:"/campus/course/a2-final-mock-exam"};
+  render(<TrialExam.Provider value={trial}><ExamsOverviewPage /></TrialExam.Provider>);
+  fireEvent.click(screen.getByRole("button",{name:"Open trial practice →"}));
+  expect(mockNavigate).toHaveBeenLastCalledWith(trial.route);
 });
