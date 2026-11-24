@@ -19,13 +19,15 @@ function resolveSwahiliAccess(profile, level, now = Date.now(), policy = {}) {
   if (primary !== "swahili" && !secondary) return { allowed:false };
   const placement = secondary ? profile.coursePlacements?.swahili : profile;
   if (!placement || normalize(placement.institutionVerification) === "pending" ||
-      normalize(placement.accessType) === "invitation_pending") return { allowed:false };
+      ["pending","invitation_pending"].includes(normalize(placement.accessType))) return { allowed:false };
   const assigned = String(placement.level || placement.levelId || "").trim().toUpperCase();
   const wanted = String(level || "").toUpperCase();
   if (!LEVELS.includes(wanted) || LEVELS.indexOf(assigned) < LEVELS.indexOf(wanted)) return { allowed:false };
   const managed = secondary && normalize(placement.accessType) === "complimentary";
   const hasEnd = placement.contractEnd !== null && placement.contractEnd !== undefined && placement.contractEnd !== "";
   const end = dateMillis(placement.contractEnd);
+  const start = dateMillis(placement.contractStart);
+  if (Number.isFinite(start) && start > now) return {allowed:false};
   if ((managed || hasEnd) && (!Number.isFinite(end) || end <= now)) return { allowed:false };
   return { allowed:true, expiresAtMs: Number.isFinite(end) ? end : null };
 }
