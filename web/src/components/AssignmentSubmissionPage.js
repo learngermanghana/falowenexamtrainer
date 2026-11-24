@@ -12,6 +12,7 @@ import AutomaticMarkingStatus from "./AutomaticMarkingStatus";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
 import { courseTrial } from "./TrialPractice";
+import { useAccessLock, courseLockInfo } from "./AccessLockDialog";
 import { courseSchedules } from "../data/courseSchedule";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { mergeAssignmentProgress } from "../utils/assignmentProgress";
@@ -3286,6 +3287,7 @@ export const __TESTING__ = {
 
 export default function AssignmentSubmissionAccess(props) {
   const { studentProfile } = useAuth();
-  if (studentProfile?.accountType === "exam_only") return <section style={styles.card}><h3>Course assignments are locked</h3><p>Explore the Day 1 lesson. Submitting work requires Full Course access.</p><a href="/mock/payment">View plans</a></section>;
+  const { openLock, lockDialog } = useAccessLock();
+  if (studentProfile?.accountType === "exam_only") return <section style={styles.card}><h3>Course assignments are locked</h3><p>Explore the Day 1 lesson. Submitting work requires Full Course access.</p><button type="button" style={styles.secondaryButton} onClick={event=>openLock(courseLockInfo({title:"Course assignment submission",examOnly:true,assignment:true,level:studentProfile.level}),event)}>🔒 Why is submission locked?</button>{lockDialog}</section>;
   return <AssignmentSubmissionPage {...props} />;
 }
