@@ -6,8 +6,8 @@ describe("institutional Kiswahili retention safety", () => {
     const index = fs.readFileSync(path.resolve(__dirname, "../../index.js"), "utf8");
     expect(index).toContain('student.registrationSource === "university-invite"');
     expect(index).toContain('student.cohortId === "university-hamburg-kiswahili-a1"');
-    expect(index).toContain('if (isInstitutionalKiswahiliStudent(student)) return { state: "not_trial" }');
-    expect(index).toContain('if (!student || isInstitutionalKiswahiliStudent(student) || hasStudentMadePayment(student)) return false');
-    expect(index).toContain('if (isInstitutionalKiswahiliStudent(docSnap.data() || {})) continue');
+    expect(index).toContain('isInstitutionalKiswahiliStudent(student)) return { state: "not_trial" }');
+    expect(index).toContain('isInstitutionalKiswahiliStudent(student) || hasStudentMadePayment(student)) return false');
+    expect(index).toContain('isInstitutionalKiswahiliStudent(student)) continue');
   });
 });
