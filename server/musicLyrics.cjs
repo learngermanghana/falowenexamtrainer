@@ -138,7 +138,7 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
       source:fallback===estimate ? 'acoustic-estimate' : checkedRecording ? 'bundled' : 'owner-supplied',
       timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? (recorded.timingStatus === 'estimated' ? 'estimated' : 'published') : approved?.timingStatus || 'missing'}));
     try {
-      const timingKey=objectKey.replace(/\.mp3$/i,'.lyrics.json');
+      const timingKey=objectKey.replace(/\.mp3(?:\.mpeg)?$/i,'.lyrics.json');
       const signed=signObject({key:timingKey},env);
       const response=await fetchImpl(signed.url,{signal:AbortSignal.timeout(10000)});
       if(response.status===404) return fallback ? sendFallback() : res.status(404).json({error:'Lyrics not published'});

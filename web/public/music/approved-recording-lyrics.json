@@ -4034,6 +4034,15 @@
       "recordingSha256": "d7f0e2bb93a32253bcf9a8e43e8fe7054af11b64ac53b45460493fe2f468012e",
       "source": "Owner-selected full recording lyrics; offline acoustic alignment. Line timings pending listening review.",
       "timingStatus": "estimated"
+    },
+    {
+      "trackId": "swahili-a1-day-12",
+      "objectKey": "swahili/music/A1/day-12/Angalia Kalenda.mp3.mpeg",
+      "title": "Angalia Kalenda",
+      "lyrics": "[Verse 1]\nWiki ina siku ngapi?\nSiku saba, siku saba!\nJumamosi, Jumapili,\nJumatatu, Jumanne, Jumatano,\nAlhamisi, Ijumaa,\nSiku saba za wiki!\nOh-oh, siku saba!\nSiku saba za wiki!\n\n[Chorus]\nSema, leo ni siku gani?\nSema, kesho ni siku gani?\nMwezi gani? Tarehe ngapi?\nAngalia kalenda!\nOh-oh, angalia kalenda!\nEh-eh, tarehe ngapi?\n\n[Verse 2]\nMwaka una miezi mingapi?\nMiezi kumi na miwili!\nJanuari, Februari, Machi,\nAprili, Mei, Juni,\nJulai, Agosti, Septemba,\nOktoba, Novemba, Desemba!\nOh-oh, miezi kumi na miwili!\nMiezi ya mwaka!\n\n[Verse 3]\nMei ni mwezi wa ngapi?\nMei ni mwezi wa tano!\nNovemba ni mwezi wa ngapi?\nNovemba ni mwezi wa kumi na moja!\nJanuari ni mwezi wa kwanza,\nDesemba ni mwezi wa kumi na mbili!\n\n[Chorus]\nSema, leo ni siku gani?\nSema, kesho ni siku gani?\nMwezi gani? Tarehe ngapi?\nAngalia kalenda!\nOh-oh, angalia kalenda!\nEh-eh, tarehe ngapi?\n\n[Verse 4]\nJuzi, jana, leo,\nKesho na kesho kutwa!\nLeo ni Jumatano,\nJana ilikuwa Jumanne.\nJuzi ilikuwa Jumatatu,\nKesho ni Alhamisi,\nKesho kutwa ni Ijumaa!\nOh-oh, juzi na jana,\nLeo, kesho, kesho kutwa!\n\n[Verse 5]\nLeo ni Jumatatu, tarehe tano Mei,\nKesho ni Jumanne, tarehe sita Mei.\nSiku yako ya kuzaliwa ni lini?\nNi tarehe kumi mwezi wa Juni!\nOh-oh, siku ya kuzaliwa!\nTarehe kumi mwezi wa Juni!\n\n[Verse 6]\nUna miadi lini, rafiki?\nNina miadi Alhamisi.\nTarehe ngapi?\nTarehe ishirini!\nMwezi gani?\nMwezi wa Agosti!\n\n[Final Chorus]\nSema, leo ni siku gani?\nSema, kesho ni siku gani?\nMwezi gani? Tarehe ngapi?\nAngalia kalenda!\nOh-oh, siku saba za wiki!\nEh-eh, miezi ya mwaka!\nWiki ina siku saba,\nMwaka una miezi kumi na miwili!",
+      "cues": [],
+      "source": "owner-supplied",
+      "timingStatus": "missing"
     }
   ]
 }

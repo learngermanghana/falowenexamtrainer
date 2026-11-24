@@ -1,6 +1,19 @@
 {
   "tracks": [
     {
+      "id": "swahili-a1-day-12",
+      "title": "Angalia Kalenda",
+      "level": "A1",
+      "day": 12,
+      "topic": "Siku, Miezi na Tarehe · Days, months and dates",
+      "language": "Swahili",
+      "type": "Lesson song",
+      "coursebook": true,
+      "featured": true,
+      "objectKey": "swahili/music/A1/day-12/Angalia Kalenda.mp3.mpeg",
+      "audioUrl": "https://www.falowen.app/api/music?track=swahili-a1-day-12"
+    },
+    {
       "id": "swahili-a1-day-02",
       "title": "Salamu, Salamu",
       "level": "A1",
