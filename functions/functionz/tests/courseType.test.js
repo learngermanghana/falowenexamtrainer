@@ -1,4 +1,4 @@
-const { registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition } = require("../courseType");
+const { registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition, preserveCourseExamTrial } = require("../courseType");
 
 function fixture(student) {
   const records = new Map([["students/student", { uid: "student", role: "student", level: "A1", ...student }]]);
@@ -101,4 +101,19 @@ test("admin transition preserves payment history and only restores an existing e
   expect(adminCourseTypeTransition({ paid: 1000 }, null, "exam_preparation", billing).updates.accountType).toBe("course");
   expect(adminCourseTypeTransition({ accountType: "exam_only" }, { examOnly: true, canRestoreCourse: false }, "full_course", billing).status).toBe(409);
   expect(adminCourseTypeTransition({ accountType: "exam_only" }, { examOnly: true, canRestoreCourse: true }, "full_course", billing).updates.accountType).toBe("course");
+});
+
+test("switch preserves the exact original course trial expiry and never restarts an existing exam trial", async () => {
+  const end = Date.now() + 3600000;
+  const { records, change } = fixture({ paid: 0, balanceDue: 3000, level: "A2", trialEndsAt: new Date(end).toISOString() });
+  await change("exam_preparation");
+  expect(records.get("mockSubscriptions/student_trial")).toMatchObject({ uid: "student", level: "A2", scope: "trial", expiresAtMs: end });
+  await change("full_course");
+  await change("exam_preparation");
+  expect(records.get("mockSubscriptions/student_trial").expiresAtMs).toBe(end);
+});
+test("expired course trial does not create a new exam grant", async () => {
+  const { records, change } = fixture({ paid: 0, balanceDue: 3000, level: "A2", trialEndsAt: new Date(Date.now() - 1000).toISOString() });
+  await change("exam_preparation");
+  expect(records.has("mockSubscriptions/student_trial")).toBe(false);
 });
