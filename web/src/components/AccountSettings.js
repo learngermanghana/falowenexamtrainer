@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
+import MyCoursesPanel from "./MyCoursesPanel";
 import StudentDocumentsPanel from "./StudentDocumentsPanel";
 import NotificationSettingsCard from "./NotificationSettingsCard";
 import AdditionalProgrammeRequest from "./AdditionalProgrammeRequest";
@@ -76,7 +77,7 @@ const AccountSettings = () => {
   const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab)
     ? (isSwahili && ["participation", "upgrade"].includes(requestedTab)) || (isSecondaryCourse && requestedTab === "upgrade")
       ? "studentData" : requestedTab
-    : requestedTab === "documents" ? "documents" : "studentData";
+    : requestedTab === "documents" ? "documents" : requestedTab === "courses" ? "courses" : "studentData";
 
   const selectAccountTab = (tabKey) => {
     const params = new URLSearchParams(location.search);
@@ -669,6 +670,7 @@ const AccountSettings = () => {
         </dl>
         <nav className="fw-account-nav" aria-label={t("accountOverview.title")}>
         {[
+          { key: "courses", label: "My courses" },
           { key: "studentData", label: t("accountSettings.tabs.studentData") },
           { key: "notifications", label: t("accountOverview.notifications") },
           { key: "billing", label: t("accountSettings.tabs.billing") },
@@ -693,6 +695,7 @@ const AccountSettings = () => {
             <Link to="/mock/account">Manage course type</Link>
           </p>
         )}
+      {activeTab === "courses" ? <MyCoursesPanel /> : null}
       {activeTab === "studentData" ? (
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>{t("accountSettings.studentData.title")}</h2>

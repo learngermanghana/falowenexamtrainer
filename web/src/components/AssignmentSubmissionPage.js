@@ -2058,8 +2058,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!canSubmitSelected()) { setStatus({ loading: false, error: "Course submission access is restricted.", success: "" }); return; }
     setStatus({ loading: true, error: "", success: "" });
+    if (!canSubmitSelected()) { setStatus({ loading: false, error: "Course submission access is restricted.", success: "" }); return; }
 
     if (!form.assignmentTitle || !form.submissionText.trim()) {
       setStatus({ loading: false, error: "Please select an assignment and enter your text.", success: "" });

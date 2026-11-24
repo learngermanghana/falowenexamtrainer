@@ -6,6 +6,7 @@ import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
 import { getBackendUrl } from "../services/backendUrl";
 import { isPublicClassOpen, loadPublicClasses } from "../services/publicClassCatalogService";
 import { styles } from "../styles";
+import MyCoursesPanel from "./MyCoursesPanel";
 import { PaymentNavigation } from "./MockExamCommerce";
 
 export function getCourseType(profile) {
@@ -97,6 +98,7 @@ export default function CourseTypeSettings() {
     <PaymentNavigation />
     <p><Link to="/mock/payment">← Back to payment options</Link></p>
     <h1>{choiceMode ? (selectedChoice === "full_course" ? "Full Course" : "Exam Preparation") : "Course type"}</h1>
+    {!choiceMode && <MyCoursesPanel />}
     <p>Current type <strong>{current === "exam_preparation" ? "Exam preparation" : "Full course"}</strong></p>
     {paymentReturn && <p role="status">{examOnly
       ? "Waiting for Paystack to confirm your tuition payment. Refresh this page to check your access."
