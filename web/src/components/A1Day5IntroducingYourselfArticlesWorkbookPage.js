@@ -69,14 +69,9 @@ const adjectivePairs = [
 const wWordQuestions = [
   { stem: "1. ___ heißt du?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wie", explanation: "Use Wie to ask about a name.", englishHint: "What is your name?" },
   { stem: "2. ___ ist das Buch?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wo", explanation: "Use Wo to ask about a place.", englishHint: "Where is the book?" },
-  { stem: "3. ___ wohnt er?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wo", explanation: "Use Wo for location.", englishHint: "Where does he live?" },
-  { stem: "4. ___ kommst du?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Woher", explanation: "Use Woher for origin.", englishHint: "Where do you come from?" },
-  { stem: "5. ___ ist dein Lehrer?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wer", explanation: "Use Wer for a person.", englishHint: "Who is your teacher?" },
-  { stem: "6. ___ geht es dir?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wie", explanation: "Use Wie for condition.", englishHint: "How are you?" },
-  { stem: "7. ___ machst du am Wochenende?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Was", explanation: "Use Was for an action or thing.", englishHint: "What do you do at the weekend?" },
-  { stem: "8. ___ ist das Auto?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wo", explanation: "Use Wo for location.", englishHint: "Where is the car?" },
-  { stem: "9. ___ bist du?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wer", explanation: "Use Wer to ask who a person is.", englishHint: "Who are you?" },
-  { stem: "10. ___ kommt sie?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Woher", explanation: "Use Woher for origin.", englishHint: "Where does she come from?" },
+  { stem: "3. ___ kommst du?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Woher", explanation: "Use Woher for origin.", englishHint: "Where do you come from?" },
+  { stem: "4. ___ ist dein Lehrer?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wer", explanation: "Use Wer for a person.", englishHint: "Who is your teacher?" },
+  { stem: "5. ___ machst du am Wochenende?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Was", explanation: "Use Was for an action or thing.", englishHint: "What do you do at the weekend?" },
 ];
 
 const sentenceReorderPhrases = [
