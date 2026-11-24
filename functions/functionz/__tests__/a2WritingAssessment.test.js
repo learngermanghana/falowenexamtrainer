@@ -1,7 +1,7 @@
 jest.mock('../openaiClient', () => ({ createChatCompletion: jest.fn() }));
 const { createChatCompletion } = require('../openaiClient');
 const { createMockAssessment } = require('../mockAssessment');
-const { validateA2WritingEvidence } = require('../a2WritingAssessment');
+const { validateA2WritingEvidence, canonicalizeA2WritingAssessment } = require('../a2WritingAssessment');
 // Preserve the learner's grammar, but exclude their identifying signature.
 const submission = {
   sms: 'Ich muss mit meine mutter einkaufen gehen darum werde ich spät bei unsere treffen kommen werde. Ich motchen wir nicht mehr ins Restaurant treffen aber jetzt ins Kino?',
@@ -72,6 +72,7 @@ test('A2 route wires evidence validation into the bounded assessment before scor
   const path = require('path');
   const source = fs.readFileSync(path.join(__dirname, '../app.js'), 'utf8');
   const route = source.slice(source.indexOf('app.post("/writing/a2-mock-score"'), source.indexOf('app.post("/writing/b2-mock-score"'));
+  expect(route).toContain('prepareResult: (assessment) => canonicalizeA2WritingAssessment(assessment, { sms, email })');
   expect(route).toContain('validateResult: (assessment) => validateA2WritingEvidence(assessment, { sms, email })');
   const start = source.indexOf('const a2MockWritingScorePrompt');
   const promptSource = source.slice(start, source.indexOf('].join("\\n");', start) + '].join("\\n");'.length);
@@ -82,4 +83,65 @@ test('A2 route wires evidence validation into the bounded assessment before scor
   expect(prompt).toContain(submission.email);
   expect(prompt).toContain('Assess content BEFORE language');
   expect(prompt).toContain('point_assessments');
+});
+
+test('server derives inconsistent AI arithmetic and redundant task flags without another paid call', async () => {
+  const raw = assessment();
+  raw.score = 0;
+  raw.parts.teil1.content_score = 0;
+  raw.parts.teil1.score = 10;
+  raw.parts.teil1.required_points_met = [true, true, true];
+  raw.parts.teil1.missing_required_points = [];
+  delete raw.parts.teil2.score;
+  createChatCompletion.mockResolvedValueOnce(JSON.stringify(raw));
+  const reply = await createMockAssessment([], {}, {
+    partKeys: ['teil1', 'teil2'], pointCounts: { teil1: 3, teil2: 3 }, formatPart: 'teil2',
+    prepareResult: result => canonicalizeA2WritingAssessment(result, submission),
+  });
+  const result = JSON.parse(reply);
+  expect(result.score).toBe(17);
+  expect(result.parts.teil1.score).toBe(4.5);
+  expect(result.parts.teil1.required_points_met).toEqual([false, true, true]);
+  expect(result.parts.teil1.missing_required_points).toEqual(['apology', 'new meeting time']);
+  expect(result.parts.teil2.score).toBe(12.5);
+  expect(createChatCompletion).toHaveBeenCalledTimes(1);
+});
+
+test('accepts only primary rubric fields when derived fields are omitted', () => {
+  const raw = assessment();
+  delete raw.score;
+  for (const part of Object.values(raw.parts)) {
+    for (const key of ['score', 'content_score', 'required_points_met', 'missing_required_points']) delete part[key];
+  }
+  const canonical = canonicalizeA2WritingAssessment(raw, submission);
+  expect(canonical.score).toBe(17);
+  expect(canonical.passed).toBe(true);
+  expect(canonical.parts.teil2.maxScore).toBe(15);
+  expect(raw.score).toBeUndefined();
+});
+
+test.each([
+  result => { result.parts.teil1.point_assessments[1].evidence_de = ['invented quote']; },
+  result => { result.parts.teil2.language_score = 4; },
+  result => { delete result.parts.teil2.greeting_ok; },
+  result => { result.parts.teil1.point_assessments.pop(); },
+  result => { result.parts.teil1.point_assessments[1].evidence_de = []; },
+])('still refuses missing or fabricated primary marking evidence', mutate => {
+  const raw = assessment(); mutate(raw);
+  expect(() => canonicalizeA2WritingAssessment(raw, submission)).toThrow(/Inconsistent/);
+});
+
+test('canonicalization enforces the existing score caps', () => {
+  const raw = assessment();
+  raw.parts.teil1.point_assessments[1] = point('missing', [], ['reason']);
+  raw.parts.teil1.language_score = 3;
+  raw.parts.teil1.appropriateness_score = 1;
+  raw.parts.teil2.greeting_ok = false;
+  raw.parts.teil2.closing_ok = false;
+  raw.parts.teil2.language_score = 3;
+  raw.parts.teil2.cohesion_score = 1;
+  const result = canonicalizeA2WritingAssessment(raw, submission);
+  expect(result.parts.teil1.score).toBe(4);
+  expect(result.parts.teil2.score).toBe(13);
+  expect(result.score).toBe(17);
 });
