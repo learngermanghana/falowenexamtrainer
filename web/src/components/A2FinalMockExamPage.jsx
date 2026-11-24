@@ -72,6 +72,7 @@ const emptyState = () => ({
   sectionScores: {},
   overall: null,
   writingPending: false,
+  writingTutorQueued: false,
   completed: false,
 });
 
@@ -586,7 +587,7 @@ export default function A2FinalMockExamPage() {
       });
     } catch (markError) {
       if (markError.submissionPhase === "upload") setWritingUpload("failed");
-      moveToSection("sprechen", { writingPending: true });
+      moveToSection("sprechen", { writingPending: true, writingTutorQueued: markError?.response?.data?.code === "MOCK_TUTOR_REVIEW_PENDING" });
     } finally {
       setBusy("");
     }
@@ -612,11 +613,14 @@ export default function A2FinalMockExamPage() {
         const sectionScores = {...current.sectionScores, schreiben:Number(result?.score || 0)};
         const total = Number(Object.values(sectionScores)
           .reduce((sum, n) => sum + Number(n || 0), 0).toFixed(1));
-        return {...current, schreibenResult:result, writingPending:false, sectionScores,
+        return {...current, schreibenResult:result, writingPending:false, writingTutorQueued:false, sectionScores,
           overall:current.completed ? {score:total, maxScore:100, passed:total >= 60} : current.overall};
       });
     } catch (markError) {
-      setError(getMockWritingSubmissionError(markError));
+      if (markError?.response?.data?.code === "MOCK_TUTOR_REVIEW_PENDING") {
+        setExam(current => ({...current,writingTutorQueued:true}));
+        setError("");
+      } else setError(getMockWritingSubmissionError(markError));
     } finally { setBusy(""); }
   };
 
@@ -1223,13 +1227,13 @@ export default function A2FinalMockExamPage() {
       {exam.stage === "sprechen" ? (
         <>
           {exam.writingPending ? <section aria-label="Schreiben submission">
-            <p role="status">{writingUpload === "saved"
+            <p role="status">{exam.writingTutorQueued ? "Your writing is with a tutor. Continue with Sprechen." : writingUpload === "saved"
               ? "Schreiben submitted to Falowen. AI marking needs a retry."
               : "Schreiben saved on this device. Submission or marking needs a retry."}</p>
             {error ? <p role="alert">{error}</p> : null}
-            <button type="button" onClick={retryPendingWriting} disabled={busy === "schreiben"}>
+            {!exam.writingTutorQueued && <button type="button" onClick={retryPendingWriting} disabled={busy === "schreiben"}>
               {busy === "schreiben" ? "AI marking in progress…" : "Retry Schreiben marking"}
-            </button>
+            </button>}
           </section> : null}
           <SectionHeader label="Sprechen · 15 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
           <A2FinalMockSpeaking
@@ -1244,11 +1248,11 @@ export default function A2FinalMockExamPage() {
       ) : null}
       {exam.stage === "result" && exam.writingPending ? (
         <article className="a1-final-mock-intro">
-          <h2>All four modules submitted · Schreiben feedback pending</h2>
-          <p>Your writing has been submitted, but AI marking is unavailable. You do not need to repeat the exam. The overall score will be shown only after grading succeeds.</p>
+          <h2>{exam.writingTutorQueued ? "Exam submitted · Tutor marking pending" : "All four modules submitted · Schreiben feedback pending"}</h2>
+          <p>{exam.writingTutorQueued ? "Your writing has been sent to a tutor. No further action is required. Your result will appear in Results once marking is complete." : "Your writing has been submitted, but AI marking is unavailable. You do not need to repeat the exam. The overall score will be shown only after grading succeeds."}</p>
           {error ? <p role="alert">{error}</p> : null}
           <button type="button" disabled={busy==="schreiben"} onClick={retryPendingWriting}>
-            {busy==="schreiben" ? "Marking…" : "Retry Schreiben marking"}
+            {busy==="schreiben" ? "Checking…" : exam.writingTutorQueued ? "Check result" : "Retry Schreiben marking"}
           </button>
         </article>
       ) : null}
