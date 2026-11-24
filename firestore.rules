@@ -134,7 +134,7 @@ service cloud.firestore {
     // Students can save/retrieve their own drafts, submissions, and one-time submission locks.
     // Staff can read/write for support and grading workflows.
     match /submissionDrafts/{draftId} {
-      allow create: if ownsStudentIncoming() || isStaff();
+      allow create: if (courseUser() && ownsStudentIncoming()) || isStaff();
       allow read: if ownsStudentResource() || isStaff();
       allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
       allow delete: if ownsStudentResource() || isStaff();
@@ -154,14 +154,14 @@ service cloud.firestore {
       ]);
     }
     match /submissions/{submissionId} {
-      allow create: if (ownsStudentIncoming() && hasNoMarkingFields()) || isStaff();
+      allow create: if (courseUser() && ownsStudentIncoming() && hasNoMarkingFields()) || isStaff();
       allow read: if ownsStudentResource() || isStaff();
-      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged() && markingFieldsUnchanged()) || isStaff();
+      allow update: if (courseUser() && ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged() && markingFieldsUnchanged()) || isStaff();
       allow delete: if isStaff();
     }
 
     match /submissionLocks/{lockId} {
-      allow create: if ownsStudentIncoming() || isStaff();
+      allow create: if (courseUser() && ownsStudentIncoming()) || isStaff();
       // The timed-assignment UI listens to a student's deterministic lock ID
       // before the first attempt exists. An absent document has no resource.data
       // for ownsStudentResource() to check; permit only this owner's missing lock.
@@ -178,7 +178,7 @@ service cloud.firestore {
     // Students may create their own attempt and move it forward only.
     // Staff may delete an attempt to explicitly reset it.
     match /timedAssignmentAttempts/{attemptId} {
-      allow create: if ownsStudentIncoming()
+      allow create: if courseUser() && ownsStudentIncoming()
         && request.resource.data.status == 'active'
         && request.resource.data.startedAt == request.time
         && request.resource.data.durationSeconds is int
