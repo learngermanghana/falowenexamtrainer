@@ -23,7 +23,7 @@ async function trialRestriction(db, identity, profile, courseResource = false) {
   const examOnly = profile.accountType === "exam_only" || (!profile.accountType && identity.examOnly === true);
   const ends = courseExpiry(profile);
   if (!examOnly && ends === null) return null;
-  if (courseResource) return { level: profile.level, course: !examOnly && ends > Date.now() };
+  if (courseResource) return examOnly ? { level: profile.level, course: false, preview: true } : { level: profile.level, course: ends > Date.now() };
   const grants = await activeSubscriptionsFor(db, identity.uid);
   if (grants.some(row => row.scope !== "trial" && (examOnly || row.level === profile.level))) return null;
   const trial = grants.find(row => row.scope === "trial");
@@ -61,7 +61,11 @@ function resolveEntitlements({ profile = {}, identity = {}, grants = [], now = D
   return {
     version: 1, accountType: examOnly ? "exam_only" : "course", level,
     home: true, account: true,
-    course: { day1: courseUnknown ? null : (courseAvailable || courseTrialActive),
+    campus: true, examsRoom: true,
+    course: { day1Preview: examOnly && Boolean(exams[level]), liveClasses: courseUnknown ? null : (courseAvailable || courseTrialActive),
+      day1Submission: courseUnknown ? null : (courseAvailable || courseTrialActive),
+      day2PlusSubmission: courseUnknown ? null : courseAvailable,
+      day1: courseUnknown ? null : (courseAvailable || courseTrialActive),
       day2Plus: courseUnknown ? null : courseAvailable, trial: courseTrialActive, endsAtMs },
     exam: { paidLevels, trial: trialExam ? { level: trialLevel, catalogId: trialExam.catalogId,
       expiresAtMs: examTrial ? Number(examTrial.expiresAtMs) : endsAtMs } : null },
