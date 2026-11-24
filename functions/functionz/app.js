@@ -4798,8 +4798,9 @@ app.post("/writing/a2-mock-score", async (req, res) => {
       }
       // Save any existing verified mark without another OpenAI request.
       const existing = snap.data()?.verifiedSections?.schreiben;
+      if (!existing?.verified && snap.data()?.writingTutorReview?.status === "pending") return res.status(409).json({code:"MOCK_TUTOR_REVIEW_PENDING",error:"Your writing is with a tutor."});
       if (existing?.verified && Number.isFinite(Number(existing.score))) {
-        return res.json({result:{score:Number(existing.score),maxScore:25,verified:true,reused:true}});
+        return res.json({result:{...(snap.data()?.writingTutorReview?.status === "published" ? snap.data()?.writingReview?.marking || {} : {}),score:Number(existing.score),maxScore:25,verified:true,reused:true}});
       }
     }
 
@@ -4949,7 +4950,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
       const db = getFirestoreSafe();
       if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
       try {
-        await persistVerifiedA2MockSection({
+        const verifiedWriting = await persistVerifiedA2MockSection({
           db,
           admin,
           uid: authedUser.uid,
@@ -4959,6 +4960,11 @@ app.post("/writing/a2-mock-score", async (req, res) => {
           source: "/writing/a2-mock-score",
           mockId,
         });
+        if (verifiedWriting?.source === "tutor" || Number(verifiedWriting?.score) !== Number(result?.score)) {
+          const latest = await db.collection("a2MockExamUsers").doc(authedUser.uid).collection("attempts").doc(attemptId).get();
+          pendingQuotaDate = "";
+          return res.json({result:{...(latest.data()?.writingReview?.marking || {}),score:Number(verifiedWriting.score),maxScore:25,verified:true,reused:true}});
+        }
         // The verified score is committed first. An audit-write failure must never
         // change a student's grade or trigger a second AI scoring request.
         try {
@@ -4972,6 +4978,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
         }
       } catch (verificationError) {
         const code = String(verificationError?.code || "");
+        if (code === "MOCK_TUTOR_REVIEW_PENDING") {await refundFailedMarking();return res.status(409).json({code,error:"Your writing is with a tutor."});}
         const statusCode =
           code === "A2_MOCK_ATTEMPT_NOT_FOUND"
             ? 404
@@ -5003,6 +5010,18 @@ app.post("/writing/a2-mock-score", async (req, res) => {
   } catch (err) {
     console.error("/writing/a2-mock-score error", err);
     await refundFailedMarking();
+    if (err?.code === "MOCK_MARKING_UNAVAILABLE" && authedUser?.uid &&
+        String(req.body?.mockId || "a2-mock-01") === "a2-mock-01" && req.body?.attemptId) {
+      try {
+        const db = getFirestoreSafe();
+        if (db && await require("./mockWritingTutorFallback").enqueueA2Writing({db,admin,uid:authedUser.uid,
+          attemptId:String(req.body.attemptId).trim().slice(0,120),answers:{sms:String(req.body?.sms || "").trim().slice(0,4000),email:String(req.body?.email || "").trim().slice(0,6000)}})) {
+          return res.status(409).json({code:"MOCK_TUTOR_REVIEW_PENDING",error:"Your writing has been sent to a tutor."});
+        }
+      } catch (queueError) {
+        console.error("A2 tutor handoff failed",queueError?.code || queueError?.status || "unknown");
+      }
+    }
     auditAIRequest({
       route: "/writing/a2-mock-score",
       uid: authedUser?.uid,
@@ -5465,6 +5484,70 @@ app.get("/internal/mock-writing-review", async (req, res) => {
     console.error("Staff mock writing review failed", err);
     return res.status(503).json({ error: "Could not load the mock writing review" });
   }
+});
+
+// Staff-only mock marking fallback. No polling or automatic AI retries.
+const mockTutorFallback = require("./mockWritingTutorFallback");
+const canReviewMockWriting = identity => Boolean(identity?.uid) &&
+  (require("./mockAttemptMonitor").isAuthorizedMockMonitor(identity) ||
+    (identity.staff === true && Array.isArray(identity.staffPages) && identity.staffPages.includes("marking"))) &&
+  (!Array.isArray(identity.staffLanguages) || identity.staffLanguages.includes("german"));
+app.get("/internal/mock-writing-tutor-queue", async (req,res) => {
+  try {
+    const identity = await requireAuthenticatedUser(req,res,{allowGuest:false});
+    if (!identity) return;
+    if (!canReviewMockWriting(identity)) return res.status(403).json({error:"German marking access required."});
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Marking storage unavailable."});
+    const snap = await db.collection(mockTutorFallback.QUEUE).where("status","==","pending").limit(50).get();
+    const rows = snap.docs.map(doc => {const row=doc.data();return {id:doc.id,studentEmail:row.studentEmail,level:row.level,mockId:row.mockId,attemptId:row.attemptId};});
+    res.set("Cache-Control","no-store");
+    return res.json({rows,partial:snap.size===50});
+  } catch (err) {return res.status(503).json({error:"Could not load pending mock marking."});}
+});
+app.get("/internal/mock-writing-tutor-item", async (req,res) => {
+  try {
+    const identity = await requireAuthenticatedUser(req,res,{allowGuest:false});
+    if (!identity) return;
+    if (!canReviewMockWriting(identity)) return res.status(403).json({error:"German marking access required."});
+    const id=String(req.query?.id || "");
+    if (!/^[a-f0-9]{64}$/.test(id)) return res.status(400).json({error:"Invalid review identifier."});
+    const db=getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Marking storage unavailable."});
+    const snap=await db.collection(mockTutorFallback.QUEUE).doc(id).get();
+    if (!snap.exists || snap.data().status!=="pending") return res.status(404).json({error:"Pending review not found."});
+    const row=snap.data();
+    const attempt=await db.collection("a2MockExamUsers").doc(row.uid).collection("attempts").doc(row.attemptId).get();
+    const data=attempt.data() || {};
+    res.set("Cache-Control","no-store");
+    return res.json({id,studentEmail:row.studentEmail,mockId:row.mockId,answers:row.answers,
+      task:mockTaskPrompt("A2","writing",undefined,row.mockId),
+      ready:data.state?.stage==="result" && data.state?.completed===true && data.verifiedSections?.sprechen?.verified===true});
+  } catch(err) {return res.status(503).json({error:"Could not load review."});}
+});
+app.post("/internal/mock-writing-tutor-publish", async (req,res) => {
+  try {
+    const identity=await requireAuthenticatedUser(req,res,{allowGuest:false});
+    if (!identity) return;
+    if (!canReviewMockWriting(identity)) return res.status(403).json({error:"German marking access required."});
+    const db=getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Marking storage unavailable."});
+    const result=await mockTutorFallback.publishA2TutorGrade({db,admin,id:String(req.body?.id||""),identity,grade:req.body||{},findStudentProfile:findAuthedStudentProfile});
+    return res.json(result);
+  } catch(err) {return res.status(err?.status || (err?.code==="A2_MOCK_SECTION_NOT_VERIFIED"?409:503)).json({error:err?.status?err.message:"Could not publish the verified mock result."});}
+});
+app.post("/internal/mock-writing-tutor-recover", async (req,res) => {
+  try {
+    const identity=await requireAuthenticatedUser(req,res,{allowGuest:false});
+    if (!identity) return;
+    if (!canReviewMockWriting(identity)) return res.status(403).json({error:"German marking access required."});
+    const parsed=require("./mockWritingAudit").parseReviewId(String(req.body?.attempt||""));
+    if (!parsed || parsed.level!=="A2") return res.status(400).json({error:"Enter an A2 attempt identifier."});
+    const db=getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Marking storage unavailable."});
+    const queued=await mockTutorFallback.enqueueA2Writing({db,admin,uid:parsed.uid,attemptId:parsed.attemptId,recover:true,reason:"staff_recovery"});
+    return res.json({queued});
+  } catch(err) {return res.status(err?.status||503).json({error:err?.status?err.message:"Could not recover the saved attempt."});}
 });
 
 app.post("/a1-mock/attempt/start", async (req, res) => {
@@ -6255,6 +6338,10 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           throw new Error("Server-verified A2 mock totals are missing.");
         }
         verifiedResult = { sectionScores: verifiedSectionScores, overall: verifiedOverall };
+        if (attemptData.writingTutorReview?.status === "published" && attemptData.completionSync?.ok) {
+          // Tutor publication already committed result and notifications atomically.
+          return res.json({...saveOutcome,completionSync:attemptData.completionSync,verifiedResult});
+        }
 
         completionSync = await syncA2MockCompletion({
           db,

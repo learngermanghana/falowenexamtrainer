@@ -4,7 +4,13 @@ import {restoreFullMockReviewState} from "../utils/mockReviewAccess";
 
 test.each(["A1","A2","B1"])("%s full mock keeps students progressing when writing AI fails",level => {
   const source=fs.readFileSync(path.join(__dirname,`${level}FinalMockExamPage.jsx`),"utf8");
-  expect(source).toContain('moveToSection("sprechen", { writingPending: true })');
+  if (level === "A2") {
+    expect(source).toContain('moveToSection("sprechen", { writingPending: true, writingTutorQueued:');
+    expect(source).toContain('MOCK_TUTOR_REVIEW_PENDING');
+    expect(source).toContain('No further action is required.');
+  } else {
+    expect(source).toContain('moveToSection("sprechen", { writingPending: true })');
+  }
   expect(source).toContain('Retry Schreiben marking');
   expect(source).toContain('exam.completed && !exam.writingPending');
   expect(source).toContain('exam.writingPending || !attemptId');

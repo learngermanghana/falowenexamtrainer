@@ -36,7 +36,8 @@ if (!services.includes("<CourseBookPriorityLayoutService />")) {
   throw new Error("Course Book layout-only priority service is missing.");
 }
 const hasPinnedClassCalendar = (home.match(/initialClassId=\{preferredClassId\}/g) || []).length === 2;
-if (!hasPinnedClassCalendar && !home.includes("<HomepageHighlights") && !home.includes("<HomeNextClassCard className={preferredClass}")) {
+const hasScheduleAccess = home.includes("onViewClassSchedule={openFullClassSchedule}") && home.includes("<WelcomeHero") && home.includes("<HomeMetrics") && !home.includes("<HomepageHighlights");
+if (!hasScheduleAccess && !hasPinnedClassCalendar && !home.includes("<HomepageHighlights") && !home.includes("<HomeNextClassCard className={preferredClass}")) {
   throw new Error("Homepage next-class card is missing.");
 }
 if (home.includes("<HomeClassAccess className={preferredClass}")) {
@@ -45,7 +46,7 @@ if (home.includes("<HomeClassAccess className={preferredClass}")) {
 
 fs.writeFileSync(servicesPath, services, "utf8");
 fs.writeFileSync(homePath, home, "utf8");
-console.log(hasPinnedClassCalendar
+console.log(hasScheduleAccess ? "Course Book removes Next live class; Home keeps schedule access." : hasPinnedClassCalendar
   ? "Course Book removes Next live class; Home owns both class-ID-pinned calendar mounts."
   : home.includes("<HomepageHighlights")
     ? "Course Book removes Next live class; Home Highlights owns the class schedule."
