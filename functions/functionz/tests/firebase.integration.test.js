@@ -183,10 +183,19 @@ describe("Firebase auth + Firestore integration", () => {
     const studentId = signup.localId;
     const profilePath = `students/${studentId}`;
     const profileData = {
+      uid: signup.localId,
+      role: "student",
+      program: "german",
+      courseType: "full_course",
       firstName: "Ada",
       lastName: "Lovelace",
       email,
       level: "B2",
+      status: "pending",
+      paymentStatus: "pending",
+      initialPaymentAmount: 0,
+      tuitionFee: 3000,
+      balanceDue: 3000,
       createdAt: Date.now(),
     };
 
@@ -195,12 +204,57 @@ describe("Firebase auth + Firestore integration", () => {
 
     expect(storedProfile).toMatchObject(profileData);
 
-    await writeFirestoreDocument(signup.idToken, profilePath, {
-      ...profileData,
-      level: "C1",
-    });
-    const updatedProfile = await readFirestoreDocument(signup.idToken, profilePath);
+    // Personal details are editable; enrollment and billing are staff/server-owned.
+    const updatedData = { ...profileData, firstName: "Augusta Ada" };
+    await writeFirestoreDocument(signup.idToken, profilePath, updatedData);
+    expect(await readFirestoreDocument(signup.idToken, profilePath)).toMatchObject(updatedData);
 
-    expect(updatedProfile.level).toBe("C1");
+    for (const forbidden of [
+      { level: "C1" },
+      { paymentStatus: "paid", balanceDue: 0 },
+      { initialPaymentAmount: 3000 },
+      { trialEndsAt: new Date(Date.now() + 30 * 86400000).toISOString() },
+      { uid: "different-student" },
+    ]) {
+      await expect(writeFirestoreDocument(signup.idToken, profilePath, {
+        ...updatedData, ...forbidden,
+      })).rejects.toThrow("Firestore write failed: 403");
+    }
+    expect(await readFirestoreDocument(signup.idToken, profilePath)).toMatchObject(updatedData);
+  });
+
+  it("allows a legitimate pending signup before email verification using a student-code document", async () => {
+    const email = `pending-profile-${Date.now()}@example.com`;
+    const signup = await signUpWithEmail(email, "StrongPass123!");
+    const profilePath = `students/CODE-${signup.localId}`;
+    const startedAt = Date.now();
+    const profileData = {
+      uid: signup.localId,
+      studentCode: `CODE-${signup.localId}`,
+      email,
+      role: "student",
+      program: "german",
+      courseType: "full_course",
+      level: "A1",
+      status: "pending",
+      paymentStatus: "pending",
+      initialPaymentAmount: 0,
+      balanceDue: 3000,
+      trialStatus: "active",
+      trialStartedAt: new Date(startedAt).toISOString(),
+      trialEndsAt: new Date(startedAt + 7 * 86400000).toISOString(),
+    };
+
+    const { uid, ...missingUid } = profileData;
+    for (const invalid of [
+      missingUid,
+      { ...profileData, uid: "different-student" },
+      { ...profileData, paymentStatus: "paid", balanceDue: 0 },
+    ]) {
+      await expect(writeFirestoreDocument(signup.idToken, profilePath, invalid))
+        .rejects.toThrow("Firestore write failed: 403");
+    }
+    await writeFirestoreDocument(signup.idToken, profilePath, profileData);
+    expect(await readFirestoreDocument(signup.idToken, profilePath)).toMatchObject(profileData);
   });
 });
