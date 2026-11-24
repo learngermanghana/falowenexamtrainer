@@ -1,6 +1,15 @@
 import React, { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+export const SWAHILI_B1_WORKBOOK_TABS = [
+  {key:"grammar",label:"Sarufi na msamiati"},
+  {key:"sprechen",label:"1 · Kuzungumza"},
+  {key:"schreiben",label:"2 · Kuandika"},
+  {key:"lesen",label:"3 · Kusoma"},
+  {key:"hoeren",label:"4 · Kusikiliza"},
+  {key:"submit",label:"Kagua na uwasilishe"},
+];
+
 export function useSwahiliWorkbookTab(tabs) {
   const location = useLocation();
   const navigate = useNavigate();
