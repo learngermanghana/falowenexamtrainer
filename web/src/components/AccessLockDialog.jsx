@@ -38,10 +38,10 @@ export function useAccessLock() {
     trigger.current = event?.currentTarget || document.activeElement;
     setInfo(details);
   };
-  const closeLock = () => {
-    setInfo(null);
-    trigger.current?.focus?.();
-  };
+  useEffect(() => {
+    if (!info && trigger.current) { trigger.current.focus?.(); trigger.current = null; }
+  }, [info]);
+  const closeLock = () => setInfo(null);
   return { openLock, lockDialog: info ? <AccessLockDialog info={info} onClose={closeLock} /> : null };
 }
 
