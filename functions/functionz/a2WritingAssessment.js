@@ -20,7 +20,7 @@ const pointAssessmentShape = () => Array.from({ length: 3 }, () => ({
   status: 'missing', evidence_de: [], missing_details_en: ['Unexpressed element of this point.'],
 }));
 
-const invalid = () => { throw Object.assign(new Error('Inconsistent A2 writing evidence or scores.'), { code: 'INVALID_MOCK_ASSESSMENT' }); };
+const invalid = (field = 'a2.assessment') => { throw Object.assign(new Error('Inconsistent A2 writing evidence or scores.'), { code: 'INVALID_MOCK_ASSESSMENT', validationField: field }); };
 const normalized = (text) => String(text || '').normalize('NFC').replace(/\s+/g, ' ').trim();
 const same = (a, b) => Math.abs(a - b) < 0.011;
 
@@ -30,17 +30,17 @@ function validateA2WritingEvidence(result, { sms, email }) {
     ['teil2', email, 3, { structure_score: 2, language_score: 3, cohesion_score: 1 }, [11, 7, 3]],
   ]) {
     const part = result.parts?.[key];
-    if (!part || !Array.isArray(part.point_assessments) || part.point_assessments.length !== 3) invalid();
+    if (!part || !Array.isArray(part.point_assessments) || part.point_assessments.length !== 3) invalid(`${key}.point_assessments`);
     let content = 0;
     const missing = [];
     let absent = 0;
     part.point_assessments.forEach((point, index) => {
       if (!point || !['met', 'partial', 'missing'].includes(point.status) ||
-          !Array.isArray(point.evidence_de) || !Array.isArray(point.missing_details_en)) invalid();
-      if (point.evidence_de.some(quote => typeof quote !== 'string' || !normalized(quote) || !normalized(source).includes(normalized(quote)))) invalid();
-      if (point.missing_details_en.some(detail => typeof detail !== 'string' || !detail.trim())) invalid();
-      if (point.status !== 'missing' && point.evidence_de.length === 0) invalid();
-      if (point.status === 'met' ? point.missing_details_en.length !== 0 : point.missing_details_en.length === 0) invalid();
+          !Array.isArray(point.evidence_de) || !Array.isArray(point.missing_details_en)) invalid(`${key}.point_shape`);
+      if (point.evidence_de.some(quote => typeof quote !== 'string' || !normalized(quote) || !normalized(source).includes(normalized(quote)))) invalid(`${key}.evidence_de`);
+      if (point.missing_details_en.some(detail => typeof detail !== 'string' || !detail.trim())) invalid(`${key}.missing_details_en`);
+      if (point.status !== 'missing' && point.evidence_de.length === 0) invalid(`${key}.missing_evidence`);
+      if (point.status === 'met' ? point.missing_details_en.length !== 0 : point.missing_details_en.length === 0) invalid(`${key}.missing_detail_status`);
       if (part.required_points_met?.[index] !== (point.status !== 'missing')) invalid();
       content += point.status === 'met' ? weight : point.status === 'partial' ? weight / 2 : 0;
       absent += Number(point.status === 'missing');
@@ -50,7 +50,7 @@ function validateA2WritingEvidence(result, { sms, email }) {
     if (typeof part.content_score !== 'number' || !same(part.content_score, content)) invalid();
     let score = content;
     for (const [field, max] of Object.entries(components)) {
-      if (typeof part[field] !== 'number' || !Number.isFinite(part[field]) || part[field] < 0 || part[field] > max) invalid();
+      if (typeof part[field] !== 'number' || !Number.isFinite(part[field]) || part[field] < 0 || part[field] > max) invalid(`${key}.${field}`);
       score += part[field];
     }
     if (absent) score = Math.min(score, caps[absent - 1]);
@@ -74,28 +74,28 @@ function canonicalizeA2WritingAssessment(result, submission) {
     ['teil2', submission.email, 3, 15, { structure_score: 2, language_score: 3, cohesion_score: 1 }, [11, 7, 3]],
   ]) {
     const part = result.parts[key];
-    if (!part || !Array.isArray(part.point_assessments) || part.point_assessments.length !== 3) invalid();
+    if (!part || !Array.isArray(part.point_assessments) || part.point_assessments.length !== 3) invalid(`${key}.point_assessments`);
     let content = 0;
     const flags = [];
     const missing = [];
     for (const point of part.point_assessments) {
       if (!point || !['met', 'partial', 'missing'].includes(point.status) ||
-          !Array.isArray(point.evidence_de) || !Array.isArray(point.missing_details_en)) invalid();
+          !Array.isArray(point.evidence_de) || !Array.isArray(point.missing_details_en)) invalid(`${key}.point_shape`);
       flags.push(point.status !== 'missing');
       missing.push(...point.missing_details_en);
       content += point.status === 'met' ? weight : point.status === 'partial' ? weight / 2 : 0;
     }
     let score = content;
     for (const [field, max] of Object.entries(components)) {
-      if (typeof part[field] !== 'number' || !Number.isFinite(part[field]) || part[field] < 0 || part[field] > max) invalid();
+      if (typeof part[field] !== 'number' || !Number.isFinite(part[field]) || part[field] < 0 || part[field] > max) invalid(`${key}.${field}`);
       score += part[field];
     }
-    if (key === 'teil2' && (typeof part.greeting_ok !== 'boolean' || typeof part.closing_ok !== 'boolean')) invalid();
+    if (key === 'teil2' && (typeof part.greeting_ok !== 'boolean' || typeof part.closing_ok !== 'boolean')) invalid(`${key}.format`);
     const absent = flags.filter(flag => !flag).length;
     if (absent) score = Math.min(score, caps[absent - 1]);
     if (key === 'teil2' && !part.greeting_ok && !part.closing_ok) score = Math.min(score, 13);
     if (!normalized(source)) {
-      if (flags.some(Boolean)) invalid();
+      if (flags.some(Boolean)) invalid(`${key}.blank_response`);
       score = 0;
     }
     canonical.parts[key] = { ...part, score, maxScore, content_score: content,
