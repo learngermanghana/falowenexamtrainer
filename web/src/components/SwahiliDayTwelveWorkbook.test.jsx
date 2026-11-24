@@ -4,14 +4,16 @@ import { MemoryRouter } from "react-router-dom";
 import SwahiliA1PracticeWorkbook from "./SwahiliA1PracticeWorkbook";
 import { SWAHILI_A1_PRACTICE_UNITS } from "../data/swahili/a1PracticeUnits";
 jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: null, studentProfile: null }) }));
-test.each([12,13])("Day %i has versioned calendar/routine exercises and teacher-led listening", day => {
+test.each([12,13])("Day %i has versioned calendar/routine exercises and recorded listening", day => {
  const lesson=SWAHILI_A1_PRACTICE_UNITS[day];
  expect(lesson.contentVersion).toBe(3);
  expect(lesson.reading.questions).toHaveLength(5);
  expect(lesson.listening.questions).toHaveLength(5);
- expect(lesson.listening.teacherLed).toBe(true);
- expect(lesson.listening.audioUrlEndpoint).toBeUndefined();
+ expect(lesson.listening.teacherLed).toBe(false);
+ expect(lesson.listening.audioUrlEndpoint).toBe(`/api/course-media/swahili/a1/day-${day}/audio-url`);
  for(const section of [lesson.reading,lesson.listening]) for(const q of section.questions) expect(q).not.toHaveProperty("answer");
  render(<MemoryRouter initialEntries={[`/campus/course/swahili/day-${day}?view=hoeren`]}><SwahiliA1PracticeWorkbook lesson={lesson} preview /></MemoryRouter>);
- expect(screen.getByText(/Teacher-led listening/)).toBeTruthy();
+ expect(screen.getByRole('button', {name:/Load audio/})).toBeTruthy();
+ expect(screen.queryByText(/Teacher-led listening/)).toBeNull();
+ expect(screen.getAllByRole('radio')).toHaveLength(15);
 });
