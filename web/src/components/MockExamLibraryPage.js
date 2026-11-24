@@ -7,6 +7,8 @@ import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { styles } from "../styles";
 import { announceExamSuccess } from "../services/interactionFeedback";
 
+import { TrialExam } from "../context/TrialCatalogContext";
+
 const statusLabel = (status, mock) => {
   if (mock?.mode === "full" && status === "preview" && ["a1-final-04", "a1-final-05", "a1-final-06", "a1-final-07", "a1-final-08", "a2-mock-03"].includes(mock.id)) return "4-module mock · preview";
   if (mock?.mode === "kombi") {
@@ -24,13 +26,15 @@ const statusLabel = (status, mock) => {
 
 export default function MockExamLibraryPage() {
   const navigate = useNavigate();
-  const { level } = useExam();
+  const { level: selectedLevel } = useExam();
+  const trialExam = React.useContext(TrialExam);
+  const level = trialExam?.level || selectedLevel;
   const { user, studentProfile } = useAuth();
   const examOnly = studentProfile?.accountType === "exam_only";
   const [ownedLevels, setOwnedLevels] = useState([]);
-  const [loadingOwned, setLoadingOwned] = useState(examOnly);
+  const [loadingOwned, setLoadingOwned] = useState(examOnly && !trialExam);
   useEffect(() => {
-    if (!examOnly || !user) return undefined;
+    if (!examOnly || trialExam || !user) return undefined;
     let mounted = true;
     setLoadingOwned(true);
     user.getIdToken().then(token => fetch(`${getBackendUrl()}/mock/access`, {
@@ -43,9 +47,9 @@ export default function MockExamLibraryPage() {
     }).catch(() => { if (mounted) setOwnedLevels([]); })
       .finally(() => { if (mounted) setLoadingOwned(false); });
     return () => { mounted = false; };
-  }, [examOnly, user]);
+  }, [examOnly, trialExam, user]);
   const mocks = getMockExamsForLevel(level, { includeCourse: true }).filter(mock =>
-    !examOnly || (ownedLevels.includes(mock.level) && mock.status !== "planned" &&
+    !examOnly || ((trialExam?.level === mock.level || ownedLevels.includes(mock.level)) && mock.status !== "planned" &&
       mock.id !== "a2-course-preview-01")
   );
 
@@ -57,9 +61,10 @@ export default function MockExamLibraryPage() {
         <p style={{ ...styles.helperText, margin: 0 }}>
           {mocks.some((mock) => mock.mode === "full" && mock.status === "ready") ? "Choose a complete mock or practise one skill. Full mocks cover all four modules; previews may not produce a combined score." : "A full mock is not yet published for this level. Choose available skill practice below; it does not produce an overall mock result."}
         </p>
+        {trialExam && <a href="/mock/checkout">Get 30-day exam access</a>}
       </section>
 
-      {examOnly && ownedLevels.includes(level) && <section style={styles.card}>
+      {examOnly && !trialExam && ownedLevels.includes(level) && <section style={styles.card}>
         <strong>Your {level} monthly access · practise in any order</strong>
         <p style={{ ...styles.helperText, margin: "8px 0" }}>
           All published exams and individual skills are included. There is no price per Teil.
@@ -108,8 +113,8 @@ export default function MockExamLibraryPage() {
                     </p>
                   )}
                 </div>
-                                <button type="button" style={styles.primaryButton} onClick={() => { announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
-                  {mock.mode === "full" || mock.mode === "kombi" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
+                <button type="button" disabled={Boolean(trialExam && mock.id !== trialExam.id)} style={styles.primaryButton} onClick={() => { announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
+                  {trialExam && mock.id !== trialExam.id ? "🔒 Locked" : mock.mode === "full" || mock.mode === "kombi" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
               </div>
             </article>

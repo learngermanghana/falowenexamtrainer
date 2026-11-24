@@ -15,6 +15,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ExamProvider, useExam } from "./context/ExamContext";
+import { TrialExam } from "./context/TrialCatalogContext";
 import CourseTab from "./components/CourseTab";
 import NextLevelPreviewPage from "./components/NextLevelPreviewPage";
 import CourseLessonPage from "./components/CourseLessonPage";
@@ -1741,7 +1742,8 @@ const ExamArea = ({ onBack }) => {
   const navigate = useNavigate();
   const { level, setLevel, accessibleLevels: unrestrictedAccessibleLevels } = useExam();
   const { studentProfile } = useAuth();
-  const examOnlyView = studentProfile?.accountType === "exam_only";
+  const trialExam = React.useContext(TrialExam);
+  const examOnlyView = Boolean(trialExam) || studentProfile?.accountType === "exam_only";
   const accessibleLevels = examOnlyView ? [String(studentProfile?.level || "A1").toUpperCase()] : unrestrictedAccessibleLevels;
   useEffect(() => {
     if (examOnlyView && level !== accessibleLevels[0]) setLevel(accessibleLevels[0]);
@@ -1833,6 +1835,8 @@ const ExamArea = ({ onBack }) => {
     },
   };
   const activeExamHero = examHeroConfig[examSection];
+  const tabLocked = key => Boolean(trialExam && !["overview", "mocks"].includes(key));
+
 
   const openExamSection = (tab) => {
     if (examSection === tab.key && !sampleId) return;
@@ -1851,9 +1855,9 @@ const ExamArea = ({ onBack }) => {
             <button
               key={tab.key}
               style={examSection === tab.key ? styles.navButtonActive : styles.navButton}
-              onClick={() => openExamSection(tab)}
+              disabled={tabLocked(tab.key)} onClick={() => openExamSection(tab)}
             >
-              {tab.label}
+              {tabLocked(tab.key) && "🔒 "}{tab.label}
             </button>
           ))}
         </div>
@@ -1867,8 +1871,8 @@ const ExamArea = ({ onBack }) => {
             <button type="button" onClick={() => { announceExamSuccess("Home opened successfully."); onBack(); }}>← {t("appNav.backHome")}</button>
             {tabs.map((tab) => (
               <button key={tab.key} type="button" aria-current={examSection === tab.key ? "page" : undefined}
-                onClick={() => openExamSection(tab)}>
-                {tab.label}
+                disabled={tabLocked(tab.key)} onClick={() => openExamSection(tab)}>
+                {tabLocked(tab.key) && "🔒 "}{tab.label}
               </button>
             ))}
           </nav>
