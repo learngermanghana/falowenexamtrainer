@@ -23,7 +23,7 @@ describe("Exams Room navigation cleanup", () => {
       "utf8"
     );
     expect(overview).toContain('onClick={event => trialExam ? explainLock("Exam File", event) : openPractice("/exams/file", "My Exam File opened successfully.")}');
-    expect(overview).toContain("Practise individual exam sections");
+    expect(overview).toContain("Practise by skill");
     expect(overview).not.toContain("review your exam resources");
   });
 });
