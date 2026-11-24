@@ -1,4 +1,4 @@
-const test=require("node:test"),assert=require("node:assert/strict");const {blockedEnrollmentLevels,practiceBlocked}=require("../levelEnrollmentAccess");
+const assert=require("node:assert/strict");const {blockedEnrollmentLevels,practiceBlocked}=require("../levelEnrollmentAccess");
 const a2={program:"german",level:"A2",status:"active",balanceDue:1000,paymentDeadline:"2026-12-02",contractEnd:"2027-05-24"};
 const a1={program:"german",level:"A1",status:"active",balanceDue:0,contractEnd:"2027-01-20"};
 const date=s=>Date.parse(s+"T00:00:00Z");
