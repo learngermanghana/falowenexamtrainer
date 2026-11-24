@@ -98,3 +98,12 @@ describe("Exams Room result sync", () => {
     ).toThrow(/setId is required/i);
   });
 });
+
+test("does not convert missing scores to zero or discard genuine zeros", () => {
+  const base = {level:"A2",section:"mixed",setId:"a2-final-mock",attemptId:"attempt",resultType:"final_mock",total:100};
+  expect(() => normalizeResultInput({...base,score:null})).toThrow(/score must/i);
+  const normalized = normalizeResultInput({...base,score:0,percent:null,sectionScores:{lesen:0,hoeren:null,schreiben:"",sprechen:false}});
+  expect(normalized.percent).toBe(0);
+  expect(normalized.sectionScores).toEqual({lesen:0});
+  expect(normalizeResultInput({...base,score:50,percent:null}).percent).toBe(50);
+});
