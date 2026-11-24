@@ -2,6 +2,7 @@ import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { auth, db, doc, onSnapshot, serverTimestamp, setDoc } from "../firebase";
 import { useAuth } from "../context/AuthContext";
+import { ensureCourseSubmissionAccess } from "../services/courseSubmissionAccess";
 import { useLessonProgress } from "../hooks/useLessonProgress";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { styles } from "../styles";
@@ -309,7 +310,7 @@ export default function SharedTimedAssignment({
     writeLocalSession(assignmentKey, normalizedLevel, null);
 
     if (attemptRef) {
-      setDoc(
+      ensureCourseSubmissionAccess(currentUser).then(() => setDoc(
         attemptRef,
         {
           status: "expired",
@@ -317,13 +318,13 @@ export default function SharedTimedAssignment({
           updatedAt: serverTimestamp(),
         },
         { merge: true },
-      ).catch((error) => {
+      )).catch((error) => {
         console.error("Could not persist timed assignment expiry", error);
       });
     }
 
     expiryCallbackRef.current?.({ assignmentKey, config });
-  }, [assignmentKey, attemptRef, config, enabled, normalizedLevel]);
+  }, [assignmentKey, attemptRef, config, currentUser, enabled, normalizedLevel]);
 
   useEffect(() => {
     if (!enabled || attemptState !== "active" || !session) return undefined;
@@ -384,6 +385,7 @@ export default function SharedTimedAssignment({
 
     try {
       if (attemptRef && currentUser?.uid) {
+        await ensureCourseSubmissionAccess(currentUser, { force: true });
         await setDoc(attemptRef, {
           studentId: currentUser.uid,
           studentEmail: currentUser.email || "",
@@ -416,8 +418,7 @@ export default function SharedTimedAssignment({
     attemptRef,
     attemptState,
     cloudState,
-    currentUser?.email,
-    currentUser?.uid,
+    currentUser,
     durationSeconds,
     enabled,
     normalizedLevel,
@@ -436,7 +437,7 @@ export default function SharedTimedAssignment({
     writeLocalSession(assignmentKey, normalizedLevel, null);
 
     if (attemptRef) {
-      setDoc(
+      ensureCourseSubmissionAccess(currentUser).then(() => setDoc(
         attemptRef,
         {
           status: "submitted",
@@ -444,11 +445,11 @@ export default function SharedTimedAssignment({
           updatedAt: serverTimestamp(),
         },
         { merge: true },
-      ).catch((error) => {
+      )).catch((error) => {
         console.error("Could not persist timed assignment submission state", error);
       });
     }
-  }, [assignmentKey, attemptRef, normalizedLevel]);
+  }, [assignmentKey, attemptRef, currentUser, normalizedLevel]);
 
   const onSubmissionError = useCallback((message = "") => {
     setStatus(
