@@ -6,10 +6,10 @@
 const SHEET_INPUT_FIELDS = Object.freeze([
   "studentCode", "studentcode", "uid", "email", "name", "phone",
   "location", "program", "level", "className", "status", "enrollDate", "joined_at",
-  "initialPaymentAmount", "paidAmount", "paid", "balanceDue", "balance",
+  "initialPaymentAmount", "paidAmount", "amountPaid", "totalPaid", "paid", "balanceDue", "balance",
   "tuitionFee", "paymentStatus", "contractStart", "contractEnd",
   "trialStartedAt", "trialEndsAt", "trialPurgeAt", "trialUsedAt",
-  "trialConvertedAt", "learningMode", "address", "contractMergeMode",
+  "trialConvertedAt", "courseType", "accountType", "address", "contractMergeMode",
   "upgradeCarryoverUntil", "upgradeFromLevel", "upgradeToLevel",
   "upgradeQueuedAt", "emergencyContactPhone", "dailyLimit", "usesToday",
   "lastDate", "reminderSent", "enrollmentSent", "lastPaidRecorded",

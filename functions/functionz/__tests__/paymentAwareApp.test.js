@@ -16,8 +16,8 @@ jest.mock("firebase-admin", () => ({
   firestore: Object.assign(
     () => ({
       collection: (name) => {
-        if (name === "accountDeletionRequests") {
-          return { doc: () => ({ get: jest.fn().mockResolvedValue({ exists: false, data: () => ({}) }) }) };
+        if (name === "accountDeletionRequests" || name === "courseAccountAccess") {
+          return { doc: () => ({ get: jest.fn().mockResolvedValue({ exists: false, data: () => undefined }) }) };
         }
         if (name === "students") {
           return {

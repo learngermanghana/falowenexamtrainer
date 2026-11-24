@@ -32,7 +32,8 @@ test("registration creates the student and one expiring grant in the same batch"
   const handlers = {};
   const app = { post: (path, fn) => { handlers[path] = fn; }, get: () => {} };
   const writes = [];
-  const batch = { create: (ref, data) => writes.push([ref.path, data]), commit: jest.fn() };
+  const write = (ref, data) => writes.push([ref.path, data]);
+  const batch = { create: write, set: write, commit: jest.fn() };
   const db = {
     batch: () => batch,
     collection: name => ({
@@ -48,7 +49,10 @@ test("registration creates the student and one expiring grant in the same batch"
   await handlers["/mock/register"]({body:{name:"Test Student",level:"A1"}},res);
   expect(res.status).toHaveBeenCalledWith(201);
   expect(batch.commit).toHaveBeenCalledTimes(1);
-  expect(writes.map(([path]) => path)).toEqual(["students/test","mockSubscriptions/test_trial"]);
+  expect(writes.map(([path]) => path)).toEqual(["students/test","mockSubscriptions/test_trial","courseAccountAccess/test"]);
+  expect(writes[0][1]).toMatchObject({ courseType: "exam_preparation", accountType: "exam_only", trialStatus: "not_applicable" });
+  expect(writes[0][1]).not.toHaveProperty("tuitionFee");
+  expect(writes[0][1]).not.toHaveProperty("balanceDue");
   expect(writes[1][1]).toMatchObject({scope:"trial",level:"A1",mockIds:["a1-final-02"]});
   expect(writes[1][1].expiresAtMs).toBeGreaterThanOrEqual(now + 7*86400000);
   expect(writes[1][1].expiresAtMs).toBeLessThanOrEqual(Date.now() + 7*86400000);

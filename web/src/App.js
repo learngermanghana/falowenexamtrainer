@@ -12,7 +12,7 @@ import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/Asse
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
 import { MOCK_EXAM_CATALOG } from "./data/mockExamCatalog";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
@@ -31,6 +31,7 @@ import { MockExamSignupPage, MockExamCheckoutPage, MockExamOnlyGate, isMockPorta
 import LandingPage from "./components/LandingPage";
 import HealthIndicator from "./components/HealthIndicator";
 import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
+import CourseTypeSettings from "./components/CourseTypeSettings";
 import AccountSettings from "./components/AccountSettings";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import GrammarQuestionTab from "./components/GrammarQuestionTab";
@@ -617,6 +618,7 @@ function App() {
   }
 
   if (location.pathname === "/mock/free-hoeren") return <ListeningPracticeSamplePage level="A1" sampleId="sample-1" freeTrial />;
+  if (location.pathname === "/mock/account") return <CourseTypeSettings />;
   if (location.pathname === "/mock/register") return <MockExamSignupPage />;
   if (location.pathname === "/mock/checkout" || location.pathname === "/mock/complete") {
     return <MockExamCheckoutPage paymentReturn={location.pathname === "/mock/complete"} />;
@@ -657,13 +659,13 @@ function App() {
 
   const isExamOnlyAccount = studentProfile?.accountType === "exam_only";
   if (isExamOnlyAccount) {
-    return <MockExamOnlyGate><ExamProvider><AppShell
+    return <MockExamOnlyGate>{(entitledLevels) => <ExamProvider entitledLevels={entitledLevels}><AppShell
       isStaff={isStaff}
       allowedSections={{ ...allowedSections, course: false, attendance: false, discussion: false, classMembers: false }}
       availableTabs={[]} defaultCampusSection="account" enableNotifications={enableNotifications}
       saveStudentProfile={saveStudentProfile} logout={logout} notificationStatus={notificationStatus}
       studentProfile={studentProfile} tabStructure={tabStructure} tabStorageKey={tabStorageKey} user={user}
-    /></ExamProvider></MockExamOnlyGate>;
+    /></ExamProvider>}</MockExamOnlyGate>;
   }
 
   if (awaitingPayment) {
@@ -1739,13 +1741,9 @@ const ExamArea = ({ onBack }) => {
   const { t } = useTranslation();
   const { section, practiceLevel = "", sampleId = "" } = useParams();
   const navigate = useNavigate();
-  const { level, setLevel, accessibleLevels: unrestrictedAccessibleLevels } = useExam();
+  const { level, setLevel, accessibleLevels } = useExam();
   const { studentProfile } = useAuth();
   const examOnlyView = studentProfile?.accountType === "exam_only";
-  const accessibleLevels = examOnlyView ? [String(studentProfile?.level || "A1").toUpperCase()] : unrestrictedAccessibleLevels;
-  useEffect(() => {
-    if (examOnlyView && level !== accessibleLevels[0]) setLevel(accessibleLevels[0]);
-  }, [examOnlyView, level, accessibleLevels[0], setLevel]);
 
   const lastVisitStorageKey = "falowen_exam_last_visit";
   const lastSectionStorageKey = "falowen_exam_last_section";
@@ -1857,6 +1855,7 @@ const ExamArea = ({ onBack }) => {
             </button>
           ))}
         </div>
+        {examOnlyView && <Link to="/mock/account">Manage course type</Link>}
         <details className="mobile-exam-menu" key={examSection}>
           <summary aria-label="Open Exam Room Menu and other exam pages">
             <span aria-hidden="true">☰</span> <span>Exam Room Menu</span>

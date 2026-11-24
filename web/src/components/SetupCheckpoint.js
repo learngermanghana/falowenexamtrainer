@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getCampusProgram } from "../utils/campusProgram";
@@ -122,6 +123,7 @@ const SetupCheckpoint = () => {
             </button>
           )}
           <p>Student code: {studentProfile.studentCode}</p>
+          <Link to="/mock/account">Manage course type</Link>
           {status && <p role="status">{status}</p>}
           <button style={styles.secondaryButton} onClick={logout}>Logout</button>
         </section>
@@ -221,6 +223,8 @@ const SetupCheckpoint = () => {
             Share this code with your instructor or use it when submitting assignments and practice drills.
           </p>
         </div>
+
+        <Link to="/mock/account">Manage course type</Link>
 
         <div id="tuition-payment" style={{ scrollMarginTop: 16 }}>
           <TuitionStatusCard

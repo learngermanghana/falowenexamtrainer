@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { loadPreferredLevel, savePreferredLevel } from "../services/levelStorage";
+import { getBackendUrl } from "../services/backendUrl";
 import { getExamPracticeLevels, resolveExamPracticeLevel } from "../utils/examLevelAccess";
 
 export const SPEAKING_FORMATS = {
@@ -134,12 +135,21 @@ export const getTasksForLevel = (level) =>
 
 const ExamContext = createContext();
 
-export const ExamProvider = ({ children }) => {
+export const ExamProvider = ({ children, entitledLevels }) => {
   const { user, studentProfile } = useAuth();
   const profileExamLevel = studentProfile?.level || studentProfile?.className || "";
-  const accessibleLevels = useMemo(() => getExamPracticeLevels(profileExamLevel), [profileExamLevel]);
+  const [paidExamGrants, setPaidExamGrants] = useState([]);
+  const [accessTime, setAccessTime] = useState(Date.now);
+  const includePaidExams = studentProfile?.courseEnrollmentPreserved === true && !entitledLevels;
+  const accessibleLevels = useMemo(() => {
+    if (entitledLevels) return entitledLevels;
+    const purchased = includePaidExams
+      ? paidExamGrants.filter(grant => grant.expiresAtMs > accessTime).map(grant => grant.level)
+      : [];
+    return [...new Set([...getExamPracticeLevels(profileExamLevel), ...purchased])];
+  }, [entitledLevels, profileExamLevel, includePaidExams, paidExamGrants, accessTime]);
   const [level, setLevelState] = useState(() =>
-    resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)));
+    entitledLevels?.[0] || resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)));
   const [levelConfirmed, setLevelConfirmed] = useState(Boolean(loadPreferredLevel(user?.uid)));
   const [teil, setTeil] = useState(() =>
     getTasksForLevel(resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)))[0].label);
@@ -148,10 +158,32 @@ export const ExamProvider = ({ children }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (!includePaidExams || !user) return undefined;
+    let cancelled = false;
+    user.getIdToken()
+      .then(token => fetch(`${getBackendUrl()}/mock/access`, { headers: { Authorization: `Bearer ${token}` } }))
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        if (!cancelled) {
+          setAccessTime(Date.now());
+          setPaidExamGrants((data?.active || []).filter(grant => grant.scope === "level"));
+        }
+      }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [includePaidExams, user]);
+
+  useEffect(() => {
+    const nextExpiry = Math.min(...paidExamGrants.map(grant => grant.expiresAtMs).filter(value => value > accessTime));
+    if (!includePaidExams || !Number.isFinite(nextExpiry)) return undefined;
+    const timer = setTimeout(() => setAccessTime(Date.now()), Math.min(2147483647, Math.max(1, nextExpiry - Date.now())));
+    return () => clearTimeout(timer);
+  }, [includePaidExams, paidExamGrants, accessTime]);
+
   const setLevel = useCallback(
     (requestedLevel) => {
       const nextLevel = String(requestedLevel || "").trim().toUpperCase();
-      // Never permit a higher level than the student's registered course.
+      // Levels come from the enrollment and verified exam subscriptions.
       if (!accessibleLevels.includes(nextLevel)) return;
       setLevelState(nextLevel);
       setLevelConfirmed(true);
@@ -166,9 +198,10 @@ export const ExamProvider = ({ children }) => {
     // Hydrate profile changes and saved exam preferences without editing enrollment.
     // Deliberately do not depend on "level": manual downward switches must persist.
     const storedLevel = loadPreferredLevel(user?.uid);
-    setLevelState(resolveExamPracticeLevel(profileExamLevel, storedLevel));
+    setLevelState(accessibleLevels.includes(storedLevel) ? storedLevel
+      : entitledLevels?.[0] || resolveExamPracticeLevel(profileExamLevel, storedLevel));
     if (storedLevel) setLevelConfirmed(true);
-  }, [profileExamLevel, user?.uid]);
+  }, [accessibleLevels, entitledLevels, profileExamLevel, user?.uid]);
 
   useEffect(() => {
     const allowedTeile = getTasksForLevel(level).map((task) => task.label);

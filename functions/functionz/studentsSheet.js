@@ -210,7 +210,13 @@ function collectMatchingRows({ studentCodes = [], uids = [], emails = [], target
 }
 
 function resolvePaidValue(student = {}) {
-  return student.paid ?? student.paidAmount ?? student.amountPaid ?? student.totalPaid ?? student.initialPaymentAmount ?? "";
+  const recordedPaid = student.paid ?? student.paidAmount ?? student.amountPaid ?? student.totalPaid;
+  if (recordedPaid != null && recordedPaid !== "") return recordedPaid;
+  const status = String(student.paymentStatus || "").trim().toLowerCase().replace(/[ -]+/g, "_");
+  if (student.initialPaymentAmount === 0) return 0;
+  return ["", "paid", "partial", "partially_paid", "registered_paid", "registered_partial"].includes(status)
+    ? student.initialPaymentAmount ?? ""
+    : "";
 }
 
 function resolveBalanceValue(student = {}) {
@@ -220,7 +226,8 @@ function resolveBalanceValue(student = {}) {
 
   const tuitionNumeric = Number(student.tuitionFee);
   const paidNumeric = Number(resolvePaidValue(student));
-  const hasDerivedInputs = Number.isFinite(tuitionNumeric) && Number.isFinite(paidNumeric);
+  const hasDerivedInputs = student.tuitionFee != null && String(student.tuitionFee).trim() !== "" &&
+    Number.isFinite(tuitionNumeric) && Number.isFinite(paidNumeric);
 
   if (!hasExplicitBalance && !hasDerivedInputs) return "";
   if (!hasExplicitBalance) return Math.max(tuitionNumeric - paidNumeric, 0);
@@ -250,6 +257,9 @@ async function upsertStudentToSheet(student) {
     ? ["TrialStartedAt", "TrialEndsAt", "TrialPurgeAt", "TrialUsedAt", "TrialConvertedAt"]
     : [];
   if (program) requiredHeaders.push("Program");
+  requiredHeaders.push("CourseType", "AccountType");
+  const courseType = student.courseType || (student.accountType === "exam_only" ? "exam_preparation" : "full_course");
+  const accountType = student.accountType || (courseType === "exam_preparation" ? "exam_only" : "course");
   const { headers, headerMap } = await ensureHeaders(sheets, sheetId, tabName, requiredHeaders);
   const colProgram = findCol(headerMap, "Program");
 
@@ -318,7 +328,8 @@ async function upsertStudentToSheet(student) {
     "PaymentReminderCount",
     "Payment Reminder Count"
   );
-  const colLearningMode = findCol(headerMap, "LearningMode", "Learning Mode", "learningMode");
+  const colAccountType = findCol(headerMap, "AccountType", "Account Type");
+  const colCourseType = findCol(headerMap, "CourseType", "Course Type", "courseType");
   const colAddress = findCol(headerMap, "Address", "Home Address", "address", "homeaddress");
   const colContractMergeMode = findCol(
     headerMap,
@@ -426,7 +437,8 @@ async function upsertStudentToSheet(student) {
     organisationFields.forEach(({ col, key }) => {
       if (col !== null && student[key] !== undefined && student[key] !== null) pushCell(col, student[key]);
     });
-    pushCell(colLearningMode, student.learningMode || "");
+    pushCell(colCourseType, courseType);
+    pushCell(colAccountType, accountType);
     pushCell(colAddress, student.address || "");
     pushCell(colContractMergeMode, student.contractMergeMode || "");
     pushCell(colUpgradeCarryoverUntil, student.upgradeCarryoverUntil || "");
@@ -486,7 +498,8 @@ async function upsertStudentToSheet(student) {
   organisationFields.forEach(({ col, key }) => {
     if (col !== null && student[key] !== undefined && student[key] !== null) row[col] = student[key];
   });
-  if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
+  if (colCourseType !== null) row[colCourseType] = courseType;
+  if (colAccountType !== null) row[colAccountType] = accountType;
   if (colAddress !== null) row[colAddress] = student.address || "";
   if (colContractMergeMode !== null)
     row[colContractMergeMode] = student.contractMergeMode || "";

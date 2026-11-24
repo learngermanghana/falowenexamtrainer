@@ -1,0 +1,110 @@
+--- a/FalowenAutomations.gs
++++ b/FalowenAutomations.gs
+@@ -658,2 +658,4 @@
+
++      if (isExamOnlyStudent_(s)) return;
++
+       var paidNow = hasQualifyingStudentPayment_(s);
+@@ -742,3 +744,3 @@
+       // The organisation pays Falowen: never send a personal tuition receipt.
+-      if (isOrganisationFunded_(s)) {
++      if (isOrganisationFunded_(s) || isExamOnlyStudent_(s)) {
+         state[code] = { paid: paid, balance: balance, seen_at: now.toISOString() };
+@@ -1126,3 +1128,3 @@
+       if (isFinanceSubject_(subject) && (
+-          orgFunded || !queuedStudent || isUnpaidTrial_(queuedStudent) ||
++          orgFunded || !queuedStudent || isExamOnlyStudent_(queuedStudent) || isUnpaidTrial_(queuedStudent) ||
+           (!confirmedMoneyReceived_(queuedStudent)) ||
+@@ -1236,3 +1238,3 @@
+  *  - First non-empty cell is NOT column A (often P/AG)
+- * Then it shifts a block of MASTER_HEADERS_.length into A...
++ * Then it shifts the populated header width into column A.
+  */
+@@ -1247,3 +1249,3 @@
+
+-  const headerLen = MASTER_HEADERS_().length;
++  const headerLen = getHeaderMap_(sheet).lastHeaderCol;
+   const data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+@@ -1578,3 +1580,3 @@
+     "ContractEnd14DaySent","ContractEnd7DaySent","MilestonesSent","LastMilestoneEmailAt","NoSubmission20DayLastSent",
+-    "PaymentStatus","TrialStatus","TrialExpiredAt","TrialPurgeAt"
++    "PaymentStatus","TrialStatus","TrialExpiredAt","TrialPurgeAt","CourseType","AccountType"
+   ];
+@@ -1607,3 +1609,4 @@
+   const uid   = get("UID") || detectUID_(items);
+-  const mode  = get("LearningMode") || detectMode_(items);
++  const mode  = get("LearningMode");
++  const examOnly = isExamOnlyStudent_({ AccountType: get("AccountType"), CourseType: get("CourseType"), Paid: get("Paid") });
+   const name  = get("Name") || detectName_(items, email, phone);
+@@ -1624,4 +1627,4 @@
+       case "Address": return addr || "";
+-      case "Paid": return (paid || 0);
+-      case "Balance": return (balance || 0);
++      case "Paid": return examOnly ? get("Paid") : (paid || 0);
++      case "Balance": return examOnly ? get("Balance") : (balance || 0);
+       case "PaymentReminderCount": return toNumberSafe_(get("PaymentReminderCount")) || 0;
+@@ -1638,3 +1641,3 @@
+   const enrollIdx = MASTER_HEADERS_().indexOf("EnrollDate");
+-  if (contractStartIdx >= 0 && enrollIdx >= 0) {
++  if (!examOnly && contractStartIdx >= 0 && enrollIdx >= 0) {
+     if (String(out[contractStartIdx] || "").trim() === "" && String(out[enrollIdx] || "").trim() !== "") {
+@@ -1687,2 +1690,14 @@
+
++function studentCourseType_(student) {
++  return lifecycleValue_(student.CourseType || student.course_type || student.coursetype || student['course type']);
++}
++
++function isExamOnlyStudent_(student) {
++  if (!student) return false;
++  var accountType = lifecycleValue_(student.AccountType || student.account_type || student.accounttype || student['account type']);
++  if (accountType) return accountType === 'exam_only';
++  return studentCourseType_(student) === 'exam_preparation' &&
++    !confirmedMoneyReceived_({ amount_paid: student.amount_paid ?? student.Paid ?? student.paid });
++}
++
+ function confirmedMoneyReceived_(student) {
+@@ -1705,3 +1720,3 @@
+   // non-paying signups, company-paid students, archived students or paid-in-full.
+-  return !!student && !isOrganisationFunded_(student) &&
++  return !!student && !isExamOnlyStudent_(student) && !isOrganisationFunded_(student) &&
+     !isUnpaidTrial_(student) && isStudentEmailEligible_(student) &&
+@@ -1809,2 +1824,4 @@
+       program: welcomeProgram_(row, className),
++      course_type: studentCourseType_(row),
++      account_type: lifecycleValue_(row.accounttype || row.account_type || row['account type']),
+       contract_start: contractStart,
+@@ -2556,3 +2573,6 @@
+     ? paymentStatusFromStudent_(studentMatch.student)
+-    : { status: lead.paymentStatus || previousRecord.payment_status || 'unknown', paidAt: lead.paidAt || previousRecord.paid_at || '' };
++    : studentCourseType_({ course_type: lead.courseType }) === 'exam_preparation'
++      ? { status: 'exam_only', paidAt: '' }
++      : { status: previousRecord.payment_status === 'exam_only' ? 'exam_only' : lead.paymentStatus || previousRecord.payment_status || 'unknown',
++          paidAt: lead.paidAt || previousRecord.paid_at || '' };
+   const previousCount = Number(previousRecord.follow_up_count || lead.followUpCount || 0);
+@@ -2563,2 +2583,3 @@
+     registered ||
++    paymentInfo.status === 'exam_only' ||
+     startPassed ||
+@@ -2724,3 +2745,3 @@
+     if (['student_registered', 'paid', 'class_started_no_followup'].includes(status)) return;
+-    if (['paid', 'registered_paid', 'registered_partial', 'registered_unpaid'].includes(paymentStatus)) return;
++    if (['paid', 'registered_paid', 'registered_partial', 'registered_unpaid', 'exam_only'].includes(paymentStatus)) return;
+
+@@ -2935,3 +2956,3 @@
+     const lead = rowToObject_(leadHeaders, row);
+-    if (String(lead.status || '').toLowerCase() === 'paid' || isPaidPaymentStatus_(lead.payment_status)) return;
++    if (String(lead.status || '').toLowerCase() === 'paid' || isPaidPaymentStatus_(lead.payment_status) || lead.payment_status === 'exam_only') return;
+
+@@ -2959,2 +2980,4 @@
+ function markPaidFromWebhook_(payment) {
++  const productType = lifecycleValue_(payment.productType || payment.product_type || (payment.metadata || {}).productType);
++  if (productType === 'mock_package') return { ok: true, ignored: 'exam_subscription' };
+   recordPayment_(payment);
+@@ -2974,2 +2997,3 @@
+     const lead = rowToObject_(headers, row);
++    if (lead.payment_status === 'exam_only') return false;
+     if (leadId && lead.lead_id === leadId) return true;
+@@ -3117,2 +3141,3 @@
+ function paymentStatusFromStudent_(student) {
++  if (isExamOnlyStudent_(student)) return { status: 'exam_only', paidAt: '' };
+   const paid = toNumber_(student.Paid);

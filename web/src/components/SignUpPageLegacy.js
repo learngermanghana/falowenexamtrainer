@@ -141,13 +141,15 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   const [location, setLocation] = useState(initialDraft?.location || "");
   const [countryCode, setCountryCode] = useState(initialDraft?.countryCode || "");
   const [address, setAddress] = useState(initialDraft?.address || "");
-  const [germanMode, setLearningMode] = useState("");
+  const [selectedCourseType, setCourseType] = useState(initialDraft?.courseType || "");
+  const courseType = universityInvitation || courseDiscount ? "full_course" : selectedCourseType;
+  const [examLevel, setExamLevel] = useState(initialDraft?.examLevel || requestedSignup.level || "A1");
+  const examPreparation = courseType === "exam_preparation";
   const [emergencyContactPhone, setEmergencyContactPhone] = useState(initialDraft?.emergencyContactPhone || "");
   const duplicateContactNumber = areSameContactNumber(phone, emergencyContactPhone, countryCode);
   const [germanPayment, setPaymentOption] = useState("trial");
   const [germanClass, setSelectedClass] = useState(loadPreferredClass() || "");
   const selectedLevel = universityInvitation?.level || courseDiscount?.level || (isSwahili ? "A1" : germanLevel);
-  const learningMode = isSwahili ? "Online" : germanMode;
   const selectedClass = isSwahili ? "" : germanClass;
   const paymentOption = isSwahili || courseDiscount ? "trial" : germanPayment;
   const [publicClasses, setPublicClasses] = useState([]);
@@ -298,7 +300,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
   };
 
   const stepForField = (field) => ["name", "firstName", "lastName", "nameConfirmed", "email", "password", "confirmPassword"].includes(field)
-    ? 1 : ["selectedLevel", "learningMode", "selectedClass", "initialPaymentAmount"].includes(field) ? 2 : 3;
+    ? 1 : ["selectedLevel", "courseType", "selectedClass", "initialPaymentAmount"].includes(field) ? 2 : 3;
 
   const showStepError = (issues) => {
     const first = Object.keys(issues)[0];
@@ -324,8 +326,8 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
 
   const continueStep = () => {
     const issues = step === 1 ? accountIssues() : {
-      ...(!learningMode ? { learningMode: "Choose how you plan to learn." } : {}),
-      ...(!isSwahili && !selectedClass ? { selectedClass: "Choose a class that fits your schedule." } : {}),
+      ...(!["full_course", "exam_preparation"].includes(courseType) ? { courseType: "Choose a course type." } : {}),
+      ...(!examPreparation && !isSwahili && !selectedClass ? { selectedClass: "Choose a class that fits your schedule." } : {}),
     };
     if (showStepError(issues)) return;
     setAuthError("");
@@ -408,17 +410,17 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
 
     const validationIssues = accountIssues();
 
-    if (paymentOption !== "trial" && (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment))) {
+    if (!examPreparation && paymentOption !== "trial" && (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment))) {
       validationIssues.initialPaymentAmount = `Enter a number without commas or spaces. You need at least ${formatMoney(
         MIN_INITIAL_PAYMENT
       )} to start a paid account.`;
     }
 
-    if (paymentOption !== "trial" && numericInitialPayment < 0) {
+    if (!examPreparation && paymentOption !== "trial" && numericInitialPayment < 0) {
       validationIssues.initialPaymentAmount = "Initial payment cannot be negative. Remove the minus sign and try again.";
     }
 
-    if (paymentOption !== "trial" && (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT)) {
+    if (!examPreparation && paymentOption !== "trial" && (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT)) {
       validationIssues.initialPaymentAmount = `Enter ${formatMoney(
         MIN_INITIAL_PAYMENT
       )} or more to reserve your class.`;
@@ -428,34 +430,36 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
       validationIssues.firstName = t("signupDetails.legalNameRequired");
     }
 
-    if (!isSwahili && !selectedClass) {
+    if (!examPreparation && !isSwahili && !selectedClass) {
       validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
     }
 
-    if (!cleanedPhone) {
-      validationIssues.phone = t("signupDetails.phoneCountryInvalid");
+    if (!examPreparation) {
+      if (!cleanedPhone) {
+        validationIssues.phone = t("signupDetails.phoneCountryInvalid");
+      }
+
+      if (!cleanedAddress) {
+        validationIssues.address = "Add your address so we can keep accurate records for your enrollment.";
+      }
+
+      if (!cleanedLocation) {
+        validationIssues.location = "Add your city or town so we can keep accurate enrollment records.";
+      }
+      if (!isValidCountryCode(cleanedCountryCode)) {
+        validationIssues.countryCode = t("signupDetails.countryRequired");
+      }
+
+      if (!cleanedEmergencyPhone) {
+        validationIssues.emergencyContactPhone =
+          "Add a valid emergency contact phone number (7–15 digits). This is required for safety.";
+      } else if (duplicateContactNumber) {
+        validationIssues.emergencyContactPhone = t("signupDetails.emergencyMustDiffer");
+      }
     }
 
-    if (!cleanedAddress) {
-      validationIssues.address = "Add your address so we can keep accurate records for your enrollment.";
-    }
-
-    if (!cleanedLocation) {
-      validationIssues.location = "Add your city or town so we can keep accurate enrollment records.";
-    }
-    if (!isValidCountryCode(cleanedCountryCode)) {
-      validationIssues.countryCode = t("signupDetails.countryRequired");
-    }
-
-    if (!cleanedEmergencyPhone) {
-      validationIssues.emergencyContactPhone =
-        "Add a valid emergency contact phone number (7–15 digits). This is required for safety.";
-    } else if (duplicateContactNumber) {
-      validationIssues.emergencyContactPhone = t("signupDetails.emergencyMustDiffer");
-    }
-
-    if (!learningMode) {
-      validationIssues.learningMode = "Choose how you plan to learn so we can match you to the right experience.";
+    if (!["full_course", "exam_preparation"].includes(courseType)) {
+      validationIssues.courseType = "Choose a course type.";
     }
 
     if (password !== confirmPassword) {
@@ -483,6 +487,17 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
 
     setLoading(true);
     try {
+      if (examPreparation) {
+        const receipt = await signup(cleanedEmail, password, {
+          courseType, name: cleanedName, level: examLevel,
+        });
+        onAccountCreated?.({
+          studentCode: receipt.studentCode, name: cleanedName, email: cleanedEmail,
+          level: examLevel, className: "", courseType, program: "german",
+        });
+        window.location.assign(receipt.trial ? "/exams/mocks" : "/mock/checkout");
+        return;
+      }
       const tuitionFee = isSwahili ? null : tuitionSummary.tuitionFee;
       // IMPORTANT: don't mark money as paid until the Paystack webhook confirms it.
       const intendedPaymentAmount = paymentOption === "trial"
@@ -526,7 +541,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
         countryCode: cleanedCountryCode,
         country: getCountryName(cleanedCountryCode, "en"),
         address: cleanedAddress,
-        learningMode,
+        courseType,
         emergencyContactPhone: cleanedEmergencyPhone,
         program,
         additionalProgrammeInterest,
@@ -552,7 +567,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           name: cleanedName, email: cleanedEmail, phone: cleanedPhone,
           countryCode: cleanedCountryCode,
           country: getCountryName(cleanedCountryCode, "en"),
-          level: selectedLevel, className: selectedClass, learningMode, program,
+          level: selectedLevel, className: selectedClass, courseType, program,
           universityInvitation: Boolean(universityInvitation),
           registrationSource: universityInvitation?.registrationSource || "",
           institutionId: universityInvitation?.institutionId || "",
@@ -668,7 +683,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             </p>
             <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>{t("uiLanguageFlow.motivation")}</h3>
             <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
-              {universityInvitation ? t("uiLanguageFlow.universityIntro") : isSwahili ? t("signup.swahiliTrial") : t("uiLanguageFlow.trialIntro")}
+              {universityInvitation ? t("uiLanguageFlow.universityIntro") : examPreparation ? "Create a German exam preparation account." : isSwahili ? t("signup.swahiliTrial") : t("uiLanguageFlow.trialIntro")}
             </p>
           </div>
         </div>
@@ -820,6 +835,25 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
             </div>
           ) : null}
           {courseDiscount && <p style={styles.helperText}>{t("signupDetails.offerTuition")} <strong>{formatMoney(courseDiscount.total)}</strong> ({t("signupDetails.discountOff", { amount: formatMoney(courseDiscount.discount) })}). {t("signupDetails.offerContinue")}</p>}
+          <label htmlFor="signup-courseType" style={styles.label}>Course type</label>
+          <select id="signup-courseType" name="courseType" required value={courseType}
+            disabled={Boolean(universityInvitation || courseDiscount)}
+            ref={(element) => { fieldRefs.current.courseType = element; }}
+            onChange={(event) => { setCourseType(event.target.value); setFieldErrors({}); setAuthError(""); }}
+            style={styles.select}>
+            <option value="">Choose a course type</option>
+            <option value="full_course">Full course</option>
+            <option value="exam_preparation">Exam preparation</option>
+          </select>
+          {fieldErrors.courseType && <p style={styles.fieldError}>{fieldErrors.courseType}</p>}
+          {examPreparation ? <>
+            <label htmlFor="signup-examLevel" style={styles.label}>German exam level</label>
+            <select id="signup-examLevel" name="examLevel" required value={examLevel}
+              onChange={(event) => setExamLevel(event.target.value)} style={styles.select}>
+              {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => <option key={level}>{level}</option>)}
+            </select>
+            <p style={styles.helperText}>Monthly exam access is available through the exam subscription checkout.</p>
+          </> : <>
           <label htmlFor="signup-program" style={styles.label}>{t("signup.courseLanguage")}</label>
           <select id="signup-program" name="program" style={styles.select} value={program} disabled={Boolean(universityInvitation || courseDiscount)}
             onChange={(event) => { setProgram(event.target.value); setFieldErrors({}); setAuthError(""); }}>
@@ -871,28 +905,6 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
               {t("signupDetails.placementLink")}
             </a>
           </div>
-
-          <label htmlFor="signup-learningMode" style={styles.label}>{t("signupPage.fields.learningMode")}</label>
-          <select
-            required
-            id="signup-learningMode"
-            ref={(element) => {
-              fieldRefs.current.learningMode = element;
-            }}
-            value={learningMode}
-            onChange={(event) => {
-              setLearningMode(event.target.value);
-              clearFieldError("learningMode");
-              setAuthError("");
-            }}
-            style={styles.select}
-          >
-            <option value="">{t("signupPage.options.chooseOne")}</option>
-            <option value="In-person">{t("signupPage.options.inPerson")}</option>
-            <option value="Online">{t("signupPage.options.online")}</option>
-            <option value="Hybrid">{t("signupPage.options.hybrid")}</option>
-          </select>
-          {fieldErrors.learningMode ? <p style={styles.fieldError}>{fieldErrors.learningMode}</p> : null}
 
           <label style={styles.label}>{t("signupPage.fields.classSelection")}</label>
           <select
@@ -1066,9 +1078,11 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           />
           </>}
           </>}
+          </>}
 
           </fieldset>
           <fieldset aria-label={t("uiLanguageFlow.steps", { returnObjects: true })[2]} disabled={step !== 3 || loading} hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 3 ? "grid" : "none", gap: 12 }}>
+          {!examPreparation && <>
           <label htmlFor="signup-country" style={styles.label}>{t("signupDetails.countryOfResidence")}</label>
           <CountryCombobox
             id="signup-country" label={t("signupDetails.countryOfResidence")}
@@ -1164,6 +1178,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           <p style={{ ...styles.helperText, marginTop: -4 }}>
             {t("signupDetails.duplicateProtectionNote")}
           </p>
+          </>}
 
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
             <input
@@ -1242,10 +1257,10 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           </div>
           {step === 3 ? <>
           <button style={styles.primaryButton} type="submit" disabled={loading}>
-            {loading ? t("signupPage.actions.creating") : universityInvitation ? t("uiLanguageFlow.registerComplimentary") : t("uiLanguageFlow.createTrial")}
+            {loading ? t("signupPage.actions.creating") : examPreparation ? "Create exam account" : universityInvitation ? t("uiLanguageFlow.registerComplimentary") : t("uiLanguageFlow.createTrial")}
           </button>
           <p style={{ ...styles.helperText, margin: "-4px 0 0", textAlign: "center" }}>
-            {universityInvitation ? t("uiLanguageFlow.universityNote") : isSwahili ? t("signup.swahiliTrial") : t("uiLanguageFlow.trialNote")}
+            {examPreparation ? "You can review exam access after signup." : universityInvitation ? t("uiLanguageFlow.universityNote") : isSwahili ? t("signup.swahiliTrial") : t("uiLanguageFlow.trialNote")}
           </p>
           </> : null}
         </form>

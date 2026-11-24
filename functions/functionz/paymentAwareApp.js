@@ -9,6 +9,7 @@ const { registerPublicFxRoutes } = require("./publicFxRates");
 const { registerSignupDuplicateReviewRoutes } = require("./signupDuplicateReview");
 const { registerCourseDiscountRoutes, recordDiscountPayment } = require("./courseDiscounts");
 const { registerMockCommerceRoutes, processMockWebhook } = require("./mockCommerce");
+const { PRODUCT: COURSE_TYPE_PRODUCT, accessRef, registerCourseTypeRoutes, processCourseTypeWebhook } = require("./courseType");
 const { registerBookCommerceRoutes, processBookWebhook } = require("./bookCommerce");
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
 const { registerStaffSpeakingReviewRoutes } = require("./staffSpeakingReview");
@@ -214,7 +215,8 @@ const getAuthedUser = async (req) => {
     const token = await admin.auth().verifyIdToken(match[1]);
     const deletion = await admin.firestore().collection("accountDeletionRequests").doc(token.uid).get();
     if (["pending", "processing", "completed"].includes(deletion.data()?.status)) return null;
-    return token;
+    const policy = (await accessRef(admin.firestore(), token.uid).get()).data();
+    return policy ? { ...token, examOnly: policy.examOnly === true } : token;
   } catch (_error) {
     return null;
   }
@@ -254,6 +256,7 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
 };
 
 // Exam-only purchases reuse the same Paystack credentials and authenticated backend.
+registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling });
 registerMockCommerceRoutes(app, { admin, getAuthedUser });
 registerBookCommerceRoutes(app, { admin });
 registerCourseDiscountRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling });
@@ -495,6 +498,11 @@ app.post("/paystack/webhook", async (req, res) => {
       return res.status(result.status).json(result.body);
     }
 
+    if (data?.metadata?.productType === COURSE_TYPE_PRODUCT) {
+      const result = await processCourseTypeWebhook({ admin, data, addMonths, normalizeStudentBilling });
+      return res.status(result.status === "rejected" ? 202 : 200).json(result);
+    }
+
     // Mock purchases NEVER flow through the tuition balance/contract updater.
     // Only a signed Paystack event with an existing server-issued mock order
     // can create an exam entitlement. Webhook retries are idempotent.
@@ -552,6 +560,9 @@ app.post("/paystack/webhook", async (req, res) => {
     if (!match) return reject("student_not_found", { studentCode, email });
 
     const student = match.snap.data() || {};
+    if (student.accountType === "exam_only" && !(firstValidMoney(student.tuitionFee) > 0)) {
+      return reject("no_course_enrollment");
+    }
     const { tuitionFee, paidSoFar: priorPaid, effectiveBalance: priorBalanceDue } =
       normalizeStudentBilling(student);
 

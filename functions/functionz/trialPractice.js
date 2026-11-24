@@ -19,12 +19,12 @@ function courseExpiry(profile) {
 }
 
 async function trialRestriction(db, identity, profile, courseResource = false) {
-  const examOnly = identity.examOnly === true || profile.accountType === "exam_only";
+  const examOnly = profile.accountType === "exam_only" || (!profile.accountType && identity.examOnly === true);
   const ends = courseExpiry(profile);
   if (!examOnly && ends === null) return null;
   if (courseResource) return { level: profile.level, course: !examOnly && ends > Date.now() };
   const grants = await activeSubscriptionsFor(db, identity.uid);
-  if (grants.some(row => row.scope !== "trial" && row.level === profile.level)) return null;
+  if (grants.some(row => row.scope !== "trial" && (examOnly || row.level === profile.level))) return null;
   const trial = grants.find(row => row.scope === "trial");
   return { level: examOnly ? trial?.level : ends > Date.now() ? profile.level : null, course: !examOnly && ends > Date.now() };
 }

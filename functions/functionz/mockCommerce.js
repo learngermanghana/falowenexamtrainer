@@ -61,18 +61,21 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
       const studentRef = db().collection("students").doc(uid);
       const existing = await studentRef.get();
       if (existing.exists) return res.status(409).json({ error: "This Falowen account already exists. Please sign in instead." });
-      const byUid = await db().collection("students").where("uid", "==", uid).limit(1).get();
-      if (!byUid.empty) return res.status(409).json({ error: "Existing account found. Sign in instead." });
+      const students = db().collection("students");
+      const [byUid, byEmail] = await Promise.all([
+        students.where("uid", "==", uid).limit(1).get(),
+        students.where("email", "==", user.email.toLowerCase()).limit(1).get(),
+      ]);
+      if (!byUid.empty || !byEmail.empty) return res.status(409).json({ error: "Existing account found. Sign in instead." });
       const authRecord = await admin.auth().getUser(uid);
       const existingClaims = authRecord.customClaims || {};
-      if (existingClaims.admin || existingClaims.staff || ["admin", "tutor"].includes(existingClaims.role)) {
+      if (existingClaims.admin || existingClaims.staff || ["admin", "staff", "tutor"].includes(existingClaims.role)) {
         return res.status(403).json({ error: "Staff accounts must use the standard Falowen login." });
       }
-      await admin.auth().setCustomUserClaims(uid, { ...existingClaims, examOnly: true });
       const batch = db().batch();
       batch.create(studentRef, {
         uid, name, fullName: name, email: user.email.toLowerCase(), authEmail: user.email.toLowerCase(),
-        studentCode: uid, role: "student", accountType: "exam_only",
+        studentCode: uid, role: "student", accountType: "exam_only", courseType: "exam_preparation",
         level, program: "german", className: "", status: "registered",
         ...(trialExams[level] ? { examTrialStartedAt: admin.firestore.FieldValue.serverTimestamp() } : {}),
         paymentStatus: "pending", trialStatus: "not_applicable",
@@ -86,7 +89,11 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
           mockIds: [trial.catalogId],
         });
       }
+      batch.set(db().collection("courseAccountAccess").doc(uid), { examOnly: true, canRestoreCourse: false });
       await batch.commit();
+      await admin.auth().setCustomUserClaims(uid, { ...existingClaims, examOnly: true }).catch(error => {
+        console.warn("Exam-only claim sync failed", error?.code || error?.name);
+      });
       return res.status(201).json({ ok: true, accountType: "exam_only", trial: Boolean(trial) });
     } catch (error) {
       console.error("Mock register failed", error);

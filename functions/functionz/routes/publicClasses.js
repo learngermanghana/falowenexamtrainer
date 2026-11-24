@@ -119,6 +119,11 @@ function publicClass(snapshot) {
   };
 }
 
+function isOpenPublicClass(course, today = new Date().toISOString().slice(0, 10)) {
+  if (!course.publicVisible || !course.registrationOpen || CLOSED_STATUSES.has(course.status) || !course.startDate) return false;
+  return course.status === "active" ? !course.endDate || course.endDate >= today : course.startDate >= today;
+}
+
 async function publicClassesHandler(req, res) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
   try {
@@ -126,14 +131,8 @@ async function publicClassesHandler(req, res) {
     const today = new Date().toISOString().slice(0, 10);
     const classes = snapshot.docs
       .map(publicClass)
-      .filter((course) => course.publicVisible && course.registrationOpen)
       .filter((course) => course.language !== "Swahili" || course.level === "A1")
-      .filter((course) => !CLOSED_STATUSES.has(course.status))
-      .filter((course) => {
-        if (!course.startDate) return false;
-        if (course.status === "active") return !course.endDate || course.endDate >= today;
-        return course.startDate >= today;
-      })
+      .filter((course) => isOpenPublicClass(course, today))
       .sort((a, b) => a.startDate.localeCompare(b.startDate));
 
     // Live Classes updates must appear immediately. Do not allow the browser,
@@ -156,4 +155,4 @@ async function publicClassesHandler(req, res) {
   }
 }
 
-module.exports = { publicClassesHandler, publicClass, publicStatus, dateOnly };
+module.exports = { publicClassesHandler, publicClass, publicStatus, dateOnly, isOpenPublicClass };

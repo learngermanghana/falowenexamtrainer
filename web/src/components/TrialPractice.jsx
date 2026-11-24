@@ -69,5 +69,6 @@ export function TrialExamPage({ level, path, children }) {
     {library && <ul>{getMockExamsForLevel(level).filter(item => item.id !== exam?.id && item.status !== "planned").map(item =>
       <li key={item.id}>{item.shortTitle || item.title} · Paid access</li>)}</ul>}
     <Link to="/mock/checkout">Get 30-day exam access</Link>
+    <Link to="/mock/account">Manage course type</Link>
   </main>;
 }
