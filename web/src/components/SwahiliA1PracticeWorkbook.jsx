@@ -198,12 +198,12 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
           <h2>Teil 4 · Kusikiliza (Listening)</h2>
           {listening ? <>
             <p>Sikiliza mazungumzo mara mbili. Chagua jibu moja kwa kila swali.</p>
-            <button type="button" className="swahili-book__button swahili-book__button--soft"
+            {listening.teacherLed ? <div className="swahili-book__note"><p>Teacher-led listening: ask your teacher or partner to read the dialogue twice. Audio recording not yet supplied.</p><details><summary>Transcript for teacher / self-study</summary><p style={{whiteSpace:"pre-wrap"}}>{listening.transcript}</p></details></div> : <><button type="button" className="swahili-book__button swahili-book__button--soft"
               onClick={loadListeningAudio} disabled={audio.loading}>
               {audio.loading ? "Inapakia sauti…" : audio.url ? "Pakia sauti tena · Refresh audio" : "Sikiliza sauti · Load audio"}
             </button>
             {audio.url && <audio controls preload="none" src={audio.url} aria-label={lesson.title + " listening recording"} />}
-            {audio.error && <p className="swahili-book__error" role="alert">{audio.error}</p>}
+            {audio.error && <p className="swahili-book__error" role="alert">{audio.error}</p>}</>}
             <div className="swahili-book__quiz" lang="sw">
               {listening.questions.map(({ id, question, choices }, index) => (
                 <fieldset className="swahili-book__exercise" key={id}>

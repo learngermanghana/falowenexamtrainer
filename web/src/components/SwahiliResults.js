@@ -31,7 +31,7 @@ export default function SwahiliResults({ uid }) {
       const submission = submissions.get(lessonDoc);
       if (submission?.status !== "submitted") return null;
       const review = await getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_${lessonDoc}`));
-      return { day, title, review: getCurrentSwahiliReview(submission, review.data()) };
+      return { day, title: submission.title || title, review: getCurrentSwahiliReview(submission, review.data()) };
     }))).then((entries) => {
       if (active) setRows(entries.filter(Boolean));
     }).catch(() => {

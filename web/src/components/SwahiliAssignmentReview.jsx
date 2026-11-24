@@ -17,6 +17,8 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
   const [submission, setSubmission] = useState("idle");
   const [submittedAnswers, setSubmittedAnswers] = useState("");
   const [legacyReadingSubmission, setLegacyReadingSubmission] = useState(false);
+  const [priorTopicSubmission, setPriorTopicSubmission] = useState(false);
+  const [topicChecked, setTopicChecked] = useState(!lesson.contentVersion);
   const answers = { writing, reading, listeningAnswers };
   const restoreDraft = useCallback(draft => {
     setWriting(typeof draft.writing === "string" ? draft.writing : "");
@@ -24,7 +26,7 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
     setListeningAnswers(draft.listeningAnswers || {});
   }, []);
   const draft = useSwahiliReviewDraft(canSubmit ? user.uid : null, lesson.day, answers, restoreDraft,
-    swahiliDayFourDraftVersion(lesson.day));
+    lesson.contentVersion || swahiliDayFourDraftVersion(lesson.day));
   const snapshot = JSON.stringify(answers);
   const submitted = submittedAnswers === snapshot;
   const [feedback, setFeedback] = useState("");
@@ -35,7 +37,13 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
     let active = true;
     async function restoreSubmission() {
       const work = (await getDoc(doc(db, "users", uid, "swahiliLessons", `day-${day}`))).data();
-      if (!active || work?.status !== "submitted") return;
+      if (!active) return;
+      setTopicChecked(true);
+      if (lesson.contentVersion && work?.status === "submitted" && work.contentVersion !== lesson.contentVersion) {
+        setPriorTopicSubmission(true);
+        return;
+      }
+      if (work?.status !== "submitted") return;
       const previous = {
         writing: work.writing?.[day === 11 ? "dialogue" : "response"] || "",
         reading: work.readingAnswers || {}, listeningAnswers: work.listeningAnswers || {},
@@ -59,7 +67,7 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
     }
     restoreSubmission().catch(() => {});
     return () => { active = false; };
-  }, [uid, day, canSubmit, activeTab]);
+  }, [uid, day, canSubmit, activeTab, lesson.contentVersion]);
 
   function answered(questions, values) {
     return questions.every(({ id, choices }) => choices ? choices.includes(values[id]) : !!values[id]?.trim());
@@ -67,7 +75,7 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
   const complete = writing.trim() && answered(readingQuestions, reading) && answered(listeningQuestions, listeningAnswers);
 
   async function submitWork() {
-    if (!canSubmit || !complete || !db || submitted || submission === "sending") return;
+    if (!canSubmit || !complete || !db || submitted || priorTopicSubmission || !topicChecked || submission === "sending") return;
     setSubmission("sending");
     try {
       await saveSwahiliWorkbook(user, {
@@ -75,7 +83,8 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
         day: lesson.day, lessonId: `swahili-day-${lesson.day}`, title: lesson.title,
         status: "submitted", writing: { [lesson.day === 11 ? "dialogue" : "response"]: writing.trim() },
         ...(lesson.day === 4 ? { readingVersion: 2 } : {}), readingAnswers: reading,
-        listeningAnswers, listeningTeacherLed: false, 
+        listeningAnswers, listeningTeacherLed: Boolean(lesson.listening?.teacherLed),
+        ...(lesson.contentVersion ? {contentVersion:lesson.contentVersion} : {}), 
         studentName: studentProfile?.name || studentProfile?.displayName || user.displayName || "",
         studentEmail: user.email || "",
       });
@@ -90,21 +99,22 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
 
   return { writing, setWriting, reading, setReading, listeningAnswers, setListeningAnswers,
     readingQuestions, listeningQuestions, draft, canSubmit, complete, submission, submitted, feedback,
-    legacyReadingSubmission, submitWork };
+    legacyReadingSubmission, priorTopicSubmission, topicChecked, submitWork };
 }
 
 export default function SwahiliAssignmentReview({ assignment }) {
   const { writing, reading, listeningAnswers, readingQuestions, listeningQuestions,
-    draft, canSubmit, complete, submission, submitted, feedback, legacyReadingSubmission, submitWork } = assignment;
+    draft, canSubmit, complete, submission, submitted, feedback, legacyReadingSubmission, priorTopicSubmission, topicChecked, submitWork } = assignment;
   return <>
     <h2>Review &amp; Submit · Wasilisha</h2>
     {legacyReadingSubmission && <p role="status">You previously submitted Day 4 with the older three-question reading task. Your earlier result remains in <Link to="/campus/results">Campus Results</Link>. Complete the new five Lesen and five Hören questions for a new tutor-marked submission.</p>}
+    {priorTopicSubmission && <p role="status">Your earlier assignment for this day is preserved. You can practise the new topic, but submission is disabled to protect your earlier work and result. <Link to="/campus/results">View results</Link>.</p>}
     <SwahiliReviewDraft writing={{ Kuandika: writing }} questions={readingQuestions}
       reading={reading} listening={listeningAnswers} listeningQuestions={listeningQuestions}
       draft={canSubmit ? draft : null} />
     {canSubmit ? <>
       {!complete && <p>Complete your writing and all questions in the assigned sections before submitting.</p>}
-      <SwahiliFinalSubmit requireListening={listeningQuestions.length > 0} disabled={!complete || !db || submission === "sending" || submitted} onSubmit={submitWork}>
+      <SwahiliFinalSubmit requireListening={listeningQuestions.length > 0} disabled={!complete || !db || submission === "sending" || submitted || priorTopicSubmission || !topicChecked} onSubmit={submitWork}>
         {submission === "sending" ? "Submitting…" : "Wasilisha kazi · Submit to tutor"}
       </SwahiliFinalSubmit>
       {feedback && <p><strong>Tutor feedback</strong> {feedback}</p>}

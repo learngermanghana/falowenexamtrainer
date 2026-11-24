@@ -8,20 +8,20 @@ import { SWAHILI_DAY_SIX } from "../data/swahili/daySix";
 // Vocabulary comes from the pronunciation, restaurant, market and shop lessons.
 export const SWAHILI_DICTIONARY_TOPICS = [
   "Salamu", "Utambulisho", "Familia", "Mgahawani", "Sokoni",
-  "Dukani", "Mapishi ya Kitanzania", "Nyumbani", "Shughuli za Kila Siku",
+  "Dukani", "Siku, Miezi na Tarehe", "Kutaja Saa na Shughuli za Kila Siku", "Mapishi ya Kitanzania", "Nyumbani", "Shughuli za Kila Siku",
   "Hospitalini", "Kusafiri", "Safari ya Kitalii", "Hali ya Hewa na Majira",
   "Watu na Taaluma Zao", "Ofisini", "Sikukuu na Matukio Mbalimbali",
   "Huduma za Malazi", "Kutoa Taarifa za Matukio", "Mawasiliano ya Kirafiki",
   "Nchi ya Tanzania",
 ];
 
-const shoppingDays = [10, 11];
+const vocabularyDays = [10, 11, 12, 13];
 
 const starterVocabulary = [
   ...SWAHILI_DAY_ONE.vowels.map(({ word, meaning }) => ({ sw: word, en: meaning, source: "day-1" })),
   ...SWAHILI_DAY_ONE.combinations.map(({ word, meaning }) => ({ sw: word, en: meaning, source: "day-1" })),
   ...[...SWAHILI_DAY_SIX.food, ...SWAHILI_DAY_SIX.drinks].map(({sw,en}) => ({sw,en,source:"day-6"})),
-  ...shoppingDays.flatMap((day) => SWAHILI_A1_PRACTICE_UNITS[day].vocabulary.map((entry) => ({ ...entry, source: `day-${day}` }))),
+  ...vocabularyDays.flatMap((day) => SWAHILI_A1_PRACTICE_UNITS[day].vocabulary.map((entry) => ({ ...entry, source: `day-${day}` }))),
 ];
 
 export const SWAHILI_DICTIONARY_WORDS = Array.from(
@@ -55,7 +55,7 @@ export default function SwahiliDictionary() {
             <option value="all">All available words</option>
             <option value="day-1">Somo la 1 · Alfabeti na matamshi</option>
             <option value="day-6">Somo la 6 · Mgahawani (Topic 4)</option>
-            {shoppingDays.map((day) => (
+            {vocabularyDays.map((day) => (
               <option key={day} value={`day-${day}`}>Somo la {day} · {SWAHILI_A1_PRACTICE_UNITS[day].title}</option>
             ))}
           </select>
