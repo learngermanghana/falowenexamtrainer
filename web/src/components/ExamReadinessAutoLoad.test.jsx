@@ -45,7 +45,7 @@ beforeEach(() => {
 
 test("independent B2 learner automatically receives their own score readiness without a class", async () => {
   render(<ExamReadinessBadge studentProfile={{ id: "student-record-id", level: "B2" }} variant="homepage" />);
-  await waitFor(() => expect(screen.getByRole("progressbar", { name: "Exam readiness" }))
+  await waitFor(() => expect(screen.getByRole("progressbar", { name: "Course progress" }))
     .toHaveAttribute("aria-valuenow", expect.stringMatching(/^\d+$/)));
   expect(fetchScoreSummary).toHaveBeenCalledWith({
     idToken: "signed-in-firebase-token",
@@ -58,7 +58,7 @@ test("independent B2 learner automatically receives their own score readiness wi
 test("class attendance failing does not prevent authenticated score readiness", async () => {
   fetchAttendanceSummary.mockRejectedValue(new Error("attendance offline"));
   render(<ExamReadinessBadge studentProfile={{ id: "student-record-id", className: "A2 Accra", level: "A2" }} variant="homepage" />);
-  await waitFor(() => expect(screen.getByRole("progressbar", { name: "Exam readiness" }))
+  await waitFor(() => expect(screen.getByRole("progressbar", { name: "Course progress" }))
     .toHaveAttribute("aria-valuenow", expect.stringMatching(/^\d+$/)));
   expect(fetchAttendanceSummary).toHaveBeenCalledWith({
     className: "A2 Accra",
@@ -72,7 +72,7 @@ test("does not display a fabricated 15 percent while the authenticated token is 
   mockIdToken = null;
   render(<ExamReadinessBadge studentProfile={{ id: "student-record-id", level: "B2" }} variant="homepage" />);
   expect(screen.getByText("Checking your latest progress…")).toBeInTheDocument();
-  expect(screen.getByRole("progressbar", { name: "Exam readiness" })).not.toHaveAttribute("aria-valuenow");
+  expect(screen.getByRole("progressbar", { name: "Course progress" })).not.toHaveAttribute("aria-valuenow");
   expect(fetchScoreSummary).not.toHaveBeenCalled();
 });
 
@@ -86,7 +86,7 @@ test("no marked results do not get mistaken for a calculated score", async () =>
   fetchScoreSummary.mockResolvedValue({ student: null });
   render(<ExamReadinessBadge studentProfile={{ id: "student-record-id", level: "B2" }} variant="homepage" />);
   expect(await screen.findByText(/No marked results yet/i)).toBeInTheDocument();
-  expect(screen.getByRole("progressbar", { name: "Exam readiness" })).not.toHaveAttribute("aria-valuenow");
+  expect(screen.getByRole("progressbar", { name: "Course progress" })).not.toHaveAttribute("aria-valuenow");
 });
 
 test("prefer canonical student code if the authenticated profile provides it", async () => {

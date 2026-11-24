@@ -18,7 +18,7 @@ describe("Class Participation navigation", () => {
   test("Account exposes participation as a Router-synchronized deep view without consuming a tab slot", () => {
     const source = fs.readFileSync(accountSettingsPath, "utf8");
 
-    expect(source).toContain('import { useLocation, useNavigate } from "react-router-dom";');
+    expect(source).toMatch(/import\s*\{[^}]*\buseLocation\b[^}]*\buseNavigate\b[^}]*\}\s*from\s*"react-router-dom"/);
     expect(source).toContain("const location = useLocation();");
     expect(source).toContain("const navigate = useNavigate();");
     expect(source).toContain('new URLSearchParams(location.search).get("tab")');
