@@ -4,12 +4,21 @@ const primaryCourse = profile => normalizeProgram(profile?.program) || "german";
 
 // Only server-issued programme enrollment grants access. A locally stored
 // preference or an admissions interest request never creates an enrollment.
-export function enrolledCourses(profile) {
+export function secondaryAccessExpiry(profile) {
+  const placement = profile?.coursePlacements?.swahili;
+  if (primaryCourse(profile) !== "german" || normalizeProgram(profile?.secondaryProgram) !== "swahili" || placement?.accessType !== "complimentary") return null;
+  const value = placement.contractEnd;
+  const end = typeof value?.toMillis === "function" ? value.toMillis() : typeof value?.seconds === "number" ? value.seconds * 1000 : Date.parse(value || "");
+  return Number.isFinite(end) ? end : 0;
+}
+
+export function enrolledCourses(profile, now = Date.now()) {
   if (!profile) return ["german"];
   const primary = primaryCourse(profile);
   const secondary = normalizeProgram(profile?.secondaryProgram);
   if (!COURSE_PROGRAMS.includes(primary)) return [];
-  return secondary !== primary && COURSE_PROGRAMS.includes(secondary) ? [primary, secondary] : [primary];
+  const expiry = secondaryAccessExpiry(profile);
+  return secondary !== primary && COURSE_PROGRAMS.includes(secondary) && (expiry === null || expiry > now) ? [primary, secondary] : [primary];
 }
 
 export const COURSE_PLACEMENT_FIELDS = [
