@@ -50,7 +50,13 @@ describe("simplified Exam Room overview", () => {
       .toHaveAttribute("aria-valuenow", "0");
     expect(screen.getByText(/Coverage records practice, not an exam pass/i)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Start or resume a full mock exam" }));
+    const mock = screen.getByRole("button", { name: "Start or resume a full mock exam" });
+    const progress = screen.getByRole("region", { name: "Exam room progress" });
+    expect(mock.compareDocumentPosition(progress) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Practise Sprechen" }).compareDocumentPosition(progress) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByText(/Option [12]/)).not.toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Recent results" })).toBeInTheDocument();
+    fireEvent.click(mock);
     expect(mockNavigate).toHaveBeenLastCalledWith("/exams/mocks");
 
     [
@@ -90,7 +96,7 @@ describe("simplified Exam Room overview", () => {
     expect(screen.getByText("Warm-up in progress")).toBeInTheDocument();
     expect(screen.getByText(/A2 Lesen sample/)).toBeInTheDocument();
     expect(screen.getAllByText("53%").length).toBeGreaterThan(0);
-    expect(screen.getByText(/Suggested: Lesen/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Practise Lesen" })).toHaveTextContent("Suggested next");
 
     fireEvent.click(screen.getByRole("button", { name: "Continue →" }));
     expect(mockNavigate).toHaveBeenLastCalledWith("/exams/question");

@@ -230,6 +230,7 @@ import PaymentComplete from "./components/PaymentComplete";
 import LiveSpeakPage from "./components/LiveSpeakPage";
 import MyExamFilePage from "./components/MyExamFilePage";
 import ExamsOverviewPage from "./components/ExamsOverviewPage";
+import PersonalExamCountdown from "./components/PersonalExamCountdown";
 import MockExamLibraryPage from "./components/MockExamLibraryPage";
 import SeoLandingPage from "./components/SeoLandingPage";
 import GermanLevelSeoPage from "./components/GermanLevelSeoPage";
@@ -1771,7 +1772,7 @@ const ExamArea = ({ onBack }) => {
   const { section, practiceLevel = "", sampleId = "" } = useParams();
   const navigate = useNavigate();
   const { level, setLevel, accessibleLevels } = useExam();
-  const { studentProfile } = useAuth();
+  const { studentProfile, user } = useAuth();
   const trialExam = React.useContext(TrialExam);
   const { openLock, lockDialog } = useAccessLock();
   const examOnlyView = Boolean(trialExam) || studentProfile?.accountType === "exam_only";
@@ -1929,6 +1930,7 @@ const ExamArea = ({ onBack }) => {
               Your Course Book level stays unchanged.
             </small>
           </div>
+          <div className="exam-room-date-picker-row">
           <div role="group" aria-label="Choose exam practice level" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {visibleLevels.map((option) => (
               <button
@@ -1953,8 +1955,10 @@ const ExamArea = ({ onBack }) => {
               </button>
             ))}
           </div>
+            {examSection === "overview" && user?.uid && <PersonalExamCountdown key={user.uid + ":" + level} uid={user.uid} level={level} compact />}
+          </div>
           <small style={{ ...styles.helperText, margin: 0 }}>
-            Choose your current level or any lower level for mock exams, Lesen, Hören, Schreiben and Sprechen.
+            Practise at your current level or any lower level.
           </small>
         </div>
 
@@ -1984,7 +1988,7 @@ const ExamArea = ({ onBack }) => {
         ) : null}
       </div>
 
-      {examSection === "overview" ? <ExamsOverviewPage /> : null}
+      {examSection === "overview" ? <ExamsOverviewPage dateInLevelPicker /> : null}
       {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
       {examSection === "speaking" ? <SpeakingPage /> : null}

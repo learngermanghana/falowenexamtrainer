@@ -10,7 +10,7 @@ export function examDaysRemaining(value, now = new Date()) {
 }
 const storageKey = (uid, level) => "falowen:exam-date:" + uid + ":" + level;
 
-export default function PersonalExamCountdown({uid, level}) {
+export default function PersonalExamCountdown({uid, level, compact = false}) {
   const key = storageKey(uid, level);
   const [date, setDate] = useState(() => {
     try { return window.localStorage.getItem(key) || ""; } catch { return ""; }
@@ -26,11 +26,11 @@ export default function PersonalExamCountdown({uid, level}) {
       setStorageIssue(false);
     } catch { setStorageIssue(true); }
   };
-  return <div className="exam-room-countdown">
+  return <div className={"exam-room-countdown" + (compact ? " exam-room-countdown--compact" : "")}>
     <div>
-      <h3>My {level} exam date</h3>
-      <p>{days === null ? "Add your booked exam date to plan your practice." : days > 0 ? days + " day" + (days === 1 ? "" : "s") + " until your exam" : days === 0 ? "Your exam is today" : "Your recorded exam date has passed."}</p>
-      <small>{storageIssue ? "Date could not be saved on this device." : "Personal reminder · saved on this device only, not a booking."}</small>
+      {!compact && <h3>My {level} exam date</h3>}
+      {(!compact || days !== null) && <p>{days === null ? "Add your booked exam date to plan your practice." : days > 0 ? days + " day" + (days === 1 ? "" : "s") + " until your exam" : days === 0 ? "Your exam is today" : "Your recorded exam date has passed."}</p>}
+      <small>{storageIssue ? "Date could not be saved on this device." : compact ? "Saved on this device only · not a booking." : "Personal reminder · saved on this device only, not a booking."}</small>
     </div>
     <div className="exam-room-date-control">
       <label>Booked exam date<input type="date" value={date} onChange={event=>update(event.target.value)} /></label>

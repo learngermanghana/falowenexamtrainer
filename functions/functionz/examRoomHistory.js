@@ -9,7 +9,7 @@ const safeDateMillis = (value) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 const asFinite = (value) => {
-  if (value === null || value === undefined || value === "") return null;
+  if (value === null || value === undefined || typeof value === "boolean" || (typeof value === "string" && !value.trim())) return null;
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
 };
@@ -17,6 +17,7 @@ const validSection = (value) =>
   ["lesen", "hoeren", "schreiben", "sprechen", "mixed"].includes(value);
 
 const normalizeExamRoomHistoryRow = (id, row = {}, requestedLevel = "") => {
+  if (row.assessed === false || ["draft", "in_progress", "incomplete", "unassessed", "not_assessed", "pending"].includes(String(row.status || "").toLowerCase())) return null;
   const source = String(row.source || "").toLowerCase();
   const isMock = FINAL_MOCK_SOURCE.test(source);
   if (source !== "exam_room_practice" && !isMock) return null;

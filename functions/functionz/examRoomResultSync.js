@@ -16,6 +16,7 @@ const safeDocId = (value = "") =>
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 const asNumber = (value, fallback = null) => {
+  if (value === null || value === undefined || typeof value === "boolean" || (typeof value === "string" && !value.trim())) return fallback;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
 };
