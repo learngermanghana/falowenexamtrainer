@@ -155,3 +155,17 @@ test("active trial can check in but expired and exam-only accounts cannot", asyn
   mockDb = createDb({session,access:{examOnly:true}});
   expect((await request({className:"A1",sessionId:"s1"})).status).toBe(403);
 });
+
+
+test("dual enrollment check-in respects independent Kiswahili expiry without blocking German", async () => {
+  const session={opened:true,openTo:"2999-01-01T00:00:00Z"};
+  const profile={program:"german",level:"A1",paymentStatus:"paid",secondaryProgram:"swahili",
+    coursePlacements:{swahili:{className:"Kiswahili A1",level:"A1",accessType:"complimentary",contractEnd:new Date(Date.now()+60000).toISOString()}}};
+  mockDb=createDb({session,profile});
+  expect((await request({className:"Kiswahili A1",sessionId:"s1"})).status).toBe(200);
+  profile.coursePlacements.swahili.contractEnd=new Date(Date.now()-60000).toISOString();
+  mockDb=createDb({session,profile});
+  expect((await request({className:"Kiswahili A1",sessionId:"s1"})).status).toBe(403);
+  expect(mockDb.writes).toHaveLength(0);
+  expect((await request({className:"A1",sessionId:"s1"})).status).toBe(200);
+});

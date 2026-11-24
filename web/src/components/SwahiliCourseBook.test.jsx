@@ -8,6 +8,8 @@ import { SWAHILI_A1_PRACTICE_UNITS } from "../data/swahili/a1PracticeUnits";
 import SwahiliDaySixWorkbook from "./SwahiliDaySixWorkbook";
 import { SWAHILI_DAY_ONE } from "../data/swahili/dayOne";
 import { setDoc, getDoc, getDocs } from "../firebase";
+import { saveSwahiliWorkbook } from "../services/swahiliWorkbookService";
+jest.mock("../services/swahiliWorkbookService", () => ({ saveSwahiliWorkbook: jest.fn(async () => ({ok:true})) }));
 
 let mockUser = null;
 let mockStudentProfile = null;
@@ -65,10 +67,11 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.queryByText(/Suggested answer|Model answer/)).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
     expect(setDoc).not.toHaveBeenCalled();
+    expect(saveSwahiliWorkbook).not.toHaveBeenCalled();
     screen.getAllByRole("checkbox").forEach(box => fireEvent.click(box));
     fireEvent.click(screen.getByRole("button", { name: /Submit to tutor/ }));
     expect(await screen.findByText(/Submitted for tutor review/)).toBeTruthy();
-    expect(setDoc).toHaveBeenCalledWith("/users/day11-learner/swahiliLessons/day-11", expect.objectContaining({
+    expect(saveSwahiliWorkbook).toHaveBeenCalledWith(expect.objectContaining({uid:"day11-learner"}), expect.objectContaining({
       status: "submitted", lessonId: "swahili-day-11", writing: { dialogue: "Nataka mkate." },
       readingAnswers: Object.fromEntries(lesson.reading.questions.map(q => [q.id, q.choices[0]])),
       listeningAnswers: Object.fromEntries(lesson.listening.questions.map(q => [q.id, q.choices[0]])),
@@ -96,6 +99,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.getByText("Hospitali.")).toBeTruthy();
     expect(screen.queryByText(/Suggested answer|Model answer/)).toBeNull();
     expect(setDoc).not.toHaveBeenCalled();
+    expect(saveSwahiliWorkbook).not.toHaveBeenCalled();
   });
 
   it("lists all 20 lessons in order, including the updated practice lessons", () => {
@@ -236,6 +240,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     openTab("Review & Submit");
     expect(screen.getByText(/Ingia kwenye akaunti yako/)).toBeTruthy();
     expect(setDoc).not.toHaveBeenCalled();
+    expect(saveSwahiliWorkbook).not.toHaveBeenCalled();
   });
 
   it("persists a logged-in learner's actual submitted Day 1 work in the separate Swahili user record", async () => {
@@ -255,14 +260,15 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.getByText("mama kiti kuku")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
     expect(setDoc).not.toHaveBeenCalled();
+    expect(saveSwahiliWorkbook).not.toHaveBeenCalled();
     const button = screen.getByRole("button", { name: "Wasilisha kazi" });
     expect(button.disabled).toBe(true);
     screen.getAllByRole("checkbox").forEach(box => fireEvent.click(box));
     expect(button.disabled).toBe(false);
     fireEvent.click(button);
-    await waitFor(() => expect(setDoc).toHaveBeenCalledTimes(1));
-    expect(setDoc.mock.calls[0][0]).toBe("/users/swahili-student-1/swahiliLessons/day-1");
-    expect(setDoc.mock.calls[0][1]).toEqual(expect.objectContaining({
+    await waitFor(() => expect(saveSwahiliWorkbook).toHaveBeenCalledTimes(1));
+    expect(saveSwahiliWorkbook.mock.calls[0][0]).toMatchObject({uid:"swahili-student-1"});
+    expect(saveSwahiliWorkbook.mock.calls[0][1]).toEqual(expect.objectContaining({
       program: "swahili",
       lessonId: "swahili-day-1",
       status: "submitted",
@@ -311,6 +317,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.queryByRole("button", { name: "Wasilisha kazi" })).toBeNull();
     expect(getDoc).not.toHaveBeenCalled();
     expect(setDoc).not.toHaveBeenCalled();
+    expect(saveSwahiliWorkbook).not.toHaveBeenCalled();
   });
 
   it("sends a completed Day 6 workbook to the tutor queue only on final submit", async () => {
@@ -331,16 +338,16 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     }
     fireEvent.click(screen.getByRole("button", { name: "Save & Review" }));
     expect(setDoc).not.toHaveBeenCalled();
+    expect(saveSwahiliWorkbook).not.toHaveBeenCalled();
     screen.getAllByRole("checkbox").forEach(box => fireEvent.click(box));
     fireEvent.click(screen.getByRole("button", { name: "Wasilisha kazi" }));
-    await waitFor(() => expect(setDoc).toHaveBeenCalledWith(
-      "/users/synthetic-day-six/swahiliLessons/day-6",
+    await waitFor(() => expect(saveSwahiliWorkbook).toHaveBeenCalledWith(
+      expect.objectContaining({uid:"synthetic-day-six"}),
       expect.objectContaining({
         program: "swahili", lessonId: "swahili-day-6", status: "submitted",
         studentId: "synthetic-day-six",
         writing: expect.objectContaining({ order: "Ninaomba maji." }),
       }),
-      { merge: true },
     ));
   });
 
@@ -354,6 +361,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.queryByRole("button", { name: "Wasilisha kazi" })).toBeNull();
     expect(getDoc).not.toHaveBeenCalled();
     expect(setDoc).not.toHaveBeenCalled();
+    expect(saveSwahiliWorkbook).not.toHaveBeenCalled();
   });
 
   it("shows only current, student-owned tutor feedback and prioritizes revisions", async () => {

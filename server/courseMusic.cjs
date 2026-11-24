@@ -21,7 +21,8 @@ function signTrack(id, env = process.env, now = new Date()) {
   if (!track) throw Object.assign(new Error('Unknown classroom song.'), { status: 404 });
   return signObject(track, env, now);
 }
-function signObject(track, env = process.env, now = new Date(), method = 'GET') {
+function signObject(track, env = process.env, now = new Date(), method = 'GET', ttlSeconds = 3600) {
+  const ttl = Math.max(1, Math.min(3600, Math.floor(ttlSeconds)));
   if (!['GET','PUT'].includes(method)) throw Object.assign(new Error('Unsupported music storage operation.'), { status: 400 });
   for (const key of ['R2_ACCOUNT_ID','R2_ACCESS_KEY_ID','R2_SECRET_ACCESS_KEY','R2_AUDIO_BUCKET']) {
     if (!String(env[key] || '').trim()) throw Object.assign(new Error('Classroom music storage is not configured.'), { status: 503 });
@@ -36,13 +37,13 @@ function signObject(track, env = process.env, now = new Date(), method = 'GET') 
   const query = Object.entries({
     'X-Amz-Algorithm':'AWS4-HMAC-SHA256', 'X-Amz-Content-Sha256':'UNSIGNED-PAYLOAD',
     'X-Amz-Credential':`${String(env.R2_ACCESS_KEY_ID).trim()}/${scope}`, 'X-Amz-Date':stamp,
-    'X-Amz-Expires':'3600', 'X-Amz-SignedHeaders':'host',
+    'X-Amz-Expires':String(ttl), 'X-Amz-SignedHeaders':'host',
   }).sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>`${encode(k)}=${encode(v)}`).join('&');
   const canonical = [method,uri,query,`host:${host}\n`,'host','UNSIGNED-PAYLOAD'].join('\n');
   const toSign = ['AWS4-HMAC-SHA256',stamp,scope,crypto.createHash('sha256').update(canonical).digest('hex')].join('\n');
   const signingKey = hmac(hmac(hmac(hmac(`AWS4${String(env.R2_SECRET_ACCESS_KEY).trim()}`,date),'auto'),'s3'),'aws4_request');
   return { ...track, url:`https://${host}${uri}?${query}&X-Amz-Signature=${hmac(signingKey,toSign).toString('hex')}`,
-    expiresAt:new Date(now.getTime()+3600000).toISOString() };
+    expiresAt:new Date(now.getTime()+ttl*1000).toISOString() };
 }
 function isMusicStaff(account, env = process.env) {
   let claims = {};
@@ -82,8 +83,8 @@ function createMusicHandler({
       const data = await response.json();
       const account = data.users?.[0];
       if (!response.ok || !account?.localId || account.disabled) return res.status(401).json({error:'Your Falowen session has expired. Please sign in again.'});
-      if (!isAuthorized(account,env)) return res.status(403).json({error:authorizationError});
-      const signed = await prepare(req, env);
+      if (!await isAuthorized(account,env)) return res.status(403).json({error:authorizationError});
+      const signed = await prepare(req, env, account);
       return res.status(200).json({url:signed.url, expiresAt:signed.expiresAt, track:signed.id});
     } catch (error) {
       return res.status(error.status || 502).json({error:error.status ? error.message : 'Could not prepare classroom music. Please retry.'});
@@ -144,17 +145,27 @@ const SWAHILI_DAY_ELEVEN_LISTENING = Object.freeze({
 });
 
 function createSwahiliListeningHandler(recording, options = {}) {
+  const lookup = options.loadSwahiliAccess || require('../functions/functionz/swahiliAccess').loadSwahiliAccess;
   return createMusicHandler({
     ...options,
     isAuthorized: account => Boolean(account?.localId && !account.disabled),
     authorizationError: 'A signed-in Falowen account is required.',
     signInError: 'Please sign in to Falowen to play this recording.',
-    prepare: async (req, env) => {
+    prepare: async (req, env, account) => {
       const params = new URL(req.url, 'https://www.falowen.app').searchParams;
       if ([...params.keys()].length) {
         throw Object.assign(new Error('Unexpected listening audio parameters.'), { status: 400 });
       }
-      return signObject(recording, env);
+      const now = new Date();
+      const level = recording.key.split('/')[1];
+      let claims = {};
+      try { claims = JSON.parse(account.customAttributes || '{}'); } catch { /* no trusted roles */ }
+      const staff = claims.admin === true || claims.staff === true || ['admin','staff','teacher','tutor','instructor'].includes(claims.role) || (account.emailVerified === true && isMusicStaff(account,env));
+      const access = staff ? { allowed:true } : await lookup(account.localId, level, now.getTime());
+      if (!access.allowed) throw Object.assign(new Error('Active Kiswahili course access is required.'), {status:403});
+      const ttl = Number.isFinite(access.expiresAtMs) ? Math.floor((access.expiresAtMs-now.getTime())/1000) : 3600;
+      if (ttl < 1) throw Object.assign(new Error('Kiswahili course access has expired.'), {status:403});
+      return signObject(recording, env, now, 'GET', ttl);
     },
   });
 }

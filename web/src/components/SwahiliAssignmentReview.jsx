@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
+import { db, doc, getDoc } from "../firebase";
+import { saveSwahiliWorkbook } from "../services/swahiliWorkbookService";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import { isLegacySwahiliDayFourSubmission, swahiliDayFourDraftVersion } from "../utils/swahiliDayFourVersion";
@@ -69,12 +70,12 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
     if (!canSubmit || !complete || !db || submitted || submission === "sending") return;
     setSubmission("sending");
     try {
-      await setDoc(doc(db, "users", user.uid, "swahiliLessons", `day-${lesson.day}`), {
+      await saveSwahiliWorkbook(user, {
         studentId: user.uid, userId: user.uid, program: "swahili", level: "A1",
         day: lesson.day, lessonId: `swahili-day-${lesson.day}`, title: lesson.title,
         status: "submitted", writing: { [lesson.day === 11 ? "dialogue" : "response"]: writing.trim() },
         ...(lesson.day === 4 ? { readingVersion: 2 } : {}), readingAnswers: reading,
-        listeningAnswers, listeningTeacherLed: false, submittedAt: serverTimestamp(),
+        listeningAnswers, listeningTeacherLed: false, 
         studentName: studentProfile?.name || studentProfile?.displayName || user.displayName || "",
         studentEmail: user.email || "",
       });
