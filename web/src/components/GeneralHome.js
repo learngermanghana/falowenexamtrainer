@@ -77,7 +77,7 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
   );
 };
 
-const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false, examOnly = false }) => (
+const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) => (
   <section className="falowen-home-spaces" aria-label={t("homeAccess.spaces")}>
     <div className="falowen-home-spaces__heading">
       <h2>{t("homeAccess.spaces")}</h2>
@@ -377,7 +377,7 @@ const GeneralHome = ({
         </section>
       ) : null}
 
-      <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} examOnly={examOnly} />
+      <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
       {examOnly && <section style={styles.card}><h3>Exam preparation access</h3><p>Explore Campus Day 1 and browse your exam room. Subscribe when you are ready to unlock more practice.</p><button style={styles.secondaryButton} onClick={() => navigate("/mock/payment")}>Payment options</button></section>}
       {!examOnly && <div className="falowen-home-section-break falowen-home-section-break--highlights">
         <HomepageHighlights
