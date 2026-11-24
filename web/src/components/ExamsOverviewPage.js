@@ -13,6 +13,8 @@ import {
 } from "../services/examRoomDashboardService";
 import "./ExamsOverviewPage.css";
 
+import { TrialExam } from "../context/TrialCatalogContext";
+
 const sectionIcons = { lesen: "📖", hoeren: "🎧", schreiben: "✍️", sprechen: "🎤" };
 const readableDate = (value) => {
   const date = new Date(value || "");
@@ -22,6 +24,7 @@ const readableDate = (value) => {
 };
 
 export default function ExamsOverviewPage() {
+  const trialExam = React.useContext(TrialExam);
   const navigate = useNavigate();
   const openPractice = (path, message) => {
     announceExamSuccess(message);
@@ -153,13 +156,14 @@ export default function ExamsOverviewPage() {
               <button
                 key={skill.key}
                 type="button"
-                aria-label={"Practise " + skill.title}
+                disabled={Boolean(trialExam)}
+                aria-label={(trialExam ? "Locked: " : "Practise ") + skill.title}
                 className={"exam-room-skill" + (suggested ? " exam-room-skill-recommended" : "")}
                 onClick={() => openPractice(skill.path, `${skill.title} practice opened successfully.`)}
               >
                 <span>
                   <span className="exam-room-skill-top">
-                    <span className="exam-room-skill-icon" aria-hidden="true">{sectionIcons[skill.key]}</span>
+                    <span className="exam-room-skill-icon" aria-hidden="true">{trialExam ? "🔒" : sectionIcons[skill.key]}</span>
                     {suggested ? <span className="exam-room-skill-suggested">Suggested next</span> : null}
                   </span>
                   <span className="exam-room-skill-title">{skill.title}</span>
@@ -200,8 +204,8 @@ export default function ExamsOverviewPage() {
                 ? "Your saved warm-up is waiting."
                 : "A short German task for your level."}</p>
           </div>
-          <button type="button" className="exam-room-text-action" onClick={() => openPractice("/exams/question", "Daily exam practice opened successfully.")}>
-            {dailyDone ? "Review →" : localDaily.hasDraft ? "Continue →" : "Start →"}
+          <button type="button" disabled={Boolean(trialExam)} className="exam-room-text-action" onClick={() => openPractice("/exams/question", "Daily exam practice opened successfully.")}>
+            {trialExam ? "🔒 Locked" : dailyDone ? "Review →" : localDaily.hasDraft ? "Continue →" : "Start →"}
           </button>
         </div>
         <div className="exam-room-recent-heading">
@@ -209,8 +213,8 @@ export default function ExamsOverviewPage() {
             <h3>Your recent practice</h3>
             <p>Your latest recorded results.</p>
           </div>
-          <button type="button" className="exam-room-text-action" onClick={() => openPractice("/exams/file", "My Exam File opened successfully.")}>
-            Exam File →
+          <button type="button" disabled={Boolean(trialExam)} className="exam-room-text-action" onClick={() => openPractice("/exams/file", "My Exam File opened successfully.")}>
+            {trialExam ? "🔒 Exam File" : "Exam File →"}
           </button>
         </div>
         {loading ? <p className="exam-room-status" role="status">Loading saved practice results…</p> : null}

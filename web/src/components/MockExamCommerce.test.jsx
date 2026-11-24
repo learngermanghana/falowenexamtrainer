@@ -1,16 +1,23 @@
 /** @jest-environment-options {"url":"https://exams.falowen.app/"} */
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter, Routes, Route, useLocation } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { MockExamCheckoutPage, MockExamOnlyGate, MockExamSignupPage } from "./MockExamCommerce";
+import MockExamLibraryPage from "./MockExamLibraryPage";
 import MockOnlyRouteBoundary from "./MockOnlyRouteBoundary";
 
 jest.mock("../firebase", () => ({ auth: {}, createUserWithEmailAndPassword: jest.fn() }));
 jest.mock("../context/AuthContext", () => ({ useAuth: jest.fn() }));
 jest.mock("../services/backendUrl", () => ({ getBackendUrl: () => "" }));
 jest.mock("../lib/falowenFxRate", () => ({ useFalowenUsdGhsRate: () => null, approximateUsd: () => null }));
+
+jest.mock("../context/ExamContext", () => ({ useExam: () => ({ level: "A2" }) }));
+
+function Destination() {
+  return <p>{useLocation().pathname}</p>;
+}
 
 const student = { getIdToken: jest.fn(async () => "test-token") };
 const profile = { accountType: "exam_only", level: "A2" };
@@ -21,7 +28,8 @@ function openPage(path) {
       <Routes>
         <Route path="/mock/register" element={<MockExamSignupPage />} />
         <Route path="/mock/checkout" element={<MockExamCheckoutPage />} />
-        <Route path="/exams/mocks" element={<MockExamOnlyGate><h1>All paid mocks</h1></MockExamOnlyGate>} />
+        <Route path="/exams/mocks" element={<MockExamOnlyGate><MockExamLibraryPage /></MockExamOnlyGate>} />
+        <Route path="*" element={<Destination />} />
         <Route path="/login/" element={<h1>Student login</h1>} />
         <Route path="/exams/overview" element={<MockExamOnlyGate><h1>Exam overview</h1></MockExamOnlyGate>} />
       </Routes>
@@ -70,13 +78,13 @@ test("a new student can register for A2 and reach the included trial before chec
   fireEvent.change(screen.getByLabelText("Exam level"), { target: { value: "A2" } });
   fireEvent.click(screen.getByRole("button", { name: "Create exam account" }));
 
-  expect(await screen.findByRole("link", { name: "Start or resume mock" })).toHaveAttribute("href", "/campus/course/a2-final-mock-exam");
+  expect(await screen.findByRole("button", { name: "Start or resume mock" })).toBeEnabled();
   expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(expect.anything(), "exam@example.org", "test-only-pass");
   expect(api).toHaveBeenCalledWith("/mock/register", expect.objectContaining({
     method: "POST", body: JSON.stringify({ name: "Test Student", level: "A2" }),
   }));
   expect(student.getIdToken).toHaveBeenCalledWith(true);
-  expect(screen.getByText("A2 exam trial")).toBeVisible();
+  expect(screen.getAllByRole("button", { name: /Locked/ })[0]).toBeDisabled();
   expect(screen.queryByRole("link", { name: /Open Exams Room/ })).toBeNull();
 });
 
@@ -116,6 +124,8 @@ test.each([
   mockApi([{ level, scope: "trial", expiresAtMs: Date.now() + 60000 }]);
   useAuth.mockReturnValue({user: student, studentProfile: {...profile, level}});
   openPage("/exams/mocks");
-  expect(await screen.findByRole("link", {name: /Start or resume mock|Open reading practice/})).toHaveAttribute("href", route);
-  expect(screen.queryByRole("heading", {name: "All paid mocks"})).toBeNull();
+  const included = await screen.findByRole("button", {name: /Start or resume mock|Open practice section/});
+  expect(screen.getAllByRole("article")).toHaveLength(screen.queryAllByRole("button", {name: /Locked/}).length + 1);
+  fireEvent.click(included);
+  expect(await screen.findByText(route)).toBeVisible();
 });

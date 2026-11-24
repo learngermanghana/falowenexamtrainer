@@ -37,3 +37,5 @@ For A2 Kombi Mocks 4–8, new Sprechen Teil 3 sessions use the published scenari
 ### Seven-day practice trials
 
 New exam-only registrations at A1 through C1 receive seven days from signup at their registered level. The designated catalogue entries are A1 Mock 2, A2 Mock 1, B1 Mock 1, B2 Mock 1, and C1 Reading Sample 1. C1 is a reading trial. A1 Day 23 remains a graded Course Book final. German course trials include Day 1 and the same designated exam. Monthly exam access unlocks the level's published exam practice. Course enrolment is separate.
+
+During an active trial, learners browse the regular Course Book and Exams Room layouts. Later lesson cards and restricted exam materials display a padlock. The designated trial exam opens from its usual mock library card.
