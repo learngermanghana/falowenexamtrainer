@@ -132,7 +132,7 @@ export default function CourseTypeSettings() {
       </button>
       {checkoutRequired && target === "full_course" && needsTuition && <button type="button" style={styles.secondaryButton} disabled={busy} onClick={event=>submit(event,true)}>Continue to tuition checkout</button>}
     </form>}
-    <p><Link to={examOnly ? "/mock/checkout" : "/campus/account"}>{examOnly ? "Exam subscription" : "Back to Account"}</Link></p>
+    <p><Link to="/mock/checkout">Review exam subscription</Link>{" · "}{!examOnly && (typeof window !== "undefined" && window.location.hostname.includes("exams.falowen.app") ? <a href="https://www.falowen.app/campus/account?tab=billing">Course billing</a> : <Link to="/campus/account?tab=billing">Course billing</Link>)}</p>
     {examOnly && <button type="button" onClick={logout} style={styles.secondaryButton}>Sign out</button>}
   </main>;
 }
