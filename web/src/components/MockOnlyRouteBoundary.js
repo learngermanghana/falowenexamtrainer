@@ -13,6 +13,8 @@ export default function MockOnlyRouteBoundary({ children }) {
   if (loading && user && /^\/campus(?:\/|$)/.test(location.pathname)) return null;
   if (!examOnly && !isMockPortal()) return children;
   const route = location.pathname;
+  if (examOnly && !isMockPortal() && route === "/") return children;
+  if (examOnly && /^\/campus\/account\/?$/.test(route)) return <Navigate to="/mock/account" replace />;
   if (["/mock/payment", "/mock/account", "/mock/register", "/mock/checkout", "/mock/complete", "/mock/free-hoeren", "/login", "/login/", "/signup", "/signup/"].includes(route)) return children;
   if (/^\/exams(?:\/|$)/.test(route)) return children;
   const allowedMock = Object.values(MOCK_EXAM_CATALOG).some(

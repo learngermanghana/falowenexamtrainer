@@ -8,6 +8,7 @@ import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
 
 import { courseTrial, TrialExamPage } from "./TrialPractice";
+import { TrialExam } from "../context/TrialCatalogContext";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const safeLevels = new Set(LEVELS);
@@ -34,7 +35,7 @@ export function PaymentNavigation() {
   const { studentProfile } = useAuth();
   const examOnly = studentProfile?.accountType === "exam_only";
   return <nav aria-label="Student navigation" style={{display: "flex", flexWrap: "wrap", gap: "8px 18px", marginBottom: 20}}>
-    {!examOnly && (isMockPortal() ? <a href="https://www.falowen.app/campus">Home</a> : <Link to="/campus">Home</Link>)}
+    {isMockPortal() ? <a href="https://www.falowen.app/">Home</a> : <Link to="/">Home</Link>}
     {!examOnly && (isMockPortal() ? <a href="https://www.falowen.app/campus/course">Course Book</a> : <Link to="/campus/course">Course Book</Link>)}
     <Link to="/exams/overview">Exams Room</Link>
     {!examOnly && isMockPortal() ? <a href="https://www.falowen.app/campus/account?tab=billing">Account</a>
@@ -82,7 +83,7 @@ export function MockExamSignupPage() {
   const [level, setLevel] = useState(new URLSearchParams(window.location.search).get("level")?.toUpperCase() || "A1");
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
-  if (user && studentProfile && !working) return <Navigate to={studentProfile.examTrialStartedAt ? "/exams/mocks" : "/mock/payment"} replace />;
+  if (user && studentProfile && !working) return <Navigate to={"/exams/mocks"} replace />;
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!safeLevels.has(level) || name.trim().split(/\s+/).length < 2 || (!user && password.length < 8)) {
@@ -95,10 +96,10 @@ export function MockExamSignupPage() {
         ? { user }
         : await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       const token = await credential.user.getIdToken();
-      const registration = await api("/mock/register", { method: "POST", token, body: { name: name.trim(), level } });
+      await api("/mock/register", { method: "POST", token, body: { name: name.trim(), level } });
       await credential.user.getIdToken(true); // reload server-issued examOnly claim
       await refreshStudentProfile?.().catch(() => {});
-      navigate(registration.trial ? "/exams/mocks" : "/mock/payment", { replace: true });
+      navigate("/exams/mocks", { replace: true });
     } catch (err) {
       setError(err?.code === "auth/email-already-in-use"
         ? "This email already has a Falowen account. Sign in instead."
@@ -214,36 +215,38 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
     const timer = setTimeout(() => setClock(Date.now()), Math.min(2147483647, Math.max(1, expiry - Date.now())));
     return () => clearTimeout(timer);
   }, [expiry, clock]);
-  if (state.loading) return <div style={card} role="status">Checking your purchased mock access…</div>;
-  const active = state.active.filter(row => !row.expiresAtMs || row.expiresAtMs > Date.now());
-  if (courseTrialState && !active.some(row => row.scope !== "trial" && row.level === studentProfile.level)) {
-    if (!courseTrialState.active || courseTrialState.endsAtMs <= Date.now()) return <Navigate to="/mock/payment" replace />;
-    return <TrialExamPage level={studentProfile.level} path={location.pathname.replace(/\/+$/, "")}>{children}</TrialExamPage>;
-  }
-  if (!active.length) return <Navigate to="/mock/payment" replace />;
-  const trial = active.find(row => row.scope === "trial" && row.expiresAtMs > Date.now());
-  if (trial && !active.some(row => row.scope !== "trial" && (studentProfile?.courseEnrollmentPreserved || row.level === trial.level))) {
-    return <TrialExamPage level={trial.level} path={location.pathname.replace(/\/+$/, "") || "/"}>
-      {typeof children === "function" ? children([trial.level]) : children}
-    </TrialExamPage>;
-  }
-  if (location.pathname === "/") return <Navigate to="/exams/overview" replace />;
-  const examArea = /^\/exams\/(overview|mocks|file|lesen|horen|writing|speaking|question|vocab)(?:\/.*)?$/.test(location.pathname);
-  const allowedMockRoutes = Object.values(MOCK_EXAM_CATALOG)
-    .filter(mock => active.some(p => p.level === mock.level) && mock.status !== "planned" &&
-      mock.id !== "a2-course-preview-01" && mock.route)
-    .map(mock => mock.route);
-  if (!examArea && !allowedMockRoutes.includes(location.pathname)) {
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  const home = path === "/" && !isMockPortal();
+  const active = state.loading ? [] : state.active.filter(row => !row.expiresAtMs || row.expiresAtMs > Date.now());
+  const registeredLevel = String(studentProfile?.level || "").toUpperCase();
+  const eligible = active.filter(row => studentProfile?.courseEnrollmentPreserved || row.level === registeredLevel);
+  const paidLevels = [...new Set(eligible.filter(row => row.scope !== "trial").map(row => row.level))];
+  const trial = eligible.find(row => row.scope === "trial" && row.expiresAtMs > Date.now());
+  const displayLevel = safeLevels.has(registeredLevel) ? registeredLevel : "A1";
+  const renderShell = levels => typeof children === "function" ? children(levels) : children;
+  // Navigation is not an entitlement. Only these exact catalog paths can
+  // render without a verified grant; direct practice URLs remain blocked.
+  if (home) return renderShell([displayLevel]);
+  const catalog = ["/exams/overview", "/exams/mocks"].includes(path);
+  if (state.loading) return <div style={card} role="status">Checking your exam access…</div>;
+  if (!paidLevels.length) {
+    if (trial) {
+      if (catalog || Object.values(MOCK_EXAM_CATALOG).some(mock => mock.level === trial.level && mock.route === path)) {
+        return <TrialExamPage level={trial.level} path={path}>{renderShell([trial.level])}</TrialExamPage>;
+      }
+    }
+    if (catalog) return <TrialExam.Provider value={{ level: displayLevel, id: null, locked: true }}>{renderShell([displayLevel])}</TrialExam.Provider>;
     return <Navigate to="/exams/overview" replace />;
   }
-  const subscribedLevels = [...new Set(active.filter(row => row.scope !== "trial").map(row => row.level))];
-  const registeredLevel = String(studentProfile?.level || "").toUpperCase();
-  const allowedLevels = studentProfile?.courseEnrollmentPreserved
-    ? subscribedLevels : subscribedLevels.filter(level => level === registeredLevel);
-  if (examArea && (!allowedLevels.length || (safeLevels.has(location.pathname.split("/")[3]?.toUpperCase()) &&
-      !allowedLevels.includes(location.pathname.split("/")[3].toUpperCase())))) {
-    return <Navigate to="/mock/payment" replace />;
+  const examArea = /^\/exams\/(overview|mocks|file|lesen|horen|writing|speaking|question|vocab)(?:\/.*)?$/.test(path);
+  const allowedMockRoutes = Object.values(MOCK_EXAM_CATALOG)
+    .filter(mock => paidLevels.includes(mock.level) && mock.status !== "planned" &&
+      mock.id !== "a2-course-preview-01" && mock.route).map(mock => mock.route);
+  const routeLevel = path.split("/")[3]?.toUpperCase();
+  if ((!examArea && !allowedMockRoutes.includes(path)) ||
+      (examArea && safeLevels.has(routeLevel) && !paidLevels.includes(routeLevel))) {
+    return <Navigate to="/exams/overview" replace />;
   }
-  return typeof children === "function" ? children(allowedLevels) : children;
+  return renderShell(paidLevels);
 }
 export { isMockPortal };

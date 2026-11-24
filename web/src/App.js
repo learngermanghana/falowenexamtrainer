@@ -752,6 +752,7 @@ const AppShell = ({
   const onboardingRole = String(studentProfile?.role || "student").toLowerCase();
   const directSwahiliTrial = isSwahiliCampus && hasActiveTrial;
   const requiresOnboarding =
+    studentProfile?.accountType !== "exam_only" &&
     !directSwahiliTrial &&
     !["admin", "tutor"].includes(onboardingRole) &&
     !Boolean(studentProfile?.isTutor) &&

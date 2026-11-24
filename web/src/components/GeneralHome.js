@@ -24,7 +24,7 @@ const classLevelFromName = (className = "") => {
   return match?.[1] || "";
 };
 
-const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClassSchedule, onJoinZoom, onOpenAccount, isSwahili = false }) => {
+const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClassSchedule, onJoinZoom, onOpenAccount, isSwahili = false, examOnly = false }) => {
   const { t } = useTranslation();
   const studentName =
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
@@ -38,7 +38,7 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
         <p className="falowen-learner-hero__lead">{t("homeAccess.welcomeLead")}</p>
         <div className="falowen-learner-hero__actions">
           <button type="button" className="falowen-learner-hero__secondary" onClick={onOpenAccount}>{t("homeAccess.account")}</button>
-          {!isSwahili && (
+          {!isSwahili && !examOnly && (
             <button type="button" className="falowen-learner-hero__zoom" onClick={onJoinZoom}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                 <rect x="3" y="6" width="13" height="12" rx="2" />
@@ -49,7 +49,7 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
           )}
         </div>
       </section>
-      {!isSwahili && (
+      {!isSwahili && !examOnly && (
         <section className="falowen-home-class-schedule" aria-label={t("homeAccess.scheduleAria")}>
           <span className="falowen-home-class-schedule__eyebrow">{t("homeAccess.liveClass")}</span>
           <div className="falowen-home-class-schedule__identity">
@@ -77,7 +77,7 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
   );
 };
 
-const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) => (
+const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false, examOnly = false }) => (
   <section className="falowen-home-spaces" aria-label={t("homeAccess.spaces")}>
     <div className="falowen-home-spaces__heading">
       <h2>{t("homeAccess.spaces")}</h2>
@@ -105,7 +105,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) =>
             : t("homeAccess.gerBookDesc")}</p>
         </div>
         <div className="falowen-home-space-card__bottom">
-          <button style={styles.primaryButton} onClick={openCampus}>{t("homeAccess.openCourseBook")} <span aria-hidden="true">→</span></button>
+          <button style={styles.primaryButton} onClick={openCampus} disabled={examOnly}>{examOnly ? "🔒 Full Course required" : t("homeAccess.openCourseBook")} <span aria-hidden="true">→</span></button>
         </div>
       </section>
 
@@ -174,7 +174,8 @@ const GeneralHome = ({
   const levelKey = detectLevelKey(studentProfile);
   const isSwahiliCampus = getCampusProgram(studentProfile) === "swahili";
   const firstLessonPath = isSwahiliCampus ? "/campus/course/swahili/day-1" : levelKey ? `/campus/course/lesson/${levelKey}/1` : "/campus/course";
-  const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted);
+  const examOnly = studentProfile?.accountType === "exam_only";
+  const onboardingCompleted = examOnly || Boolean(studentProfile?.onboardingCompleted);
   const assignedClassLevel = classLevelFromName(preferredClass);
   const metricsStudentProfile = useMemo(
     () => assignedClassLevel
@@ -200,8 +201,8 @@ const GeneralHome = ({
 
   const openAccount = useCallback(() => {
     playOpenFeedback();
-    navigate("/campus/account");
-  }, [navigate, playOpenFeedback]);
+    navigate(examOnly ? "/mock/account" : "/campus/account");
+  }, [navigate, playOpenFeedback, examOnly]);
 
   const openBilling = useCallback(() => {
     playOpenFeedback();
@@ -220,7 +221,7 @@ const GeneralHome = ({
 
   const paymentAlert = useMemo(() => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
-    if (balanceDue <= 0) return null;
+    if (examOnly || balanceDue <= 0) return null;
     if (!studentProfile?.contractEnd) return null;
     const contractEndMs = toDateMs(studentProfile.contractEnd);
     if (!Number.isFinite(contractEndMs)) return null;
@@ -238,7 +239,7 @@ const GeneralHome = ({
           ? translate("generalHome.paymentAlert.endsToday", { amount })
           : translate("generalHome.paymentAlert.endsSoon", { amount, time: daysLabel }),
     };
-  }, [formatTimeUnit, locale, studentProfile?.balanceDue, studentProfile?.contractEnd, translate]);
+  }, [examOnly, formatTimeUnit, locale, studentProfile?.balanceDue, studentProfile?.contractEnd, translate]);
 
   const handleSelectLevel = () => navigate("/campus/account");
   const handleConfirmClass = () => {
@@ -339,11 +340,12 @@ const GeneralHome = ({
 
   return (
     <div className="falowen-home-dashboard">
-      {new URLSearchParams(location.search).get("welcome") === "1" ? (
+      {!examOnly && new URLSearchParams(location.search).get("welcome") === "1" ? (
         <OnboardingStudyBuddyStart firstLessonPath={firstLessonPath} />
       ) : null}
       <WelcomeHero
         studentProfile={studentProfile}
+        examOnly={examOnly}
         className={preferredClass}
         classId={preferredClassId}
         onViewClassSchedule={openFullClassSchedule}
@@ -375,19 +377,20 @@ const GeneralHome = ({
         </section>
       ) : null}
 
-      <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
-      <div className="falowen-home-section-break falowen-home-section-break--highlights">
+      <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} examOnly={examOnly} />
+      {examOnly && <section style={styles.card}><h3>Exam preparation access</h3><p>Browse your exam room. Subscribe when you are ready to unlock practice.</p><button style={styles.secondaryButton} onClick={() => navigate("/mock/payment")}>Payment options</button></section>}
+      {!examOnly && <div className="falowen-home-section-break falowen-home-section-break--highlights">
         <HomepageHighlights
           className={preferredClass}
           classId={preferredClassId}
           level={assignedClassLevel || levelKey}
           program={studentProfile?.program}
         />
-      </div>
+      </div>}
 
-      <div className="falowen-home-section-break falowen-home-section-break--metrics">
+      {!examOnly && <div className="falowen-home-section-break falowen-home-section-break--metrics">
         <HomeMetrics studentProfile={metricsStudentProfile} />
-      </div>
+      </div>}
 
       <LegalFooter />
     </div>
