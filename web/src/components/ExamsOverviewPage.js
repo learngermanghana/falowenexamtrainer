@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
-import { EXAM_SKILLS, buildExamRoomCoach } from "../lib/examRoomCoach";
+import { EXAM_SKILLS, buildExamRoomCoach, examNextActivity } from "../lib/examRoomCoach";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { announceExamSuccess } from "../services/interactionFeedback";
 import { getReadingPracticeHistory, getReadingPracticeStudentKey } from "../services/readingPracticeHistory";
@@ -11,6 +11,7 @@ import {
   loadDailyWarmupProgress,
   loadExamRoomResults,
 } from "../services/examRoomDashboardService";
+import PersonalExamCountdown from "./PersonalExamCountdown";
 import "./ExamsOverviewPage.css";
 
 import { TrialExam } from "../context/TrialCatalogContext";
@@ -33,7 +34,9 @@ export default function ExamsOverviewPage() {
   const { level } = useExam();
   const { user, idToken, studentProfile } = useAuth();
   const currentLevel = String(level || "A1").toUpperCase();
-  const [cloudResults, setCloudResults] = useState([]);
+  const historyKey = (user?.uid || "") + ":" + currentLevel;
+  const [cloudHistory, setCloudHistory] = useState({ key: "", results: [] });
+  const cloudResults = cloudHistory.key === historyKey ? cloudHistory.results : [];
   const [loading, setLoading] = useState(false);
   const [loadIssue, setLoadIssue] = useState("");
   const [limited, setLimited] = useState(false);
@@ -47,6 +50,7 @@ export default function ExamsOverviewPage() {
     () => buildExamRoomCoach({ level: currentLevel, cloudResults, localReading }),
     [currentLevel, cloudResults, localReading],
   );
+  const nextActivity = examNextActivity(coach, trialExam);
   const hasFullMock = useMemo(
     () => getMockExamsForLevel(currentLevel, { includeCourse: true })
       .some((mock) => mock.mode === "full" && mock.status === "ready"),
@@ -55,7 +59,7 @@ export default function ExamsOverviewPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setCloudResults([]);
+    setCloudHistory({ key: historyKey, results: [] });
     setDailyCloudStatus(null);
     setLimited(false);
     setLoadIssue("");
@@ -65,7 +69,7 @@ export default function ExamsOverviewPage() {
     loadExamRoomResults({ idToken, level: currentLevel })
       .then(({ results, limited: wasLimited }) => {
         if (cancelled) return;
-        setCloudResults(results);
+        setCloudHistory({ key: historyKey, results });
         setLimited(wasLimited);
       })
       .catch(() => {
@@ -78,7 +82,7 @@ export default function ExamsOverviewPage() {
       .catch(() => { /* Local warm-up progress remains usable offline. */ });
 
     return () => { cancelled = true; };
-  }, [currentLevel, idToken, user?.uid]);
+  }, [currentLevel, idToken, user?.uid, historyKey]);
 
   return (
     <main className="exam-room-overview">
@@ -105,6 +109,29 @@ export default function ExamsOverviewPage() {
             <span>Latest score</span>
           </div>
         </div>
+        <div className="exam-room-performance">
+          <div>
+            <h3>Exam performance</h3>
+            <strong className="exam-room-overall-score">{coach.overallPercent === null ? "—" : coach.overallPercent + "%"}</strong>
+            <p>{coach.overallPercent === null
+              ? "Record all four skills to see your overall practice score."
+              : "Equal-weight average of your latest four skill scores."}</p>
+            {coach.missingSkills.length > 0 && <p>Still to assess: {coach.missingSkills.map(skill => skill.title).join(", ")}</p>}
+            <small>Practice indicator only — not an official Goethe score or a pass prediction.</small>
+          </div>
+          <div className="exam-room-performance-skills">
+            {EXAM_SKILLS.map(skill => {
+              const result = coach.latestBySection[skill.key];
+              return <div key={skill.key} className="exam-room-performance-skill">
+                <span>{skill.title}</span><strong>{result ? result.percent + "%" : "Not assessed"}</strong>
+                <div className="exam-room-performance-track" aria-hidden="true">
+                  <div style={{width: (result?.percent || 0) + "%"}} />
+                </div>
+              </div>;
+            })}
+          </div>
+        </div>
+        {user?.uid && <PersonalExamCountdown key={historyKey} uid={user.uid} level={currentLevel} />}
         <div className="exam-room-coverage">
           <div className="exam-room-coverage-heading">
             <span>Skill coverage</span>
@@ -151,7 +178,7 @@ export default function ExamsOverviewPage() {
           {EXAM_SKILLS.map((skill) => {
             const last = coach.latestBySection[skill.key];
             const trend = coach.skillTrends[skill.key];
-            const suggested = coach.focus.key === skill.key;
+            const suggested = !trialExam && coach.focus.key === skill.key;
             return (
               <button
                 key={skill.key}
@@ -175,6 +202,7 @@ export default function ExamsOverviewPage() {
                 {trend.count ? (
                   <span className="exam-room-skill-trend">
                     <span>{trend.count} scored attempt{trend.count === 1 ? "" : "s"} · Average {trend.average}%</span>
+                    {coach.weakParts[skill.key] && <span>Lowest-scoring part: {coach.weakParts[skill.key]}</span>}
                     {trend.change !== null ? (
                       <span className="exam-room-skill-change" aria-label={`Change from previous attempt: ${trend.change > 0 ? "up " : trend.change < 0 ? "down " : "unchanged "}${Math.abs(trend.change)} percentage points`}>
                         {trend.change > 0 ? "↑ +" : trend.change < 0 ? "↓ " : "→ "}{trend.change} pp vs previous
@@ -187,12 +215,30 @@ export default function ExamsOverviewPage() {
             );
           })}
         </div>
-        <p className="exam-room-suggestion">
-          <strong>Suggested: {coach.focus.title}.</strong> {coach.focus.reason}
-          {coach.focus.weakPart ? " Focus on " + coach.focus.weakPart + "." : ""}
-        </p>
+        <div className="exam-room-suggestion exam-room-next-activity">
+          <p><strong>Suggested: {nextActivity.title}.</strong> {nextActivity.reason}
+            {nextActivity.weakPart ? " Focus on " + nextActivity.weakPart + "." : ""}
+          </p>
+          <button type="button" className="exam-room-text-action"
+            onClick={() => openPractice(nextActivity.route, "Recommended practice opened.")}>
+            {trialExam?.locked ? "Browse exams" : trialExam ? "Open trial practice" : "Practise recommended skill"} →
+          </button>
+        </div>
       </section>
 
+      <section className="exam-room-activity" aria-label="Full mock history">
+        <div className="exam-room-recent-heading">
+          <div><h3>Full mock history</h3><p>Completed mock results recorded for {currentLevel}.</p></div>
+          <button type="button" className="exam-room-text-action" onClick={() => openPractice("/exams/mocks", "Mock Exams opened successfully.")}>Browse mocks →</button>
+        </div>
+        {coach.mockHistory.length ? <ol className="exam-room-recent-list">
+          {coach.mockHistory.slice(0,5).map((attempt,index) => <li className="exam-room-recent-item" key={attempt.id || index}>
+            <div><strong>{attempt.title}</strong><p>{readableDate(attempt.completedAt)}</p></div>
+            <strong className="exam-room-recent-score">{attempt.percent}%</strong>
+          </li>)}
+        </ol> : <p className="exam-room-status">{loading ? "Loading mock results…" : loadIssue ? "Mock history temporarily unavailable." : "No recorded full mock results yet."}</p>}
+        {coach.mockHistory.length > 5 && <p className="exam-room-status">Showing the latest five recorded mocks.</p>}
+      </section>
       <section className="exam-room-activity" aria-label="Warm-up and recent practice">
         <div className="exam-room-warmup">
           <span className="exam-room-warmup-icon" aria-hidden="true">☀️</span>
@@ -211,7 +257,7 @@ export default function ExamsOverviewPage() {
         <div className="exam-room-recent-heading">
           <div>
             <h3>Your recent practice</h3>
-            <p>Your latest recorded results.</p>
+            <p>Your latest individual practice results.</p>
           </div>
           <button type="button" disabled={Boolean(trialExam)} className="exam-room-text-action" onClick={() => openPractice("/exams/file", "My Exam File opened successfully.")}>
             {trialExam ? "🔒 Exam File" : "Exam File →"}
@@ -220,9 +266,9 @@ export default function ExamsOverviewPage() {
         {loading ? <p className="exam-room-status" role="status">Loading saved practice results…</p> : null}
         {loadIssue ? <p className="exam-room-status" role="status" style={{ color: "#92400e" }}>{loadIssue}</p> : null}
         {limited ? <p className="exam-room-status">Showing results from a limited history window.</p> : null}
-        {coach.attempts.length ? (
+        {coach.practiceHistory.length ? (
           <ol className="exam-room-recent-list">
-            {coach.attempts.slice(0, 3).map((attempt, index) => (
+            {coach.practiceHistory.slice(0, 3).map((attempt, index) => (
               <li className="exam-room-recent-item" key={attempt.id || attempt.section + "-" + index}>
                 <div>
                   <strong>{attempt.section === "mixed"
@@ -235,7 +281,7 @@ export default function ExamsOverviewPage() {
             ))}
           </ol>
         ) : (
-          <p className="exam-room-status">No scored practice yet. Choose a mock or skill above to begin.</p>
+          <p className="exam-room-status">No individual scored practice yet. Choose an available skill to begin.</p>
         )}
       </section>
     </main>
