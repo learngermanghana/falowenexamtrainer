@@ -83,9 +83,9 @@ export default function ExamsOverviewPage({ dateInLevelPicker = false }) {
       >
         <span className="exam-room-mock-icon" aria-hidden="true">📝</span>
         <span className="exam-room-mock-copy">
-          <strong>{hasFullMock && !trialExam ? "Full Mock Exams" : "Mock Practice"}</strong>
-          <span>{trialExam ? "Browse the exam catalogue." : hasFullMock ? "All four skills in one exam." : "A complete " + currentLevel + " mock is not yet published."}</span>
-          <span className="exam-room-mock-action">{hasFullMock && !trialExam ? "Choose a mock" : "Browse practice"} <span aria-hidden="true">→</span></span>
+          <strong>{hasFullMock || (trialExam?.id && !trialExam.locked) ? "Start Mock Test" : "Mock Exams"}</strong>
+          <span>{trialExam ? "Choose an available mock exam." : hasFullMock ? "All four skills in one exam." : "A complete " + currentLevel + " mock is not yet published."}</span>
+          <span className="exam-room-mock-action">{hasFullMock || (trialExam?.id && !trialExam.locked) ? "Choose a mock" : "View available exams"} <span aria-hidden="true">→</span></span>
         </span>
       </button>
 
