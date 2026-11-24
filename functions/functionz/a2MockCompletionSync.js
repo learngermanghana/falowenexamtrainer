@@ -177,6 +177,24 @@ const persistVerifiedA2MockSection = async ({
     .doc(clean(uid))
     .collection("attempts")
     .doc(clean(attemptId));
+  // For the tutor-fallback paper, serialize AI and tutor writes against the same attempt.
+  if (mockId === "a2-mock-01" && section === "schreiben") {
+    return db.runTransaction(async tx => {
+      const snap = await tx.get(attemptRef);
+      const attempt = snap.data();
+      const fail = (message,code) => {throw Object.assign(new Error(message),{code});};
+      if (!snap.exists) fail("Mock attempt not found for verified section.","A2_MOCK_ATTEMPT_NOT_FOUND");
+      if (attempt.mockId && attempt.mockId !== mockId) fail("This verified grade belongs to a different A2 mock.","A2_MOCK_ATTEMPT_MISMATCH");
+      if (attempt.uid && attempt.uid !== clean(uid)) fail("Mock attempt belongs to another account.","A2_MOCK_ATTEMPT_FORBIDDEN");
+      const existing = attempt.verifiedSections?.schreiben;
+      if (existing?.verified && Number.isFinite(Number(existing.score))) return existing;
+      if (attempt.writingTutorReview?.status === "pending") fail("Your writing is with a tutor.","MOCK_TUTOR_REVIEW_PENDING");
+      if (attempt.status === "completed") fail("Completed mock attempts cannot receive new verified section scores.","A2_MOCK_ALREADY_COMPLETED");
+      const record={verified:true,score:Number(numericScore.toFixed(1)),maxScore:25,source:clean(source),gradedAt:admin.firestore.FieldValue.serverTimestamp()};
+      tx.update(attemptRef,{"verifiedSections.schreiben":record,updatedAt:admin.firestore.FieldValue.serverTimestamp()});
+      return record;
+    });
+  }
   const snap = await attemptRef.get();
   if (!snap.exists) {
     const error = new Error("Mock attempt not found for verified section.");

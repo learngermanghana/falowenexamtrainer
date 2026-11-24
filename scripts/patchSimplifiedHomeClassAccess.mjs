@@ -13,7 +13,16 @@ const hasHomepageHighlights = source.includes("<HomepageHighlights") &&
   source.includes("classId={preferredClassId}") &&
   source.includes("<HomeMetrics studentProfile={metricsStudentProfile} />");
 
-if (hasHomepageHighlights) {
+const dashboardSource = source.slice(source.lastIndexOf("  return ("));
+const hasCleanHome = !dashboardSource.includes("<HomepageHighlights") &&
+  !dashboardSource.includes("<ClassCalendarCard") &&
+  dashboardSource.includes("<QuickMainAccess") &&
+  dashboardSource.indexOf("<HomeMetrics") > dashboardSource.indexOf("<QuickMainAccess") &&
+  dashboardSource.indexOf("<LegalFooter") > dashboardSource.indexOf("<HomeMetrics") &&
+  source.includes("onViewClassSchedule={openFullClassSchedule}");
+if (hasCleanHome) {
+  console.log("Falowen Home retains schedule access and ends at Home Metrics without Highlights.");
+} else if (hasHomepageHighlights) {
   const dashboard = source.slice(source.lastIndexOf("  return ("));
   const highlightsIndex = dashboard.indexOf("<HomepageHighlights");
   const metricsIndex = dashboard.indexOf("<HomeMetrics");
