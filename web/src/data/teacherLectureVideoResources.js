@@ -36,7 +36,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     25: [{ chapter: "9.25", tutor_lecture_video: "" }],
     26: [{ chapter: "10.26", tutor_lecture_video: "" }],
     27: [{ chapter: "10.27", tutor_lecture_video: "" }],
-    28: [{ chapter: "10.28", tutor_lecture_video: "" }],
+    28: [{ chapter: "10.28", topic: "Zukunft planen", tutor_lecture_video: "https://youtu.be/sXdXv5dreN0" }],
   },
   B1: {
     1: [{ chapter: "1.1", tutor_lecture_video: "" }],
