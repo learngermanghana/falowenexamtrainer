@@ -169,6 +169,9 @@ function createSwahiliListeningHandler(recording, options = {}) {
     },
   });
 }
+function createSwahiliB1Day27AudioHandler(options) {
+  return createSwahiliListeningHandler({ id: 'swahili-b1-day27-listening', key: 'swahili/B1/day-27/day-27.mp3' }, options);
+}
 function createSwahiliB1Day26AudioHandler(options) {
   return createSwahiliListeningHandler({
     id: 'swahili-b1-day26-listening',
@@ -282,4 +285,4 @@ function createClassroomBankAudioHandler(options = {}) {
     return signObject(recording, env);
   } });
 }
-module.exports = { createSwahiliB1Day26AudioHandler, createSwahiliDayThirteenAudioHandler, createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayThreeAudioHandler, createSwahiliDayFourAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayEightAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
+module.exports = { createSwahiliB1Day27AudioHandler, createSwahiliB1Day26AudioHandler, createSwahiliDayThirteenAudioHandler, createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayThreeAudioHandler, createSwahiliDayFourAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayEightAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
