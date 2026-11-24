@@ -154,17 +154,17 @@ export default function ExamsOverviewPage() {
       <button
         type="button"
         className="exam-room-mock-entry"
-        aria-label={hasFullMock ? "Start or resume a full mock exam" : "Browse available exam practice"}
+        aria-label={hasFullMock && !trialExam ? "Start or resume a full mock exam" : "Browse available exam practice"}
         onClick={() => openPractice("/exams/mocks", "Mock Exams opened successfully.")}
       >
         <span className="exam-room-mock-icon" aria-hidden="true">📝</span>
         <span className="exam-room-mock-copy">
-          <span className="exam-room-mock-eyebrow">{hasFullMock ? "Option 1 · Complete exam" : "Available exam practice"}</span>
-          <strong>{hasFullMock ? "Start Full Mock" : "Explore Mock Practice"}</strong>
-          <span>{hasFullMock
+          <span className="exam-room-mock-eyebrow">{hasFullMock && !trialExam ? "Option 1 · Complete exam" : "Available exam practice"}</span>
+          <strong>{hasFullMock && !trialExam ? "Start Full Mock" : "Explore Mock Practice"}</strong>
+          <span>{trialExam ? "Browse the full catalogue and see which activities your current access includes." : hasFullMock
             ? "Take Lesen, Hören, Schreiben and Sprechen together. Start a new mock or resume one already in progress."
             : "A complete " + currentLevel + " mock is not yet published. Explore the available practice."}</span>
-          <span className="exam-room-mock-action">{hasFullMock ? "Choose or resume a full mock" : "See available practice"} <span aria-hidden="true">→</span></span>
+          <span className="exam-room-mock-action">{hasFullMock && !trialExam ? "Choose or resume a full mock" : "See available practice"} <span aria-hidden="true">→</span></span>
         </span>
         </button>
 
