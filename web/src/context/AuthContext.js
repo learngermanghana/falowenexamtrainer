@@ -1274,6 +1274,7 @@ export const AuthProvider = ({ children }) => {
     () => ({
       user,
       studentProfile: activeProfile,
+      accountProfile: studentProfile,
       courseOptions,
       selectCourse,
       idToken,
@@ -1295,6 +1296,7 @@ export const AuthProvider = ({ children }) => {
     [
       user,
       activeProfile,
+      studentProfile,
       courseOptions,
       selectCourse,
       idToken,
