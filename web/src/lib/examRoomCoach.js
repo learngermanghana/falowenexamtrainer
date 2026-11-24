@@ -6,7 +6,7 @@ export const EXAM_SKILLS = Object.freeze([
 ]);
 
 const finite = (value) => {
-  if (value === null || value === undefined || value === "") return null;
+  if (value === null || value === undefined || typeof value === "boolean" || (typeof value === "string" && !value.trim())) return null;
   const num = Number(value);
   return Number.isFinite(num) ? num : null;
 };
@@ -88,7 +88,7 @@ const mockSectionPercents = (attempt) => {
     const skill = EXAM_SKILLS.find((entry) => entry.key === key);
     const score = finite(part.score);
     const max = finite(part.maxScore);
-    if (!skill || score === null || max === null || max <= 0) return null;
+    if (!skill || part.assessed === false || part.verified === false || ["unassessed", "not_assessed", "pending", "unanswered", "incomplete"].includes(String(part.status || "").toLowerCase()) || score === null || max === null || max <= 0 || score < 0 || score > max) return null;
     return {
       id: `${attempt.id}:${key}`,
       section: key,
@@ -134,6 +134,7 @@ export const buildExamRoomCoach = ({
     if (String(row?.level || "").toUpperCase() !== selectedLevel) return;
     const section = normalizedSection(row);
     if (section !== "mixed" && !EXAM_SKILLS.some((skill) => skill.key === section)) return;
+    if (row.assessed === false || ["draft", "in_progress", "incomplete", "unassessed", "not_assessed", "pending"].includes(String(row.status || "").toLowerCase())) return;
     const percent = scorePercent(row);
     if (percent === null) return;
     const uniqueKey = String(row?.attemptId || row?.examRoomAttemptId || row?.id || "");
