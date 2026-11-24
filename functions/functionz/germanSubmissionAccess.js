@@ -67,7 +67,11 @@ async function verifyGermanSubmissionAccess(db,auth,identity,now=Date.now()) {
   const profile=record.data();
   if (profile.uid!==uid) return null;
   const access=germanSubmissionAccess(profile,now,account.metadata?.creationTime);
-  return access ? {...access,profileId:record.id,profileFields:accessFingerprint(profile)} : null;
+  if(!access)return null;
+  const {enrollmentRows,blockedEnrollmentLevels}=require("./levelEnrollmentAccess");
+  const blocked=blockedEnrollmentLevels(await enrollmentRows(record.ref),"german",now);
+  const levels=access.levels.filter(level=>!blocked.includes(level));
+  return levels.length ? {...access,levels,level:levels.includes(access.level)?access.level:levels[levels.length-1],profileId:record.id,profileFields:accessFingerprint(profile)} : null;
 }
 function registerGermanSubmissionAccessRoute(app,{admin,getAuthedUser}) {
   app.post("/course/submission-access",async(req,res)=>{

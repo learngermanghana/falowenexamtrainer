@@ -146,8 +146,8 @@ export const ExamProvider = ({ children, entitledLevels }) => {
     const purchased = includePaidExams
       ? paidExamGrants.filter(grant => grant.expiresAtMs > accessTime).map(grant => grant.level)
       : [];
-    return [...new Set([...getExamPracticeLevels(profileExamLevel), ...purchased])];
-  }, [entitledLevels, profileExamLevel, includePaidExams, paidExamGrants, accessTime]);
+    return [...new Set([...getExamPracticeLevels(profileExamLevel), ...purchased])].filter(level=>!studentProfile?.blockedEnrollmentLevels?.includes(level));
+  }, [entitledLevels, profileExamLevel, includePaidExams, paidExamGrants, accessTime, studentProfile?.blockedEnrollmentLevels]);
   const [level, setLevelState] = useState(() =>
     entitledLevels?.[0] || resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)));
   const [levelConfirmed, setLevelConfirmed] = useState(Boolean(loadPreferredLevel(user?.uid)));
@@ -199,7 +199,7 @@ export const ExamProvider = ({ children, entitledLevels }) => {
     // Deliberately do not depend on "level": manual downward switches must persist.
     const storedLevel = loadPreferredLevel(user?.uid);
     setLevelState(accessibleLevels.includes(storedLevel) ? storedLevel
-      : entitledLevels?.[0] || resolveExamPracticeLevel(profileExamLevel, storedLevel));
+      : accessibleLevels[accessibleLevels.length-1] || entitledLevels?.[0] || resolveExamPracticeLevel(profileExamLevel, storedLevel));
     if (storedLevel) setLevelConfirmed(true);
   }, [accessibleLevels, entitledLevels, profileExamLevel, user?.uid]);
 

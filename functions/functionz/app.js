@@ -817,7 +817,8 @@ app.use(
 );
 
 const { trialRestriction, allowsTrialRequest } = require("./trialPractice");
-const limitedPracticePath = /^\/(?:[ab][12]-mock|course-media|writing|speaking|exam-room)(?:[-/]|$)/i;
+const { enrollmentRows, ownsEnrollmentProfile, practiceBlocked, blockedEnrollmentLevels } = require("./levelEnrollmentAccess");
+const limitedPracticePath = /^\/(?:[abc][12]-mock|course-media|writing|speaking|exam-room)(?:[-/]|$)/i;
 async function enforceTrialPractice(req, res, next) {
   if (!req.headers.authorization || !limitedPracticePath.test(req.path)) return next();
   try {
@@ -825,7 +826,13 @@ async function enforceTrialPractice(req, res, next) {
     if (!identity) return res.status(401).json({ error: "Sign in again." });
     req.verifiedPracticeUser = identity;
     const db = getFirestoreSafe();
-    const profile = (await findAuthedStudentProfile(db, identity))?.data || {};
+    const match = await findAuthedStudentProfile(db, identity);
+    const profile = match?.data || {};
+    if (ownsEnrollmentProfile(match, identity) && !profile.isTutor && !["admin","tutor","staff"].includes(String(profile.role||"").toLowerCase()) && profile.accountType !== "exam_only") {
+      const rows = await enrollmentRows(match.snap.ref);
+      if (req.path === "/speaking/analyze" || req.path === "/speaking/interaction-score") { req.levelEnrollmentPractice = { profile, rows }; }
+      else if (practiceBlocked(req, profile, rows)) return res.status(403).json({error:"Payment overdue or contract ended for this level. Contact Falowen or visit your account."});
+    }
     const courseMedia = /^\/course-media\/(?:studio|[abc][12]\/audio-url)/i.test(req.path);
     const trial = await trialRestriction(db, identity, profile, courseMedia);
     if (!trial) return next();
@@ -2059,6 +2066,7 @@ app.post("/attendance/checkin", async (req, res) => {
       }
     }
 
+    if (ownsEnrollmentProfile(student,authedUser) && blockedEnrollmentLevels(await enrollmentRows(student.snap.ref),secondaryMatch?"swahili":studentData.program||"german").includes(String(secondaryMatch?secondarySwahili.level:studentData.level||"").toUpperCase())) return res.status(403).json({error:"This class level has an overdue payment or ended contract."});
     const studentCode = normalizeStudentCodeForAttendance(studentData.studentCode || studentData.studentcode || student.snap.id || authedUser.uid);
     const email = String(studentData.email || authedUser.email || "").toLowerCase();
     const phone = String(studentData.phone || studentData.phoneNumber || studentData.whatsapp || "").trim();
@@ -6805,6 +6813,7 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
+    if (req.levelEnrollmentPractice && practiceBlocked(req,req.levelEnrollmentPractice.profile,req.levelEnrollmentPractice.rows)) return res.status(403).json({error:"This level is not currently available. Visit your account."});
     if (req.practiceTrial && !await allowsTrialRequest(req, req.practiceTrial, getFirestoreSafe(), authedUser.uid)) {
       return res.status(403).json({ error: "This speaking task is outside your trial." });
     }
@@ -6956,6 +6965,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
 });
 
 app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
+  if (req.levelEnrollmentPractice && practiceBlocked(req,req.levelEnrollmentPractice.profile,req.levelEnrollmentPractice.rows)) return res.status(403).json({error:"This level is not currently available. Visit your account."});
   let authedUser;
   try {
     authedUser = await requireAuthenticatedUser(req, res);

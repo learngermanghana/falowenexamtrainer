@@ -412,8 +412,14 @@ service cloud.firestore {
         ))
       ));
       allow delete: if isStaff();
+      // Financial enrollment records are server-owned. No broader legacy grant may overlap.
+      match /levelEnrollments/{enrollmentId} {
+        allow read: if isStaff() || (signedIn() && get(/databases/$(database)/documents/students/$(studentId)).data.get("uid", "") == request.auth.uid);
+        allow write: if false;
+        match /{nested=**} { allow read: if isStaff(); allow write: if false; }
+      }
       match /{collectionId}/{documentId}/{nested=**} {
-        allow read, write: if courseUser() || (signedIn() && studentId == request.auth.uid);
+        allow read, write: if collectionId != "levelEnrollments" && (courseUser() || (signedIn() && studentId == request.auth.uid));
       }
     }
     // Goethe Speaking practice history is private to the signed-in learner.

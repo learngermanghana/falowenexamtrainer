@@ -1,4 +1,5 @@
 import { courseProfile, enrolledCourses, readCoursePreference, saveCoursePreference, secondaryAccessExpiry } from "../utils/courseEnrollment";
+import { blockedEnrollmentLevels } from "../utils/levelEnrollmentAccess";
 import { ReadingStudentContext } from "../services/savedReadingPhrases";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -1263,7 +1264,30 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (linkedCourse && user?.uid) saveCoursePreference(user.uid, linkedCourse, courseOptions);
   }, [linkedCourse, user?.uid, courseOptions]);
-  const activeProfile = useMemo(() => courseProfile(studentProfile, preferred), [studentProfile, preferred]);
+  const [levelEnrollmentState,setLevelEnrollmentState] = useState(null);
+  const enrollmentProfileId=studentProfile?.id;
+  const enrollmentUid=user?.uid;
+  const enrollmentOwner=studentProfile?.uid===enrollmentUid;
+  useEffect(()=>{
+    setLevelEnrollmentState(null);
+    if(!db||!enrollmentUid||!enrollmentProfileId||!enrollmentOwner)return undefined;
+    return onSnapshot(collection(db,"students",enrollmentProfileId,"levelEnrollments"),snap=>{
+      setLevelEnrollmentState({uid:enrollmentUid,id:enrollmentProfileId,rows:snap.docs.map(d=>d.data())});
+    },()=>setLevelEnrollmentState({uid:enrollmentUid,id:enrollmentProfileId,error:true,rows:[]}));
+  },[enrollmentUid,enrollmentProfileId,enrollmentOwner]);
+  const [levelAccessClock,setLevelAccessClock]=useState(Date.now);
+  useEffect(()=>{
+    if(!levelEnrollmentState?.rows?.length)return undefined;
+    const now=Date.now(),next=new Date(new Date(now).toISOString().slice(0,10)+"T00:00:00Z").getTime()+86400000;
+    const timer=setTimeout(()=>setLevelAccessClock(Date.now()),Math.max(1,next-now));
+    return ()=>clearTimeout(timer);
+  },[levelAccessClock,levelEnrollmentState]);
+  const activeProfile = useMemo(() => {
+    const profile=courseProfile(studentProfile,preferred);
+    if(!profile)return profile;
+    const state=levelEnrollmentState?.uid===enrollmentUid&&levelEnrollmentState?.id===enrollmentProfileId?levelEnrollmentState:null;
+    return {...profile,blockedEnrollmentLevels:blockedEnrollmentLevels(state?.rows,profile.program||"german",Math.max(levelAccessClock,Date.now())),levelEnrollmentCheckPending:!!enrollmentOwner&&!state};
+  },[studentProfile,preferred,levelEnrollmentState,enrollmentUid,enrollmentProfileId,enrollmentOwner,levelAccessClock]);
   const selectCourse = useCallback(program => {
     if (!courseOptions.includes(program) || !user?.uid) return;
     saveCoursePreference(user.uid, program, courseOptions);
