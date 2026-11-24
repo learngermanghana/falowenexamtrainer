@@ -14,6 +14,7 @@ import {
 import PersonalExamCountdown from "./PersonalExamCountdown";
 import "./ExamsOverviewPage.css";
 
+import { useAccessLock, examLockInfo } from "./AccessLockDialog";
 import { TrialExam } from "../context/TrialCatalogContext";
 
 const sectionIcons = { lesen: "📖", hoeren: "🎧", schreiben: "✍️", sprechen: "🎤" };
@@ -26,6 +27,7 @@ const readableDate = (value) => {
 
 export default function ExamsOverviewPage() {
   const trialExam = React.useContext(TrialExam);
+  const { openLock, lockDialog } = useAccessLock();
   const navigate = useNavigate();
   const openPractice = (path, message) => {
     announceExamSuccess(message);
@@ -51,6 +53,7 @@ export default function ExamsOverviewPage() {
     [currentLevel, cloudResults, localReading],
   );
   const nextActivity = examNextActivity(coach, trialExam);
+  const explainLock = (title, event) => openLock(examLockInfo({ title, trialExam, level: currentLevel, examOnly: studentProfile?.accountType === "exam_only" }), event);
   const hasFullMock = useMemo(
     () => getMockExamsForLevel(currentLevel, { includeCourse: true })
       .some((mock) => mock.mode === "full" && mock.status === "ready"),
@@ -86,6 +89,7 @@ export default function ExamsOverviewPage() {
 
   return (
     <main className="exam-room-overview">
+      {lockDialog}
       <section className="exam-room-summary" aria-label="Exam room progress">
         <div className="exam-room-summary-heading">
           <div>
@@ -183,10 +187,9 @@ export default function ExamsOverviewPage() {
               <button
                 key={skill.key}
                 type="button"
-                disabled={Boolean(trialExam)}
                 aria-label={(trialExam ? "Locked: " : "Practise ") + skill.title}
                 className={"exam-room-skill" + (suggested ? " exam-room-skill-recommended" : "")}
-                onClick={() => openPractice(skill.path, `${skill.title} practice opened successfully.`)}
+                onClick={event => trialExam ? explainLock(skill.title, event) : openPractice(skill.path, `${skill.title} practice opened successfully.`)}
               >
                 <span>
                   <span className="exam-room-skill-top">
@@ -250,7 +253,7 @@ export default function ExamsOverviewPage() {
                 ? "Your saved warm-up is waiting."
                 : "A short German task for your level."}</p>
           </div>
-          <button type="button" disabled={Boolean(trialExam)} className="exam-room-text-action" onClick={() => openPractice("/exams/question", "Daily exam practice opened successfully.")}>
+          <button type="button" className="exam-room-text-action" onClick={event => trialExam ? explainLock("Daily warm-up", event) : openPractice("/exams/question", "Daily exam practice opened successfully.")}>
             {trialExam ? "🔒 Locked" : dailyDone ? "Review →" : localDaily.hasDraft ? "Continue →" : "Start →"}
           </button>
         </div>
@@ -259,7 +262,7 @@ export default function ExamsOverviewPage() {
             <h3>Your recent practice</h3>
             <p>Your latest individual practice results.</p>
           </div>
-          <button type="button" disabled={Boolean(trialExam)} className="exam-room-text-action" onClick={() => openPractice("/exams/file", "My Exam File opened successfully.")}>
+          <button type="button" className="exam-room-text-action" onClick={event => trialExam ? explainLock("Exam File", event) : openPractice("/exams/file", "My Exam File opened successfully.")}>
             {trialExam ? "🔒 Exam File" : "Exam File →"}
           </button>
         </div>

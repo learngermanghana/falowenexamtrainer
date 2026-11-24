@@ -1,0 +1,14 @@
+.fw-access-lock-dialog { width:min(480px, calc(100% - 32px)); max-height:calc(100dvh - 32px); padding:0; border:1px solid #cbd5e1; border-radius:16px; background:#fff; color:#0f172a; box-shadow:0 20px 60px #0f172a33; overflow:auto; }
+.fw-access-lock-dialog::backdrop { background:rgba(15,23,42,.6); }
+.fw-access-lock-content { display:grid; gap:12px; padding:24px; }
+.fw-access-lock-content h2,.fw-access-lock-content p,.fw-access-lock-content ul { margin:0; }
+.fw-access-lock-content h2 { font-size:21px; overflow-wrap:anywhere; }
+.fw-access-lock-content p,.fw-access-lock-content li { line-height:1.5; font-size:14px; color:#334155; }
+.fw-access-lock-content ul { padding-left:20px; }
+.fw-access-lock-eyebrow { font-size:12px; font-weight:700; color:#475569; }
+.fw-access-lock-note { font-size:12px!important; }
+.fw-access-lock-actions { display:grid; gap:8px; }
+.fw-access-lock-actions a,.fw-access-lock-actions button { border:1px solid #cbd5e1; border-radius:9px; padding:11px; min-height:42px; box-sizing:border-box; text-align:center; text-decoration:none; background:#fff; color:#1e40af; font:inherit; font-weight:700; cursor:pointer; }
+.fw-access-lock-actions a.fw-access-lock-primary { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
+.fw-access-lock-actions :focus-visible { outline:3px solid #60a5fa; outline-offset:2px; }
+@media(max-width:480px) { .fw-access-lock-content { padding:18px; } }

@@ -7,6 +7,7 @@ import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { styles } from "../styles";
 import { announceExamSuccess } from "../services/interactionFeedback";
 
+import { useAccessLock, examLockInfo } from "./AccessLockDialog";
 import { TrialExam } from "../context/TrialCatalogContext";
 
 const statusLabel = (status, mock) => {
@@ -28,6 +29,7 @@ export default function MockExamLibraryPage() {
   const navigate = useNavigate();
   const { level: selectedLevel } = useExam();
   const trialExam = React.useContext(TrialExam);
+  const { openLock, lockDialog } = useAccessLock();
   const level = trialExam?.level || selectedLevel;
   const { user, studentProfile } = useAuth();
   const examOnly = studentProfile?.accountType === "exam_only";
@@ -55,6 +57,7 @@ export default function MockExamLibraryPage() {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      {lockDialog}
       <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Full exam practice</p>
         <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>{level} Mock Exams</h2>
@@ -113,7 +116,7 @@ export default function MockExamLibraryPage() {
                     </p>
                   )}
                 </div>
-                <button type="button" disabled={Boolean(trialExam && mock.id !== trialExam.id)} style={styles.primaryButton} onClick={() => { announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
+                <button type="button" style={trialExam && mock.id !== trialExam.id ? styles.secondaryButton : styles.primaryButton} onClick={event => { if (trialExam && mock.id !== trialExam.id) { openLock(examLockInfo({ title: mock.shortTitle || mock.title, trialExam, level, examOnly }), event); return; } announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
                   {trialExam && mock.id !== trialExam.id ? "🔒 Locked" : mock.mode === "full" || mock.mode === "kombi" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
               </div>

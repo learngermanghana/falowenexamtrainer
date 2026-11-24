@@ -16,6 +16,7 @@ import { expandCourseBookEntries } from "../utils/courseBookEntries";
 import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
 import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";
 import { persistCourseCompletionSnapshot } from "../services/courseCompletionSnapshotService";
+import { useAccessLock, courseLockInfo } from "./AccessLockDialog";
 import { TrialCourseLevel, TrialCourseDay1 } from "../context/TrialCatalogContext";
 import CourseBookLevelSelector from "./CourseBookLevelSelector";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
@@ -572,6 +573,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const trialLevel = React.useContext(TrialCourseLevel);
   const day1Available = React.useContext(TrialCourseDay1);
+  const { openLock, lockDialog } = useAccessLock();
   const levels = useMemo(() => {
     if (trialLevel) return [trialLevel];
     const baseLevels = Object.keys(schedules);
@@ -1304,7 +1306,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               </>
                             ) : null}
                             {locked ? (
-                              <a href="/mock/payment" style={{ ...styles.secondaryButton, textDecoration: "none" }} aria-label={"Locked: " + getCourseBookEntryTitle(entry) + " — view plans"}>🔒 Locked · View plans</a>
+                              <button type="button" style={styles.secondaryButton} aria-label={"Locked: " + getCourseBookEntryTitle(entry)} onClick={event => openLock(courseLockInfo({ title: getCourseBookEntryTitle(entry), examOnly: studentProfile?.accountType === "exam_only", day1Available, level: normalizedSelectedCourseLevel }), event)}>🔒 Locked · Why?</button>
                             ) : (<a
                               href={getLessonHref(entry)}
                               style={{ ...styles.primaryButton, textDecoration: "none" }}
@@ -1334,6 +1336,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             </section>
           )}
 
+          {lockDialog}
           {isCourseConclusionLevel ? (
             <CourseCompletionConclusion
               level={normalizedSelectedCourseLevel}

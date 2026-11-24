@@ -111,7 +111,14 @@ describe("simplified Exam Room overview", () => {
 test("locked catalogue does not recommend a paid skill", () => {
   mockLevel = "A2";
   render(<TrialExam.Provider value={{locked:true,id:null,level:"A2"}}><ExamsOverviewPage /></TrialExam.Provider>);
-  expect(screen.getByRole("button",{name:"Locked: Lesen"})).toBeDisabled();
+  mockNavigate.mockClear();
+  const locked = screen.getByRole("button",{name:"Locked: Lesen"});
+  expect(locked).toBeEnabled();
+  fireEvent.click(locked);
+  expect(screen.getByRole("dialog",{name:"Locked: Lesen"})).toBeInTheDocument();
+  expect(mockNavigate).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button",{name:"Keep browsing"}));
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(screen.queryByRole("button",{name:"Practise recommended skill →"})).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole("button",{name:"Browse exams →"}));
   expect(mockNavigate).toHaveBeenLastCalledWith("/exams/mocks");
