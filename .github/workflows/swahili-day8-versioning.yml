@@ -1,0 +1,38 @@
+name: Swahili Day 8 assignment versioning
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/SwahiliAssignmentReview.jsx"
+      - "web/src/components/SwahiliReviewDraft.jsx"
+      - "web/src/components/SwahiliResults.js"
+      - "web/src/components/SwahiliDayEightVersioning.test.jsx"
+      - "web/src/components/SwahiliDayEightWorkbook.test.jsx"
+      - "web/src/utils/swahiliDayEightVersion.js"
+      - "web/src/utils/swahiliDayEightVersion.test.js"
+      - ".github/workflows/swahili-day8-versioning.yml"
+
+jobs:
+  verify-day8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Test Day 8 versioning without unrelated pretest patch scripts
+        working-directory: web
+        env:
+          CI: true
+        run: |
+          ./node_modules/.bin/jest --runInBand --runTestsByPath \
+            src/utils/swahiliDayEightVersion.test.js \
+            src/utils/swahiliDayFourVersion.test.js \
+            src/components/SwahiliDayEightVersioning.test.jsx \
+            src/components/SwahiliDayEightWorkbook.test.jsx \
+            src/components/SwahiliDayFourWorkbook.test.jsx

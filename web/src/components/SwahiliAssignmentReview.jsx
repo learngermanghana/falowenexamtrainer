@@ -5,6 +5,12 @@ import { db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
 import { isLegacySwahiliDayFourSubmission, swahiliDayFourDraftVersion } from "../utils/swahiliDayFourVersion";
+import {
+  SWAHILI_DAY_EIGHT_ASSIGNMENT_VERSION,
+  isLegacySwahiliDayEightSubmission,
+  isRecognizableSwahiliDayEightNewDraft,
+  swahiliDayEightDraftVersion,
+} from "../utils/swahiliDayEightVersion";
 import SwahiliReviewDraft, { SwahiliFinalSubmit, useSwahiliReviewDraft } from "./SwahiliReviewDraft";
 
 export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestions, listeningQuestions = []) {
@@ -16,14 +22,16 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
   const [submission, setSubmission] = useState("idle");
   const [submittedAnswers, setSubmittedAnswers] = useState("");
   const [legacyReadingSubmission, setLegacyReadingSubmission] = useState(false);
+  const [legacyDayEightSubmission, setLegacyDayEightSubmission] = useState(false);
   const answers = { writing, reading, listeningAnswers };
   const restoreDraft = useCallback(draft => {
     setWriting(typeof draft.writing === "string" ? draft.writing : "");
     setReading(draft.reading || {});
     setListeningAnswers(draft.listeningAnswers || {});
   }, []);
+  const draftVersion = swahiliDayEightDraftVersion(lesson.day) ?? swahiliDayFourDraftVersion(lesson.day);
   const draft = useSwahiliReviewDraft(canSubmit ? user.uid : null, lesson.day, answers, restoreDraft,
-    swahiliDayFourDraftVersion(lesson.day));
+    draftVersion, Number(lesson.day) === 8 ? isRecognizableSwahiliDayEightNewDraft : null);
   const snapshot = JSON.stringify(answers);
   const submitted = submittedAnswers === snapshot;
   const [feedback, setFeedback] = useState("");
@@ -39,16 +47,20 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
         writing: work.writing?.[day === 11 ? "dialogue" : "response"] || "",
         reading: work.readingAnswers || {}, listeningAnswers: work.listeningAnswers || {},
       };
-      if (isLegacySwahiliDayFourSubmission(day, work)) {
-        // Day 4 reading IDs were reused after replacing a 3-question, ungraded
-        // short-answer exercise. Do not present old responses as new answers.
-        setLegacyReadingSubmission(true);
+      const oldDayFour = isLegacySwahiliDayFourSubmission(day, work);
+      const oldDayEight = isLegacySwahiliDayEightSubmission(day, work);
+      if (oldDayFour || oldDayEight) {
+        // Old question IDs overlap with the replacement lessons. The old Day 8
+        // writing prompt and tutor feedback are different assignments too.
+        setLegacyReadingSubmission(oldDayFour);
+        setLegacyDayEightSubmission(oldDayEight);
         setSubmittedAnswers("");
         setFeedback("");
-        setWriting(value => value || previous.writing);
+        if (oldDayFour) setWriting(value => value || previous.writing);
         return;
       }
       setLegacyReadingSubmission(false);
+      setLegacyDayEightSubmission(false);
       setWriting(value => value || previous.writing);
       setReading(value => ({ ...previous.reading, ...value }));
       setListeningAnswers(value => ({ ...previous.listeningAnswers, ...value }));
@@ -73,13 +85,17 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
         studentId: user.uid, userId: user.uid, program: "swahili", level: "A1",
         day: lesson.day, lessonId: `swahili-day-${lesson.day}`, title: lesson.title,
         status: "submitted", writing: { [lesson.day === 11 ? "dialogue" : "response"]: writing.trim() },
-        ...(lesson.day === 4 ? { readingVersion: 2 } : {}), readingAnswers: reading,
+        ...(lesson.day === 4 ? { readingVersion: 2 } : {}),
+        ...(lesson.day === 8 ? { assignmentVersion: SWAHILI_DAY_EIGHT_ASSIGNMENT_VERSION,
+          readingVersion: SWAHILI_DAY_EIGHT_ASSIGNMENT_VERSION } : {}),
+        readingAnswers: reading,
         listeningAnswers, listeningTeacherLed: false, submittedAt: serverTimestamp(),
         studentName: studentProfile?.name || studentProfile?.displayName || user.displayName || "",
         studentEmail: user.email || "",
       });
       setFeedback("");
       setLegacyReadingSubmission(false);
+      setLegacyDayEightSubmission(false);
       setSubmittedAnswers(snapshot);
       setSubmission("idle");
     } catch {
@@ -89,15 +105,17 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
 
   return { writing, setWriting, reading, setReading, listeningAnswers, setListeningAnswers,
     readingQuestions, listeningQuestions, draft, canSubmit, complete, submission, submitted, feedback,
-    legacyReadingSubmission, submitWork };
+    legacyReadingSubmission, legacyDayEightSubmission, submitWork };
 }
 
 export default function SwahiliAssignmentReview({ assignment }) {
   const { writing, reading, listeningAnswers, readingQuestions, listeningQuestions,
-    draft, canSubmit, complete, submission, submitted, feedback, legacyReadingSubmission, submitWork } = assignment;
+    draft, canSubmit, complete, submission, submitted, feedback,
+    legacyReadingSubmission, legacyDayEightSubmission, submitWork } = assignment;
   return <>
     <h2>Review &amp; Submit · Wasilisha</h2>
     {legacyReadingSubmission && <p role="status">You previously submitted Day 4 with the older three-question reading task. Your earlier result remains in <Link to="/campus/results">Campus Results</Link>. Complete the new five Lesen and five Hören questions for a new tutor-marked submission.</p>}
+    {legacyDayEightSubmission && <p role="status">Your previous Day 8 submission used the earlier classroom-number and contact-code tasks. It is a different assignment, so those answers and its tutor feedback will not be copied into this new family-and-age workbook. You can review the earlier result in <Link to="/campus/results">Campus Results</Link> before submitting the new version.</p>}
     <SwahiliReviewDraft writing={{ Kuandika: writing }} questions={readingQuestions}
       reading={reading} listening={listeningAnswers} listeningQuestions={listeningQuestions}
       draft={canSubmit ? draft : null} />
