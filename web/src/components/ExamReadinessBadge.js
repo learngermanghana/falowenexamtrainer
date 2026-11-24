@@ -345,20 +345,20 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
     readiness.statusLabel || t("examReadiness.statusFallback", "Status")
   }`;
 
-  // Compact homepage view: the same authenticated readiness calculation, not a mock percentage.
+  // Compact homepage view: course engagement, not an exam performance percentage.
   if (variant === "homepage") {
     const hasReadiness = state.loaded && !state.loading && !state.error && Boolean(studentCode);
     return (
       <section className="falowen-home-readiness" aria-label="Your exam journey">
-        <span className="falowen-home-readiness__eyebrow">YOUR EXAM JOURNEY</span>
+        <span className="falowen-home-readiness__eyebrow">YOUR COURSE PROGRESS</span>
         <h2>A little practice, every day.</h2>
         <div className="falowen-home-readiness__score">
-          <span>Exams</span>
+          <span>Course progress</span>
           <strong>{hasReadiness ? readiness.scoreLabel : "—"}</strong>
         </div>
         <div className="falowen-home-readiness__track"
              role="progressbar"
-             aria-label="Exam readiness"
+             aria-label="Course progress"
              aria-valuemin={0}
              aria-valuemax={100}
              aria-valuenow={hasReadiness ? readiness.score : undefined}
@@ -367,13 +367,13 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
         </div>
         <div className="falowen-home-readiness__status">
           {hasReadiness && (
-            <span className="falowen-home-readiness__pill" style={{ background: readiness.statusPillBg, color: readiness.statusPillText, border: "1px solid " + readiness.statusPillBorder }}>{readiness.statusLabel || readiness.text}</span>
+            <span className="falowen-home-readiness__pill" style={{ background: readiness.statusPillBg, color: readiness.statusPillText, border: "1px solid " + readiness.statusPillBorder }}>Course progress indicator</span>
           )}
           <p>{state.loading || (!state.loaded && !state.error)
             ? "Checking your latest progress…"
             : state.error
               ? state.error
-              : "Keep going. You’re building momentum."}</p>
+              : "Based on course work and attendance. Check the Exams Room for your four-skill practice performance."}</p>
         </div>
         <button type="button" className="falowen-home-readiness__action" onClick={handleOpenExamFile}>
           <span className="falowen-home-readiness__action-label">

@@ -1,4 +1,4 @@
-import { EXAM_SKILLS, buildExamRoomCoach, normalizeReadingPartScores } from "./examRoomCoach";
+import { EXAM_SKILLS, buildExamRoomCoach, normalizeReadingPartScores, examNextActivity } from "./examRoomCoach";
 
 describe("Exam Room coach recommendations", () => {
   it("starts with a real section and no invented readiness score", () => {
@@ -191,5 +191,41 @@ describe("per-skill dashboard trends", () => {
     expect(coach.attempts).toHaveLength(2);
     expect(coach.skillTrends.lesen).toEqual({ count: 2, latest: 80, previous: 50, change: 30, average: 65 });
     expect(coach.skillTrends.hoeren).toEqual({ count: 1, latest: 60, previous: null, change: null, average: 60 });
+  });
+});
+
+
+describe("exam performance and access-aware recommendations", () => {
+  const rows = [
+    {id:"read",level:"A2",section:"lesen",percent:82},
+    {id:"listen",level:"A2",section:"hoeren",percent:55,sectionScores:[{label:"Teil 1",score:4,total:5},{label:"Teil 2",score:2,total:10}]},
+    {id:"write",level:"A2",section:"schreiben",percent:70},
+    {id:"speak",level:"A2",section:"sprechen",percent:65}
+  ];
+  it("withholds an overall score until all four skills have results, including a genuine zero", () => {
+    const partial = buildExamRoomCoach({level:"A2",cloudResults:rows.slice(0,3)});
+    expect(partial.overallPercent).toBeNull();
+    expect(partial.missingSkills.map(skill=>skill.key)).toEqual(["sprechen"]);
+    expect(buildExamRoomCoach({level:"A2",cloudResults:rows}).overallPercent).toBe(68);
+    expect(buildExamRoomCoach({level:"A2",cloudResults:[...rows.slice(0,3),{...rows[3],percent:0}]}).overallPercent).toBe(52);
+  });
+  it("uses actual part denominators in any skill and ignores unsupported raw points", () => {
+    const coach=buildExamRoomCoach({level:"A2",cloudResults:rows});
+    expect(coach.weakParts.hoeren).toBe("Teil 2");
+    expect(coach.focus.weakPart).toBe("Teil 2");
+    expect(buildExamRoomCoach({level:"A2",cloudResults:[{...rows[1],sectionScores:{teil1:2,teil2:1}}]}).weakParts.hoeren).toBe("");
+  });
+  it("separates mock and individual practice without counting a mock four times", () => {
+    const mock={id:"mock",level:"A2",section:"mixed",resultType:"final_mock",percent:70,scoreBreakdown:[{key:"lesen",score:20,maxScore:25}]};
+    const coach=buildExamRoomCoach({level:"A2",cloudResults:[...rows,mock]});
+    expect(coach.attempts).toHaveLength(5);
+    expect(coach.mockHistory).toHaveLength(1);
+    expect(coach.practiceHistory).toHaveLength(4);
+  });
+  it("recommends only the included trial activity or catalogue when access is restricted", () => {
+    const coach=buildExamRoomCoach({level:"A2",cloudResults:rows});
+    expect(examNextActivity(coach,null).route).toBe("/exams/horen");
+    expect(examNextActivity(coach,{id:"trial",route:"/campus/course/a2-final-mock-exam"}).route).toBe("/campus/course/a2-final-mock-exam");
+    expect(examNextActivity(coach,{locked:true,id:null}).route).toBe("/exams/mocks");
   });
 });

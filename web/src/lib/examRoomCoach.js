@@ -57,6 +57,25 @@ export const normalizeReadingPartScores = (row = {}) => {
   })).filter((part) => part.label && part.score !== null && part.total > 0);
 };
 
+// Other skills may report different part sizes. Never infer denominators from
+// raw part points or compare unscored parts. Lesen retains its known legacy formats.
+export const normalizeSkillPartScores = (row = {}) => {
+  const section = normalizedSection(row);
+  const parts = section === "lesen" ? normalizeReadingPartScores(row) : row.sectionScores;
+  const entries = Array.isArray(parts) ? parts : Object.entries(parts || {}).map(([key, value]) =>
+    value && typeof value === "object" ? { ...value, key } : null);
+  return entries.filter(part => part && typeof part === "object").map(part => ({
+    label: String(part.label || readingPartLabel(part.key) || "").trim(),
+    score: finite(part.score),
+    total: finite(part.total ?? part.maxScore),
+  })).filter(part => part.label && part.score !== null && part.total > 0 && part.score >= 0 && part.score <= part.total);
+};
+
+const weakestPartFor = attempt => {
+  const parts = Array.isArray(attempt?.sectionScores) ? attempt.sectionScores : [];
+  return [...parts].sort((a,b) => a.score/a.total - b.score/b.total)[0]?.label || "";
+};
+
 const mockSectionPercents = (attempt) => {
   if (attempt.section !== "mixed" || attempt.resultType !== "final_mock") return [];
   const breakdown = Array.isArray(attempt.scoreBreakdown) && attempt.scoreBreakdown.length
@@ -78,7 +97,7 @@ const mockSectionPercents = (attempt) => {
       route: skill.path,
       completedAt: attempt.completedAt,
       title: `${attempt.title} · ${skill.title}`,
-      sectionScores: null,
+      sectionScores: normalizeSkillPartScores({ section: key, level: attempt.level, sectionScores: part.partScores || part.sectionScores || [] }),
     };
   }).filter(Boolean);
 };
@@ -133,7 +152,7 @@ export const buildExamRoomCoach = ({
         (row.route.startsWith("/exams/") || row.route.startsWith("/campus/course/"))
         ? row.route : skill?.path || "/exams/mocks",
       completedAt: row?.completedAt || row?.date || "",
-      sectionScores: section === "lesen" ? normalizeReadingPartScores(row) : row?.sectionScores || null,
+      sectionScores: section === "mixed" ? row?.sectionScores || null : normalizeSkillPartScores(row),
       scoreBreakdown: row?.scoreBreakdown || null,
       resultType: row?.resultType || "practice",
     });
@@ -187,19 +206,22 @@ export const buildExamRoomCoach = ({
       ? `You haven't recorded a ${focus.title} result yet. Try your first practice.`
       : "All four skills have been practised. Keep improving with another attempt.";
 
-  let weakPart = "";
-  if (shouldRevise && focus.key === "lesen" && Array.isArray(focusResult?.sectionScores)) {
-    const ranked = [...focusResult.sectionScores]
-      .filter((part) => finite(part.total) > 0 && finite(part.score) !== null)
-      .sort((a, b) => Number(a.score) / Number(a.total) - Number(b.score) / Number(b.total));
-    weakPart = String(ranked[0]?.label || "");
-  }
+  const weakPart = shouldRevise ? weakestPartFor(focusResult) : "";
+  const overallPercent = coveredSkills === EXAM_SKILLS.length
+    ? Math.round(scored.reduce((sum, entry) => sum + entry.percent, 0) / EXAM_SKILLS.length) : null;
+  const mockHistory = attempts.filter(attempt => attempt.section === "mixed" && attempt.resultType === "final_mock");
+  const practiceHistory = attempts.filter(attempt => !mockHistory.includes(attempt));
 
   return {
     attempts,
     latest,
     latestBySection,
     skillTrends,
+    overallPercent,
+    mockHistory,
+    practiceHistory,
+    missingSkills: EXAM_SKILLS.filter(skill => !latestBySection[skill.key]),
+    weakParts: Object.fromEntries(EXAM_SKILLS.map(skill => [skill.key, weakestPartFor(latestBySection[skill.key])])),
     coveredSkills,
     coveragePercent: Math.round((coveredSkills / EXAM_SKILLS.length) * 100),
     focus: {
@@ -210,3 +232,14 @@ export const buildExamRoomCoach = ({
     },
   };
 };
+
+// Access comes from the existing route guard, not the calculated score.
+export function examNextActivity(coach, trialExam) {
+  if (trialExam) {
+    if (!trialExam.locked && trialExam.id && trialExam.route) return {
+      title: "Your included trial practice", reason: "Start or resume the practice included with your trial. Other skills remain locked.", route: trialExam.route,
+    };
+    return { title: "Explore available exams", reason: "Browse the catalogue. New assessed practice requires active access.", route: "/exams/mocks" };
+  }
+  return { ...coach.focus, route: coach.focus.path };
+}
