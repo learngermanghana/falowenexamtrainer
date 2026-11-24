@@ -2044,8 +2044,19 @@ app.post("/attendance/checkin", async (req, res) => {
     if ((access?.examOnly ?? (studentData.accountType === "exam_only" || authedUser.examOnly === true)) || (trialEnd !== null && trialEnd <= Date.now())) {
       return res.status(403).json({ error: "An active Full Course enrollment or trial is required for attendance." });
     }
-    if (String(studentData.className || "") !== String(className)) {
+    const secondarySwahili = studentData.program !== "swahili" && studentData.secondaryProgram === "swahili"
+      ? studentData.coursePlacements?.swahili : null;
+    const primaryMatch = String(studentData.className || "") === String(className);
+    const secondaryMatch = !primaryMatch && secondarySwahili && String(secondarySwahili.className || "") === String(className);
+    if (!primaryMatch && !secondaryMatch) {
       return res.status(403).json({ error: "Attendance session is not for your class" });
+    }
+    if (studentData.program === "swahili" || secondaryMatch) {
+      const level = secondaryMatch ? secondarySwahili.level : studentData.level;
+      const { resolveSwahiliAccess } = require("./swahiliAccess");
+      if (!resolveSwahiliAccess(studentData, level, Date.now(), access || {}).allowed) {
+        return res.status(403).json({ error: "Active Kiswahili course access is required for attendance." });
+      }
     }
 
     const studentCode = normalizeStudentCodeForAttendance(studentData.studentCode || studentData.studentcode || student.snap.id || authedUser.uid);
