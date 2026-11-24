@@ -3,6 +3,14 @@ const fs = require('node:fs');
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require('@firebase/rules-unit-testing');
 const { collection, doc, getDoc, getDocs, query, where, setDoc, serverTimestamp, writeBatch } = require('firebase/firestore');
 let env;
+async function seedAccess(uid,level,mode='full',expiresAtMs=Date.now()+600000) {
+  const profile={uid,program:'german',level,paymentStatus:mode==='full'?'paid':'pending'};
+  await env.withSecurityRulesDisabled(async context=>{
+    const db=context.firestore();
+    await setDoc(doc(db,'students',uid),profile);
+    await setDoc(doc(db,'courseSubmissionAccess',uid),{uid,profileId:uid,profileFields:profile,mode,levels:mode==='full'?['A1','A2','B1','B2','C1','C2'].slice(0,['A1','A2','B1','B2','C1','C2'].indexOf(level)+1):[level],day1Keys:[level==='A1'?'A1-0.1':level+'-1.1'],expiresAtMs});
+  });
+}
 before(async () => {
   env = await initializeTestEnvironment({ projectId: 'demo-falowen-locks', firestore: { host: '127.0.0.1', port: 8080, rules: fs.readFileSync('firestore.rules', 'utf8') } });
 });
@@ -27,6 +35,7 @@ test('A1 timed mock can check its own unused lock without exposing another stude
   await assertFails(getDoc(doc(owner, 'submissionLocks/timed__student-two__a1-13')));
   await assertFails(getDoc(doc(owner, 'submissionLocks/unrelated-missing-lock')));
 
+  await seedAccess('timed-student','A1');
   const lock = { studentId: 'timed-student', assignmentKey: 'A1-13',
     timerRecord: true, status: 'active', level: 'A1', durationSeconds: 2100 };
   await assertSucceeds(setDoc(doc(owner, path), lock));
@@ -56,6 +65,7 @@ for (const [level, assignmentKey, durationSeconds] of [
 
     await assertFails(getDoc(doc(outsider, 'submissionLocks', lockId)));
     await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'submissionLocks', lockId)));
+    await seedAccess(uid,level);
     await assertSucceeds(setDoc(lockRef, {
       studentId: uid,
       studentEmail: `${level.toLowerCase()}@example.com`,
@@ -80,6 +90,7 @@ test('owner-scoped lookup permits first submission and saving a draft without br
   const locks = query(collection(db, 'submissionLocks'), where('studentId', '==', 'student-one'));
   const before = await assertSucceeds(getDocs(locks));
   if (before.docs.length !== 0) throw new Error('Expected no existing locks');
+  await seedAccess('student-one','A2');
   const payload = { studentId: 'student-one', assignmentKey: 'A2-4.11', submissionText: 'TEIL 3\n1. B\nTEIL 4\n1. A', level: 'A2' };
   await assertSucceeds(setDoc(doc(db, 'submissionDrafts/first-draft'), { ...payload, status: 'draft' }));
   await assertSucceeds(setDoc(doc(db, 'submissions/first-submission'), { ...payload, status: 'submitted' }));
@@ -108,6 +119,7 @@ for (const level of ['A1', 'A2', 'B1']) {
     const firstDrafts = await assertSucceeds(getDocs(draftsQuery));
     const firstLocks = await assertSucceeds(getDocs(locksQuery));
     if (firstDrafts.docs.length || firstLocks.docs.length) throw new Error('Expected first submission to be empty');
+    await seedAccess(uid,level);
     const body = {studentId:uid,ownerUid:uid,uid,userId:uid,level,
       assignmentKey:`${level}-1.1`,submissionText:'1. A 2. B 3. C',status:'draft'};
     await assertSucceeds(setDoc(draftRef,body,{merge:true}));
@@ -137,6 +149,7 @@ for (const [level, key] of [['A1','A1-12.3'],['A2','A2-8.21'],['B1','B1-6.18']])
       assignmentKey:key,level,status:'active',startedAt:serverTimestamp(),
       clientStartedAt:now,durationSeconds:1800,createdAt:serverTimestamp(),
       updatedAt:serverTimestamp()};
+    await seedAccess(uid,level);
     await assertSucceeds(setDoc(ref,base));
     const started=await assertSucceeds(getDoc(ref));
     if(!started.exists()||started.data().status!=='active')throw new Error('Timer failed to start');
@@ -169,6 +182,7 @@ for (const level of ['A1', 'A2', 'B1']) {
       submissionText: 'The student completed part of this timed task.',
       status: 'submitted',
     };
+    await seedAccess(uid,level);
     const batch = writeBatch(student);
     batch.set(submissionRef, payload);
     batch.set(lockRef, {
@@ -196,3 +210,40 @@ for (const level of ['A1', 'A2', 'B1']) {
     if (!ownStillMissing.empty) throw new Error('Rejected batch leaked a partial submission');
   });
 }
+
+test('trial writes require an unexpired server-issued grant and the exact canonical Day 1 assignment',async()=>{
+ const uid='trial-safeguard';
+ const db=env.authenticatedContext(uid,{email:'trial@example.com'}).firestore();
+ const data={studentId:uid,level:'A2',program:'german',assignmentKey:'A2-1.1',canonicalAssignmentKey:'A2-1.1',day:1,status:'draft'};
+ await assertFails(setDoc(doc(db,'submissionDrafts','trial-before-grant'),data));
+ await seedAccess(uid,'A2','trial');
+ await assertSucceeds(setDoc(doc(db,'submissionDrafts','trial-day1'),data));
+ await assertSucceeds(setDoc(doc(db,'submissions','trial-day1'),{...data,status:'submitted'}));
+ await assertSucceeds(setDoc(doc(db,'submissionLocks','trial-day1'),data));
+ for(const name of ['submissionDrafts','submissions','submissionLocks']) {
+   await assertFails(setDoc(doc(db,name,'trial-day2'),{...data,assignmentKey:'A2-2.4',canonicalAssignmentKey:'A2-2.4'}));
+   await assertFails(setDoc(doc(db,name,'trial-fake-day'),{...data,assignmentId:'A2-2.4'}));
+   await assertFails(setDoc(doc(db,name,'trial-other-level'),{...data,level:'A1'}));
+ }
+ await assertFails(setDoc(doc(db,'timedAssignmentAttempts','trial-timer'),{...data,assignmentKey:'A2-8.21',status:'active',startedAt:serverTimestamp(),durationSeconds:1800}));
+ await assertFails(setDoc(doc(db,'students',uid),{paymentStatus:'paid',balanceDue:0},{merge:true}));
+ await assertFails(setDoc(doc(db,'students',uid),{trialEndsAt:serverTimestamp()},{merge:true}));
+ await assertFails(setDoc(doc(db,'courseSubmissionAccess',uid),{mode:'full'},{merge:true}));
+ await seedAccess(uid,'A2','trial',Date.now()-1000);
+ await assertFails(setDoc(doc(db,'submissionDrafts','trial-day1'),{submissionText:'later'},{merge:true}));
+ await assertSucceeds(getDoc(doc(db,'submissions','trial-day1')));
+});
+test('revoking access in the live profile invalidates an outstanding grant',async()=>{
+ const uid='revoked-submission';
+ await seedAccess(uid,'B1');
+ const db=env.authenticatedContext(uid).firestore();
+ const data={studentId:uid,level:'B1',assignmentKey:'B1-1.1'};
+ await assertSucceeds(setDoc(doc(db,'submissionDrafts','revoked-before'),data));
+ await env.withSecurityRulesDisabled(async context=>setDoc(doc(context.firestore(),'students',uid),{status:'withdrawn'},{merge:true}));
+ await assertFails(setDoc(doc(db,'submissionDrafts','revoked-after'),data));
+});
+test('students cannot create a forged paid profile',async()=>{
+ const uid='forged-paid';
+ const db=env.authenticatedContext(uid).firestore();
+ await assertFails(setDoc(doc(db,'students',uid),{uid,role:'student',program:'german',paymentStatus:'paid',balanceDue:0}));
+});

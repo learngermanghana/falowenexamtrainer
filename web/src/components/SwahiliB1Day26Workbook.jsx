@@ -34,6 +34,19 @@ export default function SwahiliB1Day26Workbook({uid}) {
   const [submitted,setSubmitted] = useState(false);
   const [confirmed,setConfirmed] = useState(false);
   const [notice,setNotice] = useState("");
+  const [audio,setAudio] = useState({url:"",loading:false,error:""});
+  async function loadAudio() {
+    if (audio.loading) return;
+    if (!user?.getIdToken) { setAudio({url:"",loading:false,error:"Ingia kwenye akaunti yako ili kusikiliza sauti."}); return; }
+    setAudio({url:"",loading:true,error:""});
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch("/api/course-media/swahili/b1/day-26/audio-url",{headers:{Authorization:`Bearer ${token}`}});
+      const result = await response.json();
+      if (!response.ok || !result?.url) throw new Error(result?.error || "Sauti haikupatikana.");
+      setAudio({url:result.url,loading:false,error:""});
+    } catch (error) { setAudio({url:"",loading:false,error:error.message || "Sauti haikupatikana. Jaribu tena."}); }
+  }
   const complete = readingQuestions.every(({id}) => draft.reading?.[id]?.trim()) && listeningQuestions.every(({id}) => draft.listening?.[id]?.trim());
   useEffect(() => {
     if (!canSubmit || !db) { setLoading(false); return; }
@@ -71,7 +84,9 @@ export default function SwahiliB1Day26Workbook({uid}) {
         <h3>Maswali 5 ya Ufahamu</h3><Questions questions={readingQuestions} answers={draft.reading || {}} update={(id,value)=>update("reading",id,value)} /></>}
       {activeTab==="hoeren" && <><h2>4 · Kusikiliza</h2>
         <p>Sikiliza mazungumzo ya Amina na Juma mara mbili, kisha jibu maswali kwa Kiswahili.</p>
-        <p>Rekodi ya sauti bado haijaongezwa. Mwalimu anaweza kusoma mazungumzo kwa darasa. Kwa mazoezi binafsi, fungua maandishi hapa chini.</p>
+        {audio.url ? <audio controls preload="none" src={audio.url} aria-label="Mazungumzo ya Amina na Juma" onError={()=>setAudio({url:"",loading:false,error:"Sauti haikupatikana. Jaribu tena."})} /> :
+          <button type="button" disabled={audio.loading} onClick={loadAudio}>{audio.loading ? "Inapakia…" : "Pakua sauti ili usikilize"}</button>}
+        {audio.error && <p role="alert">{audio.error}</p>}
         <details><summary>Maandishi ya mazungumzo · Mazoezi / mwalimu</summary>{listeningDialogue.map(([speaker,line],index)=><p key={index}><strong>{speaker}:</strong> {line}</p>)}</details>
         <h3>Maswali 5 ya Kusikiliza</h3><Questions questions={listeningQuestions} answers={draft.listening || {}} update={(id,value)=>update("listening",id,value)} /></>}
       {activeTab==="submit" && <><h2>Kagua na uwasilishe kazi</h2>

@@ -51,11 +51,6 @@ const articleWords = [
   { noun: "Lampe", article: "die", english: "lamp", gender: "feminine" },
   { noun: "Apfel", article: "der", english: "apple", gender: "masculine" },
   { noun: "Buch", article: "das", english: "book", gender: "neuter" },
-  { noun: "Katze", article: "die", english: "cat", gender: "feminine" },
-  { noun: "Stuhl", article: "der", english: "chair", gender: "masculine" },
-  { noun: "Haus", article: "das", english: "house", gender: "neuter" },
-  { noun: "Blume", article: "die", english: "flower", gender: "feminine" },
-  { noun: "Hund", article: "der", english: "dog", gender: "masculine" },
 ];
 
 const adjectivePairs = [
