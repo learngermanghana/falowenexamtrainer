@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { auth, createUserWithEmailAndPassword } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
 import { MOCK_EXAM_CATALOG } from "../data/mockExamCatalog";
 import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
+import { getTuitionFeeForLevel } from "../data/levelFees";
+import "./PaymentOptions.css";
 
 import { courseTrial, TrialExamPage } from "./TrialPractice";
 import { TrialExam } from "../context/TrialCatalogContext";
@@ -29,7 +30,7 @@ const card = { maxWidth: 720, margin: "42px auto", background: "#fff", padding: 
 const field = { display: "grid", gap: 5, fontWeight: 600, marginTop: 14 };
 const input = { padding: 12, border: "1px solid #bfcbd8", borderRadius: 8, font: "inherit", width: "100%" };
 const button = { border: 0, background: "#0b776e", color: "white", padding: "13px 19px", borderRadius: 9, font: "inherit", cursor: "pointer", fontWeight: 800 };
-const format = (amount) => `GH₵${amount}`;
+const format = (amount) => `GH₵${Number(amount).toLocaleString("en-GH")}`;
 
 export function PaymentNavigation() {
   const { studentProfile } = useAuth();
@@ -46,6 +47,12 @@ export function PaymentNavigation() {
 
 export function PaymentOptionsPage() {
   const { user, studentProfile, loading } = useAuth();
+  const [catalog, setCatalog] = useState([]);
+  useEffect(() => {
+    let mounted = true;
+    api("/mock/catalog").then(data => { if (mounted) setCatalog(data.levels || []); }).catch(() => {});
+    return () => { mounted = false; };
+  }, []);
   if (loading) return <p role="status">Loading your account…</p>;
   if (!user) return <Navigate to="/login/" replace />;
   if (!studentProfile) return <p role="status">Loading your student account…</p>;
@@ -53,77 +60,47 @@ export function PaymentOptionsPage() {
   const switchToExam = !examOnly && Boolean(courseTrial(studentProfile));
   const fullCourseLink = examOnly ? "/mock/account?choice=full_course" : "/campus/account?tab=billing";
   const examLink = switchToExam ? "/mock/account?choice=exam_preparation" : "/mock/checkout";
-  return <main style={card}>
-    <PaymentNavigation />
-    <h1>Choose how to continue</h1>
-    <p>Choose the access that suits your learning. You can review the price before paying.</p>
-    <section style={{...card, margin: "16px 0", padding: 20}}>
-      <h2>Full Course</h2>
-      <p>Continue your course with lessons, course materials and exam preparation at your enrolled level.</p>
-      <p>Your existing tuition payments and balance remain on your account.</p>
-      {isMockPortal() && !examOnly
-        ? <a href="https://www.falowen.app/campus/account?tab=billing">Continue to course billing</a>
-        : <Link to={fullCourseLink}>Continue to course billing</Link>}
-    </section>
-    <section style={{...card, margin: "16px 0", padding: 20}}>
-      <h2>Exam Preparation</h2>
-      <p>Practise available mock exams and the four skills at your selected level for 30 days.</p>
-      <p>Exam subscriptions and course tuition are separate payments.</p>
-      <Link to={examLink}>Continue to exam preparation</Link>
-    </section>
+  const level = String(studentProfile.level || "").toUpperCase();
+  const examPackage = catalog.find(row => row.level === level)?.packages?.find(item => item.id === "monthly");
+  const currentTuition = !examOnly && Number(studentProfile.tuitionFee) > 0 ? Number(studentProfile.tuitionFee) : getTuitionFeeForLevel(level);
+  return <main className="fw-plans">
+    <div className="fw-plans-nav"><PaymentNavigation /></div>
+    <header className="fw-plans-hero"><div className="fw-plans-eyebrow">Your learning, your choice</div>
+      <h1>Choose how to continue</h1>
+      <p className="fw-plans-intro">Find the right path for your goals. Review your options and see the final price before paying.</p>
+    </header>
+    <div className="fw-plans-grid">
+      <section className="fw-plan fw-plan--course"><h2>Full Course</h2>
+        <div className="fw-plan-price">{currentTuition > 0 ? format(currentTuition) : "View tuition"}</div>
+        <p className="fw-plan-subtitle">6 months of platform access</p>
+        <ul><li>Live classes</li><li>Course Book</li><li>Exam preparation</li><li>Tutor feedback</li></ul>
+        <p className="fw-plan-note">Your existing payments and balance remain on your account. Class pricing and payment options are confirmed before checkout.</p>
+        {isMockPortal() && !examOnly ? <a href="https://www.falowen.app/campus/account?tab=billing">Choose course</a> : <Link to={fullCourseLink}>Choose course</Link>}
+      </section>
+      <section className="fw-plan fw-plan--exam"><h2>Exam Preparation</h2>
+        <div className="fw-plan-price">{examPackage ? format(examPackage.priceGhs) : "Monthly subscription"}</div>
+        <p className="fw-plan-subtitle">{examPackage ? `per ${examPackage.days} days · ${level}` : "30 days of access"}</p>
+        <ul><li>Available full mock exams</li><li>All four exam skills</li><li>AI assessment where available</li><li>Saved progress where available</li></ul>
+        <p className="fw-plan-note">Exam subscriptions and course tuition are separate payments. Final fees are shown before payment.</p>
+        <Link to={examLink}>Choose exam access</Link>
+      </section>
+    </div>
   </main>;
 }
 
 export function MockExamSignupPage() {
-  const { user, studentProfile, refreshStudentProfile } = useAuth();
-  const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [level, setLevel] = useState(new URLSearchParams(window.location.search).get("level")?.toUpperCase() || "A1");
-  const [working, setWorking] = useState(false);
-  const [error, setError] = useState("");
-  if (user && studentProfile && !working) return <Navigate to={"/exams/mocks"} replace />;
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!safeLevels.has(level) || name.trim().split(/\s+/).length < 2 || (!user && password.length < 8)) {
-      setError("Enter your full name, level and a password of at least eight characters.");
-      return;
+  const { user, loading } = useAuth();
+  useEffect(() => {
+    if (!loading && !user) {
+      const level = new URLSearchParams(window.location.search).get("level");
+      const url = new URL("https://www.falowen.app/signup");
+      if (safeLevels.has(String(level || "").toUpperCase())) url.searchParams.set("level", level.toUpperCase());
+      window.location.replace(url.href);
     }
-    setWorking(true); setError("");
-    try {
-      const credential = user
-        ? { user }
-        : await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
-      const token = await credential.user.getIdToken();
-      await api("/mock/register", { method: "POST", token, body: { name: name.trim(), level } });
-      await credential.user.getIdToken(true); // reload server-issued examOnly claim
-      await refreshStudentProfile?.().catch(() => {});
-      navigate("/exams/mocks", { replace: true });
-    } catch (err) {
-      setError(err?.code === "auth/email-already-in-use"
-        ? "This email already has a Falowen account. Sign in instead."
-        : err.message || "Could not create your exam account.");
-      setWorking(false);
-    }
-  };
-  return <main style={card}>
-    <a href="/" style={{ color: "#0b776e" }}>← Falowen Exams</a>
-    <h1>Exam-only registration</h1>
-    <p>Create one Falowen account for German mock exam practice, without enrolling in a full course. At A1–B2, try one complete mock for seven days. At C1, try one reading paper. Monthly access unlocks all published practice.</p>
-    <form onSubmit={handleSubmit}>
-      <label style={field}>Full name<input style={input} required value={name} onChange={e => setName(e.target.value)} /></label>
-      {!user && <>
-        <label style={field}>Email<input type="email" style={input} required value={email} onChange={e => setEmail(e.target.value)} /></label>
-        <label style={field}>Password<input type="password" minLength={8} style={input} required value={password} onChange={e => setPassword(e.target.value)} /></label>
-      </>}
-      <label style={field}>Exam level<select style={input} value={level} onChange={e => setLevel(e.target.value)}>{LEVELS.map(x=><option key={x}>{x}</option>)}</select></label>
-      <p style={{ fontSize: 13, color: "#64748b" }}>Exam registration is for German exam preparation only.</p>
-      {error && <p role="alert" style={{ color: "#b42318" }}>{error}</p>}
-      <button type="submit" disabled={working} style={button}>{working ? "Creating account…" : "Create exam account"}</button>
-    </form>
-    <p>Already have a Falowen account? <a href="/login/" style={{ color: "#0b776e" }}>Sign in</a>.</p>
-  </main>;
+  }, [loading, user]);
+  if (loading) return <p role="status">Loading your account…</p>;
+  if (user) return <Navigate to="/exams/mocks" replace />;
+  return <main style={card}><p>Opening Falowen signup…</p><a href="https://www.falowen.app/signup">Continue to signup</a></main>;
 }
 
 export function MockExamCheckoutPage({ paymentReturn = false }) {

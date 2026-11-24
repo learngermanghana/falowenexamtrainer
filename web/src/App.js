@@ -630,9 +630,9 @@ function App() {
     // Keep a direct protected mock URL intact through sign-in so the learner
     // arrives at the exam they selected instead of returning to the homepage.
     if (location.pathname.startsWith("/campus/course/") || location.pathname.startsWith("/exams/")) {
-      return <AuthGate initialMode="login" onBack={() => navigate("/")} onSwitchToSignup={() => isMockPortal() ? navigate("/mock/register") : setAuthMode("signup")} />;
+      return <AuthGate initialMode="login" onBack={() => navigate("/")} onSwitchToSignup={() => isMockPortal() ? window.location.assign("https://www.falowen.app/signup") : setAuthMode("signup")} />;
     }
-    if (authMode === "signup" && isMockPortal()) return <Navigate to="/mock/register" replace />;
+    if (authMode === "signup" && isMockPortal()) return <MockExamSignupPage />;
     if (authMode === "signup") {
       return <SignUpPage onLogin={() => setAuthMode("login")} onBack={() => setAuthMode("landing")} />;
     }

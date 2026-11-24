@@ -28,7 +28,7 @@ afterEach(() => jest.restoreAllMocks());
 
 test("a selected full course does not ask for the course type again and can go back", async () => {
   open("/mock/payment");
-  fireEvent.click(screen.getByRole("link", { name: "Continue to course billing" }));
+  fireEvent.click(screen.getByRole("link", { name: "Choose course" }));
   expect(screen.getByRole("heading", { name: "Full Course" })).toBeVisible();
   expect(screen.queryByLabelText("Change course type")).toBeNull();
   expect(await screen.findByRole("option", { name: /A2 class/ })).toBeInTheDocument();
@@ -59,7 +59,7 @@ test("a course trial student explicitly confirms switching before exam checkout"
   useAuth.mockReturnValue({ user, studentProfile: { accountType: "course", courseType: "full_course", level: "A2", trialStatus: "active", trialEndsAt: new Date(Date.now() + 86400000).toISOString() }, refreshStudentProfile });
   const fetchMock = jest.spyOn(global, "fetch").mockImplementation(async (path) => ({ ok: true, json: async () => path === "/account/course-type" ? { checkout: "exam" } : path === "/mock/catalog" ? { levels: [] } : { active: [] } }));
   open("/mock/payment");
-  fireEvent.click(screen.getByRole("link", { name: "Continue to exam preparation" }));
+  fireEvent.click(screen.getByRole("link", { name: "Choose exam access" }));
   expect(screen.queryByLabelText("Change course type")).toBeNull();
   expect(fetchMock).not.toHaveBeenCalledWith("/account/course-type", expect.anything());
   fireEvent.click(screen.getByRole("button", { name: "Continue to exam checkout" }));
