@@ -16,7 +16,6 @@ import { PrimaryActionBar, SectionHeader } from "./ui";
 import "./GeneralHome.css";
 import { formatCurrency } from "../lib/formatters";
 import LegalFooter from "./LegalFooter";
-import HomepageHighlights from "./HomepageHighlights";
 import { detectLevelKey } from "../lib/day0Workbook";
 import { getCampusProgram } from "../utils/campusProgram";
 
@@ -292,7 +291,7 @@ const GeneralHome = ({
           <SectionHeader
             eyebrow="Class access"
             title="Check your Zoom and calendar here"
-            subtitle="Use this during onboarding only. After setup, your next scheduled class will appear in the homepage Highlights section."
+            subtitle="Use this during onboarding only. After setup, open View schedule on your homepage to see your class timetable."
           />
           <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />
         </section>
@@ -383,14 +382,6 @@ const GeneralHome = ({
 
       <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
       {examOnly && <section style={styles.card}><h3>Exam preparation access</h3><p>Explore Campus Day 1 and browse your exam room. Subscribe when you are ready to unlock more practice.</p><button style={styles.secondaryButton} onClick={() => navigate("/mock/payment")}>Payment options</button></section>}
-      {!examOnly && !browseOnly && <div className="falowen-home-section-break falowen-home-section-break--highlights">
-        <HomepageHighlights
-          className={preferredClass}
-          classId={preferredClassId}
-          level={assignedClassLevel || levelKey}
-          program={studentProfile?.program}
-        />
-      </div>}
 
       {!examOnly && <div className="falowen-home-section-break falowen-home-section-break--metrics">
         <HomeMetrics studentProfile={metricsStudentProfile} />
