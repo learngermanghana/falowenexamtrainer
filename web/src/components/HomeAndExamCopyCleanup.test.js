@@ -14,7 +14,7 @@ describe("homepage and Exams Room student-facing cleanup", () => {
   const footerSource = readSource("components/LegalFooter.js");
 
   test("normal homepage ends after Home Metrics and the footer", () => {
-    expect(homeSource).toContain("<HomepageHighlights");
+    expect(homeSource).not.toContain("<HomepageHighlights");
     expect(homeSource).not.toContain("homepageCompact");
     expect(homeSource).not.toContain("AnnouncementSection");
     expect(homeSource).not.toContain("fetchAnnouncements");
@@ -47,7 +47,7 @@ describe("homepage and Exams Room student-facing cleanup", () => {
     expect(homeSource).toContain("<WelcomeHero");
     expect(homeSource).toContain("<QuickMainAccess");
     expect(homeSource).not.toContain("<FirstLessonGuide");
-    expect(homeSource).toContain("<HomepageHighlights");
+    expect(homeSource).not.toContain("<HomepageHighlights");
     expect(homeSource).toContain("<HomeMetrics");
     expect(homeSource).toContain("<ClassCalendarCard");
     expect(homeSource).toContain("onOpenAccount={openAccount}");
@@ -102,7 +102,14 @@ describe("homepage and Exams Room student-facing cleanup", () => {
       "Open preview",
     ].forEach((phrase) => expect(mockLibrarySource).not.toContain(phrase));
 
-    expect(mockLibrarySource).toContain("Choose a complete mock or practise one skill");
+    expect(mockLibrarySource).toContain("Choose a mock or practise one skill.");
+    expect(mockLibrarySource).not.toContain("Full exam practice");
+    expect(mockLibrarySource).not.toContain("Your free trial is active");
+    expect(mockLibrarySource).not.toContain("Included in your free trial");
+    expect(mockLibrarySource).not.toContain("Start or resume mock");
+    expect(mockLibrarySource).toContain('? "Begin"');
+    expect(mockLibrarySource).toContain("navigate(mock.route)");
+    expect(mockLibrarySource).toContain("openLock(examLockInfo");
     expect(mockLibrarySource).toContain("Section practice does not generate a complete mock score.");
     expect(mockLibrarySource).toContain("Open practice section");
   });
