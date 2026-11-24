@@ -84,7 +84,7 @@ const sentenceReorderPhrases = [
   "kommen, woher, Sie (Question)",
   "bin, ich, Jahre alt, 25 (Statement)",
   "aus, komme, ich, Deutschland (Statement)",
-  "ist, meine, Telefonnummer, 123456789 (Statement)",
+  "ist, mein, Telefonnummer, 123456789 (Statement)",
   "Entschuldigung, heißen, Sie, wie (Question)",
   "wie, dir, es, geht (Question)",
   "wie, Ihnen, es, geht (Question)",
