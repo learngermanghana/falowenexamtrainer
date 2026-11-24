@@ -1,0 +1,3 @@
+const {normalizeWorkbook}=require("../swahiliSubmission");
+const input={level:"B1",day:27,title:"Kutunza mazingira katika maisha ya kila siku",writing:{},readingAnswers:{},listeningAnswers:Object.fromEntries(["listen-plastic","listen-baskets","listen-ready","listen-bottles","listen-change"].map(k=>[k,"jibu"]))};
+test("Day 27 accepts five listening responses without unrelated sections",()=>{expect(normalizeWorkbook(input).id).toBe("b1-day-27"); expect(normalizeWorkbook({...input,listeningAnswers:{}})).toBeNull();expect(normalizeWorkbook({...input,listeningAnswers:{...input.listeningAnswers,"listen-plastic":" "}})).toBeNull();});
