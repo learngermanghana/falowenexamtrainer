@@ -4,6 +4,8 @@ import SharedTimedAssignment, { TimedAssignmentPanel, buildTimedAssignmentStorag
 import { getTimedAssignmentConfig } from "../data/timedAssignmentConfig";
 import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import { onSnapshot, setDoc } from "../firebase";
+import { ensureCourseSubmissionAccess } from "../services/courseSubmissionAccess";
+jest.mock("../services/courseSubmissionAccess", () => ({ ensureCourseSubmissionAccess: jest.fn(async () => ({ok:true})) }));
 jest.mock("../firebase", () => ({ auth: null, db: {}, doc: jest.fn(() => "ref"), onSnapshot: jest.fn(), setDoc: jest.fn(), serverTimestamp: jest.fn(() => "server-time") }));
 jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: { uid: "student" } }) }));
 jest.mock("../hooks/useLessonProgress", () => ({ useLessonProgress: () => ({ progressByAssignmentId: {}, loading: false }) }));
@@ -186,6 +188,7 @@ test("A1 Day 17 starts counting immediately while the cloud write is pending", a
   expect(screen.getByLabelText("1498 seconds remaining")).toBeInTheDocument();
   expect(screen.getByTestId("lock")).toHaveTextContent("false");
 
+  await act(async () => {});
   await act(async () => acknowledgeStart());
   expect(screen.getByLabelText("1498 seconds remaining")).toBeInTheDocument();
   expect(setDoc).toHaveBeenCalledWith("ref", expect.objectContaining({
@@ -218,6 +221,7 @@ test("failed cloud acknowledgement rolls back the optimistic countdown without u
   fireEvent.click(screen.getByRole("checkbox"));
   act(() => fireEvent.click(screen.getByRole("button", { name: /^Start/ })));
   expect(screen.getByLabelText("1500 seconds remaining")).toBeInTheDocument();
+  await act(async () => {});
   await act(async () => rejectStart(new Error("permission-denied")));
   expect(screen.queryByLabelText(/seconds remaining/)).not.toBeInTheDocument();
   expect(screen.getByTestId("lock")).toHaveTextContent("true");
@@ -268,4 +272,15 @@ test("A2 Day 21 teacher timer reset clears the closed attempt and allows a new t
   expect(setDoc).toHaveBeenCalledWith("ref", expect.objectContaining({
     assignmentKey: "A2-8.21", studentId: "student", timerRecord: true, status: "active",
   }));
+});
+
+test("denied enrollment check never creates a timed assignment", async () => {
+  ensureCourseSubmissionAccess.mockRejectedValueOnce(new Error("Access expired"));
+  const log = jest.spyOn(console,"error").mockImplementation(()=>{});
+  render(<Harness level="B1" assignmentKey="B1-6.18" day={18} />);
+  fireEvent.click(screen.getByRole("checkbox"));
+  await act(async()=>fireEvent.click(screen.getByRole("button",{name:/^Start/})));
+  expect(setDoc).not.toHaveBeenCalled();
+  expect(screen.getByTestId("lock")).toHaveTextContent("true");
+  log.mockRestore();
 });

@@ -12,6 +12,7 @@ import AutomaticMarkingStatus from "./AutomaticMarkingStatus";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
 import { courseTrial } from "./TrialPractice";
+import { ensureCourseSubmissionAccess } from "../services/courseSubmissionAccess";
 import { useAccessLock, courseLockInfo } from "./AccessLockDialog";
 import { courseSchedules } from "../data/courseSchedule";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
@@ -1185,6 +1186,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       const trimmedText = form.submissionText.trim();
       if (!form.assignmentTitle || !trimmedText || !db || !user?.uid) return { ok: false, reason: "missing" };
 
+      await ensureCourseSubmissionAccess(user, { force: statusLabel !== "draft" });
       const submissionPayload = buildSubmissionPayload(statusLabel);
 
       // Drafts: deterministic doc ID -> no duplicates
@@ -1232,6 +1234,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         level: selectedAssignmentLevel,
         lockedAt: serverTimestamp(),
         assignmentTitle: form.assignmentTitle,
+        assignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
         day: selectedAssignmentDay,
         chapter: selectedAssignmentChapter || "",
         chapterKey: buildChapterKey(form.assignmentTitle),
@@ -1264,6 +1267,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       buildChapterKey,
       buildSubmissionPayload,
       canSubmitSelected,
+      user,
       draftsByAssignment,
       form.assignmentTitle,
       form.submissionText,
@@ -2429,6 +2433,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         updatedAt: serverTimestamp(),
       };
 
+      await ensureCourseSubmissionAccess(user, { force: true });
       await setDoc(draftRef, payload, { merge: true });
 
       setDraftsByAssignment((prev) => ({
