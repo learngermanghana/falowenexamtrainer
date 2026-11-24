@@ -25,7 +25,7 @@ const readableDate = (value) => {
     : "";
 };
 
-export default function ExamsOverviewPage() {
+export default function ExamsOverviewPage({ dateInLevelPicker = false }) {
   const trialExam = React.useContext(TrialExam);
   const { openLock, lockDialog } = useAccessLock();
   const navigate = useNavigate();
@@ -90,14 +90,93 @@ export default function ExamsOverviewPage() {
   return (
     <main className="exam-room-overview">
       {lockDialog}
+      <header className="exam-room-heading">
+        <h2>Your {currentLevel} exam room</h2>
+        {user?.uid && !dateInLevelPicker && <PersonalExamCountdown key={historyKey} uid={user.uid} level={currentLevel} compact />}
+      </header>
+
+      <button
+        type="button"
+        className="exam-room-mock-entry"
+        aria-label={hasFullMock && !trialExam ? "Start or resume a full mock exam" : "Browse available exam practice"}
+        onClick={() => openPractice("/exams/mocks", "Mock Exams opened successfully.")}
+      >
+        <span className="exam-room-mock-icon" aria-hidden="true">📝</span>
+        <span className="exam-room-mock-copy">
+          <strong>{hasFullMock && !trialExam ? "Full Mock Exam" : "Explore Mock Practice"}</strong>
+          <span>{trialExam ? "Browse the full catalogue and see which activities your current access includes." : hasFullMock
+            ? "Practise all four skills in one exam."
+            : "A complete " + currentLevel + " mock is not yet published. Explore the available practice."}</span>
+          <span className="exam-room-mock-action">{hasFullMock && !trialExam ? "Choose or resume a full mock" : "See available practice"} <span aria-hidden="true">→</span></span>
+        </span>
+      </button>
+
+      <section aria-labelledby="exam-room-skills-heading">
+        <div className="exam-room-skills-heading">
+          <h3 id="exam-room-skills-heading">Practise by skill</h3>
+        </div>
+        <div className="exam-room-skills-grid">
+          {EXAM_SKILLS.map((skill) => {
+            const last = coach.latestBySection[skill.key];
+            const suggested = !trialExam && coach.focus.key === skill.key;
+            return (
+              <button
+                key={skill.key}
+                type="button"
+                aria-label={(trialExam ? "Locked: " : "Practise ") + skill.title}
+                className={"exam-room-skill" + (suggested ? " exam-room-skill-recommended" : "")}
+                onClick={event => trialExam ? explainLock(skill.title, event) : openPractice(skill.path, `${skill.title} practice opened successfully.`)}
+              >
+                <span>
+                  <span className="exam-room-skill-top">
+                    <span className="exam-room-skill-icon" aria-hidden="true">{trialExam ? "🔒" : sectionIcons[skill.key]}</span>
+                    {suggested ? <span className="exam-room-skill-suggested">Suggested next</span> : null}
+                  </span>
+                  <span className="exam-room-skill-title">{skill.title}</span>
+                  <span className="exam-room-skill-description">{skill.description}</span>
+                  {suggested && <span className="exam-room-skill-reason">{nextActivity.reason}{nextActivity.weakPart ? " Focus on " + nextActivity.weakPart + "." : ""}</span>}
+                </span>
+                <span className="exam-room-skill-bottom">
+                  <span>{last ? "Latest: " + last.percent + "%" : "Not yet practised"}</span>
+                  <span className="exam-room-arrow" aria-hidden="true">→</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        {trialExam && <div className="exam-room-suggestion exam-room-next-activity">
+          <p><strong>Suggested: {nextActivity.title}.</strong> {nextActivity.reason}
+            {nextActivity.weakPart ? " Focus on " + nextActivity.weakPart + "." : ""}
+          </p>
+          <button type="button" className="exam-room-text-action"
+            onClick={() => openPractice(nextActivity.route, "Recommended practice opened.")}>
+            {trialExam?.locked ? "Browse exams" : trialExam ? "Open trial practice" : "Practise recommended skill"} →
+          </button>
+        </div>}
+      </section>
+
       <section className="exam-room-summary" aria-label="Exam room progress">
-        <div className="exam-room-summary-heading">
+        <div className="exam-room-performance">
           <div>
-            <p className="exam-room-eyebrow">Falowen · Exam Room</p>
-            <h2>Your {currentLevel} exam room</h2>
-            <p className="exam-room-summary-intro">{hasFullMock ? "Choose an available full mock or focus on one skill below. Your progress and latest results appear here." : "A complete mock is not yet available at this level. Practise the available skills below and review your progress here."}</p>
+            <h3>Your progress</h3>
+            <strong className="exam-room-overall-score">{coach.overallPercent === null ? "—" : coach.overallPercent + "%"}</strong>
+            <p>{coach.overallPercent === null
+              ? "Record all four skills to see your overall practice score."
+              : "Average of your latest four skill scores."}</p>
+            <small>Practice indicator only — not an official Goethe score or a pass prediction.</small>
           </div>
-          <span className="exam-room-level">{currentLevel}</span>
+          <div className="exam-room-performance-skills">
+            {EXAM_SKILLS.map(skill => {
+              const result = coach.latestBySection[skill.key];
+              return <div key={skill.key} className="exam-room-performance-skill">
+                <span>{skill.title}</span><strong>{result ? result.percent + "%" : "Not assessed"}</strong>
+                <div className="exam-room-performance-track" aria-hidden="true">
+                  <div style={{width: (result?.percent || 0) + "%"}} />
+                </div>
+                {coach.skillTrends[skill.key].count > 0 && <small className="exam-room-skill-detail">{coach.skillTrends[skill.key].count} scored attempt{coach.skillTrends[skill.key].count === 1 ? "" : "s"} · Average {coach.skillTrends[skill.key].average}%{coach.skillTrends[skill.key].change !== null ? " · " + (coach.skillTrends[skill.key].change > 0 ? "+" : "") + coach.skillTrends[skill.key].change + " pp" : ""}{coach.weakParts[skill.key] ? " · Lowest: " + coach.weakParts[skill.key] : ""}</small>}
+              </div>;
+            })}
+          </div>
         </div>
         <div className="exam-room-metrics">
           <div className="exam-room-metric">
@@ -113,29 +192,6 @@ export default function ExamsOverviewPage() {
             <span>Latest score</span>
           </div>
         </div>
-        <div className="exam-room-performance">
-          <div>
-            <h3>Exam performance</h3>
-            <strong className="exam-room-overall-score">{coach.overallPercent === null ? "—" : coach.overallPercent + "%"}</strong>
-            <p>{coach.overallPercent === null
-              ? "Record all four skills to see your overall practice score."
-              : "Equal-weight average of your latest four skill scores."}</p>
-            {coach.missingSkills.length > 0 && <p>Still to assess: {coach.missingSkills.map(skill => skill.title).join(", ")}</p>}
-            <small>Practice indicator only — not an official Goethe score or a pass prediction.</small>
-          </div>
-          <div className="exam-room-performance-skills">
-            {EXAM_SKILLS.map(skill => {
-              const result = coach.latestBySection[skill.key];
-              return <div key={skill.key} className="exam-room-performance-skill">
-                <span>{skill.title}</span><strong>{result ? result.percent + "%" : "Not assessed"}</strong>
-                <div className="exam-room-performance-track" aria-hidden="true">
-                  <div style={{width: (result?.percent || 0) + "%"}} />
-                </div>
-              </div>;
-            })}
-          </div>
-        </div>
-        {user?.uid && <PersonalExamCountdown key={historyKey} uid={user.uid} level={currentLevel} />}
         <div className="exam-room-coverage">
           <div className="exam-room-coverage-heading">
             <span>Skill coverage</span>
@@ -155,94 +211,32 @@ export default function ExamsOverviewPage() {
         </div>
       </section>
 
-      <button
-        type="button"
-        className="exam-room-mock-entry"
-        aria-label={hasFullMock && !trialExam ? "Start or resume a full mock exam" : "Browse available exam practice"}
-        onClick={() => openPractice("/exams/mocks", "Mock Exams opened successfully.")}
-      >
-        <span className="exam-room-mock-icon" aria-hidden="true">📝</span>
-        <span className="exam-room-mock-copy">
-          <span className="exam-room-mock-eyebrow">{hasFullMock && !trialExam ? "Option 1 · Complete exam" : "Available exam practice"}</span>
-          <strong>{hasFullMock && !trialExam ? "Start Full Mock" : "Explore Mock Practice"}</strong>
-          <span>{trialExam ? "Browse the full catalogue and see which activities your current access includes." : hasFullMock
-            ? "Take Lesen, Hören, Schreiben and Sprechen together. Start a new mock or resume one already in progress."
-            : "A complete " + currentLevel + " mock is not yet published. Explore the available practice."}</span>
-          <span className="exam-room-mock-action">{hasFullMock && !trialExam ? "Choose or resume a full mock" : "See available practice"} <span aria-hidden="true">→</span></span>
-        </span>
-        </button>
-
-      <section aria-labelledby="exam-room-skills-heading">
-        <div className="exam-room-skills-heading">
-          <span className="exam-room-skills-eyebrow">Option 2 · Practice in parts</span>
-          <h3 id="exam-room-skills-heading">Practise individual exam sections</h3>
-          <p>Not ready for a complete mock? Choose Lesen, Hören, Schreiben or Sprechen below and practise one section at a time.</p>
-        </div>
-        <div className="exam-room-skills-grid">
-          {EXAM_SKILLS.map((skill) => {
-            const last = coach.latestBySection[skill.key];
-            const trend = coach.skillTrends[skill.key];
-            const suggested = !trialExam && coach.focus.key === skill.key;
-            return (
-              <button
-                key={skill.key}
-                type="button"
-                aria-label={(trialExam ? "Locked: " : "Practise ") + skill.title}
-                className={"exam-room-skill" + (suggested ? " exam-room-skill-recommended" : "")}
-                onClick={event => trialExam ? explainLock(skill.title, event) : openPractice(skill.path, `${skill.title} practice opened successfully.`)}
-              >
-                <span>
-                  <span className="exam-room-skill-top">
-                    <span className="exam-room-skill-icon" aria-hidden="true">{trialExam ? "🔒" : sectionIcons[skill.key]}</span>
-                    {suggested ? <span className="exam-room-skill-suggested">Suggested next</span> : null}
-                  </span>
-                  <span className="exam-room-skill-title">{skill.title}</span>
-                  <span className="exam-room-skill-description">{skill.description}</span>
-                </span>
-                <span className="exam-room-skill-bottom">
-                  <span>{last ? "Latest: " + last.percent + "%" : "Not yet practised"}</span>
-                  <span className="exam-room-arrow" aria-hidden="true">→</span>
-                {trend.count ? (
-                  <span className="exam-room-skill-trend">
-                    <span>{trend.count} scored attempt{trend.count === 1 ? "" : "s"} · Average {trend.average}%</span>
-                    {coach.weakParts[skill.key] && <span>Lowest-scoring part: {coach.weakParts[skill.key]}</span>}
-                    {trend.change !== null ? (
-                      <span className="exam-room-skill-change" aria-label={`Change from previous attempt: ${trend.change > 0 ? "up " : trend.change < 0 ? "down " : "unchanged "}${Math.abs(trend.change)} percentage points`}>
-                        {trend.change > 0 ? "↑ +" : trend.change < 0 ? "↓ " : "→ "}{trend.change} pp vs previous
-                      </span>
-                    ) : null}
-                  </span>
-                ) : null}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        <div className="exam-room-suggestion exam-room-next-activity">
-          <p><strong>Suggested: {nextActivity.title}.</strong> {nextActivity.reason}
-            {nextActivity.weakPart ? " Focus on " + nextActivity.weakPart + "." : ""}
-          </p>
-          <button type="button" className="exam-room-text-action"
-            onClick={() => openPractice(nextActivity.route, "Recommended practice opened.")}>
-            {trialExam?.locked ? "Browse exams" : trialExam ? "Open trial practice" : "Practise recommended skill"} →
+      <section className="exam-room-activity" aria-label="Recent results">
+        <div className="exam-room-recent-heading">
+          <h3>Recent results</h3>
+          <button type="button" className="exam-room-text-action" onClick={event => trialExam ? explainLock("Exam File", event) : openPractice("/exams/file", "My Exam File opened successfully.")}>
+            {trialExam ? "🔒 Exam File" : "Exam File →"}
           </button>
         </div>
+        {loading && <p className="exam-room-status" role="status">Loading saved practice results…</p>}
+        {loadIssue && <p className="exam-room-status" role="status">{loadIssue}</p>}
+        {limited && <p className="exam-room-status">Showing results from a limited history window.</p>}
+        {coach.attempts.length ? (
+          <ol className="exam-room-recent-list">
+            {coach.attempts.slice(0, 5).map((attempt, index) => (
+              <li className="exam-room-recent-item" key={attempt.section + ":" + (attempt.id || index)}>
+                <div>
+                  <strong>{attempt.section === "mixed" ? attempt.title : EXAM_SKILLS.find(skill => skill.key === attempt.section)?.title}</strong>
+                  <p>{[readableDate(attempt.completedAt), attempt.section === "mixed" ? "Full mock" : attempt.title].filter(Boolean).join(" · ")}</p>
+                </div>
+                <strong className="exam-room-recent-score">{attempt.percent}%</strong>
+              </li>
+            ))}
+          </ol>
+        ) : !loading && !loadIssue ? <p className="exam-room-status">No scored results yet. Choose an available practice to begin.</p> : null}
+        {coach.attempts.length > 5 && <p className="exam-room-status">Showing the latest five results. Open Exam File for more.</p>}
       </section>
-
-      <section className="exam-room-activity" aria-label="Full mock history">
-        <div className="exam-room-recent-heading">
-          <div><h3>Full mock history</h3><p>Completed mock results recorded for {currentLevel}.</p></div>
-          <button type="button" className="exam-room-text-action" onClick={() => openPractice("/exams/mocks", "Mock Exams opened successfully.")}>Browse mocks →</button>
-        </div>
-        {coach.mockHistory.length ? <ol className="exam-room-recent-list">
-          {coach.mockHistory.slice(0,5).map((attempt,index) => <li className="exam-room-recent-item" key={attempt.id || index}>
-            <div><strong>{attempt.title}</strong><p>{readableDate(attempt.completedAt)}</p></div>
-            <strong className="exam-room-recent-score">{attempt.percent}%</strong>
-          </li>)}
-        </ol> : <p className="exam-room-status">{loading ? "Loading mock results…" : loadIssue ? "Mock history temporarily unavailable." : "No recorded full mock results yet."}</p>}
-        {coach.mockHistory.length > 5 && <p className="exam-room-status">Showing the latest five recorded mocks.</p>}
-      </section>
-      <section className="exam-room-activity" aria-label="Warm-up and recent practice">
+      <section className="exam-room-activity" aria-label="Daily warm-up">
         <div className="exam-room-warmup">
           <span className="exam-room-warmup-icon" aria-hidden="true">☀️</span>
           <div className="exam-room-warmup-copy">
@@ -257,35 +251,6 @@ export default function ExamsOverviewPage() {
             {trialExam ? "🔒 Locked" : dailyDone ? "Review →" : localDaily.hasDraft ? "Continue →" : "Start →"}
           </button>
         </div>
-        <div className="exam-room-recent-heading">
-          <div>
-            <h3>Your recent practice</h3>
-            <p>Your latest individual practice results.</p>
-          </div>
-          <button type="button" className="exam-room-text-action" onClick={event => trialExam ? explainLock("Exam File", event) : openPractice("/exams/file", "My Exam File opened successfully.")}>
-            {trialExam ? "🔒 Exam File" : "Exam File →"}
-          </button>
-        </div>
-        {loading ? <p className="exam-room-status" role="status">Loading saved practice results…</p> : null}
-        {loadIssue ? <p className="exam-room-status" role="status" style={{ color: "#92400e" }}>{loadIssue}</p> : null}
-        {limited ? <p className="exam-room-status">Showing results from a limited history window.</p> : null}
-        {coach.practiceHistory.length ? (
-          <ol className="exam-room-recent-list">
-            {coach.practiceHistory.slice(0, 3).map((attempt, index) => (
-              <li className="exam-room-recent-item" key={attempt.id || attempt.section + "-" + index}>
-                <div>
-                  <strong>{attempt.section === "mixed"
-                    ? "Full mock exam"
-                    : EXAM_SKILLS.find((skill) => skill.key === attempt.section)?.title}</strong>
-                  <p>{readableDate(attempt.completedAt)} · {attempt.title}</p>
-                </div>
-                <strong className="exam-room-recent-score">{attempt.percent}%</strong>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <p className="exam-room-status">No individual scored practice yet. Choose an available skill to begin.</p>
-        )}
       </section>
     </main>
   );
