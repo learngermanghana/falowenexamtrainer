@@ -229,3 +229,27 @@ describe("exam performance and access-aware recommendations", () => {
     expect(examNextActivity(coach,{locked:true,id:null}).route).toBe("/exams/mocks");
   });
 });
+
+test("unassessed mock modules do not inflate skill coverage; an assessed zero still counts", () => {
+  const coach = buildExamRoomCoach({level:"A2",cloudResults:[{
+    id:"mock",level:"A2",section:"mixed",resultType:"final_mock",percent:0,
+    scoreBreakdown:[
+      {key:"lesen",score:0,maxScore:25,assessed:true},
+      {key:"hoeren",score:0,maxScore:25,assessed:false},
+      {key:"schreiben",score:null,maxScore:25},
+      {key:"sprechen",score:0,maxScore:25,status:"pending"},
+    ],
+  }]});
+  expect(coach.coveredSkills).toBe(1);
+  expect(coach.coveragePercent).toBe(25);
+  expect(coach.latestBySection.lesen.percent).toBe(0);
+  expect(coach.overallPercent).toBeNull();
+});
+test("a genuine completed zero result across all four skills remains valid", () => {
+  const coach = buildExamRoomCoach({level:"A2",cloudResults:[{
+    id:"zero",level:"A2",section:"mixed",resultType:"final_mock",percent:0,
+    sectionScores:{lesen:0,hoeren:0,schreiben:0,sprechen:0},
+  }]});
+  expect(coach.coveredSkills).toBe(4);
+  expect(coach.overallPercent).toBe(0);
+});
