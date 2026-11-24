@@ -64,13 +64,13 @@ async function publishA2TutorGrade({db,admin,id,identity,grade,findStudentProfil
     const artifacts = buildA2MockCompletionArtifacts({authedUser:user,studentProfile:profile,attemptId:row.attemptId,attemptNumber:data.attemptNumber,firstAttempt:data.firstAttempt,overall:verified.overall,sectionScores:verified.sectionScores,mockId:MOCK});
     tx.update(attemptRef,{verifiedSections,verifiedSectionScores:verified.sectionScores,verifiedOverall:verified.overall,objectiveVerification:verified.objective,
       sectionScores:verified.sectionScores,overall:verified.overall,status:"completed",section:"result",completedAt:now,updatedAt:now,
-      state:{...data.state,writingPending:false,writingTutorQueued:false,schreibenResult:result,sectionScores:verified.sectionScores,overall:verified.overall,completed:true},
+      state:{...data.state,schreibenSms:review.answers.sms,schreibenEmail:review.answers.email,writingPending:false,writingTutorQueued:false,schreibenResult:result,sectionScores:verified.sectionScores,overall:verified.overall,completed:true},
       writingTutorReview:{id,status:"published"},writingReview:writingAuditRecord({level:"A2",attemptId:row.attemptId,answers:review.answers,result,source:"tutor"}),
       completionSync:{ok:true,scoreDocId:artifacts.scoreDocId,notificationId:artifacts.notificationId,syncedAt:now}});
     const userData=userSnap.data()||{};
     tx.set(userRef,{lastCompletedAttemptId:row.attemptId,lastCompletedScore:verified.overall.score,lastCompletedPassed:verified.overall.passed,updatedAt:now,
       ...(userData.activeAttemptId===row.attemptId?{activeAttemptId:null}:{})},{merge:true});
-    tx.set(db.collection("scores").doc(artifacts.scoreDocId),{...artifacts.scoreDocument,updatedAt:now,createdAt:now},{merge:true});
+    tx.set(db.collection("scores").doc(artifacts.scoreDocId),{...artifacts.scoreDocument,feedback:result.overall_feedback_en,writingMarkingSource:"tutor",updatedAt:now,createdAt:now},{merge:true});
     const notification={...artifacts.notificationDocument,updatedAt:now,createdAt:now};
     tx.set(db.collection("studentNotifications").doc(artifacts.notificationId),notification,{merge:true});
     if(artifacts.identity.studentDocId) tx.set(db.collection("students").doc(artifacts.identity.studentDocId).collection("notifications").doc(artifacts.notificationId),notification,{merge:true});
