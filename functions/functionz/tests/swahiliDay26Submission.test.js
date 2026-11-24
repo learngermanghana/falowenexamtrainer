@@ -1,5 +1,4 @@
 "use strict";
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const {normalizeWorkbook} = require("../swahiliSubmission");
 const readingAnswers=Object.fromEntries(["read-purpose","read-delays","read-documents","read-label","read-message"].map(k=>[k,"jibu"]));
