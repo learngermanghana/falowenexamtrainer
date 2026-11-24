@@ -17,7 +17,9 @@ function germanPlacement(profile) {
 function germanSubmissionAccess(profile, now = Date.now(), authCreatedAt = null) {
   if (!profile || profile.accountType === "exam_only" || ["archived","inactive","deleted","withdrawn","suspended"].includes(text(profile.status))) return null;
   const placement = germanPlacement(profile);
-  if (!placement) return null;
+  if (!placement || ["pending","invitation_pending"].includes(text(placement.accessType))) return null;
+  const startAt = dateMillis(placement.contractStart);
+  if (Number.isFinite(startAt) && startAt > now) return null;
   const level = String(placement.level || "").trim().toUpperCase();
   if (!LEVELS.includes(level)) return null;
   const balance = placement.balanceDue ?? placement.balance;
