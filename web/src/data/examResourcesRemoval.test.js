@@ -22,7 +22,7 @@ describe("Exams Room navigation cleanup", () => {
       path.join(process.cwd(), "src", "components", "ExamsOverviewPage.js"),
       "utf8"
     );
-    expect(overview).toContain('onClick={() => openPractice("/exams/file", "My Exam File opened successfully.")}');
+    expect(overview).toContain('onClick={event => trialExam ? explainLock("Exam File", event) : openPractice("/exams/file", "My Exam File opened successfully.")}');
     expect(overview).toContain("Practise individual exam sections");
     expect(overview).not.toContain("review your exam resources");
   });
