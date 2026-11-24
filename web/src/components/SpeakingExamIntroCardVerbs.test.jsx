@@ -1,12 +1,12 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import SpeakingExamIntroPage from "./SpeakingExamIntroPage";
 
 jest.mock("./navigation/AppBackButton", () => () => <span>Back to Course Book</span>);
 
 describe("A1 Teil 3 object-card lesson", () => {
   test("uses everyday-object verbs instead of generic classroom-only prompts", () => {
-    render(<SpeakingExamIntroPage />);
+    render(<SpeakingExamIntroPage initialTab="workbook" />);
     expect(screen.getByRole("heading", { name: "Picture-card verbs you really need" })).toBeInTheDocument();
 
     [
@@ -29,7 +29,7 @@ describe("A1 Teil 3 object-card lesson", () => {
   });
 
   test("removes repetitive practice blocks but keeps reaction models and compact object pictures", () => {
-    render(<SpeakingExamIntroPage />);
+    render(<SpeakingExamIntroPage initialTab="workbook" />);
 
     expect(screen.getByText("Öffnen Sie bitte die Flasche.")).toBeInTheDocument();
     expect(screen.getByText("Machen Sie bitte das Radio aus.")).toBeInTheDocument();
@@ -43,7 +43,8 @@ describe("A1 Teil 3 object-card lesson", () => {
     expect(screen.getByRole("img", { name: "Flasche picture" })).toHaveAttribute("width", "50");
     expect(screen.getAllByRole("img", { name: "Radio picture" })).toHaveLength(2);
 
-    expect(screen.getByRole("heading", { name: "Introduction to the speaking exam" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Open official Goethe A1 speaking practice" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab",{name:"Overview"}));
+    expect(screen.getByRole("heading", { name: "Introduction to the speaking exam" })).toBeInTheDocument();
   });
 });

@@ -147,6 +147,9 @@ function patchSpeakingIntroPage() {
   const file = path.join(root, "web/src/components/SpeakingExamIntroPage.js");
   let source = fs.readFileSync(file, "utf8");
 
+  // The dedicated tabbed page already owns its lazy practice mount.
+  if (source.includes('lazy(() => import("./A1Teil3SpeakingPracticePanel"))') && source.includes('speaking-intro-panel-ai-practice')) return;
+
   if (!source.includes('import A1Teil3SpeakingPracticePanel from "./A1Teil3SpeakingPracticePanel";')) {
     const importAnchor = 'import AppBackButton from "./navigation/AppBackButton";';
     if (!source.includes(importAnchor)) throw new Error("Speaking intro import anchor missing.");
