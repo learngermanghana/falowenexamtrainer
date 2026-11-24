@@ -4,8 +4,8 @@ const {readSwahiliAccess} = require("./swahiliAccess");
 function normalizeWorkbook(input = {}) {
   const level = String(input.level || "").toUpperCase() === "BEGINNER" ? "A1" : String(input.level || "").toUpperCase();
   const day = Number(input.day);
-  if (!(level === "A1" && Number.isInteger(day) && day >= 1 && day <= 20) && !(level === "B1" && day === 28)) return null;
-  const id = level === "B1" ? "b1-day-28" : "day-" + day;
+  if (!(level === "A1" && Number.isInteger(day) && day >= 1 && day <= 20) && !(level === "B1" && [26, 28].includes(day))) return null;
+  const id = level === "B1" ? "b1-day-" + day : "day-" + day;
   const answers = value => {
     if (!value || typeof value !== "object" || Array.isArray(value)) return null;
     const entries = Object.entries(value);
@@ -15,6 +15,7 @@ function normalizeWorkbook(input = {}) {
   const writing = answers(input.writing), readingAnswers = answers(input.readingAnswers), listeningAnswers = answers(input.listeningAnswers || {});
   if (!writing || !Object.values(writing).some(v=>v.trim()) || !readingAnswers || !listeningAnswers ||
       typeof input.title !== "string" || input.title.length > 250) return null;
+  if (level === "B1" && day === 26 && (!writing.essay?.trim() || ["read-purpose","read-delays","read-documents","read-label","read-message"].some(key => !readingAnswers[key]?.trim()) || ["listen-delay","listen-repair","listen-alternative","listen-advice","listen-next"].some(key => !listeningAnswers[key]?.trim()))) return null;
   return {id, level, day, data:{program:"swahili", level: level === "A1" && day === 1 ? "beginner" : level, day,
     lessonId:"swahili-"+id, title:input.title, status:"submitted", writing, readingAnswers, listeningAnswers,
     listeningTeacherLed:false, ...(level === "A1" && day === 4 && input.readingVersion === 2 ? {readingVersion:2}: {})}};
