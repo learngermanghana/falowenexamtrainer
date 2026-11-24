@@ -16,6 +16,7 @@ import { expandCourseBookEntries } from "../utils/courseBookEntries";
 import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
 import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";
 import { persistCourseCompletionSnapshot } from "../services/courseCompletionSnapshotService";
+import { TrialCourseLevel } from "../context/TrialCatalogContext";
 import CourseBookLevelSelector from "./CourseBookLevelSelector";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
@@ -569,7 +570,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     return { schedules: mergedCourseSchedules, resolvedDerivedLevels: derivedLevels };
   }, [isFrenchProgram]);
 
+  const trialLevel = React.useContext(TrialCourseLevel);
   const levels = useMemo(() => {
+    if (trialLevel) return [trialLevel];
     const baseLevels = Object.keys(schedules);
     const normalizedDefault = resolvedDefaultLevel;
     const merged = normalizedDefault && !baseLevels.includes(normalizedDefault) ? [...baseLevels, normalizedDefault] : baseLevels;
@@ -582,7 +585,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       if (bIndex !== -1) return 1;
       return a.localeCompare(b);
     });
-  }, [resolvedDefaultLevel, schedules]);
+  }, [resolvedDefaultLevel, schedules, trialLevel]);
 
   const [levelChoice, setLevelChoice] = useState(null);
   const assignedLevel = levels.includes(resolvedDefaultLevel) ? resolvedDefaultLevel : levels[0] || "";
@@ -733,7 +736,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const progressPercent = isC2CourseBook
     ? (courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0)
     : (courseCompletion?.completionPercent || 0);
-  const nextLesson = isC2CourseBook
+  const nextLesson = trialLevel ? courseLessons.find(entry => Number(entry.day) === 1) : isC2CourseBook
     ? getNextCourseBookEntry(courseLessons, effectivePracticeProgress)
     : findCourseBookEntryForRequirement(courseLessons, courseCompletion?.next);
   const nextLessonIndex = nextLesson ? courseLessons.findIndex((entry) => entry.assignmentKey === nextLesson.assignmentKey) : -1;
@@ -840,6 +843,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   };
 
   const getLessonHref = (entry) => {
+    if (trialLevel && ["B2", "C1"].includes(trialLevel) && Number(entry.day) === 1) {
+      return "/campus/course/" + trialLevel.toLowerCase() + "-self-learning/day-1";
+    }
     if (
       String(selectedCourseLevel || "").toUpperCase() === "A2" &&
       Number(entry?.day) === 29
@@ -1128,6 +1134,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             )}
 
           <section className="course-book-toolbar" style={courseBookStyles.toolbar}>
+            {trialLevel && <a href="/campus/account?tab=billing">Join the full course</a>}
             <div style={courseBookStyles.toolbarTop}>
               <div>
                 <h3 style={{ margin: 0, fontSize: 18 }}>Lessons</h3>
@@ -1192,6 +1199,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       ? (canonicalSelfLearningComplete ? ASSIGNMENT_STATUSES.milestoneComplete : ASSIGNMENT_STATUSES.inProgress)
                       : (practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly);
                     const instruction = formatCourseBookInstruction(entry.instruction);
+                    const locked = Boolean(trialLevel && Number(entry.day) !== 1);
                     return (
                       <React.Fragment key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`}>
                         {isA1CourseBook && timedPhase && Number(getCourseBookDisplayDay(entry)) === timedPhase.startDay ? (
@@ -1259,14 +1267,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                     <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#334155", fontWeight: 700 }}>
                                       <input
                                         type="checkbox"
-                                        disabled={isSelfLearningLevel}
+                                        disabled={locked || isSelfLearningLevel}
                                         checked={isSelfLearningLevel ? canonicalSelfLearningComplete : Boolean(practiceState.completed)}
                                         onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })}
                                       />
                                       {isSelfLearningLevel ? "Complete inside lesson" : "Completed"}
                                     </label>
                                     {!isSelfLearningLevel ? (
-                                      <select value={practiceState.confidence || ""} onChange={(e) => updatePracticeEntry(entry, { confidence: e.target.value })} style={{ ...styles.select, minHeight: 34, padding: "4px 8px" }}>
+                                      <select disabled={locked} value={practiceState.confidence || ""} onChange={(e) => updatePracticeEntry(entry, { confidence: e.target.value })} style={{ ...styles.select, minHeight: 34, padding: "4px 8px" }}>
                                         <option value="">Confidence</option>
                                         <option value="low">Low</option>
                                         <option value="medium">Medium</option>
@@ -1294,13 +1302,15 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 ) : null}
                               </>
                             ) : null}
-                            <a
+                            {locked ? (
+                              <button type="button" disabled style={styles.primaryButton}>🔒 Locked</button>
+                            ) : (<a
                               href={getLessonHref(entry)}
                               style={{ ...styles.primaryButton, textDecoration: "none" }}
                               onClick={(event) => handleLessonLinkClick(event, entry)}
                             >
                               Open Lesson
-                            </a>
+                            </a>)}
                           </div>
                         </div>
                         {entry.goal ? <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.45 }}>{entry.goal}</p> : null}

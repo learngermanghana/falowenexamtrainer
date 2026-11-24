@@ -1,9 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import trialExams from "../../../functions/functionz/trialExams.json";
-import { getMockExam, getMockExamsForLevel } from "../data/mockExamCatalog";
+import { getMockExam } from "../data/mockExamCatalog";
 import { getLessonsByLevel } from "../data/lessonCatalog";
 import { getTrialLifecycleState } from "../lib/trialAccess";
+
+import { TrialCourseLevel, TrialExam } from "../context/TrialCatalogContext";
 
 export function courseTrial(profile) {
   if (!profile || profile.accountType === "exam_only" || profile.program === "swahili" ||
@@ -42,13 +44,13 @@ export function TrialCoursePage({ level, path, active, endsAtMs, children }) {
   }, [active, endsAtMs, clock]);
   active = active && (!Number.isFinite(endsAtMs) || Date.now() < endsAtMs);
   if (active && firstDayRoutes(level).has(path)) return children;
-  const home = path === "/campus/course";
+  if (active && path === "/campus/course") {
+    return <TrialCourseLevel.Provider value={level}>{children}</TrialCourseLevel.Provider>;
+  }
   return <main style={{ padding: 24 }}>
-    <h1>{home ? level + " Course Book" : "Unlock the full course"}</h1>
+    <h1>Unlock the full course</h1>
     {active && <p><Link to={["B2", "C1"].includes(level) ? "/campus/course/" + level.toLowerCase() + "-self-learning/day-1" : "/campus/course/lesson/" + level + "/1"}>Open Day 1</Link></p>}
     <p>{active ? "Your trial includes Day 1. Join the full course for Day 2 onward." : "Your course trial has ended."}</p>
-    {home && <ul>{[...new Set(getLessonsByLevel(level).filter(item => item.day > 1).map(item => item.day))].map(day =>
-      <li key={day}>Day {day} · Full course</li>)}</ul>}
     <Link to="/campus/account?tab=billing">Join the full course</Link>
   </main>;
 }
@@ -56,9 +58,12 @@ export function TrialCoursePage({ level, path, active, endsAtMs, children }) {
 export function TrialExamPage({ level, path, children }) {
   const exam = getMockExam(trialExams[level]?.catalogId);
   if (exam && path === exam.route) return children;
-  const library = ["/", "/exams", "/exams/overview", "/exams/mocks"].includes(path);
+  if (path === "/" || path === "/exams") return <Navigate to="/exams/overview" replace />;
+  if (exam && ["/exams/overview", "/exams/mocks"].includes(path)) {
+    return <TrialExam.Provider value={exam}>{children}</TrialExam.Provider>;
+  }
   return <main style={{ maxWidth: 720, margin: "2rem auto", padding: 20 }}>
-    <h1>{library ? level + " exam trial" : "Unlock exam practice"}</h1>
+    <h1>Unlock exam practice</h1>
     {exam && <section>
       <h2>{level === "C1" ? "C1 Reading trial" : exam.shortTitle}</h2>
       <p>Included in your trial · {exam.durationLabel}</p>
@@ -66,8 +71,6 @@ export function TrialExamPage({ level, path, children }) {
     </section>}
     <h2>Monthly exam access</h2>
     <p>Unlock individual skill practice and all published mocks at your level.</p>
-    {library && <ul>{getMockExamsForLevel(level).filter(item => item.id !== exam?.id && item.status !== "planned").map(item =>
-      <li key={item.id}>{item.shortTitle || item.title} · Paid access</li>)}</ul>}
     <Link to="/mock/checkout">Get 30-day exam access</Link>
     <Link to="/mock/account">Manage course type</Link>
   </main>;

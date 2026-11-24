@@ -1,5 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import { TrialCourseLevel } from "../context/TrialCatalogContext";
 import CourseTab from "../components/CourseTab";
 
 const mockNavigate = jest.fn();
@@ -33,4 +34,13 @@ test.each(["A1", "A2", "B1", "B2", "C1"])("%s Course Book begins at Day 1 while 
   expect(days[0]).toBe(1);
   expect(days).not.toContain(0);
   expect(screen.queryByRole("heading", { name: "Orientation", exact: true })).not.toBeInTheDocument();
+});
+
+test.each(["A1", "A2", "B1", "B2", "C1"])("%s trial keeps the lesson cards and locks later days", level => {
+  render(<TrialCourseLevel.Provider value={level}><CourseTab defaultLevel={level} /></TrialCourseLevel.Provider>);
+  const cards = screen.getAllByRole("article");
+  expect(within(cards[0]).getByRole("link", { name: "Open Lesson" })).toBeVisible();
+  const dayTwo = cards.find(card => within(card).queryByText(/^Day 2(?:$|\s|·)/));
+  expect(within(dayTwo).getByRole("button", { name: /Locked/ })).toBeDisabled();
+  expect(within(dayTwo).queryByRole("link", { name: "Open Lesson" })).toBeNull();
 });

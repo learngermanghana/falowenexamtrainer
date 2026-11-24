@@ -94,7 +94,8 @@ describe("Exams Room practice level never changes course enrollment", () => {
     const fs = require("fs");
     const app = fs.readFileSync(require.resolve("../App.js"), "utf8");
     expect(app).toContain('role="group" aria-label="Choose exam practice level"');
-    expect(app).toContain("accessibleLevels.map((option)");
+    expect(app).toContain("visibleLevels.map((option)");
+    expect(app).toContain("accessibleLevels.filter((option)");
     expect(app).toContain("aria-pressed={level === option}");
     expect(app).toContain("if (sampleId) navigate(`/exams/${examSection}`)");
     expect(app).not.toContain('{!sampleId ? (\n          <div\n            className="exam-room-level-picker"');

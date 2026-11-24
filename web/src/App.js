@@ -15,6 +15,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ExamProvider, useExam } from "./context/ExamContext";
+import { TrialExam } from "./context/TrialCatalogContext";
 import CourseTab from "./components/CourseTab";
 import NextLevelPreviewPage from "./components/NextLevelPreviewPage";
 import CourseLessonPage from "./components/CourseLessonPage";
@@ -1743,7 +1744,14 @@ const ExamArea = ({ onBack }) => {
   const navigate = useNavigate();
   const { level, setLevel, accessibleLevels } = useExam();
   const { studentProfile } = useAuth();
-  const examOnlyView = studentProfile?.accountType === "exam_only";
+  const trialExam = React.useContext(TrialExam);
+  const examOnlyView = Boolean(trialExam) || studentProfile?.accountType === "exam_only";
+  const visibleLevels = trialExam
+    ? accessibleLevels.filter((option) => option === String(trialExam.level || studentProfile?.level || "A1").toUpperCase())
+    : accessibleLevels;
+  useEffect(() => {
+    if (trialExam && visibleLevels.length && level !== visibleLevels[0]) setLevel(visibleLevels[0]);
+  }, [trialExam, level, visibleLevels[0], setLevel]);
 
   const lastVisitStorageKey = "falowen_exam_last_visit";
   const lastSectionStorageKey = "falowen_exam_last_section";
@@ -1831,6 +1839,8 @@ const ExamArea = ({ onBack }) => {
     },
   };
   const activeExamHero = examHeroConfig[examSection];
+  const tabLocked = key => Boolean(trialExam && !["overview", "mocks"].includes(key));
+
 
   const openExamSection = (tab) => {
     if (examSection === tab.key && !sampleId) return;
@@ -1849,9 +1859,9 @@ const ExamArea = ({ onBack }) => {
             <button
               key={tab.key}
               style={examSection === tab.key ? styles.navButtonActive : styles.navButton}
-              onClick={() => openExamSection(tab)}
+              disabled={tabLocked(tab.key)} onClick={() => openExamSection(tab)}
             >
-              {tab.label}
+              {tabLocked(tab.key) && "🔒 "}{tab.label}
             </button>
           ))}
         </div>
@@ -1866,8 +1876,8 @@ const ExamArea = ({ onBack }) => {
             <button type="button" onClick={() => { announceExamSuccess("Home opened successfully."); onBack(); }}>← {t("appNav.backHome")}</button>
             {tabs.map((tab) => (
               <button key={tab.key} type="button" aria-current={examSection === tab.key ? "page" : undefined}
-                onClick={() => openExamSection(tab)}>
-                {tab.label}
+                disabled={tabLocked(tab.key)} onClick={() => openExamSection(tab)}>
+                {tabLocked(tab.key) && "🔒 "}{tab.label}
               </button>
             ))}
           </nav>
@@ -1889,7 +1899,7 @@ const ExamArea = ({ onBack }) => {
             </small>
           </div>
           <div role="group" aria-label="Choose exam practice level" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {accessibleLevels.map((option) => (
+            {visibleLevels.map((option) => (
               <button
                 key={option}
                 type="button"
