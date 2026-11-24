@@ -147,3 +147,19 @@ test("payment options show the exam price from the current catalog", async () =>
   expect(screen.getByRole("link", {name:"Choose course"})).toHaveAttribute("href", "/mock/account?choice=full_course");
   expect(screen.getByRole("link", {name:"Choose exam access"})).toHaveAttribute("href", "/mock/checkout");
 });
+
+test('server entitlement opens the designated course-trial mock with other cards locked', async () => {
+  jest.spyOn(global, 'fetch').mockResolvedValue({ok:true, json:async()=>({active:[],entitlements:{exam:{paidLevels:[],trial:{level:'A2',catalogId:'a2-final-01',expiresAtMs:Date.now()+60000}}}})});
+  useAuth.mockReturnValue({user:student,studentProfile:{accountType:'course',level:'A2'}});
+  render(<MemoryRouter initialEntries={['/exams/mocks']}><Routes><Route path="/exams/mocks" element={<MockExamOnlyGate courseTrialState={{active:true,endsAtMs:Date.now()+60000}}><MockExamLibraryPage /></MockExamOnlyGate>} /></Routes></MemoryRouter>);
+  expect(await screen.findByRole('button',{name:'Start or resume mock'})).toBeEnabled();
+  expect(screen.getAllByRole('button',{name:/Locked/}).length).toBeGreaterThan(0);
+});
+
+test('a verified expired entitlement is not reopened by a stale local course trial', async () => {
+  jest.spyOn(global, 'fetch').mockResolvedValue({ok:true, json:async()=>({active:[],entitlements:{exam:{paidLevels:[],trial:null}}})});
+  useAuth.mockReturnValue({user:student,studentProfile:{accountType:'course',level:'A2'}});
+  render(<MemoryRouter initialEntries={['/exams/mocks']}><Routes><Route path="/exams/mocks" element={<MockExamOnlyGate courseTrialState={{active:true,endsAtMs:Date.now()+60000}}><MockExamLibraryPage /></MockExamOnlyGate>} /></Routes></MemoryRouter>);
+  await screen.findByRole('heading',{name:'A2 Mock Exams'});
+  expect(screen.queryByRole('button',{name:'Start or resume mock'})).toBeNull();
+});

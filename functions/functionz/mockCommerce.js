@@ -29,7 +29,7 @@ const safeRedirect = (value) => {
   // Redirect is deliberately fixed; the client may not send an arbitrary callback.
   return "https://exams.falowen.app/mock/complete";
 };
-function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
+function registerMockCommerceRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail }) {
   const db = () => admin.firestore();
   const verified = async (req, res) => {
     const user = await getAuthedUser(req);
@@ -168,8 +168,19 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
       const user = await verified(req, res);
       if (!user) return;
       const active = await activeSubscriptionsFor(db(), user.uid);
+      let entitlements;
+      if (findStudentByCodeOrEmail) {
+        const match = await findStudentByCodeOrEmail({ uid: user.uid, email: user.email });
+        const student = match?.snap?.data();
+        const owns = student && (student.uid ? student.uid === user.uid :
+          user.email_verified === true && user.email && String(student.email || "").toLowerCase() === String(user.email).toLowerCase());
+        // Older students may lack a verified-email marker or a UID on their
+        // sheet-backed record. Preserve their existing subscription response;
+        // only emit profile-derived access after ownership is verified.
+        if (owns) entitlements = require("./entitlementService").resolveEntitlements({ profile: student, identity: user, grants: active });
+      }
       res.set("Cache-Control", "private, no-store");
-      return res.json({ ok: true, active: active.map(({ id, level, packageId, expiresAtMs, scope }) =>
+      return res.json({ ok: true, ...(entitlements ? { entitlements } : {}), active: active.map(({ id, level, packageId, expiresAtMs, scope }) =>
         ({ id, level, packageId, expiresAtMs, scope: scope === "trial" ? "trial" : "level", mockIds: scope === "trial" ? [trialExams[level]?.catalogId] : [...READY_MOCKS[level]] })) });
     } catch (error) {
       console.error("Mock access lookup error", error);
