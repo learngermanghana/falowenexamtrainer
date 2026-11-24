@@ -98,6 +98,7 @@ test.each(["missing", "expired", "revoked", "expired_course", "no_policy"])(
       ["courseAccountAccess/u", {examOnly:true,canRestoreCourse:scenario!=="no_policy"}],
     ]);
     if (["expired","revoked"].includes(scenario)) records.set("mockSubscriptions/u_trial",{uid:"u",level:"A2",scope:"trial",status:scenario==="revoked"?"revoked":"active",expiresAtMs:scenario==="expired"?Date.now()-1000:end,mockIds:["a2-final-01"]});
+    const previousGrant = records.get("mockSubscriptions/u_trial");
     const snapshot = key => ({exists:records.has(key),data:()=>records.get(key)});
     const db = {collection:name=>({
       doc:id=>({key:name+"/"+id}),
@@ -118,7 +119,7 @@ test.each(["missing", "expired", "revoked", "expired_course", "no_policy"])(
       expect(records.get("mockSubscriptions/u_trial").expiresAtMs).toBe(end);
     }else{
       expect(result.entitlements.exam.trial).toBeNull();
-      if(scenario==="expired"||scenario==="revoked")expect(records.get("mockSubscriptions/u_trial").expiresAtMs).toBe(scenario==="revoked"?end:expect.any(Number));
+      if(scenario==="expired"||scenario==="revoked")expect(records.get("mockSubscriptions/u_trial")).toEqual(previousGrant);
       else expect(records.has("mockSubscriptions/u_trial")).toBe(false);
     }
   }
