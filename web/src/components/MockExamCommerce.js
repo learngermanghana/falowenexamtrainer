@@ -30,6 +30,19 @@ const input = { padding: 12, border: "1px solid #bfcbd8", borderRadius: 8, font:
 const button = { border: 0, background: "#0b776e", color: "white", padding: "13px 19px", borderRadius: 9, font: "inherit", cursor: "pointer", fontWeight: 800 };
 const format = (amount) => `GH₵${amount}`;
 
+export function PaymentNavigation() {
+  const { studentProfile } = useAuth();
+  const examOnly = studentProfile?.accountType === "exam_only";
+  return <nav aria-label="Student navigation" style={{display: "flex", flexWrap: "wrap", gap: "8px 18px", marginBottom: 20}}>
+    {!examOnly && (isMockPortal() ? <a href="https://www.falowen.app/campus">Home</a> : <Link to="/campus">Home</Link>)}
+    {!examOnly && (isMockPortal() ? <a href="https://www.falowen.app/campus/course">Course Book</a> : <Link to="/campus/course">Course Book</Link>)}
+    <Link to="/exams/overview">Exams Room</Link>
+    {!examOnly && isMockPortal() ? <a href="https://www.falowen.app/campus/account?tab=billing">Account</a>
+      : <Link to={examOnly ? "/mock/account" : "/campus/account?tab=billing"}>Account</Link>}
+    <Link to="/mock/payment">Payment options</Link>
+  </nav>;
+}
+
 export function PaymentOptionsPage() {
   const { user, studentProfile, loading } = useAuth();
   if (loading) return <p role="status">Loading your account…</p>;
@@ -40,6 +53,7 @@ export function PaymentOptionsPage() {
   const fullCourseLink = examOnly ? "/mock/account?choice=full_course" : "/campus/account?tab=billing";
   const examLink = switchToExam ? "/mock/account?choice=exam_preparation" : "/mock/checkout";
   return <main style={card}>
+    <PaymentNavigation />
     <h1>Choose how to continue</h1>
     <p>Choose the access that suits your learning. You can review the price before paying.</p>
     <section style={{...card, margin: "16px 0", padding: 20}}>
@@ -148,8 +162,8 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
   };
   if (!user) return <Navigate to="/login/" replace />;
   return <main style={card}>
-    <a href="/" style={{ color: "#0b776e" }}>← Falowen Exams</a>
-    <p><Link to="/mock/payment">Compare payment options</Link> · <Link to="/mock/account">Manage course type</Link></p>
+    <PaymentNavigation />
+    <p><Link to="/mock/payment">← Back to payment options</Link></p>
     <h1>{paymentReturn ? "Monthly access confirmation" : "Your monthly exam subscription"}</h1>
     {paymentReturn && <p>Paystack has returned you to Falowen. Access appears below only after the signed payment notification is confirmed. Refresh this page if the payment is still processing.</p>}
     {access.length > 0 && <div style={{ padding: 14, background:"#e6f8f0", borderRadius:10 }}>
