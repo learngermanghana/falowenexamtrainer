@@ -1,0 +1,18 @@
+.fw-plans { max-width: 1120px; margin: 0 auto; padding: 32px 24px 64px; font-family: Inter, Arial, sans-serif; color: #17332d; }
+.fw-plans-nav { margin-bottom: 28px; }
+.fw-plans-hero { max-width: 670px; margin-bottom: 32px; }
+.fw-plans-eyebrow { color: #168267; text-transform: uppercase; letter-spacing: .12em; font-size: 12px; font-weight: 800; }
+.fw-plans h1 { font-size: clamp(32px, 5vw, 50px); line-height: 1.08; margin: 10px 0 14px; letter-spacing: -.035em; }
+.fw-plans-intro { color: #53665f; line-height: 1.6; font-size: 16px; }
+.fw-plans-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.fw-plan { background: #fff; border: 1px solid #dce9e2; border-radius: 22px; padding: 28px; display: flex; flex-direction: column; box-shadow: 0 12px 32px rgba(24,67,50,.07); }
+.fw-plan--course { background: #f0f8f3; border-color: #acd9c1; }
+.fw-plan h2 { font-size: 23px; margin: 0 0 10px; }
+.fw-plan-price { font-size: 34px; font-weight: 800; letter-spacing: -.03em; margin: 10px 0 0; }
+.fw-plan-subtitle { color: #52665d; margin: 2px 0 12px; }
+.fw-plan ul { list-style: none; margin: 12px 0 26px; padding: 0; display: grid; gap: 12px; flex: 1; }
+.fw-plan li:before { content: '✓'; color: #0d8a63; margin-right: 10px; font-weight: 800; }
+.fw-plan a { display: block; text-align: center; text-decoration: none; font-weight: 750; border-radius: 12px; padding: 14px; background: #116e57; color: white; }
+.fw-plan--exam a { background: #fff; color: #116e57; border: 1px solid #116e57; }
+.fw-plan-note { color: #5c6d65; font-size: 13px; line-height: 1.5; }
+@media(max-width: 700px) { .fw-plans { padding: 24px 16px 40px; } .fw-plans-grid { grid-template-columns: 1fr; } .fw-plan { padding: 23px; } }

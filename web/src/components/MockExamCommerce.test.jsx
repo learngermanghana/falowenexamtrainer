@@ -41,7 +41,7 @@ function openPage(path) {
 function mockApi(active = []) {
   return jest.spyOn(global, "fetch").mockImplementation(async (path, options) => {
     const response = {
-      "/mock/catalog": { levels: [{ level: "A2", packages: [{ priceGhs: 99 }] }] },
+      "/mock/catalog": { levels: [{ level: "A2", packages: [{ id: "monthly", priceGhs: 99, days: 30 }] }] },
       "/mock/register": { ok: true, trial: true },
       "/mock/access": { active },
     };
@@ -65,28 +65,11 @@ test("checkout sends signed-out students to login", async () => {
   expect(await screen.findByRole("heading", { name: "Student login" })).toBeVisible();
 });
 
-test("a new student can register for A2 and reach the included trial before checkout", async () => {
-  const api = mockApi([{ level: "A2", scope: "trial", expiresAtMs: Date.now() + 86400000 }]);
-  const refreshStudentProfile = jest.fn(async () => {
-    useAuth.mockReturnValue({ user: student, studentProfile: profile });
-  });
-  useAuth.mockReturnValue({ user: null, refreshStudentProfile });
-  createUserWithEmailAndPassword.mockResolvedValue({ user: student });
+test("legacy registration points to the unified Falowen signup", () => {
+  useAuth.mockReturnValue({ user: null });
   openPage("/mock/register");
-  fireEvent.change(screen.getByLabelText("Full name"), { target: { value: "Test Student" } });
-  fireEvent.change(screen.getByLabelText("Email"), { target: { value: "Exam@Example.org" } });
-  fireEvent.change(screen.getByLabelText("Password"), { target: { value: "test-only-pass" } });
-  fireEvent.change(screen.getByLabelText("Exam level"), { target: { value: "A2" } });
-  fireEvent.click(screen.getByRole("button", { name: "Create exam account" }));
-
-  expect(await screen.findByRole("button", { name: "Start or resume mock" })).toBeEnabled();
-  expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(expect.anything(), "exam@example.org", "test-only-pass");
-  expect(api).toHaveBeenCalledWith("/mock/register", expect.objectContaining({
-    method: "POST", body: JSON.stringify({ name: "Test Student", level: "A2" }),
-  }));
-  expect(student.getIdToken).toHaveBeenCalledWith(true);
-  expect(screen.getAllByRole("button", { name: /Locked/ })[0]).toBeDisabled();
-  expect(screen.queryByRole("link", { name: /Open Exams Room/ })).toBeNull();
+  expect(screen.getByRole("link", { name: "Continue to signup" })).toHaveAttribute("href", "https://www.falowen.app/signup");
+  expect(screen.queryByLabelText("Exam level")).toBeNull();
 });
 
 test.each([
@@ -135,14 +118,14 @@ test.each([
 test("exam-only students can choose a full course or review exam checkout", () => {
   useAuth.mockReturnValue({ user: student, studentProfile: profile });
   openPage("/mock/payment");
-  expect(screen.getByRole("link", {name: "Continue to course billing"})).toHaveAttribute("href", "/mock/account?choice=full_course");
-  expect(screen.getByRole("link", {name: "Continue to exam preparation"})).toHaveAttribute("href", "/mock/checkout");
+  expect(screen.getByRole("link", {name: "Choose course"})).toHaveAttribute("href", "/mock/account?choice=full_course");
+  expect(screen.getByRole("link", {name: "Choose exam access"})).toHaveAttribute("href", "/mock/checkout");
 });
 
 test("course trial students switch account type before exam checkout", () => {
   useAuth.mockReturnValue({ user: student, studentProfile: {accountType: "course", level: "A2", trialStatus: "active", trialEndsAt: new Date(Date.now() + 86400000).toISOString()} });
   openPage("/mock/payment");
-  expect(screen.getByRole("link", {name: "Continue to exam preparation"})).toHaveAttribute("href", "/mock/account?choice=exam_preparation");
+  expect(screen.getByRole("link", {name: "Choose exam access"})).toHaveAttribute("href", "/mock/account?choice=exam_preparation");
 });
 
 test("unsubscribed exam-only students can browse all mock cards but cannot start them", async () => {
@@ -154,4 +137,13 @@ test("unsubscribed exam-only students can browse all mock cards but cannot start
   expect(locked.length).toBeGreaterThan(0);
   locked.forEach(button => expect(button).toBeDisabled());
   expect(screen.queryByRole("heading", { name: "Choose how to continue" })).toBeNull();
+});
+
+test("payment options show the exam price from the current catalog", async () => {
+  mockApi();
+  useAuth.mockReturnValue({ user: student, studentProfile: profile });
+  openPage("/mock/payment");
+  expect(await screen.findByText("GH₵99")).toBeVisible();
+  expect(screen.getByRole("link", {name:"Choose course"})).toHaveAttribute("href", "/mock/account?choice=full_course");
+  expect(screen.getByRole("link", {name:"Choose exam access"})).toHaveAttribute("href", "/mock/checkout");
 });

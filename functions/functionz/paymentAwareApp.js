@@ -880,7 +880,7 @@ app.use(async (req, res, next) => {
     if (!allowed) return res.status(403).json({ error: "Exam-only accounts cannot use course services." });
     const { activeSubscriptionsFor, READY_MOCKS } = require("./mockCommerce");
     const grants = await activeSubscriptionsFor(admin.firestore(), identity.uid);
-    const active = grants.filter(row => row.scope !== "trial");
+    const active = require("./entitlementService").paidExamGrants(grants);
     if (!active.length && grants.length) return next(); // Trial requests are checked against the designated paper in the legacy handler.
     if (!active.length) return res.status(403).json({ error: "Activate a monthly exam subscription before using this service." });
     const requestedLevel = (path.match(/^\/(a1|a2|b1|b2)-mock\//i)?.[1]
