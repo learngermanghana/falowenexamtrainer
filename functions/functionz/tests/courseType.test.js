@@ -1,4 +1,4 @@
-const { registerCourseTypeRoutes, processCourseTypeWebhook } = require("../courseType");
+const { registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition } = require("../courseType");
 
 function fixture(student) {
   const records = new Map([["students/student", { uid: "student", role: "student", level: "A1", ...student }]]);
@@ -23,7 +23,7 @@ function fixture(student) {
   const admin = { firestore: Object.assign(() => db, { FieldValue: { serverTimestamp: () => "server" } }) };
   let handle;
   const studentRef = ref("students/student");
-  registerCourseTypeRoutes({ post: (_path, fn) => { handle = fn; } }, {
+  registerCourseTypeRoutes({ post: (path, fn) => { if (path === "/account/course-type") handle = fn; } }, {
     admin,
     getAuthedUser: async (req) => req.user,
     findStudentByCodeOrEmail: async () => ({ ref: studentRef, snap: await studentRef.get() }),
@@ -90,4 +90,15 @@ test("only a matching successful tuition order activates a new course once", asy
   });
   expect(records.get("courseAccountAccess/student")).toMatchObject({ examOnly: false });
   expect(records.get("mockSubscriptions/student_A1")).toEqual({ scope: "level", status: "active" });
+});
+
+test("admin transition preserves payment history and only restores an existing enrollment", () => {
+  const billing = student => ({ paidSoFar: student.paid || 0 });
+  expect(adminCourseTypeTransition({ paid: 0, balanceDue: 3000, trialEndsAt: "original" }, null, "exam_preparation", billing)).toEqual({
+    updates: { courseType: "exam_preparation", accountType: "exam_only", courseEnrollmentPreserved: true },
+    policy: { examOnly: true, canRestoreCourse: true },
+  });
+  expect(adminCourseTypeTransition({ paid: 1000 }, null, "exam_preparation", billing).updates.accountType).toBe("course");
+  expect(adminCourseTypeTransition({ accountType: "exam_only" }, { examOnly: true, canRestoreCourse: false }, "full_course", billing).status).toBe(409);
+  expect(adminCourseTypeTransition({ accountType: "exam_only" }, { examOnly: true, canRestoreCourse: true }, "full_course", billing).updates.accountType).toBe("course");
 });
