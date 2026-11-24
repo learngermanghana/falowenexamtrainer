@@ -16,6 +16,20 @@ function ownsStudent(snapshot, user) {
     String(student.email || "").toLowerCase() === user.email.toLowerCase();
 }
 
+
+async function preserveCourseExamTrial(tx, db, student, uid, canRestoreCourse, now = Date.now()) {
+  if (!canRestoreCourse || student.accountType === "exam_only" || student.program === "swahili" ||
+      student.secondaryProgram === "swahili" || student.examTrialStartedAt) return;
+  const trial = require("./trialExams.json")[student.level];
+  const end = require("./entitlementService").courseExpiry(student);
+  if (!trial || !Number.isFinite(end) || end <= now) return;
+  const ref = db.collection("mockSubscriptions").doc(uid + "_trial");
+  const prior = await tx.get(ref);
+  if (prior.exists || prior.data()) return; // never restart a used or expired exam trial
+  tx.create(ref, { uid, level: student.level, scope: "trial", status: "active",
+    expiresAtMs: end, mockIds: [trial.catalogId], source: "preserved_course_trial" });
+}
+
 function registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling }) {
   registerAdminCourseTypeRoute(app, { admin, normalizeStudentBilling });
   app.post("/account/course-type", async (req, res) => {
@@ -49,6 +63,7 @@ function registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCode
           const canRestoreCourse = !examOnly || policy?.canRestoreCourse === true;
           const keepCourse = canRestoreCourse && (paidSoFar > 0 || student.accessType === "complimentary" ||
             student.institutionVerification === "approved" || student.paymentStatus === "paid");
+          if (!keepCourse) await preserveCourseExamTrial(tx, db, student, user.uid, canRestoreCourse);
           tx.set(access, { examOnly: !keepCourse, canRestoreCourse });
           tx.update(match.ref, { courseType, accountType: keepCourse ? "course" : "exam_only", courseEnrollmentPreserved: canRestoreCourse, updated_at: timestamp() });
           return { courseType, checkout: "exam" };
@@ -238,6 +253,9 @@ function registerAdminCourseTypeRoute(app, { admin, normalizeStudentBilling }) {
         const transition = adminCourseTypeTransition(student, policy, courseType, normalizeStudentBilling);
         if (transition.error) return transition;
         const timestamp = admin.firestore.FieldValue.serverTimestamp();
+        if (courseType === "exam_preparation" && transition.policy.examOnly) {
+          await preserveCourseExamTrial(tx, db, student, uid, transition.policy.canRestoreCourse);
+        }
         tx.set(access, transition.policy, { merge: true });
         tx.update(ref, { ...transition.updates, updated_at: timestamp });
         tx.create(audit, { studentId: id, uid, actorUid: actor.uid, previousCourseType: current,
@@ -254,4 +272,4 @@ function registerAdminCourseTypeRoute(app, { admin, normalizeStudentBilling }) {
   });
 }
 
-module.exports = { PRODUCT, accessRef, registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition };
+module.exports = { PRODUCT, accessRef, registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition, preserveCourseExamTrial };
