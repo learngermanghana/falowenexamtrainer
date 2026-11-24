@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import SpeakingExamIntroPage from "./SpeakingExamIntroPage";
 import { ExamProvider } from "../context/ExamContext";
 
@@ -17,12 +18,15 @@ export const buildA1SpeakingExamIntroHubDestination = (search = "") => {
 };
 
 export default function A1SpeakingExamIntroEntryRoute() {
+  const { search } = useLocation();
+  const view = new URLSearchParams(search).get("view");
+  const initialTab = view === "workbook" ? "workbook" : view === "ai-practice" ? "ai-practice" : "overview";
   // Day 15 was originally a stable dedicated page. Keep it outside the
   // generic chapter hub and its DOM injectors. The route-scoped A1 Radio
   // service owns the one-time Radio gate; this component owns only the page.
   return (
     <ExamProvider>
-      <SpeakingExamIntroPage />
+      <SpeakingExamIntroPage initialTab={initialTab} />
     </ExamProvider>
   );
 }

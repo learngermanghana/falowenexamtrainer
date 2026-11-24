@@ -14,10 +14,10 @@ jest.mock("../context/AuthContext", () => ({
   useAuth: () => ({ studentProfile: null, saveStudentProfile: jest.fn() }),
 }));
 
-jest.mock("./SpeakingExamIntroPage", () => function SpeakingWorkbookProbe() {
+jest.mock("./SpeakingExamIntroPage", () => function SpeakingWorkbookProbe({ initialTab }) {
   const { useExam } = require("../context/ExamContext");
   const { level } = useExam();
-  return <div data-testid="speaking-workbook">Speaking workbook ({level})</div>;
+  return <div data-testid="speaking-workbook" data-initial-tab={initialTab}>Speaking workbook ({level})</div>;
 });
 
 describe("A1 speaking-exam self-learning entry flow", () => {
@@ -45,6 +45,7 @@ describe("A1 speaking-exam self-learning entry flow", () => {
     );
 
     expect(screen.getByTestId("speaking-workbook")).toHaveTextContent("Speaking workbook (A1)");
+    expect(screen.getByTestId("speaking-workbook")).toHaveAttribute("data-initial-tab","workbook");
   });
 
   test("does not redirect the dedicated page back into the generic lesson hub", () => {
@@ -55,6 +56,7 @@ describe("A1 speaking-exam self-learning entry flow", () => {
     );
 
     expect(screen.getByTestId("speaking-workbook")).toHaveTextContent("Speaking workbook (A1)");
+    expect(screen.getByTestId("speaking-workbook")).toHaveAttribute("data-initial-tab","overview");
   });
 
   test("the supporting hub contains teacher and AI videos plus a separate workbook link", () => {

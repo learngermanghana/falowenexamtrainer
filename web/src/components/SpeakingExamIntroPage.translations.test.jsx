@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, fireEvent } from "@testing-library/react";
 import SpeakingExamIntroPage from "./SpeakingExamIntroPage";
 
 jest.mock("./navigation/AppBackButton", () => function BackButton() {
@@ -7,7 +7,7 @@ jest.mock("./navigation/AppBackButton", () => function BackButton() {
 });
 
 describe("A1 Day 15 · Speaking Exam Intro English support", () => {
-  beforeEach(() => render(<SpeakingExamIntroPage />));
+  beforeEach(() => render(<SpeakingExamIntroPage initialTab="workbook" />));
 
   test.each([
     ["Flasche", "bottle", "öffnen", "open"],
@@ -43,8 +43,9 @@ describe("A1 Day 15 · Speaking Exam Intro English support", () => {
     expect(screen.getByRole("heading", { name: "Sie-Imperativ with the same exam verbs" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Accept or refuse politely" })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Question with können" })).toBeInTheDocument();
-    expect(screen.getByTitle("Teacher lecture: Introduction to the Goethe A1 Speaking Exam")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Open official Goethe A1 speaking practice" }))
       .toHaveAttribute("href", "https://bfu.goethe.de/a1_sd1/sprechen.php");
+    fireEvent.click(screen.getByRole("tab", { name: "Overview" }));
+    expect(screen.getByTitle("Video lesson: Introduction to the Goethe A1 Speaking Exam")).toBeInTheDocument();
   });
 });

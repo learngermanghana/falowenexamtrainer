@@ -1,7 +1,14 @@
-import React from "react";
+import React, { lazy, Suspense, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import A1ExamObjectPicture from "./A1ExamObjectPicture";
 import { styles } from "../styles";
+
+const A1Teil3SpeakingPracticePanel = lazy(() => import("./A1Teil3SpeakingPracticePanel"));
+const tabs = [
+  { id: "overview", label: "Overview" },
+  { id: "workbook", label: "Workbook" },
+  { id: "ai-practice", label: "AI Practice" },
+];
 
 const card = {
   ...styles.card,
@@ -44,7 +51,13 @@ const examCardVerbs = [
   ["Formular", "form", "unterschreiben", "sign", "Können Sie bitte das Formular unterschreiben?", "Unterschreiben Sie bitte das Formular.", "Ja, gern."],
 ];
 
-const SpeakingExamIntroPage = () => (
+const SpeakingExamIntroPage = ({ initialTab = "overview" }) => {
+  const [activeTab, setActiveTab] = useState(() => tabs.some(tab => tab.id === initialTab) ? initialTab : "overview");
+  const chooseTab = (id, focus = false) => {
+    setActiveTab(id);
+    if (focus) document.getElementById("speaking-intro-tab-" + id)?.focus();
+  };
+  return (
   <main style={{ ...styles.container, display: "grid", gap: 16, maxWidth: 1080 }}>
     <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
       <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
@@ -60,14 +73,31 @@ const SpeakingExamIntroPage = () => (
       </p>
     </header>
 
-    <Section eyebrow="Teacher lecture" title="Introduction to the speaking exam">
+    <div role="tablist" aria-label="Speaking lesson sections" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 6, padding: 6, background: "#f1f5f9", borderRadius: 12 }}>
+      {tabs.map((tab, index) => (
+        <button key={tab.id} type="button" role="tab" id={"speaking-intro-tab-" + tab.id}
+          aria-selected={activeTab === tab.id} aria-controls={"speaking-intro-panel-" + tab.id}
+          tabIndex={activeTab === tab.id ? 0 : -1}
+          onClick={() => chooseTab(tab.id)}
+          onKeyDown={event => {
+            const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : event.key === "ArrowRight" ? (index + 1) % tabs.length : event.key === "ArrowLeft" ? (index + tabs.length - 1) % tabs.length : -1;
+            if (next >= 0) { event.preventDefault(); chooseTab(tabs[next].id, true); }
+          }}
+          style={{ border: "1px solid " + (activeTab === tab.id ? "#4338ca" : "#cbd5e1"), background: activeTab === tab.id ? "#4338ca" : "#fff", color: activeTab === tab.id ? "#fff" : "#334155", borderRadius: 8, padding: "12px 5px", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>
+          {tab.label}
+        </button>
+      ))}
+    </div>
+
+    {activeTab === "overview" && <div role="tabpanel" id="speaking-intro-panel-overview" aria-labelledby="speaking-intro-tab-overview" style={{ display: "grid", gap: 16 }}>
+    <Section eyebrow="Video lesson" title="Introduction to the speaking exam">
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Watch the teacher lecture first. It introduces the speaking exam before you work through the notes and illustrated picture-card examples below.
+        Watch the video, then open Workbook to study the notes and illustrated picture cards. Use AI Practice when you are ready to speak.
       </p>
       <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 14, overflow: "hidden", background: "#0f172a" }}>
         <iframe
-          src="https://www.youtube-nocookie.com/embed/MPDY2x3suW8?rel=0"
-          title="Teacher lecture: Introduction to the Goethe A1 Speaking Exam"
+          src="https://www.youtube-nocookie.com/embed/TKJk3hF76qw?rel=0"
+          title="Video lesson: Introduction to the Goethe A1 Speaking Exam"
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
@@ -76,15 +106,29 @@ const SpeakingExamIntroPage = () => (
         />
       </div>
       <a
-        href="https://youtu.be/MPDY2x3suW8"
+        href="https://youtu.be/TKJk3hF76qw"
         target="_blank"
         rel="noreferrer"
         style={{ color: "#3730a3", fontWeight: 800, width: "fit-content" }}
       >
-        Open teacher lecture on YouTube
+        Open video on YouTube
       </a>
+      <a href="https://youtu.be/MPDY2x3suW8" target="_blank" rel="noreferrer" style={{ color: "#475569", fontSize: 14, width: "fit-content" }}>Watch the previous teacher lecture</a>
     </Section>
 
+    <Section eyebrow="Today's targets" title="By the end of this lesson, you should be able to">
+      <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
+        <li>name the three parts of the Goethe A1 speaking exam;</li>
+        <li>choose a useful action verb for an everyday-object card, such as <strong>öffnen, geben</strong> or <strong>bringen</strong>;</li>
+        <li>make a polite formal request using <strong>Können Sie bitte ...?</strong> or the Sie-imperative;</li>
+        <li>accept or refuse a simple request politely.</li>
+      </ol>
+    </Section>
+
+    <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => chooseTab("workbook", true)}>Open Workbook</button>
+    </div>}
+
+    {activeTab === "workbook" && <div role="tabpanel" id="speaking-intro-panel-workbook" aria-labelledby="speaking-intro-tab-workbook" style={{ display: "grid", gap: 16 }}>
     <Section eyebrow="Big picture" title="The three speaking parts">
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
@@ -105,15 +149,6 @@ const SpeakingExamIntroPage = () => (
       <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", borderRadius: 10, padding: 12, lineHeight: 1.65 }}>
         <strong>Today’s focus:</strong> Teil 3. You are not expected to master every speaking part in one lesson; this page gives you the map first, then trains one part properly.
       </div>
-    </Section>
-
-    <Section eyebrow="Today's targets" title="By the end of this lesson, you should be able to">
-      <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
-        <li>name the three parts of the Goethe A1 speaking exam;</li>
-        <li>choose a useful action verb for an everyday-object card, such as <strong>öffnen, geben</strong> or <strong>bringen</strong>;</li>
-        <li>make a polite formal request using <strong>Können Sie bitte ...?</strong> or the Sie-imperative;</li>
-        <li>accept or refuse a simple request politely.</li>
-      </ol>
     </Section>
 
     <Section eyebrow="Teil 3 core" title="Picture-card verbs you really need">
@@ -229,7 +264,17 @@ const SpeakingExamIntroPage = () => (
         <li>Respond naturally with a short acceptance or refusal.</li>
       </ul>
     </Section>
+    <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => chooseTab("ai-practice", true)}>Continue to AI Practice</button>
+    </div>}
+
+    {activeTab === "ai-practice" && <div role="tabpanel" id="speaking-intro-panel-ai-practice" aria-labelledby="speaking-intro-tab-ai-practice" style={{ display: "grid", gap: 16 }}>
+      <Suspense fallback={<p role="status">Loading AI speaking practice…</p>}>
+        <A1Teil3SpeakingPracticePanel />
+      </Suspense>
+      <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => chooseTab("workbook", true)}>Back to Workbook</button>
+    </div>}
   </main>
-);
+  );
+};
 
 export default SpeakingExamIntroPage;
