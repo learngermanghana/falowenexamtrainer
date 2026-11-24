@@ -59,23 +59,23 @@ export const listeningDialogue = [
 ];
 export const listeningQuestions = [
   {
-    "id": "listen-plastic",
+    "id": "listen-plastic", "choices": ["Kwa sababu mifuko ya nailoni inachafua mazingira.","Kwa sababu mifuko ya nailoni ni migumu kupata.","Kwa sababu vikapu vya kusuka ni vya matumizi ya mara moja."],
     "prompt": "Kwa nini Juma anataka kupunguza matumizi ya mifuko ya nailoni?"
   },
   {
-    "id": "listen-baskets",
+    "id": "listen-baskets", "choices": ["Ni vyepesi sana na vinatupwa baada ya matumizi.","Ni vidogo na vinahitaji kubadilishwa kila wiki.","Ni imara na vinaweza kudumu kwa miaka mingi bila kuchanika."],
     "prompt": "Juma anataja faida gani mbili za vikapu vya kusuka?"
   },
   {
-    "id": "listen-ready",
+    "id": "listen-ready", "choices": ["Kwenye duka la karibu.","Kwenye mkoba wake au gari.","Katika kabati la jikoni pekee."],
     "prompt": "Juma anapendekeza Amina aweke kikapu kidogo wapi ili kiwe tayari kila wakati?"
   },
   {
-    "id": "listen-bottles",
+    "id": "listen-bottles", "choices": ["Kwa sababu inaweza kujazwa tena badala ya kununua maji kila siku, hivyo kuokoa pesa kwa mwezi mzima.","Kwa sababu chupa ya chuma hutupwa baada ya matumizi.","Kwa sababu chupa ya chuma haihitaji kujazwa maji."],
     "prompt": "Kwa nini kununua chupa ya chuma kunaweza kuwa nafuu kwa muda mrefu?"
   },
   {
-    "id": "listen-change",
+    "id": "listen-change", "choices": ["Ataendelea kununua maji kwenye chupa za plastiki kila siku.","Ataacha kutumia vikapu na kununua mifuko mingi ya nailoni.","Atabadilisha tabia yake ya ununuzi na kuanza kutumia chupa yake ya chuma."],
     "prompt": "Amina anaamua kubadili tabia gani kuanzia kesho?"
   }
 ];
@@ -87,27 +87,27 @@ export const readingPassage = [
 ];
 export const readingQuestions = [
   {
-    "id": "read-importance",
+    "id": "read-importance", "choices": ["Kwa sababu mazingira safi huongeza gharama za maisha.","Kwa sababu mazingira safi na salama huwezesha binadamu na viumbe wengine kuishi kwa afya njema, na husaidia kupunguza mabadiliko ya tabianchi.","Kwa sababu kutunza mazingira ni jukumu la serikali pekee."],
     "prompt": "Ni kwa nini kutunza mazingira ni jukumu muhimu katika maisha ya kila siku?",
     "english": "Why is caring for the environment an important duty in daily life?"
   },
   {
-    "id": "read-challenges",
+    "id": "read-challenges", "choices": ["Mabadiliko ya tabianchi na kuongezeka kwa magonjwa.","Ukosefu wa ajira na ongezeko la bei.","Upungufu wa usafiri na makazi."],
     "prompt": "Ni changamoto gani mbili kuu zinazotokana na uchafuzi wa mazingira kulingana na maandishi?",
     "english": "What two main challenges result from environmental pollution according to the text?"
   },
   {
-    "id": "read-waste",
+    "id": "read-waste", "choices": ["Kuchanganya taka zote na kuzitupa pamoja.","Kutumia mifuko mingi ya plastiki na kuchoma taka zote.","Kupunguza matumizi ya plastiki, kurejeleza taka, na kutenganisha taka za kikaboni na zile zisizooza badala ya kutupa ovyo."],
     "prompt": "Insha inatoa ushauri gani kuhusu usimamizi wa taka nyumbani?",
     "english": "What advice does the essay give regarding waste management at home?"
   },
   {
-    "id": "read-energy",
+    "id": "read-energy", "choices": ["Huongeza matumizi ya nishati na rasilimali.","Husaidia kutumia nishati kwa busara na kuokoa rasilimali.","Hufanya vifaa vya umeme vitumie nishati zaidi."],
     "prompt": "Kuzima taa na vyombo vya umeme husaidiaje katika hifadhi ya mazingira?",
     "english": "How does turning off lights and electrical appliances help in environmental preservation?"
   },
   {
-    "id": "read-connector",
+    "id": "read-connector", "choices": ["Hata hivyo.","Kwa hitimisho.","Kwa sababu hiyo."],
     "prompt": "Neno gani la kuunganisha sentensi lililotumiwa kuonyesha matokeo au sababu katika aya ya kwanza?",
     "english": "Which linking word was used to show consequence/reason in the first paragraph?"
   }

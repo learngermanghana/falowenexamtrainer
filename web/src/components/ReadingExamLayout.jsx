@@ -42,6 +42,7 @@ export function ReadingExamFrame({
   format = "",
   strategy = "",
   variant = "document",
+  language = "de",
   children,
 }) {
   return (
@@ -80,13 +81,13 @@ export function ReadingExamFrame({
               textTransform: "uppercase",
             }}
           >
-            {level ? `${level} · Lesen` : "Lesen"}
+            {level ? `${level} · ${language === "sw" ? "Kusoma" : "Lesen"}` : language === "sw" ? "Kusoma" : "Lesen"}
           </span>
           {title ? <strong style={{ fontSize: 17, color: "#0f172a" }}>{title}</strong> : null}
           {format ? <span style={{ color: "#475569", fontSize: 13 }}>{format}</span> : null}
         </div>
         <span style={{ color: "#64748b", fontSize: 12, fontWeight: 800 }}>
-          {variant === "sources" ? "Quellen vergleichen" : "Text lesen · Aufgaben lösen"}
+          {language === "sw" ? "Soma maandishi · Jibu maswali" : variant === "sources" ? "Quellen vergleichen" : "Text lesen · Aufgaben lösen"}
         </span>
       </header>
 

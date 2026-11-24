@@ -1,3 +1,4 @@
+import { allObjectiveQuestionsAnswered } from "./SwahiliObjectiveQuestions";
 import WorkbookDayMusic from "./WorkbookDayMusic";
 import React, { useState, useEffect } from "react";
 import SwahiliB1Day28Listening, { listeningQuestions } from "./SwahiliB1Day28Listening";
@@ -127,8 +128,8 @@ export default function SwahiliB1Day28Workbook({ uid }) {
   const [loadingWork, setLoadingWork] = useState(true);
   const missing = [
     !writing.trim() && "2 · Kuandika",
-    readingQuestions.some(({ id }) => !reading[id]?.trim()) && "3 · Kusoma",
-    listeningQuestions.some(({ id }) => !listening[id]?.trim()) && "4 · Kusikiliza",
+    !allObjectiveQuestionsAnswered(readingQuestions, reading) && "3 · Kusoma",
+    !allObjectiveQuestionsAnswered(listeningQuestions, listening) && "4 · Kusikiliza",
   ].filter(Boolean);
 
   useEffect(() => {

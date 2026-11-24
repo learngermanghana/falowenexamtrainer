@@ -1,3 +1,5 @@
+import SwahiliObjectiveQuestions, { allObjectiveQuestionsAnswered } from "./SwahiliObjectiveQuestions";
+import { ReadingExamFrame, ReadingExamDocument } from "./ReadingExamLayout";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -12,14 +14,6 @@ import SwahiliReviewDraft, { SwahiliFinalSubmit } from "./SwahiliReviewDraft";
 import "./SwahiliCourseBook.css";
 
 const tabs = SWAHILI_B1_WORKBOOK_TABS;
-function Questions({questions, answers, update, review = false}) {
-  return <ol>{questions.map(({id,prompt,english}) => <li key={id}>
-    <label htmlFor={review ? undefined : id}>{prompt}</label>
-    {english && <p lang="en">{english}</p>}
-    {review ? <p>{answers[id] || "Hakuna jibu"}</p> :
-      <textarea id={id} rows={3} value={answers[id] || ""} onChange={event => update(id,event.target.value)} />}
-  </li>)}</ol>;
-}
 export default function SwahiliB1Day27Workbook({uid}) {
   const {user,studentProfile} = useAuth();
   const canSubmit = canSubmitSwahiliWorkbook({user,studentProfile}) && uid === user?.uid;
@@ -48,7 +42,7 @@ export default function SwahiliB1Day27Workbook({uid}) {
     } catch (error) { setAudio({url:"",loading:false,error:error.message || "Sauti haikupatikana. Jaribu tena."}); }
   }
   const essay = draft.writing?.essay || "";
-  const complete = essay.trim().length > 0 && readingQuestions.every(({id}) => draft.reading?.[id]?.trim()) && listeningQuestions.every(({id}) => draft.listening?.[id]?.trim());
+  const complete = essay.trim().length > 0 && allObjectiveQuestionsAnswered(readingQuestions, draft.reading) && allObjectiveQuestionsAnswered(listeningQuestions, draft.listening);
   useEffect(() => {
     if (!canSubmit || !db) { setLoading(false); return; }
     let active = true;
@@ -83,16 +77,17 @@ export default function SwahiliB1Day27Workbook({uid}) {
       {activeTab==="grammar" && <Day27Grammar />}
       {activeTab==="sprechen" && <Day27Speaking />}
       {activeTab==="schreiben" && <Day27Writing value={essay} onChange={value=>update("writing","essay",value)} />}
-      {activeTab==="lesen" && <><h2>3 · Kusoma</h2><h3>Kutunza Mazingira katika Maisha ya Kila Siku</h3>
+      {activeTab==="lesen" && <><h2>3 · Kusoma</h2><ReadingExamFrame level="B1" language="sw" title="Kutunza Mazingira katika Maisha ya Kila Siku" format="Chagua jibu moja"><ReadingExamDocument label="Maandishi">
         {readingPassage.map((paragraph,index)=><p key={index}>{paragraph}</p>)}
-        <h3>Maswali 5 ya Ufahamu</h3><Questions questions={readingQuestions} answers={draft.reading || {}} update={(id,value)=>update("reading",id,value)} /></>}
+        </ReadingExamDocument></ReadingExamFrame>
+        <h3>Maswali 5 ya Ufahamu</h3><SwahiliObjectiveQuestions questions={readingQuestions} answers={draft.reading || {}} onAnswer={(id,value)=>update("reading",id,value)} groupName="reading" /></>}
       {activeTab==="hoeren" && <><h2>4 · Kusikiliza</h2>
-        <p>Sikiliza mazungumzo ya Amina na Juma mara mbili, kisha jibu maswali kwa Kiswahili.</p>
+        <p>Sikiliza mazungumzo ya Amina na Juma mara mbili, kisha chagua jibu moja kwa kila swali.</p>
         {audio.url ? <audio controls preload="none" src={audio.url} aria-label="Mazungumzo ya Amina na Juma" onError={()=>setAudio({url:"",loading:false,error:"Sauti haikupatikana. Jaribu tena."})} /> :
           <button type="button" disabled={audio.loading} onClick={loadAudio}>{audio.loading ? "Inapakia…" : "Pakua sauti ili usikilize"}</button>}
         {audio.error && <p role="alert">{audio.error}</p>}
         <details><summary>Maandishi ya mazungumzo · Soma baada ya kusikiliza</summary>{listeningDialogue.map(([speaker,line],index)=><p key={index}><strong>{speaker}:</strong> {line}</p>)}</details>
-        <h3>Maswali 5 ya Kusikiliza</h3><Questions questions={listeningQuestions} answers={draft.listening || {}} update={(id,value)=>update("listening",id,value)} /></>}
+        <h3>Maswali 5 ya Kusikiliza</h3><SwahiliObjectiveQuestions questions={listeningQuestions} answers={draft.listening || {}} onAnswer={(id,value)=>update("listening",id,value)} groupName="listening" /></>}
       {activeTab==="submit" && <><h2>Kagua na uwasilishe kazi</h2>
         {submitted && <p>Kazi iliyowasilishwa awali inaweza kusasishwa.</p>}
         <SwahiliReviewDraft writing={{"Insha au ripoti":essay}} questions={readingQuestions} reading={draft.reading || {}} listeningQuestions={listeningQuestions} listening={draft.listening || {}} />
