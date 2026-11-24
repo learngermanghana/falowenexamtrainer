@@ -19,19 +19,20 @@ describe("Falowen signed-in homepage", () => {
     const metrics = dashboard.indexOf("<HomeMetrics");
     const footer = dashboard.indexOf("<LegalFooter");
     expect(access).toBeGreaterThan(0);
-    expect(highlights).toBeGreaterThan(access);
-    expect(metrics).toBeGreaterThan(highlights);
+    expect(highlights).toBe(-1);
+    expect(metrics).toBeGreaterThan(access);
     expect(footer).toBeGreaterThan(metrics);
     expect(dashboard).not.toContain("homepageCompact");
     expect(dashboard).not.toContain("<HomepageBooksCarousel");
     expect(dashboard).not.toContain("falowen-home-discover");
   });
 
-  test("highlights reuse assigned class identity and student level", () => {
+  test("the schedule retains assigned class identity without highlights", () => {
     const home = read("./GeneralHome.js");
     expect(home).toContain("className={preferredClass}");
     expect(home).toContain("classId={preferredClassId}");
-    expect(home).toContain("level={assignedClassLevel || levelKey}");
+    expect(home).toContain("onViewClassSchedule={openFullClassSchedule}");
+    expect(home).not.toContain("<HomepageHighlights");
   });
 
   test("responsive manual carousel has visible focus and uses existing routes", () => {
