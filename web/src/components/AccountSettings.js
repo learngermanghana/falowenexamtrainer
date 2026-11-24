@@ -1,7 +1,7 @@
 import { AccountDeletionCard } from "./AccountDeletion";
 import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
@@ -20,6 +20,7 @@ import { clearPaymentAttempt, getPaymentAttempt } from "../lib/paymentAttempt";
 import { getTrialLifecycleState } from "../lib/trialAccess";
 import { isApprovedUniversityStudent, isHamburgUniversityStudent } from "../lib/universityInvitations";
 import useCourseCompletionProgress from "../hooks/useCourseCompletionProgress";
+import { getCourseType } from "./CourseTypeSettings";
 import "./AccountSettings.css";
 
 const formatDate = (value) => {
@@ -687,6 +688,11 @@ const AccountSettings = () => {
         </nav>
       </aside>
       <div className="fw-account-content">
+        {!isSecondaryCourse && studentProfile && (
+          <p>Course type <strong>{getCourseType(studentProfile) === "exam_preparation" ? "Exam preparation" : "Full course"}</strong>{" "}
+            <Link to="/mock/account">Manage course type</Link>
+          </p>
+        )}
       {activeTab === "studentData" ? (
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>{t("accountSettings.studentData.title")}</h2>

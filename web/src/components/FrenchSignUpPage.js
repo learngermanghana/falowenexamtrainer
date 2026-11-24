@@ -86,7 +86,6 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [selectedLevel, setSelectedLevel] = useState(FRENCH_LEVELS[0]);
   const [address, setAddress] = useState("");
-  const [learningMode, setLearningMode] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [paymentOption, setPaymentOption] = useState("full");
 
@@ -149,10 +148,6 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
 
     if (!cleanedLocation) {
       validationIssues.location = "Add your current location so we can keep accurate enrollment records.";
-    }
-
-    if (!learningMode) {
-      validationIssues.learningMode = "Choose how you plan to learn so we can match you to the right experience.";
     }
 
     if (!isLikelyPhoneNumber(cleanedEmergencyPhone)) {
@@ -221,7 +216,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
         className: selectedClass,
         phone: cleanedPhone,
         location: cleanedLocation,
-        learningMode,
+        courseType: "full_course",
         address: cleanedAddress,
         emergencyContactPhone: cleanedEmergencyPhone,
         program: "french",
@@ -447,24 +442,6 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
               required
             />
             {fieldErrors.location ? <p style={styles.fieldError}>{fieldErrors.location}</p> : null}
-
-            <label style={styles.label}>Preferred learning mode</label>
-            <select
-              required
-              value={learningMode}
-              onChange={(event) => {
-                setLearningMode(event.target.value);
-                clearFieldError("learningMode");
-                setAuthError("");
-              }}
-              style={styles.select}
-            >
-              <option value="">Choose one</option>
-              <option value="In-person">In-person</option>
-              <option value="Online">Online</option>
-              <option value="Hybrid">Hybrid</option>
-            </select>
-            {fieldErrors.learningMode ? <p style={styles.fieldError}>{fieldErrors.learningMode}</p> : null}
 
             <label style={styles.label}>Emergency contact phone</label>
             <input

@@ -167,8 +167,8 @@ const applyMobileFieldEnhancements = (form) => {
 };
 
 const findLevelSelect = (form) =>
-  Array.from(form?.querySelectorAll("select") || []).find((select) =>
-    ["A1", "A2", "B1"].every((value) =>
+  form?.querySelector("#signup-selectedLevel") || Array.from(form?.querySelectorAll("select") || []).find((select) =>
+    select.name !== "examLevel" && ["A1", "A2", "B1"].every((value) =>
       Array.from(select.options).some((option) => option.value === value)
     )
   );
@@ -188,10 +188,8 @@ const readFormDraft = (form) => ({
   address: form.querySelector('[autocomplete="street-address"]')?.value || "",
   location: form.querySelector('[autocomplete="address-level2"]')?.value || "",
   countryCode: form.elements.namedItem("countryCode")?.value || "",
-  learningMode:
-    Array.from(form.querySelectorAll("select")).find((select) =>
-      Array.from(select.options).some((option) => option.value === "Hybrid")
-    )?.value || "",
+  examLevel: form.elements.namedItem("examLevel")?.value || "",
+  courseType: form.elements.namedItem("courseType")?.value || "",
   emergencyContactPhone: form.querySelector('[autocomplete="tel-national"]')?.value || "",
   level: findLevelSelect(form)?.value || "",
   className: form.querySelector("#class-selection")?.value || "",
@@ -215,10 +213,7 @@ const restoreDraft = (form, draft) => {
   setControlValue(findLevelSelect(form), draft.level);
   setControlValue(form.querySelector("#class-selection"), draft.className);
   setControlValue(form.querySelector("#initial-payment-amount"), draft.paymentOption);
-  const mode = Array.from(form.querySelectorAll("select")).find((select) =>
-    Array.from(select.options).some((option) => option.value === "Hybrid")
-  );
-  setControlValue(mode, draft.learningMode);
+  setControlValue(form.elements.namedItem("courseType"), draft.courseType);
 };
 
 const classNameFromQuery = () => {
@@ -446,7 +441,7 @@ export default function SignUpPage(props) {
       program: details.program,
       className: details.className,
       classSlug: slugify(details.className),
-      learningMode: details.learningMode,
+      courseType: details.courseType,
       paymentStatus: details.universityInvitation ? "exempt_pending" : "pending",
       registrationSource: details.registrationSource || "public-application",
       institutionId: details.institutionId || "",

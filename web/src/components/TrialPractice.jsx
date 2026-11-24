@@ -72,5 +72,6 @@ export function TrialExamPage({ level, path, children }) {
     <h2>Monthly exam access</h2>
     <p>Unlock individual skill practice and all published mocks at your level.</p>
     <Link to="/mock/checkout">Get 30-day exam access</Link>
+    <Link to="/mock/account">Manage course type</Link>
   </main>;
 }

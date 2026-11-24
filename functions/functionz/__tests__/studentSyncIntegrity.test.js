@@ -46,6 +46,13 @@ describe("student sync integrity", () => {
     expect(resolveBalanceValue(trialStudent)).toBe(3000);
   });
 
+  test("keeps exam-only billing blank and preserves an existing balance without tuition", () => {
+    expect(resolvePaidValue({ accountType: "exam_only", paymentStatus: "pending" })).toBe("");
+    expect(resolveBalanceValue({ accountType: "exam_only", tuitionFee: null })).toBe("");
+    expect(resolveBalanceValue({ balanceDue: 1000, tuitionFee: null })).toBe(1000);
+    expect(resolvePaidValue({ paymentStatus: "pending", initialPaymentAmount: 2000 })).toBe("");
+  });
+
   test("uses confirmed paid amount and never lets balance exceed the derived balance", () => {
     expect(
       resolveBalanceValue({
@@ -75,7 +82,7 @@ describe("student sync integrity", () => {
       'className: universityInvitation ? "" : profile.className',
       "phone: profile.phone",
       "location: profile.location",
-      "learningMode: profile.learningMode",
+      'courseType: "full_course"',
       "address: profile.address",
       "emergencyContactPhone: profile.emergencyContactPhone",
       "initialPaymentAmount: profile.initialPaymentAmount",
@@ -146,7 +153,7 @@ describe("student sync integrity", () => {
       "student.trialEndsAt ||",
       "student.trialPurgeAt ||",
       "student.trialConvertedAt ||",
-      "student.learningMode ||",
+      "student.courseType ||",
       "student.address ||",
       "student.emergencyContactPhone ||",
       "resolvePaidValue(student)",

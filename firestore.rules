@@ -8,8 +8,13 @@ service cloud.firestore {
       );
     }
 
+    function isExamOnly() {
+      let access = /databases/$(database)/documents/courseAccountAccess/$(request.auth.uid);
+      return exists(access) ? get(access).data.examOnly == true : request.auth.token.get('examOnly', false) == true;
+    }
+
     function courseUser() {
-      return signedIn() && request.auth.token.get('examOnly', false) != true && (
+      return signedIn() && !isExamOnly() && (
         isStaff() ||
         !exists(/databases/$(database)/documents/organisationPartnerMembers/$(request.auth.uid)) ||
         get(/databases/$(database)/documents/organisationPartnerMembers/$(request.auth.uid)).data.get('courseAccessAllowed', false) == true
@@ -330,7 +335,7 @@ service cloud.firestore {
       // Recovery may look up a missing UID document before querying the legacy
       // student-code profile. Only the root profile is readable while paused.
       allow read: if courseUser() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
-      allow create: if signedIn() && (isStaff() || (request.auth.token.get('examOnly', false) != true && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements', 'courseDiscount', 'courseCheckoutStartedAt'])
+      allow create: if signedIn() && (isStaff() || (!isExamOnly() && request.resource.data.get('courseType', 'full_course') == 'full_course' && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'courseEnrollmentPreserved', 'secondaryProgram', 'coursePlacements', 'courseDiscount', 'courseCheckoutStartedAt'])
         && request.resource.data.get('institutionVerification', 'pending') == 'pending'
         && request.resource.data.get('accessType', 'invitation_pending') == 'invitation_pending'
         && (request.resource.data.get('registrationSource', '') != 'university-invite' || (
@@ -354,9 +359,9 @@ service cloud.firestore {
         (resource.data.get('uid', '') == request.auth.uid
           || studentId == request.auth.uid
           || (resource.data.get('uid', '') == '' && resource.data.get('email', '') == request.auth.token.email))
-        && (request.auth.token.get('examOnly', false) != true || resource.data.get('uid', '') == request.auth.uid)
+        && (!isExamOnly() || resource.data.get('uid', '') == request.auth.uid)
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'role', 'studentCode', 'studentcode', 'program'])
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'secondaryProgram', 'coursePlacements',
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType', 'courseType', 'courseEnrollmentPreserved', 'secondaryProgram', 'coursePlacements',
           'institutionId', 'institutionName', 'cohortId', 'instructorName', 'registrationSource', 'universityInvitationCode', 'institutionVerification', 'accessType', 'courseDiscount', 'courseCheckoutStartedAt'])
         && (resource.data.get('courseDiscount', null) == null || resource.data.get('paymentStatus', '') == 'paid' ||
           !request.resource.data.diff(resource.data).affectedKeys().hasAny([
@@ -374,9 +379,10 @@ service cloud.firestore {
         && (resource.data.get('accountType', '') != 'exam_only' || (
           resource.data.uid == request.auth.uid
           && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-            'role', 'uid', 'studentCode', 'className', 'program', 'status', 'paymentStatus',
-            'paid', 'balanceDue', 'tuitionFee', 'contractStart', 'contractEnd',
-            'onboardingCompleted', 'trialStatus', 'trialStartedAt', 'trialEndsAt'
+            'role', 'uid', 'studentCode', 'className', 'program', 'level', 'levelId', 'status', 'paymentStatus',
+            'paid', 'paidAmount', 'initialPaymentAmount', 'balanceDue', 'balance', 'tuitionFee', 'tuitionCurrency',
+            'contractStart', 'contractEnd', 'contractTermMonths', 'paystackReference', 'classId', 'classRecordId', 'assignedClassId',
+            'onboardingCompleted', 'trialStatus', 'trialStartedAt', 'trialEndsAt', 'trialUsedAt', 'trialPurgeAt'
           ])
         ))
       ));

@@ -195,7 +195,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [location, setLocation] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [address, setAddress] = useState(""); // ✅ NEW
-  const [learningMode, setLearningMode] = useState("Online"); // Online | In-person | Hybrid
+  const [courseType, setCourseType] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const duplicateContactNumber = areSameContactNumber(phone, emergencyContactPhone, countryCode);
   const [className, setClassName] = useState("");
@@ -272,7 +272,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         }
         const studentCode = generateStudentCode({ name });
 
-        await signup(email, password, {
+        const receipt = await signup(email, password, {
           name,
           firstName: normalizePersonName(firstName),
           middleName: normalizePersonName(middleName),
@@ -285,12 +285,16 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           countryCode,
           country: getCountryName(countryCode, "en"),
           address, // ✅ NEW
-          learningMode,
+          courseType,
           emergencyContactPhone: formattedEmergency,
           className,
           contractTermMonths: 6,
         });
 
+        if (courseType === "exam_preparation") {
+          window.location.assign(receipt.trial ? "/exams/mocks" : "/mock/checkout");
+          return;
+        }
         savePreferredLevel(selectedLevel);
         rememberStudentCodeForEmail(email, studentCode);
 
@@ -528,16 +532,12 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 placeholder={t("authUi.addressHint")}
               />
 
-              <label style={styles.label}>{t("authUi.learningMode")}</label>
-              <select
-                required
-                value={learningMode}
-                onChange={(e) => setLearningMode(e.target.value)}
-                style={{ ...styles.select, height: 44 }}
-              >
-                <option value="Online">{t("signupPage.options.online")}</option>
-                <option value="In-person">{t("signupPage.options.inPerson")}</option>
-                <option value="Hybrid">{t("signupPage.options.hybrid")}</option>
+              <label htmlFor="auth-course-type" style={styles.label}>Course type</label>
+              <select id="auth-course-type" required value={courseType}
+                onChange={(event) => setCourseType(event.target.value)} style={{ ...styles.select, height: 44 }}>
+                <option value="">Choose a course type</option>
+                <option value="full_course">Full course</option>
+                <option value="exam_preparation">Exam preparation</option>
               </select>
             </>
           )}

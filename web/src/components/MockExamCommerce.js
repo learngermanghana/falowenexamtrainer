@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { auth, createUserWithEmailAndPassword } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
@@ -42,7 +42,7 @@ export function MockExamSignupPage() {
   if (user && studentProfile && !working) return <Navigate to={studentProfile.examTrialStartedAt ? "/exams/mocks" : "/mock/checkout"} replace />;
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!safeLevels.has(level) || name.trim().split(/\s+/).length < 2 || password.length < 8) {
+    if (!safeLevels.has(level) || name.trim().split(/\s+/).length < 2 || (!user && password.length < 8)) {
       setError("Enter your full name, level and a password of at least eight characters.");
       return;
     }
@@ -120,6 +120,7 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
   if (!user) return <Navigate to="/login/" replace />;
   return <main style={card}>
     <a href="/" style={{ color: "#0b776e" }}>← Falowen Exams</a>
+    <p><Link to="/mock/account">Manage course type</Link></p>
     <h1>{paymentReturn ? "Monthly access confirmation" : "Your monthly exam subscription"}</h1>
     {paymentReturn && <p>Paystack has returned you to Falowen. Access appears below only after the signed payment notification is confirmed. Refresh this page if the payment is still processing.</p>}
     {access.length > 0 && <div style={{ padding: 14, background:"#e6f8f0", borderRadius:10 }}>
@@ -178,8 +179,10 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
   }
   if (!active.length) return <Navigate to="/mock/checkout" replace />;
   const trial = active.find(row => row.scope === "trial" && row.expiresAtMs > Date.now());
-  if (trial && !active.some(row => row.scope !== "trial" && row.level === trial.level)) {
-    return <TrialExamPage level={trial.level} path={location.pathname.replace(/\/+$/, "") || "/"}>{children}</TrialExamPage>;
+  if (trial && !active.some(row => row.scope !== "trial" && (studentProfile?.courseEnrollmentPreserved || row.level === trial.level))) {
+    return <TrialExamPage level={trial.level} path={location.pathname.replace(/\/+$/, "") || "/"}>
+      {typeof children === "function" ? children([trial.level]) : children}
+    </TrialExamPage>;
   }
   if (location.pathname === "/") return <Navigate to="/exams/overview" replace />;
   const examArea = /^\/exams\/(overview|mocks|file|lesen|horen|writing|speaking|question|vocab)(?:\/.*)?$/.test(location.pathname);
@@ -190,10 +193,14 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
   if (!examArea && !allowedMockRoutes.includes(location.pathname)) {
     return <Navigate to="/exams/overview" replace />;
   }
-  // Ensure the profile's current level cannot extend access to another level.
-  if (examArea && !active.some(p=>p.level===String(studentProfile?.level || "").toUpperCase())) {
+  const subscribedLevels = [...new Set(active.filter(row => row.scope !== "trial").map(row => row.level))];
+  const registeredLevel = String(studentProfile?.level || "").toUpperCase();
+  const allowedLevels = studentProfile?.courseEnrollmentPreserved
+    ? subscribedLevels : subscribedLevels.filter(level => level === registeredLevel);
+  if (examArea && (!allowedLevels.length || (safeLevels.has(location.pathname.split("/")[3]?.toUpperCase()) &&
+      !allowedLevels.includes(location.pathname.split("/")[3].toUpperCase())))) {
     return <Navigate to="/mock/checkout" replace />;
   }
-  return children;
+  return typeof children === "function" ? children(allowedLevels) : children;
 }
 export { isMockPortal };

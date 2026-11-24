@@ -97,8 +97,8 @@ const AuthenticatedAppRoutes = () => (
     <PublicAuthMobileRecovery />
     <A1Day13RevisionNumberCleanup />
     <AuthProvider>
-      <CourseTrialBoundary><CourseRouteBoundary>
       <ToastProvider>
+      <MockOnlyRouteBoundary><CourseTrialBoundary><CourseRouteBoundary>
         <A1ChapterSpecificLessonRouteBoundary>
           <RouteScopedAppServices />
           <SelfLearningLessonDirectNavigationFix />
@@ -106,7 +106,7 @@ const AuthenticatedAppRoutes = () => (
           <A1Day5FinalWorkbookOpenFix />
           <A1SharedPracticeWorkbookNavigation />
           <RequestedLessonAiVideoHeader />
-          <MockOnlyRouteBoundary><Routes>
+          <Routes>
             <Route path={A1_DAY0_TUTORIAL_ROUTE} element={<Navigate to={A1_DAY0_WORKBOOK_ROUTE} replace />} />
             <Route
               path="/campus/course/lesson/A1/chapter/:chapter"
@@ -144,10 +144,10 @@ const AuthenticatedAppRoutes = () => (
               element={<A2Day27DigitaleKommunikationGrammarPage />}
             />
             <Route path="*" element={<App />} />
-          </Routes></MockOnlyRouteBoundary>
+          </Routes>
         </A1ChapterSpecificLessonRouteBoundary>
+      </CourseRouteBoundary></CourseTrialBoundary></MockOnlyRouteBoundary>
       </ToastProvider>
-      </CourseRouteBoundary></CourseTrialBoundary>
     </AuthProvider>
   </>
 );

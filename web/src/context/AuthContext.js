@@ -623,12 +623,14 @@ export const AuthProvider = ({ children }) => {
       }
       // Fail closed before making a new Firebase Auth user, so an alternate email
       // cannot silently create another student profile using the same phone.
-      await checkSignupDuplicate({
-        name: profile.name || profile.firstName || "",
-        email: normalizedEmail,
-        phone: profile.phone || "",
-        emergencyContactPhone: profile.emergencyContactPhone || "",
-      });
+      if (profile.courseType !== "exam_preparation") {
+        await checkSignupDuplicate({
+          name: profile.name || profile.firstName || "",
+          email: normalizedEmail,
+          phone: profile.phone || "",
+          emergencyContactPhone: profile.emergencyContactPhone || "",
+        });
+      }
       // A previous attempt may have created Firebase Auth successfully but failed
       // before writing students/{studentCode}. Only the correct existing password
       // may resume that incomplete account; existing profiles are never overwritten.
@@ -646,6 +648,26 @@ export const AuthProvider = ({ children }) => {
 
       const token = await credential.user.getIdToken();
       setIdToken(token);
+
+      if (profile.courseType === "exam_preparation") {
+        let registration;
+        try {
+          const response = await fetch(`${getBackendUrl()}/mock/register`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ name: profile.name, level: profile.level }),
+          });
+          registration = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(registration.error || "Could not register for exam preparation.");
+        } catch (error) {
+          await signOut(auth).catch(() => {});
+          throw error;
+        }
+        setIdToken(await credential.user.getIdToken(true));
+        const examProfile = await fetchStudentProfileByUid(credential.user.uid);
+        if (examProfile) setStudentProfile(examProfile);
+        return { studentCode: credential.user.uid, trial: registration.trial };
+      }
 
       const studentCode = profile.studentCode;
       const studentId = studentCode || credential.user.uid;
@@ -693,7 +715,7 @@ export const AuthProvider = ({ children }) => {
         preferredInterfaceLanguage: ["en", "de", "fr", "sw"].includes(profile.preferredInterfaceLanguage)
           ? profile.preferredInterfaceLanguage : "en",
 
-        learningMode: profile.learningMode || "", // already there ✅
+        courseType: "full_course",
         address: profile.address || "",            // ✅ NEW FIELD
 
         emergencyContactPhone: profile.emergencyContactPhone || "",
