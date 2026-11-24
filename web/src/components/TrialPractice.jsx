@@ -5,7 +5,7 @@ import { getMockExam } from "../data/mockExamCatalog";
 import { getLessonsByLevel } from "../data/lessonCatalog";
 import { getTrialLifecycleState } from "../lib/trialAccess";
 
-import { TrialCourseLevel, TrialExam } from "../context/TrialCatalogContext";
+import { TrialCourseLevel, TrialCourseDay1, TrialExam } from "../context/TrialCatalogContext";
 
 export function courseTrial(profile) {
   if (!profile || profile.accountType === "exam_only" || profile.program === "swahili" ||
@@ -45,7 +45,7 @@ export function TrialCoursePage({ level, path, active, endsAtMs, previewOnly = f
   active = active && (!Number.isFinite(endsAtMs) || Date.now() < endsAtMs);
   if (active && firstDayRoutes(level).has(path)) return children;
   if (path === "/campus/course") {
-    return <TrialCourseLevel.Provider value={level}>{children}</TrialCourseLevel.Provider>;
+    return <TrialCourseLevel.Provider value={level}><TrialCourseDay1.Provider value={active}>{children}</TrialCourseDay1.Provider></TrialCourseLevel.Provider>;
   }
   return <main style={{ padding: 24 }}>
     <h1>Unlock the full course</h1>
