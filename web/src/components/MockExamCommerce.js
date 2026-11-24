@@ -175,15 +175,16 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
   const { user, studentProfile } = useAuth();
   const location = useLocation();
   const [state, setState] = useState({ loading: true, active: [] });
+  const [retry, setRetry] = useState(0);
   useEffect(() => {
     let subscribed = true;
     setState({loading:true,active:[]});
     if (!user) return undefined;
     user.getIdToken().then(token=>api("/mock/access",{token}))
       .then(data=> {if(subscribed)setState({loading:false,active:data.active||[],entitlements:data.entitlements || null});})
-      .catch(()=> {if(subscribed)setState({loading:false,active:[]});});
+      .catch(()=> {if(subscribed)setState({loading:false,active:[],accessError:true});});
     return ()=>{subscribed=false;};
-  }, [user, location.pathname]);
+  }, [user, location.pathname, retry, studentProfile?.accountType, studentProfile?.level]);
   const [clock, setClock] = useState(Date.now);
   const expiry = Math.min(...[...state.active.map(row => row.expiresAtMs), courseTrialState?.endsAtMs]
     .filter(value => Number.isFinite(value) && value > clock));
@@ -215,9 +216,10 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
   const catalog = ["/exams/overview", "/exams/mocks"].includes(path);
   if (state.loading) return <div style={card} role="status">Checking your exam access…</div>;
   if (!paidLevels.length) {
+    if (state.accessError && catalog) return <TrialExam.Provider value={{ level: displayLevel, id: null, locked: true, accessError: true, retryAccess: () => setRetry(value => value + 1) }}>{renderShell([displayLevel])}</TrialExam.Provider>;
     if (trial) {
       if (catalog || Object.values(MOCK_EXAM_CATALOG).some(mock => mock.level === trial.level && mock.route === path)) {
-        return <TrialExamPage level={trial.level} path={path}>{renderShell([trial.level])}</TrialExamPage>;
+        return <TrialExamPage level={trial.level} path={path} expiresAtMs={Number(trial.expiresAtMs)}>{renderShell([trial.level])}</TrialExamPage>;
       }
     }
     if (catalog) return <TrialExam.Provider value={{ level: displayLevel, id: null, locked: true }}>{renderShell([displayLevel])}</TrialExam.Provider>;

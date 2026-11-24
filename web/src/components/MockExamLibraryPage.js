@@ -50,6 +50,7 @@ export default function MockExamLibraryPage() {
       .finally(() => { if (mounted) setLoadingOwned(false); });
     return () => { mounted = false; };
   }, [examOnly, trialExam, user]);
+  const includedTrial = Boolean(trialExam && !trialExam.locked && trialExam.id);
   const mocks = getMockExamsForLevel(level, { includeCourse: true }).filter(mock =>
     !examOnly || ((trialExam?.level === mock.level || ownedLevels.includes(mock.level)) && mock.status !== "planned" &&
       mock.id !== "a2-course-preview-01")
@@ -64,7 +65,9 @@ export default function MockExamLibraryPage() {
         <p style={{ ...styles.helperText, margin: 0 }}>
           {mocks.some((mock) => mock.mode === "full" && mock.status === "ready") ? "Choose a complete mock or practise one skill. Full mocks cover all four modules; previews may not produce a combined score." : "A full mock is not yet published for this level. Choose available skill practice below; it does not produce an overall mock result."}
         </p>
-        {trialExam && <a href="/mock/payment">Choose a payment option</a>}
+        {includedTrial && <p role="status" style={{ ...styles.helperText, margin: "10px 0 0", color: "#166534", fontWeight: 700 }}>Your free trial is active. {trialExam.shortTitle || trialExam.title} is included{Number.isFinite(trialExam.expiresAtMs) ? " until " + new Date(trialExam.expiresAtMs).toLocaleDateString() : ""}. No payment is required to start or resume it.</p>}
+        {trialExam?.accessError && <div role="status"><p>We could not verify your exam access. Retry before making any payment.</p><button type="button" style={styles.secondaryButton} onClick={trialExam.retryAccess}>Retry access check</button></div>}
+        {trialExam?.locked && !trialExam.accessError && <a href="/mock/payment">Choose a payment option</a>}
       </section>
 
       {examOnly && !trialExam && ownedLevels.includes(level) && <section style={styles.card}>
@@ -90,7 +93,7 @@ export default function MockExamLibraryPage() {
                 <div style={{ maxWidth: 720 }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                     <h3 style={{ margin: 0 }}>{mock.shortTitle || mock.title}</h3>
-                    <span style={styles.badge}>{statusLabel(mock.status, mock)}</span>
+                    <span style={styles.badge}>{includedTrial && mock.id === trialExam.id ? "Included in your free trial" : statusLabel(mock.status, mock)}</span>
                   </div>
                   <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
                     {mock.description}

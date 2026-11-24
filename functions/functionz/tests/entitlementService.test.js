@@ -88,3 +88,39 @@ test('Full Course trial allows Day 1 submissions and live classes until the orig
   expect(resolveEntitlements({profile,now})).toMatchObject({course:{day1:true,liveClasses:true,day1Submission:true,day2PlusSubmission:false}});
   expect(resolveEntitlements({profile,now:now+60000})).toMatchObject({campus:true,examsRoom:true,course:{day1:false,liveClasses:false,day1Submission:false,day2PlusSubmission:false}});
 });
+
+test.each(["missing", "expired", "revoked", "expired_course", "no_policy"])(
+  "access lookup recovers only the original eligible preserved trial: %s", async scenario => {
+    const end = Date.now() + 60000;
+    const profile = {uid:"u",accountType:"exam_only",courseEnrollmentPreserved:true,level:"A2",paymentStatus:"pending",balanceDue:3000,trialEndsAt:new Date(scenario==="expired_course"?Date.now()-1000:end).toISOString()};
+    const records = new Map([
+      ["students/student-code", profile],
+      ["courseAccountAccess/u", {examOnly:true,canRestoreCourse:scenario!=="no_policy"}],
+    ]);
+    if (["expired","revoked"].includes(scenario)) records.set("mockSubscriptions/u_trial",{uid:"u",level:"A2",scope:"trial",status:scenario==="revoked"?"revoked":"active",expiresAtMs:scenario==="expired"?Date.now()-1000:end,mockIds:["a2-final-01"]});
+    const previousGrant = records.get("mockSubscriptions/u_trial");
+    const snapshot = key => ({exists:records.has(key),data:()=>records.get(key)});
+    const db = {collection:name=>({
+      doc:id=>({key:name+"/"+id}),
+      where:()=>({get:async()=>({docs:[...records].filter(([k,v])=>k.startsWith("mockSubscriptions/")&&v.uid==="u").map(([k,v])=>({id:k.split("/")[1],data:()=>v}))})}),
+    }),runTransaction:async fn=>fn({get:async ref=>snapshot(ref.key),create:(ref,data)=>records.set(ref.key,data)})};
+    const handlers = {};
+    require("../mockCommerce").registerMockCommerceRoutes({get:(p,f)=>{handlers[p]=f;},post:()=>{}},{
+      admin:{firestore:()=>db},getAuthedUser:async()=>({uid:"u"}),
+      findStudentByCodeOrEmail:async()=>({ref:db.collection("students").doc("student-code"),snap:snapshot("students/student-code")})
+    });
+    const res={status:jest.fn().mockReturnThis(),set:jest.fn().mockReturnThis(),json:jest.fn()};
+    await handlers["/mock/access"]({},res);
+    const result=res.json.mock.calls[0][0];
+    if(scenario==="missing"){
+      expect(result.entitlements.exam.trial).toEqual({level:"A2",catalogId:"a2-final-01",expiresAtMs:end});
+      expect(records.get("mockSubscriptions/u_trial").expiresAtMs).toBe(end);
+      await handlers["/mock/access"]({},res);
+      expect(records.get("mockSubscriptions/u_trial").expiresAtMs).toBe(end);
+    }else{
+      expect(result.entitlements.exam.trial).toBeNull();
+      if(scenario==="expired"||scenario==="revoked")expect(records.get("mockSubscriptions/u_trial")).toEqual(previousGrant);
+      else expect(records.has("mockSubscriptions/u_trial")).toBe(false);
+    }
+  }
+);

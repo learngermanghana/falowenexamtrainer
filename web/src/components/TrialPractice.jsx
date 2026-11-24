@@ -55,12 +55,12 @@ export function TrialCoursePage({ level, path, active, endsAtMs, previewOnly = f
   </main>;
 }
 
-export function TrialExamPage({ level, path, children }) {
+export function TrialExamPage({ level, path, expiresAtMs, children }) {
   const exam = getMockExam(trialExams[level]?.catalogId);
   if (exam && path === exam.route) return children;
   if (path === "/" || path === "/exams") return <Navigate to="/exams/overview" replace />;
   if (exam && ["/exams/overview", "/exams/mocks"].includes(path)) {
-    return <TrialExam.Provider value={exam}>{children}</TrialExam.Provider>;
+    return <TrialExam.Provider value={{...exam, expiresAtMs}}>{children}</TrialExam.Provider>;
   }
   return <main style={{ maxWidth: 720, margin: "2rem auto", padding: 20 }}>
     <h1>Unlock exam practice</h1>

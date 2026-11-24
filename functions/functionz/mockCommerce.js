@@ -177,7 +177,30 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser, findStudentByCo
         // Older students may lack a verified-email marker or a UID on their
         // sheet-backed record. Preserve their existing subscription response;
         // only emit profile-derived access after ownership is verified.
-        if (owns) entitlements = require("./entitlementService").resolveEntitlements({ profile: student, identity: user, grants: active });
+        if (owns) {
+          // Recover a missing grant for older Full Course -> Exam Preparation
+          // switches, using only the already-preserved enrollment and expiry.
+          // Never renew or replace a previous (including expired) trial record.
+          const { courseExpiry, resolveEntitlements } = require("./entitlementService");
+          if (student.uid === user.uid && student.accountType === "exam_only" &&
+              student.courseEnrollmentPreserved === true && !student.examTrialStartedAt &&
+              trialExams[student.level] && courseExpiry(student) > Date.now() &&
+              !active.some(row => row.scope === "trial" || (row.scope !== "trial" && row.level === student.level))) {
+            const recovered = await db().runTransaction(async tx => {
+              const latest = await tx.get(match.ref);
+              const profile = latest.data();
+              const policy = (await tx.get(db().collection("courseAccountAccess").doc(user.uid))).data();
+              const deletion = (await tx.get(db().collection("accountDeletionRequests").doc(user.uid))).data();
+              if (!profile || profile.uid !== user.uid || profile.accountType !== "exam_only" ||
+                  profile.courseEnrollmentPreserved !== true || policy?.examOnly !== true || policy?.canRestoreCourse !== true ||
+                  ["pending", "processing", "completed"].includes(deletion?.status) ||
+                  ["archived","deleted","inactive","withdrawn","suspended"].includes(String(profile.status || "").toLowerCase())) return null;
+              return require("./courseType").preserveCourseExamTrial(tx, db(), profile, user.uid, true);
+            });
+            if (recovered) active.push({ id: user.uid + "_trial", ...recovered });
+          }
+          entitlements = resolveEntitlements({ profile: student, identity: user, grants: active });
+        }
       }
       res.set("Cache-Control", "private, no-store");
       return res.json({ ok: true, ...(entitlements ? { entitlements } : {}), active: active.map(({ id, level, packageId, expiresAtMs, scope }) =>

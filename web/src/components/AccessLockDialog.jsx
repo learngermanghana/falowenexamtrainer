@@ -20,13 +20,15 @@ export function examLockInfo({ title, trialExam, level, examOnly = false } = {})
   const includedTrial = trialExam && !trialExam.locked && trialExam.id && trialExam.route;
   return {
     title: title || "Exam practice",
-    reason: includedTrial
+    reason: trialExam?.accessError ? "Your access could not be verified. Retry the access check before making any payment." : includedTrial
       ? "Your trial includes one designated practice. This activity is outside your current trial access."
       : "This activity requires active exam access for your level. Your current access does not include it.",
     plan: "Exam Preparation or eligible Full Course",
     included: ["Published mocks at your eligible level", "Lesen, Hören, Schreiben and Sprechen practice", "Assessment and saved results where available"],
     level,
     trialHref: includedTrial ? trialExam.route : null,
+    accessError: Boolean(trialExam?.accessError),
+    retryAccess: trialExam?.retryAccess,
     accountHref: examOnly ? "/mock/account" : "/campus/account?tab=courses",
   };
 }
@@ -65,9 +67,9 @@ export default function AccessLockDialog({ info, onClose }) {
       <p>{info.reason}</p>
       <strong>{info.plan}{info.level ? " · " + info.level : ""}</strong>
       <ul>{info.included.map(item=><li key={item}>{item}</li>)}</ul>
-      <p className="fw-access-lock-note">Review the available plans before paying. Opening this explanation does not change your access or charge you.</p>
+      {!info.accessError && <p className="fw-access-lock-note">Review the available plans before paying. Opening this explanation does not change your access or charge you.</p>}
       <div className="fw-access-lock-actions">
-        <a className="fw-access-lock-primary" href="/mock/payment">View plans</a>
+        {info.accessError ? <button type="button" onClick={()=>{onClose();info.retryAccess?.();}}>Retry access check</button> : <a className="fw-access-lock-primary" href="/mock/payment">View plans</a>}
         <a href={info.accountHref}>My courses &amp; subscriptions</a>
         {info.trialHref && <a href={info.trialHref}>Open included trial practice</a>}
         <button ref={closeRef} type="button" onClick={onClose}>Keep browsing</button>
