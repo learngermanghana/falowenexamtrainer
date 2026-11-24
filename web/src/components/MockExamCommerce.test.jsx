@@ -92,12 +92,12 @@ test("a new student can register for A2 and reach the included trial before chec
 test.each([
   ["no active subscription", []],
   ["only another level", [{ id: "test-a1", level: "A1", expiresAtMs: Date.now() + 86400000 }]],
-])("direct Exam Room access returns to checkout with %s", async (_description, active) => {
+])("direct Exam Room access keeps the overview visible with %s", async (_description, active) => {
   mockApi(active);
   useAuth.mockReturnValue({ user: student, studentProfile: profile });
   openPage("/exams/overview");
-  expect(await screen.findByRole("heading", { name: "Choose how to continue" })).toBeVisible();
-  expect(screen.queryByRole("heading", { name: "Exam overview" })).toBeNull();
+  expect(await screen.findByRole("heading", { name: "Exam overview" })).toBeVisible();
+  expect(screen.queryByRole("heading", { name: "Choose how to continue" })).toBeNull();
 });
 
 test("an active A2 student can enter the protected Exam Room", async () => {
@@ -107,11 +107,11 @@ test("an active A2 student can enter the protected Exam Room", async () => {
   expect(await screen.findByRole("heading", { name: "Exam overview" })).toBeVisible();
 });
 
-test("a signed-in student with a profile goes straight from registration to checkout", async () => {
+test("a signed-in student with a profile goes straight from registration to the exam catalog", async () => {
   mockApi();
   useAuth.mockReturnValue({ user: student, studentProfile: profile });
   openPage("/mock/register");
-  expect(await screen.findByRole("heading", { name: "Choose how to continue" })).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "A2 Mock Exams" })).toBeVisible();
   expect(createUserWithEmailAndPassword).not.toHaveBeenCalled();
 });
 
@@ -143,4 +143,15 @@ test("course trial students switch account type before exam checkout", () => {
   useAuth.mockReturnValue({ user: student, studentProfile: {accountType: "course", level: "A2", trialStatus: "active", trialEndsAt: new Date(Date.now() + 86400000).toISOString()} });
   openPage("/mock/payment");
   expect(screen.getByRole("link", {name: "Continue to exam preparation"})).toHaveAttribute("href", "/mock/account?choice=exam_preparation");
+});
+
+test("unsubscribed exam-only students can browse all mock cards but cannot start them", async () => {
+  mockApi();
+  useAuth.mockReturnValue({ user: student, studentProfile: profile });
+  openPage("/exams/mocks");
+  expect(await screen.findByRole("heading", { name: "A2 Mock Exams" })).toBeVisible();
+  const locked = await screen.findAllByRole("button", { name: /Locked/ });
+  expect(locked.length).toBeGreaterThan(0);
+  locked.forEach(button => expect(button).toBeDisabled());
+  expect(screen.queryByRole("heading", { name: "Choose how to continue" })).toBeNull();
 });
