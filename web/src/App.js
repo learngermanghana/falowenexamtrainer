@@ -663,8 +663,8 @@ function App() {
   if (isExamOnlyAccount) {
     return <MockExamOnlyGate>{(entitledLevels) => <ExamProvider entitledLevels={entitledLevels}><AppShell
       isStaff={isStaff}
-      allowedSections={{ ...allowedSections, course: false, attendance: false, discussion: false, classMembers: false }}
-      availableTabs={[]} defaultCampusSection="account" enableNotifications={enableNotifications}
+      allowedSections={{ course: true, account: true, attendance: false, discussion: false, classMembers: false, submit: false }}
+      availableTabs={tabStructure.filter(tab => isTabAvailable(tab, { course: true, account: true }))} defaultCampusSection="course" enableNotifications={enableNotifications}
       saveStudentProfile={saveStudentProfile} logout={logout} notificationStatus={notificationStatus}
       studentProfile={studentProfile} tabStructure={tabStructure} tabStorageKey={tabStorageKey} user={user}
     /></ExamProvider>}</MockExamOnlyGate>;
@@ -1734,7 +1734,7 @@ const CampusArea = ({
       {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
       {resolvedSection === "discussion" && allowedSections.discussion && getCampusProgram(campusStudentProfile) !== "swahili" ? <ClassDiscussionPage /> : null}
       {resolvedSection === "account" && allowedSections.account ? <AccountSettings /> : null}
-      {getCampusProgram(campusStudentProfile) !== "swahili" && <AttendanceCheckinCard />}
+      {allowedSections.attendance && getCampusProgram(campusStudentProfile) !== "swahili" && <AttendanceCheckinCard />}
       {resolvedSection === "tutor-marking" && allowedSections["tutor-marking"] ? <TutorMarkingPage /> : null}
     </>
   );
