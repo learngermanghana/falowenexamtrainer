@@ -131,3 +131,10 @@ describe("authenticated Exam Room history", () => {
     }).percent).toBe(0);
   });
 });
+
+test("only completed assessed results contribute to exam history", () => {
+  const base={source:"a2_final_mock",level:"A2",score:0,sectionScores:{lesen:0}};
+  expect(normalizeExamRoomHistoryRow("pending",{...base,status:"pending"})).toBeNull();
+  expect(normalizeExamRoomHistoryRow("unassessed",{...base,assessed:false})).toBeNull();
+  expect(normalizeExamRoomHistoryRow("complete",{...base,status:"needs_more_practice"}).percent).toBe(0);
+});
