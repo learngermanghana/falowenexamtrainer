@@ -28,5 +28,5 @@ export function useCourseTrialEntitlement(user, enabled, trialEnd) {
       .catch(() => { if (!cancelled) setState(null); });
     return () => { cancelled = true; };
   }, [user, enabled, trialEnd]);
-  return state?.uid === user?.uid ? state.snapshot : null;
+  return state && user && state.uid === user.uid ? state.snapshot : null;
 }
