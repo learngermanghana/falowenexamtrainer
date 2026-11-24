@@ -105,7 +105,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false, exam
             : t("homeAccess.gerBookDesc")}</p>
         </div>
         <div className="falowen-home-space-card__bottom">
-          <button style={styles.primaryButton} onClick={openCampus} disabled={examOnly}>{examOnly ? "🔒 Full Course required" : t("homeAccess.openCourseBook")} <span aria-hidden="true">→</span></button>
+          <button style={styles.primaryButton} onClick={openCampus}>{t("homeAccess.openCourseBook")} <span aria-hidden="true">→</span></button>
         </div>
       </section>
 
@@ -378,7 +378,7 @@ const GeneralHome = ({
       ) : null}
 
       <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} examOnly={examOnly} />
-      {examOnly && <section style={styles.card}><h3>Exam preparation access</h3><p>Browse your exam room. Subscribe when you are ready to unlock practice.</p><button style={styles.secondaryButton} onClick={() => navigate("/mock/payment")}>Payment options</button></section>}
+      {examOnly && <section style={styles.card}><h3>Exam preparation access</h3><p>Explore Campus Day 1 and browse your exam room. Subscribe when you are ready to unlock more practice.</p><button style={styles.secondaryButton} onClick={() => navigate("/mock/payment")}>Payment options</button></section>}
       {!examOnly && <div className="falowen-home-section-break falowen-home-section-break--highlights">
         <HomepageHighlights
           className={preferredClass}
