@@ -670,6 +670,18 @@ function App() {
     /></ExamProvider>}</MockExamOnlyGate>;
   }
 
+  if (awaitingPayment && campusProgram === "german" && !universityPending && !universityContractEnded && ["expired_retained", "retention_ending_soon", "purge_due"].includes(trialLifecycle.key)) {
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    const browseSections = { course: true, account: true, results: true };
+    const examPath = /^\/exams(?:\/|$)/.test(path) || Object.values(MOCK_EXAM_CATALOG).some(mock => mock.route === path);
+    if (!examPath && !["/", "/campus", "/campus/course", "/campus/account", "/campus/results"].includes(path)) return <Navigate to="/campus/course" replace />;
+    return <ExamProvider><AppShell browseOnly isStaff={false} allowedSections={browseSections}
+      availableTabs={tabStructure.filter(tab => isTabAvailable(tab, browseSections))} defaultCampusSection="course"
+      enableNotifications={enableNotifications} saveStudentProfile={saveStudentProfile} logout={logout}
+      notificationStatus={notificationStatus} studentProfile={studentProfile} tabStructure={tabStructure}
+      tabStorageKey={tabStorageKey} user={user} /></ExamProvider>;
+  }
+
   if (awaitingPayment) {
     if (universityPending || universityContractEnded) {
       return (
@@ -731,6 +743,7 @@ const AppShell = ({
   availableTabs,
   defaultCampusSection,
   hasActiveTrial = false,
+  browseOnly = false,
   enableNotifications,
   saveStudentProfile,
   logout,
@@ -753,6 +766,7 @@ const AppShell = ({
   const directSwahiliTrial = isSwahiliCampus && hasActiveTrial;
   const requiresOnboarding =
     studentProfile?.accountType !== "exam_only" &&
+    !browseOnly &&
     !directSwahiliTrial &&
     !["admin", "tutor"].includes(onboardingRole) &&
     !Boolean(studentProfile?.isTutor) &&
@@ -971,6 +985,7 @@ const AppShell = ({
             path="/"
             element={
               <GeneralHome
+                browseOnly={browseOnly}
                 onSelectArea={handleAreaSelect}
                 studentProfile={studentProfile}
                 notificationStatus={notificationStatus}
