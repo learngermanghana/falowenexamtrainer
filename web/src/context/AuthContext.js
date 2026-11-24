@@ -1,4 +1,4 @@
-import { courseProfile, enrolledCourses, readCoursePreference, saveCoursePreference } from "../utils/courseEnrollment";
+import { courseProfile, enrolledCourses, readCoursePreference, saveCoursePreference, secondaryAccessExpiry } from "../utils/courseEnrollment";
 import { ReadingStudentContext } from "../services/savedReadingPhrases";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -1245,7 +1245,14 @@ export const AuthProvider = ({ children }) => {
     [studentProfile]
   );
 
-  const courseOptions = useMemo(() => enrolledCourses(studentProfile), [studentProfile]);
+  const [courseAccessClock, setCourseAccessClock] = useState(Date.now);
+  const secondaryExpiry = secondaryAccessExpiry(studentProfile);
+  useEffect(() => {
+    if (!secondaryExpiry || secondaryExpiry <= Date.now()) return undefined;
+    const timer = setTimeout(() => setCourseAccessClock(Date.now()), Math.min(2147483647, Math.max(1, secondaryExpiry - Date.now())));
+    return () => clearTimeout(timer);
+  }, [secondaryExpiry, courseAccessClock]);
+  const courseOptions = useMemo(() => enrolledCourses(studentProfile, Math.max(courseAccessClock, Date.now())), [studentProfile, courseAccessClock]);
   const courseKey = `falowen:course:${user?.uid}`;
   const [selection, setSelection] = useState(null);
   const linkedCourse = typeof window !== "undefined" && /^#swahili-day-/.test(window.location.hash)

@@ -16,3 +16,16 @@ test("a stored preference cannot re-enable an archived course", () => {
   expect(enrolledCourses(legacy)).toEqual(["german"]);
   expect(courseProfile(legacy, "swahili")).toBe(legacy);
 });
+
+test("complimentary secondary Swahili access expires independently of the German course", () => {
+  const end = "2027-02-24T10:00:00.000Z";
+  const profile = { program: "german", secondaryProgram: "swahili", level: "A2",
+    contractEnd: "2027-05-24", paid: 3000, coursePlacements: { swahili: { level: "A1",
+      accessType: "complimentary", contractEnd: end } } };
+  const expires = Date.parse(end);
+  expect(enrolledCourses(profile, expires - 1)).toEqual(["german", "swahili"]);
+  expect(enrolledCourses(profile, expires)).toEqual(["german"]);
+  expect(enrolledCourses(profile, expires + 1)).toEqual(["german"]);
+  expect(profile.contractEnd).toBe("2027-05-24");
+  expect(profile.paid).toBe(3000);
+});
