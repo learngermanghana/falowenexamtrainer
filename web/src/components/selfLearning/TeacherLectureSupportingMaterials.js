@@ -65,7 +65,25 @@ export const removeTeacherLectureFromCanonicalLesson = (canonicalLesson = null) 
   };
 };
 
-export default function TeacherLectureSupportingMaterials({ lesson = null, canonicalLesson = null }) {
+const TEACHER_LECTURE_LABELS = {
+  en: {
+    category: "Supporting materials",
+    heading: "Teacher lecture",
+    description: "The AI lesson stays embedded above. The teacher lecture is optional supporting material and opens separately.",
+    fallback: "Teacher lecture",
+    action: "Open teacher lecture",
+  },
+  sw: {
+    category: "Nyenzo za ziada",
+    heading: "Video ya mwalimu",
+    description: "Video ya AI iko hapo juu. Tazama pia maelezo ya mwalimu kwa hiari; video hii itafunguka katika ukurasa mwingine.",
+    fallback: "Video ya mwalimu",
+    action: "Tazama video ya mwalimu",
+  },
+};
+
+export default function TeacherLectureSupportingMaterials({ lesson = null, canonicalLesson = null, language = "en" }) {
+  const labels = TEACHER_LECTURE_LABELS[language] || TEACHER_LECTURE_LABELS.en;
   const resources = resolveTeacherLectureResources({ lesson, canonicalLesson });
   if (!resources.length) return null;
 
@@ -82,11 +100,11 @@ export default function TeacherLectureSupportingMaterials({ lesson = null, canon
       >
         <div style={{ display: "grid", gap: 5 }}>
           <span style={{ ...styles.badge, width: "fit-content", background: "#e2e8f0", color: "#334155" }}>
-            Supporting materials
+            {labels.category}
           </span>
-          <h2 style={{ margin: 0, fontSize: "1.2rem" }}>Teacher lecture</h2>
+          <h2 style={{ margin: 0, fontSize: "1.2rem" }}>{labels.heading}</h2>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-            The AI lesson stays embedded above. The teacher lecture is optional supporting material and opens separately.
+            {labels.description}
           </p>
         </div>
 
@@ -103,7 +121,7 @@ export default function TeacherLectureSupportingMaterials({ lesson = null, canon
                 gap: 8,
               }}
             >
-              <strong>{resource.title || `Teacher lecture ${index + 1}`}</strong>
+              <strong>{resource.title || `${labels.fallback} ${index + 1}`}</strong>
               {resource.description ? (
                 <p style={{ margin: 0, color: "#64748b", lineHeight: 1.6 }}>{resource.description}</p>
               ) : null}
@@ -113,7 +131,7 @@ export default function TeacherLectureSupportingMaterials({ lesson = null, canon
                 rel="noreferrer"
                 style={{ ...styles.linkButton, width: "fit-content" }}
               >
-                Open teacher lecture
+                {labels.action}
               </a>
             </article>
           ))}

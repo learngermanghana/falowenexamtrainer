@@ -66,3 +66,16 @@ test("deduplicates the same teacher lecture from canonical resource aliases", ()
     }),
   ).toEqual([teacherVideo]);
 });
+
+ test("shows a Kiswahili teacher lecture link without adding a second video iframe", () => {
+  const { container } = render(
+    <TeacherLectureSupportingMaterials language="sw" lesson={{teacherVideo: {
+      key: "swahili-b1-day28-teacher-lecture",
+      title: "Kutunza Mazingira",
+      url: "https://youtu.be/6AvbuULcCeg",
+    }}} />
+  );
+  expect(screen.getByRole("heading", { name: "Video ya mwalimu" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Tazama video ya mwalimu" })).toHaveAttribute("href", "https://youtu.be/6AvbuULcCeg");
+  expect(container.querySelectorAll("iframe")).toHaveLength(0);
+});

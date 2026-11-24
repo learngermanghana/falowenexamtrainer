@@ -12,9 +12,19 @@ import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { WorkbookTabNav } from "./StandardWorkbookComponents";
 import SwahiliReviewDraft, { SwahiliFinalSubmit } from "./SwahiliReviewDraft";
+import TeacherLectureSupportingMaterials from "./selfLearning/TeacherLectureSupportingMaterials";
 import "./SwahiliCourseBook.css";
 
 const tabs = [{ key: "references", label: "Muziki" }, ...SWAHILI_B1_WORKBOOK_TABS];
+
+const teacherLecture = {
+  key: "swahili-b1-day28-10.28-teacher-lecture",
+  chapter: "10.28",
+  type: "teacher-lecture",
+  title: "Kutunza Mazingira katika Maisha ya Kila Siku · Somo la mwalimu",
+  description: "Tazama maelezo ya mwalimu kuhusu mada ya Somo la 28.",
+  url: "https://youtu.be/6AvbuULcCeg",
+};
 
 const musicQuestions = [
   [
@@ -191,6 +201,7 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           src="https://www.youtube-nocookie.com/embed/kcqRGi5KLMs" />
         <a href="https://youtu.be/kcqRGi5KLMs" target="_blank" rel="noopener noreferrer">Tazama video kwenye YouTube</a>
       </section>
+      <TeacherLectureSupportingMaterials language="sw" lesson={{ teacherVideo: teacherLecture }} />
       <WorkbookTabNav activeTab={activeTab} onChange={selectTab} tabs={tabs}
         ariaLabel="Kiswahili B1 Somo la 28" renderLegacyGrammarPanel={false} />
       <section className="swahili-book__card" role="tabpanel" tabIndex={-1} aria-label={tabs.find(tab => tab.key === activeTab).label}>

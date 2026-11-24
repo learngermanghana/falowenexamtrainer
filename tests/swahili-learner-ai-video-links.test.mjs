@@ -27,3 +27,12 @@ test("B1 Day 28 learner workbook embeds the exact supplied AI video without repl
   assert.match(b1Workbook, /<RadioFirstWorkbookGate /);
   assert.match(b1Workbook, /<SwahiliB1Day28Listening /);
 });
+
+test("B1 Day 28 keeps its teacher lecture separate from AI video and radio", () => {
+  assert.match(b1Workbook, /type: "teacher-lecture"/);
+  assert.match(b1Workbook, /url: "https:\/\/youtu\.be\/6AvbuULcCeg"/);
+  assert.match(b1Workbook, /<TeacherLectureSupportingMaterials language="sw" lesson=\{\{ teacherVideo: teacherLecture \}\} \/>/);
+  assert.ok(b1Workbook.indexOf("<TeacherLectureSupportingMaterials") > b1Workbook.indexOf('src="https://www.youtube-nocookie.com/embed/kcqRGi5KLMs"'));
+  assert.ok(b1Workbook.indexOf("<TeacherLectureSupportingMaterials") < b1Workbook.lastIndexOf("<WorkbookTabNav"));
+  assert.doesNotMatch(b1Workbook, /embed\/6AvbuULcCeg/);
+});
