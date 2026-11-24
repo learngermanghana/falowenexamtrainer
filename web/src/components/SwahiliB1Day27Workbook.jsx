@@ -69,11 +69,11 @@ export default function SwahiliB1Day27Workbook({uid}) {
     } catch { setNotice("Imeshindikana kuwasilisha kazi. Jaribu tena."); }
     finally { setSaving(false); }
   }
-  return <main className="swahili-book swahili-book--workbook" lang="sw">
+  return <main className="swahili-book swahili-book--workbook swahili-b1-study" lang="sw">
     <Link to="/campus/course">← Kitabu cha kozi</Link>
     <header className="swahili-book__hero"><p>Kiswahili B1 · Somo la 27 · 10.27</p><h1>{title}</h1><p>Jifunze kueleza tabia za kutunza mazingira, faida zake na kutoa ushauri kwa kutumia viunganishi vya B1.</p></header>
     <WorkbookTabNav activeTab={activeTab} onChange={selectTab} tabs={tabs} ariaLabel="Kiswahili B1 Somo la 27" renderLegacyGrammarPanel={false} />
-    <section className="swahili-book__card" role="tabpanel" tabIndex={-1} aria-label={tabs.find(tab=>tab.key===activeTab).label}>
+    <section className="swahili-book__card swahili-b1-study__panel" role="tabpanel" tabIndex={-1} aria-label={tabs.find(tab=>tab.key===activeTab).label}>
       {activeTab==="grammar" && <Day27Grammar />}
       {activeTab==="sprechen" && <Day27Speaking />}
       {activeTab==="schreiben" && <Day27Writing value={essay} onChange={value=>update("writing","essay",value)} />}

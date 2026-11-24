@@ -304,3 +304,44 @@
 .swahili-day2-practice__footer{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#f1f6fd;padding:15px;border-radius:13px;color:#4b607c;font-size:.92rem}
 @media(max-width:760px){.swahili-day2-practice__steps{grid-template-columns:1fr}.swahili-day2-practice__writing-grid{grid-template-columns:1fr}}
 @media(max-width:540px){.swahili-day2-practice__phrases{grid-template-columns:1fr}.swahili-day2-practice__header{padding:17px}.swahili-day2-practice__footer .swahili-book__button{width:100%}}
+
+/* B1 Kiswahili study pages follow the German B1 grammar cards and document layout.
+   Scoped to the three B1 workbooks; A1 and German styles are unchanged. */
+.swahili-b1-study{color:#1e293b;line-height:1.75}
+.swahili-b1-study .swahili-b1-study__panel{display:grid;gap:18px;min-width:0;padding:clamp(14px,3vw,24px)}
+.swahili-b1-study .swahili-b1-study__panel>h2{font-size:clamp(1.35rem,3vw,1.7rem);line-height:1.3;color:#172554;margin:0}
+.swahili-b1-study .swahili-b1-study__panel h3{font-size:1.12rem;line-height:1.45;color:#1e3a8a;margin:0}
+.swahili-b1-study .swahili-b1-study__panel h4{font-size:1rem;color:#334155;margin:4px 0}
+.swahili-b1-study .swahili-b1-study__panel p{margin:0;line-height:1.75;overflow-wrap:anywhere}
+.swahili-b1-study__section{display:grid;align-content:start;gap:12px;min-width:0;padding:clamp(14px,2.5vw,20px);border:1px solid #e2e8f0;border-radius:14px;background:#fff}
+.swahili-b1-study__section h3{padding-bottom:9px;border-bottom:1px solid #e2e8f0}
+.swahili-b1-study__section>p:first-of-type,.swahili-b1-study__rule{padding:12px 14px;border-left:3px solid #2563eb;background:#eff6ff;border-radius:8px;color:#1e3a8a}
+.swahili-b1-study .swahili-b1-study__panel ul,.swahili-b1-study .swahili-b1-study__panel ol{margin:0;padding-left:1.4rem;line-height:1.75}
+.swahili-b1-study .swahili-b1-study__panel li{margin:0 0 7px;padding-left:3px}
+.swahili-b1-study__examples{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 14px 14px 32px!important}
+.swahili-b1-study__examples strong{color:#1d4ed8}
+.swahili-b1-study .swahili-b1-study__panel table{width:100%;border-collapse:separate;border-spacing:0;text-align:left;line-height:1.6;font-size:.96rem;border:1px solid #dbe3ee;border-radius:12px;overflow:hidden}
+.swahili-b1-study .swahili-b1-study__panel th,.swahili-b1-study .swahili-b1-study__panel td{padding:11px 13px;vertical-align:top;text-align:left;border-bottom:1px solid #e2e8f0;overflow-wrap:anywhere}
+.swahili-b1-study .swahili-b1-study__panel th{background:#eaf1fc;color:#1e3a8a;font-weight:750}
+.swahili-b1-study .swahili-b1-study__panel td:first-child{font-weight:650;color:#1e3a8a}
+.swahili-b1-study .swahili-b1-study__panel tbody tr:nth-child(even){background:#f8fafc}
+.swahili-b1-study .swahili-b1-study__panel tbody tr:last-child td{border-bottom:0}
+.swahili-b1-study .swahili-b1-study__panel details,.swahili-b1-study__media-questions details{border:1px solid #dbe3ee;background:#f8fafc;border-radius:10px;padding:12px 14px}
+.swahili-b1-study .swahili-b1-study__panel summary,.swahili-b1-study__media-questions summary{font-weight:700;color:#1d4ed8;cursor:pointer;line-height:1.5}
+.swahili-b1-study details[open]>summary{margin-bottom:10px}
+.swahili-b1-study__practice{display:grid;gap:8px;min-width:0;border:1px solid #dbe3ee;border-radius:12px;padding:12px 14px;background:#f8fafc}
+.swahili-b1-study__practice legend{font-weight:700;padding:0 4px;line-height:1.55}
+.swahili-b1-study .swahili-book__choice{line-height:1.55;min-height:44px;border-color:#cbd5e1;background:white}
+.swahili-b1-study .swahili-book__choice:has(input:checked){background:#eff6ff;border-color:#2563eb}
+.swahili-b1-study .swahili-book__choice input{flex:none;accent-color:#2563eb;margin-top:5px}
+.swahili-b1-study .swahili-book__choice:focus-within,.swahili-b1-study summary:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+.swahili-b1-study__editor{display:grid;gap:10px;border:1px solid #dbe3ee;border-radius:12px;padding:14px;background:#fff}
+.swahili-b1-study__editor label{font-weight:750;color:#1e3a8a}
+.swahili-b1-study__editor textarea{width:100%;min-height:220px;resize:vertical;border:1px solid #94a3b8;border-radius:10px;padding:14px;font:inherit;line-height:1.75;color:#1e293b;background:white}
+.swahili-b1-study__editor textarea:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+.swahili-b1-study .swahili-b1-study__word-count{font-size:.88rem;color:#475569}
+.swahili-b1-study .swahili-b1-study__panel audio{width:100%;max-width:100%}
+.swahili-b1-study__media-questions{display:grid;gap:12px;line-height:1.75}
+.swahili-b1-study__media-questions>section{padding:14px;border:1px solid #dbe3ee;border-radius:12px;background:#fff}
+.swahili-b1-study__media-questions h3,.swahili-b1-study__media-questions h4{margin:0;color:#1e3a8a}
+@media(max-width:600px){.swahili-b1-study .swahili-b1-study__panel{gap:12px}.swahili-b1-study__section{padding:12px}.swahili-b1-study .swahili-b1-study__panel table{min-width:440px}.swahili-b1-study .swahili-b1-study__panel td,.swahili-b1-study .swahili-b1-study__panel th{padding:9px 10px}.swahili-b1-study__editor{padding:10px}}

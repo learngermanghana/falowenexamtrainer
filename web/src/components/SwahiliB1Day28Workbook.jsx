@@ -67,7 +67,7 @@ const radioQuestions = [
 
 function MediaQuestions({ title, questions }) {
   return (
-    <section lang="sw">
+    <section className="swahili-b1-study__media-questions" lang="sw">
       <h3>{title}</h3>
       {["Majibu mafupi", "Kuzungumza"].map((heading, index) => (
         <section key={heading}>
@@ -96,7 +96,7 @@ const radioResource = {
 };
 
 const radioIntro = (
-  <div lang="sw">
+  <div className="swahili-b1-study" lang="sw">
     <FalowenRadioTabContent level="Kiswahili B1" day={28} resource={radioResource} />
     <p><a href="https://youtu.be/aeXVw4Q4olE?si=mE7Lv8rc-LRliwsC" target="_blank" rel="noreferrer">Tazama kwenye YouTube</a></p>
     <MediaQuestions title="Maswali kuhusu podcast" questions={radioQuestions} />
@@ -187,7 +187,7 @@ export default function SwahiliB1Day28Workbook({ uid }) {
   return (
     <RadioFirstWorkbookGate level="Kiswahili B1" day={28} transcriptIntro={radioIntro}
       introInstruction="Sikiliza kipindi cha Falowen Radio, kisha jibu maswali kabla ya kuendelea.">
-    <main className="swahili-book swahili-book--workbook" lang="sw">
+    <main className="swahili-book swahili-book--workbook swahili-b1-study" lang="sw">
       <Link to="/campus/course">← Kitabu cha kozi</Link>
       <header className="swahili-book__hero">
         <p>Kiswahili B1 · Somo la 28 · 10.28</p>
@@ -205,7 +205,7 @@ export default function SwahiliB1Day28Workbook({ uid }) {
       <TeacherLectureSupportingMaterials language="sw" lesson={{ teacherVideo: teacherLecture }} />
       <WorkbookTabNav activeTab={activeTab} onChange={selectTab} tabs={tabs}
         ariaLabel="Kiswahili B1 Somo la 28" renderLegacyGrammarPanel={false} />
-      <section className="swahili-book__card" role="tabpanel" tabIndex={-1} aria-label={tabs.find(tab => tab.key === activeTab).label}>
+      <section className="swahili-book__card swahili-b1-study__panel" role="tabpanel" tabIndex={-1} aria-label={tabs.find(tab => tab.key === activeTab).label}>
         {activeTab === "references" && <>
           <h2>Muziki</h2>
           <WorkbookDayMusic program="swahili" level="B1" day={28} hideLegacyNotes />
@@ -213,7 +213,7 @@ export default function SwahiliB1Day28Workbook({ uid }) {
         </>}
         {activeTab === "grammar" && <>
           <h2>Sarufi na msamiati</h2>
-          <h3>1. Msamiati muhimu</h3>
+          <section className="swahili-b1-study__section"><h3>1. Msamiati muhimu</h3>
           <div style={{ overflowX: "auto" }}><table><thead><tr><th scope="col">Kiswahili</th><th scope="col">Maana / mfano</th><th scope="col">English</th></tr></thead><tbody>
           <tr><td>mazingira</td><td>vitu na hali zinazotuzunguka</td><td>environment</td></tr>
           <tr><td>uendelevu</td><td>kutumia rasilimali bila kuharibu maisha ya baadaye</td><td>sustainability</td></tr>
@@ -230,7 +230,7 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <tr><td>vyakula vya msimu</td><td>vyakula vinavyopatikana katika kipindi fulani</td><td>seasonal food</td></tr>
           <tr><td>kurejeleza</td><td>kutengeneza bidhaa mpya kutokana na vitu vilivyotumika</td><td>to recycle</td></tr>
           </tbody></table></div>
-          <h3>2. Maneno yanayotumika pamoja</h3>
+          </section><section className="swahili-b1-study__section"><h3>2. Maneno yanayotumika pamoja</h3>
           <div style={{ overflowX: "auto" }}><table><thead><tr><th scope="col">Muundo</th><th scope="col">Mfano</th></tr></thead><tbody>
           <tr><td>kupunguza taka</td><td>Tunapunguza taka kwa kutumia mifuko yetu.</td></tr>
           <tr><td>kuzima vifaa</td><td>Ninazima vifaa nisivyotumia.</td></tr>
@@ -238,30 +238,23 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <tr><td>kuhifadhi rasilimali</td><td>Kutumia tena husaidia kuhifadhi rasilimali.</td></tr>
           <tr><td>kuandaa shughuli</td><td>Majirani wanaandaa shughuli ya kusafisha eneo.</td></tr>
           </tbody></table></div>
-          <h3>1. Kueleza namna kwa “kwa + kitenzi-jina”</h3>
-          <p>Tumia kwa + kitenzi-jina kueleza namna tendo linavyofanyika. In English, this often means “by doing”.</p>
-          <p>Tunaokoa umeme kwa kuzima taa.</p>
-          <p>Tunapunguza plastiki kwa kutumia mifuko ya kitambaa.</p>
-          <p>Majirani wanatusaidia kwa kuleta vifaa vyao.</p>
-          <h3>2. Kutaja njia mbadala kwa “badala ya”</h3>
-          <p>Tumia badala ya kuonyesha uchaguzi mwingine.</p>
-          <p>Badala ya kutumia gari, ninatembea kwa miguu.</p>
-          <p>Ninatumia chupa yangu badala ya kununua chupa mpya.</p>
-          <p>Badala ya kununua vifaa vipya, tunaazima vifaa vya majirani.</p>
-          <h3>3. Kueleza tendo lisilofanyika kwa “bila”</h3>
-          <p>Ninaenda sokoni bila kuchukua mfuko mpya wa plastiki.</p>
-          <p>Tunaweza kusafisha eneo bila kununua vifaa vipya.</p>
-          <h3>4. Kutaja lengo kwa “ili”</h3>
-          <p>Baada ya ili, tumia kitenzi kinachoonyesha lengo linalotarajiwa.</p>
-          <p>Tunahifadhi maji ili tuwe na maji ya kutosha baadaye.</p>
-          <p>Tunaweka mapipa tofauti ili watu watenganishe taka.</p>
-          <p>Ninatembea kwa miguu ili nipunguze uchafuzi wa hewa.</p>
-          <h3>Zoezi A · Unganisha sentensi</h3>
+          </section><section className="swahili-b1-study__section"><h3>3. Kueleza namna kwa “kwa + kitenzi-jina”</h3>
+          <p className="swahili-b1-study__rule">Tumia kwa + kitenzi-jina kueleza namna tendo linavyofanyika. In English, this often means “by doing”.</p>
+          <ul className="swahili-b1-study__examples"><li>Tunaokoa umeme <strong>kwa</strong> kuzima taa.</li><li>Tunapunguza plastiki <strong>kwa</strong> kutumia mifuko ya kitambaa.</li><li>Majirani wanatusaidia <strong>kwa</strong> kuleta vifaa vyao.</li></ul>
+          </section><section className="swahili-b1-study__section"><h3>4. Kutaja njia mbadala kwa “badala ya”</h3>
+          <p className="swahili-b1-study__rule">Tumia badala ya kuonyesha uchaguzi mwingine.</p>
+          <ul className="swahili-b1-study__examples"><li><strong>Badala ya</strong> kutumia gari, ninatembea <strong>kwa</strong> miguu.</li><li>Ninatumia chupa yangu <strong>badala ya</strong> kununua chupa mpya.</li><li><strong>Badala ya</strong> kununua vifaa vipya, tunaazima vifaa vya majirani.</li></ul>
+          </section><section className="swahili-b1-study__section"><h3>5. Kueleza tendo lisilofanyika kwa “bila”</h3><p className="swahili-b1-study__rule">Tumia bila + kitenzi-jina kueleza tendo ambalo halifanyiki.</p>
+          <ul className="swahili-b1-study__examples"><li>Ninaenda sokoni <strong>bila</strong> kuchukua mfuko mpya wa plastiki.</li><li>Tunaweza kusafisha eneo <strong>bila</strong> kununua vifaa vipya.</li></ul>
+          </section><section className="swahili-b1-study__section"><h3>6. Kutaja lengo kwa “ili”</h3>
+          <p className="swahili-b1-study__rule">Baada ya ili, tumia kitenzi kinachoonyesha lengo linalotarajiwa.</p>
+          <ul className="swahili-b1-study__examples"><li>Tunahifadhi maji <strong>ili</strong> tuwe na maji ya kutosha baadaye.</li><li>Tunaweka mapipa tofauti <strong>ili</strong> watu watenganishe taka.</li><li>Ninatembea <strong>kwa</strong> miguu <strong>ili</strong> nipunguze uchafuzi wa hewa.</li></ul>
+          </section><section className="swahili-b1-study__section"><h3>Zoezi A · Unganisha sentensi</h3>
           <p>1. Tunaokoa karatasi. Tunachapisha pande zote mbili. (kwa)</p>
           <p>2. Sinunui mfuko mpya. Ninatumia mfuko wangu wa zamani. (badala ya)</p>
           <p>3. Majirani wanasaidia. Wanaleta vifaa. (kwa)</p>
           <p>4. Hatutumii gari. Tunatembea kwa miguu. (badala ya)</p>
-          <h3>Zoezi B · Jaza: kwa, badala ya, bila au ili</h3>
+          </section><section className="swahili-b1-study__section"><h3>Zoezi B · Jaza: kwa, badala ya, bila au ili</h3>
           <p>1. Ninabeba chupa yangu __________ kununua chupa mpya.</p>
           <p>2. Tunaokoa umeme __________ kuzima vifaa tusivyotumia.</p>
           <p>3. Anaoga kwa muda mfupi __________ aokoe maji.</p>
@@ -278,25 +271,25 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <tr><td>B4</td><td>bila</td></tr>
           </tbody></table></div>
           </details>
-          <h3>Faida, changamoto na maoni</h3>
+          </section><section className="swahili-b1-study__section"><h3>Faida, changamoto na maoni</h3>
           <div style={{ overflowX: "auto" }}><table><thead><tr><th scope="col">Hatua</th><th scope="col">Muundo wa sentensi</th><th scope="col">Mfano</th></tr></thead><tbody>
           <tr><td>Faida</td><td>Faida moja ni kwamba …</td><td>Faida moja ni kwamba tunaweza kuokoa pesa.</td></tr>
           <tr><td>Changamoto</td><td>Changamoto moja ni kwamba …</td><td>Baadhi ya bidhaa rafiki kwa mazingira ni ghali.</td></tr>
           <tr><td>Tofauti</td><td>Hata hivyo … / Ingawa …</td><td>Ingawa si rahisi kila wakati, hatua ndogo husaidia.</td></tr>
           <tr><td>Maoni</td><td>Kwa maoni yangu …</td><td>Kwa maoni yangu, kila mtu anaweza kuanza na tabia moja.</td></tr>
           </tbody></table></div>
-          <h3>Epuka makosa haya</h3>
+          </section><section className="swahili-b1-study__section"><h3>Epuka makosa haya</h3>
           <div style={{ overflowX: "auto" }}><table><thead><tr><th scope="col">Si sahihi</th><th scope="col">Sahihi</th></tr></thead><tbody>
           <tr><td>Tunaokoa umeme kwa tunazima taa.</td><td>Tunaokoa umeme kwa kuzima taa.</td></tr>
           <tr><td>Ili tunaokoa maji, tunaoga haraka.</td><td>Ili tuokoe maji, tunaoga kwa muda mfupi.</td></tr>
           <tr><td>Badala ya tunatumia gari, tunatembea.</td><td>Badala ya kutumia gari, tunatembea.</td></tr>
           </tbody></table></div>
-        </>}
+        </section></>}
         {activeTab === "sprechen" && <>
           <h2>1 · Kuzungumza</h2>
-          <p>Swali la siku</p>
+          <section className="swahili-b1-study__section"><h3>Swali la siku</h3>
           <p>Unafanya nini ili kutunza mazingira katika maisha yako ya kila siku? Taja tabia moja, faida moja, changamoto moja na pendekezo linaloweza kutekelezwa. Andaa jibu la sekunde 60–90.</p>
-          <h3>Ramani ya mawazo</h3>
+          </section><section className="swahili-b1-study__section"><h3>Ramani ya mawazo</h3>
           <div style={{ overflowX: "auto" }}><table><thead><tr><th scope="col">Eneo</th><th scope="col">Mawazo</th></tr></thead><tbody>
           <tr><td>Taka</td><td>kutenganisha taka; kupunguza plastiki; kutumia tena</td></tr>
           <tr><td>Maji na nishati</td><td>kufunga bomba; kuoga kwa muda mfupi; kuzima taa</td></tr>
@@ -304,7 +297,7 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <tr><td>Ununuzi</td><td>mfuko wa kitambaa; bidhaa za eneo; bidhaa za msimu</td></tr>
           <tr><td>Jamii</td><td>kusafisha eneo; kupanda miti; kutoa elimu</td></tr>
           </tbody></table></div>
-          <h3>Maelezo ya kujifunza · Kutoka wazo hadi jibu</h3>
+          </section><section className="swahili-b1-study__section"><h3>Maelezo ya kujifunza · Kutoka wazo hadi jibu</h3>
           <div style={{ overflowX: "auto" }}><table><thead><tr><th scope="col">Hatua</th><th scope="col">Swali la kujiuliza</th><th scope="col">Kianzio cha sentensi</th></tr></thead><tbody>
           <tr><td>1. Mada</td><td>Ninazungumzia nini?</td><td>Leo ningependa kuzungumzia …</td></tr>
           <tr><td>2. Tabia binafsi</td><td>Ninafanya nini tayari?</td><td>Katika maisha yangu ya kila siku …</td></tr>
@@ -317,16 +310,12 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <p>Mfano wa jibu
           Habari zenu. Leo ningependa kuzungumzia kutunza mazingira katika maisha ya kila siku. Ninajaribu kupunguza taka kwa kubeba mfuko wangu wa kitambaa na chupa ya maji. Pia ninatembea kwa miguu badala ya kutumia gari kwa safari fupi. Faida moja ni kwamba ninaokoa pesa na kupunguza uchafuzi wa hewa. Hata hivyo, wakati wa mvua si rahisi kutembea au kutumia baiskeli. Katika eneo ninapoishi, tunaweza kupanga siku ya kusafisha mazingira. Kwa maoni yangu, si lazima mtu abadili kila kitu mara moja. Tukianza na tabia moja rahisi, watu wengi wanaweza kuleta mabadiliko makubwa.</p>
           </details>
-          <h3>Kazi ya jozi · Panga shughuli ya mazingira</h3>
+          </section><section className="swahili-b1-study__section"><h3>Kazi ya jozi · Panga shughuli ya mazingira</h3>
           <p>Pangeni shughuli ya kusafisha eneo. Kubalianeni kuhusu:</p>
-          <p>mahali, tarehe na saa;</p>
-          <p>vifaa vinavyohitajika;</p>
-          <p>mgawanyo wa kazi;</p>
-          <p>mtakachofanya mvua ikinyesha;</p>
-          <p>namna ya kuwajulisha majirani.</p>
-          <p>Tofauti ya maoni</p>
+          <ul><li>mahali, tarehe na saa;</li><li>vifaa vinavyohitajika;</li><li>mgawanyo wa kazi;</li><li>mtakachofanya mvua ikinyesha;</li><li>namna ya kuwajulisha majirani.</li></ul>
+          <h4>Tofauti ya maoni</h4>
           <p>Mwanafunzi A anataka kununua vifaa vipya. Mwanafunzi B anataka kuazima au kutumia vifaa vilivyopo. Tafuteni mwafaka.</p>
-          <h3>Misemo muhimu</h3>
+          </section><section className="swahili-b1-study__section"><h3>Misemo muhimu</h3>
           <div style={{ overflowX: "auto" }}><table><thead><tr><th scope="col">Kusudi</th><th scope="col">Misemo</th></tr></thead><tbody>
           <tr><td>Kutoa pendekezo</td><td>Ninapendekeza kwamba … / Vipi kama …?</td></tr>
           <tr><td>Kukubaliana</td><td>Hilo ni wazo zuri. / Hilo linanifaa.</td></tr>
@@ -334,18 +323,17 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <tr><td>Kutoa njia mbadala</td><td>Badala ya …, tunaweza …</td></tr>
           <tr><td>Kutaja lengo</td><td>Tunaweza … ili …</td></tr>
           </tbody></table></div>
-          <h3>Orodha ya kujikagua</h3>
-          <p>Nimetaja tabia binafsi.</p>
-          <p>Nimeeleza faida na changamoto.</p>
-          <p>Nimetumia kwa, badala ya, bila au ili.</p>
-          <p>Nimetoa pendekezo linaloweza kutekelezwa.</p>
-          <p>Nimehitimisha kwa maoni wazi.</p>
-        </>}
+          </section><section className="swahili-b1-study__section"><h3>Orodha ya kujikagua</h3><ul><li>Nimetaja tabia binafsi.</li>
+          <li>Nimeeleza faida na changamoto.</li>
+          <li>Nimetumia kwa, badala ya, bila au ili.</li>
+          <li>Nimetoa pendekezo linaloweza kutekelezwa.</li>
+          <li>Nimehitimisha kwa maoni wazi.</li>
+        </ul></section></>}
         {activeTab === "schreiben" && <>
           <h2>2 · Kuandika</h2>
-          <p>Kazi yako · Barua pepe</p>
+          <section className="swahili-b1-study__section"><h3>Kazi yako · Barua pepe</h3>
           <p>Waandikie majirani barua pepe ya maneno 100–120. Waalike kwenye shughuli ya pamoja ya kutunza mazingira. Eleza tatizo, taja mahali na wakati, fafanua kazi mbili na uombe jibu. Tumia angalau muundo mmoja wa namna, njia mbadala au lengo.</p>
-          <h3>Mpango wa kuandika</h3>
+          </section><section className="swahili-b1-study__section"><h3>Mpango wa kuandika</h3>
           <div style={{ overflowX: "auto" }}><table><thead><tr><th scope="col">Kipengele</th><th scope="col">Maudhui</th><th scope="col">Muundo muhimu</th></tr></thead><tbody>
           <tr><td>Anwani</td><td>watu unaowaandikia</td><td>Wapendwa majirani,</td></tr>
           <tr><td>Sababu</td><td>tatizo na madhumuni</td><td>Katika eneo letu … Kwa hiyo …</td></tr>
@@ -354,16 +342,15 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           <tr><td>Vifaa</td><td>vitu vya kuleta</td><td>Tafadhali, leteni …</td></tr>
           <tr><td>Jibu na mwisho</td><td>ombi la uthibitisho</td><td>Tafadhali nijulishe … Salamu,</td></tr>
           </tbody></table></div>
-          <label htmlFor="sw-b1-28-writing">Andika barua pepe yako</label>
+          <div className="swahili-b1-study__editor"><label htmlFor="sw-b1-28-writing">Andika barua pepe yako</label>
           <textarea id="sw-b1-28-writing" rows={9} value={writing} onChange={event => updateWriting(event.target.value)} />
-          <p>Maneno: {writing.trim() ? writing.trim().split(/\s+/).length : 0} · Lengo: 100–120</p>
-          <h3>Orodha ya mwisho</h3>
-          <p>Nimeeleza tatizo na sababu ya kuandika.</p>
-          <p>Nimetaja mahali, tarehe na saa.</p>
-          <p>Nimetaja kazi na vifaa.</p>
-          <p>Nimetumia muundo unaofaa wa sarufi.</p>
-          <p>Nimeomba jibu na kuhitimisha kwa salamu.</p>
-        </>}
+          <p className="swahili-b1-study__word-count" aria-live="polite">Maneno: {writing.trim() ? writing.trim().split(/\s+/).length : 0} · Lengo: 100–120</p></div>
+          </section><section className="swahili-b1-study__section"><h3>Orodha ya mwisho</h3><ul><li>Nimeeleza tatizo na sababu ya kuandika.</li>
+          <li>Nimetaja mahali, tarehe na saa.</li>
+          <li>Nimetaja kazi na vifaa.</li>
+          <li>Nimetumia muundo unaofaa wa sarufi.</li>
+          <li>Nimeomba jibu na kuhitimisha kwa salamu.</li>
+        </ul></section></>}
         {activeTab === "lesen" && <SwahiliB1Day28Reading answers={reading} onAnswer={updateReading} />}
         {activeTab === "hoeren" && <SwahiliB1Day28Listening answers={listening} onAnswer={updateListening} />}
         {activeTab === "submit" && <>
