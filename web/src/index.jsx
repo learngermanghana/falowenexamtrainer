@@ -1,4 +1,5 @@
 import { courseTrial, TrialCoursePage } from "./components/TrialPractice";
+import { restrictTrialWithServer, useCourseTrialEntitlement } from "./lib/courseTrialEntitlement";
 import { MockExamOnlyGate } from "./components/MockExamCommerce";
 import { MOCK_EXAM_CATALOG } from "./data/mockExamCatalog";
 import React from 'react';
@@ -65,14 +66,16 @@ const AppMountedSignal = () => {
 
 // Some German workbook routes mount directly, outside App's normal route guard.
 function CourseTrialBoundary({ children }) {
-  const { studentProfile, loading } = useAuth();
+  const { user, studentProfile, loading } = useAuth();
   const { pathname, state, search } = useLocation();
   const path = pathname.replace(/\/+$/, "");
   const exam = /^\/exams(?:\/|$)/i.test(path) || Object.values(MOCK_EXAM_CATALOG).some(mock => mock.route === path);
   const course = /^\/campus\/course(?:\/|$)/i.test(path);
+  const localTrial = courseTrial(studentProfile);
+  const snapshot = useCourseTrialEntitlement(user, course && Boolean(localTrial), localTrial?.endsAtMs);
   if (!course && !exam) return children;
   if (loading) return null;
-  const trial = courseTrial(studentProfile);
+  const trial = restrictTrialWithServer(localTrial, snapshot);
   if (!trial) return children;
   if (exam) return <MockExamOnlyGate courseTrialState={trial}>{children}</MockExamOnlyGate>;
   if (/\/lesson\//i.test(path) && state) return <Navigate to={pathname + search} replace state={null} />;
