@@ -45,9 +45,9 @@ const request = (body) =>
     });
   });
 
-function createDb({ session, existingCheckin = null }) {
+function createDb({ session, existingCheckin = null, profile = {}, access = {} }) {
   const writes = [];
-  const studentSnap = { exists: true, id: "student-doc", data: () => ({ className: "A1", studentCode: "STU-1", email: "student@example.com" }) };
+  const studentSnap = { exists: true, id: "student-doc", data: () => ({ className: "A1", studentCode: "STU-1", email: "student@example.com", ...profile }) };
   const sessionRef = { kind: "session", collection: () => ({ doc: () => checkinRef }) };
   const checkinRef = { kind: "checkin" };
   const tx = {
@@ -63,6 +63,7 @@ function createDb({ session, existingCheckin = null }) {
     tx,
     collection: jest.fn((name) => {
       if (name === "accountDeletionRequests") return { doc: () => ({ get: async () => ({ exists: false, data: () => ({}) }) }) };
+      if (name === "courseAccountAccess") return { doc: () => ({ get: async () => ({ data: () => access }) }) };
       if (name === "students") return { doc: () => ({ get: async () => studentSnap }), where: jest.fn() };
       if (name === "attendance") return { doc: () => ({ collection: () => ({ doc: () => sessionRef }) }) };
       throw new Error(`unexpected collection ${name}`);
@@ -143,4 +144,14 @@ describe("attendance check-in", () => {
     expect(mockDb.writes[0].data).toMatchObject({ method: "falowen_button", source: "falowen_student_app" });
     expect(mockDb.writes[1].data.attendance["STU-1"]).toMatchObject({ method: "falowen_button", source: "falowen_student_app" });
   });
+});
+
+test("active trial can check in but expired and exam-only accounts cannot", async () => {
+  const session = {opened:true,openTo:"2999-01-01T00:00:00Z"};
+  mockDb = createDb({session,profile:{level:"A1",trialEndsAt:new Date(Date.now()+60000).toISOString()}});
+  expect((await request({className:"A1",sessionId:"s1"})).status).toBe(200);
+  mockDb = createDb({session,profile:{level:"A1",trialEndsAt:new Date(Date.now()-60000).toISOString()}});
+  expect((await request({className:"A1",sessionId:"s1"})).status).toBe(403);
+  mockDb = createDb({session,access:{examOnly:true}});
+  expect((await request({className:"A1",sessionId:"s1"})).status).toBe(403);
 });
