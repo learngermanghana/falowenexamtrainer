@@ -22,9 +22,11 @@ const retryable = (error) => ["INVALID_MOCK_ASSESSMENT", "OPENAI_EMPTY_RESPONSE"
 // Two bounded attempts fit within the 60-second API gateway budget. Retrying
 // here charges the application's quota once and never writes a partial grade.
 const createMockAssessment = async (messages, options = {}, { partKeys = [], pointCounts = {}, formatPart = "", prepareResult, validateResult } = {}) => {
+  let retryField = "";
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
-      const reply = await createChatCompletion(messages, {
+      const requestMessages = prepareResult && retryField ? [...messages, { role: "user", content: `The previous assessment failed validation at ${retryField}. Return the complete JSON again, correcting that field. Quote only exact text from the matching response; do not invent evidence or scores.` }] : messages;
+      const reply = await createChatCompletion(requestMessages, {
         ...options,
         max_tokens: Math.max(Number(options.max_tokens) || 0, 2200),
         response_format: { type: "json_object" },
@@ -39,6 +41,7 @@ const createMockAssessment = async (messages, options = {}, { partKeys = [], poi
       if (!retryable(error)) throw error;
       // Never log model output, answers, or student identity.
       console.warn("mock.assessment.retry", { attempt: attempt + 1, code: error?.code || error?.name, status: error?.status, field: error?.validationField || "unspecified" });
+      if (error?.code === "INVALID_MOCK_ASSESSMENT") retryField = error.validationField || "assessment";
       if (attempt === 1) {
         throw Object.assign(new Error("AI marking is temporarily unavailable. Keep this page open and retry marking shortly."), {
           code: "MOCK_MARKING_UNAVAILABLE", status: 503,
