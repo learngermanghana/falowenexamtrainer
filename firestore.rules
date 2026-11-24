@@ -77,9 +77,15 @@ service cloud.firestore {
       ]);
     }
 
-    match /users/{userId}/{document=**} {
+    match /users/{userId} {
       allow read: if isOwner(userId) || isStaff();
       allow create, update, delete: if isOwner(userId);
+      match /{collectionId}/{document=**} {
+        allow read: if isOwner(userId) || isStaff();
+        // Workbook writes must use the server route, which rechecks the current
+        // enrolled programme and expiry. Keep historic submissions readable.
+        allow create, update, delete: if isOwner(userId) && collectionId != 'swahiliLessons';
+      }
     }
 
     function canReviewSwahili() {
