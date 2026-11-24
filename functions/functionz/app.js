@@ -2038,6 +2038,12 @@ app.post("/attendance/checkin", async (req, res) => {
     const student = await findAuthedStudentProfile(db, authedUser);
     if (!student) return res.status(404).json({ error: "Student profile not found" });
     const studentData = student.data;
+    const access = (await db.collection("courseAccountAccess").doc(authedUser.uid).get()).data();
+    const { courseExpiry } = require("./entitlementService");
+    const trialEnd = courseExpiry(studentData);
+    if ((access?.examOnly ?? (studentData.accountType === "exam_only" || authedUser.examOnly === true)) || (trialEnd !== null && trialEnd <= Date.now())) {
+      return res.status(403).json({ error: "An active Full Course enrollment or trial is required for attendance." });
+    }
     if (String(studentData.className || "") !== String(className)) {
       return res.status(403).json({ error: "Attendance session is not for your class" });
     }
