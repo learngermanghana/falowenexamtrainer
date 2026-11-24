@@ -25,7 +25,7 @@ function normalizeWorkbook(input = {}) {
   }
   return {id, level, day, data:{program:"swahili", level: level === "A1" && day === 1 ? "beginner" : level, day,
     lessonId:"swahili-"+id, title:input.title, status:"submitted", writing, readingAnswers, listeningAnswers,
-    listeningTeacherLed:revisedTopic, ...(revisedTopic ? {contentVersion:3} : {}), ...(level === "A1" && day === 4 && input.readingVersion === 2 ? {readingVersion:2}: {})}};
+    listeningTeacherLed:false, ...(revisedTopic ? {contentVersion:3} : {}), ...(level === "A1" && day === 4 && input.readingVersion === 2 ? {readingVersion:2}: {})}};
 }
 
 function registerSwahiliSubmissionRoute(app,{admin,getAuthedUser}) {

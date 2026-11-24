@@ -2408,52 +2408,53 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       ]
     },
     "listening": {
-      "teacherLed": true,
-      "transcript": "Juma: Habari, Neema! Leo ni siku gani?\nNeema: Leo ni Jumatano, tarehe saba Agosti.\nJuma: Kesho ni Alhamisi, sivyo?\nNeema: Ndiyo. Kesho nina miadi na daktari.\nJuma: Siku yako ya kuzaliwa ni lini?\nNeema: Tarehe kumi Desemba.\nJuma: Asante. Jana ilikuwa Jumanne.\nNeema: Ndiyo, kwa heri!",
+      "teacherLed": false,
+      "transcript": "A: Jambo, habari za asubuhi?\nB: Jambo, habari nzuri sana.\nA: Leo ni siku gani ya juma?\nB: Leo ni Jumatatu.\nA: Je, tarehe ya leo ni ngapi?\nB: Leo ni tarehe kumi na mbili.\nA: Mwezi huu ni upi?\nB: Mwezi huu ni Machi.\nA: Mwaka gani sasa hivi?\nB: Mwaka ni elfu mbili na ishirini na nne.\nA: Asante sana kwa habari hii.\nB: Karibu sana rafiki yangu.",
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-12/audio-url",
       "questions": [
         {
           "id": "calendar-listen-1",
-          "question": "Leo ni siku gani?",
+          "question": "B anajibu nini baada ya salamu?",
           "choices": [
-            "Jumanne",
-            "Jumatano",
-            "Alhamisi"
+            "Habari mbaya.",
+            "Habari nzuri sana.",
+            "Sijui."
           ]
         },
         {
           "id": "calendar-listen-2",
-          "question": "Leo ni tarehe ngapi?",
+          "question": "Leo ni siku gani ya juma?",
           "choices": [
-            "Tarehe saba Agosti",
-            "Tarehe nane Agosti",
-            "Tarehe kumi Desemba"
+            "Jumatatu.",
+            "Jumanne.",
+            "Ijumaa."
           ]
         },
         {
           "id": "calendar-listen-3",
-          "question": "Kesho Neema ana miadi na nani?",
+          "question": "Tarehe ya leo ni ngapi?",
           "choices": [
-            "Mwalimu",
-            "Rafiki",
-            "Daktari"
+            "Tarehe kumi.",
+            "Tarehe ishirini.",
+            "Tarehe kumi na mbili."
           ]
         },
         {
           "id": "calendar-listen-4",
-          "question": "Neema alizaliwa lini?",
+          "question": "Mwezi huu ni upi?",
           "choices": [
-            "Tarehe kumi Desemba",
-            "Tarehe saba Agosti",
-            "Tarehe nane Agosti"
+            "Januari.",
+            "Machi.",
+            "Mei."
           ]
         },
         {
           "id": "calendar-listen-5",
-          "question": "Jana ilikuwa siku gani?",
+          "question": "Mwaka gani sasa hivi?",
           "choices": [
-            "Ijumaa",
-            "Jumanne",
-            "Jumamosi"
+            "Elfu mbili na ishirini na nne.",
+            "Elfu mbili na ishirini na tatu.",
+            "Elfu mbili na ishirini na tano."
           ]
         }
       ]
@@ -2891,52 +2892,53 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
       ]
     },
     "listening": {
-      "teacherLed": true,
-      "transcript": "Amina: Hujambo, Juma? Unaamka saa ngapi kila siku?\nJuma: Sijambo. Huamka saa kumi na mbili asubuhi.\nAmina: Hufanya nini ukiamka?\nJuma: Ninaoga na kula kifungua kinywa. Ninaenda kazini saa mbili asubuhi.\nAmina: Hula chakula cha mchana saa ngapi?\nJuma: Saa saba mchana. Hurudi nyumbani saa kumi na moja jioni.\nAmina: Hufanya nini usiku?\nJuma: Hutazama televisheni, kisha hulala saa nne usiku.",
+      "teacherLed": false,
+      "transcript": "A: Hujambo jirani.\nB: Sijambo hujambo.\nA: Saa ngapi sasa?\nB: Saa tatu asubuhi.\nA: Unakwenda wapi sasa hivi?\nB: Ninakwenda kazini mjini.\nA: Unafanya kazi gani?\nB: Mimi ni mwalimu wa shule.\nA: Unaanza kazi saa ngapi?\nB: Ninaanza saa nne kamili.\nA: Unamaliza kazi saa ngapi?\nB: Ninamaliza saa kumi jioni.\nA: Unarudi nyumbani saa ngapi?\nB: Ninafika nyumbani saa kumi na moja.\nA: Unafanya nini usiku?\nB: Ninapika chakula na kulala.\nA: Safari njema kazini leo.\nB: Asante sana kwaheri.",
+      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-13/audio-url",
       "questions": [
         {
           "id": "routine-listen-1",
-          "question": "Juma huamka saa ngapi?",
+          "question": "Saa ngapi sasa?",
           "choices": [
-            "Saa mbili asubuhi",
-            "Saa kumi na mbili asubuhi",
-            "Saa nne usiku"
+            "Saa mbili asubuhi.",
+            "Saa nne asubuhi.",
+            "Saa tatu asubuhi."
           ]
         },
         {
           "id": "routine-listen-2",
-          "question": "Juma anafanya nini kabla ya kwenda kazini?",
+          "question": "B anafanya kazi gani?",
           "choices": [
-            "Anaoga na kula kifungua kinywa",
-            "Anatazama televisheni",
-            "Anarudi nyumbani"
+            "Ni mwalimu wa shule.",
+            "Ni daktari.",
+            "Ni muuzaji."
           ]
         },
         {
           "id": "routine-listen-3",
-          "question": "Juma anaenda kazini saa ngapi?",
+          "question": "B anaanza kazi saa ngapi?",
           "choices": [
-            "Saa saba mchana",
-            "Saa mbili asubuhi",
-            "Saa kumi na moja jioni"
+            "Saa tatu kamili.",
+            "Saa nne kamili.",
+            "Saa tano kamili."
           ]
         },
         {
           "id": "routine-listen-4",
-          "question": "Juma hula chakula cha mchana saa ngapi?",
+          "question": "B anamaliza kazi saa ngapi?",
           "choices": [
-            "Saa sita mchana",
-            "Saa nne usiku",
-            "Saa saba mchana"
+            "Saa kumi jioni.",
+            "Saa tisa alasiri.",
+            "Saa kumi na moja jioni."
           ]
         },
         {
           "id": "routine-listen-5",
-          "question": "Juma hufanya nini kabla ya kulala?",
+          "question": "B anafika nyumbani saa ngapi?",
           "choices": [
-            "Hutazama televisheni",
-            "Huenda kazini",
-            "Hula kifungua kinywa"
+            "Saa nane.",
+            "Saa kumi.",
+            "Saa kumi na moja."
           ]
         }
       ]
