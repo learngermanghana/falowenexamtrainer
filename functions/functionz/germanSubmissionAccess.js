@@ -5,7 +5,7 @@ const { dateMillis } = require("./swahiliAccess");
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 const PAID = ["paid","active","partial","partially paid","partially_paid","part paid","part-paid"];
 const text = value => String(value || "").trim().toLowerCase();
-const ACCESS_FIELDS = ["accountType","program","secondaryProgram","coursePlacements","level","status","role","isTutor","paymentStatus","paid","paidAmount","balanceDue","balance","accessType","institutionVerification","contractEnd","trialStatus","trialStartedAt","trialUsedAt","trialEndsAt","joined_at","joinedAt"];
+const ACCESS_FIELDS = ["accountType","program","secondaryProgram","coursePlacements","level","status","role","isTutor","paymentStatus","paid","paidAmount","balanceDue","balance","accessType","institutionVerification","contractStart","contractEnd","trialStatus","trialStartedAt","trialUsedAt","trialEndsAt","joined_at","joinedAt"];
 function accessFingerprint(profile) {
   return Object.fromEntries(ACCESS_FIELDS.map(key=>[key,profile[key] ?? null]));
 }
@@ -67,11 +67,19 @@ async function verifyGermanSubmissionAccess(db,auth,identity,now=Date.now()) {
   const profile=record.data();
   if (profile.uid!==uid) return null;
   const access=germanSubmissionAccess(profile,now,account.metadata?.creationTime);
-  if(!access)return null;
-  const {enrollmentRows,blockedEnrollmentLevels}=require("./levelEnrollmentAccess");
-  const blocked=blockedEnrollmentLevels(await enrollmentRows(record.ref),"german",now);
-  const levels=access.levels.filter(level=>!blocked.includes(level));
-  return levels.length ? {...access,levels,level:levels.includes(access.level)?access.level:levels[levels.length-1],profileId:record.id,profileFields:accessFingerprint(profile)} : null;
+  const {enrollmentRows,enrollmentDecision}=require("./levelEnrollmentAccess");
+  const decision=enrollmentDecision(await enrollmentRows(record.ref),"german",now);
+  const placement=germanPlacement(profile);
+  if(!placement||profile.accountType==="exam_only"||["archived","inactive","deleted","withdrawn","suspended","blocked"].includes(text(profile.status))||["pending","invitation_pending"].includes(text(placement.accessType)))return null;
+  const levels=LEVELS.filter(level=>!decision.blocked.includes(level)&&((access?.levels||[]).includes(level)||decision.granted.includes(level)));
+  if(!levels.length)return null;
+  // Never turn a trial grant into unrestricted access to another level.
+  const full=access?.mode==="full"||decision.granted.length>0;
+  const allowed=full&&access?.mode==="trial"?levels.filter(level=>decision.granted.includes(level)):levels;
+  if(!allowed.length)return null;
+  const nextMidnight=Date.parse(new Date(now).toISOString().slice(0,10)+"T00:00:00Z")+86400000;
+  const expires=decision.managed.length?Math.min(nextMidnight,access?.endsAtMs??Infinity):access?.endsAtMs??null;
+  return {...access,mode:full?"full":"trial",day1Keys:full?[]:access?.day1Keys||[],levels:allowed,level:allowed.includes(access?.level)?access.level:allowed[allowed.length-1],endsAtMs:expires,profileId:record.id,profileFields:accessFingerprint(profile),enrollmentVersions:decision.versions};
 }
 function registerGermanSubmissionAccessRoute(app,{admin,getAuthedUser}) {
   app.post("/course/submission-access",async(req,res)=>{

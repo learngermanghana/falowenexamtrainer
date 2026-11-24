@@ -579,7 +579,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     const baseLevels = Object.keys(schedules);
     const normalizedDefault = resolvedDefaultLevel;
     const merged = normalizedDefault && !baseLevels.includes(normalizedDefault) ? [...baseLevels, normalizedDefault] : baseLevels;
-    const allowedLevels = getAccessibleLevels(normalizedDefault, merged).filter(level=>!studentProfile?.blockedEnrollmentLevels?.includes(level));
+    const allowedLevels = [...new Set([...getAccessibleLevels(normalizedDefault, merged),...(studentProfile?.grantedEnrollmentLevels||[])])].filter(level=>!studentProfile?.blockedEnrollmentLevels?.includes(level));
     return allowedLevels.sort((a, b) => {
       const aIndex = LEVEL_ORDER.indexOf(a);
       const bIndex = LEVEL_ORDER.indexOf(b);
@@ -588,7 +588,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       if (bIndex !== -1) return 1;
       return a.localeCompare(b);
     });
-  }, [resolvedDefaultLevel, schedules, trialLevel, studentProfile?.blockedEnrollmentLevels]);
+  }, [resolvedDefaultLevel, schedules, trialLevel, studentProfile?.blockedEnrollmentLevels,studentProfile?.grantedEnrollmentLevels]);
 
   const [levelChoice, setLevelChoice] = useState(null);
   const assignedLevel = levels.includes(resolvedDefaultLevel) ? resolvedDefaultLevel : levels[0] || "";

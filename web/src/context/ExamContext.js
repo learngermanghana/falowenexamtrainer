@@ -146,8 +146,8 @@ export const ExamProvider = ({ children, entitledLevels }) => {
     const purchased = includePaidExams
       ? paidExamGrants.filter(grant => grant.expiresAtMs > accessTime).map(grant => grant.level)
       : [];
-    return [...new Set([...getExamPracticeLevels(profileExamLevel), ...purchased])].filter(level=>!studentProfile?.blockedEnrollmentLevels?.includes(level));
-  }, [entitledLevels, profileExamLevel, includePaidExams, paidExamGrants, accessTime, studentProfile?.blockedEnrollmentLevels]);
+    return [...new Set([...getExamPracticeLevels(profileExamLevel), ...purchased,...(studentProfile?.grantedEnrollmentLevels||[])])].filter(level=>!studentProfile?.blockedEnrollmentLevels?.includes(level));
+  }, [entitledLevels, profileExamLevel, includePaidExams, paidExamGrants, accessTime, studentProfile?.blockedEnrollmentLevels,studentProfile?.grantedEnrollmentLevels]);
   const [level, setLevelState] = useState(() =>
     entitledLevels?.[0] || resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)));
   const [levelConfirmed, setLevelConfirmed] = useState(Boolean(loadPreferredLevel(user?.uid)));

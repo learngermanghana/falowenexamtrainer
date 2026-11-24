@@ -687,7 +687,7 @@ function App() {
       tabStorageKey={tabStorageKey} user={user} /></ExamProvider>;
   }
 
-  if (awaitingPayment) {
+  if (awaitingPayment && !studentProfile?.managedEnrollmentLevels?.length) {
     if (universityPending || universityContractEnded) {
       return (
         <div style={{ ...styles.container, display: "grid", placeItems: "center", minHeight: "65vh" }}>
@@ -977,7 +977,7 @@ const AppShell = ({
         {!isOnboarding ? <BookPdfDownloadInjector /> : null}
         <AssessmentRulesNotice restricted={mockAssessment} />
         {!isStaff && studentProfile?.blockedEnrollmentLevels?.length > 0 && <div role="status" style={{padding:12,marginBottom:12,border:"1px solid #f59e0b",borderRadius:8}}>Access paused for {studentProfile.blockedEnrollmentLevels.join(", ")}. Clear the outstanding balance or contact Falowen to confirm your contract. <Link to="/campus/account">View account</Link>.</div>}
-        {!isStaff && studentProfile?.levelEnrollmentCheckPending && /^\/(?:campus\/course|exams)(?:\/|$)/.test(location.pathname) ? <p>Checking your enrollment access…</p> : !isStaff && studentProfile?.blockedEnrollmentLevels?.includes(routeEnrollmentLevel(location.pathname,location.search,studentProfile)) ? <div role="alert"><h2>Course access paused</h2><p>This level has an overdue payment or ended contract. Your other levels and records are not deleted.</p><Link to="/campus/account">View account</Link> · <Link to="/campus/course">Back to courses</Link></div> : <Routes>
+        {!isStaff && (studentProfile?.levelEnrollmentCheckPending||studentProfile?.levelEnrollmentCheckError) && /^\/(?:campus\/course|exams)(?:\/|$)/.test(location.pathname) ? <p>{studentProfile?.levelEnrollmentCheckError?"Unable to verify enrollment. Refresh or contact support.":"Checking your enrollment access…"}</p> : !isStaff && studentProfile?.blockedEnrollmentLevels?.includes(routeEnrollmentLevel(location.pathname,location.search,studentProfile)) ? <div role="alert"><h2>Course access paused</h2><p>This level has an overdue payment or ended contract. Your other levels and records are not deleted.</p><Link to="/campus/account">View account</Link> · <Link to="/campus/course">Back to courses</Link></div> : <Routes>
           <Route
             path="/onboarding"
             element={

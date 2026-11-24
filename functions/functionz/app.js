@@ -1904,7 +1904,12 @@ app.post("/auth/login-diagnostics", async (req, res) => {
 
     const docSnap = await findStudentForLoginIdentifier(db, identifier);
     const profile = buildLoginDiagnosticProfile(docSnap);
-    return res.json(buildLoginDiagnostic(profile));
+    const diagnostic=buildLoginDiagnostic(profile);
+    if(docSnap?.exists&&["contract_ended","payment_status"].includes(diagnostic.reason)){
+      const contracts=await docSnap.ref.collection("levelEnrollments").limit(1).get();
+      if(!contracts.empty)return res.json({exists:true,reason:"active",profile});
+    }
+    return res.json(diagnostic);
   } catch (err) {
     log.error("auth.login_diagnostics_failed", { error: err?.message || err });
     return res.status(500).json({ error: err?.message || "Could not check login account" });

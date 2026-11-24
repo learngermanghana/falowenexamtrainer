@@ -1,5 +1,5 @@
 import { courseProfile, enrolledCourses, readCoursePreference, saveCoursePreference, secondaryAccessExpiry } from "../utils/courseEnrollment";
-import { blockedEnrollmentLevels } from "../utils/levelEnrollmentAccess";
+import { enrollmentDecision } from "../utils/levelEnrollmentAccess";
 import { ReadingStudentContext } from "../services/savedReadingPhrases";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -171,13 +171,14 @@ const buildStudentSupportDiagnostic = (profile, reason = "student_access_blocked
   profile,
 });
 
-const getStudentAccessBlockReason = (profile) => {
+const getStudentAccessBlockReason = (profile, hasIndependentContracts = false) => {
   if (!profile) return "No student profile was found for this login. Please contact support.";
 
   const status = String(profile.status || "").trim().toLowerCase();
   if (status && !ACTIVE_STUDENT_STATUSES.includes(status)) {
     return `Login blocked because this student record is marked ${profile.status}.`;
   }
+  if(hasIndependentContracts)return "";
 
   const contractEndMs = toMillis(profile.contractEnd);
   if (Number.isFinite(contractEndMs) && contractEndMs <= Date.now()) {
@@ -192,6 +193,11 @@ const getStudentAccessBlockReason = (profile) => {
   return "";
 };
 
+async function hasIndependentContracts(profile,user){
+  if(!profile?.id||!user?.uid||profile.uid!==user.uid)return false;
+  const {getDocs,query,limit}=await import("firebase/firestore");
+  try{const snap=await getDocs(query(collection(db,"students",profile.id,"levelEnrollments"),limit(1)));return !snap.empty;}catch{return false;}
+}
 class LoginDiagnosticError extends Error {
   constructor(message, diagnostic = {}) {
     super(message);
@@ -873,7 +879,7 @@ export const AuthProvider = ({ children }) => {
           profileOverride ||
           (await fetchStudentProfileByUid(credential.user.uid)) ||
           (await fetchStudentProfileByEmail(normalizedEmail));
-        const accessBlockReason = getStudentAccessBlockReason(profile);
+        const accessBlockReason = getStudentAccessBlockReason(profile,await hasIndependentContracts(profile,credential.user));
         if (accessBlockReason) {
           await signOut(auth).catch((error) => console.warn("Failed to sign out blocked login", error));
           setStudentProfile(null);
@@ -1028,7 +1034,7 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Google sign-in is limited to student accounts. Please contact support for access.");
     }
 
-    const accessBlockReason = getStudentAccessBlockReason(existingProfile);
+    const accessBlockReason = getStudentAccessBlockReason(existingProfile,await hasIndependentContracts(existingProfile,credential.user));
     if (accessBlockReason) {
       await signOut(auth);
       throw new LoginDiagnosticError(accessBlockReason, {
@@ -1286,7 +1292,14 @@ export const AuthProvider = ({ children }) => {
     const profile=courseProfile(studentProfile,preferred);
     if(!profile)return profile;
     const state=levelEnrollmentState?.uid===enrollmentUid&&levelEnrollmentState?.id===enrollmentProfileId?levelEnrollmentState:null;
-    return {...profile,blockedEnrollmentLevels:blockedEnrollmentLevels(state?.rows,profile.program||"german",Math.max(levelAccessClock,Date.now())),levelEnrollmentCheckPending:!!enrollmentOwner&&!state};
+    const now=Math.max(levelAccessClock,Date.now());
+    const decision=enrollmentDecision(state?.rows,profile.program||"german",now);
+    const legacyEnd=toMillis(profile.contractEnd);
+    const legacyUnavailable=decision.managed.length>0&&((Number.isFinite(legacyEnd)&&legacyEnd<=now)||BLOCKED_PAYMENT_STATUSES.includes(normalizePaymentStatus(profile.paymentStatus)));
+    const levels=["A1","A2","B1","B2","C1","C2"];
+    const legacyLevels=levels.slice(0,levels.indexOf(String(profile.level||"").toUpperCase())+1);
+    const blocked=[...new Set([...decision.blocked,...(legacyUnavailable?legacyLevels.filter(l=>!decision.granted.includes(l)):[])])];
+    return {...profile,blockedEnrollmentLevels:blocked,grantedEnrollmentLevels:decision.granted,managedEnrollmentLevels:decision.managed,levelEnrollmentCheckPending:!!enrollmentOwner&&!state,levelEnrollmentCheckError:!!state?.error};
   },[studentProfile,preferred,levelEnrollmentState,enrollmentUid,enrollmentProfileId,enrollmentOwner,levelAccessClock]);
   const selectCourse = useCallback(program => {
     if (!courseOptions.includes(program) || !user?.uid) return;
