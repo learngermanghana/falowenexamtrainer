@@ -257,7 +257,7 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
 
 // Exam-only purchases reuse the same Paystack credentials and authenticated backend.
 registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling });
-registerMockCommerceRoutes(app, { admin, getAuthedUser });
+registerMockCommerceRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 registerBookCommerceRoutes(app, { admin });
 registerCourseDiscountRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling });
 

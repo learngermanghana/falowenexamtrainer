@@ -180,7 +180,7 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
     setState({loading:true,active:[]});
     if (!user) return undefined;
     user.getIdToken().then(token=>api("/mock/access",{token}))
-      .then(data=> {if(subscribed)setState({loading:false,active:data.active||[]});})
+      .then(data=> {if(subscribed)setState({loading:false,active:data.active||[],entitlements:data.entitlements || null});})
       .catch(()=> {if(subscribed)setState({loading:false,active:[]});});
     return ()=>{subscribed=false;};
   }, [user, location.pathname]);
@@ -197,8 +197,16 @@ export function MockExamOnlyGate({ children, courseTrialState }) {
   const active = state.loading ? [] : state.active.filter(row => !row.expiresAtMs || row.expiresAtMs > Date.now());
   const registeredLevel = String(studentProfile?.level || "").toUpperCase();
   const eligible = active.filter(row => studentProfile?.courseEnrollmentPreserved || row.level === registeredLevel);
-  const paidLevels = [...new Set(eligible.filter(row => row.scope !== "trial").map(row => row.level))];
-  const trial = eligible.find(row => row.scope === "trial" && row.expiresAtMs > Date.now());
+  const activePaidLevels = [...new Set(eligible.filter(row => row.scope !== "trial").map(row => row.level))];
+  const paidLevels = state.entitlements
+    ? activePaidLevels.filter(level => state.entitlements.exam?.paidLevels?.includes(level))
+    : activePaidLevels;
+  const serverTrial = state.entitlements?.exam?.trial;
+  const trial = state.entitlements
+    ? (serverTrial && serverTrial.expiresAtMs > Date.now() ? serverTrial : null)
+    : (eligible.find(row => row.scope === "trial" && row.expiresAtMs > Date.now()) ||
+       (courseTrialState?.active && courseTrialState.endsAtMs > Date.now()
+         ? { level: registeredLevel, expiresAtMs: courseTrialState.endsAtMs } : null));
   const displayLevel = safeLevels.has(registeredLevel) ? registeredLevel : "A1";
   const renderShell = levels => typeof children === "function" ? children(levels) : children;
   // Navigation is not an entitlement. Only these exact catalog paths can

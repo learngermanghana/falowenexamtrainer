@@ -36,4 +36,36 @@ function paidExamGrants(grants) {
   return (grants || []).filter(row => row.scope !== "trial");
 }
 
-module.exports = { courseExpiry, trialRestriction, paidExamGrants };
+// A single snapshot used by the student catalog and server-side guards.
+// Inputs must come from the verified student record and active server grants.
+function resolveEntitlements({ profile = {}, identity = {}, grants = [], now = Date.now() } = {}) {
+  const examOnly = profile.accountType === "exam_only" || (!profile.accountType && identity.examOnly === true);
+  const level = String(profile.level || "").trim().toUpperCase();
+  const endsAtMs = examOnly ? null : courseExpiry(profile);
+  const courseTrialActive = !examOnly && endsAtMs !== null && endsAtMs > now;
+  // A missing trial date alone does not prove tuition was paid. Existing
+  // legacy and institutional access is handled by the established account
+  // policy until its authoritative status is available here.
+  const balance = profile.balanceDue ?? profile.balance;
+  const paymentStatus = String(profile.paymentStatus || "").toLowerCase();
+  const paidCourse = ["paid", "active", "partial", "partially paid", "partially_paid", "part paid", "part-paid"].includes(paymentStatus) ||
+    Number(profile.paid ?? profile.paidAmount) > 0 || (balance != null && Number(balance) <= 0);
+  const courseAvailable = !examOnly && endsAtMs === null && paidCourse;
+  const courseUnknown = !examOnly && endsAtMs === null && !paidCourse;
+  const validGrants = grants.filter(grant => grant && grant.status === "active" && Number(grant.expiresAtMs) > now);
+  const eligible = validGrants.filter(grant => profile.courseEnrollmentPreserved === true || grant.level === level);
+  const paidLevels = [...new Set(paidExamGrants(eligible).map(grant => grant.level))];
+  const examTrial = eligible.find(grant => grant.scope === "trial");
+  const trialLevel = examTrial?.level || (courseTrialActive ? level : "");
+  const trialExam = exams[trialLevel];
+  return {
+    version: 1, accountType: examOnly ? "exam_only" : "course", level,
+    home: true, account: true,
+    course: { day1: courseUnknown ? null : (courseAvailable || courseTrialActive),
+      day2Plus: courseUnknown ? null : courseAvailable, trial: courseTrialActive, endsAtMs },
+    exam: { paidLevels, trial: trialExam ? { level: trialLevel, catalogId: trialExam.catalogId,
+      expiresAtMs: examTrial ? Number(examTrial.expiresAtMs) : endsAtMs } : null },
+  };
+}
+
+module.exports = { courseExpiry, trialRestriction, paidExamGrants, resolveEntitlements };
