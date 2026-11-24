@@ -18,8 +18,10 @@ function ownsStudent(snapshot, user) {
 
 
 async function preserveCourseExamTrial(tx, db, student, uid, canRestoreCourse, now = Date.now()) {
-  if (!canRestoreCourse || student.accountType === "exam_only" || student.program === "swahili" ||
+  if (!canRestoreCourse || student.program === "swahili" ||
       student.secondaryProgram === "swahili" || student.examTrialStartedAt) return;
+  // An already converted student may be missing the preserved trial grant.
+  // Only a proven existing course enrollment can recover that original window.
   const trial = require("./trialExams.json")[student.level];
   const end = require("./entitlementService").courseExpiry(student);
   if (!trial || !Number.isFinite(end) || end <= now) return;
@@ -28,6 +30,42 @@ async function preserveCourseExamTrial(tx, db, student, uid, canRestoreCourse, n
   if (prior.exists || prior.data()) return; // never restart a used or expired exam trial
   tx.create(ref, { uid, level: student.level, scope: "trial", status: "active",
     expiresAtMs: end, mockIds: [trial.catalogId], source: "preserved_course_trial" });
+}
+
+const DAY_MS = 86400000;
+const trialExams = require("./trialExams.json");
+
+function switchableGermanStudent(student) {
+  return String(student.program || "german").toLowerCase() === "german" &&
+    String(student.secondaryProgram || "").toLowerCase() !== "swahili" &&
+    !["approved", "pending"].includes(student.institutionVerification) &&
+    !["archived","deleted","inactive","withdrawn"].includes(String(student.status || "").toLowerCase());
+}
+
+// Transfer an existing exam trial to a matching course, never issue a new trial.
+// Class and price are supplied by the server after validating the public class.
+function examTrialCoursePatch(student, grant, course, uid, now = Date.now()) {
+  const level = String(student.level || "").toUpperCase();
+  const exam = trialExams[level];
+  const expires = Number(grant?.expiresAtMs);
+  const started = student.examTrialStartedAt?.toMillis?.() ?? Date.parse(student.examTrialStartedAt || "");
+  const end = Number.isFinite(started) ? Math.min(expires, started + 7 * DAY_MS) : expires;
+  if (!exam || grant?.uid !== uid || grant.scope !== "trial" || grant.status !== "active" || grant.level !== level ||
+      !Array.isArray(grant.mockIds) || !grant.mockIds.includes(exam.catalogId) ||
+      !Number.isFinite(end) || end <= now || end > now + 7 * DAY_MS ||
+      !course || course.language !== "German" || course.level !== level || !isOpenPublicClass(course) || !(course.tuitionGhs > 0) ||
+      student.trialStartedAt || student.trialUsedAt || student.trialEndsAt) return null;
+  const originalStart = Number.isFinite(started) ? started : end - 7 * DAY_MS;
+  if (originalStart > now || originalStart >= end) return null;
+  return {
+    courseType: "full_course", accountType: "course", courseEnrollmentPreserved: true,
+    className: course.title, classId: course.id, classRecordId: course.id, level,
+    tuitionFee: course.tuitionGhs, tuitionCurrency: "GHS", paid: 0, initialPaymentAmount: 0,
+    balanceDue: course.tuitionGhs, paymentStatus: "pending", status: "pending",
+    trialStatus: "active", trialStartedAt: new Date(originalStart).toISOString(),
+    trialUsedAt: new Date(originalStart).toISOString(), trialEndsAt: new Date(end).toISOString(),
+    trialPurgeAt: new Date(end + 30 * DAY_MS).toISOString(),
+  };
 }
 
 function registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling }) {
@@ -40,7 +78,7 @@ function registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCode
           ["moxflex@gmail.com", "staff@falowen.app"].includes(user.email)) {
         return res.status(403).json({ error: "This setting is for student accounts." });
       }
-      const { courseType, classId } = req.body || {};
+      const { courseType, classId, expectedCourseType, beginCheckout } = req.body || {};
       if (!["full_course", "exam_preparation"].includes(courseType)) {
         return res.status(400).json({ error: "Choose Full course or Exam preparation." });
       }
@@ -57,22 +95,26 @@ function registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCode
         if (!ownsStudent(snapshot, user)) return { status: 403, error: "Student account not found." };
         const student = snapshot.data();
         const examOnly = policy?.examOnly ?? (student.accountType === "exam_only" || user.examOnly === true);
+        if (!switchableGermanStudent(student)) return { status: 409, error: "Contact admissions to change this language or institutional enrollment." };
+        const current = student.courseType || (examOnly ? "exam_preparation" : "full_course");
+        if (expectedCourseType && expectedCourseType !== current) return { status: 409, error: "Course type changed. Refresh your account first." };
+        const deletion = (await tx.get(db.collection("accountDeletionRequests").doc(user.uid))).data();
+        const existingOrder = (await tx.get(checkout)).data();
+        if (["pending","processing","completed"].includes(deletion?.status)) return { status: 409, error: "Resolve account deletion before switching." };
+        if (existingOrder?.status === "pending" && (courseType === "exam_preparation" || policy?.canRestoreCourse || !examOnly)) return { status: 409, error: "Resolve your pending tuition checkout before switching." };
 
         if (courseType === "exam_preparation") {
-          const { paidSoFar } = normalizeStudentBilling(student);
-          const canRestoreCourse = !examOnly || policy?.canRestoreCourse === true;
-          const keepCourse = canRestoreCourse && (paidSoFar > 0 || student.accessType === "complimentary" ||
-            student.institutionVerification === "approved" || student.paymentStatus === "paid");
-          if (!keepCourse) await preserveCourseExamTrial(tx, db, student, user.uid, canRestoreCourse);
-          tx.set(access, { examOnly: !keepCourse, canRestoreCourse });
-          tx.update(match.ref, { courseType, accountType: keepCourse ? "course" : "exam_only", courseEnrollmentPreserved: canRestoreCourse, updated_at: timestamp() });
-          return { courseType, checkout: "exam" };
+          const transition = adminCourseTypeTransition(student, { ...policy, examOnly }, courseType, normalizeStudentBilling);
+          if (transition.policy.examOnly) await preserveCourseExamTrial(tx, db, student, user.uid, transition.policy.canRestoreCourse);
+          tx.set(access, transition.policy, { merge: true });
+          tx.update(match.ref, { ...transition.updates, updated_at: timestamp() });
+          return { courseType, accountType: transition.updates.accountType, checkout: null };
         }
 
         if (!examOnly || policy?.canRestoreCourse === true) {
-          tx.set(access, { examOnly: false, canRestoreCourse: true });
-          tx.update(match.ref, { courseType, accountType: "course", updated_at: timestamp() });
-          return { courseType, checkout: null };
+          tx.set(access, { examOnly: false, canRestoreCourse: true }, { merge: true });
+          tx.update(match.ref, { courseType, accountType: "course", courseEnrollmentPreserved: true, updated_at: timestamp() });
+          return { courseType, accountType: "course", checkout: null };
         }
 
         const billing = normalizeStudentBilling(student);
@@ -80,8 +122,8 @@ function registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCode
           return { status: 409, error: "This account already has a tuition record. Contact admissions to review it before starting a new enrollment." };
         }
 
-        const existingOrder = (await tx.get(checkout)).data();
         if (existingOrder) {
+          if (beginCheckout !== true) return { courseType: current, checkout: "required", reason: "Resume your existing tuition checkout." };
           if (classId && classId !== existingOrder.classId) {
             return { status: 409, error: `Your open checkout is for ${existingOrder.className}. Clear the class selection to resume it.` };
           }
@@ -96,6 +138,14 @@ function registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCode
             !["A1", "A2", "B1", "B2", "C1"].includes(course.level) || !(course.tuitionGhs > 0)) {
           return { status: 409, error: "This class is no longer open. Choose another class." };
         }
+        const grant = (await tx.get(db.collection("mockSubscriptions").doc(user.uid + "_trial"))).data();
+        const trialPatch = examTrialCoursePatch(student, grant, course, user.uid);
+        if (trialPatch) {
+          tx.update(match.ref, { ...trialPatch, updated_at: timestamp() });
+          tx.set(access, { examOnly: false, canRestoreCourse: true }, { merge: true });
+          return { courseType, accountType: "course", checkout: null, trialEndsAt: trialPatch.trialEndsAt };
+        }
+        if (beginCheckout !== true) return { courseType: current, checkout: "required", reason: "No transferable active trial. Review tuition before enrolling." };
         if (!process.env.PAYSTACK_SECRET) return { status: 503, error: "Payments are temporarily unavailable." };
         const fee = calculateSharedPaystackFee(course.tuitionGhs);
         const order = {
@@ -272,4 +322,4 @@ function registerAdminCourseTypeRoute(app, { admin, normalizeStudentBilling }) {
   });
 }
 
-module.exports = { PRODUCT, accessRef, registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition, preserveCourseExamTrial };
+module.exports = { PRODUCT, accessRef, registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition, preserveCourseExamTrial, examTrialCoursePatch };

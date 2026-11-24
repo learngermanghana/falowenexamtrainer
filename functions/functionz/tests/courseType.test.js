@@ -1,4 +1,4 @@
-const { registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition, preserveCourseExamTrial } = require("../courseType");
+const { registerCourseTypeRoutes, processCourseTypeWebhook, adminCourseTypeTransition, preserveCourseExamTrial, examTrialCoursePatch } = require("../courseType");
 
 function fixture(student) {
   const records = new Map([["students/student", { uid: "student", role: "student", level: "A1", ...student }]]);
@@ -12,7 +12,7 @@ function fixture(student) {
       const writes = [];
       const result = await fn({
         get: (doc) => doc.get(),
-        set: (doc, data) => writes.push(() => records.set(doc.path, data)),
+        set: (doc, data, opts) => writes.push(() => records.set(doc.path, opts?.merge ? {...records.get(doc.path), ...data} : data)),
         create: (doc, data) => writes.push(() => records.set(doc.path, data)),
         update: (doc, data) => writes.push(() => records.set(doc.path, { ...records.get(doc.path), ...data })),
       });
@@ -31,9 +31,9 @@ function fixture(student) {
   });
   return {
     admin, records,
-    async change(courseType, user = { uid: "student", email: "student@example.org" }) {
+    async change(courseType, user = { uid: "student", email: "student@example.org" }, fields = {}) {
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      await handle({ user, body: { courseType, paid: 9999 }, headers: {} }, res);
+      await handle({ user, body: { courseType, paid: 9999, ...fields }, headers: {} }, res);
       return res;
     },
   };
@@ -116,4 +116,48 @@ test("expired course trial does not create a new exam grant", async () => {
   const { records, change } = fixture({ paid: 0, balanceDue: 3000, level: "A2", trialEndsAt: new Date(Date.now() - 1000).toISOString() });
   await change("exam_preparation");
   expect(records.has("mockSubscriptions/student_trial")).toBe(false);
+});
+
+test("changing preference does not initiate checkout and recovers a missing preserved trial grant", async () => {
+  const end = Date.now()+3600000;
+  const {records,change}=fixture({accountType:"exam_only",courseType:"exam_preparation",courseEnrollmentPreserved:true,level:"A2",paid:0,balanceDue:3000,trialEndsAt:new Date(end).toISOString()});
+  records.set("courseAccountAccess/student",{examOnly:true,canRestoreCourse:true});
+  const res=await change("exam_preparation");
+  expect(res.json).toHaveBeenCalledWith({courseType:"exam_preparation",accountType:"exam_only",checkout:null});
+  expect(records.get("mockSubscriptions/student_trial").expiresAtMs).toBe(end);
+  expect(records.has("courseTypeOrders/student")).toBe(false);
+});
+test("a direct exam trial transfers only the original remaining days to a validated same-level class", async () => {
+  const end=Date.now()+3600000;
+  const {records,change}=fixture({accountType:"exam_only",courseType:"exam_preparation",level:"A2",trialStatus:"not_applicable"});
+  const grant={uid:"student",scope:"trial",status:"active",level:"A2",expiresAtMs:end,mockIds:[require("../trialExams.json").A2.catalogId]};
+  records.set("mockSubscriptions/student_trial",grant);
+  records.set("classes/a2",{name:"A2 Evening",level:"A2",language:"German",status:"active",startDate:"2026-01-01",endDate:"2999-01-01",registrationOpen:true});
+  await change("full_course",undefined,{classId:"a2",expectedCourseType:"exam_preparation"});
+  expect(records.get("students/student")).toMatchObject({accountType:"course",courseType:"full_course",courseEnrollmentPreserved:true,level:"A2",classId:"a2",paid:0,balanceDue:3000,paymentStatus:"pending",trialEndsAt:new Date(end).toISOString()});
+  expect(records.get("mockSubscriptions/student_trial")).toEqual(grant);
+  await change("exam_preparation");
+  await change("full_course");
+  expect(records.get("students/student").trialEndsAt).toBe(new Date(end).toISOString());
+  expect(records.get("mockSubscriptions/student_trial")).toEqual(grant);
+  expect(records.has("courseTypeOrders/student")).toBe(false);
+});
+test("invalid, expired or different-level trial grants do not unlock Full Course", () => {
+  const now=Date.now();
+  const student={level:"A2"};
+  const course={id:"c",title:"A2",level:"A2",language:"German",publicVisible:true,registrationOpen:true,status:"active",startDate:"2026-01-01",endDate:"2999-01-01",tuitionGhs:3000};
+  const grant={uid:"student",scope:"trial",status:"active",level:"A2",expiresAtMs:now+60000,mockIds:[require("../trialExams.json").A2.catalogId]};
+  expect(examTrialCoursePatch(student,{...grant,expiresAtMs:now},course,"student",now)).toBeNull();
+  expect(examTrialCoursePatch(student,{...grant,uid:"other"},course,"student",now)).toBeNull();
+  expect(examTrialCoursePatch(student,grant,{...course,level:"B1"},"student",now)).toBeNull();
+  expect(examTrialCoursePatch({...student,trialUsedAt:"old"},grant,course,"student",now)).toBeNull();
+});
+test("stale preference and pending deletion or dual-language account cannot switch", async () => {
+  const {records,change}=fixture({courseType:"full_course",paid:0,balanceDue:3000});
+  expect((await change("exam_preparation",undefined,{expectedCourseType:"exam_preparation"})).status).toHaveBeenCalledWith(409);
+  records.set("accountDeletionRequests/student",{status:"pending"});
+  expect((await change("exam_preparation")).status).toHaveBeenCalledWith(409);
+  records.delete("accountDeletionRequests/student");
+  records.set("students/student",{...records.get("students/student"),secondaryProgram:"swahili"});
+  expect((await change("exam_preparation")).status).toHaveBeenCalledWith(409);
 });
