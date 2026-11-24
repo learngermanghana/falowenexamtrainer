@@ -1988,374 +1988,491 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
   "12": {
     "day": 12,
     "chapter": "Somo la 12",
-    "title": "Mapishi ya Kitanzania",
-    "objective": "Read a family cooking story, understand an ugali conversation and give simple cooking instructions.",
-    "grammar": "Amri, mpangilio wa hatua na mapishi",
+    "title": "Siku, Miezi na Tarehe",
+    "contentVersion": 3,
+    "objective": "Name weekdays and months, ask and answer about dates, birthdays and appointments.",
+    "grammar": "Siku, miezi, tarehe na maneno ya wakati",
     "practiceOnly": false,
-    "rule": "Use instructions in the order they happen, starting with kwanza, then kisha, and finally mwishowe. Examples of commands to one person include osha, kata and ongeza. Ongeza comes from kuongeza.",
+    "rule": "Say tarehe followed by the day number, then the month and year.",
     "examples": [
       {
-        "swahili": "Osha nyanya.",
-        "english": "Wash the tomatoes."
+        "swahili": "Leo ni Jumatatu.",
+        "english": "Today is Monday."
       },
       {
-        "swahili": "Kata vitunguu.",
-        "english": "Cut the onions."
-      },
-      {
-        "swahili": "Ongeza chumvi.",
-        "english": "Add salt."
+        "swahili": "Leo ni tarehe tano Machi.",
+        "english": "Today is 5 March."
       }
     ],
     "check": {
-      "question": "Which instruction means “Add salt”?",
+      "question": "Which means 5 March?",
       "options": [
-        "Ongeza chumvi.",
-        "Kata chumvi.",
-        "Osha chumvi."
+        "Tarehe tano Machi",
+        "Mwezi wa tano",
+        "Tarehe tatu Mei"
       ],
       "answer": 0,
-      "why": "Ongeza means add."
-    },
-    "speaking": "Talk about Tanzanian food and explain how to prepare ugali. Use sequence words, change partners and repeat the instructions.",
-    "writing": {
-      "prompt": "Andika maelekezo mafupi ya kupika ugali. Write 5–7 short sentences explaining the ingredients, how to prepare the hot water, when to add flour and how to finish.",
-      "guide": {
-        "heading": "Kuandika · Jinsi ya kupika ugali",
-        "steps": [
-          "Name the dish and two ingredients (unga wa mahindi and maji).",
-          "Start with Kwanza and explain what happens to the water.",
-          "Use Kisha or Halafu to explain adding flour slowly and stirring.",
-          "Finish with Mwishowe and describe when the ugali is ready."
-        ],
-        "phrases": [
-          "Tunahitaji …",
-          "Kwanza, …",
-          "Kisha, …",
-          "Halafu, …",
-          "Tia unga polepole.",
-          "Koroga mpaka …",
-          "Mwishowe, …"
-        ],
-        "placeholder": "Leo tunapika ugali. Tunahitaji …\\nKwanza, …",
-        "minimumLines": 5
-      }
-    },
-    "reading": {
-      "title": "Mapishi Jikoni kwa Mama",
-      "text": "Leo ni siku ya Jumapili. Mama yupo jikoni anapika chakula cha jioni kwa ajili ya familia.\n\nAnapika wali wa nazi na samaki. Kwanza, anasafisha mchele na kutumia tui la nazi kupika wali. Pili, anakaanga samaki na kuweka viungo vyenye harufu nzuri. Watoto pia wanapenda kula ugali na maharage, lakini leo chakula kikuu ni wali na samaki.\n\nBaada ya kupika, familia yote inakaa pamoja mezani kula chakula cha jioni. Baba anasema, “Chakula hiki ni kitamu sana, asante!”",
-      "questions": [
-        {
-          "id": "read-1",
-          "question": "Mama yupo wapi leo na anafanya nini?",
-          "choices": [
-            "Yupo dukani ananunua nguo",
-            "Yupo jikoni anapika chakula cha jioni",
-            "Yupo mlimani anatembea",
-            "Yupo shuleni anafundisha"
-          ]
-        },
-        {
-          "id": "read-2",
-          "question": "Mama anapika chakula gani kikuu leo?",
-          "choices": [
-            "Ugali na nyama",
-            "Chipsi na kuku",
-            "Wali wa nazi na samaki",
-            "Mkate na chai"
-          ]
-        },
-        {
-          "id": "read-3",
-          "question": "Mama anatumia nini kupika wali wa nazi?",
-          "choices": [
-            "Maji tu",
-            "Tui la nazi",
-            "Maziwa ya ng’ombe",
-            "Juisi ya embe"
-          ]
-        },
-        {
-          "id": "read-4",
-          "question": "Watoto wanapenda kula chakula gani kingine cha Kitanzania?",
-          "choices": [
-            "Pizza na pasta",
-            "Ugali na maharage",
-            "Supu na mkate",
-            "Matunda na juisi"
-          ]
-        },
-        {
-          "id": "read-5",
-          "question": "Baba anasema nini baada ya kuonja chakula mezani?",
-          "choices": [
-            "Sitaki kula leo.",
-            "Chakula ni baridi.",
-            "Chakula hiki ni kitamu sana, asante!",
-            "Naomba bili, tafadhali."
-          ]
-        }
-      ]
+      "why": "Tarehe tano is the fifth date, Machi is March."
     },
     "grammarSections": [
       {
-        "title": "Vitenzi vya kupika · Cooking verbs",
-        "rule": "Many regular Kiswahili verbs end in -a. To give one person a simple positive command, use the verb stem without ku-: kuosha → osha, kukata → kata, kupika → pika, kuongeza → ongeza. For a polite request, add tafadhali.",
+        "title": "Siku za wiki · Days of the week",
+        "rule": "Traditional weekday names begin with Jumamosi (Saturday). Alhamisi and Ijumaa reflect Arabic influence.",
         "examples": [
           {
-            "swahili": "Osha mchele, tafadhali.",
-            "english": "Wash the rice, please."
+            "swahili": "Jumamosi",
+            "english": "Saturday"
           },
           {
-            "swahili": "Kata vitunguu.",
-            "english": "Cut the onions."
+            "swahili": "Jumapili",
+            "english": "Sunday"
           },
           {
-            "swahili": "Ongeza tui la nazi.",
-            "english": "Add coconut milk."
+            "swahili": "Jumatatu",
+            "english": "Monday"
           },
           {
-            "swahili": "Koroga ugali.",
-            "english": "Stir the ugali."
+            "swahili": "Jumanne",
+            "english": "Tuesday"
+          },
+          {
+            "swahili": "Jumatano",
+            "english": "Wednesday"
+          },
+          {
+            "swahili": "Alhamisi",
+            "english": "Thursday"
+          },
+          {
+            "swahili": "Ijumaa",
+            "english": "Friday"
           }
         ]
       },
       {
-        "title": "Mpangilio wa hatua · Sequence words",
-        "rule": "Use kwanza (first), kisha or halafu (then), baadaye (afterwards) and mwishowe (finally) to give instructions in a clear order.",
+        "title": "Miezi ya mwaka · Months",
+        "rule": "Use the month name or mwezi wa + ordinal expression. Both mwezi wa kwanza and Januari mean January.",
         "examples": [
           {
-            "swahili": "Kwanza, osha mchele.",
-            "english": "First, wash the rice."
+            "swahili": "Januari / mwezi wa kwanza",
+            "english": "January"
           },
           {
-            "swahili": "Kisha, ongeza tui la nazi.",
-            "english": "Then, add coconut milk."
+            "swahili": "Februari / mwezi wa pili",
+            "english": "February"
           },
           {
-            "swahili": "Baadaye, pika wali.",
-            "english": "Afterwards, cook the rice."
+            "swahili": "Machi / mwezi wa tatu",
+            "english": "March"
           },
           {
-            "swahili": "Mwishowe, pakua chakula.",
-            "english": "Finally, serve the food."
+            "swahili": "Aprili / mwezi wa nne",
+            "english": "April"
+          },
+          {
+            "swahili": "Mei / mwezi wa tano",
+            "english": "May"
+          },
+          {
+            "swahili": "Juni / mwezi wa sita",
+            "english": "June"
+          },
+          {
+            "swahili": "Julai / mwezi wa saba",
+            "english": "July"
+          },
+          {
+            "swahili": "Agosti / mwezi wa nane",
+            "english": "August"
+          },
+          {
+            "swahili": "Septemba / mwezi wa tisa",
+            "english": "September"
+          },
+          {
+            "swahili": "Oktoba / mwezi wa kumi",
+            "english": "October"
+          },
+          {
+            "swahili": "Novemba / mwezi wa kumi na moja",
+            "english": "November"
+          },
+          {
+            "swahili": "Desemba / mwezi wa kumi na mbili",
+            "english": "December"
           }
         ]
       },
       {
-        "title": "Unahitaji nini? · Ingredients and quantities",
-        "rule": "Use unahitaji nini? to ask what someone needs; tunahitaji … means we need. Kwa ugali, use unga wa mahindi and maji. The phrase maji ya moto means hot water.",
+        "title": "Tarehe · Dates",
+        "rule": "Say the date first, then the month, and optionally mwaka + year. Ask Leo ni tarehe ngapi? or Leo ni siku gani?",
         "examples": [
           {
-            "swahili": "Unahitaji nini kupika ugali?",
-            "english": "What do you need to cook ugali?"
+            "swahili": "Leo ni tarehe tano Machi.",
+            "english": "Today is 5 March."
           },
           {
-            "swahili": "Tunahitaji unga wa mahindi na maji.",
-            "english": "We need maize flour and water."
+            "swahili": "Tarehe ishirini na moja Julai.",
+            "english": "21 July."
           },
           {
-            "swahili": "Tia unga polepole.",
-            "english": "Add the flour slowly."
+            "swahili": "Ulizaliwa lini?",
+            "english": "When were you born?"
           },
           {
-            "swahili": "Koroga mpaka ugali uwe mgumu.",
-            "english": "Stir until the ugali becomes firm."
+            "swahili": "Nilizaliwa tarehe kumi Mei.",
+            "english": "I was born on 10 May."
           }
         ]
       },
       {
-        "title": "Chakula na maoni · Food and opinions",
-        "rule": "Use ninapenda … to say what you like, napenda … in natural speech, and chakula hiki ni kitamu to describe a tasty meal. Questions with unajua …? ask if someone knows how to do something.",
+        "title": "Wakati · Time expressions",
+        "rule": "Use jana for yesterday, leo for today, kesho for tomorrow, juzi for the day before yesterday and keshokutwa for the day after tomorrow.",
         "examples": [
           {
-            "swahili": "Ninapenda wali wa nazi na samaki.",
-            "english": "I like coconut rice and fish."
+            "swahili": "Leo ni Jumatatu.",
+            "english": "Today is Monday."
           },
           {
-            "swahili": "Unajua kupika ugali?",
-            "english": "Do you know how to cook ugali?"
+            "swahili": "Jana ilikuwa Jumapili.",
+            "english": "Yesterday was Sunday."
           },
           {
-            "swahili": "Ndiyo, najua kupika.",
-            "english": "Yes, I know how to cook."
+            "swahili": "Kesho ni Jumanne.",
+            "english": "Tomorrow is Tuesday."
           },
           {
-            "swahili": "Chakula hiki ni kitamu sana.",
-            "english": "This food is very delicious."
+            "swahili": "Juzi ilikuwa Jumamosi.",
+            "english": "The day before yesterday was Saturday."
+          },
+          {
+            "swahili": "Keshokutwa ni Jumatano.",
+            "english": "The day after tomorrow is Wednesday."
           }
         ]
       }
     ],
     "vocabulary": [
       {
-        "sw": "jikoni",
-        "en": "in the kitchen"
+        "sw": "Jumamosi",
+        "en": "Saturday"
       },
       {
-        "sw": "mapishi",
-        "en": "cooking / recipes"
+        "sw": "Jumapili",
+        "en": "Sunday"
       },
       {
-        "sw": "wali wa nazi",
-        "en": "coconut rice"
+        "sw": "Jumatatu",
+        "en": "Monday"
       },
       {
-        "sw": "samaki",
-        "en": "fish"
+        "sw": "Jumanne",
+        "en": "Tuesday"
       },
       {
-        "sw": "mchele",
-        "en": "uncooked rice"
+        "sw": "Jumatano",
+        "en": "Wednesday"
       },
       {
-        "sw": "tui la nazi",
-        "en": "coconut milk"
+        "sw": "Alhamisi",
+        "en": "Thursday"
       },
       {
-        "sw": "viungo",
-        "en": "spices / seasonings"
+        "sw": "Ijumaa",
+        "en": "Friday"
       },
       {
-        "sw": "ugali",
-        "en": "maize-flour staple"
+        "sw": "Januari",
+        "en": "January"
       },
       {
-        "sw": "unga wa mahindi",
-        "en": "maize flour"
+        "sw": "Februari",
+        "en": "February"
       },
       {
-        "sw": "maji ya moto",
-        "en": "hot water"
+        "sw": "Machi",
+        "en": "March"
       },
       {
-        "sw": "kukoroga",
-        "en": "to stir"
+        "sw": "Aprili",
+        "en": "April"
       },
       {
-        "sw": "maharage",
-        "en": "beans"
+        "sw": "Mei",
+        "en": "May"
+      },
+      {
+        "sw": "Juni",
+        "en": "June"
+      },
+      {
+        "sw": "Julai",
+        "en": "July"
+      },
+      {
+        "sw": "Agosti",
+        "en": "August"
+      },
+      {
+        "sw": "Septemba",
+        "en": "September"
+      },
+      {
+        "sw": "Oktoba",
+        "en": "October"
+      },
+      {
+        "sw": "Novemba",
+        "en": "November"
+      },
+      {
+        "sw": "Desemba",
+        "en": "December"
+      },
+      {
+        "sw": "siku",
+        "en": "day"
+      },
+      {
+        "sw": "wiki",
+        "en": "week"
+      },
+      {
+        "sw": "mwezi",
+        "en": "month"
+      },
+      {
+        "sw": "mwaka",
+        "en": "year"
+      },
+      {
+        "sw": "tarehe",
+        "en": "date"
+      },
+      {
+        "sw": "leo",
+        "en": "today"
+      },
+      {
+        "sw": "jana",
+        "en": "yesterday"
+      },
+      {
+        "sw": "kesho",
+        "en": "tomorrow"
+      },
+      {
+        "sw": "juzi",
+        "en": "day before yesterday"
+      },
+      {
+        "sw": "keshokutwa",
+        "en": "day after tomorrow"
+      },
+      {
+        "sw": "sasa",
+        "en": "now"
+      },
+      {
+        "sw": "baadaye",
+        "en": "later"
+      },
+      {
+        "sw": "miadi",
+        "en": "appointments"
+      },
+      {
+        "sw": "siku ya kuzaliwa",
+        "en": "birthday"
+      },
+      {
+        "sw": "sikukuu",
+        "en": "public holiday"
+      },
+      {
+        "sw": "mwaka jana",
+        "en": "last year"
+      },
+      {
+        "sw": "mwaka ujao",
+        "en": "next year"
       }
     ],
+    "speaking": "Ask a partner about today, tomorrow, their birthday and an appointment.",
     "groupPractice": {
-      "heading": "Kuzungumza · Mapishi jikoni",
-      "intro": "Practise together in pairs or groups of three. Explain ingredients and give instructions; switch roles after each round.",
+      "heading": "Kuzungumza · Kalenda yangu",
+      "intro": "Use a calendar and work in pairs. Ask and answer in Kiswahili.",
       "stages": [
         {
-          "title": "Chakula ninachopenda · Favourite food",
-          "instruction": "Ask your partner what Tanzanian food they like. Reply using Ninapenda… and say why."
+          "title": "Siku gani?",
+          "instruction": "Choose a weekday. Ask what day today, yesterday and tomorrow are."
         },
         {
-          "title": "Viungo vya ugali · Ingredients for ugali",
-          "instruction": "One learner asks Unahitaji nini kupika ugali? The partner names unga wa mahindi and maji and explains why the water must be hot."
+          "title": "Tarehe ngapi?",
+          "instruction": "Point to dates on a calendar and say them aloud."
         },
         {
-          "title": "Mpangilio wa mapishi · Cooking steps",
-          "instruction": "Explain how to make ugali with kwanza, kisha, halafu and mwishowe. A partner repeats the actions in the correct order."
+          "title": "Siku ya kuzaliwa na miadi",
+          "instruction": "Ask your partner when their birthday is and agree on an appointment date."
         }
       ],
       "phrases": [
         {
-          "swahili": "Unapenda kula chakula gani?",
-          "english": "What food do you like eating?"
+          "swahili": "Leo ni siku gani?",
+          "english": "What day is it today?"
         },
         {
-          "swahili": "Ninapenda ugali na nyama.",
-          "english": "I like ugali and meat."
+          "swahili": "Leo ni tarehe ngapi?",
+          "english": "What is today's date?"
         },
         {
-          "swahili": "Unajua kupika ugali?",
-          "english": "Do you know how to cook ugali?"
+          "swahili": "Ulizaliwa lini?",
+          "english": "When were you born?"
         },
         {
-          "swahili": "Tunahitaji unga wa mahindi na maji.",
-          "english": "We need maize flour and water."
-        },
-        {
-          "swahili": "Kwanza, chemsha maji.",
-          "english": "First, boil the water."
-        },
-        {
-          "swahili": "Halafu, tia unga polepole na ukoroge.",
-          "english": "Then add the flour slowly and stir."
+          "swahili": "Miadi yetu ni tarehe tano Mei.",
+          "english": "Our appointment is on 5 May."
         }
       ],
-      "challenge": "In groups of three, explain ugali preparation for 45 seconds without reading. One learner speaks, another repeats the steps and the third checks the sequence. Then rotate roles."
+      "challenge": "Record a short audiovisual calendar introduction: say today’s date, tomorrow’s day and your birthday or an imaginary birthday."
     },
-    "referencePractice": {
-      "heading": "Mazoezi ya msamiati · Cooking phrases",
-      "instruction": "No Day 12 song is linked yet. Practise these expressions before the group discussion.",
-      "phrases": [
+    "writing": {
+      "prompt": "Write 5–7 short Kiswahili sentences about a calendar: today's day and date, yesterday, tomorrow, your birthday and an appointment. You may use imaginary dates.",
+      "guide": {
+        "heading": "Kuandika · Kalenda yangu",
+        "steps": [
+          "State today's day and date.",
+          "Say yesterday's and tomorrow's days.",
+          "State a birthday and an appointment date."
+        ],
+        "phrases": [
+          "Leo ni …",
+          "Jana ilikuwa …",
+          "Kesho ni …",
+          "Nilizaliwa tarehe …",
+          "Miadi yangu ni tarehe …"
+        ],
+        "placeholder": "Leo ni …\nJana ilikuwa …",
+        "minimumLines": 5
+      }
+    },
+    "reading": {
+      "title": "Kalenda ya Amina",
+      "text": "Leo ni Jumatatu, tarehe tano Machi. Amina anaenda shuleni. Kesho ni Jumanne, tarehe sita Machi. Ana miadi na mwalimu wake. Siku yake ya kuzaliwa ni tarehe kumi Mei. Jana ilikuwa Jumapili. Amina alikuwa nyumbani na familia yake.",
+      "questions": [
         {
-          "swahili": "Nina njaa sana.",
-          "english": "I am very hungry."
+          "id": "calendar-read-1",
+          "question": "Leo ni siku gani?",
+          "choices": [
+            "Jumatatu",
+            "Jumanne",
+            "Ijumaa"
+          ]
         },
         {
-          "swahili": "Unahitaji nini kwa ugali?",
-          "english": "What do you need for ugali?"
+          "id": "calendar-read-2",
+          "question": "Leo ni tarehe ngapi?",
+          "choices": [
+            "Tarehe sita Machi",
+            "Tarehe tano Machi",
+            "Tarehe kumi Mei"
+          ]
         },
         {
-          "swahili": "Maji ya moto ni muhimu.",
-          "english": "Hot water is important."
+          "id": "calendar-read-3",
+          "question": "Amina ana miadi na nani?",
+          "choices": [
+            "Mama",
+            "Rafiki",
+            "Mwalimu wake"
+          ]
         },
         {
-          "swahili": "Chakula hiki ni kitamu sana.",
-          "english": "This food is very delicious."
+          "id": "calendar-read-4",
+          "question": "Siku ya kuzaliwa ya Amina ni lini?",
+          "choices": [
+            "Tarehe kumi Mei",
+            "Tarehe tano Machi",
+            "Tarehe sita Machi"
+          ]
+        },
+        {
+          "id": "calendar-read-5",
+          "question": "Jana ilikuwa siku gani?",
+          "choices": [
+            "Jumamosi",
+            "Jumapili",
+            "Jumatatu"
+          ]
         }
       ]
     },
     "listening": {
-      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-12/audio-url",
+      "teacherLed": true,
+      "transcript": "Juma: Habari, Neema! Leo ni siku gani?\nNeema: Leo ni Jumatano, tarehe saba Agosti.\nJuma: Kesho ni Alhamisi, sivyo?\nNeema: Ndiyo. Kesho nina miadi na daktari.\nJuma: Siku yako ya kuzaliwa ni lini?\nNeema: Tarehe kumi Desemba.\nJuma: Asante. Jana ilikuwa Jumanne.\nNeema: Ndiyo, kwa heri!",
       "questions": [
         {
-          "id": "listen-favorite",
-          "question": "Mzungumzaji A anapenda chakula gani cha Kitanzania?",
+          "id": "calendar-listen-1",
+          "question": "Leo ni siku gani?",
           "choices": [
-            "Ugali",
-            "Chapati",
-            "Wali wa nazi",
-            "Pilau"
+            "Jumanne",
+            "Jumatano",
+            "Alhamisi"
           ]
         },
         {
-          "id": "listen-knowledge",
-          "question": "Mzungumzaji B anasema nini kuhusu kupika ugali?",
+          "id": "calendar-listen-2",
+          "question": "Leo ni tarehe ngapi?",
           "choices": [
-            "Hajui kupika ugali",
-            "Anajua kupika ugali vizuri",
-            "Anataka kununua ugali",
-            "Anapika samaki"
+            "Tarehe saba Agosti",
+            "Tarehe nane Agosti",
+            "Tarehe kumi Desemba"
           ]
         },
         {
-          "id": "listen-ingredients",
-          "question": "Wanahitaji nini kupika ugali?",
+          "id": "calendar-listen-3",
+          "question": "Kesho Neema ana miadi na nani?",
           "choices": [
-            "Mchele na tui la nazi",
-            "Unga wa mahindi na maji",
-            "Nyama na vitunguu",
-            "Maziwa na sukari"
+            "Mwalimu",
+            "Rafiki",
+            "Daktari"
           ]
         },
         {
-          "id": "listen-water",
-          "question": "Maji yanapaswa kuwa ya namna gani?",
+          "id": "calendar-listen-4",
+          "question": "Neema alizaliwa lini?",
           "choices": [
-            "Baridi",
-            "Ya uvuguvugu",
-            "Ya moto",
-            "Yenye chumvi nyingi"
+            "Tarehe kumi Desemba",
+            "Tarehe saba Agosti",
+            "Tarehe nane Agosti"
           ]
         },
         {
-          "id": "listen-process",
-          "question": "Baada ya kutia unga polepole, wanafanya nini?",
+          "id": "calendar-listen-5",
+          "question": "Jana ilikuwa siku gani?",
           "choices": [
-            "Wanakoroga mpaka ugali uwe mgumu",
-            "Wanaongeza sukari",
-            "Wanakaanga samaki",
-            "Wanaweka wali kwenye sahani"
+            "Ijumaa",
+            "Jumanne",
+            "Jumamosi"
           ]
+        }
+      ]
+    },
+    "referencePractice": {
+      "heading": "Marudio · Calendar review",
+      "instruction": "Review the days and months before the A1 consolidation exercise. A separate mock exam is not included here.",
+      "phrases": [
+        {
+          "swahili": "Leo ni siku gani?",
+          "english": "What day is it today?"
+        },
+        {
+          "swahili": "Leo ni tarehe ngapi?",
+          "english": "What is today's date?"
+        },
+        {
+          "swahili": "Mwezi wa kwanza",
+          "english": "January"
         }
       ]
     }
@@ -2363,259 +2480,482 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
   "13": {
     "day": 13,
     "chapter": "Somo la 13",
-    "title": "Nyumbani",
-    "objective": "Describe your home, rooms and where you live.",
-    "grammar": "Locative -ni and common prepositions",
+    "title": "Kutaja Saa na Shughuli za Kila Siku",
+    "contentVersion": 3,
+    "objective": "Tell time in Kiswahili and describe daily routines using present and habitual forms.",
+    "grammar": "Saa, wakati uliopo -na-, wakati wa mazoea hu- na mpangilio",
     "practiceOnly": false,
-    "rule": "On familiar place nouns, -ni can give a location: nyumba → nyumbani and jikoni means in the kitchen. Use karibu na for near, mbele ya for in front of, and nyuma ya for behind.",
+    "rule": "Swahili clock hours are counted from around 6 a.m. and 6 p.m.; saa moja asubuhi is 7 a.m.",
     "examples": [
       {
-        "swahili": "Niko nyumbani.",
-        "english": "I am at home."
+        "swahili": "Sasa ni saa ngapi?",
+        "english": "What time is it?"
       },
       {
-        "swahili": "Mama yuko jikoni.",
-        "english": "Mother is in the kitchen."
-      },
-      {
-        "swahili": "Chumba kiko karibu na bafu.",
-        "english": "The room is near the bathroom."
+        "swahili": "Sasa ni saa moja asubuhi.",
+        "english": "It is 7 a.m."
       }
     ],
     "check": {
-      "question": "Which phrase means “behind the house”?",
+      "question": "What time is saa mbili asubuhi?",
       "options": [
-        "mbele ya nyumba",
-        "karibu na nyumba",
-        "nyuma ya nyumba"
+        "2 a.m.",
+        "8 a.m.",
+        "8 p.m."
       ],
-      "answer": 2,
-      "why": "Nyuma ya puts something behind a place."
-    },
-    "speaking": "Describe an imaginary home and its rooms. Ask and answer where the kitchen, bedroom and furniture are, then change roles.",
-    "writing": {
-      "prompt": "Andika kuhusu nyumba ya kufikirika. Write 5–7 sentences about an imaginary home, its rooms and where things are.",
-      "guide": {
-        "heading": "Kuandika · Nyumba yangu",
-        "steps": [
-          "Say how many bedrooms your imaginary home has.",
-          "Name three rooms or objects.",
-          "Describe two locations using karibu na, mbele ya, nyuma ya or upande wa kulia.",
-          "Say what you like about the house."
-        ],
-        "phrases": [
-          "Nyumba yangu ina …",
-          "Hiki ni chumba cha …",
-          "Meza iko karibu na …",
-          "Bafu liko …",
-          "Ninapenda …"
-        ],
-        "placeholder": "Nyumba yangu ina …\nHiki ni …",
-        "minimumLines": 5
-      }
-    },
-    "reading": {
-      "text": "Nyumba ya Nia ina vyumba viwili. Bafu liko karibu na jiko. Bustani iko mbele ya nyumba.",
-      "questions": [
-        {
-          "id": "read-1",
-          "question": "Nyumba ina vyumba vingapi?",
-          "choices": [
-            "Kimoja",
-            "Viwili",
-            "Vitatu"
-          ]
-        },
-        {
-          "id": "read-2",
-          "question": "Bafu liko wapi?",
-          "choices": [
-            "Karibu na jiko",
-            "Nyuma ya bustani",
-            "Mbele ya mlango"
-          ]
-        },
-        {
-          "id": "read-3",
-          "question": "Bustani iko wapi?",
-          "choices": [
-            "Nyuma ya nyumba",
-            "Mbele ya nyumba",
-            "Ndani ya jiko"
-          ]
-        }
-      ],
-      "title": "Nyumba ya Nia"
+      "answer": 1,
+      "why": "Swahili hours start at approximately 6 a.m."
     },
     "grammarSections": [
       {
-        "title": "Mahali · Places",
-        "rule": "Nyumbani means at home and jikoni means in the kitchen. Ask wapi? to ask where something is.",
+        "title": "Kutaja saa · The Swahili clock",
+        "rule": "Count from 6 a.m./p.m. The conventional 12-hour clock is six hours different. Say the part of day to avoid ambiguity.",
         "examples": [
           {
-            "swahili": "Niko nyumbani.",
-            "english": "I am at home."
+            "swahili": "saa kumi na mbili asubuhi",
+            "english": "6:00 a.m."
           },
           {
-            "swahili": "Jikoni iko wapi?",
-            "english": "Where is the kitchen?"
+            "swahili": "saa moja asubuhi",
+            "english": "7:00 a.m."
+          },
+          {
+            "swahili": "saa mbili asubuhi",
+            "english": "8:00 a.m."
+          },
+          {
+            "swahili": "saa sita mchana",
+            "english": "12:00 noon"
+          },
+          {
+            "swahili": "saa tisa alasiri",
+            "english": "3:00 p.m."
+          },
+          {
+            "swahili": "saa kumi na mbili jioni",
+            "english": "6:00 p.m."
+          },
+          {
+            "swahili": "saa moja usiku",
+            "english": "7:00 p.m."
+          },
+          {
+            "swahili": "saa sita usiku",
+            "english": "12:00 midnight"
           }
         ]
       },
       {
-        "title": "Kueleza mahali · Locations",
-        "rule": "Karibu na means near, mbele ya in front of, nyuma ya behind, and upande wa kulia on the right. Location forms agree with the noun: meza iko, chumba kiko, bafu liko.",
+        "title": "Dakika · Minutes and parts of the day",
+        "rule": "Use na robo for quarter past, na nusu for half past, kasoro robo for quarter to the named hour, and na dakika for minutes past.",
         "examples": [
           {
-            "swahili": "Meza iko karibu na dirisha.",
-            "english": "The table is near the window."
+            "swahili": "saa nane na robo mchana",
+            "english": "2:15 p.m."
           },
           {
-            "swahili": "Chumba kiko mbele ya nyumba.",
-            "english": "The room is in front of the house."
+            "swahili": "saa tisa na nusu alasiri",
+            "english": "3:30 p.m."
           },
           {
-            "swahili": "Bafu liko karibu na mlango.",
-            "english": "The bathroom is near the door."
+            "swahili": "saa kumi na moja kasoro robo jioni",
+            "english": "4:45 p.m."
+          },
+          {
+            "swahili": "saa tatu na dakika kumi na mbili asubuhi",
+            "english": "9:12 a.m."
+          }
+        ]
+      },
+      {
+        "title": "Wakati uliopo · Present -na-",
+        "rule": "Use subject prefix + na + verb stem: ni-, u-, a-, tu-, m-, wa-. Short verbs such as kula and kunywa retain ku- after -na-.",
+        "examples": [
+          {
+            "swahili": "Ninaamka.",
+            "english": "I am waking up / I wake up."
+          },
+          {
+            "swahili": "Unaoga.",
+            "english": "You are bathing."
+          },
+          {
+            "swahili": "Anasoma.",
+            "english": "He/she is reading."
+          },
+          {
+            "swahili": "Tunafanya kazi.",
+            "english": "We work."
+          },
+          {
+            "swahili": "Mnakula.",
+            "english": "You (plural) are eating."
+          },
+          {
+            "swahili": "Wanarudi nyumbani.",
+            "english": "They return home."
+          }
+        ]
+      },
+      {
+        "title": "Wakati wa mazoea · Habitual hu-",
+        "rule": "Use hu- directly before the stem, without a subject prefix. Use a pronoun or noun to clarify who. Short verbs drop ku-: kula → hula, kunywa → hunywa.",
+        "examples": [
+          {
+            "swahili": "Mimi huamka saa kumi na mbili asubuhi.",
+            "english": "I usually wake up at 6 a.m."
+          },
+          {
+            "swahili": "Yeye hula kifungua kinywa.",
+            "english": "He/she usually eats breakfast."
+          },
+          {
+            "swahili": "Sisi husoma kila siku.",
+            "english": "We usually study every day."
+          },
+          {
+            "swahili": "Wewe hunywa chai.",
+            "english": "You usually drink tea."
+          }
+        ]
+      },
+      {
+        "title": "Mpangilio · Sequencing",
+        "rule": "Use kwanza, halafu, kisha and mwishowe to describe activities in order.",
+        "examples": [
+          {
+            "swahili": "Kwanza, ninaamka.",
+            "english": "First, I wake up."
+          },
+          {
+            "swahili": "Halafu, ninaoga.",
+            "english": "Then, I bathe."
+          },
+          {
+            "swahili": "Kisha, ninakwenda kazini.",
+            "english": "After that, I go to work."
+          },
+          {
+            "swahili": "Mwishowe, ninalala.",
+            "english": "Finally, I sleep."
           }
         ]
       }
     ],
     "vocabulary": [
       {
-        "sw": "nyumba",
-        "en": "house"
+        "sw": "kuamka",
+        "en": "to wake up"
       },
       {
-        "sw": "nyumbani",
-        "en": "at home"
+        "sw": "kupiga mswaki",
+        "en": "to brush teeth"
       },
       {
-        "sw": "chumba cha wageni",
-        "en": "living room"
+        "sw": "kuoga",
+        "en": "to bathe"
       },
       {
-        "sw": "chumba cha kulala",
-        "en": "bedroom"
+        "sw": "kuvaa nguo",
+        "en": "to get dressed"
       },
       {
-        "sw": "jikoni",
-        "en": "in the kitchen"
+        "sw": "kula kifungua kinywa",
+        "en": "to eat breakfast"
       },
       {
-        "sw": "bafu",
-        "en": "bathroom"
+        "sw": "kwenda shuleni",
+        "en": "to go to school"
       },
       {
-        "sw": "meza",
-        "en": "table"
+        "sw": "kusoma",
+        "en": "to study/read"
       },
       {
-        "sw": "kiti",
-        "en": "chair"
+        "sw": "kwenda kazini",
+        "en": "to go to work"
       },
       {
-        "sw": "dirisha",
-        "en": "window"
+        "sw": "kufanya kazi",
+        "en": "to work"
       },
       {
-        "sw": "mlango",
-        "en": "door"
+        "sw": "kula chakula cha mchana",
+        "en": "to eat lunch"
       },
       {
-        "sw": "karibu na",
-        "en": "near"
+        "sw": "kupumzika",
+        "en": "to rest"
+      },
+      {
+        "sw": "kurudi nyumbani",
+        "en": "to return home"
+      },
+      {
+        "sw": "kula chakula cha jioni",
+        "en": "to eat dinner"
+      },
+      {
+        "sw": "kutazama televisheni",
+        "en": "to watch television"
+      },
+      {
+        "sw": "kulala",
+        "en": "to sleep"
+      },
+      {
+        "sw": "asubuhi",
+        "en": "morning"
+      },
+      {
+        "sw": "mchana",
+        "en": "daytime/afternoon"
+      },
+      {
+        "sw": "alasiri",
+        "en": "late afternoon"
+      },
+      {
+        "sw": "jioni",
+        "en": "evening"
+      },
+      {
+        "sw": "usiku",
+        "en": "night"
+      },
+      {
+        "sw": "alfajiri",
+        "en": "dawn"
+      },
+      {
+        "sw": "saa",
+        "en": "hour/time"
+      },
+      {
+        "sw": "dakika",
+        "en": "minute"
+      },
+      {
+        "sw": "na nusu",
+        "en": "half past"
+      },
+      {
+        "sw": "na robo",
+        "en": "quarter past"
+      },
+      {
+        "sw": "kasoro robo",
+        "en": "quarter to"
+      },
+      {
+        "sw": "kamili",
+        "en": "exactly"
+      },
+      {
+        "sw": "kwanza",
+        "en": "first"
+      },
+      {
+        "sw": "halafu",
+        "en": "then"
+      },
+      {
+        "sw": "kisha",
+        "en": "after that"
+      },
+      {
+        "sw": "mwishowe",
+        "en": "finally"
+      },
+      {
+        "sw": "kwa kawaida",
+        "en": "usually"
+      },
+      {
+        "sw": "baada ya",
+        "en": "after"
+      },
+      {
+        "sw": "kila siku",
+        "en": "every day"
       }
     ],
+    "speaking": "Siku Yangu: describe your typical day using times and sequence words.",
     "groupPractice": {
-      "heading": "Kuzungumza · Nyumbani",
-      "intro": "Work in pairs. One learner welcomes a visitor; the other asks about the home. Then swap roles.",
+      "heading": "Kuzungumza · Siku Yangu",
+      "intro": "Ask and answer in pairs, then give a short oral or audiovisual presentation.",
       "stages": [
         {
-          "title": "Karibu nyumbani",
-          "instruction": "Greet the visitor and welcome them into an imaginary home."
+          "title": "Asubuhi",
+          "instruction": "Ask when your partner wakes up and what they do before school or work."
         },
         {
-          "title": "Vyumba na vitu",
-          "instruction": "Ask where the kitchen, bedroom and table are. Answer with location phrases."
+          "title": "Mchana na jioni",
+          "instruction": "Ask about lunch, returning home and bedtime."
         },
         {
-          "title": "Idadi ya vyumba",
-          "instruction": "Ask how many bedrooms there are and answer in a complete sentence."
+          "title": "Siku Yangu",
+          "instruction": "Present your daily routine in 45–60 seconds. Use at least four times and three sequence words."
         }
       ],
       "phrases": [
         {
-          "swahili": "Karibu nyumbani kwangu.",
-          "english": "Welcome to my home."
+          "swahili": "Unaamka saa ngapi?",
+          "english": "What time do you wake up?"
         },
         {
-          "swahili": "Chumba cha kulala kiko wapi?",
-          "english": "Where is the bedroom?"
+          "swahili": "Mimi huamka saa kumi na mbili asubuhi.",
+          "english": "I usually wake at 6 a.m."
         },
         {
-          "swahili": "Meza iko karibu na dirisha.",
-          "english": "The table is near the window."
+          "swahili": "Hufanya nini jioni?",
+          "english": "What do you usually do in the evening?"
         },
         {
-          "swahili": "Ina vyumba vitatu vya kulala.",
-          "english": "It has three bedrooms."
+          "swahili": "Ninalala saa nne usiku.",
+          "english": "I sleep at 10 p.m."
         }
       ],
-      "challenge": "Draw an imaginary home and describe three rooms and two locations to a partner. Swap roles."
+      "challenge": "Student exchange scenario: tell a Tanzanian partner about your usual weekday, using times and sequencing words."
     },
-    "listening": {
-      "audioUrlEndpoint": "/api/course-media/swahili/a1/day-13/audio-url",
+    "writing": {
+      "prompt": "Andika kuhusu siku yako. Write 6–8 short sentences about your usual day with at least four Swahili clock times and sequencing words.",
+      "guide": {
+        "heading": "Kuandika · Siku Yangu",
+        "steps": [
+          "Say when you wake up.",
+          "Describe breakfast, school or work, and lunch.",
+          "Explain what you do in the evening and when you sleep.",
+          "Use kwanza, halafu, kisha and mwishowe."
+        ],
+        "phrases": [
+          "Kwa kawaida, mimi huamka …",
+          "Kwanza …",
+          "Halafu …",
+          "Kisha …",
+          "Mwishowe …"
+        ],
+        "placeholder": "Mimi huamka saa …\nKwanza …",
+        "minimumLines": 6
+      }
+    },
+    "reading": {
+      "title": "Siku ya Asha",
+      "text": "Asha huamka saa kumi na mbili asubuhi. Kwanza, huoga na kupiga mswaki. Halafu, hula kifungua kinywa saa moja asubuhi. Anaenda shuleni saa mbili asubuhi. Hula chakula cha mchana saa sita mchana. Kisha, hurudi nyumbani saa kumi jioni. Mwishowe, hulala saa nne usiku.",
       "questions": [
         {
-          "id": "listen-room",
-          "question": "A anamwonyesha B chumba gani kwanza?",
+          "id": "routine-read-1",
+          "question": "Asha huamka saa ngapi?",
           "choices": [
-            "Chumba cha wageni",
-            "Chumba cha kulala",
-            "Bafu",
-            "Jikoni"
+            "Saa moja asubuhi",
+            "Saa kumi na mbili asubuhi",
+            "Saa mbili asubuhi"
           ]
         },
         {
-          "id": "listen-table",
-          "question": "Meza iko wapi?",
+          "id": "routine-read-2",
+          "question": "Asha hufanya nini kwanza?",
           "choices": [
-            "Karibu na dirisha",
-            "Nyuma ya nyumba",
-            "Jikoni",
-            "Karibu na bafu"
+            "Huoga na kupiga mswaki",
+            "Hulala",
+            "Hurudi nyumbani"
           ]
         },
         {
-          "id": "listen-kitchen",
-          "question": "Jikoni iko upande gani?",
+          "id": "routine-read-3",
+          "question": "Asha anaenda shuleni saa ngapi?",
           "choices": [
-            "Upande wa kushoto",
-            "Upande wa kulia",
-            "Nyuma ya nyumba",
-            "Mbele ya mlango"
+            "Saa sita mchana",
+            "Saa moja asubuhi",
+            "Saa mbili asubuhi"
           ]
         },
         {
-          "id": "listen-bedrooms",
-          "question": "Nyumba ina vyumba vingapi vya kulala?",
+          "id": "routine-read-4",
+          "question": "Asha hula chakula cha mchana saa ngapi?",
           "choices": [
-            "Kimoja",
-            "Viwili",
-            "Vitatu",
-            "Vinne"
+            "Saa sita mchana",
+            "Saa nne usiku",
+            "Saa kumi jioni"
           ]
         },
         {
-          "id": "listen-bathroom",
-          "question": "Bafu liko wapi?",
+          "id": "routine-read-5",
+          "question": "Asha hulala saa ngapi?",
           "choices": [
-            "Karibu na mlango mkuu",
-            "Karibu na dirisha",
-            "Upande wa kushoto",
-            "Nyuma ya meza"
+            "Saa moja usiku",
+            "Saa nne usiku",
+            "Saa mbili asubuhi"
           ]
+        }
+      ]
+    },
+    "listening": {
+      "teacherLed": true,
+      "transcript": "Amina: Hujambo, Juma? Unaamka saa ngapi kila siku?\nJuma: Sijambo. Huamka saa kumi na mbili asubuhi.\nAmina: Hufanya nini ukiamka?\nJuma: Ninaoga na kula kifungua kinywa. Ninaenda kazini saa mbili asubuhi.\nAmina: Hula chakula cha mchana saa ngapi?\nJuma: Saa saba mchana. Hurudi nyumbani saa kumi na moja jioni.\nAmina: Hufanya nini usiku?\nJuma: Hutazama televisheni, kisha hulala saa nne usiku.",
+      "questions": [
+        {
+          "id": "routine-listen-1",
+          "question": "Juma huamka saa ngapi?",
+          "choices": [
+            "Saa mbili asubuhi",
+            "Saa kumi na mbili asubuhi",
+            "Saa nne usiku"
+          ]
+        },
+        {
+          "id": "routine-listen-2",
+          "question": "Juma anafanya nini kabla ya kwenda kazini?",
+          "choices": [
+            "Anaoga na kula kifungua kinywa",
+            "Anatazama televisheni",
+            "Anarudi nyumbani"
+          ]
+        },
+        {
+          "id": "routine-listen-3",
+          "question": "Juma anaenda kazini saa ngapi?",
+          "choices": [
+            "Saa saba mchana",
+            "Saa mbili asubuhi",
+            "Saa kumi na moja jioni"
+          ]
+        },
+        {
+          "id": "routine-listen-4",
+          "question": "Juma hula chakula cha mchana saa ngapi?",
+          "choices": [
+            "Saa sita mchana",
+            "Saa nne usiku",
+            "Saa saba mchana"
+          ]
+        },
+        {
+          "id": "routine-listen-5",
+          "question": "Juma hufanya nini kabla ya kulala?",
+          "choices": [
+            "Hutazama televisheni",
+            "Huenda kazini",
+            "Hula kifungua kinywa"
+          ]
+        }
+      ]
+    },
+    "referencePractice": {
+      "heading": "Marudio · Saa na shughuli",
+      "instruction": "Practise the phrases before your Siku Yangu presentation.",
+      "phrases": [
+        {
+          "swahili": "Sasa ni saa ngapi?",
+          "english": "What time is it?"
+        },
+        {
+          "swahili": "Saa moja asubuhi",
+          "english": "7 a.m."
+        },
+        {
+          "swahili": "Kwa kawaida huamka mapema.",
+          "english": "Usually I wake early."
         }
       ]
     }

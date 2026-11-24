@@ -17,9 +17,15 @@ function normalizeWorkbook(input = {}) {
       typeof input.title !== "string" || input.title.length > 250) return null;
   if (level === "B1" && day === 26 && (!writing.essay?.trim() || ["read-purpose","read-delays","read-documents","read-label","read-message"].some(key => !readingAnswers[key]?.trim()) || ["listen-delay","listen-repair","listen-alternative","listen-advice","listen-next"].some(key => !listeningAnswers[key]?.trim()))) return null;
   if (level === "B1" && day === 27 && (!writing.essay?.trim() || ["read-importance","read-challenges","read-waste","read-energy","read-connector"].some(key => !readingAnswers[key]?.trim()) || ["listen-plastic","listen-baskets","listen-ready","listen-bottles","listen-change"].some(key => !listeningAnswers[key]?.trim()))) return null;
+  const revisedTopic = level === "A1" && [12,13].includes(day) && input.contentVersion === 3;
+  if (level === "A1" && [12,13].includes(day) && !revisedTopic) return null;
+  if (revisedTopic) {
+    const prefix = day === 12 ? "calendar" : "routine";
+    if (!writing.response?.trim() || [1,2,3,4,5].some(n=>!readingAnswers[prefix+"-read-"+n]?.trim() || !listeningAnswers[prefix+"-listen-"+n]?.trim())) return null;
+  }
   return {id, level, day, data:{program:"swahili", level: level === "A1" && day === 1 ? "beginner" : level, day,
     lessonId:"swahili-"+id, title:input.title, status:"submitted", writing, readingAnswers, listeningAnswers,
-    listeningTeacherLed:false, ...(level === "A1" && day === 4 && input.readingVersion === 2 ? {readingVersion:2}: {})}};
+    listeningTeacherLed:revisedTopic, ...(revisedTopic ? {contentVersion:3} : {}), ...(level === "A1" && day === 4 && input.readingVersion === 2 ? {readingVersion:2}: {})}};
 }
 
 function registerSwahiliSubmissionRoute(app,{admin,getAuthedUser}) {

@@ -24,7 +24,7 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
     setListeningAnswers(draft.listeningAnswers || {});
   }, []);
   const draft = useSwahiliReviewDraft(canSubmit ? user.uid : null, lesson.day, answers, restoreDraft,
-    swahiliDayFourDraftVersion(lesson.day));
+    lesson.contentVersion || swahiliDayFourDraftVersion(lesson.day));
   const snapshot = JSON.stringify(answers);
   const submitted = submittedAnswers === snapshot;
   const [feedback, setFeedback] = useState("");
@@ -59,7 +59,7 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
     }
     restoreSubmission().catch(() => {});
     return () => { active = false; };
-  }, [uid, day, canSubmit, activeTab]);
+  }, [uid, day, canSubmit, activeTab, lesson.contentVersion]);
 
   function answered(questions, values) {
     return questions.every(({ id, choices }) => choices ? choices.includes(values[id]) : !!values[id]?.trim());
@@ -75,7 +75,8 @@ export function useSwahiliAssignment(lesson, preview, activeTab, readingQuestion
         day: lesson.day, lessonId: `swahili-day-${lesson.day}`, title: lesson.title,
         status: "submitted", writing: { [lesson.day === 11 ? "dialogue" : "response"]: writing.trim() },
         ...(lesson.day === 4 ? { readingVersion: 2 } : {}), readingAnswers: reading,
-        listeningAnswers, listeningTeacherLed: false, 
+        listeningAnswers, listeningTeacherLed: Boolean(lesson.listening?.teacherLed),
+        ...(lesson.contentVersion ? {contentVersion:lesson.contentVersion} : {}), 
         studentName: studentProfile?.name || studentProfile?.displayName || user.displayName || "",
         studentEmail: user.email || "",
       });
