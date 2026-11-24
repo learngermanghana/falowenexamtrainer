@@ -17,7 +17,10 @@ export default function CourseTypeSettings() {
   const location = useLocation();
   const paymentReturn = new URLSearchParams(location.search).has("tuitionReturn");
   const current = getCourseType(studentProfile);
-  const [target, setTarget] = useState("");
+  const [target, setTarget] = useState(() => {
+    const choice = new URLSearchParams(location.search).get("choice");
+    return ["full_course", "exam_preparation"].includes(choice) ? choice : "";
+  });
   const [classes, setClasses] = useState([]);
   const [classId, setClassId] = useState("");
   const [loadingClasses, setLoadingClasses] = useState(false);
@@ -76,6 +79,7 @@ export default function CourseTypeSettings() {
 
   return <main style={{ ...styles.card, maxWidth: 640, margin: "32px auto" }}>
     <h1>Course type</h1>
+    <p><Link to="/mock/payment">Compare payment options</Link></p>
     <p>Current type <strong>{current === "exam_preparation" ? "Exam preparation" : "Full course"}</strong></p>
     {paymentReturn && <p role="status">{examOnly
       ? "Waiting for Paystack to confirm your tuition payment. Refresh this page to check your access."
@@ -89,7 +93,7 @@ export default function CourseTypeSettings() {
         <option value="exam_preparation">Exam preparation</option>
       </select>
       {target === "exam_preparation" && target !== current &&
-        <p>Continue to exam checkout to review monthly access. Existing payments, course balances and paid access are preserved.</p>}
+        <p>Switch to exam preparation, then review the monthly price before paying. Your existing enrollment, payments and balance are preserved if you return to the full course. Unpaid course access remains subject to trial limits.</p>}
       {target === "full_course" && target !== current && (needsTuition ? <>
         <label htmlFor="account-course-class">German class</label>
         <select id="account-course-class" style={styles.select} value={classId}

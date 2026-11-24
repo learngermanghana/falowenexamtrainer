@@ -61,7 +61,7 @@ export default function MockExamLibraryPage() {
         <p style={{ ...styles.helperText, margin: 0 }}>
           {mocks.some((mock) => mock.mode === "full" && mock.status === "ready") ? "Choose a complete mock or practise one skill. Full mocks cover all four modules; previews may not produce a combined score." : "A full mock is not yet published for this level. Choose available skill practice below; it does not produce an overall mock result."}
         </p>
-        {trialExam && <a href="/mock/checkout">Get 30-day exam access</a>}
+        {trialExam && <a href="/mock/payment">Choose a payment option</a>}
       </section>
 
       {examOnly && !trialExam && ownedLevels.includes(level) && <section style={styles.card}>

@@ -762,6 +762,7 @@ const AccountSettings = () => {
       </section>
       ) : activeTab === "billing" ? (
       <section className="fw-account-billing">
+        {!isSwahili && <p><Link to="/mock/payment">Compare Full Course and Exam Preparation payment options</Link></p>}
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
           <div style={{ minWidth: 0 }}>
             <h2 style={{ ...styles.sectionTitle, marginBottom: 3 }}>{t("accountSettings.billing.title")}</h2>

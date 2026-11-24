@@ -292,7 +292,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         });
 
         if (courseType === "exam_preparation") {
-          window.location.assign(receipt.trial ? "/exams/mocks" : "/mock/checkout");
+          window.location.assign(receipt.trial ? "/exams/mocks" : "/mock/payment");
           return;
         }
         savePreferredLevel(selectedLevel);

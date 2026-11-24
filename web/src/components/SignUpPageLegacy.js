@@ -495,7 +495,7 @@ const SignUpPage = ({ onLogin, onBack, onAccountCreated, initialProgram, invitat
           studentCode: receipt.studentCode, name: cleanedName, email: cleanedEmail,
           level: examLevel, className: "", courseType, program: "german",
         });
-        window.location.assign(receipt.trial ? "/exams/mocks" : "/mock/checkout");
+        window.location.assign(receipt.trial ? "/exams/mocks" : "/mock/payment");
         return;
       }
       const tuitionFee = isSwahili ? null : tuitionSummary.tuitionFee;
