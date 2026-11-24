@@ -50,7 +50,6 @@ export default function MockExamLibraryPage() {
       .finally(() => { if (mounted) setLoadingOwned(false); });
     return () => { mounted = false; };
   }, [examOnly, trialExam, user]);
-  const includedTrial = Boolean(trialExam && !trialExam.locked && trialExam.id);
   const mocks = getMockExamsForLevel(level, { includeCourse: true }).filter(mock =>
     !examOnly || ((trialExam?.level === mock.level || ownedLevels.includes(mock.level)) && mock.status !== "planned" &&
       mock.id !== "a2-course-preview-01")
@@ -60,12 +59,10 @@ export default function MockExamLibraryPage() {
     <div style={{ display: "grid", gap: 12 }}>
       {lockDialog}
       <section style={styles.card}>
-        <p style={{ ...styles.helperText, margin: 0 }}>Full exam practice</p>
         <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>{level} Mock Exams</h2>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          {mocks.some((mock) => mock.mode === "full" && mock.status === "ready") ? "Choose a complete mock or practise one skill. Full mocks cover all four modules; previews may not produce a combined score." : "A full mock is not yet published for this level. Choose available skill practice below; it does not produce an overall mock result."}
+          {mocks.some((mock) => mock.mode === "full" && mock.status === "ready") ? "Choose a mock or practise one skill." : "No complete mock is published yet. Choose a skill to practise."}
         </p>
-        {includedTrial && <p role="status" style={{ ...styles.helperText, margin: "10px 0 0", color: "#166534", fontWeight: 700 }}>Your free trial is active. {trialExam.shortTitle || trialExam.title} is included{Number.isFinite(trialExam.expiresAtMs) ? " until " + new Date(trialExam.expiresAtMs).toLocaleDateString() : ""}. No payment is required to start or resume it.</p>}
         {trialExam?.accessError && <div role="status"><p>We could not verify your exam access. Retry before making any payment.</p><button type="button" style={styles.secondaryButton} onClick={trialExam.retryAccess}>Retry access check</button></div>}
         {trialExam?.locked && !trialExam.accessError && <a href="/mock/payment">Choose a payment option</a>}
       </section>
@@ -93,34 +90,23 @@ export default function MockExamLibraryPage() {
                 <div style={{ maxWidth: 720 }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                     <h3 style={{ margin: 0 }}>{mock.shortTitle || mock.title}</h3>
-                    <span style={styles.badge}>{includedTrial && mock.id === trialExam.id ? "Included in your free trial" : statusLabel(mock.status, mock)}</span>
+                    {!(mock.mode === "full" && mock.status === "ready" && mock.id !== "a2-mock-02") && <span style={styles.badge}>{statusLabel(mock.status, mock)}</span>}
                   </div>
-                  <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
-                    {mock.description}
-                  </p>
                   <p style={{ ...styles.helperText, margin: "8px 0 0", fontSize: 12 }}>
                     {mock.durationLabel} · {(mock.sections || []).join(" · ")}
                   </p>
-                  {mock.mode === "full" ? (
-                    <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
-                      Finish all four modules for your final result. You can resume an unfinished attempt; running timers do not pause.
-                    </p>
-                  ) : mock.mode === "kombi" ? (
-                    <p style={{ ...styles.helperText, margin: "8px 0 0", fontWeight: 700 }}>
-                      {mock.sections?.some(section=>section==="Hören") ? "Complete Lesen, Hören, Schreiben and Sprechen for a verified score out of 100 points. Your earlier three-module results remain unchanged." : "Complete Lesen, Schreiben and Sprechen for a combined verified score out of 75 points. Hören is not included and will be added later. Your old result stays unchanged."}
-                    </p>
-                  ) : mock.id === "a2-mock-02" ? (
+                  {mock.mode === "kombi" ? (
                     <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
-                      All four modules are inside this mock. Your progress is saved on this device; verified final scores are not available yet.
+                      {mock.sections?.includes("Hören") ? "Four modules · 100 points" : "Three modules · 75 points; Hören not included."}
                     </p>
-                  ) : (
-                    <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
+                  ) : mock.mode !== "full" && mock.id !== "a2-mock-02" && mock.id !== "b1-mock-02" ? (
+                    <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
                       Section practice does not generate a complete mock score.
                     </p>
-                  )}
+                  ) : null}
                 </div>
                 <button type="button" style={trialExam && mock.id !== trialExam.id ? styles.secondaryButton : styles.primaryButton} onClick={event => { if (trialExam && mock.id !== trialExam.id) { openLock(examLockInfo({ title: mock.shortTitle || mock.title, trialExam, level, examOnly }), event); return; } announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
-                  {trialExam && mock.id !== trialExam.id ? "🔒 Locked" : mock.mode === "full" || mock.mode === "kombi" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
+                  {trialExam && mock.id !== trialExam.id ? "🔒 Locked" : mock.mode === "full" || mock.mode === "kombi" ? "Begin" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
               </div>
             </article>
