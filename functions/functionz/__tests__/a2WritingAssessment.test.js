@@ -145,3 +145,17 @@ test('canonicalization enforces the existing score caps', () => {
   expect(result.parts.teil2.score).toBe(13);
   expect(result.score).toBe(17);
 });
+
+test('an invalid evidence retry identifies the field without copying the rejected output', async () => {
+  const raw = assessment();
+  raw.parts.teil1.point_assessments[1].evidence_de = ['invented quote'];
+  createChatCompletion.mockResolvedValueOnce(JSON.stringify(raw)).mockResolvedValueOnce(JSON.stringify(assessment()));
+  const result = await createMockAssessment([{ role: 'user', content: 'Assess the submitted text' }], {}, {
+    prepareResult: assessment => canonicalizeA2WritingAssessment(assessment, submission),
+  });
+  expect(JSON.parse(result).score).toBe(17);
+  expect(createChatCompletion).toHaveBeenCalledTimes(2);
+  const retry = createChatCompletion.mock.calls[1][0].slice(-1)[0].content;
+  expect(retry).toContain('teil1.evidence_de');
+  expect(retry).not.toContain('invented quote');
+});
