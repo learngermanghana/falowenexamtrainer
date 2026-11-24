@@ -5,8 +5,11 @@ const primaryCourse = profile => normalizeProgram(profile?.program) || "german";
 // Only server-issued programme enrollment grants access. A locally stored
 // preference or an admissions interest request never creates an enrollment.
 export function secondaryAccessExpiry(profile) {
-  const placement = profile?.coursePlacements?.swahili;
-  if (primaryCourse(profile) !== "german" || normalizeProgram(profile?.secondaryProgram) !== "swahili" || placement?.accessType !== "complimentary") return null;
+  const secondary = normalizeProgram(profile?.secondaryProgram);
+  if (!COURSE_PROGRAMS.includes(secondary) || primaryCourse(profile) === secondary) return null;
+  const placement = profile?.coursePlacements?.[secondary];
+  if (["pending","invitation_pending"].includes(placement?.accessType)) return 0;
+  if (placement?.accessType !== "complimentary" && !placement?.contractEnd) return null;
   const value = placement.contractEnd;
   const end = typeof value?.toMillis === "function" ? value.toMillis() : typeof value?.seconds === "number" ? value.seconds * 1000 : Date.parse(value || "");
   return Number.isFinite(end) ? end : 0;
