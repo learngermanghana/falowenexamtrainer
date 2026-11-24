@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route, useLocation } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "../firebase";
 import { useAuth } from "../context/AuthContext";
-import { MockExamCheckoutPage, MockExamOnlyGate, MockExamSignupPage } from "./MockExamCommerce";
+import { MockExamCheckoutPage, MockExamOnlyGate, MockExamSignupPage, PaymentOptionsPage } from "./MockExamCommerce";
 import MockExamLibraryPage from "./MockExamLibraryPage";
 import MockOnlyRouteBoundary from "./MockOnlyRouteBoundary";
 
@@ -28,6 +28,7 @@ function openPage(path) {
       <Routes>
         <Route path="/mock/register" element={<MockExamSignupPage />} />
         <Route path="/mock/checkout" element={<MockExamCheckoutPage />} />
+        <Route path="/mock/payment" element={<PaymentOptionsPage />} />
         <Route path="/exams/mocks" element={<MockExamOnlyGate><MockExamLibraryPage /></MockExamOnlyGate>} />
         <Route path="*" element={<Destination />} />
         <Route path="/login/" element={<h1>Student login</h1>} />
@@ -95,7 +96,7 @@ test.each([
   mockApi(active);
   useAuth.mockReturnValue({ user: student, studentProfile: profile });
   openPage("/exams/overview");
-  expect(await screen.findByRole("heading", { name: "Your monthly exam subscription" })).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Choose how to continue" })).toBeVisible();
   expect(screen.queryByRole("heading", { name: "Exam overview" })).toBeNull();
 });
 
@@ -110,7 +111,7 @@ test("a signed-in student with a profile goes straight from registration to chec
   mockApi();
   useAuth.mockReturnValue({ user: student, studentProfile: profile });
   openPage("/mock/register");
-  expect(await screen.findByRole("heading", { name: "Your monthly exam subscription" })).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Choose how to continue" })).toBeVisible();
   expect(createUserWithEmailAndPassword).not.toHaveBeenCalled();
 });
 
@@ -128,4 +129,18 @@ test.each([
   expect(screen.getAllByRole("article")).toHaveLength(screen.queryAllByRole("button", {name: /Locked/}).length + 1);
   fireEvent.click(included);
   expect(await screen.findByText(route)).toBeVisible();
+});
+
+
+test("exam-only students can choose a full course or review exam checkout", () => {
+  useAuth.mockReturnValue({ user: student, studentProfile: profile });
+  openPage("/mock/payment");
+  expect(screen.getByRole("link", {name: "Continue to course billing"})).toHaveAttribute("href", "/mock/account?choice=full_course");
+  expect(screen.getByRole("link", {name: "Continue to exam preparation"})).toHaveAttribute("href", "/mock/checkout");
+});
+
+test("course trial students switch account type before exam checkout", () => {
+  useAuth.mockReturnValue({ user: student, studentProfile: {accountType: "course", level: "A2", trialStatus: "active", trialEndsAt: new Date(Date.now() + 86400000).toISOString()} });
+  openPage("/mock/payment");
+  expect(screen.getByRole("link", {name: "Continue to exam preparation"})).toHaveAttribute("href", "/mock/account?choice=exam_preparation");
 });

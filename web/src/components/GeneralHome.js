@@ -307,7 +307,7 @@ const GeneralHome = ({
           isSwahili
           onOpenAccount={openAccount}
         />
-        <TrialCountdownBanner studentProfile={studentProfile} onCompletePayment={openBilling} />
+        <TrialCountdownBanner studentProfile={studentProfile} onCompletePayment={isSwahiliCampus ? openBilling : () => navigate("/mock/payment")} />
         {paymentAlert ? (
           <section style={{ ...styles.card, background: "#fffbeb", border: "1px solid #f59e0b", display: "grid", gap: 8 }}>
             <strong>{paymentAlert.message}</strong>
@@ -351,7 +351,7 @@ const GeneralHome = ({
         onOpenAccount={openAccount}
       />
 
-      <TrialCountdownBanner studentProfile={studentProfile} onCompletePayment={openBilling} />
+      <TrialCountdownBanner studentProfile={studentProfile} onCompletePayment={isSwahiliCampus ? openBilling : () => navigate("/mock/payment")} />
 
       {paymentAlert ? (
         <section

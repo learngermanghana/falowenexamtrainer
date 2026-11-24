@@ -51,7 +51,7 @@ export function TrialCoursePage({ level, path, active, endsAtMs, children }) {
     <h1>Unlock the full course</h1>
     {active && <p><Link to={["B2", "C1"].includes(level) ? "/campus/course/" + level.toLowerCase() + "-self-learning/day-1" : "/campus/course/lesson/" + level + "/1"}>Open Day 1</Link></p>}
     <p>{active ? "Your trial includes Day 1. Join the full course for Day 2 onward." : "Your course trial has ended."}</p>
-    <Link to="/campus/account?tab=billing">Join the full course</Link>
+    <Link to="/mock/payment">Choose a payment option</Link>
   </main>;
 }
 
@@ -71,7 +71,7 @@ export function TrialExamPage({ level, path, children }) {
     </section>}
     <h2>Monthly exam access</h2>
     <p>Unlock individual skill practice and all published mocks at your level.</p>
-    <Link to="/mock/checkout">Get 30-day exam access</Link>
+    <Link to="/mock/payment">Choose a payment option</Link>
     <Link to="/mock/account">Manage course type</Link>
   </main>;
 }

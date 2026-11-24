@@ -18,15 +18,16 @@ describe("payment recovery billing flow", () => {
     expect(source).toContain("handleRefreshPaymentStatus");
   });
 
-  test("billing uses a compact two-column summary without a duplicate status card", () => {
+  test("billing shows tuition, paid amount and balance in a responsive summary", () => {
     const source = read("AccountSettings.js");
+    const css = read("AccountSettings.css");
     expect(source).toContain("data-account-billing-summary");
-    expect(source).toContain('gridTemplateColumns: "repeat(2, minmax(0, 1fr))"');
-    expect(source).toContain(">Tuition<");
-    expect(source).toContain(">Paid<");
-    expect(source).toContain(">Balance<");
-    expect(source).toContain('"Trial ends" : "Access until"');
-    expect(source).not.toContain(">Payment status<");
+    expect(source).toContain('className="fw-account-amounts"');
+    expect(css).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
+    expect(css).toContain("@container (max-width: 440px)");
+    expect(source).toContain('t("accountOverview.tuition")');
+    expect(source).toContain('t("accountOverview.paid")');
+    expect(source).toContain('t("accountOverview.balance")');
     expect(source).toContain("showSummary={false}");
   });
 
@@ -74,7 +75,8 @@ describe("payment recovery billing flow", () => {
   test("refresh payment status re-fetches the student Firestore profile", () => {
     const source = fs.readFileSync(path.resolve(__dirname, "../context/AuthContext.js"), "utf8");
     expect(source).toContain("const refreshStudentProfile = useCallback");
-    expect(source).toContain('getDoc(doc(db, "students", studentProfile.id))');
+    expect(source).toContain('getDoc(doc(db, "students", profileId))');
+    expect(source).toContain("setStudentProfile(profile)");
     expect(source).toContain("refreshStudentProfile,");
   });
 

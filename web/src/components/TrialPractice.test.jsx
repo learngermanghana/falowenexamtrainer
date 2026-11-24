@@ -10,11 +10,11 @@ test.each(["A1", "A2", "B1", "B2", "C1"])("protects Day 2 direct links at %s", l
   expect(screen.getByText("Lesson content")).toBeVisible();
   rerender(page(2));
   expect(screen.queryByText("Lesson content")).toBeNull();
-  expect(screen.getByRole("link", {name:"Join the full course"})).toHaveAttribute("href","/campus/account?tab=billing");
+  expect(screen.getByRole("link", {name:"Choose a payment option"})).toHaveAttribute("href","/mock/payment");
 });
 
 test.each(["/campus/course/a1-final-mock-exam", "/campus/course/a2-final-mock-exam", "/exams/lesen/a1/sample-2"])("A1 trial locks %s", path => {
   render(<MemoryRouter><TrialExamPage level="A1" path={path}>Protected questions</TrialExamPage></MemoryRouter>);
   expect(screen.queryByText("Protected questions")).toBeNull();
-  expect(screen.getByRole("link",{name:"Get 30-day exam access"})).toBeVisible();
+  expect(screen.getByRole("link",{name:"Choose a payment option"})).toBeVisible();
 });
