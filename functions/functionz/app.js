@@ -6338,6 +6338,10 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           throw new Error("Server-verified A2 mock totals are missing.");
         }
         verifiedResult = { sectionScores: verifiedSectionScores, overall: verifiedOverall };
+        if (attemptData.writingTutorReview?.status === "published" && attemptData.completionSync?.ok) {
+          // Tutor publication already committed result and notifications atomically.
+          return res.json({...saveOutcome,completionSync:attemptData.completionSync,verifiedResult});
+        }
 
         completionSync = await syncA2MockCompletion({
           db,
