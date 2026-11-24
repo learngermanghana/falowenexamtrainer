@@ -868,6 +868,8 @@ app.use(async (req, res, next) => {
     if (!identity) return res.status(401).json({ error: "Authentication required." });
     if (identity.examOnly !== true) return next();
     const path = req.path || "";
+    // Read-only Day 1 preview is verified against the enrolled level in the legacy trial guard.
+    if (req.method === "GET" && (/^\/course-media\/studio\/lesson$/.test(path) || /^\/course-media\/[abc][12]\/audio-url$/.test(path))) return next();
     const allowed = [
       /^\/(?:a1|a2|b1|b2)-mock\/attempt\/(?:start|save)$/,
       /^\/(?:writing|speaking)\/(?:a1|a2|b1|b2)-mock-score$/,
