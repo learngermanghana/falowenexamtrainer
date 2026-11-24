@@ -259,6 +259,7 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
 registerCourseTypeRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling });
 registerMockCommerceRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 require("./swahiliSubmission").registerSwahiliSubmissionRoute(app, { admin, getAuthedUser });
+require("./germanSubmissionAccess").registerGermanSubmissionAccessRoute(app, { admin, getAuthedUser });
 registerBookCommerceRoutes(app, { admin });
 registerCourseDiscountRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, normalizeStudentBilling });
 
