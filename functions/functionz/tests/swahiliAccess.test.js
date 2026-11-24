@@ -52,3 +52,21 @@ test("server refuses expired grant and binds successful writes to authenticated 
   }
  }
 });
+
+test("protected media refuses expired grants and caps signed URLs at the enrollment expiry",async()=>{
+ const {createSwahiliDayOneAudioHandler}=require("../../../server/courseMusic.cjs");
+ const env={FIREBASE_API_KEY:"key",R2_ACCOUNT_ID:"a".repeat(32),R2_ACCESS_KEY_ID:"test",R2_SECRET_ACCESS_KEY:"secret",R2_AUDIO_BUCKET:"audio"};
+ const fetchImpl=async()=>({ok:true,json:async()=>({users:[{localId:"u",email:"student@example.org"}]})});
+ const response=()=>({setHeader:jest.fn(),status:jest.fn().mockReturnThis(),json:jest.fn()});
+ const request={method:"GET",url:"/course-media/swahili/a1/day-1/audio-url",headers:{authorization:"Bearer token"}};
+ const deny=jest.fn(async()=>({allowed:false}));
+ const denied=response();
+ await createSwahiliDayOneAudioHandler({env,fetchImpl,loadSwahiliAccess:deny})(request,denied);
+ expect(deny).toHaveBeenCalledWith("u","A1",expect.any(Number));
+ expect(denied.status).toHaveBeenCalledWith(403);
+ const grant=response();
+ await createSwahiliDayOneAudioHandler({env,fetchImpl,loadSwahiliAccess:async(_uid,_level,now)=>({allowed:true,expiresAtMs:now+60000})})(request,grant);
+ expect(grant.status).toHaveBeenCalledWith(200);
+ const url=new URL(grant.json.mock.calls[0][0].url);
+ expect(url.searchParams.get("X-Amz-Expires")).toBe("60");
+});
