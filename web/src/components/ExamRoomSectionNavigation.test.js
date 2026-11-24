@@ -55,7 +55,9 @@ describe("Exams Room section navigation", () => {
     expect(overviewSource).toContain('onClick={() => openPractice("/exams/mocks", "Mock Exams opened successfully.")}');
     expect(overviewSource).toContain('aria-label={(trialExam ? "Locked: " : "Practise ") + skill.title}');
     expect(overviewSource).toContain("trialExam ? explainLock(skill.title, event) : openPractice(skill.path,");
-    expect(overviewSource).toContain('onClick={event => trialExam ? explainLock("Daily warm-up", event) : openPractice("/exams/question", "Daily exam practice opened successfully.")}');
+    expect(overviewSource).not.toContain('aria-label="Daily warm-up"');
+    expect(overviewSource).not.toContain('loadDailyWarmupProgress');
+    expect(overviewSource).toContain('className="exam-room-skill-action"');
     expect(overviewSource).toContain('onClick={event => trialExam ? explainLock("Exam File", event) : openPractice("/exams/file", "My Exam File opened successfully.")}');
     expect(overviewSource).not.toContain("PRACTICE_SECTIONS");
     expect(appSource).toContain('role="group" aria-label="Choose exam practice level"');
