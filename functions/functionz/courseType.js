@@ -28,8 +28,10 @@ async function preserveCourseExamTrial(tx, db, student, uid, canRestoreCourse, n
   const ref = db.collection("mockSubscriptions").doc(uid + "_trial");
   const prior = await tx.get(ref);
   if (prior.exists || prior.data()) return; // never restart a used or expired exam trial
-  tx.create(ref, { uid, level: student.level, scope: "trial", status: "active",
-    expiresAtMs: end, mockIds: [trial.catalogId], source: "preserved_course_trial" });
+  const grant = { uid, level: student.level, scope: "trial", status: "active",
+    expiresAtMs: end, mockIds: [trial.catalogId], source: "preserved_course_trial" };
+  tx.create(ref, grant);
+  return grant;
 }
 
 const DAY_MS = 86400000;
