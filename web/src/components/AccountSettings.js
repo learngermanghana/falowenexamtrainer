@@ -948,6 +948,7 @@ const AccountSettings = () => {
             <p>No further level is available for this programme.</p>}
           {!managedUpgrade.overlap&&!managedUpgrade.next&&managedUpgrade.nextLevel&&managedUpgrade.current&&verifiedLevelBalance(managedUpgrade.current)===0&&managedUpgrade.current.contractEnd>=new Date().toISOString().slice(0,10)&&getTuitionFeeForLevel(managedUpgrade.nextLevel)>0&&<button type="button" style={styles.secondaryButton} onClick={prepareManagedUpgrade} disabled={isUpgradingLevel}>{isUpgradingLevel?"Preparing…":"Prepare "+managedUpgrade.nextLevel+" upgrade"}</button>}
           <button type="button" style={styles.secondaryButton} onClick={()=>selectAccountTab("billing")}>View payments &amp; billing</button>
+          {status && <p role="status">{status}</p>}
           <a href={supportMailTo}>Contact Falowen about your upgrade</a>
           <LevelBillingPanel rows={levelBillingRows} user={user} paymentsEnabled={paymentsEnabled} blockedLevels={managedUpgrade.blocked} grantedLevels={managedUpgrade.granted} studentProfile={studentProfile}/>
         </section>
