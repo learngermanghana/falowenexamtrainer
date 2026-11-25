@@ -14,7 +14,7 @@ const read = (key) => {
 // Keep Mock 3's original content: Mock 1 has different cards and situations.
 // Four cards drawn from the two teacher-provided topic groups.
 const MOCK_3_CARDS = CONTENT.cards.filter(card => ["Wochenende", "Sport", "Wohnung", "Einkaufen"].includes(card.keyword));
-const TASKS = [
+export const TASKS = [
   { teil:"1",title:"Fragen zur Person", english:"Ask questions with the topic cards, then answer your AI partner.",
     prompt:`Stellen Sie zu jedem Stichwort eine Frage: ${MOCK_3_CARDS.map(c=>c.keyword).join(", ")}. Antworten Sie danach auf die Fragen Ihres Partners: ${MOCK_3_CARDS.map(c=>c.samplePartnerQuestion).join(" / ")}.`,
     keywords:MOCK_3_CARDS.map(c=>c.keyword).join(", "),
