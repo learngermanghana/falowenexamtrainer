@@ -527,6 +527,15 @@ exports.cleanupExpiredTrials = onSchedule(
       purgeSheets: (identity) => getStudentSheetPurger()({ ...identity, scoresSpreadsheetUrl: RESULTS_SHEET_PUBLISHED_CSV_URL.value(), scoresTabName: "scores_backup" }),
     });
 
+    // Recover overdue sheet-only rows left behind by historical purges.
+    // Existing weekly job, existing Sheets credentials, no additional trigger.
+    try {
+      const recovery = await require("./functionz/studentsSheet").recoverOrphanedExpiredTrialRows({ db, auth, now: nowMs });
+      console.log("cleanupExpiredTrials: orphan sheet recovery", recovery);
+    } catch (error) {
+      console.warn("cleanupExpiredTrials: orphan sheet recovery deferred", error?.code || error?.name || "failed");
+    }
+
     const snapshot = await db.collection("students").get();
     if (snapshot.empty) {
       console.log("cleanupExpiredTrials: no student records found");

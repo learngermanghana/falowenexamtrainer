@@ -655,7 +655,42 @@ async function purgeStudentFromSheets({
   return { studentRowsDeleted, scoreRowsDeleted };
 }
 
+async function recoverOrphanedExpiredTrialRows({db,auth,now=Date.now()}={}) {
+  const spreadsheetId = process.env.STUDENTS_SHEET_ID;
+  const tab = process.env.STUDENTS_SHEET_TAB || "students";
+  if (!spreadsheetId) throw Error("Missing STUDENTS_SHEET_ID");
+  const sheets = await getSheetsClient();
+  const { recoverExpiredTrialSheetRows } = require("./expiredTrialSheetRecovery");
+  const quote = value => "'" + String(value).replace(/'/g,"''") + "'";
+  async function readTab(name, required) {
+    const {headerMap} = await loadHeaderMap(sheets,spreadsheetId,quote(name));
+    const indices = required.map(header=>findCol(headerMap,header));
+    if (indices.some(index=>index===null)) throw Error("Trial recovery required header missing: "+name);
+    const last = colToA1(Math.max(...indices));
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,range:quote(name)+"!A2:"+last,valueRenderOption:"UNFORMATTED_VALUE",
+    });
+    return (response.data.values||[]).map((row,i)=>({
+      rowNumber:i+2,...Object.fromEntries(required.map((header,j)=>[header,row[indices[j]]])),
+    }));
+  }
+  return recoverExpiredTrialSheetRows({
+    db,auth,now,
+    readStudents:()=>readTab(tab,["StudentCode","UID","Email","Paid","Status","TrialEndsAt","TrialPurgeAt","TrialConvertedAt"]),
+    readProtected:async()=> {
+      const [level,exam,payments]=await Promise.all([
+        readTab("Level Enrollments",["Student ID","Student Code"]),
+        readTab("Exam Subscriptions",["Student ID","Student Code","Email"]),
+        readTab("Payments",["email"]),
+      ]);
+      return [...level,...exam,...payments];
+    },
+    deleteRows: rows=>deleteDuplicateRows(sheets,spreadsheetId,tab,rows),
+  });
+}
+
 module.exports = {
+  recoverOrphanedExpiredTrialRows,
   upsertStudentToSheet,
   appendStudentToStudentsSheetSafely,
   purgeStudentFromSheets,
