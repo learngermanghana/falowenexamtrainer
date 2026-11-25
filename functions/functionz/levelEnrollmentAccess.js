@@ -10,6 +10,8 @@ function enrollmentDecision(rows,program,now=Date.now()){
  for(const r of Array.isArray(rows)?rows:[]){
   if(!r||r.program!==language||!levels.includes(r.level))continue;
   managed.push(r.level);versions[r.level]=Number(r.sheetVersion||1);
+  // Legacy planned rows are informational; payment-driven upgrades remain blocked.
+  if(r.status==="planned"&&r.accountingMode!=="payment_driven_upgrade_v1")continue;
   const ended=validDate(r.contractEnd)&&r.contractEnd<today;
   const future=validDate(r.contractStart)&&r.contractStart>today;
   const overdue=validMoney(r.balanceDue)&&r.balanceDue>0&&validDate(r.paymentDeadline)&&r.paymentDeadline<today;
