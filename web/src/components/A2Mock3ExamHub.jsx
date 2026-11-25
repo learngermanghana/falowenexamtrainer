@@ -1,3 +1,5 @@
+import {MockModeGate} from "./MockPracticeWorkspace";
+import A2AdditionalMockPractice from "./A2AdditionalMockPractice";
 import { SavedMockListeningReview } from "./MockListeningReview";
 import { runA2MockSubmissionStep } from "../services/a2MockSubmissionDiagnostics";
 import { resumeA2MockSections } from "../services/a2MockCloudResume";
@@ -9,7 +11,7 @@ import { startA2MockAttempt, saveA2MockAttempt } from "../services/a2FinalMockSe
 import { finalizeA2Mock3, savedA2Mock3State } from "../services/a2Mock3Finalization";
 import { getA2Mock3StorageKeys, isA2Mock3ReviewReady } from "../utils/mockReviewAccess";
 import A2Mock3Lesen from "./A2Mock3Lesen";
-import A2Mock3Hoeren from "./A2Mock3Hoeren";
+import A2Mock3Hoeren, {a2Mock3HoerenAnswersKey} from "./A2Mock3Hoeren";
 import A2Mock3Schreiben from "./A2Mock3Schreiben";
 import A2Mock3ConversationalSpeaking from "./A2Mock3ConversationalSpeaking";
 import "./A2Mock2ExamHub.css";
@@ -177,6 +179,7 @@ function A2Mock3ExamHubAttempt() {
       const history=read(historyKey);
       localStorage.setItem(historyKey,JSON.stringify([...(Array.isArray(history)?history:[]),completed]));
       Object.values(keys).forEach(key=>localStorage.removeItem(key));
+      localStorage.removeItem(a2Mock3HoerenAnswersKey(user?.uid));
       setFlow({stage:"intro",startedAt:null});
       setProgress(progressFor(keys));
       setFinalError("");
@@ -247,5 +250,5 @@ function A2Mock3ExamHubAttempt() {
 }
 export default function A2Mock3ExamHub() {
   const {user}=useAuth();
-  return <A2Mock3ExamHubAttempt key={user?.uid||"guest"}/>;
+  return <MockModeGate key={user?.uid||"guest"} mockId="a2-mock-03" title="A2 Mock 3" timed={<A2Mock3ExamHubAttempt/>} practice={<A2AdditionalMockPractice mockId="a2-mock-03"/>}/>;
 }

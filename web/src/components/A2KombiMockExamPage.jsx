@@ -1,3 +1,5 @@
+import {MockModeGate} from "./MockPracticeWorkspace";
+import A2AdditionalMockPractice from "./A2AdditionalMockPractice";
 import { SavedMockListeningReview } from "./MockListeningReview";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
@@ -323,5 +325,5 @@ export default function A2KombiMockExamPage({mockNumber}) {
   const {user}=useAuth();
   const paper=getA2KombiSet(`a2-mock-${String(mockNumber).padStart(2,"0")}`);
   if(!paper)return <section className="a2-mock2-shell"><h2>Mock not found</h2></section>;
-  return <A2KombiAttempt key={`${paper.id}:${user?.uid||"guest"}`} mockNumber={mockNumber} paper={paper}/>;
+  return <MockModeGate key={`${paper.id}:${user?.uid||"guest"}`} mockId={paper.id} title={`A2 Mock ${mockNumber}`} timed={<A2KombiAttempt mockNumber={mockNumber} paper={paper}/>} practice={<A2AdditionalMockPractice mockId={paper.id}/>}/>;
 }

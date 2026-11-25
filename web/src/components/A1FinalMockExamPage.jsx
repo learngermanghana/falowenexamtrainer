@@ -1,3 +1,5 @@
+import MockPracticeWorkspace, {MockModeGate,PracticeAudio,PracticeQuestions,PracticeWriting,PracticeSpeaking} from "./MockPracticeWorkspace";
+import { A1_GOETHE_SPEAKING_MOCK } from "./A1GoetheSpeakingMockPreview";
 import MockListeningReview, { listeningReviewRow } from "./MockListeningReview";
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
@@ -358,7 +360,7 @@ const SectionHeader = ({ label, secondsLeft, attemptInfo }) => (
   </div>
 );
 
-export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
+function A1TimedMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   useAssessmentRestriction();
   const { idToken, user } = useAuth();
   const isMock2 = mockId === A1_MOCK_2_ID;
@@ -570,12 +572,8 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
         });
       }
 
-      if (forceNew && typeof window !== "undefined") {
-        window.localStorage.removeItem(storageKey);
-      }
-
       const response = await startA1MockAttempt({ idToken, mockId });
-      if (response?.resumed && response?.state && !forceNew) {
+      if (response?.resumed && response?.state) {
         const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
         const localSavedAt = Number(exam.clientSavedAtMs || 0);
         const serverSavedAt = Number(response.state?.clientSavedAtMs || 0);
@@ -1243,4 +1241,98 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
       {exam.stage === "result" && !exam.writingPending && !exam.verificationPending && canReviewFullMock(exam) ? renderResult() : null}
     </main>
   );
+}
+
+function A1PracticePaper({mockId}) {
+  const isMock2=mockId===A1_MOCK_2_ID,isMock3=mockId===A1_MOCK_3_ID,isKombi=/^a1-mock-0[4-8]$/.test(mockId);
+  const kombiNumber=Number(mockId.slice(-2));
+  const listening=isKombi?({4:A1_MOCK_4_LISTENING,5:A1_MOCK_5_LISTENING,6:A1_MOCK_6_LISTENING,7:A1_MOCK_7_LISTENING,8:A1_MOCK_8_LISTENING})[kombiNumber]:isMock3?A1_MOCK_3_LISTENING:isMock2?A1_MOCK_2_LISTENING:A1_GOETHE_LISTENING_MOCK;
+  const writing=isKombi?A1_KOMBI_TASK_SETS[kombiNumber].writing:isMock3?A1_MOCK_3_WRITING:isMock2?A1_MOCK_2_WRITING:A1_GOETHE_WRITING_MOCK;
+  const speaking=isKombi?A1_KOMBI_TASK_SETS[kombiNumber].speaking:isMock3?A1_MOCK_3_SPEAKING:isMock2?A1_MOCK_2_SPEAKING:A1_GOETHE_SPEAKING_MOCK;
+  return <MockPracticeWorkspace mockId={mockId} title={`A1 Mock ${kombiNumber}`} displayAnswer={(section,row,value)=>{
+    if(section==="hoeren"&&isMock2){const part=[listening.teil1,listening.teil2,listening.teil3][row.part-1];const q=part?.questions.find(q=>q.number===row.number);if(q?.options?.some(o=>o.picture))return mockDisplayAnswer(q.options,value,`a1-picture-t${row.part}-${row.number}`)}
+    return String(value||"").toUpperCase();
+  }} reading={({answers,onChange:setLesenAnswer})=>{
+    const exam={lesenAnswers:answers};return <article className="a1-goethe-mock-exam">        {isKombi ? <A1KombiReadingSection mockNumber={kombiNumber} answers={exam.lesenAnswers} onChange={setLesenAnswer} /> : isMock3 ? <A1Mock3ReadingSection answers={exam.lesenAnswers} onChange={setLesenAnswer} /> : isMock2 ? <A1Mock2Reading answers={exam.lesenAnswers} onChange={setLesenAnswer} /> : <>
+        <section className="a1-final-mock-part">
+          <h2>Teil 1</h2>
+          <p>Lesen Sie die beiden Texte. Kreuzen Sie an: Richtig oder Falsch.</p>
+
+          <section className="a1-goethe-mock-question a1-goethe-mock-question-example">
+            <h3>Beispiel 0</h3>
+            <p className="a1-goethe-mock-statement">{A1_GOETHE_READING_MOCK_TEIL1.example.statement}</p>
+            <ReadingPaper title={A1_GOETHE_READING_MOCK_TEIL1.text1.title} lines={A1_GOETHE_READING_MOCK_TEIL1.text1.body} />
+            <BinaryChoices name="lesen-example-1" value={A1_GOETHE_READING_MOCK_TEIL1.example.answer} onChange={() => {}} disabled />
+          </section>
+
+          {A1_GOETHE_READING_MOCK_TEIL1.questions.map((question, index) => (
+            <section className="a1-goethe-mock-question" key={question.number}>
+              <h3>Aufgabe {question.number}</h3>
+              <p className="a1-goethe-mock-statement">{question.statement}</p>
+              {index === 2 ? (
+                <ReadingPaper title={A1_GOETHE_READING_MOCK_TEIL1.text2.title} lines={A1_GOETHE_READING_MOCK_TEIL1.text2.body} />
+              ) : null}
+              <BinaryChoices
+                name={`lesen-t1-${question.number}`}
+                value={exam.lesenAnswers[`t1-${question.number}`] || ""}
+                onChange={(value) => setLesenAnswer(`t1-${question.number}`, value)}
+              />
+            </section>
+          ))}
+        </section>
+
+        <section className="a1-final-mock-part">
+          <h2>Teil 2</h2>
+          <p>Welche Anzeige passt? Kreuzen Sie an: a oder b.</p>
+          {A1_GOETHE_READING_MOCK_TEIL2.questions.map((question) => (
+            <section className="a1-goethe-mock-question" key={question.number}>
+              <h3>Aufgabe {question.number}</h3>
+              <p className="a1-goethe-mock-statement">{question.statement}</p>
+              {question.timetable ? (
+                <div className="a1-goethe-mock-timetable-stack">
+                  {question.options.map((option) => <Timetable key={option.id} option={option} />)}
+                </div>
+              ) : (
+                <div className="a1-goethe-mock-website-grid">
+                  {question.options.map((option) => <BrowserPanel key={option.id} option={option} />)}
+                </div>
+              )}
+              <LetterChoices
+                name={`lesen-t2-${question.number}`}
+                options={question.options}
+                value={exam.lesenAnswers[`t2-${question.number}`] || ""}
+                onChange={(value) => setLesenAnswer(`t2-${question.number}`, value)}
+              />
+            </section>
+          ))}
+        </section>
+
+        <section className="a1-final-mock-part">
+          <h2>Teil 3</h2>
+          <p>Lesen Sie die Hinweise. Kreuzen Sie an: Richtig oder Falsch.</p>
+          {A1_GOETHE_READING_MOCK_TEIL3.questions.map((question) => (
+            <section className="a1-goethe-mock-question a1-goethe-mock-teil3-question" key={question.number}>
+              <h3>Aufgabe {question.number}</h3>
+              <p className="a1-goethe-mock-location">{question.location}</p>
+              <NoticeCard notice={question.notice} />
+              <p className="a1-goethe-mock-teil3-statement">{question.statement}</p>
+              <BinaryChoices
+                name={`lesen-t3-${question.number}`}
+                value={exam.lesenAnswers[`t3-${question.number}`] || ""}
+                onChange={(value) => setLesenAnswer(`t3-${question.number}`, value)}
+              />
+            </section>
+          ))}
+        </section>
+
+        </>}
+</article>;
+  }} listening={({answers,onChange,idToken})=><>{[listening.teil1,listening.teil2,listening.teil3].map((part,i)=><section className="mock-practice-paper" key={i}><h2>{part.title}</h2><p>{part.instruction}</p><p>{part.responseInstruction}</p><PracticeAudio load={()=>(listening.sampleId?fetchA1ExamHorenAudioPlaybackUrl:fetchA1MockAudioPlaybackUrl)({sampleId:listening.sampleId,mockId:isKombi?mockId.slice(3):"mock-01",part:`teil-${i+1}`,key:part.audioObjectKey,idToken})}/>
+    {part.questions.map(q=>{const key=`t${i+1}-${q.number}`;return isMock2&&q.options?.some(o=>o.picture)?<section key={key}><h3>{q.number}. {q.question||q.statement}</h3><A1PictureOptions name={key} options={q.options} value={answers[key]||""} onChange={v=>onChange(key,v)}/></section>:<PracticeQuestions key={key} questions={[q]} answers={answers} onChange={onChange} keyFor={()=>key} optionsFor={()=>q.options||[["richtig","Richtig"],["falsch","Falsch"]]}/>})}</section>)}</>} writing={props=><PracticeWriting {...props} tasks={[writing.teil1,writing.teil2]}/>} speaking={props=><PracticeSpeaking {...props} tasks={speaking.tasks}/>}/>;
+}
+export default function A1FinalMockExamPage({mockId=A1_FINAL_MOCK_ID}) {
+  const {user}=useAuth();
+  // Course Day 23 remains the existing assessed route, not a practice selector.
+  if(mockId===A1_FINAL_MOCK_ID)return <A1TimedMockExamPage key={user?.uid||"guest"} mockId={mockId}/>;
+  return <MockModeGate key={`${user?.uid}:${mockId}`} mockId={mockId} title={`A1 Mock ${Number(mockId.slice(-2))}`} timed={<A1TimedMockExamPage mockId={mockId}/>} practice={<A1PracticePaper mockId={mockId}/>}/>;
 }

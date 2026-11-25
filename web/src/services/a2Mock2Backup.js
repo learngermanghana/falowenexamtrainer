@@ -47,6 +47,8 @@ export function restoreA2Mock2Backup(keys, response) {
   const cloud = response?.backup;
   if (!cloud?.attemptStartedAtMs || !cloud?.sections) return false;
   const localFlow = readJson(keys.flow);
+  // A completed attempt deliberately reset on this device must not be restored.
+  if (Number(localFlow.ignoreBackupThrough || 0) >= Number(cloud.attemptStartedAtMs)) return false;
   // Refuse to replace an active, different attempt.
   if (localFlow.startedAt && localFlow.startedAt !== cloud.attemptStartedAtMs &&
       localFlow.stage !== "intro") return false;

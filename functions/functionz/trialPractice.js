@@ -23,6 +23,7 @@ async function allowsTrialRequest(req, restriction, db, uid) {
       (level === "B2" && body.setId === "b2-final-mock"));
   }
   if (!exam.engineId) return false;
+  if (path === "/mock/practice/review") return body.mockId === exam.engineId && ["lesen","hoeren"].includes(body.section);
   if (path === "/course-media/" + prefix + "/mock-audio-url") return query.mockId === exam.engineId.slice(3);
   if (path === "/course-media/a1/exam-hoeren-audio-url") return level === "A1" && query.sampleId === "sample-2";
   if (path === "/speaking/analyze") return body.level === level && body.contextType === level + " full mock exam" && body.mockId === exam.engineId;

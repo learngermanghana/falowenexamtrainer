@@ -9,13 +9,13 @@ import teil3 from "../data/mockDrafts/a2-mock-03-hoeren-teil-3.json";
 import teil4 from "../data/mockDrafts/a2-mock-03-hoeren-teil-4.json";
 import "./A2Mock2Hoeren.css";
 
-const PARTS = [
+export const PARTS = [
   { id: "teil-1", number: 1, label: "Unterwegs in der Stadt", data: teil1 },
   { id: "teil-2", number: 2, label: "Freizeit in der Woche", data: teil2 },
   { id: "teil-3", number: 3, label: "Fünf kurze Gespräche", data: teil3 },
   { id: "teil-4", number: 4, label: "Karriere im Alltag", data: { ...teil4, questions: teil4.questions.map((q, i) => ({ ...q, number: 16 + i })) } },
 ];
-const answersKey = uid => `falowen:a2:mock-03:hoeren-teile-3-4:${uid || "guest"}:v1`;
+export const a2Mock3HoerenAnswersKey = uid => `falowen:a2:mock-03:hoeren-teile-3-4:${uid || "guest"}:v1`;
 const answerLabel = (question, answer) => {
   if (!answer) return "No answer";
   if (question.options) return question.options.find(option => option.id === answer)?.label || answer;
@@ -23,7 +23,7 @@ const answerLabel = (question, answer) => {
 };
 const restore = uid => {
   if (!uid) return {};
-  try { return JSON.parse(localStorage.getItem(answersKey(uid)) || "{}") || {}; }
+  try { return JSON.parse(localStorage.getItem(a2Mock3HoerenAnswersKey(uid)) || "{}") || {}; }
   catch { return {}; }
 };
 
@@ -56,7 +56,7 @@ export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewRele
   }, [user?.uid, embedded]);
   useEffect(() => {
     if (!user?.uid) return;
-    localStorage.setItem(answersKey(user.uid), JSON.stringify(answers));
+    localStorage.setItem(a2Mock3HoerenAnswersKey(user.uid), JSON.stringify(answers));
   }, [user?.uid, answers]);
   useEffect(() => {
     if (player.current) { player.current.pause(); player.current.currentTime = 0; }

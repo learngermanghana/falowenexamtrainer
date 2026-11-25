@@ -1,3 +1,5 @@
+import MockPracticeWorkspace, {MockModeGate,PracticeAudio,PracticeQuestions,PracticeWriting,PracticeSpeaking} from "./MockPracticeWorkspace";
+import { MOCK_ONE_TASKS } from "./A2Mock1ConversationalSpeaking";
 import MockListeningReview, { listeningReviewRow } from "./MockListeningReview";
 import { runA2MockSubmissionStep } from "../services/a2MockSubmissionDiagnostics";
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
@@ -314,7 +316,7 @@ const WordCount = ({ text, min, max }) => {
   );
 };
 
-export default function A2FinalMockExamPage() {
+function A2TimedMockExamPage() {
   useAssessmentRestriction();
   const { idToken, user } = useAuth();
   const storageKey = `${A2_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
@@ -483,13 +485,9 @@ export default function A2FinalMockExamPage() {
         });
       }
 
-      if (forceNew && typeof window !== "undefined") {
-        window.localStorage.removeItem(storageKey);
-      }
-
       const response = await startA2MockAttempt({ idToken, mockId: A2_FINAL_MOCK_ID, resumeOnly });
       if (resumeOnly && !response?.resumed) throw new Error("No active attempt was found on your account.");
-      if (response?.resumed && response?.state && !forceNew) {
+      if (response?.resumed && response?.state) {
         const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
         const localSavedAt = Number(exam.clientSavedAtMs || 0);
         const serverSavedAt = Number(response.state?.clientSavedAtMs || 0);
@@ -1262,4 +1260,140 @@ export default function A2FinalMockExamPage() {
       </> : null}
     </main>
   );
+}
+
+function A2PracticePaper(){
+  const parts=[A2_GOETHE_LISTENING_TEIL1,A2_GOETHE_LISTENING_TEIL2,A2_GOETHE_LISTENING_TEIL3,A2_GOETHE_LISTENING_TEIL4];
+  return <MockPracticeWorkspace mockId={A2_FINAL_MOCK_ID} title="A2 Mock 1" displayAnswer={(section,row,value)=>{
+    if(section==="lesen"&&row.part!==4){const q=lesenScoredQuestions.find(q=>q.key===`t${row.part}-${row.number}`);if(q?.options)return mockDisplayAnswer(q.options,value,`a2-final-t${row.part}-${row.number}`)}
+    return String(value||"").toUpperCase();
+  }} reading={({answers,onChange:setLesenAnswer})=>{
+    const exam={lesenAnswers:answers};return <article className="a2-mock-exam">        <section className="a2-mock-part">
+          <header className="a2-mock-part-heading">
+            <h2>{A2_GOETHE_READING_MOCK.teil1.title}</h2>
+            {A2_GOETHE_READING_MOCK.teil1.instruction.map((line) => <p key={line}>{line}</p>)}
+          </header>
+          <article className="a2-mock-newspaper">
+            <h3>{A2_GOETHE_READING_MOCK.teil1.article.title}</h3>
+            {A2_GOETHE_READING_MOCK.teil1.article.subtitle ? <h4>{A2_GOETHE_READING_MOCK.teil1.article.subtitle}</h4> : null}
+            {A2_GOETHE_READING_MOCK.teil1.article.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          </article>
+          {A2_GOETHE_READING_MOCK.teil1.questions.map((question) => (
+            <section className="a2-mock-question" key={question.number}>
+              <h3>Aufgabe {question.number}</h3>
+              <p>{question.question}</p>
+              <ChoiceList
+                name={`a2-final-t1-${question.number}`}
+                options={question.options}
+                value={exam.lesenAnswers[`t1-${question.number}`] || ""}
+                onChange={(value) => setLesenAnswer(`t1-${question.number}`, value)}
+              />
+            </section>
+          ))}
+        </section>
+
+        <section className="a2-mock-part">
+          <header className="a2-mock-part-heading">
+            <h2>{A2_GOETHE_READING_MOCK.teil2.title}</h2>
+            {A2_GOETHE_READING_MOCK.teil2.instruction.map((line) => <p key={line}>{line}</p>)}
+          </header>
+          <article className="a2-mock-directory">
+            <h3>{A2_GOETHE_READING_MOCK.teil2.store.title}</h3>
+            {A2_GOETHE_READING_MOCK.teil2.store.floors.map(([floor, items]) => (
+              <div className="a2-mock-floor" key={floor}>
+                <strong>{floor}</strong>
+                <p>{items}</p>
+              </div>
+            ))}
+          </article>
+          {A2_GOETHE_READING_MOCK.teil2.questions.map((question) => (
+            <section className="a2-mock-question" key={question.number}>
+              <h3>Aufgabe {question.number}</h3>
+              <p>{question.question}</p>
+              <ChoiceList
+                name={`a2-final-t2-${question.number}`}
+                options={question.options}
+                value={exam.lesenAnswers[`t2-${question.number}`] || ""}
+                onChange={(value) => setLesenAnswer(`t2-${question.number}`, value)}
+              />
+            </section>
+          ))}
+        </section>
+
+        <section className="a2-mock-part">
+          <header className="a2-mock-part-heading">
+            <h2>{A2_GOETHE_READING_MOCK.teil3.title}</h2>
+            {A2_GOETHE_READING_MOCK.teil3.instruction.map((line) => <p key={line}>{line}</p>)}
+          </header>
+          <article className="a2-mock-email">
+            <div className="a2-mock-email-field"><strong>Von:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.from}</span></div>
+            <div className="a2-mock-email-field"><strong>An:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.to}</span></div>
+            <div className="a2-mock-email-field"><strong>Betreff:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.subject}</span></div>
+            <div className="a2-mock-email-body">
+              <p>{A2_GOETHE_READING_MOCK.teil3.email.greeting}</p>
+              {A2_GOETHE_READING_MOCK.teil3.email.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              {A2_GOETHE_READING_MOCK.teil3.email.closing.map((line) => <p key={line}>{line}</p>)}
+            </div>
+          </article>
+          {A2_GOETHE_READING_MOCK.teil3.questions.map((question) => (
+            <section className="a2-mock-question" key={question.number}>
+              <h3>Aufgabe {question.number}</h3>
+              <p>{question.question}</p>
+              <ChoiceList
+                name={`a2-final-t3-${question.number}`}
+                options={question.options}
+                value={exam.lesenAnswers[`t3-${question.number}`] || ""}
+                onChange={(value) => setLesenAnswer(`t3-${question.number}`, value)}
+              />
+            </section>
+          ))}
+        </section>
+
+        <section className="a2-mock-part a2-mock-teil4">
+          <header className="a2-mock-part-heading">
+            <h2>{A2_GOETHE_READING_MOCK.teil4.title}</h2>
+            {A2_GOETHE_READING_MOCK.teil4.instruction.map((line) => <p key={line}>{line}</p>)}
+          </header>
+          <div className="a2-mock-people-sheet">
+            {A2_GOETHE_READING_MOCK.teil4.people.map((item) => (
+              <div className="a2-mock-person-row" key={item.number}>
+                <div>
+                  <strong>Aufgabe {item.number}</strong>
+                  <p>{item.person}</p>
+                </div>
+                <label>
+                  Anzeige:
+                  <select
+                    value={exam.lesenAnswers[`t4-${item.number}`] || ""}
+                    onChange={(event) => setLesenAnswer(`t4-${item.number}`, event.target.value)}
+                  >
+                    <option value="">—</option>
+                    {["a", "b", "c", "d", "e", "f"].map((option) => (
+                      <option value={option} key={option}>{option}</option>
+                    ))}
+                    <option value="X">X – Keine passende Anzeige</option>
+                  </select>
+                </label>
+              </div>
+            ))}
+          </div>
+          <h3 className="a2-mock-ads-title">Internet-Anzeigen</h3>
+          <div className="a2-mock-ads-grid">
+            {A2_GOETHE_READING_MOCK.teil4.ads.map((ad) => (
+              <article className="a2-mock-ad" key={ad.id}>
+                <div className="a2-mock-ad-browser"><strong>{ad.id}</strong><span>{ad.url}</span></div>
+                <div className="a2-mock-ad-body">
+                  <h4>{ad.title}</h4>
+                  {ad.body.map((line) => <p key={line}>{line}</p>)}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+</article>;
+  }} listening={({answers,onChange,idToken})=><>{parts.map((part,i)=><section className="mock-practice-paper" key={i}><h2>Teil {i+1}</h2><p>{part.instruction}</p><PracticeAudio load={()=>fetchA2MockAudioPlaybackUrl({mockId:"mock-01",part:`teil-${i+1}`,key:part.audioObjectKey,idToken})}/><PracticeQuestions questions={part.questions||part.tasks} answers={answers} onChange={onChange} keyFor={q=>`t${i+1}-${q.number}`} optionsFor={q=>i===1?part.pictures.map(p=>({id:p.id.toLowerCase(),label:`${p.id} · ${p.label}`,imagePath:p.imagePath})):q.options||[["ja","Ja"],["nein","Nein"]]}/></section>)}</>} writing={props=><PracticeWriting {...props} tasks={[A2_GOETHE_WRITING_MOCK.teil1,A2_GOETHE_WRITING_MOCK.teil2]}/>} speaking={props=><PracticeSpeaking {...props} tasks={MOCK_ONE_TASKS}/>}/>;
+}
+export default function A2FinalMockExamPage(){
+  const {user}=useAuth();return <MockModeGate key={user?.uid||"guest"} mockId={A2_FINAL_MOCK_ID} title="A2 Mock 1" timed={<A2TimedMockExamPage/>} practice={<A2PracticePaper/>}/>;
 }

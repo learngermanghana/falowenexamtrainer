@@ -822,7 +822,7 @@ const { trialRestriction, allowsTrialRequest } = require("./trialPractice");
 const { enrollmentRows, ownsEnrollmentProfile, practiceBlocked, blockedEnrollmentLevels } = require("./levelEnrollmentAccess");
 const limitedPracticePath = /^\/(?:[abc][12]-mock|course-media|writing|speaking|exam-room)(?:[-/]|$)/i;
 async function enforceTrialPractice(req, res, next) {
-  if (!req.headers.authorization || !limitedPracticePath.test(req.path)) return next();
+  if (!req.headers.authorization || (!limitedPracticePath.test(req.path) && req.path !== "/mock/practice/review")) return next();
   try {
     const identity = await getAuthedUser(req);
     if (!identity) return res.status(401).json({ error: "Sign in again." });
@@ -6507,6 +6507,30 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
 });
 
 // Read-only review for already completed attempts; never accept client answers here.
+app.post("/mock/practice/review", async (req,res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req,res,{allowGuest:false});
+    if (!authedUser) return;
+    const mockId = String(req.body?.mockId || "");
+    const level = mockId.slice(0,2);
+    const check = {a1:getA1MediaAccessBlockReason,a2:getA2MediaAccessBlockReason,b1:getB1MediaAccessBlockReason}[level];
+    if (!check) return res.status(400).json({error:"Unsupported practice paper."});
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Student access service is unavailable."});
+    const student = (await findAuthedStudentProfile(db,authedUser))?.data || null;
+    const block = check({authedUser,student});
+    if (block) return res.status(403).json({error:"Practice access is unavailable for this account.",code:block});
+    let rows;
+    try { rows = require("./mockPracticeReview").scoreMockPractice(mockId,req.body?.section,req.body?.answers); }
+    catch(error) { return res.status(400).json({error:error.message}); }
+    res.set("Cache-Control","private, no-store");
+    return res.json({rows,practiceOnly:true});
+  } catch(error) {
+    console.error("Mock practice review error",error);
+    return res.status(500).json({error:"Could not check practice answers."});
+  }
+});
+
 app.post("/mock/attempt/listening-review", async (req, res) => {
   try {
     const user = await requireAuthenticatedUser(req, res, { allowGuest: false });

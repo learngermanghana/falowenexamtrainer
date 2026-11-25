@@ -11,11 +11,11 @@ function loadLocal(uid){
   try{return JSON.parse(localStorage.getItem(storageKey(uid))||"{}")||{}}
   catch{return {}}
 }
-export default function B1Mock2Hoeren({embedded=false,onComplete,onAnswersChange}){
+export default function B1Mock2Hoeren({embedded=false,initialAnswers={},onComplete,onAnswersChange}){
   const {idToken,user}=useAuth();
   const [exam,setExam]=useState(null);
   const [active,setActive]=useState(0);
-  const [answers,setAnswers]=useState(()=>loadLocal(user?.uid));
+  const [answers,setAnswers]=useState(()=>embedded?initialAnswers:loadLocal(user?.uid));
   const [result,setResult]=useState(null);
   const [error,setError]=useState("");
   const [audioError,setAudioError]=useState("");
@@ -28,7 +28,7 @@ export default function B1Mock2Hoeren({embedded=false,onComplete,onAnswersChange
   const part=parts[active];
   const total=Number(exam?.questionCount||30);
   const answered=parts.flatMap(p=>p.questions).filter(q=>typeof answers[q.number]==="string").length;
-  useEffect(()=>{setAnswers(loadLocal(user?.uid));setResult(null);},[user?.uid]);
+  useEffect(()=>{if(!embedded){setAnswers(loadLocal(user?.uid));setResult(null);}},[user?.uid,embedded]);
   useEffect(()=>{
     let cancelled=false;
     if(!idToken){setExam(null);return;}
@@ -38,8 +38,8 @@ export default function B1Mock2Hoeren({embedded=false,onComplete,onAnswersChange
     return()=>{cancelled=true};
   },[idToken]);
   useEffect(()=>{
-    if(user?.uid&&!result)localStorage.setItem(storageKey(user.uid),JSON.stringify(answers));
-  },[user?.uid,answers,result]);
+    if(!embedded&&user?.uid&&!result)localStorage.setItem(storageKey(user.uid),JSON.stringify(answers));
+  },[user?.uid,answers,result,embedded]);
   useEffect(()=>{
     if(audioRef.current){audioRef.current.pause();audioRef.current.currentTime=0;}
     setAudioUrl("");setAudioError("");
@@ -74,7 +74,7 @@ export default function B1Mock2Hoeren({embedded=false,onComplete,onAnswersChange
   };
   const reset=()=>{
     setAnswers({});setResult(null);setPlayed({});setActive(0);setAudioUrl("");setError("");
-    if(user?.uid)localStorage.removeItem(storageKey(user.uid));
+    if(!embedded&&user?.uid)localStorage.removeItem(storageKey(user.uid));
   };
   return <main className="a2-mock2-shell" lang="de" data-b1-mock2-hoeren>
     {!embedded?<div className="a2-mock2-top">

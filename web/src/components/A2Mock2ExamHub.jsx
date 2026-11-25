@@ -1,3 +1,5 @@
+import {MockModeGate} from "./MockPracticeWorkspace";
+import A2AdditionalMockPractice from "./A2AdditionalMockPractice";
 import { runA2MockSubmissionStep } from "../services/a2MockSubmissionDiagnostics";
 import { resumeA2MockSections } from "../services/a2MockCloudResume";
 import { getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
@@ -74,7 +76,7 @@ function A2Mock2ExamHubAttempt(){
      const resumed = await resumeA2MockSections({ keys: STORAGE, idToken, mockId: "a2-mock-02" });
      if (!resumed) {
        if (!startIfMissing) throw new Error("No active attempt was found on your account.");
-       setFlow({ stage: "lesen", startedAt: Date.now() });
+       setFlow(current=>({ ...current, stage: "lesen", startedAt: Date.now() }));
        return;
      }
      setProgress(getProgress(STORAGE));
@@ -236,7 +238,9 @@ function A2Mock2ExamHubAttempt(){
    const completedAttempt = Object.fromEntries(Object.entries(STORAGE).map(([name, key]) => [name, read(key)]));
    localStorage.setItem(historyKey, JSON.stringify([...(Array.isArray(history) ? history : []), completedAttempt]));
    Object.values(STORAGE).forEach(key => localStorage.removeItem(key));
-   setFlow({ stage: "intro", startedAt: null });
+   const resetFlow={stage:"intro",startedAt:null,ignoreBackupThrough:Date.now()};
+   localStorage.setItem(STORAGE.flow,JSON.stringify(resetFlow));
+   setFlow(resetFlow);
    setProgress(getProgress(STORAGE));
    setResetError("");
    announceExamSuccess("A2 Mock 2 is ready for a new attempt.");
@@ -310,5 +314,5 @@ function A2Mock2ExamHubAttempt(){
 // Switching accounts must remount local exam state, not copy the prior answers.
 export default function A2Mock2ExamHub(props) {
   const { user } = useAuth();
-  return <A2Mock2ExamHubAttempt key={user?.uid || "guest"} {...props} />;
+  return <MockModeGate key={user?.uid||"guest"} mockId="a2-mock-02" title="A2 Mock 2" timed={<A2Mock2ExamHubAttempt {...props}/>} practice={<A2AdditionalMockPractice mockId="a2-mock-02"/>}/>;
 }
