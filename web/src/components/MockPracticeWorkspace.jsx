@@ -33,15 +33,15 @@ export function PracticeAudio({load}) {
 export function PracticeQuestions({questions=[],answers,onChange,optionsFor,keyFor=q=>String(q.number)}) {
   return questions.map(q=>{const key=keyFor(q);const options=optionsFor?optionsFor(q):q.options;
     return <fieldset className="mock-practice-question" key={key}><legend>{q.number}. {q.question||q.statement||q.person||q.text||q.day}</legend>{q.context?<p>{q.context}</p>:null}
-    {(options||[]).map(opt=>{const [id,label]=Array.isArray(opt)?opt:[opt.id,opt.label];return <label key={id}><input type="radio" name={key} value={id} checked={answers[key]===id} onChange={()=>onChange(key,id)}/><span>{label||id}</span>{opt.imagePath?<img loading="lazy" src={opt.imagePath} alt={opt.imageAlt||label}/>:null}</label>})}</fieldset>})
+    {(options||[]).map(opt=>{const [id,label]=Array.isArray(opt)?opt:[opt.id,opt.label];return <label key={id}><input type="radio" name={key} value={id} checked={answers[key]===id} onChange={()=>onChange(key,id)}/><span>{/^[a-z]$/i.test(String(id))?`${String(id).toUpperCase()}) `:""}{label||id}</span>{opt.imagePath?<img loading="lazy" src={opt.imagePath} alt={opt.imageAlt||label}/>:null}</label>})}</fieldset>})
 }
-function PracticeReview({rows,section}) {
+function PracticeReview({rows,section,displayAnswer}) {
   const [mistakes,setMistakes]=useState(false);
   const correct=rows.filter(r=>r.status==="correct").length;
   return <section className="mock-practice-review"><h2>{LABELS[section]} practice result</h2><p><strong>{correct}/{rows.length} correct</strong> · {rows.length-correct} incorrect or unanswered</p>
   <div className="mock-practice-numbers">{rows.map(r=><span key={r.number} className={r.status} aria-label={`Question ${r.number}: ${r.status}`}>{r.number} {r.status==="correct"?"✓":"×"}</span>)}</div>
   <label><input type="checkbox" checked={mistakes} onChange={e=>setMistakes(e.target.checked)}/> Show mistakes only</label>
-  {rows.filter(r=>!mistakes||r.status!=="correct").map(r=><article className={r.status} key={r.number}><strong>Aufgabe {r.number} · {r.status==="correct"?"Correct":r.status==="unanswered"?"Not answered":"Incorrect"}</strong><p>Your answer: {r.submitted?.toUpperCase()||"—"} · Correct answer: {r.expected?.toUpperCase()}</p></article>)}</section>;
+  {rows.filter(r=>!mistakes||r.status!=="correct").map(r=><article className={r.status} key={r.number}><strong>Aufgabe {r.number} · {r.status==="correct"?"Correct":r.status==="unanswered"?"Not answered":"Incorrect"}</strong><p>Your answer: {r.submitted?(displayAnswer?.(section,r,r.submitted)||r.submitted.toUpperCase()):"—"} · Correct answer: {displayAnswer?.(section,r,r.expected)||r.expected?.toUpperCase()}</p></article>)}</section>;
 }
 export function PracticeWriting({tasks,answers,onChange}) {
   return <>{tasks.map((task,i)=><article className="mock-practice-paper" key={i}><h2>{task.title||`Teil ${i+1}`}</h2>
@@ -54,11 +54,11 @@ export function PracticeSpeaking({tasks,answers,onChange}) {
   return <>{tasks.map((t,i)=><article className="mock-practice-paper" key={i}><h2>{t.title||`Teil ${i+1}`}</h2><p>{t.prompt||t.situation}</p><p>{t.context} {t.keyword} {t.pictureAlt}</p>{Array.isArray(t.card)?<p>{t.card.join(" · ")}</p>:null}<p>{t.followUp||t.hint}</p>
     <p>Practise aloud with a partner or on your own. Write notes here if useful.</p><textarea aria-label={`Speaking notes ${i+1}`} rows={3} value={answers[String(i)]||""} onChange={e=>onChange(String(i),e.target.value)}/></article>)}</>;
 }
-export default function MockPracticeWorkspace({mockId,title,reading,listening,writing,speaking}) {
+export default function MockPracticeWorkspace({mockId,title,reading,listening,writing,speaking,displayAnswer}) {
   const {user,idToken}=useAuth();
-  return <PracticeAttempt key={`${user?.uid}:${mockId}`} {...{mockId,title,reading,listening,writing,speaking,idToken,uid:user?.uid}}/>;
+  return <PracticeAttempt key={`${user?.uid}:${mockId}`} {...{mockId,title,reading,listening,writing,speaking,displayAnswer,idToken,uid:user?.uid}}/>;
 }
-function PracticeAttempt({mockId,title,reading,listening,writing,speaking,idToken,uid}) {
+function PracticeAttempt({mockId,title,reading,listening,writing,speaking,displayAnswer,idToken,uid}) {
   const key=practiceStorageKey(uid,mockId);
   const [saved,setSaved]=useState(()=>uid?read(key):{});
   const [section,setSection]=useState("lesen"),[busy,setBusy]=useState(false),[error,setError]=useState("");
@@ -84,7 +84,7 @@ function PracticeAttempt({mockId,title,reading,listening,writing,speaking,idToke
   return <main className="mock-practice"><AppBackButton label="Back to Mock Exams" fallbackPath="/exams/mocks"/><h1>{title} · Practice Mode</h1><p>No time limit · Practice is saved on this device only. It does not count towards a certificate or verified exam score.</p>
     <nav className="mock-practice-tabs" aria-label="Practice modules">{modules.map(s=><button key={s} disabled={busy} type="button" aria-pressed={section===s} onClick={()=>choose(s)}>{LABELS[s]}</button>)}</nav>
     {error?<p role="alert">{error}</p>:null}
-    {review?<>{objective?<PracticeReview rows={review.rows} section={section}/>:<section><h2>Practice completed</h2><p>Self-practice only: check that you covered every task point and used clear German. No AI or tutor grade was requested.</p></section>}<button type="button" className="mock-practice-primary" onClick={reset}>Practise this module again</button></>:<>
+    {review?<>{objective?<PracticeReview rows={review.rows} section={section} displayAnswer={displayAnswer}/>:<section><h2>Practice completed</h2><p>Self-practice only: check that you covered every task point and used clear German. No AI or tutor grade was requested.</p></section>}<button type="button" className="mock-practice-primary" onClick={reset}>Practise this module again</button></>:<>
       {render?.({answers,onChange:change,idToken,section})}
       {render?<div className="mock-practice-actions"><button className="mock-practice-primary" disabled={busy||objective&&!Object.values(answers).some(v=>normalize(v))} type="button" onClick={submit}>{busy?"Checking…":objective?"Check answers":"Finish self-practice"}</button><button type="button" disabled={busy} onClick={()=>{if(window.confirm("Clear this practice draft? Past practice results stay saved."))reset()}}>Start module again</button></div>:null}
     </>}
