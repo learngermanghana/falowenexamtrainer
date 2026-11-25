@@ -70,7 +70,7 @@ async function verifyGermanSubmissionAccess(db,auth,identity,now=Date.now()) {
   const {enrollmentRows,enrollmentDecision}=require("./levelEnrollmentAccess");
   const decision=enrollmentDecision(await enrollmentRows(record.ref),"german",now);
   const placement=germanPlacement(profile);
-  if(!placement||profile.accountType==="exam_only"||["archived","inactive","deleted","withdrawn","suspended","blocked"].includes(text(profile.status))||["pending","invitation_pending"].includes(text(placement.accessType)))return null;
+  if(!placement||profile.accountType==="exam_only"||["archived","inactive","deleted","withdrawn","suspended","blocked"].includes(text(profile.status))||text(placement.accessType)==="invitation_pending"|| (text(placement.accessType)==="pending"&&!decision.granted.length))return null;
   const levels=LEVELS.filter(level=>!decision.blocked.includes(level)&&((access?.levels||[]).includes(level)||decision.granted.includes(level)));
   if(!levels.length)return null;
   // Never turn a trial grant into unrestricted access to another level.
