@@ -1,3 +1,4 @@
+import MockListeningReview, { listeningReviewRow } from "./MockListeningReview";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import AppBackButton from "./navigation/AppBackButton";
@@ -308,6 +309,7 @@ function A2KombiAttempt({mockNumber,paper}) {
         <p><strong>{flow.verifiedResult.overall.points}/{flow.verifiedResult.overall.maxPoints} points</strong> · {flow.verifiedResult.overall.score}% · {flow.verifiedResult.overall.passed?"Passed":"More practice recommended"}</p>
         {(flow.verifiedResult.overall.sections||order).map(k=><p key={k}>{LABELS[k]}: <strong>{flow.verifiedResult.sectionScores[k]}/25</strong></p>)}
         {flow.verifiedResult.overall.assessmentVersion==="three-module-v1"?<p>This earlier /75 result remains unchanged; Hören was not part of this attempt.</p>:null}
+        {Object.prototype.hasOwnProperty.call(flow.verifiedResult.sectionScores || {}, "hoeren") ? <MockListeningReview rows={(flow.verifiedResult.listeningReview || []).map(row => listeningReviewRow(row))}/> : null}
         <p>The verified result is saved in Falowen Results.</p>
         <button type="button" className="a2-mock2-primary" onClick={restart}>Start another attempt</button>
       </div>:<>
