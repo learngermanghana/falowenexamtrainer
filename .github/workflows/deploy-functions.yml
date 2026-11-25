@@ -65,7 +65,7 @@ jobs:
           node --test __tests__/bookCommerce.test.js __tests__/bookReceiptVerification.test.js functionz/privateBookDelivery.test.js functionz/bookPricing.test.js
           node --check functionz/privateBookDelivery.js
           node --check functionz/paystackFeePolicy.js
-          node -e 'const exported = require("./index.entry.js"); if (!exported.api) throw new Error("Firebase api export was not discovered"); if (!exported.submitAssignmentResubmission) throw new Error("Resubmission callable export was not discovered"); if (!exported.sendPushTestNotification) throw new Error("Push test callable export was not discovered"); for (const key of ["onClassSessionPushLifecycleUpdated", "onAnnouncementCreated", "onAttendanceSessionUpdated"]) if (key in exported) throw new Error("Retired Firebase export: "+key); console.log("Required Firebase exports verified; retired push triggers absent");'
+          node -e 'const exported = require("./index.entry.js"); if (!exported.api) throw new Error("Firebase api export was not discovered"); if (!exported.submitAssignmentResubmission) throw new Error("Resubmission callable export was not discovered"); for (const key of ["onClassSessionPushLifecycleUpdated","onAnnouncementCreated","onAttendanceSessionUpdated","sendPushTestNotification","onClassBoardPostCreated","onQaPostCreated","onQaPostUpdated","onScoreCreated","onExamTutorReviewCreated","onExamTutorReviewUpdated","sendPaymentReminders"]) if (key in exported) throw new Error("Retired Firebase export: "+key); console.log("Required Firebase exports verified; retired push triggers absent");'
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
@@ -97,7 +97,7 @@ jobs:
           set +e
           firebase deploy \
             --project "$FIREBASE_PROJECT_ID" \
-            --only functions:falowenexamtrainer:api,functions:falowenexamtrainer:submitAssignmentResubmission,functions:falowenexamtrainer:sendPushTestNotification \
+            --only functions:falowenexamtrainer:api,functions:falowenexamtrainer:submitAssignmentResubmission \
             --debug > firebase-deploy.log 2>&1
           status=$?
           tail -n 180 firebase-deploy.log || true
@@ -162,12 +162,9 @@ jobs:
             "requestAccountDeletion,cancelAccountDeletion"
             "cleanupExpiredTrials,cleanupStaleUnpaidSignups"
             "cleanupExpiredStudentContracts,submitHistoricalAssignmentResubmission"
-            "sendPaymentReminders,onMarkedAssignmentNotificationCreated"
-            "onClassLessonNoteCreated,onClassBoardPostCreated"
-            "onQaPostCreated"
-            "onQaPostUpdated,onScoreCreated"
-            "onExamTutorReviewCreated"
-            "onExamTutorReviewUpdated,onStudentCreated"
+            "onMarkedAssignmentNotificationCreated"
+            "onClassLessonNoteCreated"
+            "onStudentCreated"
             "onStudentUpdated"
           )
           for batch in "${batches[@]}"; do

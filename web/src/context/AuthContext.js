@@ -346,7 +346,8 @@ export const AuthProvider = ({ children }) => {
   const [messagingToken, setMessagingToken] = useState(null);
   const deviceId = useMemo(() => getDeviceId(), []);
   const devicePlatform = useMemo(() => getDevicePlatform(), []);
-  const hasVapidKey = Boolean(process.env.REACT_APP_FIREBASE_VAPID_KEY);
+  // Device push is retired; do not refresh or register tokens on sign-in.
+  const hasVapidKey = false;
   const previousUserId = useRef(null);
 
   const persistMessagingToken = useCallback(async (token, studentId) => {
@@ -1151,7 +1152,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
       }
       if (!hasVapidKey) {
-        console.warn("Push notifications disabled: missing REACT_APP_FIREBASE_VAPID_KEY.");
+        // Email and the in-app inbox remain available.
         setNotificationStatus("idle");
         return null;
       }

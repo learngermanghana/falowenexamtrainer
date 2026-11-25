@@ -36,7 +36,7 @@ jobs:
           node --check index.entry.js
           node --check classPushLifecycle.js
           node --check classNotificationCopy.js
-          node -e 'const f=require("./index.entry.js"); for (const key of ["api", "submitAssignmentResubmission", "sendPushTestNotification"]) if (!f[key]) throw new Error("Missing Firebase export: "+key); for (const key of ["onClassSessionPushLifecycleUpdated", "onAnnouncementCreated", "onAttendanceSessionUpdated"]) if (key in f) throw new Error("Retired Firebase export: "+key); console.log("Firebase exports verified; retired push triggers absent");'
+          node -e 'const f=require("./index.entry.js"); for (const key of ["api", "submitAssignmentResubmission", "onMarkedAssignmentNotificationCreated", "onClassLessonNoteCreated", "onAttendanceCheckinWritten"]) if (!f[key]) throw new Error("Missing Firebase export: "+key); for (const key of ["onClassSessionPushLifecycleUpdated","onAnnouncementCreated","onAttendanceSessionUpdated","sendPushTestNotification","onClassBoardPostCreated","onQaPostCreated","onQaPostUpdated","onScoreCreated","onExamTutorReviewCreated","onExamTutorReviewUpdated","sendPaymentReminders"]) if (key in f) throw new Error("Retired Firebase export: "+key); console.log("Firebase exports verified; retired push triggers absent");'
       - name: Test notification translations
         working-directory: functions
         run: node --test __tests__/classNotificationLanguage.test.cjs __tests__/studentNotificationLanguage.test.cjs
