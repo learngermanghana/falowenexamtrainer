@@ -10,7 +10,7 @@ const read=key=>{try{return JSON.parse(localStorage.getItem(key)||"null")||{}}ca
 const normalize=v=>String(v??"").trim().toLowerCase();
 export const practiceStorageKey=(uid,mockId)=>`falowen:mock-practice:v1:${uid}:${mockId}`;
 export const practiceModules=mockId=>mockId==="a2-mock-08"?["lesen","schreiben","sprechen"]:Object.keys(LABELS);
-export function MockModeGate({mockId, title, timed, practice, defaultTimed=false}) {
+export function MockModeGate({mockId, title, timed, practice, defaultTimed=true}) {
   const initial=()=>{const mode=new URLSearchParams(typeof window==="undefined"?"":window.location.search).get("mode");return mode==="practice"?"practice":mode==="timed"||defaultTimed?"timed":""};
   const [mode,setMode]=useState(initial);
   if(mode==="timed") return <><div className="mock-mode-switch"><button type="button" onClick={()=>{if(window.confirm("Leave the timed view? Your saved attempt is retained and its timer continues."))setMode("")}}>Choose another mode</button></div>{timed}</>;
@@ -46,9 +46,9 @@ function PracticeReview({rows,section}) {
 export function PracticeWriting({tasks,answers,onChange}) {
   return <>{tasks.map((task,i)=><article className="mock-practice-paper" key={i}><h2>{task.title||`Teil ${i+1}`}</h2>
     {(Array.isArray(task.scenario)?task.scenario:[task.situation||task.scenario||task.prompt||task.context]).filter(Boolean).map((line,j)=><p key={j}>{line}</p>)}
-    <p>{task.instruction}</p>{task.points?.length?<ul>{task.points.map((p,j)=><li key={j}>{p}</li>)}</ul>:null}
+    {task.quote?<blockquote>{task.quoteBy?<strong>{task.quoteBy}</strong>:null}<p>{task.quote}</p></blockquote>:null}<p>{task.instruction}</p>{task.points?.length?<ul>{task.points.map((p,j)=><li key={j}>{p}</li>)}</ul>:null}
     {task.formRows?.length?task.formRows.filter(r=>r.kind==="input").map((r,j)=><label key={j}>{r.label}<input value={answers[`form-${j}`]||""} onChange={e=>onChange(`form-${j}`,e.target.value)}/></label>):<textarea aria-label={`Writing task ${i+1}`} rows={7} value={answers[String(i)]||""} onChange={e=>onChange(String(i),e.target.value)}/>}
-    <p>{task.reminder||""} {task.wordTarget?`Target: ${task.wordTarget} words`:""}</p></article>)}</>;
+    <p>{task.reminder||""} {task.wordTarget?`Target: ${task.wordTarget} words`:task.target?`Target: ${task.target} words`:task.minWords&&task.maxWords?`Target: ${task.minWords}–${task.maxWords} words`:""}</p></article>)}</>;
 }
 export function PracticeSpeaking({tasks,answers,onChange}) {
   return <>{tasks.map((t,i)=><article className="mock-practice-paper" key={i}><h2>{t.title||`Teil ${i+1}`}</h2><p>{t.prompt||t.situation}</p><p>{t.context} {t.keyword} {t.pictureAlt}</p>{Array.isArray(t.card)?<p>{t.card.join(" · ")}</p>:null}<p>{t.followUp||t.hint}</p>
