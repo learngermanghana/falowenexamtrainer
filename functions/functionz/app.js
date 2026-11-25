@@ -6507,6 +6507,32 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
 });
 
 // Read-only review for already completed attempts; never accept client answers here.
+// Personal historical results remain readable without starting an assessment.
+// The authenticated UID owns the entire query; no caller-supplied user ID,
+// attempt mutation, score recomputation, or new practice entitlement.
+const mockAttemptHistory = require("./mockAttemptHistory");
+async function handleMockAttemptHistory(req,res,review=false) {
+  try {
+    const identity=await requireAuthenticatedUser(req,res,{allowGuest:false});
+    if(!identity)return;
+    const db=getFirestoreSafe();
+    if(!db)return res.status(503).json({error:"Mock history storage is unavailable."});
+    const mockId=req.body?.mockId;
+    const args={db,uid:identity.uid,mockId};
+    const result=review
+      ? await mockAttemptHistory.getMockHistoryReview({...args,attemptId:req.body?.attemptId})
+      : await mockAttemptHistory.listMockHistory({...args,cursor:req.body?.cursor,documentId:admin.firestore.FieldPath.documentId()});
+    res.set("Cache-Control","private, no-store");
+    return res.json(result);
+  } catch(error) {
+    if(error.status)return res.status(error.status).json({error:error.message});
+    console.error("Mock history read failed",error);
+    return res.status(500).json({error:"Could not load mock history. Please retry."});
+  }
+}
+app.post("/mock/history/list",(req,res)=>handleMockAttemptHistory(req,res));
+app.post("/mock/history/review",(req,res)=>handleMockAttemptHistory(req,res,true));
+
 app.post("/mock/practice/review", async (req,res) => {
   try {
     const authedUser = await requireAuthenticatedUser(req,res,{allowGuest:false});
