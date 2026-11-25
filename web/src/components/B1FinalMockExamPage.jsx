@@ -1,4 +1,4 @@
-import MockListeningReview, { listeningReviewRow } from "./MockListeningReview";
+import MockListeningReview, { listeningReviewRow, SavedMockListeningReview } from "./MockListeningReview";
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
 import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresentation";
@@ -653,10 +653,10 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
             <div key={key}><span>{SECTION_LABELS[key]}</span><strong>{score}/25</strong></div>
           ))}
         </section>
-        <MockListeningReview rows={isVerified ? (exam.listeningReview || []).map(row => listeningReviewRow(row)) : B1_LISTENING.flatMap((part,index)=>part.questions.map(q=>listeningReviewRow({
+        {isVerified ? <SavedMockListeningReview key={exam.attemptInfo?.attemptId} rows={exam.listeningReview} level="B1" attemptId={exam.attemptInfo?.attemptId} idToken={idToken}/> : <MockListeningReview rows={B1_LISTENING.flatMap((part,index)=>part.questions.map(q=>listeningReviewRow({
           number:q.number,part:index+1,question:q.question,submitted:exam.hoerenAnswers?.[`t${index+1}-${q.number}`],expected:q.answer,
           display:value=>mockDisplayAnswer(q.options,value,`hoeren-${part.id}-${q.number}`)
-        })))}/>
+        })))}/>}
         <section className="b1-final-rules">
           <p><strong>Strongest:</strong> {SECTION_LABELS[sorted[0]?.[0]] || "—"}</p>
           <p><strong>Practise next:</strong> {weakest?.label || SECTION_LABELS[sorted[sorted.length - 1]?.[0]] || "—"}{weakest ? ` (${weakest.score}/25)` : ""}</p>
