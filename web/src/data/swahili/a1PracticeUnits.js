@@ -1991,6 +1991,10 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Siku, Miezi na Tarehe",
     "contentVersion": 3,
     "objective": "Name weekdays and months, ask and answer about dates, birthdays and appointments.",
+    "aiLecture": {
+      "title": "Video ya AI · Siku, Miezi na Tarehe",
+      "youtubeId": "xYwrJxRhVn8"
+    },
     "radio": {
       "resourceRole": "falowenRadio",
       "youtubeId": "QdpRliUlbMA",

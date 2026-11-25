@@ -33,6 +33,9 @@ test("Day 12 exposes the song lyrics and all seven optional questions from the w
   render(<MemoryRouter initialEntries={["/campus/course/swahili/day-12?radio=done"]}>
    <SwahiliA1PracticeWorkbook lesson={SWAHILI_A1_PRACTICE_UNITS[12]} preview />
   </MemoryRouter>);
+  const lecture = screen.getByTitle("Video ya AI · Siku, Miezi na Tarehe");
+  expect(lecture.getAttribute("src")).toBe("https://www.youtube-nocookie.com/embed/xYwrJxRhVn8");
+  expect(lecture.compareDocumentPosition(screen.getByRole("tablist")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   fireEvent.click(screen.getByRole("button", {name:/Angalia Kalenda · Maneno ya wimbo na maswali/}));
   expect(screen.queryByTitle(/Falowen Radio:.*Siku, Miezi na Tarehe/)).toBeNull();
   expect(screen.queryByText("Sikiliza na ukamilishe taarifa hizi.")).toBeNull();
