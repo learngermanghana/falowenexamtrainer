@@ -204,12 +204,18 @@ test('Swahili A1 Day 12 opens the published lyrics and offers seven self-check q
  const track = JSON.parse(read('web/public/music/swahili-catalog.json')).tracks.find(row => row.id === 'swahili-a1-day-12');
  const pack = JSON.parse(read('web/public/music/approved-recording-lyrics.json')).recordings.find(row => row.objectKey === track.objectKey);
  pack.practiceQuestions = JSON.parse(read('server/data/swahili-a1-day-12-music-practice.json'));
- const { w, dom, click } = await room(track, pack, {swahiliTracks:[track]});
+ const { w, a, dom, click } = await room(track, pack, {swahiliTracks:[track]});
  try {
   const d = w.document;
   assert.equal(d.getElementById('detail-lyrics').hidden, false);
   assert.match(d.getElementById('lyrics-text').textContent, /Wiki ina siku ngapi/);
-  assert.equal(d.getElementById('follow-lyrics').disabled, true);
+  assert.equal(d.getElementById('follow-lyrics').disabled, false);
+  a.currentTime = 129.5;
+  a.dispatchEvent(new w.Event('timeupdate'));
+  assert.equal(d.querySelector('.lyric-line[aria-current="true"]').textContent, 'Nina miadi Alhamisi.');
+  a.currentTime = 90;
+  a.dispatchEvent(new w.Event('seeked'));
+  assert.equal(d.querySelector('.lyric-line[aria-current="true"]'), null);
   click('lyrics-next');
   assert.equal(d.getElementById('detail-practice').hidden, false);
   const answers = [...d.querySelectorAll('#listening-questions details')];

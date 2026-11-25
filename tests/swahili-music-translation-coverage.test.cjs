@@ -40,6 +40,10 @@ test('Day 12 practice is served only with the matching public song lyrics', asyn
     assert.equal(code, 200);
     assert.equal(body.objectKey, track.objectKey);
     assert.match(body.lyrics, /Nina miadi Alhamisi/);
+    assert.equal(body.timingStatus, 'estimated');
+    assert.equal(body.cues.length, 63);
+    assert.ok(body.cues.every((cue, index) => cue.end > cue.start &&
+      (index === 0 || cue.start >= body.cues[index - 1].end)));
     assert.equal(body.practiceQuestions.length, 7);
     assert.match(body.practiceQuestions[5].answer, /Alhamisi, tarehe ishirini mwezi wa Agosti/);
   }

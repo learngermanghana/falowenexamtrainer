@@ -4040,9 +4040,326 @@
       "objectKey": "swahili/music/A1/day-12/Angalia Kalenda.mp3.mpeg",
       "title": "Angalia Kalenda",
       "lyrics": "[Verse 1]\nWiki ina siku ngapi?\nSiku saba, siku saba!\nJumamosi, Jumapili,\nJumatatu, Jumanne, Jumatano,\nAlhamisi, Ijumaa,\nSiku saba za wiki!\nOh-oh, siku saba!\nSiku saba za wiki!\n\n[Chorus]\nSema, leo ni siku gani?\nSema, kesho ni siku gani?\nMwezi gani? Tarehe ngapi?\nAngalia kalenda!\nOh-oh, angalia kalenda!\nEh-eh, tarehe ngapi?\n\n[Verse 2]\nMwaka una miezi mingapi?\nMiezi kumi na miwili!\nJanuari, Februari, Machi,\nAprili, Mei, Juni,\nJulai, Agosti, Septemba,\nOktoba, Novemba, Desemba!\nOh-oh, miezi kumi na miwili!\nMiezi ya mwaka!\n\n[Verse 3]\nMei ni mwezi wa ngapi?\nMei ni mwezi wa tano!\nNovemba ni mwezi wa ngapi?\nNovemba ni mwezi wa kumi na moja!\nJanuari ni mwezi wa kwanza,\nDesemba ni mwezi wa kumi na mbili!\n\n[Chorus]\nSema, leo ni siku gani?\nSema, kesho ni siku gani?\nMwezi gani? Tarehe ngapi?\nAngalia kalenda!\nOh-oh, angalia kalenda!\nEh-eh, tarehe ngapi?\n\n[Verse 4]\nJuzi, jana, leo,\nKesho na kesho kutwa!\nLeo ni Jumatano,\nJana ilikuwa Jumanne.\nJuzi ilikuwa Jumatatu,\nKesho ni Alhamisi,\nKesho kutwa ni Ijumaa!\nOh-oh, juzi na jana,\nLeo, kesho, kesho kutwa!\n\n[Verse 5]\nLeo ni Jumatatu, tarehe tano Mei,\nKesho ni Jumanne, tarehe sita Mei.\nSiku yako ya kuzaliwa ni lini?\nNi tarehe kumi mwezi wa Juni!\nOh-oh, siku ya kuzaliwa!\nTarehe kumi mwezi wa Juni!\n\n[Verse 6]\nUna miadi lini, rafiki?\nNina miadi Alhamisi.\nTarehe ngapi?\nTarehe ishirini!\nMwezi gani?\nMwezi wa Agosti!\n\n[Final Chorus]\nSema, leo ni siku gani?\nSema, kesho ni siku gani?\nMwezi gani? Tarehe ngapi?\nAngalia kalenda!\nOh-oh, siku saba za wiki!\nEh-eh, miezi ya mwaka!\nWiki ina siku saba,\nMwaka una miezi kumi na miwili!",
-      "cues": [],
+      "cues": [
+        {
+          "start": 8.34,
+          "end": 10.66,
+          "text": "Wiki ina siku ngapi?"
+        },
+        {
+          "start": 10.66,
+          "end": 12.96,
+          "text": "Siku saba, siku saba!"
+        },
+        {
+          "start": 12.96,
+          "end": 15.13,
+          "text": "Jumamosi, Jumapili,"
+        },
+        {
+          "start": 15.44,
+          "end": 17.48,
+          "text": "Jumatatu, Jumanne, Jumatano,"
+        },
+        {
+          "start": 17.48,
+          "end": 19.2,
+          "text": "Alhamisi, Ijumaa,"
+        },
+        {
+          "start": 19.2,
+          "end": 20.94,
+          "text": "Siku saba za wiki!"
+        },
+        {
+          "start": 20.94,
+          "end": 23.16,
+          "text": "Oh-oh, siku saba!"
+        },
+        {
+          "start": 23.84,
+          "end": 25.36,
+          "text": "Siku saba za wiki!"
+        },
+        {
+          "start": 25.36,
+          "end": 27.9,
+          "text": "Sema, leo ni siku gani?"
+        },
+        {
+          "start": 27.9,
+          "end": 30.02,
+          "text": "Sema, kesho ni siku gani?"
+        },
+        {
+          "start": 30.02,
+          "end": 32.26,
+          "text": "Mwezi gani? Tarehe ngapi?"
+        },
+        {
+          "start": 32.26,
+          "end": 33.84,
+          "text": "Angalia kalenda!"
+        },
+        {
+          "start": 33.84,
+          "end": 36.04,
+          "text": "Oh-oh, angalia kalenda!"
+        },
+        {
+          "start": 36.04,
+          "end": 38.26,
+          "text": "Eh-eh, tarehe ngapi?"
+        },
+        {
+          "start": 42.54,
+          "end": 44.18,
+          "text": "Mwaka una miezi mingapi?"
+        },
+        {
+          "start": 44.18,
+          "end": 46.34,
+          "text": "Miezi kumi na miwili!"
+        },
+        {
+          "start": 46.34,
+          "end": 48.48,
+          "text": "Januari, Februari, Machi,"
+        },
+        {
+          "start": 48.48,
+          "end": 50.88,
+          "text": "Aprili, Mei, Juni,"
+        },
+        {
+          "start": 50.88,
+          "end": 53.02,
+          "text": "Julai, Agosti, Septemba,"
+        },
+        {
+          "start": 53.02,
+          "end": 55.04,
+          "text": "Oktoba, Novemba, Desemba!"
+        },
+        {
+          "start": 55.04,
+          "end": 57.66,
+          "text": "Oh-oh, miezi kumi na miwili!"
+        },
+        {
+          "start": 58.62,
+          "end": 59.82,
+          "text": "Miezi ya mwaka!"
+        },
+        {
+          "start": 59.82,
+          "end": 61.72,
+          "text": "Mei ni mwezi wa ngapi?"
+        },
+        {
+          "start": 61.72,
+          "end": 63.88,
+          "text": "Mei ni mwezi wa tano!"
+        },
+        {
+          "start": 63.88,
+          "end": 66.08,
+          "text": "Novemba ni mwezi wa ngapi?"
+        },
+        {
+          "start": 66.08,
+          "end": 68.46,
+          "text": "Novemba ni mwezi wa kumi na moja!"
+        },
+        {
+          "start": 68.46,
+          "end": 70.34,
+          "text": "Januari ni mwezi wa kwanza,"
+        },
+        {
+          "start": 70.34,
+          "end": 72.8,
+          "text": "Desemba ni mwezi wa kumi na mbili!"
+        },
+        {
+          "start": 72.8,
+          "end": 75.48,
+          "text": "Sema, leo ni siku gani?"
+        },
+        {
+          "start": 75.48,
+          "end": 77.56,
+          "text": "Sema, kesho ni siku gani?"
+        },
+        {
+          "start": 77.56,
+          "end": 79.92,
+          "text": "Mwezi gani? Tarehe ngapi?"
+        },
+        {
+          "start": 79.92,
+          "end": 81.42,
+          "text": "Angalia kalenda!"
+        },
+        {
+          "start": 81.42,
+          "end": 83.6,
+          "text": "Oh-oh, angalia kalenda!"
+        },
+        {
+          "start": 83.6,
+          "end": 85.84,
+          "text": "Eh-eh, tarehe ngapi?"
+        },
+        {
+          "start": 94.36,
+          "end": 96.86,
+          "text": "Juzi, jana, leo,"
+        },
+        {
+          "start": 96.86,
+          "end": 99.18,
+          "text": "Kesho na kesho kutwa!"
+        },
+        {
+          "start": 99.18,
+          "end": 101.0,
+          "text": "Leo ni Jumatano,"
+        },
+        {
+          "start": 101.0,
+          "end": 103.04,
+          "text": "Jana ilikuwa Jumanne."
+        },
+        {
+          "start": 103.04,
+          "end": 105.6,
+          "text": "Juzi ilikuwa Jumatatu,"
+        },
+        {
+          "start": 105.6,
+          "end": 107.84,
+          "text": "Kesho ni Alhamisi,"
+        },
+        {
+          "start": 107.84,
+          "end": 109.48,
+          "text": "Kesho kutwa ni Ijumaa!"
+        },
+        {
+          "start": 109.48,
+          "end": 111.7,
+          "text": "Oh-oh, juzi na jana,"
+        },
+        {
+          "start": 111.7,
+          "end": 113.96,
+          "text": "Leo, kesho, kesho kutwa!"
+        },
+        {
+          "start": 113.96,
+          "end": 116.08,
+          "text": "Leo ni Jumatatu, tarehe tano Mei,"
+        },
+        {
+          "start": 116.08,
+          "end": 117.96,
+          "text": "Kesho ni Jumanne, tarehe sita Mei."
+        },
+        {
+          "start": 118.54,
+          "end": 120.94,
+          "text": "Siku yako ya kuzaliwa ni lini?"
+        },
+        {
+          "start": 120.94,
+          "end": 123.02,
+          "text": "Ni tarehe kumi mwezi wa Juni!"
+        },
+        {
+          "start": 123.02,
+          "end": 125.28,
+          "text": "Oh-oh, siku ya kuzaliwa!"
+        },
+        {
+          "start": 125.28,
+          "end": 127.46,
+          "text": "Tarehe kumi mwezi wa Juni!"
+        },
+        {
+          "start": 127.46,
+          "end": 128.92,
+          "text": "Una miadi lini, rafiki?"
+        },
+        {
+          "start": 128.92,
+          "end": 131.16,
+          "text": "Nina miadi Alhamisi."
+        },
+        {
+          "start": 131.16,
+          "end": 132.16,
+          "text": "Tarehe ngapi?"
+        },
+        {
+          "start": 132.16,
+          "end": 133.32,
+          "text": "Tarehe ishirini!"
+        },
+        {
+          "start": 133.32,
+          "end": 134.34,
+          "text": "Mwezi gani?"
+        },
+        {
+          "start": 134.34,
+          "end": 135.92,
+          "text": "Mwezi wa Agosti!"
+        },
+        {
+          "start": 135.92,
+          "end": 138.1,
+          "text": "Sema, leo ni siku gani?"
+        },
+        {
+          "start": 138.1,
+          "end": 140.16,
+          "text": "Sema, kesho ni siku gani?"
+        },
+        {
+          "start": 140.16,
+          "end": 142.5,
+          "text": "Mwezi gani? Tarehe ngapi?"
+        },
+        {
+          "start": 142.5,
+          "end": 144.0,
+          "text": "Angalia kalenda!"
+        },
+        {
+          "start": 144.0,
+          "end": 146.18,
+          "text": "Oh-oh, siku saba za wiki!"
+        },
+        {
+          "start": 146.18,
+          "end": 148.46,
+          "text": "Eh-eh, miezi ya mwaka!"
+        },
+        {
+          "start": 153.06,
+          "end": 155.78,
+          "text": "Wiki ina siku saba,"
+        },
+        {
+          "start": 157.5,
+          "end": 159.66,
+          "text": "Mwaka una miezi kumi na miwili!"
+        }
+      ],
       "source": "owner-supplied",
-      "timingStatus": "missing"
+      "timingStatus": "estimated",
+      "recordingSha256": "7802329a2a98fb5f369830180cd9b73e0a1b2dbd44a0ae1c8ecb0524cc02d626"
     }
   ]
 }
