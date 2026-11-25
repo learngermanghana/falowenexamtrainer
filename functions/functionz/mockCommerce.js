@@ -246,6 +246,20 @@ async function processMockWebhook({ admin, data }) {
       tx.update(orderRef, { status: "rejected", updatedAt: admin.firestore.FieldValue.serverTimestamp() });
       return { status: 202, body: { status: "rejected", reason: "purchase_mismatch" } };
     }
+    // Record exact gateway amounts from the verified transaction and immutable
+    // server order. The provider's fee is not the student's fee contribution.
+    const feeMinor = Number.isSafeInteger(data.fees) && data.fees >= 0 ? data.fees : null;
+    const paidAtRaw = data.paid_at || data.paidAt;
+    const paidAtMs = typeof paidAtRaw === "string" ? Date.parse(paidAtRaw) : NaN;
+    const settlement = {
+      grossAmountGhs: order.checkoutPesewas / 100,
+      gatewayFeeGhs: feeMinor === null ? null : feeMinor / 100,
+      studentFeeContributionGhs: (order.checkoutPesewas - Math.round(order.amountGhs * 100)) / 100,
+      currency: "GHS",
+      paymentDate: Number.isFinite(paidAtMs) ? new Date(paidAtMs).toISOString() : null,
+      productType: "mock_package",
+      program: "german"
+    };
     const now = Date.now();
     const previousExpiry = Number(subscriptionSnap?.data()?.expiresAtMs || 0);
     const startsAtMs = Math.max(now, previousExpiry);
@@ -253,7 +267,7 @@ async function processMockWebhook({ admin, data }) {
     tx.create(purchaseRef, {
       uid: order.uid, studentId: order.studentId, level: order.level,
       packageId: order.packageId, scope: "level", mockIds: order.mockIds,
-      status: "active", reference, priceGhs: order.amountGhs,
+      status: "active", reference, priceGhs: order.amountGhs, ...settlement,
       purchasedAtMs: now, startsAtMs, expiresAtMs,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -262,7 +276,7 @@ async function processMockWebhook({ admin, data }) {
       scope: "level", status: "active", startsAtMs, expiresAtMs,
       lastPaymentReference: reference, updatedAt: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
-    tx.update(orderRef, { status: "paid", paidAtMs: now });
+    tx.update(orderRef, { status: "paid", paidAtMs: now, ...settlement });
     return { status: 200, body: { status: "synced", reference } };
   });
   return result;
