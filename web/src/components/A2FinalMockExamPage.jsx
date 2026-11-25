@@ -485,13 +485,9 @@ function A2TimedMockExamPage() {
         });
       }
 
-      if (forceNew && typeof window !== "undefined") {
-        window.localStorage.removeItem(storageKey);
-      }
-
       const response = await startA2MockAttempt({ idToken, mockId: A2_FINAL_MOCK_ID, resumeOnly });
       if (resumeOnly && !response?.resumed) throw new Error("No active attempt was found on your account.");
-      if (response?.resumed && response?.state && !forceNew) {
+      if (response?.resumed && response?.state) {
         const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
         const localSavedAt = Number(exam.clientSavedAtMs || 0);
         const serverSavedAt = Number(response.state?.clientSavedAtMs || 0);
