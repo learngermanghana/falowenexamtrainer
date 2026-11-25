@@ -56,7 +56,8 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
         .some((value) => String(value).toLowerCase().includes(query));
   });
   const metrics = [
-    ["Completed", submissionKnown ? `${completed}/${ASSIGNMENTS.length}` : `—/${ASSIGNMENTS.length}`],
+    ["Published", `${PUBLISHED.length}/${LESSONS.filter(lesson => lesson.day > 0).length}`],
+    ["Completed", submissionKnown && ASSIGNMENTS.length ? `${completed}/${ASSIGNMENTS.length}` : `—/${ASSIGNMENTS.length}`],
     ["Next lesson", nextLabel === "Review lessons" ? "Published work submitted" : next ? `Somo la ${next.day}` : "Not published"],
     ["Tutor review", submissionKnown ? `${reviewed} reviewed` : "—"],
   ];
@@ -88,13 +89,12 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
         </div>
         <div style={{ display: "grid", gap: 8 }}>
           {percent !== null && (
-            <div role="progressbar" aria-label="Kiswahili course progress" aria-valuenow={percent} style={book.progressShell}>
+            <div role="progressbar" aria-label="Kiswahili course progress" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} style={book.progressShell}>
               <div style={{ ...book.progressFill, width: `${percent}%` }} />
             </div>
           )}
           <p style={{ ...book.heroText, fontSize: 13 }} role="status">
             {!personal ? "Personal progress is available in Campus." : failed ? "Progress could not be loaded. Reopen this page to retry." : !records ? "Syncing progress…" :
-              !submissionKnown ? "Some submissions could not be loaded." :
               ASSIGNMENTS.length ? `${completed} of ${ASSIGNMENTS.length} required assignments submitted · ${percent}% complete` : "No tutor assignments published for this level yet."}
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
         <div style={book.toolbarTop}>
           <div>
             <h3 style={{ margin: 0, fontSize: 18 }}>Lessons</h3>
-            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{visible.length} shown from {LESSONS.filter(lesson => lesson.day > 0).length} {level} units · {PUBLISHED.length} available</p>
+            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{visible.filter(lesson => lesson.day > 0).length} shown from {LESSONS.filter(lesson => lesson.day > 0).length} {level} units · {PUBLISHED.length} available</p>
           </div>
           <div className="course-book-filter-row" role="group" aria-label="Course Book lesson filters" style={book.filterRow}>
             {FILTERS.map(({ key, label }) => (
@@ -120,7 +120,7 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
 
       {visible.length === 0 && <p style={book.emptyState}>{filter === "needsRevision" ? "No lessons currently need revision." : "No lessons match your search or filter."}</p>}
       {visible.map((lesson) => {
-        const published = lesson.status !== "coming-soon";
+        const published = lesson.published;
         const record = published ? records?.find(({ day }) => day === lesson.day) : null;
         const badge = !published ? "Coming soon" : record?.submitted ? {
           reviewed: "Reviewed",
