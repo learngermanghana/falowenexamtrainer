@@ -12,6 +12,17 @@ describe("useHealthStatus", () => {
     delete global.fetch;
   });
 
+  it("does not call the backend when passive checks are disabled; explicit refresh still works", async () => {
+    global.fetch.mockResolvedValue({ ok: true, json: async () => ({ timestamp: "2024-01-01T00:00:00.000Z" }) });
+    const { result } = renderHook(() => useHealthStatus({ autoCheck: false }));
+    expect(result.current.status).toBe("idle");
+    await act(async () => { jest.advanceTimersByTime(60000); });
+    expect(global.fetch).not.toHaveBeenCalled();
+    await act(async () => { await result.current.refresh(); });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(result.current.status).toBe("ok");
+  });
+
   it("reports ok when the API responds", async () => {
     global.fetch.mockResolvedValue({
       ok: true,

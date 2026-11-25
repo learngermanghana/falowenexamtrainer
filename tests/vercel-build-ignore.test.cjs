@@ -58,6 +58,8 @@ test("missing baseline or inaccessible shallow history must build, never skip", 
 test("skip only documentation/test/CI paths and reject malformed names", () => {
   assert.equal(needsBuild(["docs/help.md", "tests/test.cjs", ".github/workflows/build.yml"]), false);
   assert.equal(needsBuild(["README.md"]), false);
+  assert.equal(needsBuild(["web/src/hooks/useLessonProgress.test.js", "functions/__tests__/worker.test.cjs"]), false);
+  assert.equal(needsBuild(["web/src/hooks/useLessonProgress.test.js", "web/src/hooks/useLessonProgress.js"]), true);
   for (const path of ["src/App.jsx", "api/index.js", "vercel.json", "package.json",
     "scripts/build.mjs", "functions/main.js", "web/public/music/catalog.json",
     "docs/note.md\n../src/App.jsx", "../docs/note.md"]) {

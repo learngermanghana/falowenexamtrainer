@@ -1,7 +1,16 @@
+jest.mock("../firebase", () => ({
+  db: {},
+  doc: jest.fn((...args) => args),
+  serverTimestamp: jest.fn(() => "server-time"),
+  setDoc: jest.fn(),
+}));
+import { setDoc } from "../firebase";
 import {
   COURSE_COMPLETION_ENGINE_VERSION,
   buildCourseCompletionSnapshot,
   getCourseCompletionSnapshotId,
+  persistCourseCompletionSnapshot,
+  __resetCourseCompletionSnapshotCacheForTests,
 } from "./courseCompletionSnapshotService";
 
 describe("course completion snapshot service", () => {
@@ -70,4 +79,20 @@ describe("course completion snapshot service", () => {
     expect(buildCourseCompletionSnapshot({ progress: { total: 28 }, level: "A2", user: null })).toBeNull();
     expect(buildCourseCompletionSnapshot({ progress: { total: 0 }, level: "A2", user })).toBeNull();
   });
+});
+
+test("concurrent identical progress snapshots issue only one write", async () => {
+  __resetCourseCompletionSnapshotCacheForTests();
+  setDoc.mockReset();
+  let finish;
+  setDoc.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  const input = { user: { uid: "student-123" }, level: "A2", progress: { total: 28, completed: 5 } };
+  const first = persistCourseCompletionSnapshot(input);
+  const second = persistCourseCompletionSnapshot(input);
+  await Promise.resolve();
+  expect(setDoc).toHaveBeenCalledTimes(1);
+  finish();
+  expect((await first).skipped).toBe(false);
+  expect((await second).skipped).toBe(true);
+  expect(setDoc).toHaveBeenCalledTimes(1);
 });
