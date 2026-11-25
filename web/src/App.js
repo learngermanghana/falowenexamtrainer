@@ -259,10 +259,10 @@ const getTabStructure = (t) => {
     { key: "course", label: t("appNav.sections.courseBook"), section: "course" },
     { key: "music", label: "Music", section: "music" },
     { key: "books", label: "Books", section: "books" },
-    { key: "vocab", label: t("appNav.sections.vocab"), section: "vocab" },
     { key: "attendance", label: t("appNav.sections.attendance"), section: "attendance" },
-    { key: "classMembers", label: t("appNav.sections.classMembers"), section: "classMembers" },
     { key: "results", label: t("appNav.tabs.results"), section: "results" },
+    { key: "vocab", label: t("appNav.sections.vocab"), section: "vocab" },
+    { key: "classMembers", label: t("appNav.sections.classMembers"), section: "classMembers" },
     { key: "account", label: t("appNav.tabs.account"), section: "account" },
   ];
 };
@@ -1557,6 +1557,7 @@ const CampusQuickNavigation = ({ allowedSections, availableTabs, tabStructure })
             </button>
           );
         })}
+        <button type="button" style={styles.navButton} onClick={() => navigate("/")}>Falowen Home</button>
       </div>
 
       {activeMainTabConfig?.sections ? (
@@ -1682,6 +1683,7 @@ const CampusArea = ({
             </button>
           );
         })}
+        <button type="button" style={styles.navButton} onClick={() => navigate("/")}>Falowen Home</button>
       </div>
 
       {activeMainTabConfig?.sections ? (
