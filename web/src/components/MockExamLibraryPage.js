@@ -1,3 +1,4 @@
+import MockAttemptHistory, {historyMockId} from "./MockAttemptHistory";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
@@ -114,6 +115,7 @@ export default function MockExamLibraryPage() {
                   {trialExam && mock.id !== trialExam.id ? "🔒 Locked" : mock.mode === "full" || mock.mode === "kombi" ? "Begin" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>}
               </div>
+              {user?.uid && historyMockId(mock) && (!trialExam || (!trialExam.locked && mock.id===trialExam.id)) ? <MockAttemptHistory key={`${user.uid}:${mock.id}`} user={user} mockId={historyMockId(mock)} onPractice={()=>navigate(mock.route+"?mode=practice")}/> : null}
             </article>
           ))}
         </section>
