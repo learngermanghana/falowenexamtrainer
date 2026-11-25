@@ -157,7 +157,9 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
     expect(screen.getByRole("link", { name: "Fungua Somo la 5" }).getAttribute("href")).toBe("/campus/course/swahili/day-5");
     fireEvent.change(selector(), { target: { value: "B1" } });
     expect(screen.getByText("Ulimwengu wa ndoto (Zoezi)")).toBeTruthy();
-    expect(screen.queryByRole("progressbar")).toBeNull();
+    expect(await screen.findByText(/0 of 3 required assignments submitted/)).toBeTruthy();
+    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("0");
+    expect(screen.getAllByRole("link", { name: "Open workbook" })).toHaveLength(3);
   });
 
   it("shows the assigned A2 and lower level, matching the German access rule", () => {
