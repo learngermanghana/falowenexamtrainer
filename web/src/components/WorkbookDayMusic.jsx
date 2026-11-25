@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import WorkbookMusicPlayer from "./WorkbookMusicPlayer";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { styles } from "../styles";
@@ -52,6 +52,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const [stories, setStories] = useState(null);
   const [translations, setTranslations] = useState({recordings:[]});
   const [activeLine, setActiveLine] = useState(-1);
+  const calendarLyricsRef = useRef(null);
   const [showEnglish, setShowEnglish] = useState(courseLevel === "A1");
   useEffect(() => { setShowEnglish(courseLevel === "A1"); }, [courseLevel]);
 
@@ -155,6 +156,16 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
     translations, chosen.objectKey, approvedLyrics) || matchingEnglishTranslation(
     {recordings:[{...recordingLyrics?.englishTranslation,objectKey:recordingLyrics?.objectKey}]},chosen.objectKey,approvedLyrics) : null;
 
+  useEffect(() => {
+    const box = calendarLyricsRef.current;
+    const line = box?.querySelector('[aria-current="true"]');
+    if (!line || !box.clientHeight) return;
+    const top = line.getBoundingClientRect().top - box.getBoundingClientRect().top;
+    if (top < 0 || top + line.offsetHeight > box.clientHeight) {
+      box.scrollTop += top - box.clientHeight / 3;
+    }
+  }, [activeLine]);
+
   if (!valid) return null;
 
   return (
@@ -233,7 +244,9 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
                 {!englishPack ? <p data-english-unavailable="true" style={{ margin: 0, fontSize: 12, color: "#62766b" }}>
                   English translation is not available for this recording yet.
                 </p> : null}
-                <div style={{ display: "grid", gap: 5, padding: "4px 0" }}>
+                <div ref={isCalendarSong ? calendarLyricsRef : undefined}
+                  style={{ display: "grid", gap: 5, padding: "4px 0",
+                    ...(isCalendarSong ? { maxHeight: "50vh", overflowY: "auto" } : {}) }}>
                   {String(approvedLyrics).replace(/\\n/g, "\n").split(/\r?\n/).map((line, rawIndex) => {
                     const de = line.trim();
                     if (!de) return null;

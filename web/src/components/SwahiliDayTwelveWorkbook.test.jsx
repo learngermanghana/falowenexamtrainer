@@ -26,7 +26,7 @@ test("Day 12 exposes the song lyrics and all seven optional questions from the w
  const previousFetch = global.fetch;
  global.fetch = jest.fn(async url => ({ok:true, json:async () => {
   if (url.includes("swahili-catalog")) return { tracks: [track] };
-  if (url.includes("music-lyrics")) return {objectKey:track.objectKey, lyrics:"Jumamosi, Jumapili,", cues:[], practiceQuestions};
+  if (url.includes("music-lyrics")) return {objectKey:track.objectKey, lyrics:"Jumamosi, Jumapili,", cues:[{start:1,end:3,text:"Jumamosi, Jumapili,"}], practiceQuestions};
   return {};
  }}));
  try {
@@ -34,9 +34,16 @@ test("Day 12 exposes the song lyrics and all seven optional questions from the w
    <SwahiliA1PracticeWorkbook lesson={SWAHILI_A1_PRACTICE_UNITS[12]} preview />
   </MemoryRouter>);
   fireEvent.click(screen.getByRole("button", {name:/Angalia Kalenda · Maneno ya wimbo na maswali/}));
+  const radio = screen.getByTitle("Falowen Radio · Siku, Miezi na Tarehe");
+  expect(radio.src).toContain("/embed/QdpRliUlbMA");
+  expect(screen.queryByText("Sikiliza na ukamilishe taarifa hizi.")).toBeNull();
   const summary = await screen.findByText("Swahili lyrics · Soma pamoja");
   expect(summary.closest("details").open).toBe(true);
-  expect(screen.getByText("Jumamosi, Jumapili,")).toBeTruthy();
+  const line = screen.getByText("Jumamosi, Jumapili,").closest("[data-lyric-pair]");
+  const player = screen.getByLabelText("Play Angalia Kalenda", {selector:"audio"});
+  player.currentTime = 2;
+  fireEvent.timeUpdate(player);
+  expect(line.getAttribute("aria-current")).toBe("true");
   const answers = screen.getAllByText("Onyesha jibu");
   expect(answers).toHaveLength(7);
   expect(answers.every(answer => !answer.closest("details").open)).toBe(true);
