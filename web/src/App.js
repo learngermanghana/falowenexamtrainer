@@ -1773,12 +1773,17 @@ const ExamArea = ({ onBack }) => {
   const { level: germanLevel, setLevel: setGermanLevel, accessibleLevels } = useExam();
   const { studentProfile, user } = useAuth();
   const isSwahili = getCampusProgram(studentProfile) === "swahili";
-  const swahiliLevels = accessibleLevels.filter(option => ["A1","A2","B1"].includes(option));
+  const swahiliLevelOrder = ["A1","A2","B1"];
+  const assignedSwahiliLevel = normalizeCourseLevel(studentProfile?.level);
+  const swahiliLevels = swahiliLevelOrder.filter((option,index) => index <= swahiliLevelOrder.indexOf(assignedSwahiliLevel) && !studentProfile?.blockedEnrollmentLevels?.includes(option));
   const [swahiliChoice, setSwahiliChoice] = useState(null);
   const level = isSwahili
     ? (swahiliChoice?.uid === user?.uid && swahiliLevels.includes(swahiliChoice?.level) ? swahiliChoice.level : swahiliLevels.at(-1))
     : germanLevel;
-  const setLevel = option => isSwahili ? setSwahiliChoice({uid:user?.uid,level:option}) : setGermanLevel(option);
+  const setLevel = React.useCallback(option => {
+    if (isSwahili) setSwahiliChoice({uid:user?.uid,level:option});
+    else setGermanLevel(option);
+  }, [isSwahili, user?.uid, setGermanLevel]);
   const trialExam = React.useContext(TrialExam);
   const { openLock, lockDialog } = useAccessLock();
   const examOnlyView = Boolean(trialExam) || studentProfile?.accountType === "exam_only";
