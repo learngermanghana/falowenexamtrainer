@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
 import WorkbookDayMusic from "./WorkbookDayMusic";
+import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import { GrammarSelfCheck } from "./MgahawaniGrammarPractice";
 import { useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import SwahiliAssignmentReview, { useSwahiliAssignment } from "./SwahiliAssignmentReview";
@@ -13,11 +14,17 @@ const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.map((tab) =>
   tab.key === "submit" ? { ...tab, label: "Review & Submit", description: "Review and submit your work" } : tab);
 
 export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
+  return <SwahiliWorkbookRadio lesson={lesson} preview={preview}>
+    <PracticeWorkbook lesson={lesson} preview={preview} />
+  </SwahiliWorkbookRadio>;
+}
+
+function PracticeWorkbook({ lesson, preview }) {
   const { user } = useAuth();
   const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
   const assignment = useSwahiliAssignment(lesson, preview, activeTab, lesson.reading.questions, lesson.listening?.questions);
   const { writing, setWriting, reading, setReading, listeningAnswers, setListeningAnswers } = assignment;
-  const { aiLecture, radio, listening } = lesson;
+  const { aiLecture, listening } = lesson;
   const {audio,setAudio,loadAudio:loadListeningAudio} = useSwahiliSignedAudio(user,listening?.audioUrlEndpoint,{signIn:"Sign in to play the recording.",failed:"Could not load the listening recording."});
   const lectureHeadingId = `swahili-ai-lecture-${lesson.day}`;
   const grammarSections = lesson.grammarSections || [{ rule: lesson.rule, examples: lesson.examples }];
@@ -47,19 +54,6 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
             style={{ width: "100%", aspectRatio: "16 / 9", border: 0 }}
             src={`https://www.youtube-nocookie.com/embed/${aiLecture.youtubeId}`} />
           <a href={`https://youtu.be/${aiLecture.youtubeId}`} target="_blank" rel="noreferrer">Tazama kwenye YouTube</a>
-        </section>
-      )}
-      {radio?.youtubeId && (
-        <section className="swahili-book__tile" aria-label="Falowen Radio podcast">
-          <h2>{radio.title}</h2>
-          <p>{radio.instruction}</p>
-          <iframe title={radio.title} loading="lazy" allowFullScreen
-            style={{ width: "100%", aspectRatio: "16 / 9", border: 0 }}
-            src={`https://www.youtube-nocookie.com/embed/${radio.youtubeId}`} />
-          <a href={`https://youtu.be/${radio.youtubeId}`} target="_blank" rel="noopener noreferrer">Play Falowen Radio on YouTube</a>
-          <p className="swahili-book__note">Falowen Radio is for language practice. Teil 4 has a separate listening recording and assignment questions.</p>
-          <button type="button" className="swahili-book__button swahili-book__button--soft"
-            onClick={() => selectTab("hoeren")}>Go to Teil 4 · Listening</button>
         </section>
       )}
       <WorkbookTabNav activeTab={activeTab} onChange={selectTab} tabs={tabs}

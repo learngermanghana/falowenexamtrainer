@@ -40,6 +40,13 @@ Run `node scripts/checkAiDocumentation.mjs`. It validates required sources, inte
 
 ## Kiswahili Course Book layout
 
+Published Kiswahili Radio episodes use the same Radio-first screen and Continue
+button as German A2 Day 1. A1 Days 5, 6, 10, 11 and 12 and B1 Day 28 open Radio
+before the workbook navigation. Continue preserves any requested workbook
+section. AI lessons retain their workbook placement. Lessons without a
+configured episode open directly to the workbook; Kiswahili A2 has no published
+workbooks yet.
+
 Kiswahili A1 Day 4 (**Nchi na Lugha**) replaces its old three-question short-answer Lesen with the instructor-supplied Amina–John countries/languages dialogue and five four-option multiple-choice questions. Hören now has five four-option questions based on the teacher-provided Kenya–Tanzania conversation and reads the private R2 key `swahili/A1/day-04/day-04.mp3` only through the existing Firebase-authenticated, fixed-key signed-audio endpoint `/api/course-media/swahili/a1/day-4/audio-url`. The learner workbook contains question prompts and options but no correct-answer key or public audio object URL. New Day 4 submissions use `readingVersion: 2`, so Admin applies the revised tutor key and includes listening; existing unversioned submissions retain the old three-question reading reference and no listening requirement. The learner review identifies older submissions rather than showing them under the new questions, and Day 4 revision drafts use a separate local key. The teacher-provided transcript is the basis for the five Hören questions; verify that the uploaded recording matches it before releasing to students. This does not change other lessons.
 
 

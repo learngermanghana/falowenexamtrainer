@@ -120,7 +120,7 @@ export const openCompletedWorkbook = (locationLike, windowRef) => {
 export const shouldShowRadioFirst = (level, day) =>
   Boolean(resolveRadioFirstWorkbookResource(level, day));
 
-const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseBookPath = "/campus/course", transcriptIntro = null, introInstruction }) => {
+const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseBookPath = "/campus/course", transcriptIntro = null, introInstruction, radioActivities }) => {
   const explicitRadio = isFalowenRadioResource(resource) ? resource : null;
   const radio = explicitRadio || (transcriptIntro ? null : resolveRadioFirstWorkbookResource(level, day));
   const hasIntro = Boolean(radio || transcriptIntro);
@@ -225,7 +225,7 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseB
         actionDisabled={isContinuing}
         persistCompletionInUrl={false}
         onContinue={handleContinue}
-      />}
+      >{radioActivities}</FalowenRadioTabContent>}
     </div>
   );
 };
