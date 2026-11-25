@@ -195,7 +195,7 @@ import { useAuth } from "./context/AuthContext";
 import { routeEnrollmentLevel } from "./utils/levelEnrollmentAccess";
 import { useToast } from "./context/ToastContext";
 import { announceExamSuccess } from "./services/interactionFeedback";
-import { isFirebaseConfigured, listenForForegroundMessages } from "./firebase";
+import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
 import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
@@ -225,7 +225,6 @@ import C1Day16TechnologieImAlltagGrammarNotesPage from "./components/C1Day16Tech
 import C1Day16TechnologieImAlltagWorkbookPage from "./components/C1Day16TechnologieImAlltagWorkbookPage";
 import B2Day1PersoenlicheIdentitaetGrammarNotesPage from "./components/B2Day1PersoenlicheIdentitaetGrammarNotesPage";
 import B2Day1PersoenlicheIdentitaetWorkbookPage from "./components/B2Day1PersoenlicheIdentitaetWorkbookPage";
-import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import LiveSpeakPage from "./components/LiveSpeakPage";
@@ -245,7 +244,6 @@ import PublicUpcomingClassesPage from "./components/PublicUpcomingClassesPage";
 import PublicExamPracticePage from "./components/PublicExamPracticePage";
 import PublicAdmissionsVisitorGuidePage from "./components/PublicAdmissionsVisitorGuidePage";
 import TutorMarkingPage from "./pages/TutorMarkingPage";
-import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { getTrialLifecycleState } from "./lib/trialAccess";
 import { isApprovedUniversityStudent, isPendingUniversityStudent } from "./lib/universityInvitations";
@@ -851,48 +849,6 @@ const AppShell = ({
     }
   };
 
-  useEffect(() => {
-    if (!user || !studentProfile) return undefined;
-    let unsubscribe = () => {};
-    let isMounted = true;
-
-    listenForForegroundMessages(async (payload) => {
-      if (!isMounted || !payload) return;
-      const normalized = buildPushNotification(payload);
-      if (!normalized) return;
-      if (normalized.title || normalized.body) {
-        showToast(`${normalized.title}${normalized.body ? ` — ${normalized.body}` : ""}`, "info");
-      }
-
-      try {
-        await persistPushNotification({ studentId: studentProfile.id, payload, notification: normalized });
-      } catch (error) {
-        console.error("Failed to persist push notification", error);
-      }
-
-      try {
-        window.dispatchEvent(
-          new CustomEvent("falowen:push-notification", { detail: { notification: normalized } })
-        );
-      } catch (error) {
-        console.error("Failed to dispatch push notification event", error);
-      }
-    }).then((off) => {
-      if (typeof off === "function") {
-        unsubscribe = off;
-      }
-    }).catch((error) => {
-      console.error("Failed to listen for foreground messages", error);
-    });
-
-    return () => {
-      isMounted = false;
-      if (typeof unsubscribe === "function") {
-        unsubscribe();
-      }
-    };
-  }, [showToast, studentProfile, user]);
-
   if (directSwahiliTrial && (isOnboarding || /^\/signup(?:\/|$)/.test(location.pathname))) {
     return <Navigate to="/campus/course/swahili/day-1" replace />;
   }
@@ -932,10 +888,6 @@ const AppShell = ({
             {t("appNav.signedInAs", { email: user.email })}
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
-            <NotificationBell
-              notificationStatus={notificationStatus}
-              onEnablePush={enableNotifications}
-            />
             {courseSelector}
             <label style={{ display: "grid", gap: 4, fontSize: 12, color: "#374151" }}>
               {t("interfaceLanguage.shortLabel")}

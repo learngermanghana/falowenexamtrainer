@@ -1,17 +1,5 @@
 /* eslint-disable no-undef */
-importScripts("https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js");
-importScripts(
-  "https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging-compat.js"
-);
-
-try {
-  importScripts("/__falowen-firebase-config.js");
-} catch (error) {
-  console.warn("Falowen background push config could not be loaded", error);
-}
-
-let messaging = null;
-
+// Offline caching only; device push is retired.
 const CACHE_PREFIX = "apzla-offline";
 const CACHE_NAME = `${CACHE_PREFIX}-v15`;
 const OFFLINE_URL = "/offline.html";
@@ -19,8 +7,6 @@ const VERSIONED_ASSET_PREFIX = "/assets/";
 const BUILD_ASSET_MANIFEST_URL = "/offline-build-assets.json";
 const BUILD_PRECACHE_BATCH_SIZE = 8;
 const BUILD_MANIFEST_RECHECK_MS = 30 * 60 * 1000;
-const DEFAULT_NOTIFICATION_BODY = "Falowen Learning Hub update";
-const DEFAULT_ROUTE = "/";
 const PUBLIC_AUTH_PATHS = [
   "/signup",
   "/login",
@@ -48,139 +34,8 @@ const isPublicAuthPath = (pathname = "") => {
 const isVersionedBuildAsset = (url) =>
   url?.origin === self.location.origin && url.pathname.startsWith(VERSIONED_ASSET_PREFIX);
 
-const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
-  const params = new URLSearchParams();
-  if (level) params.set("level", level);
-  if (className) params.set("className", className);
-  if (postId) params.set("postId", postId);
-  const query = params.toString();
-  return `/campus/discussion${query ? `?${query}` : ""}`;
-};
-
-const resolveNotificationRoute = (data = {}) => {
-  if (data.route) return data.route;
-  const type = String(data.type || "").toLowerCase();
-  if (data.postId || type.includes("discussion") || type.includes("class")) {
-    return buildDiscussionRoute(data);
-  }
-  if (type.includes("score") || type.includes("assignment")) {
-    return "/campus/results";
-  }
-  if (type.includes("exam")) {
-    return "/exams/overview";
-  }
-  return DEFAULT_ROUTE;
-};
-
-const normalizeRoute = (route) => {
-  if (!route) return DEFAULT_ROUTE;
-  try {
-    const url = new URL(route, self.location.origin);
-    if (url.origin !== self.location.origin) return DEFAULT_ROUTE;
-    return `${url.pathname}${url.search}${url.hash}`;
-  } catch (error) {
-    return DEFAULT_ROUTE;
-  }
-};
-
-const buildNotificationData = (payload = {}) => {
-  const data = { ...(payload.data || {}) };
-  data.route = resolveNotificationRoute(data);
-  return data;
-};
-
-const resolveNotificationContent = (payload = {}) => {
-  const data = payload.data || {};
-  const type = String(data.type || "").toLowerCase();
-  const status = String(data.status || data.attendanceStatus || "").toLowerCase();
-  const presentFlag = String(data.present || "").toLowerCase();
-
-  const title =
-    payload.notification?.title ||
-    data.title ||
-    data.subject ||
-    data.headline ||
-    (type.includes("attendance")
-      ? status.includes("present") || presentFlag === "true"
-        ? "Marked present ✅"
-        : status.includes("absent") || presentFlag === "false"
-        ? "Marked absent ❌"
-        : "Attendance update"
-      : "") ||
-    "New update";
-
-  const body =
-    payload.notification?.body ||
-    data.body ||
-    data.message ||
-    data.detail ||
-    DEFAULT_NOTIFICATION_BODY;
-
-  return { title, body };
-};
-
-function initializeMessaging(config) {
-  if (!config || messaging || !config.apiKey) return;
-
-  if (!firebase.apps.length) {
-    firebase.initializeApp(config);
-  }
-  messaging = firebase.messaging();
-
-  messaging.onBackgroundMessage((payload) => {
-    // Firebase automatically displays messages that include a notification
-    // payload. Only render manually for data-only pushes to avoid duplicates.
-    if (payload?.notification) return;
-
-    const { title, body } = resolveNotificationContent(payload);
-    self.registration.showNotification(title, {
-      body,
-      icon: "/logo192.png",
-      data: buildNotificationData(payload),
-    });
-  });
-}
-
-// Initialize immediately so a push can wake this service worker from a cold
-// browser/app state without requiring an open Falowen page to post INIT_FIREBASE.
-initializeMessaging(self.__FALOWEN_FIREBASE_CONFIG__);
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-
-  event.waitUntil(
-    (async () => {
-      const data = event.notification?.data || {};
-      const route = normalizeRoute(resolveNotificationRoute(data));
-      const targetUrl = new URL(route, self.location.origin).toString();
-      const clientList = await self.clients.matchAll({
-        type: "window",
-        includeUncontrolled: true,
-      });
-
-      for (const client of clientList) {
-        if ("navigate" in client) {
-          await client.navigate(targetUrl);
-          await client.focus();
-          return;
-        }
-      }
-
-      if (self.clients.openWindow) {
-        await self.clients.openWindow(targetUrl);
-      }
-    })()
-  );
-});
-
 self.addEventListener("message", (event) => {
-  if (event?.data?.type === "INIT_FIREBASE") {
-    initializeMessaging(event.data.payload);
-    return;
-  }
-  if (event?.data?.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
+  if (event?.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 const normalizeBuildPrecacheManifest = (payload = {}) => {
@@ -346,7 +201,16 @@ self.addEventListener("activate", (event) => {
             .map((key) => caches.delete(key))
         )
       )
-      .then(() => self.clients.claim())
+      .then(async () => {
+        // Retire old device subscriptions without affecting the offline cache.
+        try {
+          const subscription = await self.registration?.pushManager?.getSubscription();
+          if (subscription) await subscription.unsubscribe();
+        } catch (error) {
+          console.warn("Could not retire old push subscription", error);
+        }
+        await self.clients.claim();
+      })
   );
 });
 

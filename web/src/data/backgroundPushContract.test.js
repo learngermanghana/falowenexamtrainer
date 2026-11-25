@@ -1,111 +1,52 @@
 import fs from "fs";
 import path from "path";
-
 const root = path.resolve(process.cwd(), "..");
-
-describe("background push contract", () => {
-  test("messaging service worker initializes Firebase on a cold start", () => {
-    const worker = fs.readFileSync(
-      path.join(process.cwd(), "public", "firebase-messaging-sw.js"),
-      "utf8"
-    );
-    expect(worker).toContain('importScripts("/__falowen-firebase-config.js")');
-    expect(worker).toContain("initializeMessaging(self.__FALOWEN_FIREBASE_CONFIG__)");
-    expect(worker).toContain("messaging.onBackgroundMessage");
-    expect(worker).toContain("if (payload?.notification) return;");
-  });
-
-  test("production build emits a Firebase config file for the service worker", () => {
-    const buildIdentity = fs.readFileSync(
-      path.join(root, "scripts", "writeBuildIdentity.mjs"),
-      "utf8"
-    );
-    expect(buildIdentity).toContain("__falowen-firebase-config.js");
-    expect(buildIdentity).toContain("REACT_APP_FIREBASE_API_KEY");
-    expect(buildIdentity).toContain("REACT_APP_FIREBASE_MESSAGING_SENDER_ID");
-    expect(buildIdentity).toContain("REACT_APP_FIREBASE_APP_ID");
-  });
-
-  test("messaging worker and bootstrap config bypass browser caches", () => {
-    const firebaseClient = fs.readFileSync(
-      path.join(process.cwd(), "src", "firebase.js"),
-      "utf8"
-    );
-    expect(firebaseClient).toContain('updateViaCache: "none"');
-
-    const config = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
-    for (const source of [
-      "/firebase-messaging-sw.js",
-      "/__falowen-firebase-config.js",
-    ]) {
-      const header = config.headers.find((entry) => entry.source === source);
-      expect(header).toBeTruthy();
-      expect(header.headers).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            key: "Cache-Control",
-            value: expect.stringMatching(/no-store/),
-          }),
-        ])
-      );
+const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const retired = [
+  "onClassSessionPushLifecycleUpdated",
+  "onAnnouncementCreated",
+  "onAttendanceSessionUpdated",
+  "sendPushTestNotification",
+  "onClassBoardPostCreated",
+  "onQaPostCreated",
+  "onQaPostUpdated",
+  "onScoreCreated",
+  "onExamTutorReviewCreated",
+  "onExamTutorReviewUpdated",
+  "sendPaymentReminders",
+  "onMarkedAssignmentNotificationCreated",
+  "onClassLessonNoteCreated"
+];
+describe("retired device push contract", () => {
+  test("push-only functions are not exported or deployed", () => {
+    const index = read("functions/index.js");
+    const notifications = read("functions/index.notifications.js");
+    const workflow = read(".github/workflows/deploy-functions.yml");
+    for (const name of retired) {
+      expect(index).not.toContain("exports." + name + " =");
+      expect(notifications).not.toContain("exportedFunctions." + name + " =");
+      expect(workflow).not.toContain("functions:falowenexamtrainer:" + name);
+      expect(workflow).toContain('"' + name + '"');
     }
+    expect(index).not.toContain("sendEachForMulticast");
+    expect(notifications).not.toContain("sendEachForMulticast");
   });
-
-  test("students can verify the current device with a delayed backend push", () => {
-    const settings = fs.readFileSync(
-      path.join(process.cwd(), "src", "components", "NotificationSettingsCard.js"),
-      "utf8"
-    );
-    expect(settings).toContain('t("notificationUi.sendTest")');
-    const en = JSON.parse(fs.readFileSync(path.join(process.cwd(), "src", "i18n", "locales", "en", "translation.json"), "utf8"));
-    expect(en.notificationUi.sendTest).toBe("Send test notification");
-    expect(settings).toContain("sendPushTestNotification");
-    expect(settings).toContain("delaySeconds: 8");
-
-    const functionsIndex = fs.readFileSync(
-      path.join(root, "functions", "index.js"),
-      "utf8"
-    );
-    expect(functionsIndex).toContain("exports.sendPushTestNotification = onCall");
-    expect(functionsIndex).toContain("findOwnedMessagingToken");
-    expect(functionsIndex).toContain("Background push is working on this device.");
-
-    const deployWorkflow = fs.readFileSync(
-      path.join(root, ".github", "workflows", "deploy-functions.yml"),
-      "utf8"
-    );
-    expect(deployWorkflow).toContain("functions:falowenexamtrainer:sendPushTestNotification");
-    expect(deployWorkflow).toContain("Push test callable export was not discovered");
-    expect(settings).toContain("getPushTestErrorMessage");
-    expect(settings).not.toContain("? error.message\n          : \"Could not send the background push test");
+  test("notification jobs are detached and attendance progress remains", () => {
+    expect(read("functions/index.entry.js")).not.toContain('require("./index.notifications")');
+    expect(read("functions/index.js")).toContain("exports.onAttendanceCheckinWritten");
   });
-  test("iPhone push setup is gated by the installed Home Screen context", () => {
-    const firebaseClient = fs.readFileSync(
-      path.join(process.cwd(), "src", "firebase.js"),
-      "utf8"
-    );
-    const authContext = fs.readFileSync(
-      path.join(process.cwd(), "src", "context", "AuthContext.js"),
-      "utf8"
-    );
-    const settings = fs.readFileSync(
-      path.join(process.cwd(), "src", "components", "NotificationSettingsCard.js"),
-      "utf8"
-    );
-    const manifest = JSON.parse(
-      fs.readFileSync(path.join(process.cwd(), "public", "manifest.json"), "utf8")
-    );
-
-    expect(firebaseClient).toContain("const getPushEnvironment = () =>");
-    expect(firebaseClient).toContain("environment.ios && !environment.standalone");
-    expect(firebaseClient.indexOf("ensureNotificationPermission()")).toBeLessThan(
-      firebaseClient.indexOf("isSupported().catch")
-    );
-    expect(authContext).toContain("if (!pushEnvironment.notificationApi)");
-    expect(settings).toContain("Home Screen app");
-    expect(settings).toContain("Web Push unavailable");
-    expect(manifest.display).toBe("standalone");
-    expect(manifest.id).toBe("/");
+  test("web clients do not register or test device push", () => {
+    expect(read("web/src/firebase.js")).toContain("const requestMessagingToken = async () => null;");
+    expect(read("web/src/firebase.js")).toContain("const listenForForegroundMessages = async () => () => {};");
+    expect(read("web/src/context/AuthContext.js")).toContain("const hasVapidKey = false;");
+    const settings = read("web/src/components/NotificationSettingsCard.js");
+    expect(settings).not.toContain("sendPushTestNotification");
+    expect(settings).toContain("() => null");
+    expect(read("web/src/App.js")).not.toContain("<NotificationBell");
+    expect(read("web/src/components/AccountSettings.js")).not.toContain('key: "notifications"');
+    const worker = read("web/public/firebase-messaging-sw.js");
+    expect(worker).not.toContain("onBackgroundMessage");
+    expect(worker).not.toContain("showNotification");
+    expect(worker).toContain('addEventListener("fetch"');
   });
-
 });
