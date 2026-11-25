@@ -10,6 +10,7 @@ on:
       - 'scripts/deploySpeakingIndexes.cjs'
       - 'scripts/deploySwahiliIndexes.cjs'
       - 'scripts/deployFirestoreRules.cjs'
+      - 'scripts/composeFirestoreRules.cjs'
       - 'firebase.json'
       - '.firebaserc'
       - '.github/workflows/deploy-firestore-rules.yml'
@@ -40,6 +41,20 @@ jobs:
       - name: Install rules deployment client
         run: npm install --prefix functions --no-audit --no-fund
 
+      - name: Fetch Admin rules for the shared Firestore project
+        uses: actions/checkout@v4
+        with:
+          repository: learngermanghana/falowenadmin
+          ref: main
+          path: .firestore-admin-source
+          persist-credentials: false
+
+      - name: Verify rule composition and assemble the deployment bundle
+        shell: bash
+        run: |
+          node --test tests/compose-firestore-rules.test.cjs
+          node scripts/composeFirestoreRules.cjs firestore.rules .firestore-admin-source/firestore.rules > "$RUNNER_TEMP/falowen-firestore.rules"
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -49,7 +64,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          node scripts/deployFirestoreRules.cjs 2>&1 | tee firebase-rules-deploy.log
+          node scripts/deployFirestoreRules.cjs "$RUNNER_TEMP/falowen-firestore.rules" 2>&1 | tee firebase-rules-deploy.log
 
       - name: Provision speaking review indexes without deleting other indexes
         shell: bash
