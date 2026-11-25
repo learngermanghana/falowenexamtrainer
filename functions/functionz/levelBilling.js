@@ -1,5 +1,6 @@
 "use strict";
 const crypto=require("crypto");
+const {preparePlan,paymentLifecycle,payableStatus}=require("./levelUpgradeLifecycle");
 const {calculateSharedPaystackFee}=require("./paystackFeePolicy");
 const LEVEL_ID=/^(german|swahili)-(A1|A2|B1|B2|C1|C2)$/;
 const PRODUCT="falowen_level_enrollment";
@@ -20,7 +21,7 @@ function legacyUpgradeOverlap(student,row){
 function checkoutCredit(row,amount,student) {
   if (legacyUpgradeOverlap(student,row)) throw new Error("An earlier upgrade exists for this level. Contact Falowen to verify your balance before paying again.");
   const balance=ledgerBalance(row),credit=moneyCents(amount);
-  if (!["active","expired","completed"].includes(row?.status)) throw new Error("Contact Falowen about this enrollment before paying.");
+  if (!payableStatus(row)) throw new Error("Contact Falowen about this enrollment before paying.");
   if (balance===null||balance===0||credit===null||credit<=0||credit>balance) throw new Error("The level balance changed or is not verified. Refresh and review your tuition.");
   if (credit<200000&&credit!==balance) throw new Error("Minimum installment is GH₵2,000, or pay the full remaining balance.");
   return credit/100;
@@ -36,7 +37,37 @@ async function ownProfile(db,identity){
   if(student.uid!==identity.uid||student.accountType==="exam_only"||["deleted","archived","withdrawn","suspended","blocked"].includes(String(student.status||"").toLowerCase()))return null;
   return record;
 }
-function registerLevelBillingRoutes(app,{admin,getAuthedUser,fetchImpl=fetch}){
+function registerLevelBillingRoutes(app,{admin,getAuthedUser,getTrustedCourseCompletion,fetchImpl=fetch}){
+  app.post("/billing/prepare-level-upgrade",async(req,res)=>{
+    res.set("Cache-Control","private, no-store");
+    try{
+      const identity=await getAuthedUser(req);if(!identity)return res.status(401).json({error:"Sign in again."});
+      const db=admin.firestore(),owner=await ownProfile(db,identity);
+      if(!owner)return res.status(403).json({error:"Account not verified."});
+      const targetLevel=String(req.body?.targetLevel||"").toUpperCase();
+      const collection=owner.ref.collection("levelEnrollments"),today=new Date().toISOString().slice(0,10);
+      const initial=await collection.get();
+      const plan=preparePlan({student:owner.data(),rows:initial.docs.map(d=>d.data()),targetLevel,today});
+      if(typeof getTrustedCourseCompletion!=="function")throw Error("Course completion cannot be verified.");
+      const studentCode=String(owner.data().studentCode||owner.data().studentcode||owner.id);
+      const completion=await getTrustedCourseCompletion({studentCode,level:plan.source.level});
+      if(completion.required&&!completion.complete)throw Error("Complete the current Course Book before upgrading.");
+      const result=await db.runTransaction(async tx=>{
+        const [parent,all]=await Promise.all([tx.get(owner.ref),tx.get(collection)]);
+        if(!parent.exists||parent.data().uid!==identity.uid||["deleted","archived","withdrawn","suspended","blocked"].includes(String(parent.data().status||"").toLowerCase()))throw Error("Account not verified.");
+        const fresh=preparePlan({student:parent.data(),rows:all.docs.map(d=>d.data()),targetLevel,today});
+        if(fresh.source.level!==plan.source.level)throw Error("Your current course changed. Refresh and try again.");
+        const id="german-"+targetLevel;
+        if(!fresh.existing){
+          const stamp=admin.firestore.FieldValue.serverTimestamp();
+          tx.create(collection.doc(id),{...fresh.row,studentId:owner.id,studentCode,createdAt:stamp,createdBy:identity.uid});
+          tx.set(db.collection("auditLogs").doc(),{type:"student.levelUpgradePrepared",studentId:owner.id,enrollmentId:id,createdAt:stamp});
+        }
+        return id;
+      });
+      return res.json({ok:true,enrollmentId:result});
+    }catch(error){return res.status(409).json({error:String(error?.message||"Unable to prepare upgrade.").slice(0,200)});}
+  });
   app.post("/billing/level-checkout",async(req,res)=>{
     res.set("Cache-Control","private, no-store");
     try{
@@ -110,7 +141,14 @@ async function processLevelEnrollmentWebhook({admin,data}){
       tx.set(db.collection("auditLogs").doc(),{...record,type:"student.levelPaymentNeedsAllocation",createdAt:stamp});
       return {status:200,body:{status:"paid_unallocated",reference}};
     }
-    const remaining=balance-amount,patch={paid:(moneyCents(row.paid)+amount)/100,balanceDue:remaining/100,paymentStatus:remaining?"Partially Paid":"Paid",sheetVersion:Number(row.sheetVersion||1)+1,sheetSyncStatus:"pending"};
+    const remaining=balance-amount;
+    let lifecycle;
+    try{if(legacyUpgradeOverlap(student.data(),row))throw Error("Overlapping upgrade");lifecycle=paymentLifecycle(row,remaining/100,date);}catch(error){
+      tx.update(paymentRef,{status:"paid_unallocated",allocationError:error.message,paidAt:stamp,paystackTransactionId:data.id||null});
+      tx.set(db.collection("auditLogs").doc(),{...record,type:"student.levelPaymentNeedsAllocation",reason:error.message,createdAt:stamp});
+      return {status:200,body:{status:"paid_unallocated",reference}};
+    }
+    const patch={...lifecycle,paid:(moneyCents(row.paid)+amount)/100,balanceDue:remaining/100,paymentStatus:remaining?"Partially Paid":"Paid",sheetVersion:Number(row.sheetVersion||1)+1,sheetSyncStatus:"pending"};
     tx.set(unique,{...record,createdAt:stamp});
     tx.set(ref.collection("payments").doc(key),{...record,createdAt:stamp});
     tx.update(ref,{...patch,updatedAt:stamp});
