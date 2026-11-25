@@ -12,7 +12,7 @@ import {
   getRemainingMs,
   formatRemaining,
 } from "./placementTest2026Data";
-import { swahiliPlacementTest, swahiliPlacementQuestions, SWAHILI_PLACEMENT_STORAGE_KEY } from "./swahiliPlacementTestData";
+import { swahiliPlacementTest, swahiliPlacementQuestions, SWAHILI_PLACEMENT_STORAGE_KEY, shufflePlacementItems } from "./swahiliPlacementTestData";
 
 const initialSession = () => ({
   id: null,
@@ -63,9 +63,13 @@ export default function PlacementTestPage2026({ language = "german" }) {
   const { t, i18n } = useTranslation();
   const isSwahili = language === "swahili";
   const test = isSwahili ? swahiliPlacementTest : placementTest;
-  const questions = isSwahili ? swahiliPlacementQuestions : placementQuestions;
+  const canonicalQuestions = isSwahili ? swahiliPlacementQuestions : placementQuestions;
   const storageKey = isSwahili ? SWAHILI_PLACEMENT_STORAGE_KEY : PLACEMENT_STORAGE_KEY;
   const [session, setSession] = useState(() => readSession(language));
+  const questions = useMemo(() => isSwahili && session.id
+    ? [0, 10, 20].flatMap(offset => shufflePlacementItems(canonicalQuestions.slice(offset, offset + 10), session.id + ":section:" + offset))
+        .map((q, index) => ({ ...q, number: index + 1, options: shufflePlacementItems(q.options, session.id + ":" + q.id) }))
+    : canonicalQuestions, [isSwahili, session.id, canonicalQuestions]);
   const [now, setNow] = useState(() => Date.now());
   const trackedCompletion = useRef(Boolean(session.completedAt && (!isSwahili || session.serverScore)));
   const [starting,setStarting] = useState(false);
@@ -151,7 +155,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
     if (!session.id || !session.completedAt || (isSwahili && session.serverScore)) return undefined;
     let active = true;
     const payload = {id:session.id, action:"complete", language, ticket:session.ticket,
-      answers:answersToIndices(session.answers,questions)};
+      answers:answersToIndices(session.answers,canonicalQuestions)};
     const send = async () => {
       if (active) setDelivery("saving");
       try {
@@ -170,7 +174,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
     send();
     window.addEventListener("online",send);
     return () => { active = false; window.removeEventListener("online",send); };
-  }, [session.id,session.completedAt,session.answers,session.ticket,session.serverScore,retry,isSwahili,language,questions]);
+  }, [session.id,session.completedAt,session.answers,session.ticket,session.serverScore,retry,isSwahili,language,canonicalQuestions]);
 
   useEffect(() => {
     if (!finished || trackedCompletion.current || (isSwahili && !session.serverScore)) return;
@@ -351,7 +355,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
                 })}
               </nav>
               <div className="falowen-placement-question-heading">
-                <small>{activeQuestion.level} · {activeQuestion.topic}</small>
+                <small>{activeQuestion.level}{!isSwahili && ` · ${activeQuestion.topic}`}</small>
                 <h2>{activeQuestion.number}. {activeQuestion.text}</h2>
               </div>
               <fieldset className="falowen-placement-options">
