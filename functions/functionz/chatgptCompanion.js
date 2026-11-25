@@ -12,6 +12,7 @@ const { prepareFromTimetable } = require("./chatgptClassPreparation");
 const { getExamPractice, listExamPractice } = require("./chatgptExamPractice");
 const { getMyExamDictionary } = require("./chatgptExamLibrary");
 const { germanEnrollment, submitA1Assignment } = require("./chatgptAssignmentSubmission");
+const { submitExpandedWorkbook, workbookStatus } = require("./chatgptWorkbookSubmission");
 
 let GENERATED_COURSE_CONTENT = null;
 try {
@@ -368,7 +369,7 @@ function swahiliLessonResponse(student, day, section = "overview") {
   const details = { ...base, title: lesson.title, lessonUrl: SITE + "/campus/course/swahili/day-" + day,
     guidance: "Use the published Kiswahili content. Ask one question at a time; provide unofficial feedback after the learner attempts it. Do not invent audio, grades, completion or answer keys." };
   if (section === "overview") return { ...details, available: true, goal: lesson.goal,
-    grammarFocus: lesson.grammarFocus, availableSections: ["grammar","vocabulary","reading","speaking","writing"].filter(k => Boolean(lesson[k])) };
+    grammarFocus: lesson.grammarFocus, availableSections: ["grammar","vocabulary","reading","speaking","writing","listening"].filter(k => Boolean(lesson[k])) };
   return lesson[section] ? { ...details, available: true, material: lesson[section] }
     : { ...details, available: false, clarification: "This section is not exported. Open the lesson in Campus." };
 }
@@ -490,6 +491,32 @@ const toolDefinitions = [
     }, required: ["day", "skill", "note", "requestId"], additionalProperties: false },
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false, idempotentHint: true },
     securitySchemes: [{ type: "oauth2", scopes: [SCOPE, PRACTICE_WRITE_SCOPE] }],
+  },
+  {
+    name: "get_my_falowen_submission_status",
+    description: "Check my own official workbook submission record, required sections and review status. Use German assignment ID or Kiswahili A1 day. No record does not prove missing work; official grades are separate.",
+    inputSchema: { type:"object", properties:{
+      program:{type:"string",enum:["german","swahili"]},
+      assignmentId:{type:"string",maxLength:48},day:{type:"integer",minimum:1,maximum:20},
+    }, required:["program"],additionalProperties:false },
+  },
+  {
+    name: "submit_my_falowen_workbook",
+    description: "Submit eligible untimed German A2/B1 or published Kiswahili A1 work for tutor review. First retrieve exact requirements and prompts, show every learner answer and obtain separate explicit confirmation that the work is final. For Kiswahili listening require the student to confirm listening to the real recording or teacher. Never invent answers, submit timed work or overwrite an existing submission. Requires assignment-write OAuth permission.",
+    inputSchema:{type:"object",properties:{
+      program:{type:"string",enum:["german","swahili"]},
+      assignmentId:{type:"string",maxLength:48},
+      day:{type:"integer",minimum:1,maximum:20},
+      answerText:{type:"string",maxLength:4200},
+      writing:{type:"string",maxLength:12000},
+      readingAnswers:{type:"object",additionalProperties:{type:"string",maxLength:12000}},
+      listeningAnswers:{type:"object",additionalProperties:{type:"string",maxLength:12000}},
+      listeningConfirmed:{type:"boolean"},
+      requestId:{type:"string",minLength:8,maxLength:80,pattern:"^[A-Za-z0-9_-]+$"},
+      confirmed:{type:"boolean",description:"True only after explicit confirmation of the displayed exact final answers."},
+    },required:["program","requestId","confirmed"],additionalProperties:false},
+    annotations:{readOnlyHint:false,destructiveHint:true,openWorldHint:false,idempotentHint:true},
+    securitySchemes:[{type:"oauth2",scopes:[SCOPE,ASSIGNMENT_WRITE_SCOPE]}],
   },
   {
     name: "submit_my_falowen_assignment",
@@ -1024,6 +1051,18 @@ function makeRouter(admin) {
         return res.json({ jsonrpc: "2.0", id, result: {
           isError: !result.submitted, content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result,
         } });
+      }
+      if (name === "submit_my_falowen_workbook" || name === "get_my_falowen_submission_status") {
+        if (name === "submit_my_falowen_workbook" && !session.scope.split(/\s+/).includes(ASSIGNMENT_WRITE_SCOPE)) {
+          return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"Reconnect with explicit assignment-write permission. Nothing was submitted."}]}});
+        }
+        const params = {admin,student,uid:session.uid,email:session.email,
+          args:message.params?.arguments || {},rules:GENERATED_COURSE_CONTENT?.officialWorkbookRules};
+        const result = name === "submit_my_falowen_workbook"
+          ? await submitExpandedWorkbook(params) : await workbookStatus(params);
+        return res.json({jsonrpc:"2.0",id,result:{
+          ...(name === "submit_my_falowen_workbook" ? {isError:!result.submitted} : {}),
+          content:[{type:"text",text:JSON.stringify(result)}],structuredContent:result}});
       }
       const result = await callTool(name, message.params?.arguments || {}, student, admin);
       return res.json({ jsonrpc: "2.0", id, result: {
