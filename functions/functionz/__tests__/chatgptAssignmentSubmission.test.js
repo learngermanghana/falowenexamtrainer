@@ -140,3 +140,47 @@ describe("Falowen official A1 MCP submission boundaries", () => {
     }
   });
 });
+
+
+describe("Expanded workbook safety", () => {
+  const { germanRule, validateGermanText, planSwahili, submitExpandedWorkbook } = require("../chatgptWorkbookSubmission");
+  const rules = require("../../data/chatgptLessonContent.generated.json").officialWorkbookRules;
+  test("only current non-timed German assignments can be selected", () => {
+    for (const level of ["A2","B1"]) {
+      const student = {id:"s",data:{program:"german",level}};
+      const entries = Object.entries(rules.german).filter(([id,r])=>r.level===level && r.day < (level==="B1"?18:21));
+      expect(entries.length).toBeGreaterThan(0);
+      const match = entries.find(([id])=>germanRule(student,{assignmentId:id},rules));
+      expect(match).toBeDefined();
+      const rule = germanRule(student,{assignmentId:match[0]},rules);
+      expect(validateGermanText("Teil 2\n",rule)).toBe(false);
+      const response = rule.requiredParts.map(n=>"Teil "+n+"\nMeine eigene Antwort besteht aus mehreren vollständigen Sätzen. Ich lerne und schreibe heute.").join("\n");
+      expect(validateGermanText(response,rule)).toBe(true);
+      expect(germanRule(student,{assignmentId:level==="A2"?"A2-8.21":"B1-6.18"},rules)).toBeNull();
+      expect(germanRule({id:"s",data:{program:"swahili",level}}, {assignmentId:match[0]},rules)).toBeNull();
+    }
+  });
+  test("Kiswahili requires every exact question ID and a listening confirmation", () => {
+    const rule = rules.swahili["12"];
+    const answers = list => Object.fromEntries(list.map(q=>[q.id,q.choices[0] || "Jibu langu"]));
+    const args = {day:12,writing:"Jibu langu kuhusu tarehe.",readingAnswers:answers(rule.reading),listeningAnswers:answers(rule.listening),listeningConfirmed:true};
+    expect(planSwahili(args,rules)?.data).toMatchObject({contentVersion:3,program:"swahili",writing:{response:args.writing}});
+    expect(planSwahili({...args,listeningConfirmed:false},rules)).toBeNull();
+    expect(planSwahili({...args,readingAnswers:{}},rules)).toBeNull();
+    expect(planSwahili({...args,day:1},rules)).toBeNull();
+  });
+  test("without confirmation or rollout flag, no database access occurs", async () => {
+    const prior=process.env.FALOWEN_CHATGPT_EXPANDED_SUBMIT_ENABLED;
+    delete process.env.FALOWEN_CHATGPT_EXPANDED_SUBMIT_ENABLED;
+    const firestore=jest.fn();
+    try {
+      const base={admin:{firestore},student:user,uid:"uid",email:"student@example.test",rules};
+      expect((await submitExpandedWorkbook({...base,args:{program:"german",confirmed:true,requestId:"request_123"}})).submitted).toBe(false);
+      expect((await submitExpandedWorkbook({...base,args:{program:"swahili",confirmed:false,requestId:"request_123"}})).submitted).toBe(false);
+      expect(firestore).not.toHaveBeenCalled();
+    } finally {
+      if(prior===undefined) delete process.env.FALOWEN_CHATGPT_EXPANDED_SUBMIT_ENABLED;
+      else process.env.FALOWEN_CHATGPT_EXPANDED_SUBMIT_ENABLED=prior;
+    }
+  });
+});
