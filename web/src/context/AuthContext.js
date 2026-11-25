@@ -1278,7 +1278,7 @@ export const AuthProvider = ({ children }) => {
     setLevelEnrollmentState(null);
     if(!db||!enrollmentUid||!enrollmentProfileId||!enrollmentOwner)return undefined;
     return onSnapshot(collection(db,"students",enrollmentProfileId,"levelEnrollments"),snap=>{
-      setLevelEnrollmentState({uid:enrollmentUid,id:enrollmentProfileId,rows:snap.docs.map(d=>d.data())});
+      setLevelEnrollmentState({uid:enrollmentUid,id:enrollmentProfileId,rows:snap.docs.map(d=>({...d.data(),id:d.id}))});
     },()=>setLevelEnrollmentState({uid:enrollmentUid,id:enrollmentProfileId,error:true,rows:[]}));
   },[enrollmentUid,enrollmentProfileId,enrollmentOwner]);
   const [levelAccessClock,setLevelAccessClock]=useState(Date.now);
@@ -1299,7 +1299,7 @@ export const AuthProvider = ({ children }) => {
     const levels=["A1","A2","B1","B2","C1","C2"];
     const legacyLevels=levels.slice(0,levels.indexOf(String(profile.level||"").toUpperCase())+1);
     const blocked=[...new Set([...decision.blocked,...(legacyUnavailable?legacyLevels.filter(l=>!decision.granted.includes(l)):[])])];
-    return {...profile,blockedEnrollmentLevels:blocked,grantedEnrollmentLevels:decision.granted,managedEnrollmentLevels:decision.managed,levelEnrollmentCheckPending:!!enrollmentOwner&&!state,levelEnrollmentCheckError:!!state?.error};
+    return {...profile,blockedEnrollmentLevels:blocked,grantedEnrollmentLevels:decision.granted,managedEnrollmentLevels:decision.managed,levelBillingEnrollments:state?.rows||[],levelEnrollmentCheckPending:!!enrollmentOwner&&!state,levelEnrollmentCheckError:!!state?.error};
   },[studentProfile,preferred,levelEnrollmentState,enrollmentUid,enrollmentProfileId,enrollmentOwner,levelAccessClock]);
   const selectCourse = useCallback(program => {
     if (!courseOptions.includes(program) || !user?.uid) return;

@@ -1,0 +1,5 @@
+const {ledgerBalance,checkoutCredit,isLevelPayment}=require("../levelBilling");
+const row={program:"german",level:"A2",status:"active",tuitionFee:3000,paid:2000,balanceDue:1000};
+test("full remaining level balance can be paid below installment minimum",()=>{expect(ledgerBalance(row)).toBe(100000);expect(checkoutCredit(row,1000)).toBe(1000);});
+test("inconsistent, cleared, overpaid, cancelled and unconfirmed invoices cannot start payment",()=>{for(const r of [{...row,balanceDue:0},{...row,tuitionFee:null},{...row,status:"cancelled"},{...row,status:"planned"}])expect(()=>checkoutCredit(r,1000)).toThrow();expect(()=>checkoutCredit(row,1001)).toThrow();expect(()=>checkoutCredit(row,1)).toThrow();});
+test("level webhook is separated from legacy tuition",()=>{expect(isLevelPayment({reference:"FAL-LEVEL-123"})).toBe(true);expect(isLevelPayment({reference:"FAL-admin-123",metadata:{purpose:"level_enrollment"}})).toBe(true);expect(isLevelPayment({reference:"legacy",metadata:{purpose:"balance"}})).toBe(false);});

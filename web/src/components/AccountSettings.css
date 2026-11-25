@@ -51,3 +51,23 @@
   .fw-account-amounts { grid-template-columns: 1fr; gap: 12px; margin-top: 16px; }
   .fw-account-amounts > div, .fw-account-amounts > div:first-child { padding: 10px 0 0; border: 0; border-top: 1px solid var(--line); }
 }
+
+/* Payment-first hierarchy: balance and the payment action precede contract detail. */
+.fw-billing-level { display:grid;gap:12px;padding:clamp(16px,2.5vw,26px);background:white;border:1px solid var(--line);border-radius:16px;min-width:0; }
+.fw-billing-level header { display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap; }
+.fw-billing-level h3,.fw-account-billing h2 {margin:0;}
+.fw-account-billing p {margin:6px 0;}
+.fw-billing-due {display:grid;gap:5px;}
+.fw-billing-due strong {font-size:clamp(30px,5vw,42px);line-height:1.1;font-variant-numeric:tabular-nums;}
+.fw-billing-action {display:grid;gap:8px;}
+.fw-billing-pay {width:100%;min-height:52px;border:0;border-radius:10px;background:#176644;color:white;font:inherit;font-weight:750;cursor:pointer;padding:12px;}
+.fw-billing-pay:disabled {opacity:.55;cursor:not-allowed;}
+.fw-billing-breakdown {display:grid;grid-template-columns:1fr 1fr;gap:12px;border-top:1px solid var(--line);padding-top:12px;}
+.fw-billing-breakdown div,.fw-billing-dates,.fw-billing-transactions {display:grid;gap:4px;}
+.fw-billing-level small {color:var(--muted);}
+.fw-billing-level progress {width:100%;height:10px;accent-color:#176644;}
+.fw-billing-level summary {cursor:pointer;font-weight:650;}
+.fw-billing-level input {display:block;width:100%;max-width:260px;padding:9px;border:1px solid var(--line);border-radius:8px;margin-top:5px;}
+.fw-billing-transactions div {padding:8px 0;border-bottom:1px solid var(--line);display:grid;gap:3px;}
+.fw-account[data-billing-active="true"] .fw-account-billing {gap:14px;}
+@container (max-width: 710px) { .fw-account[data-billing-active="true"] .fw-account-content {order:-1;} }
