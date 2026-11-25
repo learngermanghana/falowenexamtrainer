@@ -77,7 +77,7 @@ const WelcomeHero = ({ studentProfile, className = "", classId = "", onViewClass
   );
 };
 
-const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) => (
+const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false, swahiliLevel }) => (
   <section className="falowen-home-spaces" aria-label={t("homeAccess.spaces")}>
     <div className="falowen-home-spaces__heading">
       <h2>{t("homeAccess.spaces")}</h2>
@@ -96,7 +96,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false }) =>
             <span className="falowen-home-space-card__eyebrow">{t("homeAccess.dailyWork")}</span>
             <h3>Campus</h3>
           </div>
-          <span className="falowen-home-space-card__level">{isSwahili ? "Kiswahili A1" : t("homeAccess.courseBook")}</span>
+          <span className="falowen-home-space-card__level">{isSwahili ? ["Kiswahili", swahiliLevel].filter(Boolean).join(" ") : t("homeAccess.courseBook")}</span>
         </div>
         <div className="falowen-home-space-card__body">
           <h4>{t("homeAccess.continueLearning")}</h4>
@@ -320,8 +320,8 @@ const GeneralHome = ({
             </PrimaryActionBar>
           </section>
         ) : null}
-        <QuickMainAccess t={t} openCampus={openCampus} isSwahili />
-        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <QuickMainAccess t={t} openCampus={openCampus} isSwahili swahiliLevel={levelKey?.toUpperCase()} />
+        {(!levelKey || levelKey.toUpperCase() === "A1") && <section style={{ ...styles.card, display: "grid", gap: 10 }}>
           <SectionHeader
             eyebrow="Kiswahili A1"
             title={t("uiLanguageFlow.publishedLessons")}
@@ -335,7 +335,7 @@ const GeneralHome = ({
               Somo la 6 · Mgahawani
             </button>
           </PrimaryActionBar>
-        </section>
+        </section>}
         <LegalFooter />
       </div>
     );
