@@ -835,6 +835,7 @@ function B1TimedMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
         onComplete={() => submitHoeren()}
       /> : null}
       {exam.stage === "hoeren" && isSecond ? <B1Mock2Hoeren embedded
+        initialAnswers={Object.fromEntries(Object.entries(exam.hoerenAnswers || {}).map(([key,value])=>[key.split("-")[1],value]))}
         onAnswersChange={(number,value,part)=>setExam(current=>({...current,hoerenAnswers:{...current.hoerenAnswers,[`t${part}-${number}`]:value}}))}
         onComplete={({answers,result})=>{const sectionScore=Number((result.correct/Math.max(1,result.total)*25).toFixed(1));const hoerenAnswers=Object.fromEntries(Object.entries(answers).map(([number,value])=>{const n=Number(number);const part=n<=10?1:n<=15?2:n<=22?3:4;return [`t${part}-${number}`,value];}));moveToSection("schreiben",{hoerenAnswers,hoerenResult:{...result,score:sectionScore,maxScore:25},sectionScores:{...exam.sectionScores,hoeren:sectionScore}});}}
       /> : null}
@@ -974,7 +975,10 @@ function B1PracticePaper({mockId}){
   const isSecond=mockId==="b1-mock-02",isThird=mockId==="b1-mock-03",isFourth=mockId==="b1-mock-04",isVerified=isSecond||isThird||isFourth;
   const reading=isFourth?B1_MOCK4_LESEN:isThird?B1_MOCK3_LESEN:isSecond?B1_MOCK2_READING:B1_READING;
   const writingTasks=isFourth?B1_MOCK4_WRITING_TASKS:isThird?B1_MOCK3_WRITING_TASKS:isSecond?B1_MOCK2_WRITING_TASKS:B1_WRITING_TASKS;
-  return <MockPracticeWorkspace mockId={mockId} title={`B1 Mock ${Number(mockId.slice(-2))}`} reading={({answers,onChange:setLesen})=>{
+  return <MockPracticeWorkspace mockId={mockId} title={`B1 Mock ${Number(mockId.slice(-2))}`} displayAnswer={(section,row,value)=>{
+    if(section==="lesen"){const q=buildLesenQuestions(reading).find(q=>q.key===`t${row.part}-${row.number}`);if(q?.options)return mockDisplayAnswer(q.options,value,`lesen-t${row.part}-${row.number}`)}
+    return String(value||"").toUpperCase();
+  }} reading={({answers,onChange:setLesen})=>{
     const exam={lesenAnswers:answers};return <div className="b1-final-shell">          <ReadingPart title="Teil 1" time="10 Minuten">
             <p>{reading.teil1.intro}</p>
             {reading.teil1.accommodationNote ? <p className="b1-final-small-note">{reading.teil1.accommodationNote}</p> : null}
