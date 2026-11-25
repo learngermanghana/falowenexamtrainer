@@ -12,7 +12,7 @@ import {
   getRemainingMs,
   formatRemaining,
 } from "./placementTest2026Data";
-import { swahiliPlacementTest, swahiliPlacementQuestions, SWAHILI_PLACEMENT_STORAGE_KEY, shufflePlacementItems } from "./swahiliPlacementTestData";
+import { swahiliPlacementTest, swahiliPlacementQuestions, SWAHILI_PLACEMENT_STORAGE_KEY, SWAHILI_PLACEMENT_VERSION, shufflePlacementItems } from "./swahiliPlacementTestData";
 
 const initialSession = () => ({
   id: null,
@@ -45,8 +45,8 @@ const readSession = (language = "german") => {
           questions.some((question) => question.id === id && question.options.includes(value))
         )
       ),
-      serverScore: saved.serverScore && ["A1","A2","B1"].includes(saved.serverScore.level) ? saved.serverScore : null,
-      activeIndex: Math.max(0, Math.min(29, Number.isInteger(saved.activeIndex) ? saved.activeIndex : 0)),
+      serverScore: saved.serverScore && (language === "swahili" ? ["A1","A2","B1","B2"] : ["A1","A2","B1"]).includes(saved.serverScore.level) ? saved.serverScore : null,
+      activeIndex: Math.max(0, Math.min(questions.length - 1, Number.isInteger(saved.activeIndex) ? saved.activeIndex : 0)),
     };
   } catch (_error) {
     return initialSession();
@@ -67,9 +67,9 @@ export default function PlacementTestPage2026({ language = "german" }) {
   const storageKey = isSwahili ? SWAHILI_PLACEMENT_STORAGE_KEY : PLACEMENT_STORAGE_KEY;
   const [session, setSession] = useState(() => readSession(language));
   const questions = useMemo(() => isSwahili && session.id
-    ? [0, 10, 20].flatMap(offset => shufflePlacementItems(canonicalQuestions.slice(offset, offset + 10), session.id + ":section:" + offset))
+    ? test.sections.map((_,index)=>index*10).flatMap(offset => shufflePlacementItems(canonicalQuestions.slice(offset, offset + 10), session.id + ":section:" + offset))
         .map((q, index) => ({ ...q, number: index + 1, options: shufflePlacementItems(q.options, session.id + ":" + q.id) }))
-    : canonicalQuestions, [isSwahili, session.id, canonicalQuestions]);
+    : canonicalQuestions, [isSwahili, session.id, canonicalQuestions, test.sections]);
   const [now, setNow] = useState(() => Date.now());
   const trackedCompletion = useRef(Boolean(session.completedAt && (!isSwahili || session.serverScore)));
   const [starting,setStarting] = useState(false);
@@ -81,7 +81,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
   const remaining = finished ? 0 : getRemainingMs(session.startedAt, now);
   const activeQuestion = questions[session.activeIndex];
   const levelStats = useMemo(() => isSwahili
-    ? Object.fromEntries(["A1","A2","B1"].map(level => [level, {
+    ? Object.fromEntries(test.sections.map(({level}) => [level, {
         correct: Number(session.serverScore?.[level.toLowerCase()] || 0),
         answered: questions.filter(q => q.level === level && Object.prototype.hasOwnProperty.call(session.answers,q.id)).length,
         total: 10,
@@ -197,7 +197,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
     setStartError("");
     let result;
     try {
-      result = await postPlacementEvent({action:"start",language,id:makePlacementAttemptId(),
+      result = await postPlacementEvent({action:"start",language,...(isSwahili ? {version:SWAHILI_PLACEMENT_VERSION} : {}),id:makePlacementAttemptId(),
         email:data.get("email"),name:data.get("name"),classEmails:data.has("classEmails")});
       if (!result.ticket) throw new Error("Please refresh and try again.");
     } catch (error) {
@@ -230,7 +230,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
 
   const navigate = (index) => {
     if (finished) return;
-    setSession((previous) => ({ ...previous, activeIndex: Math.max(0, Math.min(29, index)) }));
+    setSession((previous) => ({ ...previous, activeIndex: Math.max(0, Math.min(questions.length - 1, index)) }));
   };
 
   const submit = () => {
@@ -248,7 +248,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
 
   const languageName = isSwahili ? "Kiswahili" : "German";
   const resultUrl = isSwahili
-    ? "/signup?program=swahili&level=" + encodeURIComponent(suggestedLevel) + "&source=placement-test"
+    ? (suggestedLevel === "B2" ? "/learn-swahili" : "/signup?program=swahili&level=" + encodeURIComponent(suggestedLevel) + "&source=placement-test")
     : "/classes/?level=" + encodeURIComponent(suggestedLevel);
 
   return (
@@ -315,9 +315,9 @@ export default function PlacementTestPage2026({ language = "german" }) {
           <div className="falowen-placement-workspace-top">
             <div>
               <span className="falowen-placement-kicker">{finished ? "Your placement result" : "Placement assessment in progress"}</span>
-              <h1>{languageName} · A1–B1</h1>
+              <h1>{languageName} · {isSwahili ? "A1–B2" : "A1–B1"}</h1>
             </div>
-            <span className="falowen-placement-free">{finished ? "Completed" : "30 questions · 20 minutes"}</span>
+            <span className="falowen-placement-free">{finished ? "Completed" : `${questions.length} questions · 20 minutes`}</span>
           </div>
           {!finished ? (
             <section className="falowen-placement-progress-shell" aria-label="Placement test progress and timer">
@@ -417,14 +417,14 @@ export default function PlacementTestPage2026({ language = "german" }) {
               data-placement-attempt-id={session.id || ""}
               data-placement-a1={levelStats.A1.correct}
               data-placement-a2={levelStats.A2.correct}
-              data-placement-b1={levelStats.B1.correct}>
+              data-placement-b1={levelStats.B1.correct} data-placement-b2={isSwahili ? levelStats.B2.correct : undefined}>
               <div className="falowen-placement-results-hero">
                 <span className="falowen-placement-kicker">{session.completionReason === "time" ? "Time is up · answers submitted automatically" : "Assessment complete"}</span>
                 <h2>Your suggested starting level: {suggestedLevel}</h2>
                 <div className="falowen-placement-results-scoreline">
                   Suggested level: <strong>{suggestedLevel}</strong> · Score: {correct}/{questions.length}
                 </div>
-                <p>Based on 30 grammar and vocabulary questions. Confirm with a speaking or writing check before final class placement.</p>
+                <p>Based on {questions.length} grammar and vocabulary questions. Confirm with a speaking or writing check before final class placement.</p>
               </div>
               {session.ticket ? (
                 <div className="falowen-placement-email-status" role="status">
@@ -453,7 +453,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
                 {isSwahili ? (
                   suggestedLevel === "A1" ? "Start with core expressions, everyday vocabulary and basic Kiswahili grammar."
                   : suggestedLevel === "A2" ? "Continue building A2 skills before moving to more complex B1 structures."
-                  : "You showed strong performance across all three sections. B1 is a suggested starting point."
+                  : suggestedLevel === "B2" ? "Your objective answers suggest B2. Confirm your level with a teacher before enrolling." : "Your objective answers suggest B1. Confirm your level with a teacher before enrolling."
                 ) : (
                   suggestedLevel === "A1" ? "Build stronger foundations in everyday grammar and vocabulary before advancing."
                   : suggestedLevel === "A2" ? "Your A1 and A2 foundations are strong; A2 can help you prepare for B1 structures."
@@ -463,10 +463,11 @@ export default function PlacementTestPage2026({ language = "german" }) {
               <div className="falowen-placement-results-actions">
                 <a className="falowen-placement-primary" href={resultUrl}
                   onClick={() => recordEvent("recommended_class_click", { level: suggestedLevel, language })}>
-                  {isSwahili ? "Continue with Kiswahili" : "View " + suggestedLevel + " classes"} →
+                  {isSwahili ? (suggestedLevel === "B2" ? "Contact Kiswahili admissions" : "Continue with Kiswahili") : "View " + suggestedLevel + " classes"} →
                 </a>
                 <button className="falowen-placement-outline" type="button" onClick={() => setSession(initialSession())}>Retake test</button>
               </div>
+              {isSwahili && <details className="falowen-placement-review" open><summary>Teacher follow-up · Kuandika / Kuzungumza</summary><p>These tasks are not included in the automatic score. Complete the A1 introduction in writing, or use the A2–B2 task with your teacher to confirm your level.</p>{test.sections.map(section => <div key={section.id}><h4>{section.level} · Kuandika | Writing</h4><p>{section.writingPrompt}</p></div>)}</details>}
               <details className="falowen-placement-review">
                 <summary>{isSwahili ? "Review your submitted answers" : "Review answers (after submission)"}</summary>
                 <ol>
@@ -488,7 +489,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
       )}
       <footer className="falowen-placement-foot">
         <strong>{isSwahili ? "Karibu! A good place to begin learning Kiswahili." : "A little German. A great place to start."}</strong>
-        <span>A1–B1 placement&nbsp; / &nbsp;30 questions&nbsp; / &nbsp;20 minutes</span>
+        <span>{isSwahili ? "A1–B2" : "A1–B1"} placement&nbsp; / &nbsp;{questions.length} questions&nbsp; / &nbsp;20 minutes</span>
       </footer>
     </main>
   );
