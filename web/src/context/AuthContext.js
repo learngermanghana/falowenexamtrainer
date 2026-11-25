@@ -511,7 +511,7 @@ export const AuthProvider = ({ children }) => {
             }
             const profile = { id: docSnapshot.id, ...docSnapshot.data() };
             setStudentProfile(profile);
-            setMessagingToken(getMessagingTokenFromProfile(profile, deviceId));
+            setMessagingToken(null);
             setLoading(false);
           },
           (error) => {
@@ -891,7 +891,7 @@ export const AuthProvider = ({ children }) => {
           });
         }
         setStudentProfile(profile);
-        setMessagingToken(getMessagingTokenFromProfile(profile, deviceId));
+        setMessagingToken(null);
         const studentId = profile?.id || credential.user.uid;
         const studentCode = profile?.studentCode || profile?.studentcode || credential.user.uid;
         await logLoginSession({
@@ -1074,7 +1074,7 @@ export const AuthProvider = ({ children }) => {
       name: resolvedName || existingProfile.name || "",
     };
     setStudentProfile(mergedProfile);
-    setMessagingToken(getMessagingTokenFromProfile(mergedProfile, deviceId));
+    setMessagingToken(null);
     await logLoginSession({
       uid: credential.user.uid,
       email,
@@ -1131,109 +1131,16 @@ export const AuthProvider = ({ children }) => {
         setIdToken(null);
         return;
       }
-      if (studentProfile?.id && messagingToken) {
-        try {
-          await revokeMessagingToken(studentProfile.id, messagingToken);
-        } catch (error) {
-          console.error("Failed to revoke messaging token", error);
-        }
-      }
       await signOut(auth);
       setMessagingToken(null);
       setNotificationStatus("idle");
       setStudentProfile(null);
     },
-    [messagingToken, revokeMessagingToken, studentProfile?.id]
+    []
   );
 
-  const enableNotifications = useCallback(
-    async () => {
-      if (!isFirebaseConfigured) {
-        throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
-      }
-      if (!hasVapidKey) {
-        // Email and the in-app inbox remain available.
-        setNotificationStatus("idle");
-        return null;
-      }
-      setNotificationStatus("pending");
-      try {
-        const token = await requestMessagingToken();
-        if (!token) {
-          setNotificationStatus(
-            typeof Notification !== "undefined" && Notification.permission === "denied"
-              ? "blocked"
-              : "idle"
-          );
-          return null;
-        }
-        setMessagingToken(token);
-        if (studentProfile?.id) {
-          await persistMessagingToken(token, studentProfile.id);
-        }
-        setNotificationStatus("granted");
-        return token;
-      } catch (error) {
-        console.error("Failed to enable notifications", error);
-        setNotificationStatus("error");
-        throw error;
-      }
-    },
-    [hasVapidKey, persistMessagingToken, studentProfile?.id]
-  );
-
-  useEffect(() => {
-    const refreshMessagingToken = async () => {
-      if (!user || !studentProfile || !isFirebaseConfigured) return;
-
-      const storedToken = getMessagingTokenFromProfile(studentProfile, deviceId);
-      if (!hasVapidKey) {
-        setNotificationStatus("idle");
-        return;
-      }
-
-      const pushEnvironment = getPushEnvironment();
-      if (!pushEnvironment.notificationApi) {
-        // iOS only exposes the Notifications API to a valid installed Home
-        // Screen web app. Do not turn that state into a generic setup error.
-        setNotificationStatus(storedToken ? "stale" : "idle");
-        return;
-      }
-
-      if (Notification.permission === "denied") {
-        setNotificationStatus("blocked");
-        return;
-      }
-
-      if (Notification.permission === "default") {
-        // Permission must be requested from an explicit user gesture.
-        setNotificationStatus(storedToken ? "stale" : "idle");
-        return;
-      }
-
-      if (!storedToken) {
-        setNotificationStatus("pending");
-      }
-
-      try {
-        const token = await requestMessagingToken();
-        if (!token) {
-          setNotificationStatus(storedToken ? "stale" : "blocked");
-          return;
-        }
-        setMessagingToken(token);
-        if (storedToken !== token) {
-          await persistMessagingToken(token, studentProfile.id);
-        }
-        setNotificationStatus("granted");
-      } catch (error) {
-        console.error("Failed to refresh messaging token on sign-in", error);
-        setNotificationStatus(storedToken ? "stale" : "error");
-      }
-    };
-
-    refreshMessagingToken();
-  }, [deviceId, hasVapidKey, persistMessagingToken, studentProfile, user]);
+  // Preserve the context API for older callers, without any token registration.
+  const enableNotifications = useCallback(async () => null, []);
 
   const saveStudentProfile = useCallback(
     async (updates) => {

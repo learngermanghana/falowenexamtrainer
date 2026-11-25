@@ -13,7 +13,9 @@ const retired = [
   "onScoreCreated",
   "onExamTutorReviewCreated",
   "onExamTutorReviewUpdated",
-  "sendPaymentReminders"
+  "sendPaymentReminders",
+  "onMarkedAssignmentNotificationCreated",
+  "onClassLessonNoteCreated"
 ];
 describe("retired device push contract", () => {
   test("push-only functions are not exported or deployed", () => {
@@ -29,11 +31,8 @@ describe("retired device push contract", () => {
     expect(index).not.toContain("sendEachForMulticast");
     expect(notifications).not.toContain("sendEachForMulticast");
   });
-  test("in-app notifications and attendance progress remain", () => {
-    const notifications = read("functions/index.notifications.js");
-    expect(notifications).toContain("exportedFunctions.onMarkedAssignmentNotificationCreated");
-    expect(notifications).toContain("exportedFunctions.onClassLessonNoteCreated");
-    expect(notifications).toContain("await persistInAppNotification");
+  test("notification jobs are detached and attendance progress remains", () => {
+    expect(read("functions/index.entry.js")).not.toContain('require("./index.notifications")');
     expect(read("functions/index.js")).toContain("exports.onAttendanceCheckinWritten");
   });
   test("web clients do not register or test device push", () => {
@@ -42,6 +41,12 @@ describe("retired device push contract", () => {
     expect(read("web/src/context/AuthContext.js")).toContain("const hasVapidKey = false;");
     const settings = read("web/src/components/NotificationSettingsCard.js");
     expect(settings).not.toContain("sendPushTestNotification");
-    expect(settings).toContain("Important updates are sent by email");
+    expect(settings).toContain("() => null");
+    expect(read("web/src/App.js")).not.toContain("<NotificationBell");
+    expect(read("web/src/components/AccountSettings.js")).not.toContain('key: "notifications"');
+    const worker = read("web/public/firebase-messaging-sw.js");
+    expect(worker).not.toContain("onBackgroundMessage");
+    expect(worker).not.toContain("showNotification");
+    expect(worker).toContain('addEventListener("fetch"');
   });
 });
