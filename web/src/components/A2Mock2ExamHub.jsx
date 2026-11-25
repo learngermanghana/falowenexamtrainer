@@ -299,7 +299,7 @@ function A2Mock2ExamHubAttempt(){
     {flow.verifiedResult ? <button type="button" className="a2-mock2-primary" onClick={restart}>Start a new full mock</button> : null}
     {resetError ? <p role="alert">{resetError}</p> : null}
     <details><summary>Reading · View answers and solutions</summary><A2Mock2Lesen embedded reviewReleased /></details>
-    <details><summary>Listening · View answers and solutions</summary><A2Mock2Hoeren embedded reviewReleased /></details>
+    <details open><summary>Listening · View answers and solutions</summary><A2Mock2Hoeren embedded reviewReleased /></details>
     <details><summary>Writing · AI feedback / retry marking</summary><A2Mock2Schreiben embedded reviewReleased /></details>
     <details><summary>Speaking · AI examiner feedback</summary><A2Mock2Sprechen embedded reviewReleased /></details>
     <p>A verified overall score out of 100 is shown only after the writing and speaking assessments have been validated for this Mock 2 attempt.</p>

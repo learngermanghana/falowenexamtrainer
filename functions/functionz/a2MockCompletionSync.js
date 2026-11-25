@@ -120,6 +120,15 @@ const clean = (value = "") => String(value ?? "").trim();
 
 const {scoreObjectiveAnswers,verifiedSectionScore,buildVerifiedFourSkillScore}=require("./verifiedFourSkillMockScore");
 
+const kombiListeningKey = mockId => mockId === "a2-mock-07" ? MOCK_07_LISTENING_KEY : mockId === "a2-mock-06" ? MOCK_06_LISTENING_KEY : mockId === "a2-mock-05" ? MOCK_05_LISTENING_KEY : MOCK_04_LISTENING_KEY;
+const { buildListeningReview } = require("./mockListeningReview");
+function getA2ListeningReview(attempt = {}) {
+  if (attempt.status !== "completed" || !Object.prototype.hasOwnProperty.call(attempt.verifiedSectionScores || {}, "hoeren") || !attempt.state?.hoerenAnswers) return [];
+  const mockId = attempt.mockId || "a2-mock-01";
+  if (isA2Kombi(mockId) && !["a2-mock-04","a2-mock-05","a2-mock-06","a2-mock-07"].includes(mockId)) return [];
+  const key = isA2Kombi(mockId) ? kombiListeningKey(mockId) : objectiveKeysForMock(mockId).hoeren;
+  return buildListeningReview(attempt.state.hoerenAnswers, key).map(row => ({ ...row, part: row.part || Math.ceil(row.number / 5) }));
+}
 const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {}, mockId = "a2-mock-01" } = {}) => {
   if (isA2Kombi(mockId)) {
     if (state?.mockId && state.mockId !== mockId) throw new Error("Saved A2 Kombiprüfung belongs to another paper.");
@@ -127,7 +136,7 @@ const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {}, mockId = 
     if (state?.assessmentVersion && state.assessmentVersion !== "three-module-v1" && !isFour)
       throw new Error("Unsupported A2 Kombiprüfung version.");
     const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {},KOMBI_SETS[mockId].reading,25);
-    const listeningKey = mockId === "a2-mock-07" ? MOCK_07_LISTENING_KEY : mockId === "a2-mock-06" ? MOCK_06_LISTENING_KEY : mockId === "a2-mock-05" ? MOCK_05_LISTENING_KEY : MOCK_04_LISTENING_KEY;
+    const listeningKey = kombiListeningKey(mockId);
     const hoeren = isFour ? scoreObjectiveAnswers(state?.hoerenAnswers || {},listeningKey,25) : null;
     const schreiben = verifiedSectionScore(verifiedSections,"schreiben",{errorCode:"A2_MOCK_SECTION_NOT_VERIFIED"});
     const sprechen = verifiedSectionScore(verifiedSections,"sprechen",{errorCode:"A2_MOCK_SECTION_NOT_VERIFIED"});
@@ -522,6 +531,7 @@ module.exports = {
   MOCK_2_LISTENING_ANSWER_KEY,
   scoreObjectiveAnswers,
   buildVerifiedA2MockScore,
+  getA2ListeningReview,
   persistVerifiedA2MockSection,
   buildSectionBreakdown,
   deriveMockInsights,

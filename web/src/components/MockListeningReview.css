@@ -1,0 +1,9 @@
+.mock-listening-review { margin: 1.25rem 0; padding: 1rem; border: 1px solid #94a3b8; border-radius: 12px; }
+.mock-listening-review-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); gap: .4rem; margin: .75rem 0 1rem; }
+.mock-listening-review-overview span { padding: .4rem; text-align: center; border-radius: 6px; font-weight: 600; }
+.mock-listening-review-rows { display: grid; gap: .5rem; margin-top: 1rem; }
+.mock-listening-review-rows article { border-radius: 8px; border-left: 4px solid; padding: .75rem; }
+.mock-listening-review-rows p { margin: .3rem 0; }
+.mock-listening-review .review-correct { color: #14532d; background: #dcfce7; }
+.mock-listening-review .review-incorrect { color: #991b1b; background: #fee2e2; }
+.mock-listening-review .review-unanswered, .mock-listening-review .review-unavailable { color: #334155; background: #f1f5f9; }

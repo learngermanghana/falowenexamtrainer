@@ -114,11 +114,13 @@ const {
 } = require("./a1MockCompletionSync");
 const {
   buildVerifiedA2MockScore,
+  getA2ListeningReview,
   persistVerifiedA2MockSection,
   syncA2MockCompletion,
 } = require("./a2MockCompletionSync");
 const {
   buildVerifiedB1MockScore,
+  getB1ListeningReview,
   persistVerifiedB1MockSection,
   syncB1MockCompletion,
 } = require("./b1MockCompletionSync");
@@ -6350,7 +6352,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
         if (!verifiedOverall || !verifiedSectionScores) {
           throw new Error("Server-verified A2 mock totals are missing.");
         }
-        verifiedResult = { sectionScores: verifiedSectionScores, overall: verifiedOverall };
+        verifiedResult = { sectionScores: verifiedSectionScores, overall: verifiedOverall, listeningReview: getA2ListeningReview(attemptData) };
         if (attemptData.writingTutorReview?.status === "published" && attemptData.completionSync?.ok) {
           // Tutor publication already committed result and notifications atomically.
           return res.json({...saveOutcome,completionSync:attemptData.completionSync,verifiedResult});
@@ -6501,6 +6503,29 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
   } catch (err) {
     console.error("/b1-mock/attempt/start error", err);
     return res.status(500).json({ error: err.message || "Could not start the B1 mock attempt." });
+  }
+});
+
+// Read-only review for already completed attempts; never accept client answers here.
+app.post("/mock/attempt/listening-review", async (req, res) => {
+  try {
+    const user = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!user) return;
+    const level = String(req.body?.level || "").toUpperCase();
+    const attemptId = String(req.body?.attemptId || "").trim();
+    if (!["A2","B1"].includes(level) || !attemptId || attemptId.includes("/") || attemptId.length > 150) return res.status(400).json({error:"Invalid mock attempt."});
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
+    const collection = level === "A2" ? "a2MockExamUsers" : "b1MockExamUsers";
+    const snap = await db.collection(collection).doc(user.uid).collection("attempts").doc(attemptId).get();
+    const attempt = snap.data();
+    if (!snap.exists || (attempt.uid && attempt.uid !== user.uid)) return res.status(404).json({error:"Mock attempt not found."});
+    if (attempt.status !== "completed" || !attempt.completionSync?.ok) return res.status(409).json({error:"Listening review is available after the full mock result is verified."});
+    const rows = level === "A2" ? getA2ListeningReview(attempt) : getB1ListeningReview(attempt);
+    return res.json({rows});
+  } catch (error) {
+    console.error("Mock listening review error", error);
+    return res.status(500).json({error:"Could not load the listening review."});
   }
 });
 
@@ -6764,6 +6789,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
 
         completionSync.verifiedOverall = verifiedOverall;
         completionSync.verifiedSectionScores = verifiedSectionScores;
+        completionSync.listeningReview = getB1ListeningReview(attemptData);
 
         await attemptRef.set(
           {
@@ -6804,7 +6830,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
     return res.json({
       ...(saveOutcome || { ok: true, attemptId, status }),
       ...(completionSync ? { completionSync } : {}),
-      ...(completionSync?.ok ? {verifiedOverall:completionSync.verifiedOverall,verifiedSectionScores:completionSync.verifiedSectionScores} : {}),
+      ...(completionSync?.ok ? {verifiedOverall:completionSync.verifiedOverall,verifiedSectionScores:completionSync.verifiedSectionScores,listeningReview:completionSync.listeningReview} : {}),
     });
   } catch (err) {
     console.error("/b1-mock/attempt/save error", err);

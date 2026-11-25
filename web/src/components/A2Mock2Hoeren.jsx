@@ -1,3 +1,4 @@
+import MockListeningReview, { listeningReviewRow } from "./MockListeningReview";
 import { getStudentMockStorageKey, getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
 import React, { useEffect, useRef, useState } from "react";
 import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresentation";
@@ -72,7 +73,10 @@ function A2Mock2HoerenAttempt({ embedded = false, onComplete, reviewReleased = f
       </section>
       <div className="a2-mock2-actions"><button type="button" disabled={exam.partIndex===0} onClick={()=>changePart(exam.partIndex-1)}>Back</button>{exam.partIndex!==3?<button type="button" className="a2-mock2-primary" onClick={()=>changePart(exam.partIndex+1)}>Next</button>:<button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Submit listening?"))setExam(old=>({...old,completedAt:Date.now()}));}}>Submit listening</button>}</div>
     </>:!reveal ? <p>Listening submitted. Correct answers appear after all four modules are complete.</p> : <section className="a2-mock2-results"><h1>Your listening result</h1><p className="a2-mock2-score">{correct}/20 <small>{Math.round(correct*5)}%</small></p><p>Reading, writing and speaking are not marked here. Listening points: {(correct*25/20).toFixed(1)}/25.</p>
-      {PARTS.map((p,i)=><section key={p.id}><h2>Teil {i+1}</h2>{p.questions.map(q=><div className="a2-mock2-review" key={q.number}><strong>{q.number}. {q.question}</strong><p>Your answer: {(p.pictures ? mockDisplayAnswer(p.pictures.map(([id,label,icon]) => ({id:id.toLowerCase(),label,icon})), exam.answers[q.number], "a2-mock2-picture-board") : q.options ? mockDisplayAnswer(q.options, exam.answers[q.number], `a2-mock2-hoeren-${q.number}`) : (exam.answers[q.number]||"—").toUpperCase())} · Correct answer: {p.pictures ? mockDisplayAnswer(p.pictures.map(([id,label,icon]) => ({id:id.toLowerCase(),label,icon})), q.answer, "a2-mock2-picture-board") : q.options ? mockDisplayAnswer(q.options, q.answer, `a2-mock2-hoeren-${q.number}`) : q.answer.toUpperCase()}</p></div>)}</section>)}
+      <MockListeningReview rows={PARTS.flatMap((p,i)=>p.questions.map(q=>listeningReviewRow({
+        number:q.number,part:i+1,question:q.question,submitted:exam.answers[q.number],expected:q.answer,
+        display:value=>p.pictures ? mockDisplayAnswer(p.pictures.map(([id,label,icon])=>({id:id.toLowerCase(),label,icon})),value,"a2-mock2-picture-board") : q.options ? mockDisplayAnswer(q.options,value,`a2-mock2-hoeren-${q.number}`) : String(value).toUpperCase()
+      })))}/>
       <button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Start another attempt?")){setExam(START);setStarted({});setEnded({});}}}>Practise again</button>
     </section>}
   </main>;
