@@ -14,6 +14,7 @@ const { getMyExamDictionary } = require("./chatgptExamLibrary");
 const { TOOLS: EXAM_TOOLS, isExamOnlyProfile, validExamOnlyProfile, examTool } = require("./chatgptMockReview");
 const { germanEnrollment, submitA1Assignment } = require("./chatgptAssignmentSubmission");
 const { submitExpandedWorkbook, workbookStatus } = require("./chatgptWorkbookSubmission");
+const { TOOLS: REVISION_TOOLS, revisionTool } = require("./chatgptPersonalRevision");
 
 let GENERATED_COURSE_CONTENT = null;
 try {
@@ -429,6 +430,30 @@ const toolDefinitions = [
     name: "get_my_falowen_weaknesses",
     description: "Identify German revision priorities from my own explicitly level-labelled tutor assignment scores. Not a skill-level or exam readiness prediction; missing grades are not missing submissions.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name:"get_my_falowen_revision_levels",
+    description:"Check my verified current and previous course levels for read-only revision. A trial can only access Day 1. No new submission entitlement.",
+    inputSchema:{type:"object",properties:{},additionalProperties:false},
+    annotations:{readOnlyHint:true,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_revision_lesson",
+    description:"Retrieve authorised current or previous-level original German or Kiswahili A1 lesson content for revision only. First check revision levels; no official submission or grading.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},section:{type:"string",enum:["overview","vocabulary","grammar","reading","listening","speaking","writing","review"]}},required:["program","day"],additionalProperties:false},
+    annotations:{readOnlyHint:true,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_personal_plan",
+    description:"Build a personalised 15–120 minute plan from authorised lessons, explicitly scoped tutor assignment marks, or a selected verified mock result. Optional examDate is learner supplied, not an official scheduled date. For a mock-based plan first retrieve my verified attempt ID with mock history. No pass prediction or saved official grades.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},minutes:{type:"integer",minimum:15,maximum:120},mockId:{type:"string",maxLength:80},attemptId:{type:"string",maxLength:150},examDate:{type:"string",maxLength:10}},required:["program"],additionalProperties:false},
+    annotations:{readOnlyHint:true,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_revision_vocabulary",
+    description:"Retrieve bilingual vocabulary from an authorised published lesson (specify day) or the existing level-filtered German Campus dictionary (omit day for full course). Quiz one item at a time, repeat missed words within conversation; no saved spaced-repetition records.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},query:{type:"string",maxLength:100},limit:{type:"integer",minimum:1,maximum:20}},required:["program"],additionalProperties:false},
+    annotations:{readOnlyHint:true,openWorldHint:false},
   },
   {
     name: "get_my_falowen_study_plan",
@@ -993,7 +1018,7 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "Falowen Learning Companion", version: "1.2.0" },
-        instructions: "Tutoring protocol: prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For German Exams Room, start with get_my_falowen_exam_mocks, choose an explicitly supported mock skill for get_my_falowen_exam_practice, or get real Sprechen/Schreiben practice from get_my_falowen_exam_dictionary. For Hören, link the protected recording in Exams Room without copying private audio or transcripts. For Lesen, show the original source passage and one question at a time. Never invent a missing mock. Only help a learner practise their authorised German course and do not expose hidden solutions. For mock review, first call get_my_falowen_mock_history, then get_my_falowen_mock_review on a verified attempt. Practise repeatably using the returned practiceUrl and never create or change an official attempt. Exam-only accounts may use only the entitlement-checked Exams Room tools. For official A1 tutor submissions, show the exact full answer, request explicit separate confirmation, and use submit_my_falowen_assignment only if the student approved a permanent assignment lock and separately granted the assignment-write scope. A2/B1 and exam submissions remain in Campus. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
+        instructions: "Tutoring protocol: prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For German Exams Room, start with get_my_falowen_exam_mocks, choose an explicitly supported mock skill for get_my_falowen_exam_practice, or get real Sprechen/Schreiben practice from get_my_falowen_exam_dictionary. For Hören, link the protected recording in Exams Room without copying private audio or transcripts. For Lesen, show the original source passage and one question at a time. Never invent a missing mock. Only help a learner practise their authorised German course and do not expose hidden solutions. For mock review, first call get_my_falowen_mock_history, then get_my_falowen_mock_review on a verified attempt. Practise repeatably using the returned practiceUrl and never create or change an official attempt. Exam-only accounts may use only the entitlement-checked Exams Room tools. For official A1 tutor submissions, show the exact full answer, request explicit separate confirmation, and use submit_my_falowen_assignment only if the student approved a permanent assignment lock and separately granted the assignment-write scope. A2/B1 and exam submissions remain in Campus. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. For personalised daily study, prefer get_my_falowen_personal_plan. For previous-level revision first call get_my_falowen_revision_levels, then get_my_falowen_revision_lesson or get_my_falowen_revision_vocabulary. Earlier-level material is read-only and does not grant assignment submission. Use the existing Campus dictionary for level-filtered flashcards, wait before revealing meanings, and repeat missed terms; do not claim persistent spaced-repetition history. Otherwise restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
@@ -1026,6 +1051,17 @@ function makeRouter(admin) {
       }
       if (isExamOnlyProfile(student.data)) {
         return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"This account has exam-only access. Use the Exams Room tools; Course Book and assignment tools require a Full Course account."}]}});
+      }
+      if (REVISION_TOOLS.has(name)) {
+        const result=await revisionTool({name,args:message.params?.arguments||{},student,admin,uid:session.uid,
+          snapshot:GENERATED_COURSE_CONTENT,lessonContentResponse,swahiliLessonResponse,
+          loadWeakness:async()=>{
+            const level=studentView(student).level;
+            if(!level||SELF_STUDY_LEVELS.has(level)||companionPrograms(student).length!==1)return revisionEvidence(student,[]);
+            const code=normalize(student.data.studentCode||student.data.studentcode||student.id);
+            return revisionEvidence(student,await getScoresForStudent(code));
+          }});
+        return res.json({jsonrpc:"2.0",id,result:{content:[{type:"text",text:JSON.stringify(result)}],structuredContent:result}});
       }
       if (name === "save_my_falowen_practice_note") {
         if (!session.scope.split(/\s+/).includes(PRACTICE_WRITE_SCOPE)) {
