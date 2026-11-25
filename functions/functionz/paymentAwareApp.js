@@ -270,7 +270,7 @@ registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail })
 // Staff review is read-only and fetches saved speaking snapshots on demand.
 registerStaffSpeakingReviewRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 
-registerLevelBillingRoutes(app,{admin,getAuthedUser});
+registerLevelBillingRoutes(app,{admin,getAuthedUser,getTrustedCourseCompletion});
 
 app.post("/paystack/initialize", async (req, res) => {
   try {
