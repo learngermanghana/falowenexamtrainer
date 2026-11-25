@@ -38,6 +38,8 @@ For A2 Kombi Mocks 4–8, new Sprechen Teil 3 sessions use the published scenari
 
 New exam-only registrations at A1 through C1 receive seven days from signup at their registered level. The designated catalogue entries are A1 Mock 2, A2 Mock 1, B1 Mock 1, B2 Mock 1, and C1 Reading Sample 1. C1 is a reading trial. A1 Day 23 remains a graded Course Book final. German course trials include Day 1 and the same designated exam. Monthly exam access unlocks the level's published exam practice. Course enrolment is separate.
 
+In the German Exams Room, the normal locked-access dialog offers only **Pay now** (opens `/mock/payment` to choose a plan) and **Cancel** (returns to `/exams/overview`). If access verification fails, Retry access check replaces Pay now to avoid requesting unnecessary payment. Course Book access dialogs are unchanged.
+
 During an active trial, learners browse the regular Course Book and Exams Room layouts. Later lesson cards and restricted exam materials display a padlock. The designated trial exam opens from its usual mock library card.
 
 Learners can compare Full Course and Exam Preparation from the payment options page and account billing. Full Course uses the existing tuition flow and includes exam preparation under the course access rules. Exam Preparation uses the separate 30-day exam subscription. An unpaid course trial learner confirms an account-type switch before exam checkout; existing course enrollment, balances and paid access are retained.
