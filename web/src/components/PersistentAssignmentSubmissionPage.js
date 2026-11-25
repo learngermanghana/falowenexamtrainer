@@ -1,3 +1,4 @@
+import { ensureCourseSubmissionAccess } from "../services/courseSubmissionAccess";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -131,6 +132,7 @@ const PersistentAssignmentSubmissionPage = ({ submissionContext = null } = {}) =
     setFirestoreTestState({ status: "running", message: "Writing test draft to Firestore..." });
 
     try {
+      await ensureCourseSubmissionAccess(user,{force:true});
       await setDoc(testRef, testPayload, { merge: true });
       const snapshot = await getDoc(testRef);
       const saved = snapshot.exists() ? snapshot.data() : null;

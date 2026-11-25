@@ -46,6 +46,7 @@ async function readSwahiliAccess(db, uid, level, transaction = null, now = Date.
   const profile = matches.docs[0].data();
   if (profile.uid !== uid) return {allowed:false};
   const access = resolveSwahiliAccess(profile,level,now,policy.data() || {});
+  if(access.allowed){const {enrollmentRows,blockedEnrollmentLevels}=require("./levelEnrollmentAccess");if(blockedEnrollmentLevels(await enrollmentRows(matches.docs[0].ref,transaction),"swahili",now).includes(String(level).toUpperCase()))return {allowed:false};}
   return {...access, profile};
 }
 

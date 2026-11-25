@@ -1,3 +1,4 @@
+import { ensureCourseSubmissionAccess } from "../services/courseSubmissionAccess";
 import { readA1WorkbookDraft } from "../utils/a1WorkbookDraft";
 import { buildA1RecordingSubmission } from "../utils/a1RecordingSubmission";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -388,6 +389,7 @@ const VerifiedCloudDraftSubmissionPage = ({
           updatedAt: serverTimestamp(),
         };
 
+        await ensureCourseSubmissionAccess(user);
         await setDoc(draftRef, payload, { merge: true });
         const verifiedSnapshot = await getDoc(draftRef);
         const verifiedData = verifiedSnapshot.exists() ? verifiedSnapshot.data() || {} : null;
@@ -829,6 +831,7 @@ const VerifiedCloudDraftSubmissionPage = ({
       };
 
       // Both writes succeed or neither is visible to Admin marking.
+      await ensureCourseSubmissionAccess(user,{force:true});
       const finalBatch = writeBatch(db);
       finalBatch.set(submissionRef, payload);
       finalBatch.set(lockRef, lockPayload, { merge: true });
