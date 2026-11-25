@@ -13,6 +13,7 @@ const FalowenRadioTabContent = ({
   actionLabel = "Continue to Teil 1 · Sprechen →",
   actionDisabled = false,
   persistCompletionInUrl = true,
+  children,
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -132,6 +133,8 @@ const FalowenRadioTabContent = ({
           </a>
         </div>
       </div>
+
+      {children}
 
       {showAction ? (
         <button

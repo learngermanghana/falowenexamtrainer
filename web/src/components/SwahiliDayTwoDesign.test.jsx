@@ -27,7 +27,7 @@ test("Day 2 group practice has structured role-play stages and leads to Schreibe
 });
 
 test("Day 10 keeps its existing Schreiben layout and submission structure", () => {
-  render(<MemoryRouter initialEntries={["/campus/course/swahili/day-10?view=schreiben"]}>
+  render(<MemoryRouter initialEntries={["/campus/course/swahili/day-10?view=schreiben&radio=done"]}>
     <SwahiliA1PracticeWorkbook lesson={SWAHILI_A1_PRACTICE_UNITS[10]} preview />
   </MemoryRouter>);
   expect(screen.getByRole("heading", { name: "Teil 2 · Kuandika (Writing)" })).toBeTruthy();

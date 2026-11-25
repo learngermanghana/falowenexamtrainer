@@ -55,7 +55,7 @@ describe("Kiswahili Day 1 follows the native A2/B1 workbook", () => {
   it("submits the Day 11 learner responses only after explicit confirmation", async () => {
     mockUser = { uid: "day11-learner" };
     const lesson = SWAHILI_A1_PRACTICE_UNITS[11];
-    render(<MemoryRouter initialEntries={["/campus/course/swahili/day-11?view=schreiben"]}>
+    render(<MemoryRouter initialEntries={["/campus/course/swahili/day-11?view=schreiben&radio=done"]}>
       <SwahiliA1PracticeWorkbook lesson={lesson} />
     </MemoryRouter>);
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Nataka mkate." } });

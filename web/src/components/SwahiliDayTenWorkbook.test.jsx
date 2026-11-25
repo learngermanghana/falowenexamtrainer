@@ -17,7 +17,7 @@ test("Day 10 shows five questions and five matching answers for each exercise", 
   globalThis.fetch = fetchAudio;
   try {
     render(
-      <MemoryRouter initialEntries={["/campus/course/swahili/day-10?view=lesen"]}>
+      <MemoryRouter initialEntries={["/campus/course/swahili/day-10?view=lesen&radio=done"]}>
         <SwahiliA1PracticeWorkbook lesson={SWAHILI_A1_PRACTICE_UNITS[10]} />
       </MemoryRouter>
     );
@@ -39,27 +39,23 @@ test("Day 10 shows five questions and five matching answers for each exercise", 
   }
 });
 
-test("A1 Day 10 workbook displays both approved YouTube lessons without replacing the separate Hören audio", () => {
+test("A1 Day 10 keeps its AI lecture and separate Hören audio after Radio", () => {
   const lesson = SWAHILI_A1_PRACTICE_UNITS[10];
   expect(lesson.aiLecture.youtubeId).toBe("xLN5QX669JA");
   expect(lesson.radio.resourceRole).toBe("falowenRadio");
   expect(lesson.radio.youtubeId).toBe("4_ygEiW5QjI");
 
   render(
-    <MemoryRouter initialEntries={["/campus/course/swahili/day-10?view=grammar"]}>
+    <MemoryRouter initialEntries={["/campus/course/swahili/day-10?view=grammar&radio=done"]}>
       <SwahiliA1PracticeWorkbook lesson={lesson} />
     </MemoryRouter>
   );
 
   expect(screen.getByTitle("Video ya AI · Sokoni").getAttribute("src"))
     .toContain("/embed/xLN5QX669JA");
-  expect(screen.getByTitle("Falowen Radio · Sokoni").getAttribute("src"))
-    .toContain("/embed/4_ygEiW5QjI");
-  expect(screen.getByRole("link", { name: "Play Falowen Radio on YouTube" }).getAttribute("href"))
-    .toBe("https://youtu.be/4_ygEiW5QjI");
-  expect(screen.getByText(/Teil 4 has a separate listening recording/)).toBeTruthy();
+  expect(screen.queryByTitle(/Falowen Radio:.*Sokoni/)).toBeNull();
 
-  fireEvent.click(screen.getByRole("button", { name: "Go to Teil 4 · Listening" }));
+  fireEvent.click(screen.getByRole("tab", { name: /^Teil 4 ·/ }));
   expect(screen.getByRole("heading", { name: "Teil 4 · Kusikiliza (Listening)" })).toBeTruthy();
   expect(screen.getByRole("button", { name: /Load audio/ })).toBeTruthy();
 });

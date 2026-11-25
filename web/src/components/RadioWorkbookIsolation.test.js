@@ -15,17 +15,18 @@ describe("Falowen Radio and A2 workbook section isolation", () => {
 
   test("A2 Day 15 delegates section visibility to its real workbook tabs", () => {
     const day15 = read("A2Day15MeinLieblingssportWorkbookPage.js");
-    const legacy = read("A2Day15MeinLieblingssportWorkbookPageLegacy.js");
+    const workbook = read("A2StandardTabbedWorkbookPage.js");
 
-    expect(day15).toContain("<A2Day15MeinLieblingssportWorkbookPageLegacy />");
+    expect(day15).toContain("<A2StandardTabbedWorkbookPage");
+    expect(day15).toContain("day={15}");
     expect(day15).not.toContain("workbook-hoeren-refresh");
     expect(day15).not.toContain("workbook-hoeren-replacement");
     expect(day15).not.toContain("Teil 4 · Hören video");
     expect(day15).not.toContain("p_OE59m0J-Y");
 
-    expect(legacy).toContain('const [activeTab, setActiveTab] = useState("sprechen")');
-    expect(legacy).toContain('activeTab === "sprechen"');
-    expect(legacy).toContain('activeTab === "hoeren"');
-    expect(legacy).toContain("Teil 4 · Hören");
+    expect(workbook).toContain("<WorkbookTabNav");
+    expect(workbook).toContain('displayedActiveTab === "sprechen"');
+    expect(workbook).toContain('displayedActiveTab === "hoeren"');
+    expect(workbook).toContain("Teil 4 · Hören");
   });
 });

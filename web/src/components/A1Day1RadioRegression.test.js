@@ -46,7 +46,7 @@ describe("A1 Day 1 Falowen Radio", () => {
     const source = read("RadioFirstWorkbookGate.js");
 
     expect(source).toContain('data-radio-first-workbook-gate="true"');
-    expect(source).toContain('const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseBookPath = "/campus/course", transcriptIntro = null, introInstruction })');
+    expect(source).toContain("if (hasEnteredWorkbook) return children;");
     expect(source).toContain("export const resolveRadioFirstWorkbookResource = (level, day)");
     expect(source).toContain("const explicitRadio = isFalowenRadioResource(resource) ? resource : null");
     expect(source).toContain("const radio = explicitRadio || (transcriptIntro ? null : resolveRadioFirstWorkbookResource(level, day))");
