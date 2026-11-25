@@ -124,3 +124,14 @@ test.each(["missing", "expired", "revoked", "expired_course", "no_policy"])(
     }
   }
 );
+
+test("a synthetic A2 course trial can expire while a paid A2 exam term remains accessible",async()=>{
+ const {resolveEntitlements}=require("../entitlementService");
+ const profile={uid:"u",accountType:"course",program:"german",level:"A2",paid:0,balanceDue:3000,paymentStatus:"pending",status:"trial_active",trialEndsAt:new Date(now-1000).toISOString()};
+ const grants=[active("A2","level")];
+ const result=resolveEntitlements({profile,grants,now});
+ expect(result).toMatchObject({course:{day1:false,day2Plus:false,liveClasses:false,trial:false},exam:{paidLevels:["A2"],trial:null}});
+ expect(await trialRestriction(dbFor(grants),{uid:"u"},profile,true)).toEqual({level:"A2",course:false});
+ expect(await trialRestriction(dbFor(grants),{uid:"u"},profile)).toBeNull();
+ expect(profile.balanceDue).toBe(3000);
+});
