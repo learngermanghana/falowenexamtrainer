@@ -6506,6 +6506,29 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
   }
 });
 
+// Read-only review for already completed attempts; never accept client answers here.
+app.post("/mock/attempt/listening-review", async (req, res) => {
+  try {
+    const user = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!user) return;
+    const level = String(req.body?.level || "").toUpperCase();
+    const attemptId = String(req.body?.attemptId || "").trim();
+    if (!["A2","B1"].includes(level) || !attemptId || attemptId.includes("/") || attemptId.length > 150) return res.status(400).json({error:"Invalid mock attempt."});
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
+    const collection = level === "A2" ? "a2MockExamUsers" : "b1MockExamUsers";
+    const snap = await db.collection(collection).doc(user.uid).collection("attempts").doc(attemptId).get();
+    const attempt = snap.data();
+    if (!snap.exists || (attempt.uid && attempt.uid !== user.uid)) return res.status(404).json({error:"Mock attempt not found."});
+    if (attempt.status !== "completed" || !attempt.completionSync?.ok) return res.status(409).json({error:"Listening review is available after the full mock result is verified."});
+    const rows = level === "A2" ? getA2ListeningReview(attempt) : getB1ListeningReview(attempt);
+    return res.json({rows});
+  } catch (error) {
+    console.error("Mock listening review error", error);
+    return res.status(500).json({error:"Could not load the listening review."});
+  }
+});
+
 app.post("/b1-mock/attempt/save", async (req, res) => {
   let authedUser;
   try {
