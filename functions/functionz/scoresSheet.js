@@ -31,6 +31,7 @@ async function getScoresForStudent(studentCode) {
   const idxLevel = header.indexOf("level");
   const idxLink = header.indexOf("link");
   const idxAssignmentId = header.indexOf("assignment_id");
+  const idxProgram = header.findIndex(h => ["program","languageprogram","language_program"].includes(h));
 
   if (idxStudentCode === -1) throw new Error("Scores sheet missing 'studentcode' column");
 
@@ -49,6 +50,8 @@ async function getScoresForStudent(studentCode) {
       assignment_id: idxAssignmentId !== -1 ? (r[idxAssignmentId] || "") : "",
       assignmentId: idxAssignmentId !== -1 ? (r[idxAssignmentId] || "") : "",
       score: idxScore !== -1 ? Number(r[idxScore] || 0) : 0,
+      scoreRecorded: idxScore !== -1 && String(r[idxScore] ?? "").trim() !== "" && Number.isFinite(Number(r[idxScore])),
+      program: idxProgram !== -1 ? (r[idxProgram] || "") : "",
       comments: idxComments !== -1 ? (r[idxComments] || "") : "",
       date: idxDate !== -1 ? (r[idxDate] || "") : "",
       level: idxLevel !== -1 ? (r[idxLevel] || "") : "",
