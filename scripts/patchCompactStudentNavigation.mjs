@@ -6,7 +6,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const appPath = path.join(root, "web/src/App.js");
 const appCssPath = path.join(root, "web/src/App.css");
 const healthPath = path.join(root, "web/src/components/HealthIndicator.js");
-const notificationPath = path.join(root, "web/src/components/NotificationBell.js");
 const courseBookStylesPath = path.join(root, "web/src/components/courseBookStyles.js");
 const courseTabPath = path.join(root, "web/src/components/CourseTab.js");
 const studyBuddyCssPath = path.join(root, "web/src/components/StudyBuddyBar.css");
@@ -14,7 +13,6 @@ const studyBuddyCssPath = path.join(root, "web/src/components/StudyBuddyBar.css"
 let app = fs.readFileSync(appPath, "utf8");
 let appCss = fs.readFileSync(appCssPath, "utf8");
 let health = fs.readFileSync(healthPath, "utf8");
-let notification = fs.readFileSync(notificationPath, "utf8");
 let courseTab = fs.readFileSync(courseTabPath, "utf8");
 let studyBuddyCss = fs.readFileSync(studyBuddyCssPath, "utf8");
 
@@ -32,7 +30,7 @@ const replaceRange = (source, startMarker, endMarker, replacement, label) => {
   return `${source.slice(0, start)}${replacement}${source.slice(end)}`;
 };
 
-// Compact top bar: brand + notifications + profile. Account controls move into the profile menu.
+// Compact top bar: brand and profile. Account controls move into the profile menu.
 if (!app.includes("const getProfileInitials =")) {
   app = replaceOnce(
     app,
@@ -88,10 +86,6 @@ if (!app.includes('className="app-header app-header--compact"')) {
 
           <div className="app-header-actions">
             <HealthIndicator />
-            <NotificationBell
-              notificationStatus={notificationStatus}
-              onEnablePush={enableNotifications}
-            />
             <details className="profile-menu">
               <summary className="profile-menu__trigger">
                 <span aria-hidden="true">{profileInitials}</span>
@@ -387,34 +381,6 @@ if (!health.includes('data-connection-problem="true"')) {
       ) : null}
 `;
   health = `${health.slice(0, start)}${healthUi}${health.slice(end + `      </div>\n`.length)}`;
-}
-
-// Let CSS turn the existing notification trigger into a compact bell without changing inbox behavior.
-notification = replaceOnce(
-  notification,
-  `<div ref={rootRef} style={{ position: "relative", maxWidth: "100%" }}>`,
-  `<div ref={rootRef} className="notification-bell" style={{ position: "relative", maxWidth: "100%" }}>`,
-  "notification root class",
-);
-if (notification.includes('        aria-label="Notifications"')) {
-  const triggerLabel = '        aria-label="Notifications"';
-  notification = replaceOnce(
-    notification,
-    triggerLabel,
-    '        className="notification-bell-button"\n' + triggerLabel,
-    "notification trigger class",
-  );
-} else {
-  notification = replaceOnce(
-    notification,
-    `      <button\n        type="button"\n        style={{ ...styles.secondaryButton, display: "inline-flex", alignItems: "center", gap: 6, maxWidth: "100%" }}\n        onClick={handleToggle}`,
-    `      <button
-          type="button"
-          className="notification-bell-button"
-          style={{ ...styles.secondaryButton, display: "inline-flex", alignItems: "center", gap: 6, maxWidth: "100%" }}
-          onClick={handleToggle}`,
-    "notification trigger class",
-  );
 }
 
 // Course Book: keep canonical completion, but make the first screen smaller and student-focused.
@@ -1097,13 +1063,6 @@ requiredAppMarkers.forEach((marker) => {
 });
 
 [
-  'className="notification-bell-button"',
-  'className="notification-bell"',
-].forEach((marker) => {
-  if (!notification.includes(marker)) throw new Error(`Notification compact marker missing: ${marker}`);
-});
-
-[
   'data-compact-course-hero="true"',
   "Mastery",
   "courseCompletion.masteryAvailable",
@@ -1119,7 +1078,6 @@ if (courseTab.includes("Your badges now use real submissions and marked scores f
 fs.writeFileSync(appPath, app, "utf8");
 fs.writeFileSync(appCssPath, appCss, "utf8");
 fs.writeFileSync(healthPath, health, "utf8");
-fs.writeFileSync(notificationPath, notification, "utf8");
 fs.writeFileSync(courseBookStylesPath, courseBookStyles, "utf8");
 fs.writeFileSync(courseTabPath, courseTab, "utf8");
 fs.writeFileSync(studyBuddyCssPath, studyBuddyCss, "utf8");
