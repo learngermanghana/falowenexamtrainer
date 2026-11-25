@@ -1,0 +1,43 @@
+import React from "react";
+import {render,screen,fireEvent,waitFor} from "@testing-library/react";
+import MockAttemptHistory,{historyMockId,mergeHistory} from "./MockAttemptHistory";
+jest.mock("../services/backendUrl",()=>({getBackendUrl:()=>"/api"}));
+jest.mock("./mockHistoryAnswerLabels",()=>({loadHistoryAnswerLabels:async()=>()=>null}));
+const user={uid:"student",getIdToken:jest.fn(async()=>"token")};
+const row={id:"one",attemptNumber:1,status:"verified",score:72,passed:true,completedAt:1764000000000,maxPoints:100,sectionScores:{lesen:20,hoeren:12,schreiben:20,sprechen:20}};
+const reply=data=>Promise.resolve({ok:true,json:async()=>data});
+beforeEach(()=>{global.fetch=jest.fn();user.getIdToken.mockClear()});
+test("collapsed card does not read any data; open once and cache until refreshed",async()=>{
+ global.fetch.mockImplementation(()=>reply({attempts:[row],nextCursor:null}));
+ render(<MockAttemptHistory user={user} mockId="a2-mock-01"/>);
+ expect(global.fetch).not.toHaveBeenCalled();
+ expect(user.getIdToken).not.toHaveBeenCalled();
+ fireEvent.click(screen.getByRole("button",{name:/Attempt history/}));
+ await screen.findByText("Attempt 1");
+ expect(global.fetch).toHaveBeenCalledTimes(1);
+ expect(JSON.parse(global.fetch.mock.calls[0][1].body)).toEqual({mockId:"a2-mock-01"});
+ fireEvent.click(screen.getByRole("button",{name:/Attempt history/}));
+ expect(screen.queryByText("Attempt 1")).not.toBeInTheDocument();
+ fireEvent.click(screen.getByRole("button",{name:/Attempt history/}));
+ expect(screen.getByText("Attempt 1")).toBeInTheDocument();
+ expect(global.fetch).toHaveBeenCalledTimes(1);
+});
+test("review is separately fetched and unverified attempt has no review control",async()=>{
+ global.fetch.mockImplementationOnce(()=>reply({attempts:[row,{id:"two",attemptNumber:2,status:"pending",score:null}]})).mockImplementationOnce(()=>reply({attempt:row,objective:{hoeren:{rows:[{number:2,status:"incorrect",submitted:"b",expected:"a"}]}},feedback:{}}));
+ render(<MockAttemptHistory user={user} mockId="a2-mock-01"/>);
+ fireEvent.click(screen.getByRole("button",{name:/Attempt history/}));
+ await screen.findByText("Attempt 2");
+ expect(screen.getAllByRole("button",{name:"View review"})).toHaveLength(1);
+ fireEvent.click(screen.getByRole("button",{name:"View review"}));
+ await screen.findByText("Practise next: Hören (12/25).");
+ fireEvent.click(screen.getByText("Hören corrections"));
+ expect(screen.getByText("Aufgabe 2 · Incorrect")).toBeInTheDocument();
+ expect(global.fetch).toHaveBeenCalledTimes(2);
+});
+test("catalog IDs map to server paper IDs; section-only cards excluded",()=>{
+ expect(historyMockId({id:"a2-final-01",questionSetId:"a2-final-01"})).toBe("a2-mock-01");
+ expect(historyMockId({id:"b1-final-01",questionSetId:"b1-final-01"})).toBe("b1-mock-01");
+ expect(historyMockId({id:"a1-final-05",questionSetId:"a1-mock-05"})).toBe("a1-mock-05");
+ expect(historyMockId({id:"a2-mock-03-hoeren",questionSetId:"a2-mock-03-hoeren"})).toBeNull();
+ expect(mergeHistory([row],[{...row,score:75},{...row,id:"two",attemptNumber:2}]).map(r=>r.id)).toEqual(["two","one"]);
+});

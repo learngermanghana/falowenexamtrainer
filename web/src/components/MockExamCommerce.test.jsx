@@ -108,7 +108,9 @@ test.each([
   mockApi([{ level, scope: "trial", expiresAtMs: Date.now() + 60000 }]);
   useAuth.mockReturnValue({user: student, studentProfile: {...profile, level}});
   openPage("/exams/mocks");
-  const included = await screen.findByRole("button", {name: /Begin|Open practice section/});
+  const twoModes = ["A1","A2","B1"].includes(level);
+  const included = await screen.findByRole("button", {name: twoModes ? "Timed Exam Mode" : /Begin|Open practice section/});
+  if(twoModes) expect(screen.getByRole("button", {name:"Practice Mode"})).toBeEnabled();
   expect(screen.getAllByRole("article")).toHaveLength(screen.queryAllByRole("button", {name: /Locked/}).length + 1);
   expect(screen.queryByText("Included in your free trial")).toBeNull();
   expect(screen.queryByText(/No payment is required to start or resume it/)).toBeNull();
@@ -160,7 +162,7 @@ test('server entitlement opens the designated course-trial mock with other cards
   jest.spyOn(global, 'fetch').mockResolvedValue({ok:true, json:async()=>({active:[],entitlements:{exam:{paidLevels:[],trial:{level:'A2',catalogId:'a2-final-01',expiresAtMs:Date.now()+60000}}}})});
   useAuth.mockReturnValue({user:student,studentProfile:{accountType:'course',level:'A2'}});
   render(<MemoryRouter initialEntries={['/exams/mocks']}><Routes><Route path="/exams/mocks" element={<MockExamOnlyGate courseTrialState={{active:true,endsAtMs:Date.now()+60000}}><MockExamLibraryPage /></MockExamOnlyGate>} /></Routes></MemoryRouter>);
-  expect(await screen.findByRole('button',{name:'Begin'})).toBeEnabled();
+  expect(await screen.findByRole('button',{name:'Timed Exam Mode'})).toBeEnabled();
   expect(screen.getAllByRole('button',{name:/Locked/}).length).toBeGreaterThan(0);
 });
 
@@ -169,7 +171,8 @@ test('a verified expired entitlement is not reopened by a stale local course tri
   useAuth.mockReturnValue({user:student,studentProfile:{accountType:'course',level:'A2'}});
   render(<MemoryRouter initialEntries={['/exams/mocks']}><Routes><Route path="/exams/mocks" element={<MockExamOnlyGate courseTrialState={{active:true,endsAtMs:Date.now()+60000}}><MockExamLibraryPage /></MockExamOnlyGate>} /></Routes></MemoryRouter>);
   await screen.findByRole('heading',{name:'A2 Mock Exams'});
-  expect(screen.queryByRole('button',{name:'Begin'})).toBeNull();
+  expect(screen.queryByRole('button',{name:'Timed Exam Mode'})).toBeNull();
+  expect(screen.queryByRole('button',{name:'Practice Mode'})).toBeNull();
 });
 
 test("exam-only students can navigate to the Course Book without an exam subscription", async () => {
@@ -188,8 +191,9 @@ test("failed access lookup never demands payment and can be retried", async () =
   openPage("/exams/mocks");
   expect(await screen.findByText(/could not verify your exam access/i)).toBeVisible();
   expect(screen.queryByRole("link",{name:"Choose a payment option"})).toBeNull();
-  expect(screen.queryByRole("button",{name:"Begin"})).toBeNull();
+  expect(screen.queryByRole("button",{name:"Timed Exam Mode"})).toBeNull();
+  expect(screen.queryByRole("button",{name:"Practice Mode"})).toBeNull();
   fireEvent.click(screen.getByRole("button",{name:"Retry access check"}));
-  expect(await screen.findByRole("button",{name:"Begin"})).toBeEnabled();
+  expect(await screen.findByRole("button",{name:"Timed Exam Mode"})).toBeEnabled();
   expect(screen.queryByRole("link",{name:"Choose a payment option"})).toBeNull();
 });
