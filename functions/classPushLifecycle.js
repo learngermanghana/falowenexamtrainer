@@ -1,6 +1,5 @@
 const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
 const admin = require("firebase-admin");
-const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const { languageForStudent, classCopy, classActionLabel } = require("./classNotificationCopy");
 
 const REGION = "europe-west1";
@@ -311,18 +310,5 @@ const becameCancelled = (before = {}, after = {}) => {
 const becameCheckinOpen = (before = {}, after = {}) => !isCheckinOpen(before) && isCheckinOpen(after) && isSessionActive(after);
 
 module.exports = {
-  onClassSessionPushLifecycleUpdated: onDocumentUpdated({ region: REGION, document: "classSessions/{sessionId}" }, async (event) => {
-    const before = event.data?.before?.data() || {};
-    const after = event.data?.after?.data() || {};
-    const sessionId = event.params.sessionId;
-    if (becameCancelled(before, after)) {
-      await sendImmediateClassChange({ sessionId, session: after, oldSession: before, kind: "cancelled" });
-      return null;
-    }
-    if (didStartChange(before, after) && isSessionActive(after)) {
-      await sendImmediateClassChange({ sessionId, session: after, oldSession: before, kind: "rescheduled" });
-    }
-    return null;
-  }),
   _classPushLifecycle: { classRoute, checkinRoute, getSessionStartMs, isSessionActive, reminderKindDue, didStartChange, becameCancelled, becameCheckinOpen },
 };

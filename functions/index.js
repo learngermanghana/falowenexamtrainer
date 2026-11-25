@@ -197,48 +197,6 @@ const normalizeValue = (value) => String(value || "").trim().toLowerCase();
 
 const normalizeStudentCode = (value) => String(value || "").trim().toLowerCase();
 
-const toBooleanLike = (value) => {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value > 0;
-  if (typeof value === "string") {
-    const normalized = normalizeValue(value);
-    if (["present", "p", "yes", "y", "true", "1", "attended", "late"].includes(normalized)) {
-      return true;
-    }
-    if (["absent", "a", "no", "n", "false", "0", "missed"].includes(normalized)) {
-      return false;
-    }
-  }
-  if (value && typeof value === "object") {
-    if ("present" in value) return toBooleanLike(value.present);
-    if ("attended" in value) return toBooleanLike(value.attended);
-    if ("status" in value) return toBooleanLike(value.status);
-  }
-  return false;
-};
-
-const extractAttendanceMap = (sessionData = {}) => {
-  const map = sessionData.attendance || sessionData.students || sessionData.participants;
-  if (!map || typeof map !== "object") return {};
-  return map;
-};
-
-const getPresentCodesFromAttendanceSession = (sessionData = {}) => {
-  const map = extractAttendanceMap(sessionData);
-  return new Set(
-    Object.entries(map)
-      .filter(([, value]) => toBooleanLike(value))
-      .map(([studentCode]) => normalizeStudentCode(studentCode))
-      .filter(Boolean)
-  );
-};
-
-const getNewlyPresentCodes = ({ before = {}, after = {} } = {}) => {
-  const beforeSet = getPresentCodesFromAttendanceSession(before);
-  const afterSet = getPresentCodesFromAttendanceSession(after);
-  return Array.from(afterSet).filter((code) => !beforeSet.has(code));
-};
-
 const { CURRICULUM_BY_LEVEL, normalizeLevel: normalizeCurriculumLevel } = require("./data/curriculumManifest");
 
 const ASSIGNMENT_LEVEL_PREFIX = /^(A1|A2|B1|B2|C1|C2)-/i;
@@ -712,51 +670,6 @@ const fetchClassMessagingTokens = async ({ level, className, excludeCodes = new 
   });
 
   return { tokens: Array.from(tokens), tokenOwners };
-};
-
-const fetchAnnouncementTokens = async ({ className, program } = {}) => {
-  const db = getFirestore();
-  const baseRef = db.collection("students");
-  const programFields = program ? ["program", "language", "lang"] : [null];
-  const snapshots = await Promise.all(
-    programFields.map((field) => {
-      let queryRef = baseRef;
-      if (className) {
-        queryRef = queryRef.where("className", "==", className);
-      }
-      if (program && field) {
-        queryRef = queryRef.where(field, "==", program);
-      }
-      return queryRef.get();
-    })
-  );
-
-  const tokens = new Set();
-  const tokenOwners = new Map();
-
-  snapshots.forEach((snapshot) => {
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data() || {};
-      const docTokens = getTokensFromStudentData(data);
-      docTokens.forEach((token) => {
-        if (!token) return;
-        tokens.add(token);
-        tokenOwners.set(token, docSnap.id);
-      });
-    });
-  });
-
-  return { tokens: Array.from(tokens), tokenOwners };
-};
-
-const mergeTokenResults = (current, next) => {
-  next.tokens.forEach((token) => {
-    current.tokens.add(token);
-    if (next.tokenOwners.has(token) && !current.tokenOwners.has(token)) {
-      current.tokenOwners.set(token, next.tokenOwners.get(token));
-    }
-  });
-  return current;
 };
 
 const getInvalidTokenReason = (code = "") => {
@@ -1672,90 +1585,6 @@ exports.onClassBoardPostCreated = onDocumentCreated(
   }
 );
 
-exports.onAnnouncementCreated = onDocumentCreated(
-  {
-    region: "europe-west1",
-    document: "announcements/{announcementId}",
-  },
-  async (event) => {
-    const snap = event.data;
-    if (!snap) return null;
-
-    const data = snap.data() || {};
-    const announcementId = event.params.announcementId;
-
-    const audience = normalizeValue(data.audience || data.scope || data.target || "");
-    const className =
-      data.className || data.class || data.classname || "";
-    const language = normalizeValue(data.language || data.program || data.lang || "");
-    const languages = Array.isArray(data.languages)
-      ? data.languages.map(normalizeValue).filter(Boolean)
-      : [];
-
-    const requestedLanguages = [];
-    if (language && language !== "all") {
-      requestedLanguages.push(language);
-    } else if (languages.length) {
-      requestedLanguages.push(...languages.filter((value) => value !== "all"));
-    }
-
-    const targetClassName = className && audience !== "all" ? className : className || "";
-
-    const tokenResult = { tokens: new Set(), tokenOwners: new Map() };
-
-    if (requestedLanguages.length) {
-      for (const program of requestedLanguages) {
-        const result = await fetchAnnouncementTokens({
-          className: targetClassName,
-          program,
-        });
-        mergeTokenResults(tokenResult, result);
-      }
-    } else {
-      const result = await fetchAnnouncementTokens({
-        className: targetClassName,
-        program: "",
-      });
-      mergeTokenResults(tokenResult, result);
-    }
-
-    const tokens = Array.from(tokenResult.tokens);
-    if (!tokens.length) {
-      console.log("onAnnouncementCreated: no messaging tokens found");
-      return null;
-    }
-
-    const notification = {
-      title: data.title || data.headline || "New announcement",
-      body:
-        safeTruncate(data.message, 140) ||
-        safeTruncate(data.body, 140) ||
-        safeTruncate(data.description, 140) ||
-        "A new announcement is available.",
-    };
-
-    const linkUrl = data.linkUrl || data.link || data.url || "";
-
-    const payload = {
-      type: "announcement",
-      announcementId,
-      className: className || "",
-      language: language || "",
-    };
-    if (linkUrl) {
-      payload.route = linkUrl;
-    }
-
-    await sendNotifications({
-      tokens,
-      notification,
-      data: payload,
-      tokenOwners: tokenResult.tokenOwners,
-    });
-    return null;
-  }
-);
-
 exports.onQaPostCreated = onDocumentCreated(
   {
     region: "europe-west1",
@@ -1793,71 +1622,6 @@ exports.onScoreCreated = onDocumentCreated(
     await notifyAssignmentScore({ attemptId: event.params.attemptId, attempt });
   }
 );
-
-exports.onAttendanceSessionUpdated = onDocumentUpdated(
-  {
-    region: "europe-west1",
-    document: "attendance/{className}/sessions/{sessionId}",
-  },
-  async (event) => {
-    const beforeData = event.data?.before?.data() || {};
-    const afterData = event.data?.after?.data() || {};
-    const newlyPresentCodes = getNewlyPresentCodes({ before: beforeData, after: afterData });
-
-    if (!newlyPresentCodes.length) return null;
-
-    const { className = "", sessionId = "" } = event.params;
-    const level = afterData.level || beforeData.level || "";
-    const topic =
-      afterData.sessionLabel ||
-      afterData.topic ||
-      afterData.title ||
-      afterData.chapter ||
-      beforeData.sessionLabel ||
-      beforeData.topic ||
-      beforeData.title ||
-      beforeData.chapter ||
-      "Class session";
-
-    await Promise.all(
-      newlyPresentCodes.map(async (studentCode) => {
-        const tokenInfo = await fetchStudentMessagingToken(studentCode);
-        if (!tokenInfo?.tokens?.length) return null;
-
-        const notification = {
-          title: "Attendance updated",
-          body: safeTruncate(`You were marked present for ${topic}.`, 140),
-        };
-
-        const data = {
-          type: "attendance_update",
-          status: "present",
-          studentCode,
-          className,
-          level,
-          sessionId,
-          topic,
-          route: "/campus",
-        };
-
-        const tokenOwners = tokenInfo.docId
-          ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
-          : new Map();
-
-        await sendNotifications({
-          tokens: tokenInfo.tokens,
-          notification,
-          data,
-          tokenOwners,
-        });
-        return null;
-      })
-    );
-
-    return null;
-  }
-);
-
 
 exports.onAttendanceCheckinWritten = onDocumentWritten(
   {
