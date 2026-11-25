@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { getBackendUrl } from "../services/backendUrl";
 import "./MockListeningReview.css";
 
 const normalize = value => String(value ?? "").trim().toLowerCase();
@@ -35,4 +37,26 @@ export default function MockListeningReview({ rows = [] }) {
       </div>
     </>}
   </section>;
+}
+
+export function SavedMockListeningReview({ rows, level, attemptId, idToken }) {
+  const [loaded, setLoaded] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const review = rows?.length ? rows : loaded || [];
+  async function load() {
+    if (busy || !idToken || !attemptId) return;
+    setBusy(true); setError("");
+    try {
+      const response = await axios.post(`${getBackendUrl()}/mock/attempt/listening-review`, { level, attemptId }, {headers:{Authorization:`Bearer ${idToken}`}});
+      setLoaded(Array.isArray(response.data?.rows) ? response.data.rows : []);
+    } catch {
+      setError("Could not load the saved review. Please try again.");
+    } finally { setBusy(false); }
+  }
+  return <>
+    <MockListeningReview rows={review.map(row=>listeningReviewRow(row))}/>
+    {!review.length && !loaded && attemptId && idToken ? <button type="button" disabled={busy} onClick={load}>{busy?"Loading review…":"Load saved Hören answers"}</button> : null}
+    {error ? <p role="alert">{error}</p> : null}
+  </>;
 }
