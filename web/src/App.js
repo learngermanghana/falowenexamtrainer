@@ -900,10 +900,6 @@ const AppShell = ({
     return <Navigate to="/onboarding" replace />;
   }
 
-  if (studentProfile?.program === "swahili" && allowedSections.course && location.pathname === "/") {
-    return <Navigate to="/campus/course" replace />;
-  }
-
   if (!requiresOnboarding && isOnboarding) {
     return <Navigate to="/" replace />;
   }
