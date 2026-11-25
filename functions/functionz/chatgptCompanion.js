@@ -437,25 +437,25 @@ const toolDefinitions = [
     name:"get_my_falowen_revision_levels",
     description:"Check my verified current and previous course levels for read-only revision. A trial can only access Day 1. No new submission entitlement.",
     inputSchema:{type:"object",properties:{},additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name:"get_my_falowen_revision_lesson",
     description:"Retrieve authorised current or previous-level original German or Kiswahili A1 lesson content for revision only. First check revision levels; no official submission or grading.",
     inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},section:{type:"string",enum:["overview","vocabulary","grammar","reading","listening","speaking","writing","review"]}},required:["program","day"],additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name:"get_my_falowen_personal_plan",
     description:"Build a personalised 15–120 minute plan from authorised lessons, explicitly scoped tutor assignment marks, or a selected verified mock result. Optional examDate is learner supplied, not an official scheduled date. For a mock-based plan first retrieve my verified attempt ID with mock history. No pass prediction or saved official grades.",
     inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},minutes:{type:"integer",minimum:15,maximum:120},mockId:{type:"string",maxLength:80},attemptId:{type:"string",maxLength:150},examDate:{type:"string",maxLength:10}},required:["program"],additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name:"get_my_falowen_revision_vocabulary",
     description:"Retrieve bilingual vocabulary from an authorised published lesson (specify day) or the existing level-filtered German Campus dictionary (omit day for full course). Quiz one item at a time, repeat missed words within conversation; no saved spaced-repetition records.",
     inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},query:{type:"string",maxLength:100},limit:{type:"integer",minimum:1,maximum:20}},required:["program"],additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name: "get_my_falowen_study_plan",
@@ -476,13 +476,13 @@ const toolDefinitions = [
     name:"get_my_falowen_oral_examiner",
     description:"Start interactive oral self-practice using an original authorised Exams Room speaking dictionary card, published mock task or course lesson. In exam mode ask one question at a time and give feedback at the end; coach mode corrects after each turn. No official grade, audio recording or timed exam. Exam-only students may use entitled exam sources, not Course Book.",
     inputSchema:{type:"object",properties:{source:{type:"string",enum:["dictionary","mock","lesson"]},mode:{type:"string",enum:["exam","coach"]},program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},part:{type:"string",enum:["teil1","teil2","teil3","teil4","teil5"]},mockId:{type:"string",maxLength:80},taskId:{type:"string",maxLength:130},query:{type:"string",maxLength:100}},additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name:"get_my_falowen_music_tutor",
     description:"List approved lesson-linked German or Kiswahili songs at an authorised course level, or study a chosen track using its exact bundled recording lyrics, matched English translation and editorial story when available. Returns up to eight lines per request. No R2 keys, drafts, guessed lyrics or timing, playback tracking or official score. Open the original Falowen Music song to listen.",
     inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},trackId:{type:"string",maxLength:245},startLine:{type:"integer",minimum:1,maximum:500},lineCount:{type:"integer",minimum:1,maximum:8}},required:["program"],additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name: "get_my_falowen_speaking_partner",
@@ -524,13 +524,13 @@ const toolDefinitions = [
     name:"get_my_falowen_mock_history",
     description:"List my own official Falowen mock attempts for an accessible mock paper. Only verified completed attempts contain official scores. Use its attempt ID to retrieve corrections. No exam attempts are started or modified.",
     inputSchema:{type:"object",properties:{mockId:{type:"string",maxLength:80},cursor:{type:"string",maxLength:150}},required:["mockId"],additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name:"get_my_falowen_mock_review",
     description:"Retrieve my own verified mock attempt's numbered Lesen/Hören mistakes, saved Schreiben/Sprechen feedback, recorded section scores and targeted revision priorities. Never infer a pass prediction or use historical corrections to answer an active timed test.",
     inputSchema:{type:"object",properties:{mockId:{type:"string",maxLength:80},attemptId:{type:"string",maxLength:150}},required:["mockId","attemptId"],additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name: "save_my_falowen_practice_note",
@@ -596,13 +596,13 @@ const toolDefinitions = [
     name:"get_my_falowen_assignment_correction",
     description:"Explain my recorded German A1–B1 tutor assignment feedback or my current reviewed Kiswahili A1 workbook. Ask for my own response before correcting it and create similar retry exercises. Never change marks or invent original answers.",
     inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1"]},assignmentId:{type:"string",maxLength:48},day:{type:"integer",minimum:1,maximum:20}},required:["program"],additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name:"get_my_falowen_vocabulary_review",
     description:"Get my own due vocabulary flashcards from previously confirmed practice sessions for an authorised course level. Repeat difficult words one at a time; never reveal the meaning before I answer. These are not grades.",
     inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},limit:{type:"integer",minimum:1,maximum:20}},required:["program"],additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name:"save_my_falowen_vocabulary_review",
@@ -615,7 +615,7 @@ const toolDefinitions = [
     name:"get_my_falowen_exam_recommendations",
     description:"Recommend targeted exam revision using my selected verified mock attempt and available authorised practice papers. First use mock history to select an attempt. If none is selected, establish a baseline rather than invent scores. No readiness percentage or pass prediction. Available to entitled exam-only accounts.",
     inputSchema:{type:"object",properties:{mockId:{type:"string",maxLength:80},attemptId:{type:"string",maxLength:150},minutes:{type:"integer",minimum:15,maximum:120}},additionalProperties:false},
-    annotations:{readOnlyHint:true,openWorldHint:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name: "get_my_falowen_feedback",
@@ -671,7 +671,10 @@ const toolDefinitions = [
     },
   },
 ].map((tool) => ({
-  ...tool, annotations: tool.annotations || { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+  ...tool,
+  // Apply defaults per key, not per object: partial overrides must never
+  // remove mandatory explicit boolean hints from the published MCP schema.
+  annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, ...tool.annotations },
   securitySchemes: tool.securitySchemes || [{ type: "oauth2", scopes: [SCOPE] }],
   _meta: { ...(tool._meta || {}) },
 }));

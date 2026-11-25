@@ -266,6 +266,16 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
       expect(list.data.result.tools).toHaveLength(36);
+      // Exercise the actual serialized tools/list response, not internal defaults.
+      for (const tool of list.data.result.tools) {
+        for (const key of ["readOnlyHint", "destructiveHint", "openWorldHint"]) {
+          expect(Object.prototype.hasOwnProperty.call(tool.annotations, key)).toBe(true);
+          expect(typeof tool.annotations[key]).toBe("boolean");
+        }
+        expect(tool.annotations.readOnlyHint).toBe(tool.name.startsWith("get_"));
+        expect(tool.annotations.destructiveHint).toBe(tool.name.startsWith("submit_"));
+        expect(tool.annotations.openWorldHint).toBe(false);
+      }
       expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["submit_my_falowen_workbook", "get_my_falowen_submission_status"]));
       expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["get_my_falowen_access", "get_my_falowen_swahili_lesson", "get_my_falowen_weaknesses"]));
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
