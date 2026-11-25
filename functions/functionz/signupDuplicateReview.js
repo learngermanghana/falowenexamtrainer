@@ -1,4 +1,5 @@
 "use strict";
+const { reviewSignupNetwork, observedSignupIp } = require("./signupNetworkReview");
 
 // Public registration review: compare private student records on the server.
 // Never return matched names, emails, phone numbers, codes, or record counts.
@@ -74,19 +75,9 @@ function matchesExisting(application, student) {
   const existing = student || {};
   const email = canonicalEmail(application.email);
   const primary = canonicalPhone(application.phone);
-  const emergency = canonicalPhone(application.emergency || application.emergencyContactPhone);
-  const name = canonicalName(application.name);
   const studentEmail = canonicalEmail(existing.email || existing.authEmail || existing.emailIdentity);
   const studentPhone = canonicalPhone(existing.phone || existing.phoneNumber || existing.mobile || existing.phoneIdentity);
-  const studentEmergency = canonicalPhone(
-    existing.emergencyContactPhone || existing.emergencyContactPhoneNumber ||
-    existing.emergencyPhone || existing.guardianPhone || existing.emergencyContactPhoneIdentity
-  );
-  const studentName = canonicalName(existing.name || existing.fullName || existing.nameIdentity);
-  // An emergency number is routinely shared by siblings. It cannot block alone.
-  return Boolean((email && studentEmail === email) ||
-    (primary && studentPhone === primary) ||
-    (emergency && name && studentEmergency === emergency && studentName === name));
+  return Boolean((email && studentEmail === email) || (primary && studentPhone === primary));
 }
 
 async function findProbableDuplicate(db, rawApplication) {
@@ -94,10 +85,8 @@ async function findProbableDuplicate(db, rawApplication) {
   if (!application) throw new Error("invalid_signup_identity");
   const students = db.collection("students");
   const phone = canonicalPhone(application.phone);
-  const emergency = canonicalPhone(application.emergency);
   const email = canonicalEmail(application.email);
   const variants = legacyPhoneVariants(application.phone);
-  const emergencyVariants = legacyPhoneVariants(application.emergency);
   // Strong email and primary-phone matches can be checked with short indexed
   // lookups. Prefer these before touching shared emergency contact numbers.
   const directQueries = [
@@ -119,42 +108,11 @@ async function findProbableDuplicate(db, rawApplication) {
     if (checkSnapshot(snapshot)) return true;
   }
 
-  // The same emergency contact can be shared by a large family or an
-  // institution. A limit(8) result is NOT proof of no duplicate: the ninth
-  // record might be the one with the applicant's normalized name.
-  //
-  // Scan only indexed emergency-number candidates, in small cursor pages.
-  // Older profiles may have the raw emergency phone but no nameIdentity, so
-  // filtering only on the newer normalized fields would miss them.
-  // A safety cap prevents unbounded reads; exhaustion MUST fail closed rather
-  // than return CLEAR and accidentally issue a second trial.
-  const PAGE_SIZE = 8;
-  const MAX_EMERGENCY_PAGES = 32;
-  const emergencyQueries = [
-    students.where("emergencyContactPhoneIdentity", "==", emergency),
-    students.where("emergencyContactPhone", "in", emergencyVariants),
-  ];
-  for (const query of emergencyQueries) {
-    let cursor = null;
-    let exhausted = false;
-    for (let page = 0; page < MAX_EMERGENCY_PAGES; page += 1) {
-      const paged = (cursor ? query.startAfter(cursor) : query).limit(PAGE_SIZE);
-      const snapshot = await paged.get();
-      const docs = snapshot.docs || [];
-      if (checkSnapshot(snapshot)) return true;
-      if (docs.length < PAGE_SIZE) {
-        exhausted = true;
-        break;
-      }
-      cursor = docs[docs.length - 1];
-    }
-    if (!exhausted) throw new Error("signup_emergency_lookup_limit");
-  }
   return false;
 }
 
 function allowedRequest(req) {
-  const ip = String(req.headers["x-real-ip"] || req.ip || "unknown").slice(0, 100);
+  const ip = observedSignupIp(req) || "unknown";
   const now = Date.now();
   if (attemptsByIp.size > 4096) attemptsByIp.clear();
   const previous = attemptsByIp.get(ip);
@@ -175,10 +133,22 @@ function registerSignupDuplicateReviewRoutes(app, { admin }) {
       return res.status(422).json({ code: "INVALID_DETAILS", message: "Check your name, email and two different valid contact numbers." });
     }
     try {
-      const duplicate = await findProbableDuplicate(admin.firestore(), req.body);
-      return duplicate
-        ? res.status(409).json({ code: "REVIEW_REQUIRED", message: REVIEW_MESSAGE })
-        : res.status(200).json({ code: "CLEAR" });
+      const db = admin.firestore();
+      const duplicate = await findProbableDuplicate(db, req.body);
+      if (duplicate) return res.status(409).json({ code: "REVIEW_REQUIRED", message: REVIEW_MESSAGE });
+      // Older clients and institution signup retain contact-only checks until
+      // the staged trial-permit enforcement is enabled.
+      if (!["german", "swahili"].includes(req.body.program)) {
+        return res.status(200).json({ code: "CLEAR" });
+      }
+      const network = await reviewSignupNetwork({
+        db, application: validatedApplication(req.body), program: req.body.program,
+        browserId: req.body.browserId, studentCode: req.body.studentCode,
+        emailIdentity: canonicalEmail(req.body.email), phoneIdentity: canonicalPhone(req.body.phone),
+        ip: observedSignupIp(req),
+      });
+      if (network.hold) return res.status(409).json({ code: "REVIEW_REQUIRED", message: REVIEW_MESSAGE });
+      return res.status(200).json({ code: "CLEAR", permit: network.permit });
     } catch (error) {
       // Do not log applicant PII, database record details, or match reasons.
       console.error("signup duplicate review unavailable", error?.code || "lookup_failed");

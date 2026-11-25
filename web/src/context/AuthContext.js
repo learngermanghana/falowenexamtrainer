@@ -631,13 +631,16 @@ export const AuthProvider = ({ children }) => {
       }
       // Fail closed before making a new Firebase Auth user, so an alternate email
       // cannot silently create another student profile using the same phone.
+      let signupTrialPermit = "";
       if (profile.courseType !== "exam_preparation") {
-        await checkSignupDuplicate({
+        const check = await checkSignupDuplicate({
           name: profile.name || profile.firstName || "",
           email: normalizedEmail,
           phone: profile.phone || "",
           emergencyContactPhone: profile.emergencyContactPhone || "",
+          ...(!universityInvitation ? { program, browserId: deviceId, studentCode: profile.studentCode || "" } : {}),
         });
+        if (!universityInvitation) signupTrialPermit = check;
       }
       // A previous attempt may have created Firebase Auth successfully but failed
       // before writing students/{studentCode}. Only the correct existing password
@@ -724,6 +727,7 @@ export const AuthProvider = ({ children }) => {
           ? profile.preferredInterfaceLanguage : "en",
 
         courseType: "full_course",
+        ...(!universityInvitation ? { signupTrialPermit } : {}),
         address: profile.address || "",            // ✅ NEW FIELD
 
         emergencyContactPhone: profile.emergencyContactPhone || "",
@@ -803,7 +807,7 @@ export const AuthProvider = ({ children }) => {
       }
       return { studentCode, paystackLink: payload.paystackLink };
     },
-    [logLoginSession]
+    [deviceId, logLoginSession]
   );
 
   const login = useCallback(
