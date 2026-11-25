@@ -8,6 +8,7 @@
  * This runs during Vercel's existing prebuild, and explicitly in the companion CI.
  */
 import fs from "node:fs";
+import { SWAHILI_A1_PRACTICE_UNITS } from "../web/src/data/swahili/a1PracticeUnits.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/b2LessonContentAlignment.js";
@@ -543,10 +544,36 @@ const grammarCoverage = Object.fromEntries(["A2", "B1"].map((level) => [level,
 if (grammarCoverage.A2 < 20 || grammarCoverage.B1 < 20) {
   throw new Error("Insufficient actual grammar pages exported: " + JSON.stringify(grammarCoverage));
 }
+// Only explicit learner-facing fields; never copy an entire workbook object.
+const SWAHILI_A1 = {};
+const swExamples = items => (Array.isArray(items) ? items : []).slice(0, 12)
+  .map(item => ({ term: text(item?.swahili, 350), meaning: text(item?.english, 450) }))
+  .filter(item => item.term);
+for (const [key, unit] of Object.entries(SWAHILI_A1_PRACTICE_UNITS)) {
+  const day = Number(key);
+  if (!Number.isInteger(day) || day < 1 || day > 20 || Number(unit.day) !== day) continue;
+  const examples = swExamples(unit.examples);
+  const questions = items => (Array.isArray(items) ? items : []).slice(0, 12)
+    .map(q => ({ question: text(q?.question, 600), options: strings(q?.choices || q?.options, 6, 450) }))
+    .filter(q => q.question);
+  SWAHILI_A1[key] = {
+    day, title: text(unit.title, 240), chapter: text(unit.chapter, 80),
+    goal: text(unit.objective, 900), grammarFocus: text(unit.grammar, 450),
+    grammar: { rule: text(unit.rule, 2000), examples,
+      sections: (Array.isArray(unit.grammarSections) ? unit.grammarSections : []).slice(0, 10)
+        .map(s => ({ title: text(s.title, 250), rule: text(s.rule, 1800), examples: swExamples(s.examples) })) },
+    ...(examples.length ? { vocabulary: { phrases: examples, clarification: "Published lesson examples, not the complete vocabulary list." } } : {}),
+    ...(unit.reading?.text ? { reading: { title: text(unit.reading.title, 260),
+      passage: text(unit.reading.text, 12000), questions: questions(unit.reading.questions) } } : {}),
+    ...(typeof unit.speaking === "string" && unit.speaking ? { speaking: { prompt: text(unit.speaking, 1800) } } : {}),
+    ...(unit.writing?.prompt ? { writing: { prompt: text(unit.writing.prompt, 1800) } } : {}),
+  };
+}
 const artifact = {
   schemaVersion: 1,
   provenance: "Learner-facing Falowen Course Book content compiled from canonical workbook and lesson sources",
   levels: { A1, A2, B1, B2, C1, C2 },
+  programs: { swahili: { A1: SWAHILI_A1 } },
 };
 const serialized = JSON.stringify(artifact, null, 2) + "\n";
 if (serialized.includes('"answerIndex"') || serialized.includes('"sampleAnswer"') ||
