@@ -144,3 +144,9 @@ This is a **review PR only**, not a live plugin release. After passing backend, 
 - `get_my_falowen_weaknesses`: bounded tutor assignment revision priorities from explicitly level-labelled German records; no skill scores, unverified completion, or exam readiness claims. Dual programme results remain unavailable until programme-scoped records can be verified.
 
 No new scheduled jobs, model API calls, OAuth write permissions or Firestore writes. Existing German tool contracts remain unchanged. This is a backend candidate; after CI and deployment, rescan the existing public plugin and publish the revised tool catalogue. Mock review, advanced exam readiness, persistent vocabulary revision, previous-level entitlements and richer music support remain follow-up work.
+
+## Official workbook submission expansion (release candidate)
+
+Two additional MCP tools use the existing assignment-write consent: `submit_my_falowen_workbook` and read-only `get_my_falowen_submission_status`. The build compiles required sections and timer exclusions from the existing A2/B1 Campus profiles and Kiswahili question IDs/choices from published A1 practice units. The German path uses Campus submissions and locks; the Kiswahili path uses the existing users/{uid}/swahiliLessons record and validates active access and complete answers. No extra marking API or background jobs. Existing A1 tool remains separate.
+
+Rollout is fail-closed behind `FALOWEN_CHATGPT_EXPANDED_SUBMIT_ENABLED=true` after CI and authenticated staging checks. Only primary German A2/B1 early untimed assignments and generic Kiswahili A1 workbooks are supported. Special Kiswahili days 1/5/6, timed work, secondary German writes, mock exams and resubmission stay in Campus. The status tool reports records, not inferred grades. Rescan and publish the existing plugin after deployment; confirm OAuth permission and verify both programmes with synthetic accounts before enabling production writes.

@@ -8,6 +8,7 @@
  * This runs during Vercel's existing prebuild, and explicitly in the companion CI.
  */
 import fs from "node:fs";
+import { register } from "node:module";
 import { SWAHILI_A1_PRACTICE_UNITS } from "../web/src/data/swahili/a1PracticeUnits.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -569,11 +570,58 @@ for (const [key, unit] of Object.entries(SWAHILI_A1_PRACTICE_UNITS)) {
     ...(unit.writing?.prompt ? { writing: { prompt: text(unit.writing.prompt, 1800) } } : {}),
   };
 }
+// Campus data modules use extensionless relative imports. Resolve only local
+// JS modules during this build, without a runtime dependency or a second registry.
+register(new URL("./chatgptCourseSourceLoader.mjs", import.meta.url));
+const { getA2B1LessonProfile } = await import("../web/src/data/a2B1LessonProfile.js");
+const { getTimedAssignmentConfig, getTimedAssignmentPhase } = await import("../web/src/data/timedAssignmentConfig.js");
+const { getAssignmentSubmissionWordMinimum } = await import("../web/src/utils/assignmentSubmissionWordMinimum.js");
+const germanWorkbookRules = {};
+for (const level of ["A2", "B1"]) {
+  for (let day = 1; day <= 28; day++) {
+    const profile = getA2B1LessonProfile(level, day);
+    const id = profile?.assignmentKey;
+    if (!id || !profile.requiredSubmissionParts?.length || profile.timer ||
+        getTimedAssignmentConfig(id) || day >= getTimedAssignmentPhase(level).startDay) continue;
+    // The runtime also checks the assignment ID against the live curriculum manifest.
+    germanWorkbookRules[id] = { day, level,
+      requiredParts: profile.requiredSubmissionParts.map(p => p.number),
+      minimumWords: getAssignmentSubmissionWordMinimum({ level, chapter: id.slice(3) }) };
+  }
+}
+const swahiliWorkbookRules = {};
+for (const [key, unit] of Object.entries(SWAHILI_A1_PRACTICE_UNITS)) {
+  if (unit.practiceOnly || !unit.writing?.prompt || !unit.reading?.questions?.length) continue;
+  const questionRules = items => (items || []).map(q => ({
+    id: text(q.id, 80), choices: strings(q.choices || q.options, 8, 450),
+  }));
+  const reading = questionRules(unit.reading.questions);
+  const listening = questionRules(unit.listening?.questions);
+  if ([...reading,...listening].some(q => !q.id) ||
+      (unit.listening && !listening.length)) continue;
+  swahiliWorkbookRules[key] = { day: Number(key), title: text(unit.title, 240),
+    writingKey: Number(key) === 11 ? "dialogue" : "response",
+    reading, listening, ...(unit.contentVersion ? { contentVersion: unit.contentVersion } : {}),
+    ...(Number(key) === 4 ? { readingVersion: 2 } : {}) };
+  // Supply the exact question IDs for the student's reviewed answers, but never
+  // expose a recording URL, transcript or teacher key through the MCP export.
+  const exported = SWAHILI_A1[key];
+  if (exported?.reading) exported.reading.questions = unit.reading.questions.map(q => ({
+    id: text(q.id,80), question: text(q.question,600), options: strings(q.choices || q.options,8,450),
+  }));
+  if (exported && listening.length) exported.listening = {
+    audioAvailableInCampus: Boolean(unit.listening.audioUrlEndpoint),
+    questions: unit.listening.questions.map(q => ({
+      id: text(q.id,80), question: text(q.question,600), options: strings(q.choices || q.options,8,450),
+    })),
+  };
+}
 const artifact = {
   schemaVersion: 1,
   provenance: "Learner-facing Falowen Course Book content compiled from canonical workbook and lesson sources",
   levels: { A1, A2, B1, B2, C1, C2 },
   programs: { swahili: { A1: SWAHILI_A1 } },
+  officialWorkbookRules: { german: germanWorkbookRules, swahili: swahiliWorkbookRules },
 };
 const serialized = JSON.stringify(artifact, null, 2) + "\n";
 if (serialized.includes('"answerIndex"') || serialized.includes('"sampleAnswer"') ||

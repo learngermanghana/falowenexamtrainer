@@ -432,7 +432,10 @@ describe("Companion multilingual revision", () => {
     expect(lesson.material.passage).toContain("salamu");
     expect(lesson.material.questions.length).toBeGreaterThan(0);
     expect(JSON.stringify(lesson)).not.toMatch(/"(answer|answerIndex|correctOption|transcript|why)"\s*:/);
-    expect(swahiliLessonResponse(swahili, 2, "listening").available).toBe(false);
+    const listening = swahiliLessonResponse(swahili, 2, "listening");
+    expect(listening.available).toBe(true);
+    expect(listening.material.audioAvailableInCampus).toBe(true);
+    expect(JSON.stringify(listening)).not.toMatch(/"(transcript|answer|audioUrlEndpoint)"\s*:/);
     expect(swahiliLessonResponse(swahili, 50).available).toBe(false);
     expect(swahiliLessonResponse(german, 2).available).toBe(false);
   });
