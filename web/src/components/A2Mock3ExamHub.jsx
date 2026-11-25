@@ -1,3 +1,5 @@
+import {MockModeGate} from "./MockPracticeWorkspace";
+import A2AdditionalMockPractice from "./A2AdditionalMockPractice";
 import { SavedMockListeningReview } from "./MockListeningReview";
 import { runA2MockSubmissionStep } from "../services/a2MockSubmissionDiagnostics";
 import { resumeA2MockSections } from "../services/a2MockCloudResume";
@@ -247,5 +249,5 @@ function A2Mock3ExamHubAttempt() {
 }
 export default function A2Mock3ExamHub() {
   const {user}=useAuth();
-  return <A2Mock3ExamHubAttempt key={user?.uid||"guest"}/>;
+  return <MockModeGate key={user?.uid||"guest"} mockId="a2-mock-03" title="A2 Mock 3" timed={<A2Mock3ExamHubAttempt/>} practice={<A2AdditionalMockPractice mockId="a2-mock-03"/>}/>;
 }
