@@ -13,7 +13,7 @@ function enrollmentDecision(rows,program,now=Date.now()){
   const ended=validDate(r.contractEnd)&&r.contractEnd<today;
   const future=validDate(r.contractStart)&&r.contractStart>today;
   const overdue=validMoney(r.balanceDue)&&r.balanceDue>0&&validDate(r.paymentDeadline)&&r.paymentDeadline<today;
-  if(r.status==="cancelled"||future||overdue){blocked.push(r.level);continue;}
+  if(r.status==="cancelled"||future||overdue||(r.accountingMode==="payment_driven_upgrade_v1"&&r.status==="planned")){blocked.push(r.level);continue;}
   if(r.status==="expired"||(["active","completed"].includes(r.status)&&ended)){
    blocked.push(r.level);
    // A paid, naturally ended lower course can remain available for revision.
