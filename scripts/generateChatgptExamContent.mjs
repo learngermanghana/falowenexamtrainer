@@ -7,6 +7,7 @@
  * Never copy answer keys, solutions, rubrics, audio keys, image paths, or teacher notes.
  */
 import fs from "node:fs";
+import { expandedMockContent } from "./chatgptExpandedMockContent.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { MOCK_EXAM_CATALOG } from "../web/src/data/mockExamCatalog.js";
@@ -126,7 +127,19 @@ const listening = {
   "a1-mock-02": Object.fromEntries(["teil1","teil2","teil3"].map(k => [k, listeningPart(A1_MOCK_2_LISTENING[k])])),
   "a1-mock-03": Object.fromEntries(["teil1","teil2","teil3"].map(k => [k, listeningPart(A1_MOCK_3_LISTENING[k])])),
 };
-const payload = { version: 1, mocks, speaking, writing, reading, listening };
+const expanded=expandedMockContent();
+const publishedIds=new Set(mocks.map(m=>m.mockId));
+const onlyPublished=sets=>Object.fromEntries(Object.entries(sets).filter(([id,parts])=>publishedIds.has(id)&&Object.keys(parts).length));
+const payload = { version: 2, mocks, speaking, writing,
+  reading: {...reading,...onlyPublished(expanded.reading)},
+  listening: {...listening,...onlyPublished(expanded.listening)},
+  mockWriting:onlyPublished(expanded.mockWriting),mockSpeaking:onlyPublished(expanded.mockSpeaking),
+  // Preview papers remain Campus links only, not published exports.
+  campusMocks:Object.values(MOCK_EXAM_CATALOG).filter(m=>m.showInMockLibrary!==false &&
+    ["A1","A2","B1"].includes(m.level) && ["ready","preview"].includes(m.status))
+    .map(m=>({id:m.id,mockId:m.questionSetId||m.id,level:m.level,title:m.shortTitle||m.title,status:m.status,
+      mode:m.mode,sections:strings(m.sections,6,40),examRoomUrl:link(m.route)})),
+};
 const outputText = JSON.stringify(payload, null, 2) + "\n";
 // Guard against publishing common grading or private-media field names.
 const parsed = JSON.parse(outputText);
