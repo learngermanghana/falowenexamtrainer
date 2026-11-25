@@ -149,6 +149,7 @@ async function readRecords() {
       const event=unseal(row[2]);if(!validId(event.id)||!["start","complete","contact","email_sent"].includes(event.type))continue;
       const previous=byId.get(event.id)||{id:event.id,language:"german",status:"started",startedAt:null,completedAt:null,contactedAt:null};
       if (event.language) previous.language=placementLanguage(event.language);
+      if (event.version === SWAHILI_VERSION && previous.language === "swahili") previous.version=event.version;
       if(event.type==="start"){previous.startedAt=event.at;previous.status=previous.completedAt?"completed":"in_progress";}
       if(event.type==="start" && event.contact) {
         previous.contactedAt=event.at;
