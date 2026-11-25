@@ -114,11 +114,13 @@ const {
 } = require("./a1MockCompletionSync");
 const {
   buildVerifiedA2MockScore,
+  getA2ListeningReview,
   persistVerifiedA2MockSection,
   syncA2MockCompletion,
 } = require("./a2MockCompletionSync");
 const {
   buildVerifiedB1MockScore,
+  getB1ListeningReview,
   persistVerifiedB1MockSection,
   syncB1MockCompletion,
 } = require("./b1MockCompletionSync");
@@ -6350,7 +6352,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
         if (!verifiedOverall || !verifiedSectionScores) {
           throw new Error("Server-verified A2 mock totals are missing.");
         }
-        verifiedResult = { sectionScores: verifiedSectionScores, overall: verifiedOverall };
+        verifiedResult = { sectionScores: verifiedSectionScores, overall: verifiedOverall, listeningReview: getA2ListeningReview(attemptData) };
         if (attemptData.writingTutorReview?.status === "published" && attemptData.completionSync?.ok) {
           // Tutor publication already committed result and notifications atomically.
           return res.json({...saveOutcome,completionSync:attemptData.completionSync,verifiedResult});
@@ -6764,6 +6766,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
 
         completionSync.verifiedOverall = verifiedOverall;
         completionSync.verifiedSectionScores = verifiedSectionScores;
+        completionSync.listeningReview = getB1ListeningReview(attemptData);
 
         await attemptRef.set(
           {
@@ -6804,7 +6807,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
     return res.json({
       ...(saveOutcome || { ok: true, attemptId, status }),
       ...(completionSync ? { completionSync } : {}),
-      ...(completionSync?.ok ? {verifiedOverall:completionSync.verifiedOverall,verifiedSectionScores:completionSync.verifiedSectionScores} : {}),
+      ...(completionSync?.ok ? {verifiedOverall:completionSync.verifiedOverall,verifiedSectionScores:completionSync.verifiedSectionScores,listeningReview:completionSync.listeningReview} : {}),
     });
   } catch (err) {
     console.error("/b1-mock/attempt/save error", err);
