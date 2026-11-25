@@ -13,8 +13,9 @@ const challenge = crypto.createHash("sha256").update(verifier).digest("base64url
 function mockFirebase() {
   const collections = new Map();
   const studentData = new Map([
-    ["student-1", { uid: "student-1", role: "student", level: "A2", name: "Student One", studentCode: "TEST001" }],
-    ["student-2", { uid: "student-2", role: "student", level: "B1", name: "Student Two", studentCode: "TEST002" }],
+    ["student-1", { uid: "student-1", role: "student", level: "A2", paymentStatus: "paid", name: "Student One", studentCode: "TEST001" }],
+    ["student-2", { uid: "student-2", role: "student", level: "B1", paymentStatus: "paid", name: "Student Two", studentCode: "TEST002" }],
+    ["exam-learner", { uid: "exam-learner", role: "student", level: "A2", program: "german", accountType: "exam_only", status: "registered" }],
     ["b2-learner", { uid: "b2-learner", role: "student", level: "B2", name: "B2 Test Learner", studentCode: "TESTB2" }],
     ["c1-learner", { uid: "c1-learner", role: "student", level: "C1", name: "C1 Learner" }],
     ["c2-learner", { uid: "c2-learner", role: "student", level: "C2", name: "C2 Learner" }],
@@ -22,6 +23,7 @@ function mockFirebase() {
     ["student-class", { uid: "student-class", role: "student", level: "A1", classId: "class-genuine", name: "Class Learner" }],
   ]);
   collections.set("students", studentData);
+  collections.set("mockSubscriptions", new Map([["exam-learner_A2",{uid:"exam-learner",level:"A2",scope:"level",status:"active",expiresAtMs:Date.now()+86400000}]]));
   collections.set("classes", new Map([
     ["class-genuine", { name: "A1 Genuine Klasse", levelId: "A1", status: "active", timezone: "Africa/Accra", zoomProfileId: "profile-genuine" }],
     ["class-other", { name: "A1 Private Klasse", levelId: "A1", status: "active", zoomUrl: "https://zoom.us/j/333?pwd=other" }],
@@ -41,8 +43,10 @@ function mockFirebase() {
     collection(name) {
       const stored = getStore(name);
       return {
+        async get() { return {docs:[...stored.entries()].map(([id,data])=>({id,data:()=>data}))}; },
         doc(id) {
           return {
+            collection(subname) { return db.collection(name+"/"+id+"/"+subname); },
             async get() { return { id, exists: stored.has(id), data: () => stored.get(id) }; },
             async set(data) { stored.set(id, data); },
             async create(data) { if (stored.has(id)) throw Error("ALREADY_EXISTS"); stored.set(id, data); },
@@ -51,6 +55,7 @@ function mockFirebase() {
         where(field, operator, value) {
           if (operator !== "==") throw Error("unsupported fixture query");
           return {
+            async get() { return {docs:[...stored.entries()].filter(([,row])=>row?.[field]===value).map(([id,data])=>({id,data:()=>data}))}; },
             limit(max) {
               return {
                 async get() {
@@ -107,7 +112,7 @@ function mockFirebase() {
     firestore: () => db,
     auth: () => ({
       async verifyIdToken(idToken) {
-        if (!["student-1", "student-2", "b2-learner", "c1-learner", "c2-learner", "student-class", "inactive"].includes(idToken)) throw Error("invalid token");
+        if (!["student-1", "student-2", "b2-learner", "c1-learner", "c2-learner", "student-class", "inactive", "exam-learner"].includes(idToken)) throw Error("invalid token");
         return { uid: idToken, email: idToken + "@example.org", email_verified: true };
       },
     }),
@@ -260,7 +265,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(24);
+      expect(list.data.result.tools).toHaveLength(26);
       expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["submit_my_falowen_workbook", "get_my_falowen_submission_status"]));
       expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["get_my_falowen_access", "get_my_falowen_swahili_lesson", "get_my_falowen_weaknesses"]));
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
@@ -578,4 +583,21 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
     });
   });
 
+});
+
+describe("Exam-only Companion connection",()=>{
+  test("paid exam-only learner can practise but cannot read Course Book or submit coursework",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"exam-learner","exam-only-connection");
+      expect(grant.response.status).toBe(200);
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      const list=await call("get_my_falowen_exam_mocks");
+      expect(list.data.result.structuredContent.access).toBe("paid_exam_subscription");
+      expect(list.data.result.structuredContent.mocks.every(m=>m.level==="A2")).toBe(true);
+      const forbidden=await call("get_my_falowen_lesson",{day:1});
+      expect(forbidden.data.result.isError).toBe(true);
+      const write=await call("save_my_falowen_practice_note",{});
+      expect(write.data.result.isError).toBe(true);
+    });
+  });
 });
