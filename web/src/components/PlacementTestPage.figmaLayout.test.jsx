@@ -24,7 +24,7 @@ jest.mock("../lib/placementMonitoring", () => ({
   makePlacementAttemptId: jest.fn(() => "pt_test1234567890"),
   postPlacementEvent: jest.fn(),
   sendPlacementEventOnce: jest.fn(async () => ({ ok: true })),
-  answersToIndices: jest.fn(() => Array(30).fill(null)),
+  answersToIndices: jest.fn((_,questions) => Array(questions.length).fill(null)),
 }));
 
 beforeEach(() => {
@@ -32,13 +32,13 @@ beforeEach(() => {
   jest.clearAllMocks();
   postPlacementEvent.mockImplementation(async payload => payload.action === "start"
     ? {ok: true, id: "pt_test1234567890", ticket:"signed-ticket"}
-    : {ok: true, score:{a1:8,a2:8,b1:7,total:23,answered:23,level:"B1"}});
+    : {ok: true, score:{a1:8,a2:8,b1:7,b2:2,total:25,answered:25,level:"B1"}});
 });
 afterEach(cleanup);
 
 test.each([
   ["german","Free German Placement Test (A1–B1)","German"],
-  ["swahili","Free Kiswahili Placement Test (A1–B1)","Kiswahili"]
+  ["swahili","Free Kiswahili Placement Test (A1–B2)","Kiswahili"]
 ])("%s shows the Figma two-column introduction and accessible full-width email form", (language,title,label) => {
   const view=render(<PlacementTestPage2026 language={language} />);
   expect(screen.getByRole("heading", { name:title })).toBeInTheDocument();
@@ -46,7 +46,7 @@ test.each([
   expect(intro).toBeInTheDocument();
   expect(intro.querySelector(".falowen-placement-intro-copy")).toBeInTheDocument();
   expect(intro.querySelector(".falowen-placement-start-card")).toBeInTheDocument();
-  expect(intro.querySelectorAll(".falowen-placement-level")).toHaveLength(3);
+  expect(intro.querySelectorAll(".falowen-placement-level")).toHaveLength(language==="swahili"?4:3);
   expect(screen.getByRole("form", {name:label+" placement registration"})).toBeInTheDocument();
   expect(screen.getByRole("textbox", {name:/Email address/})).toBeRequired();
   expect(screen.getByRole("button", {name:/Start test/})).toBeInTheDocument();
@@ -81,12 +81,12 @@ test("Kiswahili results display server-scored B1 and no public answer key",async
   const view=render(<PlacementTestPage2026 language="swahili"/>);
   fireEvent.change(screen.getByRole("textbox",{name:/Email address/}),{target:{value:"learner@example.com"}});
   fireEvent.click(screen.getByRole("button",{name:/Start test/}));
-  await screen.findByRole("heading",{name:"Kiswahili · A1–B1"});
+  await screen.findByRole("heading",{name:"Kiswahili · A1–B2"});
   fireEvent.click(screen.getByRole("button",{name:"Submit test"}));
   await screen.findByText("Your suggested starting level: B1");
   expect(postPlacementEvent).toHaveBeenCalledWith(expect.objectContaining({action:"complete",language:"swahili",ticket:"signed-ticket"}));
   expect(view.container.querySelector('[data-placement-language="swahili"]')).toBeInTheDocument();
-  expect(screen.getByText(/Score: 23\/30/)).toBeInTheDocument();
+  expect(screen.getByText(/Score: 25\/40/)).toBeInTheDocument();
   fireEvent.click(screen.getByText("Review your submitted answers"));
   expect(screen.queryByText(/Correct:/)).not.toBeInTheDocument();
   expect(screen.getByRole("link",{name:/Continue with Kiswahili/})).toHaveAttribute("href",expect.stringContaining("program=swahili"));
