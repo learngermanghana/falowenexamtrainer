@@ -20,6 +20,7 @@ export function examLockInfo({ title, trialExam, level, examOnly = false } = {})
   const includedTrial = trialExam && !trialExam.locked && trialExam.id && trialExam.route;
   return {
     title: title || "Exam practice",
+    variant: "exam",
     reason: trialExam?.accessError ? "Your access could not be verified. Retry the access check before making any payment." : includedTrial
       ? "Your trial includes one designated practice. This activity is outside your current trial access."
       : "This activity requires active exam access for your level. Your current access does not include it.",
@@ -67,12 +68,17 @@ export default function AccessLockDialog({ info, onClose }) {
       <p>{info.reason}</p>
       <strong>{info.plan}{info.level ? " · " + info.level : ""}</strong>
       <ul>{info.included.map(item=><li key={item}>{item}</li>)}</ul>
-      {!info.accessError && <p className="fw-access-lock-note">Review the available plans before paying. Opening this explanation does not change your access or charge you.</p>}
+      {!info.accessError && <p className="fw-access-lock-note">{info.variant === "exam" ? "Choose a plan on the payment page. You will not be charged until you confirm payment." : "Review the available plans before paying. Opening this explanation does not change your access or charge you."}</p>}
       <div className="fw-access-lock-actions">
-        {info.accessError ? <button type="button" onClick={()=>{onClose();info.retryAccess?.();}}>Retry access check</button> : <a className="fw-access-lock-primary" href="/mock/payment">View plans</a>}
-        <a href={info.accountHref}>My courses &amp; subscriptions</a>
-        {info.trialHref && <a href={info.trialHref}>Open included trial practice</a>}
-        <button ref={closeRef} type="button" onClick={onClose}>Keep browsing</button>
+        {info.variant === "exam" ? <>
+          {info.accessError ? <button type="button" onClick={()=>{onClose();info.retryAccess?.();}}>Retry access check</button> : <a className="fw-access-lock-primary" href="/mock/payment">Pay now</a>}
+          <a ref={closeRef} href="/exams/overview">Cancel</a>
+        </> : <>
+          {info.accessError ? <button type="button" onClick={()=>{onClose();info.retryAccess?.();}}>Retry access check</button> : <a className="fw-access-lock-primary" href="/mock/payment">View plans</a>}
+          <a href={info.accountHref}>My courses &amp; subscriptions</a>
+          {info.trialHref && <a href={info.trialHref}>Open included trial practice</a>}
+          <button ref={closeRef} type="button" onClick={onClose}>Keep browsing</button>
+        </>}
       </div>
     </div>
   </dialog>;
