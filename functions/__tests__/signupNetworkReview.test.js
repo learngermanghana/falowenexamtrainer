@@ -27,9 +27,9 @@ test("IP-only flag permits signup, browser match holds, same applicant retries",
  assert.equal((await check(db,b)).hold,false);
  assert.doesNotMatch(JSON.stringify([...db.rows]),/203\.0\.113\.2|device-aaaaaaaaaaaaaa/);
 });
-test("different languages are independent and IP-only never blocks",async()=>{
+test("a different language does not bypass browser review; IP-only never blocks",async()=>{
  const db=fakeDb();await check(db,a);
- assert.equal((await check(db,b,{program:"swahili"})).hold,false);
+ assert.equal((await check(db,b,{program:"swahili"})).hold,true);
  assert.equal((await check(db,b,{browserId:"device-bbbbbbbbbbbbbb"})).hold,false);
  assert.ok([...db.rows.values()].some(r=>r.status==="ip_flag"));
 });

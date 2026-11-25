@@ -144,6 +144,7 @@ function registerSignupDuplicateReviewRoutes(app, { admin }) {
       const network = await reviewSignupNetwork({
         db, application: validatedApplication(req.body), program: req.body.program,
         browserId: req.body.browserId, studentCode: req.body.studentCode,
+        emailIdentity: canonicalEmail(req.body.email), phoneIdentity: canonicalPhone(req.body.phone),
         ip: observedSignupIp(req),
       });
       if (network.hold) return res.status(409).json({ code: "REVIEW_REQUIRED", message: REVIEW_MESSAGE });

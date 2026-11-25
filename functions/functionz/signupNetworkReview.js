@@ -28,18 +28,18 @@ async function loadSalt(db) {
   }
   return saltPromise;
 }
-async function reviewSignupNetwork({db,application,program,browserId,ip,studentCode,now=Date.now(),salt}) {
+async function reviewSignupNetwork({db,application,program,browserId,ip,studentCode,now=Date.now(),salt,emailIdentity,phoneIdentity}) {
   if (!["german","swahili"].includes(program)) throw new Error("invalid_program");
   const email = application.email.trim().toLowerCase();
   const phone = application.phone;
   // Only compare exact normalized contacts and pseudonymous network signals.
   // No names, raw IP addresses or raw browser identifiers are stored.
   const key = salt || await loadSalt(db);
-  const emailKey = hash(key, "email:"+email);
-  const identity = hash(key, "application:"+program+":"+email+":"+phone.replace(/\D/g,""));
+  const emailKey = hash(key, "email:"+(emailIdentity || email));
+  const identity = hash(key, "application:"+program+":"+email+":"+(phoneIdentity || phone.replace(/\D/g,"")));
   const reviewRef = db.collection("signupRegistrationReviews").doc(identity);
-  const browserRef = browser(browserId) ? db.collection("signupNetworkKeys").doc(hash(key,"browser:"+program+":"+browserId)) : null;
-  const ipRef = isIP(ip || "") ? db.collection("signupNetworkKeys").doc(hash(key,"ip:"+program+":"+ip)) : null;
+  const browserRef = browser(browserId) ? db.collection("signupNetworkKeys").doc(hash(key,"browser:"+browserId)) : null;
+  const ipRef = isIP(ip || "") ? db.collection("signupNetworkKeys").doc(hash(key,"ip:"+ip)) : null;
   const permit = randomBytes(24).toString("hex");
   const permitRef = db.collection("signupTrialPermits").doc(permit);
   const stamp = new Date(now);
@@ -56,11 +56,12 @@ async function reviewSignupNetwork({db,application,program,browserId,ip,studentC
     const ipMatch = Boolean(signal(ipSnap));
     // An approval is specific to these contact details and course language.
     // A pending/rejected applicant cannot bypass the hold by clearing storage.
-    const approved = review.status === "approved";
-    const hold = !approved && (browserMatch || ["pending","rejected"].includes(review.status));
-    const status = hold ? (review.status === "rejected" ? "rejected" : "pending")
-      : approved ? "approved" : ipMatch ? (review.status === "acknowledged" ? "acknowledged" : "ip_flag") : "";
-    if (status && (!reviewSnap.exists || review.status !== status ||
+    const currentStatus = ms(review.expiresAt)>now ? review.status : "";
+    const approved = currentStatus === "approved";
+    const hold = !approved && (browserMatch || ["pending","rejected"].includes(currentStatus));
+    const status = hold ? (currentStatus === "rejected" ? "rejected" : "pending")
+      : approved ? "approved" : ipMatch ? (currentStatus === "acknowledged" ? "acknowledged" : "ip_flag") : "";
+    if (status && (!reviewSnap.exists || currentStatus !== status ||
         (browserMatch && !review.browserMatch) || (ipMatch && !review.ipMatch))) {
       tx.set(reviewRef,{
         email, program, status,
