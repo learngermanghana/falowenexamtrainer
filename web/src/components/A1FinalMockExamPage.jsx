@@ -1,3 +1,4 @@
+import MockListeningReview, { listeningReviewRow } from "./MockListeningReview";
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
 import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresentation";
@@ -1097,22 +1098,15 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           })}
         </section>
 
-        {hasHoren ? <section className="a1-final-mock-review">
-          <h2>Hören review</h2>
-          {hoerenScoredQuestions.map((question) => {
-            const key = listeningKey(question);
-            const submitted = exam.hoerenAnswers?.[key] || "—";
-            const correct = String(submitted).toLowerCase() === String(isKombi ? exam.listeningAnswerKey?.[key] : question.answer).toLowerCase();
-            return (
-              <div className={correct ? "correct" : "incorrect"} key={key}>
-                <strong>Aufgabe {question.number}</strong>
-                <span>Your answer: {submitted}</span>
-                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, isKombi ? exam.listeningAnswerKey?.[key] : question.answer, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : (isKombi ? exam.listeningAnswerKey?.[key] : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer)}</span>
-                {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
-              </div>
-            );
-          })}
-        </section> : null}
+        {hasHoren ? <MockListeningReview rows={hoerenScoredQuestions.map(question => {
+          const key = listeningKey(question);
+          const display = value => question.options?.length >= 3
+            ? mockDisplayAnswer(question.options, value, `${isMock2 && question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`)
+            : String(value).toUpperCase();
+          return listeningReviewRow({ number: question.number, part: key.split("-")[0].slice(1),
+            question: question.question || question.statement, explanation: question.explanation,
+            submitted: exam.hoerenAnswers?.[key], expected: isKombi ? exam.listeningAnswerKey?.[key] : question.answer, display });
+        })}/> : null}
 
         <section className="a1-final-mock-feedback">
           <h2>Schreiben feedback</h2>
