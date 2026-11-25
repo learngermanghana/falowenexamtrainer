@@ -154,7 +154,7 @@ describe("Expanded workbook safety", () => {
       expect(match).toBeDefined();
       const rule = germanRule(student,{assignmentId:match[0]},rules);
       expect(validateGermanText("Teil 2\n",rule)).toBe(false);
-      const response = rule.requiredParts.map(n=>"Teil "+n+"\nMeine eigene Antwort besteht aus mehreren vollständigen Sätzen. Ich lerne und schreibe heute.").join("\n");
+      const response = rule.requiredParts.map(n=>"Teil "+n+"\nMeine eigene Antwort besteht aus mehreren vollständigen Sätzen. Ich lerne und schreibe heute. Danach lese ich noch einen kurzen Text und übe mit meiner Freundin.").join("\n");
       expect(validateGermanText(response,rule)).toBe(true);
       expect(germanRule(student,{assignmentId:level==="A2"?"A2-8.21":"B1-6.18"},rules)).toBeNull();
       expect(germanRule({id:"s",data:{program:"swahili",level}}, {assignmentId:match[0]},rules)).toBeNull();
