@@ -1,9 +1,5 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const catalog = require('../web/public/music/swahili-catalog.json');
 const lyrics = require('../web/public/music/approved-recording-lyrics.json');
 const translations = require('../web/public/music/english-translations.json');
