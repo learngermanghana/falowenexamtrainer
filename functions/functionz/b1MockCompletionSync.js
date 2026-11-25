@@ -42,13 +42,16 @@ const {B1_MOCK4_READING_KEY,B1_MOCK4_HOEREN_KEY}=require("./b1Mock4AnswerKeys");
 const {QUESTIONS:B1_MOCK2_HOEREN_QUESTIONS}=require("./b1Mock2Hoeren");
 const B1_MOCK2_HOEREN_KEY=Object.freeze(Object.fromEntries(B1_MOCK2_HOEREN_QUESTIONS.map(q=>[`t${q.part}-${q.number}`,q.answer])));
 
+const objectiveKeysForMock = mockId => mockId==="b1-mock-04" ? {lesen:B1_MOCK4_READING_KEY,hoeren:B1_MOCK4_HOEREN_KEY} : mockId==="b1-mock-03" ? {lesen:B1_MOCK3_READING_KEY,hoeren:B1_MOCK3_HOEREN_KEY} : mockId==="b1-mock-02"
+  ? {lesen:B1_MOCK2_READING_KEY,hoeren:B1_MOCK2_HOEREN_KEY}
+  : {lesen:READING_ANSWER_KEY,hoeren:LISTENING_ANSWER_KEY};
+const { buildListeningReview } = require("./mockListeningReview");
+function getB1ListeningReview(attempt = {}) {
+  if (attempt.status !== "completed" || !Object.prototype.hasOwnProperty.call(attempt.verifiedSectionScores || {}, "hoeren") || !attempt.state?.hoerenAnswers) return [];
+  return buildListeningReview(attempt.state.hoerenAnswers, objectiveKeysForMock(attempt.mockId).hoeren);
+}
 const buildVerifiedB1MockScore = ({ state = {}, verifiedSections = {}, mockId = "b1-mock-01" } = {}) =>
-  buildVerifiedFourSkillScore({
-    level:"B1",state,verifiedSections,
-    answerKeys:mockId==="b1-mock-04" ? {lesen:B1_MOCK4_READING_KEY,hoeren:B1_MOCK4_HOEREN_KEY} : mockId==="b1-mock-03" ? {lesen:B1_MOCK3_READING_KEY,hoeren:B1_MOCK3_HOEREN_KEY} : mockId==="b1-mock-02"
-      ? {lesen:B1_MOCK2_READING_KEY,hoeren:B1_MOCK2_HOEREN_KEY}
-      : {lesen:READING_ANSWER_KEY,hoeren:LISTENING_ANSWER_KEY},
-  });
+  buildVerifiedFourSkillScore({ level:"B1",state,verifiedSections,answerKeys:objectiveKeysForMock(mockId) });
 
 const persistVerifiedB1MockSection = async ({ db, admin, uid, attemptId, section, score, source, mockId } = {}) => {
   if (!db || !admin) throw new Error("Firestore verification dependencies are unavailable.");
@@ -241,7 +244,7 @@ const syncB1MockCompletion = async ({
 
 module.exports = {
   MOCK_TITLE, READING_ANSWER_KEY, LISTENING_ANSWER_KEY, scoreObjectiveAnswers,
-  buildVerifiedB1MockScore, persistVerifiedB1MockSection, buildSectionBreakdown,
+  buildVerifiedB1MockScore, getB1ListeningReview, persistVerifiedB1MockSection, buildSectionBreakdown,
   deriveMockInsights, resolveStudentIdentity, assignmentIdForAttempt,
   buildB1MockCompletionArtifacts, syncB1MockCompletion,
 };
