@@ -139,7 +139,7 @@ if (!app.includes("const CampusPrimaryNavigation =")) {
   if (start === -1 || end === -1) throw new Error("CampusQuickNavigation block not found.");
 
   const navigationHelpers = `const getCampusNavigationItems = (allowedSections = {}) => [
-  { key: "learn", label: "Learn", route: "/campus/course", enabled: true },
+  { key: "learn", label: "Course Book", route: "/campus/course", enabled: true },
   { key: "music", label: "Music", route: "/campus/music", enabled: Boolean(allowedSections.music) },
   { key: "books", label: "Books", route: "/campus/books", enabled: Boolean(allowedSections.books) },
   { key: "attendance", label: "Attendance", route: "/campus/attendance", enabled: Boolean(allowedSections.attendance) },
@@ -184,7 +184,7 @@ const CampusPrimaryNavigation = ({ allowedSections }) => {
 };
 
 const MOBILE_NAV_ITEMS = [
-  { key: "learn", label: "Learn", icon: "▤", route: "/campus/course", permission: "course" },
+  { key: "learn", label: "Course Book", icon: "▤", route: "/campus/course", permission: "course" },
   { key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" },
   { key: "attendance", label: "Attendance", icon: "✓", route: "/campus/attendance", permission: "attendance" },
   { key: "results", label: "Results", icon: "◎", route: "/campus/results", permission: "results" },
@@ -300,6 +300,9 @@ app = app.replaceAll(
   '["vocab", "books", "classMembers", "home"].includes(item.key)',
   '["vocab", "books", "classMembers", "account", "home"].includes(item.key)',
 );
+
+// Keep the canonical Course Book label on already-patched worktrees too.
+app = app.replaceAll('key: "learn", label: "Learn"', 'key: "learn", label: "Course Book"');
 
 // Keep the generated Music destination correct on already-patched worktrees.
 // prestart/prebuild rerun this patch after CampusPrimaryNavigation already exists,

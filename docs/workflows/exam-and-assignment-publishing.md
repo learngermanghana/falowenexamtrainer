@@ -41,3 +41,7 @@ New exam-only registrations at A1 through C1 receive seven days from signup at t
 During an active trial, learners browse the regular Course Book and Exams Room layouts. Later lesson cards and restricted exam materials display a padlock. The designated trial exam opens from its usual mock library card.
 
 Learners can compare Full Course and Exam Preparation from the payment options page and account billing. Full Course uses the existing tuition flow and includes exam preparation under the course access rules. Exam Preparation uses the separate 30-day exam subscription. An unpaid course trial learner confirms an account-type switch before exam checkout; existing course enrollment, balances and paid access are retained.
+
+## Kiswahili Exams Room foundation
+
+Kiswahili uses the same active `ExamArea` desktop and mobile navigation: Overview, Mock Exams, Reading, Listening, Writing, Speaking, Exam File and Date. Exam level selection is limited to the assigned Kiswahili level (A1–B1) and eligible lower levels, separately from German preferences and grants. The seven sections display unpublished-material notices until approved question packs, server attempt persistence, protected listening and tutor review are integrated. Legacy German warm-up/question/vocabulary and German sample routes remain unavailable to Kiswahili learners. No new exam scoring service or AI calls are enabled by this navigation change.

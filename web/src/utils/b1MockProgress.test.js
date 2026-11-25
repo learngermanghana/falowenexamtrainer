@@ -56,7 +56,7 @@ describe("B1 mock completion guidance and recovery", () => {
     expect(component).toContain('sectionScores: scores');
     expect(component).toContain('stage: "result"');
     expect(component).toContain("saveB1MockAttempt");
-    expect(catalog).toContain("Start or resume mock");
+    expect(catalog).toContain('mock.mode === "full" || mock.mode === "kombi" ? "Begin"');
   });
 
   it("warns before skipping the four Hören audio Teile, without breaking timed auto-advance", () => {

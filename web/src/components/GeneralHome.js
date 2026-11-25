@@ -82,9 +82,9 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false, swah
   <section className="falowen-home-spaces" aria-label={t("homeAccess.spaces")}>
     <div className="falowen-home-spaces__heading">
       <h2>{t("homeAccess.spaces")}</h2>
-      <p>{isSwahili ? t("homeAccess.spacesSw") : t("homeAccess.spacesBoth")}</p>
+      <p>{isSwahili ? "Learn in Campus and prepare in the Kiswahili Exams Room." : t("homeAccess.spacesBoth")}</p>
     </div>
-    <div className={"falowen-home-spaces__grid" + (isSwahili ? " falowen-home-spaces__grid--single" : "")}>
+    <div className={"falowen-home-spaces__grid" + (isSwahili && !openExamsRoom ? " falowen-home-spaces__grid--single" : "")}>
       <section className="falowen-home-space-card">
         <div className="falowen-home-space-card__top">
           <span className="falowen-home-space-card__icon falowen-home-space-card__icon--campus">
@@ -110,7 +110,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false, swah
         </div>
       </section>
 
-      {!isSwahili && (
+      {(!isSwahili || openExamsRoom) && (
         <section className="falowen-home-space-card">
           <div className="falowen-home-space-card__top">
             <span className="falowen-home-space-card__icon falowen-home-space-card__icon--exams">
@@ -126,7 +126,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom, isSwahili = false, swah
           </div>
           <div className="falowen-home-space-card__body">
             <h4>{t("homeAccess.examsSkills")}</h4>
-            <p>{t("homeAccess.examsDesc")}</p>
+            <p>{isSwahili ? "Kiswahili exam preparation. Approved materials will appear when released." : t("homeAccess.examsDesc")}</p>
           </div>
           <div className="falowen-home-space-card__bottom falowen-home-space-card__bottom--exams">
             <button type="button" style={styles.primaryButton} onClick={openExamsRoom}>{t("homeAccess.openExams")} <span aria-hidden="true">→</span></button>
@@ -321,7 +321,7 @@ const GeneralHome = ({
             </PrimaryActionBar>
           </section>
         ) : null}
-        <QuickMainAccess t={t} openCampus={openCampus} isSwahili swahiliLevel={levelKey?.toUpperCase()} />
+        <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={!browseOnly && !examOnly ? openExamsRoom : undefined} isSwahili swahiliLevel={levelKey?.toUpperCase()} />
         <SwahiliHomeProgress level={levelKey || "A1"} />
         <LegalFooter />
       </div>

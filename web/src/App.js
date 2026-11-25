@@ -230,6 +230,7 @@ import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import LiveSpeakPage from "./components/LiveSpeakPage";
 import MyExamFilePage from "./components/MyExamFilePage";
+import SwahiliExamSection from "./components/SwahiliExamSection";
 import ExamsOverviewPage from "./components/ExamsOverviewPage";
 import PersonalExamCountdown from "./components/PersonalExamCountdown";
 import MockExamLibraryPage from "./components/MockExamLibraryPage";
@@ -258,10 +259,10 @@ const getTabStructure = (t) => {
     { key: "course", label: t("appNav.sections.courseBook"), section: "course" },
     { key: "music", label: "Music", section: "music" },
     { key: "books", label: "Books", section: "books" },
-    { key: "vocab", label: t("appNav.sections.vocab"), section: "vocab" },
     { key: "attendance", label: t("appNav.sections.attendance"), section: "attendance" },
-    { key: "classMembers", label: t("appNav.sections.classMembers"), section: "classMembers" },
     { key: "results", label: t("appNav.tabs.results"), section: "results" },
+    { key: "vocab", label: t("appNav.sections.vocab"), section: "vocab" },
+    { key: "classMembers", label: t("appNav.sections.classMembers"), section: "classMembers" },
     { key: "account", label: t("appNav.tabs.account"), section: "account" },
   ];
 };
@@ -1556,6 +1557,7 @@ const CampusQuickNavigation = ({ allowedSections, availableTabs, tabStructure })
             </button>
           );
         })}
+        <button type="button" style={styles.navButton} onClick={() => navigate("/")}>Falowen Home</button>
       </div>
 
       {activeMainTabConfig?.sections ? (
@@ -1681,6 +1683,7 @@ const CampusArea = ({
             </button>
           );
         })}
+        <button type="button" style={styles.navButton} onClick={() => navigate("/")}>Falowen Home</button>
       </div>
 
       {activeMainTabConfig?.sections ? (
@@ -1769,22 +1772,35 @@ const ExamArea = ({ onBack }) => {
   const { t } = useTranslation();
   const { section, practiceLevel = "", sampleId = "" } = useParams();
   const navigate = useNavigate();
-  const { level, setLevel, accessibleLevels } = useExam();
+  const { level: germanLevel, setLevel: setGermanLevel, accessibleLevels } = useExam();
   const { studentProfile, user } = useAuth();
+  const isSwahili = getCampusProgram(studentProfile) === "swahili";
+  const swahiliLevelOrder = ["A1","A2","B1"];
+  const assignedSwahiliLevel = normalizeCourseLevel(studentProfile?.level);
+  const swahiliLevels = swahiliLevelOrder.filter((option,index) => index <= swahiliLevelOrder.indexOf(assignedSwahiliLevel) && !studentProfile?.blockedEnrollmentLevels?.includes(option));
+  const [swahiliChoice, setSwahiliChoice] = useState(null);
+  const level = isSwahili
+    ? (swahiliChoice?.uid === user?.uid && swahiliLevels.includes(swahiliChoice?.level) ? swahiliChoice.level : swahiliLevels.at(-1))
+    : germanLevel;
+  const setLevel = React.useCallback(option => {
+    if (isSwahili) setSwahiliChoice({uid:user?.uid,level:option});
+    else setGermanLevel(option);
+  }, [isSwahili, user?.uid, setGermanLevel]);
   const trialExam = React.useContext(TrialExam);
   const { openLock, lockDialog } = useAccessLock();
   const examOnlyView = Boolean(trialExam) || studentProfile?.accountType === "exam_only";
-  const visibleLevels = trialExam
+  const visibleLevels = isSwahili ? swahiliLevels : trialExam
     ? accessibleLevels.filter((option) => option === String(trialExam.level || studentProfile?.level || "A1").toUpperCase())
     : accessibleLevels;
   useEffect(() => {
-    if (trialExam && visibleLevels.length && level !== visibleLevels[0]) setLevel(visibleLevels[0]);
-  }, [trialExam, level, visibleLevels[0], setLevel]);
+    if (!isSwahili && trialExam && visibleLevels.length && level !== visibleLevels[0]) setLevel(visibleLevels[0]);
+  }, [isSwahili, trialExam, level, visibleLevels[0], setLevel]);
 
   const lastVisitStorageKey = "falowen_exam_last_visit";
   const lastSectionStorageKey = "falowen_exam_last_section";
 
   const examSection = useMemo(() => {
+    if (isSwahili) return ["overview","mocks","lesen","horen","writing","speaking","file"].includes(section) ? section : "overview";
     if (section === "resources") return "file";
     if (
       [
@@ -1802,15 +1818,16 @@ const ExamArea = ({ onBack }) => {
       return section;
     }
     return "overview";
-  }, [section]);
+  }, [section, isSwahili]);
 
   useEffect(() => {
-    if (section !== examSection) {
+    if (section !== examSection || (isSwahili && sampleId)) {
       navigate(`/exams/${examSection}`, { replace: true });
     }
-  }, [examSection, navigate, section]);
+  }, [examSection, navigate, section, isSwahili, sampleId]);
 
   useEffect(() => {
+    if (isSwahili) return;
     try {
       const stored = localStorage.getItem(lastVisitStorageKey);
       const parsed = stored ? JSON.parse(stored) : {};
@@ -1823,7 +1840,7 @@ const ExamArea = ({ onBack }) => {
     } catch (error) {
       console.warn("Failed to store exam last visit metadata", error);
     }
-  }, [examSection, lastSectionStorageKey, lastVisitStorageKey]);
+  }, [examSection, lastSectionStorageKey, lastVisitStorageKey, isSwahili]);
 
 
   const tabs = [
@@ -1867,7 +1884,7 @@ const ExamArea = ({ onBack }) => {
     },
   };
   const activeExamHero = examHeroConfig[examSection];
-  const tabLocked = key => Boolean(trialExam && !["overview", "mocks"].includes(key));
+  const tabLocked = key => Boolean(!isSwahili && trialExam && !["overview", "mocks"].includes(key));
 
 
   const openExamSection = (tab, event) => {
@@ -1953,14 +1970,14 @@ const ExamArea = ({ onBack }) => {
               </button>
             ))}
           </div>
-            {examSection === "overview" && user?.uid && <PersonalExamCountdown key={user.uid + ":" + level} uid={user.uid} level={level} compact />}
+            {!isSwahili && examSection === "overview" && user?.uid && <PersonalExamCountdown key={user.uid + ":" + level} uid={user.uid} level={level} compact />}
           </div>
           <small style={{ ...styles.helperText, margin: 0 }}>
             Practise at your current level or any lower level.
           </small>
         </div>
 
-        {activeExamHero && examSection !== "speaking" ? (
+        {!isSwahili && activeExamHero && examSection !== "speaking" ? (
           <section
             style={{
               ...styles.card,
@@ -1986,6 +2003,7 @@ const ExamArea = ({ onBack }) => {
         ) : null}
       </div>
 
+      {isSwahili ? <SwahiliExamSection level={level} section={examSection} /> : <>
       {examSection === "overview" ? <ExamsOverviewPage dateInLevelPicker /> : null}
       {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
@@ -1995,6 +2013,7 @@ const ExamArea = ({ onBack }) => {
       {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
       {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
       {examSection === "file" ? <MyExamFilePage /> : null}
+      </>}
     </>
   );
 };
