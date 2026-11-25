@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
+const {registerLevelBillingRoutes,isLevelPayment,processLevelEnrollmentWebhook}=require("./levelBilling");
 const { registerPublicFxRoutes } = require("./publicFxRates");
 const { registerSignupDuplicateReviewRoutes } = require("./signupDuplicateReview");
 const { registerCourseDiscountRoutes, recordDiscountPayment } = require("./courseDiscounts");
@@ -269,6 +270,8 @@ registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail })
 // Staff review is read-only and fetches saved speaking snapshots on demand.
 registerStaffSpeakingReviewRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 
+registerLevelBillingRoutes(app,{admin,getAuthedUser});
+
 app.post("/paystack/initialize", async (req, res) => {
   try {
     const authedUser = await getAuthedUser(req);
@@ -494,6 +497,11 @@ app.post("/paystack/webhook", async (req, res) => {
     const { event, data = {} } = payload;
     if (event !== "charge.success") return res.json({ status: "ignored", event });
 
+    // Independent tuition must never reach the old student-wide balance updater.
+    if(isLevelPayment(data)){
+      const result=await processLevelEnrollmentWebhook({admin,data});
+      return res.status(result.status).json(result.body);
+    }
     // Book payments are separated from tuition balances and exam entitlements.
     if (data?.metadata?.productType === "falowen_book") {
       const result = await processBookWebhook({ admin, data });

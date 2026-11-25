@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
+import LevelBillingPanel from "./LevelBillingPanel";
 import MyCoursesPanel from "./MyCoursesPanel";
 import StudentDocumentsPanel from "./StudentDocumentsPanel";
 import NotificationSettingsCard from "./NotificationSettingsCard";
@@ -56,6 +57,8 @@ const AccountSettings = () => {
     [locale]
   );
   const paymentsEnabled = isPaymentsEnabled();
+  const levelBillingRows=(studentProfile?.levelBillingEnrollments||[]).filter(row=>row.program===(studentProfile?.program||"german")&&/^(german|swahili)-(A1|A2|B1|B2|C1|C2)$/.test(row.id||""));
+  const levelBillingUnverified=studentProfile?.levelEnrollmentCheckPending||studentProfile?.levelEnrollmentCheckError;
   const [status, setStatus] = useState("");
   const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
   const [isRefreshingPayment, setIsRefreshingPayment] = useState(false);
@@ -649,7 +652,7 @@ const AccountSettings = () => {
   const initials = displayName.trim().split(/\s+/).slice(0, 2).map(word => word.charAt(0)).join("").toUpperCase();
 
   return (
-    <div className="fw-account">
+    <div className="fw-account" data-billing-active={activeTab==="billing"?"true":"false"}>
       <header className="fw-account-header">
         <small>Falowen Campus　/　{t("accountOverview.title")}</small>
         <h1>{t("accountOverview.myAccount", "My Falowen account")}</h1>
@@ -670,10 +673,10 @@ const AccountSettings = () => {
         </dl>
         <nav className="fw-account-nav" aria-label={t("accountOverview.title")}>
         {[
+          { key: "billing", label: "Billing / Pay tuition" },
           { key: "courses", label: "My courses" },
           { key: "studentData", label: t("accountSettings.tabs.studentData") },
           { key: "notifications", label: t("accountOverview.notifications") },
-          { key: "billing", label: t("accountSettings.tabs.billing") },
           { key: "documents", label: "Documents" },
           { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
           { key: "deleteAccount", label: t("accountOverview.deleteAccount") },
@@ -690,7 +693,7 @@ const AccountSettings = () => {
         </nav>
       </aside>
       <div className="fw-account-content">
-        {!isSecondaryCourse && studentProfile && (
+        {activeTab!=="billing" && !isSecondaryCourse && studentProfile && (
           <p>Course type <strong>{getCourseType(studentProfile) === "exam_preparation" ? "Exam preparation" : "Full course"}</strong>{" "}
             <Link to="/mock/account">Manage course type</Link>
           </p>
@@ -737,7 +740,11 @@ const AccountSettings = () => {
 
       {activeTab === "notifications" ? <NotificationSettingsCard /> : null}
 
-      {activeTab === "billing" && isSecondaryCourse ? (
+      {activeTab === "billing" && !isUniversityRegistration && levelBillingUnverified ? (
+        <section className="fw-account-billing"><h2>Payments &amp; billing</h2><p role="status">{studentProfile?.levelEnrollmentCheckError?"Unable to verify your level balance. Refresh this page or contact Falowen before paying.":"Checking your tuition balance…"}</p></section>
+      ) : activeTab === "billing" && !isUniversityRegistration && levelBillingRows.length ? (
+        <LevelBillingPanel rows={levelBillingRows} user={user} paymentsEnabled={paymentsEnabled} blockedLevels={studentProfile?.blockedEnrollmentLevels||[]}/>
+      ) : activeTab === "billing" && isSecondaryCourse ? (
         <section style={{ ...styles.card, display: "grid", gap: 12, padding: 16 }} aria-label={t("enrollmentRequest.secondaryBillingTitle")}>
           <h2 style={styles.sectionTitle}>{t("enrollmentRequest.secondaryBillingTitle")}</h2>
           <p style={styles.helperText}>{t("enrollmentRequest.secondaryBillingNotice")}</p>
@@ -765,7 +772,6 @@ const AccountSettings = () => {
       </section>
       ) : activeTab === "billing" ? (
       <section className="fw-account-billing">
-        {!isSwahili && <p><Link to="/mock/payment">Compare Full Course and Exam Preparation payment options</Link></p>}
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
           <div style={{ minWidth: 0 }}>
             <h2 style={{ ...styles.sectionTitle, marginBottom: 3 }}>{t("accountSettings.billing.title")}</h2>
@@ -789,6 +795,36 @@ const AccountSettings = () => {
             <div><span>{t("accountOverview.balance")}</span><strong style={{color: balanceDue > 0 ? "#98451b" : "#20674c"}}>{formatMoney(balanceDue)}</strong>{usdBelow(balanceDue)}</div>
           </div>
         </div>
+        {hasOutstandingTuition ? (
+          <div style={{ display: "grid", gap: 7, borderTop: "1px solid #e2e8f0", paddingTop: 12 }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 18 }}>Pay tuition</h3>
+              <p style={{ ...styles.helperText, margin: "3px 0 0" }}>
+                Pay all or part of your outstanding balance.
+              </p>
+            </div>
+            <TuitionStatusCard
+              level={studentProfile.level}
+              paidAmount={paidAmount}
+              balanceDue={balanceDue}
+              tuitionFee={billingSummary.tuitionFee}
+              checkoutAmountOverride={paidAmount > 0 ? undefined : studentProfile?.paymentIntentAmount}
+              paymentActionLabel={
+                billingState.key === "pending-attempt"
+                  ? "Continue payment"
+                  : billingState.key === "partial"
+                    ? "Pay balance now"
+                    : "Pay now"
+              }
+              description={
+                billingState.key === "pending-attempt"
+                  ? "Continue your unfinished checkout below."
+                  : undefined
+              }
+              showSummary={false}
+            />
+          </div>
+        ) : null}
         <div className="fw-account-access">
           <small>{t("accountOverview.courseAccess")}</small>
           <strong>{accessUntil ? formatDate(accessUntil) : accountAccess.label}</strong>
@@ -851,36 +887,6 @@ const AccountSettings = () => {
 
         {paymentAlert ? <div style={{ ...styles.errorBox, margin: 0 }}>{paymentAlert.message}</div> : null}
 
-        {hasOutstandingTuition ? (
-          <div style={{ display: "grid", gap: 7, borderTop: "1px solid #e2e8f0", paddingTop: 12 }}>
-            <div>
-              <h3 style={{ margin: 0, fontSize: 18 }}>Pay tuition</h3>
-              <p style={{ ...styles.helperText, margin: "3px 0 0" }}>
-                Pay all or part of your outstanding balance.
-              </p>
-            </div>
-            <TuitionStatusCard
-              level={studentProfile.level}
-              paidAmount={paidAmount}
-              balanceDue={balanceDue}
-              tuitionFee={billingSummary.tuitionFee}
-              checkoutAmountOverride={paidAmount > 0 ? undefined : studentProfile?.paymentIntentAmount}
-              paymentActionLabel={
-                billingState.key === "pending-attempt"
-                  ? "Continue payment"
-                  : billingState.key === "partial"
-                    ? "Pay balance"
-                    : undefined
-              }
-              description={
-                billingState.key === "pending-attempt"
-                  ? "Continue your unfinished checkout below."
-                  : undefined
-              }
-              showSummary={false}
-            />
-          </div>
-        ) : null}
         <details className="fw-account-history">
           <summary style={{ cursor: "pointer", fontWeight: 750, color: "#0f172a", fontSize: 14 }}>
             Transaction history{transactionHistory.length > 0 ? ` (${transactionHistory.length})` : ""}
@@ -908,6 +914,7 @@ const AccountSettings = () => {
             </div>
           )}
         </details>
+        {!isSwahili && <p><Link to="/mock/account">Manage course type</Link> · <Link to="/mock/payment">Compare course payment options</Link></p>}
       </section>
       ) : null}
 
