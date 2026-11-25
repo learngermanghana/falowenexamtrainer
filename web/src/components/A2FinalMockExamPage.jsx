@@ -1,3 +1,4 @@
+import MockListeningReview, { listeningReviewRow } from "./MockListeningReview";
 import { runA2MockSubmissionStep } from "../services/a2MockSubmissionDiagnostics";
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
@@ -1110,20 +1111,13 @@ export default function A2FinalMockExamPage() {
           })}
         </section>
 
-        <section className="a1-final-mock-review">
-          <h2>Hören review</h2>
-          {hoerenScoredQuestions.map((question) => {
-            const submitted = exam.hoerenAnswers?.[question.key] || "—";
-            const correct = String(submitted).toLowerCase() === String(question.answer).toLowerCase();
-            return (
-              <div className={correct ? "correct" : "incorrect"} key={question.key}>
-                <strong>Aufgabe {question.number}</strong>
-                <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `a2-final-hoeren-${question.key}`) : submitted}</span>
-                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, question.answer, `a2-final-hoeren-${question.key}`) : question.answer}</span>
-              </div>
-            );
-          })}
-        </section>
+        <MockListeningReview rows={hoerenScoredQuestions.map(question => {
+          const display = value => question.options?.length >= 3
+            ? mockDisplayAnswer(question.options, value, `a2-final-hoeren-${question.key}`)
+            : String(value).toUpperCase();
+          return listeningReviewRow({number: question.number, part: question.key.split("-")[0].slice(1),
+            question: question.question, submitted: exam.hoerenAnswers?.[question.key], expected: question.answer, display});
+        })}/>
 
         <section className="a1-final-mock-feedback">
           <h2>Schreiben feedback</h2>
