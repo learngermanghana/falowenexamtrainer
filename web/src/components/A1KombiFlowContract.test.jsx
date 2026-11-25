@@ -51,7 +51,7 @@ describe("A1 Kombiprüfung Mocks 4–8 release flow", () => {
     expect(engine).toContain('isKombi ? <A1KombiReadingSection');
     expect(engine).toContain('isKombiThree ? ["lesen","schreiben","sprechen"]');
     expect(library).toContain('mock.mode === "kombi"');
-    expect(library).toContain("Hören is not included");
+    expect(library).toContain("Hören not included.");
   });
 
   test("a completed /75 attempt stays immutable when a later /100 contract exists", () => {
