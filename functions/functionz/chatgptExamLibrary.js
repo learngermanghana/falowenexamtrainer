@@ -19,10 +19,11 @@ const normalizePart = value => {
 function listMyExamMocks(level) {
   const mocks = (CONTENT?.mocks || []).filter(mock => mock.level === level).map(mock => {
     const supported = [];
-    if (["a1-mock-02", "a1-mock-03", "a2-mock-02"].includes(mock.mockId)) supported.push("writing", "speaking");
+    if (["a1-mock-02", "a1-mock-03", "a2-mock-02"].includes(mock.mockId) || CONTENT?.mockWriting?.[mock.mockId]) supported.push("writing");
+    if (["a1-mock-02", "a1-mock-03", "a2-mock-02"].includes(mock.mockId) || CONTENT?.mockSpeaking?.[mock.mockId]) supported.push("speaking");
     if (CONTENT?.reading?.[mock.mockId]) supported.push("reading");
     if (CONTENT?.listening?.[mock.mockId]) supported.push("listening");
-    return { ...mock, chatGPTPracticeSkills: supported, source: "Falowen Exams Room published catalogue" };
+    return { ...mock, practiceUrl:mock.examRoomUrl+"?mode=practice", chatGPTPracticeSkills: supported, source: "Falowen Exams Room published catalogue" };
   });
   return {
     available: mocks.length > 0, level, mocks,
@@ -75,22 +76,24 @@ function getMyMockObjectivePractice(level, mockId, skill, part, questionNumber) 
   const result = {
     available: true, level, mockId, skill, part: chosenPart,
     question, questionNumbers: section.questions.map(q => q.number),
-    practiceOnly: true, officialResult: false, examRoomUrl: mock.examRoomUrl,
+    practiceOnly: true, officialResult: false, examRoomUrl: mock.examRoomUrl+"?mode=practice",
     source: "Falowen Exams Room learner-visible approved mock",
   };
   if (skill === "reading") {
     const relevantText = section.texts
       ? section.texts.filter(p => p.id === question.text)
       : undefined;
-    result.passage = relevantText?.length ? relevantText : undefined;
+    result.passage = question.contextLines?.length ? question.contextLines : section.contextLines?.length ? section.contextLines : relevantText?.length ? relevantText : undefined;
+    result.instruction = section.instruction;
     result.sources = section.sources || undefined;
     // For tasks with contextual choices (e.g. Mock 3), the question itself
     // contains its answer-safe options; never include hidden solutions.
-    result.choices = chosenPart === "teil2" ? [
+    result.choices = question.options?.length ? question.options : chosenPart === "teil2" ? [
       { id: "a", label: "Text A" }, { id: "b", label: "Text B" },
     ] : [{ id: "richtig", label: "Richtig" }, { id: "falsch", label: "Falsch" }];
     result.instructions = "Present the relevant source text and this question. Ask for the learner's answer before giving reasoning-based feedback. Do not claim to know an official hidden answer key.";
   } else {
+    if (question.options?.length) result.choices = question.options;
     result.instruction = section.instruction;
     result.responseInstruction = section.responseInstruction;
     result.audioLinkPolicy = "Open the authenticated examRoomUrl and play the corresponding Hören part there. ChatGPT does not receive the private R2 recording, a transcript, or a direct audio URL.";
@@ -98,4 +101,18 @@ function getMyMockObjectivePractice(level, mockId, skill, part, questionNumber) 
   }
   return result;
 }
-module.exports = { listMyExamMocks, getMyExamDictionary, getMyMockObjectivePractice, normalizePart };
+function campusMockLinks(level) {
+  return (CONTENT?.campusMocks || CONTENT?.mocks || []).filter(m=>m.level===level)
+    .map(m=>({...m,practiceUrl:m.examRoomUrl+"?mode=practice"}));
+}
+function getExpandedMockTask(level,mockId,skill,part) {
+  const mock=(CONTENT?.mocks||[]).find(m=>m.level===level&&m.mockId===mockId);
+  const set=skill==="writing"?CONTENT?.mockWriting?.[mockId]:skill==="speaking"?CONTENT?.mockSpeaking?.[mockId]:null;
+  if(!mock||!set)return null;
+  const key=normalizePart(part||"teil1");
+  if(!set[key])return {available:false,message:"This part is not exported. Use Campus Practice Mode.",examRoomUrl:mock.examRoomUrl+"?mode=practice"};
+  return {available:true,level,mockId,skill,part:key,task:set[key],practiceOnly:true,officialResult:false,
+    examRoomUrl:mock.examRoomUrl+"?mode=practice",
+    instructions:"Use the original prompt for repeatable self-practice. Ask the learner for their own response and give conversational feedback, not an official score."};
+}
+module.exports = { listMyExamMocks, getMyExamDictionary, getMyMockObjectivePractice, normalizePart, campusMockLinks, getExpandedMockTask };
