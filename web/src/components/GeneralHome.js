@@ -11,6 +11,7 @@ import OnboardingStudyBuddyStart from "./OnboardingStudyBuddyStart";
 import { buildFullClassScheduleUrl, getHomeClassIdentity } from "../utils/homeClassSchedule";
 import HomeMetrics from "./HomeMetrics";
 import SwahiliClassDashboard from "./SwahiliClassDashboard";
+import SwahiliHomeProgress from "./SwahiliHomeProgress";
 import TrialCountdownBanner from "./TrialCountdownBanner";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PrimaryActionBar, SectionHeader } from "./ui";
@@ -323,21 +324,7 @@ const GeneralHome = ({
         ) : null}
         {!browseOnly && !examOnly && <SwahiliClassDashboard studentProfile={studentProfile} level={levelKey?.toUpperCase()} />}
         <QuickMainAccess t={t} openCampus={openCampus} isSwahili swahiliLevel={levelKey?.toUpperCase()} />
-        {(!levelKey || levelKey.toUpperCase() === "A1") && <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-          <SectionHeader
-            eyebrow="Kiswahili A1"
-            title={t("uiLanguageFlow.publishedLessons")}
-            subtitle={t("homeAccess.publishedDesc")}
-          />
-          <PrimaryActionBar align="start" wrap>
-            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course/swahili/day-1")}>
-              Somo la 1 · Alfabeti na matamshi
-            </button>
-            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course/swahili/day-6")}>
-              Somo la 6 · Mgahawani
-            </button>
-          </PrimaryActionBar>
-        </section>}
+        <SwahiliHomeProgress level={levelKey || "A1"} />
         <LegalFooter />
       </div>
     );
