@@ -1264,7 +1264,10 @@ function A2TimedMockExamPage() {
 
 function A2PracticePaper(){
   const parts=[A2_GOETHE_LISTENING_TEIL1,A2_GOETHE_LISTENING_TEIL2,A2_GOETHE_LISTENING_TEIL3,A2_GOETHE_LISTENING_TEIL4];
-  return <MockPracticeWorkspace mockId={A2_FINAL_MOCK_ID} title="A2 Mock 1" reading={({answers,onChange:setLesenAnswer})=>{
+  return <MockPracticeWorkspace mockId={A2_FINAL_MOCK_ID} title="A2 Mock 1" displayAnswer={(section,row,value)=>{
+    if(section==="lesen"&&row.part!==4){const q=lesenScoredQuestions.find(q=>q.key===`t${row.part}-${row.number}`);if(q?.options)return mockDisplayAnswer(q.options,value,`a2-final-t${row.part}-${row.number}`)}
+    return String(value||"").toUpperCase();
+  }} reading={({answers,onChange:setLesenAnswer})=>{
     const exam={lesenAnswers:answers};return <article className="a2-mock-exam">        <section className="a2-mock-part">
           <header className="a2-mock-part-heading">
             <h2>{A2_GOETHE_READING_MOCK.teil1.title}</h2>
