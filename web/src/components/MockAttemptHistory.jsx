@@ -63,8 +63,8 @@ export default function MockAttemptHistory({user,mockId,onPractice}){
     finally{if(controller.current===active)controller.current=null;if(!active.signal.aborted)setLoading(false);}
   }
   function toggle(){const next=!expanded;setExpanded(next);if(next&&!loaded&&!loading)load();}
-  async function openReview(id){
-    if(selected===id){setSelected(null);detailController.current?.abort();detailController.current=null;setDetailBusy(false);return;}
+  async function openReview(id,retry=false){
+    if(selected===id&&!retry){setSelected(null);detailController.current?.abort();detailController.current=null;setDetailBusy(false);return;}
     detailController.current?.abort();detailController.current=null;setSelected(id);setDetailError("");setDetailBusy(false);
     if(details[id])return;
     const active=new AbortController();detailController.current=active;setDetailBusy(true);
@@ -73,7 +73,7 @@ export default function MockAttemptHistory({user,mockId,onPractice}){
       if(active.signal.aborted)return;
       if(data.attempt?.id!==id)throw new Error("Invalid attempt response.");
       setDetails(old=>({...old,[id]:data}));
-      if(!labelRef.current){labelRef.current=true;import("./mockHistoryAnswerLabels").then(m=>m.loadHistoryAnswerLabels(mockId)).then(format=>{if(!active.signal.aborted)setLabels(()=>format)}).catch(()=>{});}
+      if(!labelRef.current){labelRef.current=true;import("./mockHistoryAnswerLabels").then(m=>m.loadHistoryAnswerLabels(mockId)).then(format=>{setLabels(()=>format)}).catch(()=>{});}
     }catch(e){if(!active.signal.aborted)setDetailError(e.message||"Could not load corrections.")}
     finally{if(detailController.current===active)detailController.current=null;if(!active.signal.aborted)setDetailBusy(false);}
   }
@@ -92,10 +92,10 @@ export default function MockAttemptHistory({user,mockId,onPractice}){
       {rows.map(row=><div className="mock-history-row" key={row.id}>
         <div className="mock-history-row-main"><div><strong>Attempt {row.attemptNumber??"—"}</strong><small>{dateLabel(row.completedAt||row.startedAt)}</small></div><div><strong>{row.score===null?"—":`${row.score}%`}</strong><small>{statusLabel(row)}{row.maxPoints===75?" · /75":""}</small></div>
         {row.status==="verified"?<button type="button" aria-expanded={selected===row.id} onClick={()=>openReview(row.id)}>{selected===row.id?"Hide review":"View review"}</button>:null}</div>
-        {selected===row.id?<>{detailBusy?<p role="status">Loading saved corrections…</p>:null}{detailError?<p role="alert">{detailError} <button type="button" onClick={()=>{setSelected(null);openReview(row.id+"")}} disabled={detailBusy}>Close and retry</button></p>:null}{details[row.id]?<AttemptReview key={row.id} review={details[row.id]} labels={labels}/>:null}</>:null}
+        {selected===row.id?<>{detailBusy?<p role="status">Loading saved corrections…</p>:null}{detailError?<p role="alert">{detailError} <button type="button" onClick={()=>openReview(row.id,true)} disabled={detailBusy}>Retry review</button></p>:null}{details[row.id]?<AttemptReview key={row.id} review={details[row.id]} labels={labels}/>:null}</>:null}
       </div>)}
       {cursor?<button type="button" disabled={loading} onClick={()=>load(cursor)}>Load more attempts</button>:null}
-      {loaded&&!loading?<button type="button" onClick={()=>{setSelected(null);setDetails({});load();}}>Refresh history</button>:null}
+      {loaded&&!loading?<button type="button" onClick={()=>{detailController.current?.abort();detailController.current=null;setDetailBusy(false);setSelected(null);setDetails({});load();}}>Refresh history</button>:null}
       {verified.length&&onPractice?<button type="button" onClick={onPractice}>Practise this mock</button>:null}
     </div>:null}
   </section>;
