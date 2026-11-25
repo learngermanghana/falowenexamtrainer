@@ -117,7 +117,8 @@ test("locked catalogue does not recommend a paid skill", () => {
   fireEvent.click(locked);
   expect(screen.getByRole("dialog",{name:"Locked: Lesen"})).toBeInTheDocument();
   expect(mockNavigate).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole("button",{name:"Keep browsing"}));
+  expect(screen.getByRole("link",{name:"Cancel"})).toHaveAttribute("href","/exams/overview");
+  fireEvent.keyDown(screen.getByRole("dialog",{name:"Locked: Lesen"}), {key:"Escape"});
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(screen.queryByRole("button",{name:"Practise recommended skill →"})).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole("button",{name:"Browse exams →"}));
@@ -148,5 +149,5 @@ test("locked Exam File shows an explanation and trial overview omits history and
   fireEvent.click(screen.getByRole("button",{name:"🔒 Exam File"}));
   expect(screen.getByRole("dialog",{name:"Locked: Exam File"})).toBeInTheDocument();
   expect(mockNavigate).not.toHaveBeenCalled();
-  expect(screen.getByRole("link",{name:"View plans"})).toHaveAttribute("href","/mock/payment");
+  expect(screen.getByRole("link",{name:"Pay now"})).toHaveAttribute("href","/mock/payment");
 });
