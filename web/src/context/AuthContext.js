@@ -1299,7 +1299,13 @@ export const AuthProvider = ({ children }) => {
     const levels=["A1","A2","B1","B2","C1","C2"];
     const legacyLevels=levels.slice(0,levels.indexOf(String(profile.level||"").toUpperCase())+1);
     const blocked=[...new Set([...decision.blocked,...(legacyUnavailable?legacyLevels.filter(l=>!decision.granted.includes(l)):[])])];
-    return {...profile,blockedEnrollmentLevels:blocked,grantedEnrollmentLevels:decision.granted,managedEnrollmentLevels:decision.managed,levelBillingEnrollments:state?.rows||[],levelEnrollmentCheckPending:!!enrollmentOwner&&!state,levelEnrollmentCheckError:!!state?.error};
+    const rows=state?.rows||[];
+    // Use the live level ledger only for the new upgrade lifecycle; legacy-only accounts keep their existing projection.
+    const managed=rows.some(r=>r.program===profile.program&&r.accountingMode==="payment_driven_upgrade_v1");
+    const today=new Date(now).toISOString().slice(0,10);
+    const current=managed?rows.filter(r=>r.program===profile.program&&decision.granted.includes(r.level)&&!blocked.includes(r.level)&&["active","completed"].includes(r.status)&&r.contractStart<=today&&r.contractEnd>=today).sort((a,b)=>levels.indexOf(b.level)-levels.indexOf(a.level))[0]:null;
+    const projection=current?{level:current.level,className:current.className||"",contractStart:current.contractStart,contractEnd:current.contractEnd,tuitionFee:current.tuitionFee,paid:current.paid,balanceDue:current.balanceDue,balance:current.balanceDue,paymentStatus:current.balanceDue===0?"paid":"partial"}:{};
+    return {...profile,...projection,blockedEnrollmentLevels:blocked,grantedEnrollmentLevels:decision.granted,managedEnrollmentLevels:decision.managed,levelBillingEnrollments:rows,levelEnrollmentCheckPending:!!enrollmentOwner&&!state,levelEnrollmentCheckError:!!state?.error};
   },[studentProfile,preferred,levelEnrollmentState,enrollmentUid,enrollmentProfileId,enrollmentOwner,levelAccessClock]);
   const selectCourse = useCallback(program => {
     if (!courseOptions.includes(program) || !user?.uid) return;
