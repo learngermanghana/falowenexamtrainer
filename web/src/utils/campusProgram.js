@@ -27,6 +27,7 @@ export const getProgramCourseRedirect = ({ pathname = "", studentProfile, isStaf
   if (isStaff) return null;
   const path = String(pathname).replace(/\/+$/, "").toLowerCase();
   if (getCampusProgram(studentProfile) === "swahili") {
+    if (path === "/exams" || /^\/exams\/(overview|mocks|lesen|horen|writing|speaking|file)$/.test(path)) return null;
     if (/^\/(exams|attendance|tutor-marking)(?:\/|$)/.test(path)) return "/campus/course";
     const section = path.slice("/campus/".length);
     const enabled = [...SWAHILI_CAMPUS_SECTIONS].some(key => key.toLowerCase() === section);
