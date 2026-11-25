@@ -84,18 +84,21 @@ function selectPairs(items,query,limit){
   const q=text(query,100).toLowerCase();const seen=new Set();
   return items.filter(x=>{const k=x.term.toLowerCase();if(seen.has(k)||q&&!((x.term+" "+x.meaning).toLowerCase().includes(q)))return false;seen.add(k);return true;}).slice(0,limit);
 }
-function buildPlan({minutes,lesson,day,level,program,weakness,mockReview,examDate}){
+function buildPlan({minutes,lesson,day,level,program,weakness,mockReview,examDate,now=Date.now()}){
   const labels={lesen:"reading",hoeren:"listening",schreiben:"writing",sprechen:"speaking"};
   const skills=Object.entries(mockReview?.attempt?.sectionScores||{}).filter(([k,v])=>labels[k]&&typeof v==="number"&&Number.isFinite(v)&&v>=0&&v<=25).sort((a,b)=>a[1]-b[1]);
   const activities=[];
-  const first=Math.floor(minutes/3),second=Math.floor(minutes/3);
+  const daysUntilExam=examDate?Math.round((Date.parse(examDate)-Date.parse(new Date(now).toISOString().slice(0,10)))/86400000):null;
+  const nearExam=daysUntilExam!==null&&daysUntilExam>=0&&daysUntilExam<=7;
+  const first=Math.floor(minutes*(nearExam&&skills.length?0.5:1/3)),second=Math.floor((minutes-first)/2);
   const priority=skills[0]?labels[skills[0][0]]:null;
   if(priority)activities.push({minutes:first,activity:"Review the lowest recorded mock section",skill:priority,practiceUrl:mockReview.practiceUrl});
-  else activities.push({minutes:first,activity:"Review the selected lesson vocabulary or grammar",skill:"vocabulary",day});
+  else activities.push({minutes:first,activity:lesson.vocabulary?"Review the selected lesson vocabulary":lesson.grammar?"Review the selected lesson grammar":"Review the selected lesson overview in Campus",skill:lesson.vocabulary?"vocabulary":lesson.grammar?"grammar":"review",day});
   activities.push({minutes:second,activity:"Attempt one original available lesson exercise; wait for your answer before corrections",skill:lesson.reading?"reading":lesson.writing?"writing":lesson.grammar?"grammar":"review",day});
   activities.push({minutes:minutes-first-second,activity:"Recall new expressions and produce original spoken or written sentences; revisit mistakes",skill:"review",day});
   return {available:true,program,level,day,title:lesson.title,minutes,activities,
-    ...(examDate?{examDate,examDateSource:"learner supplied"}:{}),
+    ...(examDate?{examDate,examDateSource:"learner supplied",daysUntilExam,
+      pacing:daysUntilExam<0?"The supplied date is in the past; confirm a new exam date.":nearExam?"Prioritise known mistakes and short focused practice; avoid adding too many new topics.":"Use regular short practice sessions and revisit mistakes across the remaining days."}:{}),
     ...(weakness?{recordedAssignment:{assignmentId:weakness.assignmentId,score:weakness.bestRecordedScore}}:{}),
     ...(skills.length?{verifiedMock:{attemptId:mockReview.attempt.id,sectionScores:mockReview.attempt.sectionScores}}:{}),
     basis:skills.length?"Selected verified mock attempt":weakness?"Recorded tutor assignment": "Selected published lesson; completion not verified",
