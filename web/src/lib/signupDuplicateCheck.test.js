@@ -50,3 +50,15 @@ describe("fail-closed registration duplicate check", () => {
     });
   });
 });
+
+
+test("a full-course trial needs a server-issued permit", async () => {
+  const oldFetch = global.fetch;
+  try {
+    const applicant = {name:"Ama Ofori", email:"ama@example.com", phone:"0241234567", emergencyContactPhone:"0559876543", program:"german", browserId:"browser-123456789", studentCode:"TEST123"};
+    global.fetch = jest.fn().mockResolvedValue({status:200,json:async()=>({code:"CLEAR",permit:"a".repeat(48)})});
+    await expect(checkSignupDuplicate(applicant)).resolves.toBe("a".repeat(48));
+    global.fetch = jest.fn().mockResolvedValue({status:200,json:async()=>({code:"CLEAR"})});
+    await expect(checkSignupDuplicate(applicant)).rejects.toMatchObject({code:"auth/duplicate-check-unavailable"});
+  } finally { global.fetch = oldFetch; }
+});
