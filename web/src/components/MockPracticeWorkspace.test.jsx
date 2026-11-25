@@ -1,0 +1,38 @@
+import React from "react";
+import {render,fireEvent,screen,waitFor} from "@testing-library/react";
+import axios from "axios";
+import MockPracticeWorkspace,{MockModeGate,PracticeQuestions,practiceStorageKey,practiceModules} from "./MockPracticeWorkspace";
+jest.mock("../context/AuthContext",()=>({useAuth:()=>({user:{uid:"student"},idToken:"token"})}));
+jest.mock("./navigation/AppBackButton",()=>()=> <div>Back</div>);
+jest.mock("../services/backendUrl",()=>({getBackendUrl:()=>"/api"}));
+jest.mock("axios",()=>({post:jest.fn()}));
+const key=practiceStorageKey("student","a2-mock-01");
+beforeEach(()=>{localStorage.clear();axios.post.mockReset();window.history.replaceState({},"","/");});
+test("practice result is repeatable without changing timed storage",async()=>{
+ localStorage.setItem("timed-attempt",JSON.stringify({attemptId:"old",score:72}));
+ axios.post.mockResolvedValue({data:{practiceOnly:true,rows:[{number:1,part:1,submitted:"b",expected:"a",status:"incorrect"}]}});
+ const reading=props=><PracticeQuestions {...props} questions={[{number:1,question:"Test",options:[{id:"a",label:"One"},{id:"b",label:"Two"}]}]} keyFor={()=>"t1-1"}/>;
+ render(<MockPracticeWorkspace mockId="a2-mock-01" title="A2 Mock 1" reading={reading}/>);
+ expect(screen.queryByRole("timer")).not.toBeInTheDocument();
+ fireEvent.click(screen.getByRole("radio",{name:/Two/}));
+ fireEvent.click(screen.getByRole("button",{name:"Check answers"}));
+ await screen.findByText("Aufgabe 1 · Incorrect");
+ expect(axios.post).toHaveBeenCalledWith("/api/mock/practice/review",{mockId:"a2-mock-01",section:"lesen",answers:{"t1-1":"b"}},expect.anything());
+ fireEvent.click(screen.getByRole("button",{name:"Practise this module again"}));
+ expect(screen.getByRole("radio",{name:/Two/})).not.toBeChecked();
+ expect(JSON.parse(localStorage.getItem(key)).history).toHaveLength(1);
+ expect(JSON.parse(localStorage.getItem("timed-attempt"))).toEqual({attemptId:"old",score:72});
+ fireEvent.click(screen.getByRole("radio",{name:/One/}));
+ fireEvent.click(screen.getByRole("button",{name:"Check answers"}));
+ await waitFor(()=>expect(JSON.parse(localStorage.getItem(key)).history).toHaveLength(2));
+});
+test("library practice query opens no timed exam and allows mode selection",()=>{
+ window.history.replaceState({},"","/?mode=practice");
+ render(<MockModeGate mockId="a2-mock-01" title="A2 Mock 1" timed={<div>Timed content</div>} practice={<div>Practice content</div>}/>);
+ expect(screen.getByText("Practice content")).toBeInTheDocument();
+ expect(screen.queryByText("Timed content")).not.toBeInTheDocument();
+ fireEvent.click(screen.getByRole("button",{name:"Choose another mode"}));
+ fireEvent.click(screen.getByRole("button",{name:"Start / Resume Timed Exam"}));
+ expect(screen.getByText("Timed content")).toBeInTheDocument();
+});
+test("legacy three-module A2 paper omits Hören",()=>expect(practiceModules("a2-mock-08")).toEqual(["lesen","schreiben","sprechen"]));
