@@ -1,24 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { loadSwahiliSubmissions } from "../utils/swahiliSubmissions";
+import React, { useState } from "react";
+import { useSwahiliProgress } from "../hooks/useSwahiliProgress";
 import { Link } from "react-router-dom";
-import { db, doc, getDoc } from "../firebase";
-import { SWAHILI_A1_CURRICULUM, SWAHILI_A1_PUBLISHED_LESSONS, SWAHILI_A1_ASSIGNMENTS } from "../data/swahili/a1Curriculum";
-import titleDictionary from "../data/swahili/a2B1TitleDictionary.json";
+import { SWAHILI_LEVELS, summarizeSwahiliLevel } from "../data/swahili/curriculumRegistry";
 import { getAccessibleLevels, normalizeCourseLevel } from "../utils/levelAccess";
 import CourseBookLevelSelector from "./CourseBookLevelSelector";
-import { getCurrentSwahiliReview } from "../utils/swahiliWorkbookReview";
 import { styles } from "../styles";
 import { courseBookStyles as book } from "./courseBookStyles";
 import "./CourseTabResponsive.css";
 
 const primaryLink = { ...styles.primaryButton, ...styles.primaryButtonLink, minHeight: 44 };
 
-const SWAHILI_LEVELS = ["A1", ...Object.keys(titleDictionary)];
-const LESSONS = SWAHILI_A1_CURRICULUM;
-const PUBLISHED = SWAHILI_A1_PUBLISHED_LESSONS;
-const ASSIGNMENTS = SWAHILI_A1_ASSIGNMENTS;
 const FILTERS = [
   { key: "all", label: "All lessons" },
+  { key: "available", label: "Available" },
   { key: "next", label: "Next lesson" },
   { key: "toDo", label: "To complete" },
   { key: "needsRevision", label: "Needs revision" },
@@ -31,33 +25,12 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
   const [levelChoice, setLevelChoice] = useState(null);
   const level = levelChoice?.uid === uid && levelChoice?.enrollment === enrollment && levels.includes(levelChoice?.level)
     ? levelChoice.level : defaultLevel;
-  const showA1 = level === "A1";
-  const [progress, setProgress] = useState(null);
+  const personal = Boolean(!preview && uid);
+  const { records: allRecords, failed } = useSwahiliProgress(uid, personal);
+  const records = allRecords?.filter(row => row.level === level) ?? null;
+  const { lessons: LESSONS, published: PUBLISHED, required: ASSIGNMENTS, completed, reviewed, known: submissionKnown, next, percent, allSubmitted } = summarizeSwahiliLevel(level, records);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    if (!showA1 || preview || !uid || !db) return undefined;
-    let active = true;
-    loadSwahiliSubmissions(uid).then(submissions => Promise.all(ASSIGNMENTS.map(async ({ day }) => {
-      const work = submissions.get(`day-${day}`);
-      const review = work && await getDoc(doc(db, "swahiliTeacherReviews", day === 1 ? uid : `${uid}_day-${day}`)).catch(() => null);
-      const feedback = review?.data();
-      // A fresh resubmission must not inherit an older tutor decision.
-      const currentReview = getCurrentSwahiliReview(work, feedback);
-      return {
-        day,
-        submitted: Boolean(work),
-        review: currentReview?.status || null,
-        feedback: currentReview?.feedback || "",
-      };
-    }))).then((records) => {
-      if (active) setProgress({ uid, records });
-    }).catch(() => {
-      if (active) setProgress({ uid, records: ASSIGNMENTS.map(({ day }) => ({ day, submitted: null })) });
-    });
-    return () => { active = false; };
-  }, [showA1, preview, uid]);
 
   function selectLevel(nextLevel) {
     setLevelChoice({ uid, enrollment, level: nextLevel });
@@ -67,75 +40,24 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
 
   const levelSelector = <CourseBookLevelSelector levels={levels} value={level} onChange={selectLevel} />;
 
-  if (!showA1) {
-    const query = search.trim().toLowerCase();
-    const titles = titleDictionary[level].filter(({ day, chapter, title }) =>
-      [`Day ${day}`, `Somo la ${day}`, chapter, title].some(value => value.toLowerCase().includes(query)));
-    return (
-      <div className="course-book a2-b1-course-book swahili-course-overview" data-swahili-course-book="true">
-        <section className="course-book-hero course-book-hero--compact" style={book.hero}>
-          <div data-a1-coursebook-hero-header="true" style={book.heroHeader}>
-            <div className="course-book-hero-copy">
-              <p style={book.heroEyebrow}>Kiswahili {level}</p>
-              <h2 style={book.heroTitle}>Kitabu cha Kozi ya Kiswahili</h2>
-              <p style={book.heroText}>{level === "B1" ? "Open the available workbook or browse the other lesson titles." : "Browse the lesson titles. Workbooks for this level are in preparation."}</p>
-            </div>
-            <div data-a1-coursebook-hero-actions="true" style={book.heroActions}>
-              {levelSelector}
-            </div>
-          </div>
-        </section>
-        <section className="course-book-toolbar" style={book.toolbar}>
-          <h3 style={{ margin: 0 }}>Lessons</h3>
-          <input aria-label="Search lessons" placeholder="Search by day, topic or chapter…" value={search}
-            onChange={(event) => setSearch(event.target.value)} style={book.searchInput} />
-        </section>
-        {titles.length === 0 && <p style={book.emptyState}>No lessons match your search.</p>}
-        {titles.map(({ id, day, title, chapter, status }) => (
-          <article key={id} className="course-book-lesson-card" style={book.lessonCard}>
-            <div style={book.lessonMain}>
-              <span style={book.dayBubble}>{day === 0 ? "Mwongozo" : `Somo la ${day}`}</span>
-              <div>
-                <h3 style={book.lessonTitle}>{title}</h3>
-                {day > 0 && <p style={styles.helperText}>Chapter {chapter}</p>}
-                {status === "workbook" && <Link style={primaryLink} to={`${basePath}/${level.toLowerCase()}/day-${day}`}>Open workbook</Link>}
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    );
-  }
-
-  const personal = Boolean(!preview && uid && db);
-  const records = personal && progress?.uid === uid ? progress.records : null;
-  const submissionKnown = records?.every(({ submitted }) => submitted !== null);
-  const completed = records?.filter(({ submitted }) => submitted).length ?? 0;
-  const percent = submissionKnown ? Math.round(completed / ASSIGNMENTS.length * 100) : null;
-  const reviewed = records?.filter(({ submitted, review }) => submitted && review === "reviewed").length ?? 0;
-  const needsRevision = (lesson) => records?.find((record) => record.day === lesson.day)?.review === "needs_revision";
-  const next = PUBLISHED.find(needsRevision) ??
-    ASSIGNMENTS.find(({ day }) => records?.find((entry) => entry.day === day)?.submitted !== true) ??
-    PUBLISHED[0];
-  const nextLabel = submissionKnown && completed === ASSIGNMENTS.length && !records.some(({ review }) => review === "needs_revision")
-    ? "Review lessons" : "Continue learning";
-  const lessonPath = ({ day }) => `${basePath}/day-${day}`;
-  const submitPath = (lesson) => `${lessonPath(lesson)}?view=submit`;
+  const nextLabel = allSubmitted ? "Review lessons" : "Continue learning";
+  const lessonPath = lesson => basePath + lesson.route;
+  const submitPath = lesson => lessonPath(lesson) + "?view=submit";
   const query = search.trim().toLowerCase();
   const visible = LESSONS.filter((lesson) => {
     const record = records?.find((entry) => entry.day === lesson.day);
-    const published = lesson.status !== "coming-soon";
-    const matchesFilter = filter === "all" ||
+    const published = lesson.published;
+    const matchesFilter = filter === "all" || (filter === "available" && published) ||
       (filter === "next" && lesson === next) ||
-      (filter === "toDo" && published && !lesson.practiceOnly && (record?.submitted !== true || record.review === "needs_revision")) ||
-      (filter === "needsRevision" && published && record?.review === "needs_revision");
+      (filter === "toDo" && published && !lesson.practiceOnly && (record?.submitted !== true || record.review?.status === "needs_revision")) ||
+      (filter === "needsRevision" && published && record?.review?.status === "needs_revision");
     return matchesFilter &&
       [`Day ${lesson.day}`, `Somo la ${lesson.day}`, lesson.title, lesson.objective, lesson.chapter, lesson.grammar]
         .some((value) => String(value).toLowerCase().includes(query));
   });
   const metrics = [
     ["Completed", submissionKnown ? `${completed}/${ASSIGNMENTS.length}` : `—/${ASSIGNMENTS.length}`],
-    ["Next lesson", nextLabel === "Review lessons" ? "Published work submitted" : `Somo la ${next.day}`],
+    ["Next lesson", nextLabel === "Review lessons" ? "Published work submitted" : next ? `Somo la ${next.day}` : "Not published"],
     ["Tutor review", submissionKnown ? `${reviewed} reviewed` : "—"],
   ];
 
@@ -145,15 +67,15 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
       <section className="course-book-hero course-book-hero--compact" style={book.hero}>
         <div data-a1-coursebook-hero-header="true" style={book.heroHeader}>
           <div className="course-book-hero-copy">
-            <p style={book.heroEyebrow}>Kiswahili A1 · Tutor guided</p>
+            <p style={book.heroEyebrow}>Kiswahili {level} · Tutor guided</p>
             <h2 style={book.heroTitle}>Kitabu cha Kozi ya Kiswahili</h2>
-            <p style={book.heroText}>{nextLabel === "Review lessons" ? "All tutor assignments submitted." : <>Next: <strong>Somo la {next.day} · {next.title}</strong></>}</p>
+            <p style={book.heroText}>{allSubmitted ? "All published tutor assignments submitted." : next ? <>Next: <strong>Somo la {next.day} · {next.title}</strong></> : "Workbooks for this level are in preparation."}</p>
           </div>
           <div data-a1-coursebook-hero-actions="true" className="course-book-hero-actions" style={book.heroActions}>
             {levelSelector}
-            {!preview && <Link style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }} to="/">← Back to Campus</Link>}
-            <Link className="course-book-continue-button" style={primaryLink} to={lessonPath(next)}>{nextLabel}</Link>
-            <Link className="course-book-submit-secondary" style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }} to={submitPath(next)}>Receive &amp; Submit</Link>
+            {!preview && <Link style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }} to="/">← Falowen Home</Link>}
+            {next && <Link className="course-book-continue-button" style={primaryLink} to={lessonPath(next)}>{nextLabel}</Link>}
+            {next?.required && <Link className="course-book-submit-secondary" style={{ ...styles.secondaryButton, ...styles.primaryButtonLink, minHeight: 44 }} to={submitPath(next)}>Receive &amp; Submit</Link>}
           </div>
         </div>
         <div className="course-book-quick-stats" style={book.statGrid}>
@@ -171,19 +93,19 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
             </div>
           )}
           <p style={{ ...book.heroText, fontSize: 13 }} role="status">
-            {!personal ? "Personal progress is available in Campus." : !records ? "Syncing progress…" :
+            {!personal ? "Personal progress is available in Campus." : failed ? "Progress could not be loaded. Reopen this page to retry." : !records ? "Syncing progress…" :
               !submissionKnown ? "Some submissions could not be loaded." :
-              `${completed} of ${ASSIGNMENTS.length} required assignments submitted · ${percent}% complete`}
+              ASSIGNMENTS.length ? `${completed} of ${ASSIGNMENTS.length} required assignments submitted · ${percent}% complete` : "No tutor assignments published for this level yet."}
           </p>
         </div>
       </section>
 
       <section className="course-book-toolbar" style={book.toolbar}>
-        <p style={{ ...styles.helperText, margin: 0 }}>Days 1 and 6 are tutor-marked. The other listed lessons are for self-study.</p>
+        <p style={{ ...styles.helperText, margin: 0 }}>{ASSIGNMENTS.length} published tutor-marked workbooks. Unpublished lessons are curriculum previews.</p>
         <div style={book.toolbarTop}>
           <div>
             <h3 style={{ margin: 0, fontSize: 18 }}>Lessons</h3>
-            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{visible.length} shown from {LESSONS.length} A1 units · {PUBLISHED.length} available</p>
+            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{visible.length} shown from {LESSONS.filter(lesson => lesson.day > 0).length} {level} units · {PUBLISHED.length} available</p>
           </div>
           <div className="course-book-filter-row" role="group" aria-label="Course Book lesson filters" style={book.filterRow}>
             {FILTERS.map(({ key, label }) => (
@@ -203,43 +125,44 @@ export default function SwahiliCourseOverview({ basePath, preview, uid, assigned
         const badge = !published ? "Coming soon" : record?.submitted ? {
           reviewed: "Reviewed",
           needs_revision: "Needs revision",
-        }[record.review] || "Submitted" : record?.submitted === false ? "Not started" : "Available";
+        }[record.review?.status] || "Submitted" : record?.submitted === false ? "Not started" : "Available";
         return (
           <article key={lesson.day} className="course-book-lesson-card"
             style={{ ...book.lessonCard, ...(lesson === next ? book.lessonCardCurrent : {}) }}>
             <div style={book.lessonTop}>
               <div style={book.lessonMain}>
-                <span style={book.dayBubble}>Somo la {lesson.day}</span>
+                <span style={book.dayBubble}>{lesson.day === 0 ? "Mwongozo" : `Somo la ${lesson.day}`}</span>
                 <div>
                   <h3 style={book.lessonTitle}>{lesson.title}</h3>
-                  <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{lesson.objective}</p>
+                  {lesson.objective && <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{lesson.objective}</p>}
+                  {lesson.chapter && <p style={styles.helperText}>Chapter {lesson.chapter}</p>}
                   {lesson.grammar && <p style={{ ...styles.helperText, margin: "6px 0 0" }}><strong>Sarufi · Grammar:</strong> {lesson.grammar}</p>}
                   <div style={book.lessonMeta}>
                     <span style={book.chip}>{!published ? "Curriculum preview" : lesson.practiceOnly ? "Practice" : "Tutor-marked"}</span>
                     <span style={book.chip}>{badge}</span>
                   </div>
-                  {published && <div className="course-book-included" style={book.includedRow}>
+                  {published && level === "A1" && <div className="course-book-included" style={book.includedRow}>
                     {["Music", "Grammar", "Teil 1", "Teil 2", "Teil 3", "Teil 4", "Review & Submit"].map((label) =>
                       <span key={label} style={book.includedChip}>{label}</span>)}
                   </div>}
-                  {record?.review === "needs_revision" && (
+                  {record?.review?.status === "needs_revision" && (
                     <div className="swahili-course-feedback" role="status">
                       <strong>Tutor requested revisions</strong>
-                      {record.feedback && <p>{record.feedback}</p>}
+                      {record.review.feedback && <p>{record.review.feedback}</p>}
                       <Link to={submitPath(lesson)}>View feedback and resubmit</Link>
                     </div>
                   )}
-                  {record?.review === "reviewed" && (
+                  {record?.review?.status === "reviewed" && (
                     <div className="swahili-course-feedback swahili-course-feedback--reviewed">
                       <strong>Reviewed by your tutor</strong>
-                      {record.feedback && <p>{record.feedback}</p>}
+                      {record.review.feedback && <p>{record.review.feedback}</p>}
                       <Link to={submitPath(lesson)}>View tutor feedback</Link>
                     </div>
                   )}
                 </div>
               </div>
               <div className="course-book-lesson-actions" style={book.lessonActions}>
-                {published ? <Link to={lessonPath(lesson)} style={primaryLink}>Fungua Somo la {lesson.day}</Link> :
+                {published ? <Link to={lessonPath(lesson)} style={primaryLink}>{level === "A1" ? `Fungua Somo la ${lesson.day}` : "Open workbook"}</Link> :
                   <span style={{ ...book.chip, padding: "10px 14px" }} aria-label={`Somo la ${lesson.day} coming soon`}>Coming soon · In preparation</span>}
               </div>
             </div>
