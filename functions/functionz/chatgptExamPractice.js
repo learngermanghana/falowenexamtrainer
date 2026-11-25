@@ -3,7 +3,7 @@
 // The server registry includes private keys and rubrics. Export only the
 // student-facing writing/speaking fields below, never the source object.
 const registry = require("../data/assessmentTasks.json");
-const { listMyExamMocks, getMyMockObjectivePractice } = require("./chatgptExamLibrary");
+const { listMyExamMocks, getMyMockObjectivePractice, getExpandedMockTask } = require("./chatgptExamLibrary");
 const RELEASED = new Set(["a1-mock-02", "a1-mock-03", "a2-mock-02"]);
 const text = (x, max = 1200) => typeof x === "string" ? x.slice(0, max) : "";
 const list = (x, max = 10) => Array.isArray(x)
@@ -28,6 +28,8 @@ function getExamPractice(level, mockId, skill, part, questionNumber) {
   if (skill === "reading" || skill === "listening") {
     return getMyMockObjectivePractice(level, mockId, skill, part, questionNumber);
   }
+  const expanded = getExpandedMockTask(level,mockId,skill,part);
+  if (expanded) return expanded;
   if (typeof mockId !== "string" || !RELEASED.has(mockId)) {
     return { available: false, message: "This mock is not in the approved ChatGPT practice export." };
   }
