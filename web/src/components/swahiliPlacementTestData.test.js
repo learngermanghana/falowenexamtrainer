@@ -1,4 +1,4 @@
-import { swahiliPlacementTest, swahiliPlacementQuestions, SWAHILI_PLACEMENT_STORAGE_KEY } from "./swahiliPlacementTestData";
+import { swahiliPlacementTest, swahiliPlacementQuestions, SWAHILI_PLACEMENT_STORAGE_KEY, shufflePlacementItems } from "./swahiliPlacementTestData";
 import { PLACEMENT_STORAGE_KEY } from "./placementTest2026Data";
 
 test("teacher-supplied Kiswahili A1–B1 assessment has 30 ordered questions and four choices each",()=>{
@@ -21,4 +21,23 @@ test("PDF source samples and isolation from German browser attempts",()=>{
   expect(swahiliPlacementQuestions[19].text).toMatch(/Saa tatu za usiku/);
   expect(swahiliPlacementQuestions[29].options[1]).toMatch(/Gharama za sasa/);
   expect(SWAHILI_PLACEMENT_STORAGE_KEY).not.toBe(PLACEMENT_STORAGE_KEY);
+});
+
+ test("attempt shuffling is stable, non-mutating and preserves canonical answer indices", () => {
+  const original = swahiliPlacementQuestions.map(q => ({...q, options:[...q.options]}));
+  const orders = new Set();
+  for(let i=0;i<40;i++) {
+    const seed = "pt_test_attempt_"+i;
+    const order = shufflePlacementItems(original.slice(0,10), seed);
+    expect(order).toEqual(shufflePlacementItems(original.slice(0,10), seed));
+    expect(order.map(q=>q.id).sort()).toEqual(original.slice(0,10).map(q=>q.id).sort());
+    orders.add(order.map(q=>q.id).join(","));
+    for(const q of order) {
+      const options=shufflePlacementItems(q.options,seed+q.id);
+      expect([...options].sort()).toEqual([...q.options].sort());
+      expect(q.options.indexOf(options[0])).toBeGreaterThanOrEqual(0);
+    }
+  }
+  expect(orders.size).toBeGreaterThan(1);
+  expect(swahiliPlacementQuestions).toEqual(original);
 });
