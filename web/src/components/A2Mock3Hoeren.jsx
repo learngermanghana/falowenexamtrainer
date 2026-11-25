@@ -9,7 +9,7 @@ import teil3 from "../data/mockDrafts/a2-mock-03-hoeren-teil-3.json";
 import teil4 from "../data/mockDrafts/a2-mock-03-hoeren-teil-4.json";
 import "./A2Mock2Hoeren.css";
 
-const PARTS = [
+export const PARTS = [
   { id: "teil-1", number: 1, label: "Unterwegs in der Stadt", data: teil1 },
   { id: "teil-2", number: 2, label: "Freizeit in der Woche", data: teil2 },
   { id: "teil-3", number: 3, label: "Fünf kurze Gespräche", data: teil3 },
