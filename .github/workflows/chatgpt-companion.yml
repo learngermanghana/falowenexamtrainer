@@ -36,6 +36,10 @@ on:
       - "functions/functionz/chatgptMockReview.js"
       - "functions/functionz/chatgptPersonalRevision.js"
       - "functions/functionz/chatgptInteractiveTutor.js"
+      - "functions/functionz/chatgptSavedRevision.js"
+      - "functions/functionz/scoresSheet.js"
+      - "functions/functionz/__tests__/chatgptSavedRevision.test.js"
+      - "firestore.rules"
       - "functions/functionz/__tests__/chatgptInteractiveTutor.test.js"
       - "web/public/music/catalog.json"
       - "web/public/music/swahili-catalog.json"
@@ -89,7 +93,7 @@ jobs:
       - name: Generate student-facing curriculum from canonical A1–C2 sources
         run: node scripts/generateChatgptLessonContent.mjs && node scripts/generateChatgptExamContent.mjs
       - name: Verify OAuth constraints and student data scope
-        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js functions/functionz/__tests__/chatgptExamLibrary.test.js functions/functionz/__tests__/chatgptExamPractice.test.js functions/functionz/__tests__/chatgptAssignmentSubmission.test.js functions/functionz/__tests__/chatgptPersonalRevision.test.js functions/functionz/__tests__/chatgptInteractiveTutor.test.js
+        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js functions/functionz/__tests__/chatgptExamLibrary.test.js functions/functionz/__tests__/chatgptExamPractice.test.js functions/functionz/__tests__/chatgptAssignmentSubmission.test.js functions/functionz/__tests__/chatgptPersonalRevision.test.js functions/functionz/__tests__/chatgptInteractiveTutor.test.js functions/functionz/__tests__/chatgptSavedRevision.test.js
       - name: Verify JavaScript syntax
         run: |
           node --check scripts/generateChatgptLessonContent.mjs
@@ -106,6 +110,7 @@ jobs:
           node --check functions/functionz/chatgptMockReview.js
           node --check functions/functionz/chatgptPersonalRevision.js
           node --check functions/functionz/chatgptInteractiveTutor.js
+          node --check functions/functionz/chatgptSavedRevision.js
           node --check scripts/chatgptExpandedMockContent.mjs
           node --check functions/functionz/chatgptAssignmentSubmission.js
           node --check functions/functionz/chatgptWorkbookSubmission.js

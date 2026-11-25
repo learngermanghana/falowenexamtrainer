@@ -265,7 +265,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(32);
+      expect(list.data.result.tools).toHaveLength(36);
       expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["submit_my_falowen_workbook", "get_my_falowen_submission_status"]));
       expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["get_my_falowen_access", "get_my_falowen_swahili_lesson", "get_my_falowen_weaknesses"]));
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
@@ -641,6 +641,26 @@ describe("Interactive tutor authenticated access",()=>{
       expect((await call("get_my_falowen_oral_examiner",{source:"mock",mockId:"a2-mock-02",part:"teil1"})).data.result.structuredContent.available).toBe(true);
       expect((await call("get_my_falowen_oral_examiner",{source:"lesson",program:"german",day:1})).data.result.isError).toBe(true);
       expect((await call("get_my_falowen_music_tutor",{program:"german",day:1})).data.result.isError).toBe(true);
+    });
+  });
+});
+
+describe("Saved revision OAuth boundaries",()=>{
+  test("read-only learner can view review list but cannot write vocabulary outcomes",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"student-1","vocab-review-readonly");
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      expect((await call("get_my_falowen_vocabulary_review",{program:"german"})).data.result.structuredContent).toMatchObject({available:true,total:0,dueCount:0});
+      expect((await call("save_my_falowen_vocabulary_review",{program:"german",confirmed:true})).data.result.isError).toBe(true);
+      expect((await call("get_my_falowen_vocabulary_review",{program:"german",level:"B1"})).data.result.structuredContent.available).toBe(false);
+    });
+  });
+  test("exam-only accounts can get recommendations but not saved coursework vocabulary",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"exam-learner","exam-recommendations");
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      expect((await call("get_my_falowen_exam_recommendations",{minutes:30})).data.result.structuredContent).toMatchObject({available:true,basis:"No selected verified result",priorities:[]});
+      expect((await call("get_my_falowen_vocabulary_review",{program:"german"})).data.result.isError).toBe(true);
     });
   });
 });

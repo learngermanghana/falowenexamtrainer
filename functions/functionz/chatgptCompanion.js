@@ -16,6 +16,7 @@ const { germanEnrollment, submitA1Assignment } = require("./chatgptAssignmentSub
 const { submitExpandedWorkbook, workbookStatus } = require("./chatgptWorkbookSubmission");
 const { TOOLS: REVISION_TOOLS, revisionTool } = require("./chatgptPersonalRevision");
 const { TOOLS: TUTOR_TOOLS, tutorTool } = require("./chatgptInteractiveTutor");
+const { TOOLS: COACH_TOOLS, coachTool } = require("./chatgptSavedRevision");
 
 let GENERATED_COURSE_CONTENT = null;
 try {
@@ -592,6 +593,31 @@ const toolDefinitions = [
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
+    name:"get_my_falowen_assignment_correction",
+    description:"Explain my recorded German A1–B1 tutor assignment feedback or my current reviewed Kiswahili A1 workbook. Ask for my own response before correcting it and create similar retry exercises. Never change marks or invent original answers.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1"]},assignmentId:{type:"string",maxLength:48},day:{type:"integer",minimum:1,maximum:20}},required:["program"],additionalProperties:false},
+    annotations:{readOnlyHint:true,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_vocabulary_review",
+    description:"Get my own due vocabulary flashcards from previously confirmed practice sessions for an authorised course level. Repeat difficult words one at a time; never reveal the meaning before I answer. These are not grades.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},limit:{type:"integer",minimum:1,maximum:20}},required:["program"],additionalProperties:false},
+    annotations:{readOnlyHint:true,openWorldHint:false},
+  },
+  {
+    name:"save_my_falowen_vocabulary_review",
+    description:"Save up to ten vocabulary review outcomes matching the exact authorised Falowen vocabulary previously retrieved. Show the words and agreed self-reported outcomes, then request explicit confirmation before saving. Requires optional practice-write permission. Use a unique retry ID. Not an official score.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},items:{type:"array",minItems:1,maxItems:10,items:{type:"object",properties:{term:{type:"string",maxLength:180},meaning:{type:"string",maxLength:300},day:{type:"integer",minimum:1,maximum:50},outcome:{type:"string",enum:["again","hard","remembered"]}},required:["term","meaning","outcome"],additionalProperties:false}},requestId:{type:"string",minLength:8,maxLength:80,pattern:"^[A-Za-z0-9_-]+$"},confirmed:{type:"boolean"}},required:["program","items","requestId","confirmed"],additionalProperties:false},
+    annotations:{readOnlyHint:false,destructiveHint:false,openWorldHint:false,idempotentHint:true},
+    securitySchemes:[{type:"oauth2",scopes:[SCOPE,PRACTICE_WRITE_SCOPE]}],
+  },
+  {
+    name:"get_my_falowen_exam_recommendations",
+    description:"Recommend targeted exam revision using my selected verified mock attempt and available authorised practice papers. First use mock history to select an attempt. If none is selected, establish a baseline rather than invent scores. No readiness percentage or pass prediction. Available to entitled exam-only accounts.",
+    inputSchema:{type:"object",properties:{mockId:{type:"string",maxLength:80},attemptId:{type:"string",maxLength:150},minutes:{type:"integer",minimum:15,maximum:120}},additionalProperties:false},
+    annotations:{readOnlyHint:true,openWorldHint:false},
+  },
+  {
     name: "get_my_falowen_feedback",
     description: "Retrieve my most recent tutor-marked assignment scores and feedback, not other students' data.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
@@ -1031,7 +1057,7 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "Falowen Learning Companion", version: "1.2.0" },
-        instructions: "Tutoring protocol: for interactive oral practice prefer get_my_falowen_oral_examiner, follow its exam or coach protocol, present one prompt at a time, allow fictional personal details, and never claim an official result or assess pronunciation from text alone. For song-based lessons prefer get_my_falowen_music_tutor, select an exact catalogue track first and use only matched recording lines; direct the learner to Falowen Music to hear the recording and never invent lyrics or timings. Otherwise prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For German Exams Room, start with get_my_falowen_exam_mocks, choose an explicitly supported mock skill for get_my_falowen_exam_practice, or get real Sprechen/Schreiben practice from get_my_falowen_exam_dictionary. For Hören, link the protected recording in Exams Room without copying private audio or transcripts. For Lesen, show the original source passage and one question at a time. Never invent a missing mock. Only help a learner practise their authorised German course and do not expose hidden solutions. For mock review, first call get_my_falowen_mock_history, then get_my_falowen_mock_review on a verified attempt. Practise repeatably using the returned practiceUrl and never create or change an official attempt. Exam-only accounts may use only the entitlement-checked Exams Room tools. For official A1 tutor submissions, show the exact full answer, request explicit separate confirmation, and use submit_my_falowen_assignment only if the student approved a permanent assignment lock and separately granted the assignment-write scope. A2/B1 and exam submissions remain in Campus. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. For personalised daily study, prefer get_my_falowen_personal_plan. For previous-level revision first call get_my_falowen_revision_levels, then get_my_falowen_revision_lesson or get_my_falowen_revision_vocabulary. Earlier-level material is read-only and does not grant assignment submission. Use the existing Campus dictionary for level-filtered flashcards, wait before revealing meanings, and repeat missed terms; do not claim persistent spaced-repetition history. Otherwise restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
+        instructions: "Tutoring protocol: for assignment correction call get_my_falowen_assignment_correction and use recorded feedback only. For vocabulary revision call get_my_falowen_vocabulary_review, then retrieve new words from get_my_falowen_revision_vocabulary when needed. Save outcomes only after explicit confirmation using save_my_falowen_vocabulary_review and the optional practice-write permission. For targeted exam preparation call get_my_falowen_exam_recommendations with a verified attempt selected from mock history; missing skills are not zero, and never predict a pass. For interactive oral practice prefer get_my_falowen_oral_examiner, follow its exam or coach protocol, present one prompt at a time, allow fictional personal details, and never claim an official result or assess pronunciation from text alone. For song-based lessons prefer get_my_falowen_music_tutor, select an exact catalogue track first and use only matched recording lines; direct the learner to Falowen Music to hear the recording and never invent lyrics or timings. Otherwise prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For German Exams Room, start with get_my_falowen_exam_mocks, choose an explicitly supported mock skill for get_my_falowen_exam_practice, or get real Sprechen/Schreiben practice from get_my_falowen_exam_dictionary. For Hören, link the protected recording in Exams Room without copying private audio or transcripts. For Lesen, show the original source passage and one question at a time. Never invent a missing mock. Only help a learner practise their authorised German course and do not expose hidden solutions. For mock review, first call get_my_falowen_mock_history, then get_my_falowen_mock_review on a verified attempt. Practise repeatably using the returned practiceUrl and never create or change an official attempt. Exam-only accounts may use only the entitlement-checked Exams Room tools. For official A1 tutor submissions, show the exact full answer, request explicit separate confirmation, and use submit_my_falowen_assignment only if the student approved a permanent assignment lock and separately granted the assignment-write scope. A2/B1 and exam submissions remain in Campus. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. For personalised daily study, prefer get_my_falowen_personal_plan. For previous-level revision first call get_my_falowen_revision_levels, then get_my_falowen_revision_lesson or get_my_falowen_revision_vocabulary. Earlier-level material is read-only and does not grant assignment submission. Use the existing Campus dictionary for level-filtered flashcards, wait before revealing meanings, and repeat missed terms; do not claim persistent spaced-repetition history. Otherwise restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
@@ -1069,6 +1095,19 @@ function makeRouter(admin) {
           return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"This account has exam-only access. Choose an authorised exam speaking task."}]}});
         }
         const result=await tutorTool({name,args,student,admin,uid:session.uid,snapshot:GENERATED_COURSE_CONTENT,lessonContentResponse,swahiliLessonResponse});
+        return res.json({jsonrpc:"2.0",id,result:{content:[{type:"text",text:JSON.stringify(result)}],structuredContent:result}});
+      }
+      if (COACH_TOOLS.has(name)) {
+        if(isExamOnlyProfile(student.data)&&name!=="get_my_falowen_exam_recommendations"){
+          return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"This account has exam-only access. Course corrections and saved course vocabulary require full-course access."}]}});
+        }
+        const canWrite=session.scope.split(/\s+/).includes(PRACTICE_WRITE_SCOPE);
+        if(name==="save_my_falowen_vocabulary_review"&&!canWrite){
+          return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"Reconnect with optional practice-write permission. No vocabulary outcomes saved."}]}});
+        }
+        const result=await coachTool({name,args:message.params?.arguments||{},student,admin,uid:session.uid,
+          snapshot:GENERATED_COURSE_CONTENT,canWrite,dual:companionPrograms(student).length>1,
+          loadScores:()=>getScoresForStudent(normalize(student.data.studentCode||student.data.studentcode||student.id))});
         return res.json({jsonrpc:"2.0",id,result:{content:[{type:"text",text:JSON.stringify(result)}],structuredContent:result}});
       }
       if (isExamOnlyProfile(student.data)) {

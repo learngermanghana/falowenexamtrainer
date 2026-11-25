@@ -78,10 +78,10 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
         </p>
         {wantsPracticeWrite && (
           <div style={{ padding: "12px 18px", background: "#fff5e8", border: "1px solid #f3d7a8", borderRadius: 12, marginTop: 16 }}>
-            <strong>Additional permission requested: Save personal practice notes</strong>
+            <strong>Additional permission requested: Save personal practice notes and vocabulary review</strong>
             <p style={{ marginBottom: 0, lineHeight: 1.6 }}>
               With your permission, ChatGPT may save a short learning note to your own Falowen account
-              when you explicitly ask it to do so. Notes are stored separately from official exams,
+              when you explicitly ask it to do so. With separate confirmation in the conversation, it may also save your vocabulary review outcomes and next review dates (up to 100 words per course level). These are stored separately from official grades; entries older than 180 days are excluded from active review. Notes are stored separately from official exams,
               grades and submissions, and have a 90-day expiry marker. You can request deletion through Falowen Help. You can decline by
               cancelling and reconnecting with read-only access. This permission does not allow
               ChatGPT to submit or mark exams, change tutor scores or access other students.
@@ -114,7 +114,7 @@ export default function ChatGPTConnectPage({ user, studentProfile }) {
           <p role="alert" style={{ color: "#b21d2d" }}>The ChatGPT connection request is incomplete. Start again from ChatGPT.</p>
         ) : (
           <button style={{ ...styles.button, opacity: loading ? .65 : 1 }} type="button" onClick={authorize} disabled={loading || !user}>
-            {loading ? "Connecting…" : wantsAssignmentWrite ? "Allow reading and confirmed A1 assignment submission" : wantsPracticeWrite ? "Allow reading and optional practice-note saving" : "Allow read-only access"}
+            {loading ? "Connecting…" : wantsAssignmentWrite ? "Allow reading and confirmed A1 assignment submission" : wantsPracticeWrite ? "Allow reading and optional practice saving" : "Allow read-only access"}
           </button>
         )}
         <p style={{ textAlign: "center", marginTop: 20 }}>
