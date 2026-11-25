@@ -190,7 +190,9 @@ describe("standardized A1 teacher videos", () => {
     ]);
   });
 
-  test("canonical teacher video replaces a stale curated teacher video for the same chapter", () => {
+  test("Day 16 Chapter 9 uses only the new negation teacher lecture and replaces stale curated video", () => {
+    expect(getA1TeacherVideoResources(16, "9").map(video => video.url)).toEqual(["https://youtu.be/RriTJiLUXUI"]);
+    expect(getA1TeacherVideoResources(16, "10")).toHaveLength(0);
     const lesson = normalizeLesson(
       {
         day: 16,
@@ -215,7 +217,7 @@ describe("standardized A1 teacher videos", () => {
     );
 
     expect(teacherVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/1oOO1aJ8lV0",
+      "https://youtu.be/RriTJiLUXUI",
     ]);
     expect(teacherVideos.map((video) => video.url)).not.toContain(
       "https://youtu.be/custom-teacher-video"
