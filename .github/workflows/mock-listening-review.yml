@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - 'web/src/components/MockListeningReview*'
+      - 'web/src/components/MockPracticeWorkspace*'
+      - 'web/src/components/A2AdditionalMockPractice.jsx'
+      - 'functions/functionz/mockPracticeReview.js'
+      - 'functions/functionz/tests/mockPracticeReview.test.cjs'
       - 'web/src/components/A1FinalMockExamPage.jsx'
       - 'web/src/components/A2FinalMockExamPage.jsx'
       - 'web/src/components/A2Mock2Hoeren.jsx'
@@ -28,7 +32,7 @@ jobs:
           node-version: '22'
       - run: |
           node --check functions/functionz/app.js
-          node --test functions/functionz/tests/mockListeningReview.test.cjs
+          node --test functions/functionz/tests/mockListeningReview.test.cjs functions/functionz/tests/mockPracticeReview.test.cjs
   web:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -43,7 +47,7 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci --legacy-peer-deps --no-audit --no-fund
-      - run: npx jest --runInBand --runTestsByPath src/components/MockListeningReview.test.jsx src/components/A2MockAnswerVisibility.test.jsx
+      - run: npx jest --runInBand --runTestsByPath src/components/MockListeningReview.test.jsx src/components/A2MockAnswerVisibility.test.jsx src/components/MockPracticeWorkspace.test.jsx
         env:
           CI: true
       - run: npx vite build
