@@ -12,7 +12,7 @@ const read = (key) => {
 };
 
 // Keep Mock 2's original content: Mock 1 has different cards and situations.
-const TASKS = [
+export const TASKS = [
   { teil:"1",title:"Fragen zur Person", english:"Ask questions with the topic cards, then answer your AI partner.",
     prompt:`Stellen Sie zu jedem Stichwort eine Frage: ${CONTENT.cards.map(c=>c.keyword).join(", ")}. Antworten Sie danach auf die Fragen Ihres Partners: ${CONTENT.cards.map(c=>c.samplePartnerQuestion).join(" / ")}.`,
     keywords:CONTENT.cards.map(c=>c.keyword).join(", "),
