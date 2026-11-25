@@ -136,3 +136,11 @@ The proposed ChatGPT exam tools now share a **build-time generated, answer-safe 
 - `scripts/generateChatgptExamContent.mjs` is invoked by both the existing web prebuild and the companion CI; it exports only a fixed set of learner-facing fields and fails on forbidden answer-key, transcript, rubric or private audio field names.
 
 This is a **review PR only**, not a live plugin release. After passing backend, Firebase and web checks, the publisher must review the exact permissions and tool definitions and publish a new version of the **existing** Falowen Learning Companion. Playback should be verified with an authenticated A1 learner in Exams Room before describing Hören as available end to end.
+
+## Multilingual companion release candidate (25 November 2026)
+
+- `get_my_falowen_access`: recorded active programme selections (not a billing entitlement or previous-level grant).
+- `get_my_falowen_swahili_lesson`: explicitly selects Kiswahili A1 for a verified primary or secondary enrolment. Generates learner-facing reading, grammar, vocabulary examples, speaking and writing from the existing workbook at build time. Missing sections, protected listening and unsupported levels fail closed. No answer keys or hidden teacher data.
+- `get_my_falowen_weaknesses`: bounded tutor assignment revision priorities from explicitly level-labelled German records; no skill scores, unverified completion, or exam readiness claims. Dual programme results remain unavailable until programme-scoped records can be verified.
+
+No new scheduled jobs, model API calls, OAuth write permissions or Firestore writes. Existing German tool contracts remain unchanged. This is a backend candidate; after CI and deployment, rescan the existing public plugin and publish the revised tool catalogue. Mock review, advanced exam readiness, persistent vocabulary revision, previous-level entitlements and richer music support remain follow-up work.

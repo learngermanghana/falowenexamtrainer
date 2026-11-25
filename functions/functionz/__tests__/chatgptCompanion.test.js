@@ -411,3 +411,33 @@ describe("C1 and C2 canonical student Course Book in ChatGPT", () => {
     expect(lessonContentResponse("C2", 2, "listening").material).not.toHaveProperty("transcript");
   });
 });
+
+
+describe("Companion multilingual revision", () => {
+  const { companionPrograms, swahiliLessonResponse, revisionEvidence } = require("../chatgptCompanion");
+  const german = { id: "g", data: { program: "german", level: "A1" } };
+  const swahili = { id: "s", data: { program: "swahili", level: "A1" } };
+  test("requires explicit secondary enrolment and never substitutes German", () => {
+    const retained = { id: "g", data: { ...german.data, coursePlacements: { swahili: { level: "A1" } } } };
+    expect(companionPrograms(retained)).toEqual([{ program: "german", level: "A1" }]);
+    expect(swahiliLessonResponse(retained, 2).available).toBe(false);
+    const dual = { ...retained, data: { ...retained.data, secondaryProgram: "swahili" } };
+    expect(companionPrograms(dual)).toHaveLength(2);
+    expect(swahiliLessonResponse(dual, 2, "reading").available).toBe(true);
+    expect(revisionEvidence(dual, []).available).toBe(false);
+  });
+  test("returns original Kiswahili workbook passage without key or invented audio", () => {
+    const lesson = swahiliLessonResponse(swahili, 2, "reading");
+    expect(lesson.available).toBe(true);
+    expect(lesson.material.passage).toContain("salamu");
+    expect(lesson.material.questions.length).toBeGreaterThan(0);
+    expect(JSON.stringify(lesson)).not.toMatch(/"(answer|answerIndex|correctOption|transcript|why)"\s*:/);
+    expect(swahiliLessonResponse(swahili, 2, "listening").available).toBe(false);
+    expect(swahiliLessonResponse(swahili, 50).available).toBe(false);
+    expect(swahiliLessonResponse(german, 2).available).toBe(false);
+  });
+  test("does not infer weaknesses from unlabelled or other-level records", () => {
+    expect(revisionEvidence(german, [{ level: "B1", score: 0 }, { score: 0 }]).available).toBe(false);
+    expect(revisionEvidence(swahili, []).available).toBe(false);
+  });
+});
