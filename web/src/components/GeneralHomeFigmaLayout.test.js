@@ -33,7 +33,7 @@ describe("Figma-inspired signed-in learner homepage", () => {
   test("preserves Kiswahili without showing German exam preparation", () => {
     expect(home).toContain('isSwahili ? " falowen-learner-hero--single"');
     expect(home).toContain('{!isSwahili && (');
-    expect(home).toContain('isSwahili ? " falowen-home-spaces__grid--single"');
+    expect(home).toContain('isSwahili && !openExamsRoom ? " falowen-home-spaces__grid--single"');
   });
 
   test("does not reuse the public landing page hero selector", () => {
