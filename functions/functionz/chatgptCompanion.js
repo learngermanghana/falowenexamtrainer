@@ -336,6 +336,62 @@ function summarizeStudentAssignments(student, rows) {
   };
 }
 
+// Enrolment metadata is not a payment grant. Never infer secondary enrolment
+// from a retained placement alone, or derive Kiswahili from German level.
+function companionPrograms(student) {
+  const data = student.data || {};
+  const german = germanEnrollment(student);
+  const programs = [];
+  if (german.enrolledInGerman && german.germanLevel) programs.push({ program: "german", level: german.germanLevel });
+  const secondary = normalize(data.secondaryProgram).toLowerCase();
+  const placement = data.coursePlacements?.swahili;
+  const swLevel = german.primaryProgram === "swahili"
+    ? normalizeLevel(data.level || data.course)
+    : german.primaryProgram === "german" && ["swahili", "kiswahili"].includes(secondary) && placement
+      ? normalizeLevel(placement.level || placement.levelId) : "";
+  if (swLevel) programs.push({ program: "swahili", level: swLevel });
+  return programs;
+}
+
+function swahiliLessonResponse(student, day, section = "overview") {
+  const enrolled = companionPrograms(student).find(p => p.program === "swahili");
+  const base = { program: "swahili", level: enrolled?.level || null, day, section,
+    campusUrl: SITE + "/campus/course" };
+  if (!enrolled || enrolled.level !== "A1") return { ...base, available: false,
+    clarification: "An active Kiswahili A1 enrolment is required. Other levels are not exported; use Campus." };
+  if (!Number.isInteger(day) || day < 1 || day > 20 ||
+      !["overview","grammar","vocabulary","reading","speaking","writing","listening"].includes(section)) {
+    return { ...base, available: false, clarification: "Unsupported Kiswahili day or section." };
+  }
+  const lesson = GENERATED_COURSE_CONTENT?.programs?.swahili?.A1?.[String(day)];
+  if (!lesson) return { ...base, available: false, clarification: "This lesson is not exported; do not invent course material." };
+  const details = { ...base, title: lesson.title, lessonUrl: SITE + "/campus/course/swahili/day-" + day,
+    guidance: "Use the published Kiswahili content. Ask one question at a time; provide unofficial feedback after the learner attempts it. Do not invent audio, grades, completion or answer keys." };
+  if (section === "overview") return { ...details, available: true, goal: lesson.goal,
+    grammarFocus: lesson.grammarFocus, availableSections: ["grammar","vocabulary","reading","speaking","writing"].filter(k => Boolean(lesson[k])) };
+  return lesson[section] ? { ...details, available: true, material: lesson[section] }
+    : { ...details, available: false, clarification: "This section is not exported. Open the lesson in Campus." };
+}
+
+function revisionEvidence(student, rows) {
+  const level = studentView(student).level;
+  // Use only explicitly level-labelled records for new analytics, and never
+  // mix a dual-enrolled learner's potentially same-level programme scores.
+  if (!level || SELF_STUDY_LEVELS.has(level) || companionPrograms(student).length !== 1) {
+    return { available: false, level, clarification: "Programme-specific tutor evidence is unavailable for this account. No weaknesses or readiness score can be inferred." };
+  }
+  const scoped = (Array.isArray(rows) ? rows : []).filter(row =>
+    normalizeLevel(row.level) === level &&
+    !["swahili","kiswahili"].includes(normalize(row.program || row.languageProgram).toLowerCase()));
+  const summary = summarizeStudentAssignments(student, scoped);
+  const items = (summary.assignments || []).filter(a => a.status === "needs_review")
+    .sort((a,b) => a.bestRecordedScore - b.bestRecordedScore).slice(0, 5);
+  return { available: summary.passed + summary.needsReview > 0, level,
+    recordedPassed: summary.passed, recordedNeedsReview: summary.needsReview,
+    noGradeRecorded: summary.noGradeRecorded, revisionPriorities: items,
+    guidance: "Prioritise these real recorded assignments. Tutor scores alone are not skill scores or an exam readiness prediction; do not infer unsubmitted work or promise a pass. Use the actual lesson and ask the learner what they struggled with." };
+}
+
 const toolDefinitions = [
 
   {
@@ -353,6 +409,24 @@ const toolDefinitions = [
       required: ["id"], additionalProperties: false,
     },
     _meta: { "openai/profile": true },
+  },
+  {
+    name: "get_my_falowen_access",
+    description: "List my recorded German and Kiswahili course enrolments and Campus link. This does not grant payment or previous-level access.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_my_falowen_swahili_lesson",
+    description: "Practise the published Kiswahili A1 workbook for my own enrolled programme. Choose a day and section; never substitute German, invent listening audio or expose official answers.",
+    inputSchema: { type: "object", properties: {
+      day: { type: "integer", minimum: 1, maximum: 20 },
+      section: { type: "string", enum: ["overview","grammar","vocabulary","reading","speaking","writing","listening"] },
+    }, required: ["day"], additionalProperties: false },
+  },
+  {
+    name: "get_my_falowen_weaknesses",
+    description: "Identify German revision priorities from my own explicitly level-labelled tutor assignment scores. Not a skill-level or exam readiness prediction; missing grades are not missing submissions.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_my_falowen_study_plan",
@@ -530,6 +604,17 @@ function featuredLegacyCourseBookSection(level, day) {
 }
 
 async function callTool(name, args, student, admin) {
+  if (name === "get_my_falowen_access") return {
+    programs: companionPrograms(student), campusUrl: SITE + "/campus/account",
+    clarification: "Recorded programme enrolments only. Check Campus for billing, trial, exam and previous-level access."
+  };
+  if (name === "get_my_falowen_swahili_lesson") return swahiliLessonResponse(student, args?.day, args?.section ?? "overview");
+  if (name === "get_my_falowen_weaknesses") {
+    const level = studentView(student).level;
+    if (!level || SELF_STUDY_LEVELS.has(level) || companionPrograms(student).length !== 1) return revisionEvidence(student, []);
+    const code = normalize(student.data.studentCode || student.data.studentcode || student.id);
+    return revisionEvidence(student, await getScoresForStudent(code));
+  }
   const view = studentView(student);
   const enrollment = germanEnrollment(student);
   if (!enrollment.enrolledInGerman && name !== "get_my_falowen_profile") {
@@ -959,6 +1044,6 @@ function makeRouter(admin) {
 
 module.exports = {
   makeRouter, oauthParameters, safeStudentAccess, scoreRowsForStudent, summarizeStudentAssignments,
-  lessonContentResponse, practiceGuideResponse,
+  lessonContentResponse, practiceGuideResponse, companionPrograms, swahiliLessonResponse, revisionEvidence,
   constants: { ISSUER, RESOURCE, SCOPE, PRACTICE_WRITE_SCOPE, ASSIGNMENT_WRITE_SCOPE, CLIENT_ID, CALLBACK },
 };
