@@ -161,4 +161,4 @@ async function revisionTool({name,args={},student,admin,uid,snapshot,lessonConte
   }
   return deny("Unsupported revision tool.");
 }
-module.exports={TOOLS,revisionAccess,permitted,pairsFromVocabulary,parseDictionary,selectPairs,buildPlan,revisionTool};
+module.exports={TOOLS,revisionAccess,permitted,pairsFromVocabulary,parseDictionary,selectPairs,loadDictionary,buildPlan,revisionTool};
