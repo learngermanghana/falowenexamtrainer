@@ -76,7 +76,7 @@ function A2Mock2ExamHubAttempt(){
      const resumed = await resumeA2MockSections({ keys: STORAGE, idToken, mockId: "a2-mock-02" });
      if (!resumed) {
        if (!startIfMissing) throw new Error("No active attempt was found on your account.");
-       setFlow({ stage: "lesen", startedAt: Date.now() });
+       setFlow(current=>({ ...current, stage: "lesen", startedAt: Date.now() }));
        return;
      }
      setProgress(getProgress(STORAGE));
@@ -238,7 +238,9 @@ function A2Mock2ExamHubAttempt(){
    const completedAttempt = Object.fromEntries(Object.entries(STORAGE).map(([name, key]) => [name, read(key)]));
    localStorage.setItem(historyKey, JSON.stringify([...(Array.isArray(history) ? history : []), completedAttempt]));
    Object.values(STORAGE).forEach(key => localStorage.removeItem(key));
-   setFlow({ stage: "intro", startedAt: null });
+   const resetFlow={stage:"intro",startedAt:null,ignoreBackupThrough:Date.now()};
+   localStorage.setItem(STORAGE.flow,JSON.stringify(resetFlow));
+   setFlow(resetFlow);
    setProgress(getProgress(STORAGE));
    setResetError("");
    announceExamSuccess("A2 Mock 2 is ready for a new attempt.");
