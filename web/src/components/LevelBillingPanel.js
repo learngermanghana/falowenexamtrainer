@@ -27,7 +27,8 @@ function LevelCard({row,user,paymentsEnabled,blocked,granted,studentProfile}){
  const balance=ledgerBalance(row);
  const due=balance===null?null:balance/100;
  const overlap=legacyUpgradeOverlap(studentProfile,row);
- const payable=!overlap&&due>0&&["active","expired","completed"].includes(row.status);
+ const managed=row.accountingMode==="payment_driven_upgrade_v1";
+ const payable=!overlap&&due>0&&(["active","expired","completed"].includes(row.status)||(managed&&row.status==="planned"&&row.paid===0));
  const [custom,setCustom]=useState(false),[amount,setAmount]=useState(""),[busy,setBusy]=useState(false),[error,setError]=useState("");
  const [history,setHistory]=useState(null),[historyBusy,setHistoryBusy]=useState(false),[historyError,setHistoryError]=useState("");
  const selected=custom?Number(amount):due;
@@ -69,7 +70,7 @@ function LevelCard({row,user,paymentsEnabled,blocked,granted,studentProfile}){
   {overlap?<p role="alert">An earlier upgrade exists for this level. Contact Falowen to verify the balance before paying again.</p>:due>0&&!payable&&<p>Contact Falowen about this {row.status} enrollment before paying.</p>}
   <div className="fw-billing-breakdown"><div><small>Tuition</small><strong>{row.tuitionFee==null?"Not set":money(row.tuitionFee)}</strong></div><div><small>Already paid</small><strong>{row.paid==null?"Not set":money(row.paid)}</strong></div></div>
   {percent!==null&&<><progress aria-label={title(row)+" tuition paid"} value={percent} max={100}/><small>{percent}% paid</small></>}
-  <div className="fw-billing-dates"><span>Payment deadline: <strong>{date(row.paymentDeadline)}</strong></span><span>Contract: {date(row.contractStart)} to {date(row.contractEnd)} · {row.status}</span>{blocked?<small>Course access paused. Payment does not extend an expired contract automatically.</small>:granted?<small>{row.contractEnd&&row.contractEnd<new Date().toISOString().slice(0,10)?"Previous course · revision access retained":"Course access available"}</small>:null}</div>
+  <div className="fw-billing-dates"><span>Payment deadline: <strong>{date(row.paymentDeadline)}</strong></span><span>Contract: {date(row.contractStart)} to {date(row.contractEnd)} · {row.status}</span>{blocked?<small>Course access paused. {managed?"Full payment restores upgrade access and extends the contract; additional installments do not restart temporary access.":"Payment does not extend an expired contract automatically."}</small>:granted?<small>{row.contractEnd&&row.contractEnd<new Date().toISOString().slice(0,10)?"Previous course · revision access retained":"Course access available"}</small>:null}</div>
   <details className="fw-billing-transactions" onToggle={e=>{if(e.currentTarget.open&&history===null&&!historyBusy)loadHistory();}}><summary>Transaction history</summary>
    {historyBusy?<p>Loading payments…</p>:historyError?<><p role="alert">{historyError}</p><button type="button" onClick={loadHistory}>Try again</button></>:history!==null&&<>{!history.length?<p>No individual transactions recorded for this level.</p>:history.map(p=><div key={p.id}><strong>{money(p.amount)}</strong> · {date(p.receivedDate)} · {p.method}<small>{p.reference}</small></div>)}{typeof row.paid==="number"&&row.paid>history.reduce((sum,p)=>sum+Number(p.amount||0),0)&&<p>Some historical credit is included in your paid total and does not have an individual transaction here.</p>}<button type="button" onClick={loadHistory}>Refresh transactions</button></>}
   </details>

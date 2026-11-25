@@ -78,7 +78,7 @@ async function verifyGermanSubmissionAccess(db,auth,identity,now=Date.now()) {
   const allowed=full&&access?.mode==="trial"?levels.filter(level=>decision.granted.includes(level)):levels;
   if(!allowed.length)return null;
   const nextMidnight=Date.parse(new Date(now).toISOString().slice(0,10)+"T00:00:00Z")+86400000;
-  const expires=decision.managed.length?Math.min(nextMidnight,access?.endsAtMs??Infinity):access?.endsAtMs??null;
+  const expires=decision.granted.length?nextMidnight:decision.managed.length?Math.min(nextMidnight,access?.endsAtMs??Infinity):access?.endsAtMs??null;
   return {...access,mode:full?"full":"trial",day1Keys:full?[]:access?.day1Keys||[],levels:allowed,level:allowed.includes(access?.level)?access.level:allowed[allowed.length-1],endsAtMs:expires,profileId:record.id,profileFields:accessFingerprint(profile),enrollmentVersions:decision.versions};
 }
 function registerGermanSubmissionAccessRoute(app,{admin,getAuthedUser}) {
