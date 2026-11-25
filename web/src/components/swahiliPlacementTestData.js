@@ -11,7 +11,7 @@ const SOURCE_SECTIONS = [
     "items": [
       [
         "Salamu za heshima",
-        "Mtu mzima au mzee akikusalimia \"Shikamoo!\", unajibu vipi kwa heshima?",
+        "Kijana anakusalimia kwa kusema \"Shikamoo!\". Unamjibu nini?",
         [
           "Sijambo",
           "Marahaba",
@@ -35,8 +35,8 @@ const SOURCE_SECTIONS = [
         [
           "Ninataka wali na kuku.",
           "Naomba wali na kuku, tafadhali.",
-          "Sitaki wali.",
-          "Mna wali gani?"
+          "Naomba kuleta wali na kuku.",
+          "Je, wali na kuku vimeisha?"
         ]
       ],
       [
@@ -73,10 +73,10 @@ const SOURCE_SECTIONS = [
         "Kuuliza bei",
         "Mteja anapouliza bei ya bidhaa dukani, anatumia swali gani?",
         [
-          "Mna chakula gani?",
+          "Mna bidhaa gani?",
           "Ni shilingi ngapi?",
-          "Jina lako nani?",
-          "Habari za asubuhi?"
+          "Bidhaa hii inatoka wapi?",
+          "Bidhaa hii ina uzito gani?"
         ]
       ],
       [
@@ -139,7 +139,7 @@ const SOURCE_SECTIONS = [
       ],
       [
         "Kanusho la wakati uliopita",
-        "Juma hakwenda shuleni jana. Kanusho la wakati uliopita (Past Negative) la \"alienda\" ni:",
+        "Badilisha sentensi \"Juma alienda shuleni jana\" iwe katika ukanusho.",
         [
           "hajaenda",
           "hakwenda",
@@ -169,7 +169,7 @@ const SOURCE_SECTIONS = [
       ],
       [
         "Kianambishi cha kijilisi",
-        "Mwalimu anamsaidia mwanafunzi. Kianambishi cha kijilisi (Object Marker) cha mwanafunzi ni:",
+        "Jaza pengo kwa kiambishi cha yambwa: Mwalimu ana_______saidia mwanafunzi.",
         [
           "-ki-",
           "-m-",
@@ -241,8 +241,8 @@ const SOURCE_SECTIONS = [
         [
           "ali-",
           "-cho-",
-          "-pya",
-          "-ka-"
+          "-so-",
+          "-ye-"
         ]
       ],
       [
@@ -257,7 +257,7 @@ const SOURCE_SECTIONS = [
       ],
       [
         "Uchaguzi mbadala",
-        "Chagua muundo wa kuonyesha uchaguzi mbadala: \"_______ kununua chupa mpya za plastiki, ninabeba chupa yangu ya kitambaa.\"",
+        "Chagua muundo wa kuonyesha uchaguzi mbadala: \"_______ kununua chupa mpya za plastiki, ninabeba chupa yangu inayoweza kutumiwa tena.\"",
         [
           "Badala ya",
           "Kwa sababu",
@@ -287,7 +287,7 @@ const SOURCE_SECTIONS = [
       ],
       [
         "Masharti ya -ki-",
-        "Chagua masharti ya masharti mepesi (-ki- Condition): \"Mvua _______nyesa, tutabaki nyumbani.\"",
+        "Chagua muundo unaofaa: \"Mvua _______nyesa, tutabaki nyumbani.\"",
         [
           "iki-",
           "ili-",
@@ -297,17 +297,17 @@ const SOURCE_SECTIONS = [
       ],
       [
         "Masharti yasiyo halisi",
-        "Chagua muundo wa masharti yasiyo halisi (Hypothetical -nge-): \"Kama ningekuwa na pesa, _______nunua nyumba mpya.\"",
+        "Chagua muundo unaofaa: \"Kama ningekuwa na pesa, _______nunua nyumba mpya.\"",
         [
           "nita-",
           "ninge-",
-          "nali-",
+          "nili-",
           "nime-"
         ]
       ],
       [
         "Kwa + kitenzi-jina",
-        "Chagua matumizi sahihi ya 'kwa + kitenzi-jina' (By doing): \"Tunaokoa mazingira _______ kurejeleza taka za plastiki.\"",
+        "Chagua kiunganishi kinachoeleza njia ya kuokoa mazingira: \"Tunaokoa mazingira _______ kurejeleza taka za plastiki.\"",
         [
           "badala ya",
           "kwa",
@@ -319,10 +319,10 @@ const SOURCE_SECTIONS = [
         "Ufahamu wa kina",
         "Ufahamu wa Kina (Inference): \"Ingawa bidhaa rafiki kwa mazingira ni ghali, faida yake ni kubwa kwa maisha ya baadaye.\" Sentensi hii inamaanisha nini?",
         [
-          "Bidhaa hizo hazina faida yoyote.",
+          "Gharama kubwa zinaondoa manufaa yote ya bidhaa hizo.",
           "Gharama za sasa ni za juu lakini thamani ya muda mrefu ni bora zaidi.",
-          "Watu waache kutunza mazingira.",
-          "Mazingira hayawezi kuhifadhiwa kwa fedha."
+          "Bei ya chini ndiyo faida kuu ya bidhaa hizo.",
+          "Faida za bidhaa hizo zinaonekana mara moja tu."
         ]
       ]
     ]
@@ -342,3 +342,16 @@ export const swahiliPlacementTest = {
 export const swahiliPlacementQuestions = swahiliPlacementTest.sections.flatMap((section, sectionIndex) =>
   section.questions.map((question, index) => ({ ...question, number: sectionIndex * 10 + index + 1, level: section.level }))
 );
+
+// Seeded Fisher–Yates: same attempt survives refresh; new attempt gets a new order.
+export function shufflePlacementItems(items, seed) {
+  let state = 2166136261;
+  for (const char of String(seed)) state = Math.imul(state ^ char.charCodeAt(0), 16777619) >>> 0;
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    const j = Math.floor(state / 4294967296 * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
