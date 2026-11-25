@@ -12,7 +12,13 @@ function ledgerBalance(row) {
   const fee=moneyCents(row?.tuitionFee),paid=moneyCents(row?.paid),balance=moneyCents(row?.balanceDue);
   return fee!==null&&paid!==null&&balance!==null&&fee===paid+balance?balance:null;
 }
-function checkoutCredit(row,amount) {
+function legacyUpgradeOverlap(student,row){
+  return ["awaiting_payment","pending","expired"].includes(String(student?.upgradeStatus||"").toLowerCase()) &&
+    String(student?.upgradeToLevel||"").toUpperCase()===row?.level &&
+    (String(student?.program||student?.language||"german").toLowerCase().replace(/^kiswahili$/,"swahili")===row?.program);
+}
+function checkoutCredit(row,amount,student) {
+  if (legacyUpgradeOverlap(student,row)) throw new Error("An earlier upgrade exists for this level. Contact Falowen to verify your balance before paying again.");
   const balance=ledgerBalance(row),credit=moneyCents(amount);
   if (!["active","expired","completed"].includes(row?.status)) throw new Error("Contact Falowen about this enrollment before paying.");
   if (balance===null||balance===0||credit===null||credit<=0||credit>balance) throw new Error("The level balance changed or is not verified. Refresh and review your tuition.");
@@ -47,7 +53,7 @@ function registerLevelBillingRoutes(app,{admin,getAuthedUser,fetchImpl=fetch}){
         const [profile,snapshot]=await Promise.all([tx.get(owner.ref),tx.get(ref)]);
         if(!profile.exists||profile.data().uid!==identity.uid||!snapshot.exists||!validRow(snapshot.data(),id))throw new Error("Enrollment not found.");
         const student=profile.data(),row=snapshot.data();
-        const amount=checkoutCredit(row,req.body?.amount);
+        const amount=checkoutCredit(row,req.body?.amount,student);
         const email=String(student.email||identity.email||"").trim();if(!email.includes("@"))throw new Error("Your account needs a valid email address.");
         const fee=calculateSharedPaystackFee(amount);
         const record={reference,studentId:owner.id,enrollmentId:id,purpose:PURPOSE,provider:"Paystack",currency:"GHS",email,tuitionCredit:amount,checkoutAmount:fee.checkoutAmount,status:"pending",createdBy:identity.uid};
