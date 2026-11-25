@@ -63,7 +63,7 @@ function oralProtocol({result,mode,source,level,program,part}){
   const task=source==="dictionary"?result.items?.[0]:source==="mock"?result.task:result.material;
   if(!task)return deny("No original speaking prompt is exported for this selection.");
   const p=normalizePart(part||task.teilId||result.part||"");
-  const focus=program==="swahili"?"Respond in simple Kiswahili and practise natural everyday interaction.":
+  const focus=source==="lesson"?"Practise the original lesson task, keeping follow-up questions at the learner’s level.":program==="swahili"?"Respond in simple Kiswahili and practise natural everyday interaction.":
     level==="A1"?(p==="teil2"?"Ask and answer short questions using the card.":p==="teil3"?"Formulate a polite request and react to a partner request.":"Introduce yourself and answer short follow-up questions. Use fictional personal details when appropriate."):
     level==="A2"?(p==="teil1"?"Ask and answer personal questions using the cards.":p==="teil3"?"Make suggestions, respond to alternatives and agree on a plan.":"Speak about the topic and respond to short follow-up questions."):
     level==="B1"?(p==="teil1"?"Negotiate a shared plan with the partner.":p==="teil2"?"Give a structured presentation and respond to questions.":"Respond to the topic, give reasons and interact with the partner."):
@@ -103,10 +103,9 @@ async function tutorTool({name,args={},student,admin,uid,snapshot,lessonContentR
     const db=admin.firestore();
     const [rows,policy]=await Promise.all([enrollmentRows(db.collection("students").doc(student.id)),db.collection("courseAccountAccess").doc(uid).get()]);
     const access=revisionAccess(student.data,rows,policy.data()||{});
-    // Lazy imports of existing public assets: no R2 request, model call or database write.
-    const data={german:require("../../web/public/music/catalog.json"),swahili:require("../../web/public/music/swahili-catalog.json"),
-      approved:require("../../web/public/music/approved-recording-lyrics.json"),timings:require("../../web/public/music/timings.json"),
-      translations:require("../../web/public/music/english-translations.json"),stories:require("../../web/public/music/song-stories.json")};
+    // Compiled from public assets during the existing build, never from live R2.
+    const data=snapshot?.musicTutor;
+    if(!data)return deny("The published music snapshot is not available. Open Falowen Music.");
     return musicResponse({args,access,data});
   }
   return deny("Unsupported tutoring tool.");
