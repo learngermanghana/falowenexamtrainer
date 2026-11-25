@@ -3,6 +3,476 @@
   "description": "Editor-authored English for exact recording keys and matching German lines. Course-draft translations are separately bound to draft identity and remain explicitly unverified against the audio.",
   "recordings": [
     {
+      "objectKey": "swahili/music/A1/day-12/Angalia Kalenda.mp3.mpeg",
+      "lines": [
+        {
+          "de": "Wiki ina siku ngapi?",
+          "en": "How many days are in a week?"
+        },
+        {
+          "de": "Siku saba, siku saba!",
+          "en": "Seven days, seven days!"
+        },
+        {
+          "de": "Jumamosi, Jumapili,",
+          "en": "Saturday, Sunday,"
+        },
+        {
+          "de": "Jumatatu, Jumanne, Jumatano,",
+          "en": "Monday, Tuesday, Wednesday,"
+        },
+        {
+          "de": "Alhamisi, Ijumaa,",
+          "en": "Thursday, Friday,"
+        },
+        {
+          "de": "Siku saba za wiki!",
+          "en": "Seven days of the week!"
+        },
+        {
+          "de": "Oh-oh, siku saba!",
+          "en": "Oh-oh, seven days!"
+        },
+        {
+          "de": "Siku saba za wiki!",
+          "en": "Seven days of the week!"
+        },
+        {
+          "de": "Sema, leo ni siku gani?",
+          "en": "Tell me, what day is today?"
+        },
+        {
+          "de": "Sema, kesho ni siku gani?",
+          "en": "Tell me, what day is tomorrow?"
+        },
+        {
+          "de": "Mwezi gani? Tarehe ngapi?",
+          "en": "Which month? What date?"
+        },
+        {
+          "de": "Angalia kalenda!",
+          "en": "Look at the calendar!"
+        },
+        {
+          "de": "Oh-oh, angalia kalenda!",
+          "en": "Oh-oh, look at the calendar!"
+        },
+        {
+          "de": "Eh-eh, tarehe ngapi?",
+          "en": "Eh-eh, what date?"
+        },
+        {
+          "de": "Mwaka una miezi mingapi?",
+          "en": "How many months are in a year?"
+        },
+        {
+          "de": "Miezi kumi na miwili!",
+          "en": "Twelve months!"
+        },
+        {
+          "de": "Januari, Februari, Machi,",
+          "en": "January, February, March,"
+        },
+        {
+          "de": "Aprili, Mei, Juni,",
+          "en": "April, May, June,"
+        },
+        {
+          "de": "Julai, Agosti, Septemba,",
+          "en": "July, August, September,"
+        },
+        {
+          "de": "Oktoba, Novemba, Desemba!",
+          "en": "October, November, December!"
+        },
+        {
+          "de": "Oh-oh, miezi kumi na miwili!",
+          "en": "Oh-oh, twelve months!"
+        },
+        {
+          "de": "Miezi ya mwaka!",
+          "en": "The months of the year!"
+        },
+        {
+          "de": "Mei ni mwezi wa ngapi?",
+          "en": "Which month is May?"
+        },
+        {
+          "de": "Mei ni mwezi wa tano!",
+          "en": "May is the fifth month!"
+        },
+        {
+          "de": "Novemba ni mwezi wa ngapi?",
+          "en": "Which month is November?"
+        },
+        {
+          "de": "Novemba ni mwezi wa kumi na moja!",
+          "en": "November is the eleventh month!"
+        },
+        {
+          "de": "Januari ni mwezi wa kwanza,",
+          "en": "January is the first month,"
+        },
+        {
+          "de": "Desemba ni mwezi wa kumi na mbili!",
+          "en": "December is the twelfth month!"
+        },
+        {
+          "de": "Sema, leo ni siku gani?",
+          "en": "Tell me, what day is today?"
+        },
+        {
+          "de": "Sema, kesho ni siku gani?",
+          "en": "Tell me, what day is tomorrow?"
+        },
+        {
+          "de": "Mwezi gani? Tarehe ngapi?",
+          "en": "Which month? What date?"
+        },
+        {
+          "de": "Angalia kalenda!",
+          "en": "Look at the calendar!"
+        },
+        {
+          "de": "Oh-oh, angalia kalenda!",
+          "en": "Oh-oh, look at the calendar!"
+        },
+        {
+          "de": "Eh-eh, tarehe ngapi?",
+          "en": "Eh-eh, what date?"
+        },
+        {
+          "de": "Juzi, jana, leo,",
+          "en": "The day before yesterday, yesterday, today,"
+        },
+        {
+          "de": "Kesho na kesho kutwa!",
+          "en": "Tomorrow and the day after tomorrow!"
+        },
+        {
+          "de": "Leo ni Jumatano,",
+          "en": "Today is Wednesday,"
+        },
+        {
+          "de": "Jana ilikuwa Jumanne.",
+          "en": "Yesterday was Tuesday."
+        },
+        {
+          "de": "Juzi ilikuwa Jumatatu,",
+          "en": "The day before yesterday was Monday,"
+        },
+        {
+          "de": "Kesho ni Alhamisi,",
+          "en": "Tomorrow is Thursday,"
+        },
+        {
+          "de": "Kesho kutwa ni Ijumaa!",
+          "en": "The day after tomorrow is Friday!"
+        },
+        {
+          "de": "Oh-oh, juzi na jana,",
+          "en": "Oh-oh, the day before yesterday and yesterday,"
+        },
+        {
+          "de": "Leo, kesho, kesho kutwa!",
+          "en": "Today, tomorrow, the day after tomorrow!"
+        },
+        {
+          "de": "Leo ni Jumatatu, tarehe tano Mei,",
+          "en": "Today is Monday, the fifth of May,"
+        },
+        {
+          "de": "Kesho ni Jumanne, tarehe sita Mei.",
+          "en": "Tomorrow is Tuesday, the sixth of May."
+        },
+        {
+          "de": "Siku yako ya kuzaliwa ni lini?",
+          "en": "When is your birthday?"
+        },
+        {
+          "de": "Ni tarehe kumi mwezi wa Juni!",
+          "en": "It is on the tenth of June!"
+        },
+        {
+          "de": "Oh-oh, siku ya kuzaliwa!",
+          "en": "Oh-oh, a birthday!"
+        },
+        {
+          "de": "Tarehe kumi mwezi wa Juni!",
+          "en": "The tenth of June!"
+        },
+        {
+          "de": "Una miadi lini, rafiki?",
+          "en": "When is your appointment, friend?"
+        },
+        {
+          "de": "Nina miadi Alhamisi.",
+          "en": "I have an appointment on Thursday."
+        },
+        {
+          "de": "Tarehe ngapi?",
+          "en": "What date?"
+        },
+        {
+          "de": "Tarehe ishirini!",
+          "en": "The twentieth!"
+        },
+        {
+          "de": "Mwezi gani?",
+          "en": "Which month?"
+        },
+        {
+          "de": "Mwezi wa Agosti!",
+          "en": "The month of August!"
+        },
+        {
+          "de": "Sema, leo ni siku gani?",
+          "en": "Tell me, what day is today?"
+        },
+        {
+          "de": "Sema, kesho ni siku gani?",
+          "en": "Tell me, what day is tomorrow?"
+        },
+        {
+          "de": "Mwezi gani? Tarehe ngapi?",
+          "en": "Which month? What date?"
+        },
+        {
+          "de": "Angalia kalenda!",
+          "en": "Look at the calendar!"
+        },
+        {
+          "de": "Oh-oh, siku saba za wiki!",
+          "en": "Oh-oh, seven days of the week!"
+        },
+        {
+          "de": "Eh-eh, miezi ya mwaka!",
+          "en": "Eh-eh, the months of the year!"
+        },
+        {
+          "de": "Wiki ina siku saba,",
+          "en": "A week has seven days,"
+        },
+        {
+          "de": "Mwaka una miezi kumi na miwili!",
+          "en": "A year has twelve months!"
+        }
+      ]
+    },
+    {
+      "objectKey": "swahili/music/A1/day-02/Salamu, Salamu.mp3",
+      "lines": [
+        {
+          "de": "Salamu, salamu, salamu!",
+          "en": "Greetings, greetings, greetings!"
+        },
+        {
+          "de": "Tunasalimiana kila siku!",
+          "en": "We greet one another every day!"
+        },
+        {
+          "de": "Salamu, salamu, salamu!",
+          "en": "Greetings, greetings, greetings!"
+        },
+        {
+          "de": "Tunasalimiana kwa furaha!",
+          "en": "We greet one another with joy!"
+        },
+        {
+          "de": "Habari za asubuhi? Njema sana!",
+          "en": "Good morning? Very well!"
+        },
+        {
+          "de": "Umeamkaje? Nimeamka salama!",
+          "en": "How did you wake up? I woke up well!"
+        },
+        {
+          "de": "Umelalaje? Salama kabisa!",
+          "en": "How did you sleep? Perfectly well!"
+        },
+        {
+          "de": "Habari za asubuhi? Nzuri tu!",
+          "en": "Good morning? Just fine!"
+        },
+        {
+          "de": "Habari za mchana? Salama!",
+          "en": "Good afternoon? Well!"
+        },
+        {
+          "de": "Umeshindaje? Salama kabisa!",
+          "en": "How has your day been? Very well!"
+        },
+        {
+          "de": "Habari za jioni? Nzuri sana!",
+          "en": "Good evening? Very well!"
+        },
+        {
+          "de": "Siku yako ilikuwaje? Njema kabisa!",
+          "en": "How was your day? Very good!"
+        },
+        {
+          "de": "Habari yako? Nzuri!",
+          "en": "How are you? Well!"
+        },
+        {
+          "de": "Habari zenu? Salama!",
+          "en": "How are you all? Well!"
+        },
+        {
+          "de": "Habari za leo? Njema!",
+          "en": "How are things today? Good!"
+        },
+        {
+          "de": "Habari za sasa? Nzuri tu!",
+          "en": "How are things now? Just fine!"
+        },
+        {
+          "de": "Nzuri, salama, njema,",
+          "en": "Well, safe and good,"
+        },
+        {
+          "de": "Salama kabisa, njema sana!",
+          "en": "Perfectly well, very good!"
+        },
+        {
+          "de": "Tunasalimiana kila siku,",
+          "en": "We greet one another every day,"
+        },
+        {
+          "de": "Kwa heshima na furaha!",
+          "en": "With respect and joy!"
+        },
+        {
+          "de": "Hujambo? Sijambo!",
+          "en": "Are you well? I am well!"
+        },
+        {
+          "de": "Hamjambo? Hatujambo!",
+          "en": "Are you all well? We are well!"
+        },
+        {
+          "de": "Yeye hajambo? Hajambo!",
+          "en": "Is that person well? They are well!"
+        },
+        {
+          "de": "Wao hawajambo? Hawajambo!",
+          "en": "Are they well? They are well!"
+        },
+        {
+          "de": "Habari gani? Nzuri sana!",
+          "en": "How are things? Very good!"
+        },
+        {
+          "de": "Na wewe je? Salama!",
+          "en": "And you? Well!"
+        },
+        {
+          "de": "Habari za nyumbani? Njema!",
+          "en": "How are things at home? Good!"
+        },
+        {
+          "de": "Wote wazima? Wazima!",
+          "en": "Is everyone well? Everyone is well!"
+        },
+        {
+          "de": "Shikamoo mama! Marahaba!",
+          "en": "Respectful greetings, mother! I accept your greeting!"
+        },
+        {
+          "de": "Shikamoo baba! Marahaba!",
+          "en": "Respectful greetings, father! I accept your greeting!"
+        },
+        {
+          "de": "Shikamoo mwalimu! Marahaba!",
+          "en": "Respectful greetings, teacher! I accept your greeting!"
+        },
+        {
+          "de": "Shikamoo bibi! Marahaba!",
+          "en": "Respectful greetings, grandmother! I accept your greeting!"
+        },
+        {
+          "de": "Mambo? Poa!",
+          "en": "What's up? Cool!"
+        },
+        {
+          "de": "Vipi? Safi!",
+          "en": "How's it going? Great!"
+        },
+        {
+          "de": "Sasa? Freshi!",
+          "en": "What's new? Fresh!"
+        },
+        {
+          "de": "Niaje? Shwari!",
+          "en": "How's it going? All good!"
+        },
+        {
+          "de": "Habari za asubuhi? Njema!",
+          "en": "Good morning? Good!"
+        },
+        {
+          "de": "Habari za mchana? Salama!",
+          "en": "Good afternoon? Well!"
+        },
+        {
+          "de": "Habari za jioni? Nzuri!",
+          "en": "Good evening? Good!"
+        },
+        {
+          "de": "Habari za leo? Salama kabisa!",
+          "en": "How are things today? Very well!"
+        },
+        {
+          "de": "Hujambo? Sijambo!",
+          "en": "Are you well? I am well!"
+        },
+        {
+          "de": "Hamjambo? Hatujambo!",
+          "en": "Are you all well? We are well!"
+        },
+        {
+          "de": "Shikamoo! Marahaba!",
+          "en": "Respectful greetings! I accept your greeting!"
+        },
+        {
+          "de": "Mambo? Poa!",
+          "en": "What's up? Cool!"
+        },
+        {
+          "de": "Tunasalimiana kila siku,",
+          "en": "We greet one another every day,"
+        },
+        {
+          "de": "Kwa heshima na furaha!",
+          "en": "With respect and joy!"
+        },
+        {
+          "de": "Kiswahili, Kiswahili,",
+          "en": "Swahili, Swahili,"
+        },
+        {
+          "de": "Tunajifunza kila siku!",
+          "en": "We learn every day!"
+        },
+        {
+          "de": "Asante sana, kwa heri!",
+          "en": "Thank you very much, goodbye!"
+        },
+        {
+          "de": "Kwa heri, tutaonana!",
+          "en": "Goodbye, see you!"
+        },
+        {
+          "de": "Asante sana, karibu tena!",
+          "en": "Thank you very much, come again!"
+        },
+        {
+          "de": "Tutaonana tena!",
+          "en": "See you again!"
+        }
+      ]
+    },
+    {
       "objectKey": "swahili/music/A1/day-11/Dukani.mp3",
       "lines": [
         {
