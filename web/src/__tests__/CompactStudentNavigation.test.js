@@ -24,7 +24,9 @@ describe("compact student navigation", () => {
     expect(app).toContain("Account settings");
     expect(app).toContain('className="profile-menu__action profile-menu__logout"');
     expect(app).not.toContain('t("appNav.signedInAs", { email: user.email })');
-    expect(notificationBell).toContain('className="notification-bell-button"');
+    expect(notificationBell).toContain("const NotificationBell = () => null;");
+    expect(app).not.toContain("<NotificationBell");
+    expect(compactNavigationPatch).not.toContain("<NotificationBell");
   });
 
   it("shows connection status only when there is a problem", () => {
