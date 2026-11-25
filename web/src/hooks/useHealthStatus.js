@@ -3,8 +3,8 @@ import { getBackendUrl } from "../services/backendUrl";
 
 const HEALTH_RETRY_DELAYS_MS = [3000, 10000];
 
-export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
-  const [status, setStatus] = useState("loading");
+export function useHealthStatus({ pollIntervalMs = 0, autoCheck = true } = {}) {
+  const [status, setStatus] = useState(autoCheck ? "loading" : "idle");
   const [lastChecked, setLastChecked] = useState(null);
 
   const checkHealth = useCallback(async () => {
@@ -42,6 +42,8 @@ export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
   }, [checkHealth]);
 
   useEffect(() => {
+    // A passive header must not wake the API or consume a Vercel request.
+    if (!autoCheck) return undefined;
     let intervalId;
     let retryTimerId;
     let cancelled = false;
@@ -84,7 +86,7 @@ export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
       if (intervalId) clearInterval(intervalId);
       if (retryTimerId) clearTimeout(retryTimerId);
     };
-  }, [checkHealth, pollIntervalMs]);
+  }, [autoCheck, checkHealth, pollIntervalMs]);
 
   return { status, lastChecked, refresh };
 }

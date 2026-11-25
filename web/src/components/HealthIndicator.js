@@ -8,6 +8,7 @@ import A1CoursePracticeAutoMount from "./A1CoursePracticeAutoMount";
 import C1Day2LearningSpeakingAutoMount from "./C1Day2LearningSpeakingAutoMount";
 
 const statusCopy = {
+  idle: "API not checked",
   ok: "API online",
   offline: "API offline",
   loading: "Checking API...",
@@ -25,9 +26,9 @@ const isDay0CoursePath = (pathname = "") =>
   pathname.startsWith("/campus/course/") && pathname.includes("day-0");
 
 function HealthIndicator() {
-  // Check once on mount. If that first request hits a transient Cloud Run/CORS
-  // failure, useHealthStatus retries briefly and then stops instead of polling forever.
-  const { status } = useHealthStatus({ pollIntervalMs: 0 });
+  // The header only shows browser offline status. Actual API actions report their own errors.
+  // Do not wake the backend just because a student opens or navigates the app.
+  const { status } = useHealthStatus({ pollIntervalMs: 0, autoCheck: false });
   const { isOffline } = useOfflineStatus();
   const location = useLocation();
   const navigate = useNavigate();
