@@ -523,7 +523,13 @@ const syncA2MockCompletion = async ({
   };
 };
 
+function getPracticeObjectiveKeys(mockId) {
+  if (isA2Kombi(mockId)) return {lesen:KOMBI_SETS[mockId].reading,hoeren:mockId === "a2-mock-08" ? null : kombiListeningKey(mockId)};
+  return objectiveKeysForMock(mockId);
+}
+
 module.exports = {
+  getPracticeObjectiveKeys,
   MOCK_TITLE,
   READING_ANSWER_KEY,
   LISTENING_ANSWER_KEY,
