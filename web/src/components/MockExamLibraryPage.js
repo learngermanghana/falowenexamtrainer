@@ -106,16 +106,16 @@ export default function MockExamLibraryPage() {
                     </p>
                   ) : null}
                 </div>
-                {["A1","A2","B1"].includes(level) && (mock.mode === "full" || mock.mode === "kombi" || mock.id === "b1-mock-02") && (!trialExam || mock.id === trialExam.id) ? (
+                {["A1","A2","B1"].includes(level) && (mock.mode === "full" || mock.mode === "kombi" || mock.id === "b1-mock-02") && (!trialExam || (!trialExam.locked && !trialExam.accessError && mock.id === trialExam.id)) ? (
                   <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
                     <button type="button" style={styles.secondaryButton} onClick={()=>navigate(mock.route+"?mode=practice")}>Practice Mode</button>
                     <button type="button" style={styles.primaryButton} onClick={()=>navigate(mock.route+"?mode=timed")}>Timed Exam Mode</button>
                   </div>
-                ) : <button type="button" style={trialExam && mock.id !== trialExam.id ? styles.secondaryButton : styles.primaryButton} onClick={event => { if (trialExam && mock.id !== trialExam.id) { openLock(examLockInfo({ title: mock.shortTitle || mock.title, trialExam, level, examOnly }), event); return; } announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
-                  {trialExam && mock.id !== trialExam.id ? "🔒 Locked" : mock.mode === "full" || mock.mode === "kombi" ? "Begin" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
+                ) : <button type="button" style={trialExam && (trialExam.locked || trialExam.accessError || mock.id !== trialExam.id) ? styles.secondaryButton : styles.primaryButton} onClick={event => { if (trialExam && (trialExam.locked || trialExam.accessError || mock.id !== trialExam.id)) { openLock(examLockInfo({ title: mock.shortTitle || mock.title, trialExam, level, examOnly }), event); return; } announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
+                  {trialExam && (trialExam.locked || trialExam.accessError || mock.id !== trialExam.id) ? "🔒 Locked" : mock.mode === "full" || mock.mode === "kombi" ? "Begin" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>}
               </div>
-              {user?.uid && historyMockId(mock) && (!trialExam || (!trialExam.locked && mock.id===trialExam.id)) ? <MockAttemptHistory key={`${user.uid}:${mock.id}`} user={user} mockId={historyMockId(mock)} onPractice={()=>navigate(mock.route+"?mode=practice")}/> : null}
+              {user?.uid && historyMockId(mock) && (!trialExam || (!trialExam.locked && !trialExam.accessError && mock.id===trialExam.id)) ? <MockAttemptHistory key={`${user.uid}:${mock.id}`} user={user} mockId={historyMockId(mock)} onPractice={()=>navigate(mock.route+"?mode=practice")}/> : null}
             </article>
           ))}
         </section>
