@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
 import LevelBillingPanel from "./LevelBillingPanel";
+import {getBackendUrl} from "../services/backendUrl";
 import { managedUpgradeState, verifiedLevelBalance } from "../utils/levelUpgradeBilling";
 import MyCoursesPanel from "./MyCoursesPanel";
 import StudentDocumentsPanel from "./StudentDocumentsPanel";
@@ -607,6 +608,16 @@ const AccountSettings = () => {
     await refreshStudentProfile();
   };
 
+  const prepareManagedUpgrade = async () => {
+    if(isUpgradingLevel||managedUpgrade.overlap||!managedUpgrade.nextLevel)return;
+    setIsUpgradingLevel(true);setStatus("");
+    try{
+      const response=await fetch(getBackendUrl()+"/billing/prepare-level-upgrade",{method:"POST",headers:{Authorization:"Bearer "+await user.getIdToken(),"Content-Type":"application/json"},body:JSON.stringify({targetLevel:managedUpgrade.nextLevel})});
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok||!data.ok)throw Error(data.error||"Could not prepare upgrade.");
+      setStatus("Your next level is ready for payment. Full payment adds six months; the first installment starts one month of temporary access.");
+    }catch(error){setStatus(error.message);}finally{setIsUpgradingLevel(false);}
+  };
   const handleUpgradeToNextLevel = async () => {
     if (hasOpenUpgrade || !levelUpgrade?.canUpgrade || !levelUpgrade?.courseCompleted || !levelUpgrade?.nextLevel) return;
     setIsUpgradingLevel(true);
@@ -933,8 +944,9 @@ const AccountSettings = () => {
           {managedUpgrade.current && <p>Current course: <strong>{managedUpgrade.current.level}</strong> · {verifiedLevelBalance(managedUpgrade.current) === null ? "Balance not verified" : verifiedLevelBalance(managedUpgrade.current) === 0 ? "Tuition cleared" : formatMoney(verifiedLevelBalance(managedUpgrade.current)) + " remaining"}</p>}
           {managedUpgrade.overlap ? <p role="alert">An earlier upgrade and a level enrollment exist for the same course. Contact Falowen to reconcile the payment records before paying for {managedUpgrade.legacyTarget} again.</p> :
             managedUpgrade.next ? <p>Next course: <strong>{managedUpgrade.next.level}</strong> · {verifiedLevelBalance(managedUpgrade.next) === null ? "Balance not verified" : verifiedLevelBalance(managedUpgrade.next) === 0 ? "Tuition cleared" : formatMoney(verifiedLevelBalance(managedUpgrade.next)) + " remaining"}. {managedUpgrade.granted.includes(managedUpgrade.next.level) ? "Course access available." : "Course access is subject to the enrollment dates and status."}</p> :
-            managedUpgrade.nextLevel ? <p>Next course: <strong>{managedUpgrade.nextLevel}</strong>. {managedUpgrade.current && verifiedLevelBalance(managedUpgrade.current) === 0 ? "Contact Falowen to prepare your next-level enrollment after your required coursework is complete." : "Clear and verify your current course balance before requesting an upgrade."}</p> :
+            managedUpgrade.nextLevel ? <p>Next course: <strong>{managedUpgrade.nextLevel}</strong>. {managedUpgrade.current && verifiedLevelBalance(managedUpgrade.current) === 0 ? "Prepare your next-level enrollment after your required coursework is complete." : "Clear and verify your current course balance before requesting an upgrade."}</p> :
             <p>No further level is available for this programme.</p>}
+          {!managedUpgrade.overlap&&!managedUpgrade.next&&managedUpgrade.nextLevel&&managedUpgrade.current&&verifiedLevelBalance(managedUpgrade.current)===0&&managedUpgrade.current.contractEnd>=new Date().toISOString().slice(0,10)&&getTuitionFeeForLevel(managedUpgrade.nextLevel)>0&&<button type="button" style={styles.secondaryButton} onClick={prepareManagedUpgrade} disabled={isUpgradingLevel}>{isUpgradingLevel?"Preparing…":"Prepare "+managedUpgrade.nextLevel+" upgrade"}</button>}
           <button type="button" style={styles.secondaryButton} onClick={()=>selectAccountTab("billing")}>View payments &amp; billing</button>
           <a href={supportMailTo}>Contact Falowen about your upgrade</a>
           <LevelBillingPanel rows={levelBillingRows} user={user} paymentsEnabled={paymentsEnabled} blockedLevels={managedUpgrade.blocked} grantedLevels={managedUpgrade.granted} studentProfile={studentProfile}/>
