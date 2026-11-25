@@ -107,7 +107,7 @@ describe("student sync integrity", () => {
 
     expect(index).toContain('normalizeValue(student.trialStatus) !== "active"');
     expect(index).toContain("startedAtMs + TRIAL_DURATION_MS");
-    expect(index).toContain("if (Number.isFinite(getTrialEndMillis(student))) return false");
+    expect(index).toContain("if (hasTrialHistory(student) || Number.isFinite(getTrialEndMillis(student))) return false");
     expect(index).toContain("if (!student.trialEndsAt && expectedTrialEndIso) updates.trialEndsAt = expectedTrialEndIso");
   });
 
