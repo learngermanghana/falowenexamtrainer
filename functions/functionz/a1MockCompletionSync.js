@@ -433,7 +433,13 @@ const syncA1MockCompletion = async ({
   };
 };
 
+function getPracticeObjectiveKeys(mockId) {
+  const set = getA1MockSet(mockId);
+  return {lesen:set?.readingAnswerKey || READING_ANSWER_KEY,hoeren:set?.listeningAnswerKey || LISTENING_ANSWER_KEY};
+}
+
 module.exports = {
+  getPracticeObjectiveKeys,
   MOCK_TITLE,
   READING_ANSWER_KEY,
   LISTENING_ANSWER_KEY,
