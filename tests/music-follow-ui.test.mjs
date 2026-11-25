@@ -198,3 +198,24 @@ test('each Swahili song opens its own bilingual lyrics and story', async () => {
   } finally { dom.window.close(); }
  }
 });
+
+test('Swahili A1 Day 12 opens the published lyrics and offers seven self-check questions', async () => {
+ const track = JSON.parse(read('web/public/music/swahili-catalog.json')).tracks.find(row => row.id === 'swahili-a1-day-12');
+ const pack = JSON.parse(read('web/public/music/approved-recording-lyrics.json')).recordings.find(row => row.objectKey === track.objectKey);
+ pack.practiceQuestions = JSON.parse(read('server/data/swahili-a1-day-12-music-practice.json'));
+ const { w, dom, click } = await room(track, pack, {swahiliTracks:[track]});
+ try {
+  const d = w.document;
+  assert.equal(d.getElementById('detail-lyrics').hidden, false);
+  assert.match(d.getElementById('lyrics-text').textContent, /Wiki ina siku ngapi/);
+  assert.equal(d.getElementById('follow-lyrics').disabled, true);
+  click('lyrics-next');
+  assert.equal(d.getElementById('detail-practice').hidden, false);
+  const answers = [...d.querySelectorAll('#listening-questions details')];
+  assert.equal(answers.length, 7);
+  assert.ok(answers.every(answer => !answer.open));
+  assert.match(answers[5].textContent, /Alhamisi, tarehe ishirini mwezi wa Agosti/);
+ } finally {
+  dom.window.close();
+ }
+});

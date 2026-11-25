@@ -12,7 +12,7 @@
   <link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/music/style.css?v=20261104-artwork-sizing">
   <script src="/music/analytics-config.js?v=20261031" defer></script>
   <script src="/music/analytics.js?v=20261031" defer></script>
-  <script src="/music/app.js?v=20261120-recording-covers" type="module"></script>
+  <script src="/music/app.js?v=20261125-calendar-practice" type="module"></script>
 </head>
 <body>
   <a class="skip" href="#library">Skip to songs</a>
@@ -61,7 +61,7 @@
           <button id="lyrics-next" class="outline-button" type="button">Try listening questions →</button>
         </div>
         <div id="detail-practice" class="detail-panel" hidden>
-          <h3>What did you hear?</h3><p class="detail-note">Answer from the recording. These are free practice questions, not an exam score.</p>
+          <h3 id="practice-title">What did you hear?</h3><p id="practice-instructions" class="detail-note">Answer from the recording. These are free practice questions, not an exam score.</p>
           <div id="listening-questions" class="listening-questions"></div><button id="check-answers" class="play-button" type="button">Check answers</button>
           <p id="practice-feedback" role="status" aria-live="polite"></p><div id="speaking-challenge" class="speaking-challenge"></div>
         </div>

@@ -594,7 +594,7 @@ function setTab(name) {
   const lesson = selected && lyricsFor(selected);
   if (!lesson && name !== "listen") return;
   if (name !== "listen" && document.querySelector('[data-tab="' + name + '"]').hidden) return;
-  if (name === "practice" && !lessonFor(selected)?.questions) return;
+  if (name === "practice" && !lesson.practiceQuestions?.length && !lessonFor(selected)?.questions) return;
   document.querySelectorAll(".lesson-tabs button").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.tab === name));
   });
@@ -709,9 +709,27 @@ async function loadPublishedLyrics(track) {
     publishedLyrics.set(track.id, data);
     if (selected?.id === track.id) {
       const tab = document.querySelector('.lesson-tabs button[aria-pressed="true"]')?.dataset.tab || "listen";
-      renderDetail(track); setTab(tab);
+      renderDetail(track); setTab(track.id === "swahili-a1-day-12" && tab === "listen" ? "lyrics" : tab);
     }
   } catch { lyricsRequests.delete(track.id); /* A manual refresh may retry. */ }
+}
+function renderSwahiliPractice(questions) {
+  const list = el("ol", "listening-questions");
+  list.lang = "sw";
+  for (const question of questions) {
+    const item = el("li", "quiz-question");
+    const instructions = el("ul", "");
+    for (const step of question.instructions) instructions.append(el("li", "", step));
+    const answer = el("details", "");
+    const text = el("p", "", question.answer);
+    text.style.whiteSpace = "pre-line";
+    answer.append(el("summary", "", "Onyesha jibu"), text);
+    item.append(el("h4", "", question.section), el("p", "", question.prompt), instructions, answer);
+    list.append(item);
+  }
+  byId("listening-questions").replaceChildren(list);
+  byId("practice-feedback").textContent = "";
+  byId("speaking-challenge").replaceChildren();
 }
 function renderQuestions(lesson) {
   const root = byId("listening-questions");
@@ -787,6 +805,8 @@ function renderDetail(track) {
   const lesson = lessonFor(track);
   const lyricPack = publishedLyrics.get(track.id) || (lesson?.assignmentKey === track.assignmentKey ? lesson : null) || referenceLyricsFor(track);
   const hasLyrics = Boolean(lyricPack?.lyrics);
+  const swahiliPractice = lyricPack?.practiceQuestions;
+  const hasSwahiliPractice = Boolean(swahiliPractice?.length);
   const hasLesson = Boolean(lesson && Array.isArray(lesson.questions) && (!lyricPack || JSON.stringify(lyricLines(lyricPack.lyrics)) === JSON.stringify(lyricLines(lesson.lyrics))));
   byId("detail-eyebrow").textContent = track.level === "ALL" ? "FALOWEN · CLASSROOM MUSIC" : "FALOWEN · " + track.level + " · DAY " + track.day;
   byId("detail-title").textContent = track.title;
@@ -805,16 +825,28 @@ function renderDetail(track) {
       ? "Listen to the song and read the Swahili lyrics."
       : "Listen, relax and enjoy this Falowen classroom song. You can play it again with the repeat control.";
   byId("course-link").hidden = !hasLesson && track.musicLanguage !== "swahili";
-  if (track.musicLanguage === "swahili") byId("course-link").href = "https://www.falowen.app/swahili/day-" + track.day;
+  if (track.musicLanguage === "swahili") {
+    byId("course-link").href = "https://www.falowen.app/swahili/day-" + track.day
+      + (track.id === "swahili-a1-day-12" ? "?view=references" : "");
+  }
   if (hasLesson) byId("course-link").href = /^https:\/\/www\.falowen\.app\/campus\/course\/[a-z0-9-]+$/.test(lesson.courseUrl || "")
     ? lesson.courseUrl : "https://www.falowen.app/campus"; 
   byId("listen-next").hidden = !hasLyrics;
-  byId("lyrics-next").hidden = !hasLesson;
+  byId("lyrics-next").hidden = !hasLesson && !hasSwahiliPractice;
+  byId("check-answers").hidden = hasSwahiliPractice;
+  const practiceTitle = byId("practice-title");
+  const practiceInstructions = byId("practice-instructions");
+  if (practiceTitle) practiceTitle.textContent = hasSwahiliPractice ? "Maswali ya wimbo" : "What did you hear?";
+  if (practiceInstructions) practiceInstructions.textContent = hasSwahiliPractice
+    ? "Jibu maswali, kisha angalia majibu yako."
+    : "Answer from the recording. These are free practice questions, not an exam score.";
   byId("lesson-vocabulary").hidden = !hasLesson;
   for (const tab of ["lyrics","practice"]) {
-    document.querySelector('[data-tab="' + tab + '"]').hidden = tab === "lyrics" ? !hasLyrics : !hasLesson;
+    document.querySelector('[data-tab="' + tab + '"]').hidden = tab === "lyrics" ? !hasLyrics : !hasLesson && !hasSwahiliPractice;
   }
-  if (hasLesson) {
+  if (hasSwahiliPractice) {
+    renderSwahiliPractice(swahiliPractice);
+  } else if (hasLesson) {
     renderQuestions(lesson);
   } else {
     byId("lyrics-text").replaceChildren();
@@ -825,7 +857,7 @@ function renderDetail(track) {
   if (hasLyrics) renderLyrics(hasLesson ? {...lesson, ...lyricPack} : lyricPack);
   loadPublishedLyrics(track);
   byId("song-detail").hidden = false;
-  setTab("listen");
+  setTab(track.id === "swahili-a1-day-12" && hasLyrics ? "lyrics" : "listen");
   document.title = track.title + " · Falowen Music";
   const description = document.querySelector('meta[name="description"]');
   if (description) description.content = "Listen to " + track.title + " on Falowen Music" + (hasLesson ? ", read German lyrics and practise listening." : ".");
