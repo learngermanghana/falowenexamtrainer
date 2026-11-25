@@ -1,3 +1,4 @@
+const { readCleanupCandidate, hasTrialHistory, hasConversion } = require("./enrollmentCleanupProtection");
 const { deliverCurrentStudentToSheet } = require("./studentSheetDelivery");
 const { shouldSyncStudentSheet } = require("./studentSheetSyncDiff");
 const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
@@ -347,7 +348,7 @@ const getTrialLifecycleState = (student = {}, nowMs = Date.now()) => {
   if (student.accountType === "exam_only" || isInstitutionalKiswahiliStudent(student)) return { state: "not_trial" };
   const trialEndMs = getTrialEndMillis(student);
   if (!Number.isFinite(trialEndMs)) return { state: "not_trial" };
-  if (hasStudentMadePayment(student)) {
+  if (hasStudentMadePayment(student) || hasConversion(student)) {
     return { state: "converted", trialEndMs, purgeAtMs: getTrialPurgeMillis(student) };
   }
 
@@ -366,7 +367,7 @@ const isStaleUnpaidSignup = (student = {}, cutoffMs) => {
 
   // Trial accounts have their own lifecycle: 7 days of access plus a 30-day
   // recovery window. Never let the generic 7-day unpaid-signup cleanup remove them.
-  if (Number.isFinite(getTrialEndMillis(student))) return false;
+  if (hasTrialHistory(student) || Number.isFinite(getTrialEndMillis(student))) return false;
 
   const joinedAtMs = getMillisFromTimestampLike(student.joined_at);
   if (!Number.isFinite(joinedAtMs)) return false;
@@ -1148,8 +1149,22 @@ exports.cleanupExpiredTrials = onSchedule(
       const student = docSnap.data() || {};
       const deletionUid = String(student.uid || docSnap.id);
       if (require("./accountDeletion")._isBlocked((await db.collection("accountDeletionRequests").doc(deletionUid).get()).data())) continue;
-      const lifecycle = getTrialLifecycleState(student, nowMs);
+      let lifecycle = getTrialLifecycleState(student, nowMs);
       if (lifecycle.state === "not_trial") continue;
+      // Recheck before any legacy trial status write or purge. Managed accounts
+      // are excluded entirely, including historical and incomplete ledgers.
+      let latest;
+      try {
+        latest = await readCleanupCandidate(docSnap.ref, current =>
+          getTrialLifecycleState(current, nowMs).state === lifecycle.state);
+      } catch (error) {
+        console.error("cleanupExpiredTrials: eligibility check failed", docSnap.id, error.message);
+        failed += 1;
+        continue;
+      }
+      if (!latest) continue;
+      lifecycle = getTrialLifecycleState(latest, nowMs);
+      Object.assign(student, latest);
       trialRecords += 1;
 
       const currentStatus = normalizeValue(student.status);
@@ -1219,6 +1234,7 @@ exports.cleanupExpiredTrials = onSchedule(
       const email = String(student.email || "").trim();
 
       try {
+        if (!await readCleanupCandidate(docSnap.ref, current => getTrialLifecycleState(current, Date.now()).state === "purge_due")) continue;
         const sheetResult = await getStudentSheetPurger()({
           studentCode,
           uid,
@@ -1318,7 +1334,15 @@ exports.cleanupStaleUnpaidSignups = onSchedule(
     let deletedAuthUsers = 0;
 
     for (const docSnap of staleDocs) {
-      const student = docSnap.data() || {};
+      let student;
+      try {
+        student = await readCleanupCandidate(docSnap.ref, current =>
+          normalizeValue(current.paymentStatus) === "pending" && isStaleUnpaidSignup(current, cutoffMs));
+      } catch (error) {
+        console.error("cleanupStaleUnpaidSignups: eligibility check failed", docSnap.id, error.message);
+        continue;
+      }
+      if (!student) continue;
       const deletionUid = String(student.uid || docSnap.id);
       if (require("./accountDeletion")._isBlocked((await db.collection("accountDeletionRequests").doc(deletionUid).get()).data())) continue;
       const studentCode = String(student.studentCode || student.studentcode || docSnap.id || "");
@@ -1425,7 +1449,23 @@ exports.cleanupExpiredStudentContracts = onSchedule(
           continue;
         }
 
-        const uid = String(student.uid || "").trim();
+        // Trial retention belongs exclusively to the trial lifecycle worker.
+        if (hasTrialHistory(student)) continue;
+        let latest;
+        try {
+          latest = await readCleanupCandidate(docSnap.ref, current => {
+            const end = getContractEndMillis(current.contractEnd);
+            return current.accountType !== "exam_only" && current.courseEnrollmentPreserved !== true &&
+              !isInstitutionalKiswahiliStudent(current) && !hasTrialHistory(current) &&
+              current.purgeStatus !== "failed" && (!current.role || current.role === "student") &&
+              Number.isFinite(end) && end + CONTRACT_EXPIRY_GRACE_MS < Date.now();
+          });
+        } catch (error) {
+          console.error("cleanupExpiredStudentContracts: eligibility check failed", docSnap.id, error.message);
+          continue;
+        }
+        if (!latest) continue;
+        const uid = String(latest.uid || "").trim();
         if (uid) {
           try {
             await auth.deleteUser(uid);
