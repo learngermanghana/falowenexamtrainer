@@ -11,7 +11,7 @@ import { startA2MockAttempt, saveA2MockAttempt } from "../services/a2FinalMockSe
 import { finalizeA2Mock3, savedA2Mock3State } from "../services/a2Mock3Finalization";
 import { getA2Mock3StorageKeys, isA2Mock3ReviewReady } from "../utils/mockReviewAccess";
 import A2Mock3Lesen from "./A2Mock3Lesen";
-import A2Mock3Hoeren from "./A2Mock3Hoeren";
+import A2Mock3Hoeren, {a2Mock3HoerenAnswersKey} from "./A2Mock3Hoeren";
 import A2Mock3Schreiben from "./A2Mock3Schreiben";
 import A2Mock3ConversationalSpeaking from "./A2Mock3ConversationalSpeaking";
 import "./A2Mock2ExamHub.css";
@@ -179,6 +179,7 @@ function A2Mock3ExamHubAttempt() {
       const history=read(historyKey);
       localStorage.setItem(historyKey,JSON.stringify([...(Array.isArray(history)?history:[]),completed]));
       Object.values(keys).forEach(key=>localStorage.removeItem(key));
+      localStorage.removeItem(a2Mock3HoerenAnswersKey(user?.uid));
       setFlow({stage:"intro",startedAt:null});
       setProgress(progressFor(keys));
       setFinalError("");
