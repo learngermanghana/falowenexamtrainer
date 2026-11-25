@@ -822,7 +822,7 @@ const { trialRestriction, allowsTrialRequest } = require("./trialPractice");
 const { enrollmentRows, ownsEnrollmentProfile, practiceBlocked, blockedEnrollmentLevels } = require("./levelEnrollmentAccess");
 const limitedPracticePath = /^\/(?:[abc][12]-mock|course-media|writing|speaking|exam-room)(?:[-/]|$)/i;
 async function enforceTrialPractice(req, res, next) {
-  if (!req.headers.authorization || !limitedPracticePath.test(req.path)) return next();
+  if (!req.headers.authorization || (!limitedPracticePath.test(req.path) && req.path !== "/mock/practice/review")) return next();
   try {
     const identity = await getAuthedUser(req);
     if (!identity) return res.status(401).json({ error: "Sign in again." });
