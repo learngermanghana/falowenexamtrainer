@@ -130,8 +130,11 @@ async function coachTool({name,args={},student,admin,uid,snapshot,loadScores,dua
   }
   if(new Set(entries.map(e=>keyFor(e.term,e.meaning))).size!==entries.length)return deny("Review each distinct word only once per batch.");
   return db.runTransaction(async tx=>{
-    const deletion=await tx.get(db.collection("accountDeletionRequests").doc(uid));
+    const studentRef=db.collection("students").doc(student.id);
+    const [deletion,current,policyDoc,currentRows]=await Promise.all([tx.get(db.collection("accountDeletionRequests").doc(uid)),tx.get(studentRef),tx.get(db.collection("courseAccountAccess").doc(uid)),enrollmentRows(studentRef,tx)]);
     if(["pending","processing","completed"].includes(deletion.data()?.status))return deny("Account deletion is in progress.");
+    const profile=current.data();
+    if(!profile||profile.uid!==uid||!revisionAccess(profile,currentRows,policyDoc.data()||{})[program]?.full.includes(level))return deny("Course access changed; no outcomes saved.");
     const now=Date.now(),prior=await tx.get(ref),next=applyReview(prior.data(),entries,args.requestId,now);
     if(next.error)return deny(next.error);
     if(next.duplicate)return {available:true,saved:true,alreadyProcessed:true};
