@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { collection, db, getDocs, onSnapshot, query, where } from "../firebase";
 import { fetchResults } from "../services/resultsService";
+import { createSharedProgressResource } from "../services/sharedProgressResource";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { normalizeCourseLevel } from "../utils/levelAccess";
 
@@ -381,16 +382,9 @@ export const mergeLessonProgress = (...sources) => {
   return merged;
 };
 
-export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
-  const studentCode = useMemo(() => normalizeStudentCode(studentProfile, user), [studentProfile, user]);
-  const email = useMemo(() => normalizeEmail(studentProfile, user), [studentProfile, user]);
-  const userId = user?.uid || studentProfile?.uid || "";
-  const normalizedLevel = normalizeCourseLevel(level) || "";
-  const [state, setState] = useState({ loading: false, error: "", progressByAssignmentId: {}, source: "none" });
-  const [refreshRevision, setRefreshRevision] = useState(0);
-  const refresh = useCallback(() => setRefreshRevision((value) => value + 1), []);
+const emptyProgress = { loading: false, error: "", progressByAssignmentId: {}, source: "none" };
 
-  useEffect(() => {
+function startLessonProgress({ studentCode, email, userId, normalizedLevel }, emit) {
     let cancelled = false;
     let unsubscribe = null;
     const scoreUnsubscribes = [];
@@ -401,7 +395,7 @@ export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
 
     const publish = ({ loading = false, error = "", source = "fallback" } = {}) => {
       if (cancelled) return;
-      setState({
+      emit({
         loading,
         error,
         progressByAssignmentId: mergeLessonProgress(fallbackProgress, liveProgress, scoreProgress),
@@ -491,7 +485,22 @@ export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
       if (typeof unsubscribe === "function") unsubscribe();
       scoreUnsubscribes.forEach((stop) => stop());
     };
-  }, [email, normalizedLevel, refreshRevision, studentCode, userId]);
+}
 
-  return { ...state, refresh };
+const sharedLessonProgress = createSharedProgressResource(startLessonProgress, emptyProgress);
+
+export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
+  const studentCode = useMemo(() => normalizeStudentCode(studentProfile, user), [studentProfile, user]);
+  const email = useMemo(() => normalizeEmail(studentProfile, user), [studentProfile, user]);
+  const userId = user?.uid || studentProfile?.uid || "";
+  const normalizedLevel = normalizeCourseLevel(level) || "";
+  const identity = useMemo(() => ({ studentCode, email, userId, normalizedLevel }), [studentCode, email, userId, normalizedLevel]);
+  const key = JSON.stringify([userId, studentCode, email, normalizedLevel]);
+  const [state, setState] = useState(() => ({ key, value: emptyProgress }));
+  useEffect(() => {
+    return sharedLessonProgress.subscribe(key, identity, value => setState({ key, value }));
+  }, [key, identity]);
+  const refresh = useCallback(() => sharedLessonProgress.refresh(key), [key]);
+  // Never display the previous student's progress during identity changes.
+  return { ...(state.key === key ? state.value : emptyProgress), refresh };
 };
