@@ -22,3 +22,29 @@ test('every published Swahili song has a matching English translation and biling
     assert.ok(translations.recordings.some(row => row.objectKey === track.objectKey));
   }
 });
+
+test('Day 12 practice is served only with the matching public song lyrics', async () => {
+  const { createLyricsHandler } = require('../server/musicLyrics.cjs');
+  const handler = createLyricsHandler({ env: {} });
+  async function request(query) {
+    const res = {
+      setHeader() {},
+      status(code) { this.code = code; return this; },
+      json(body) { return { code: this.code, body }; },
+    };
+    return handler({ method: 'GET', query }, res);
+  }
+  const track = catalog.tracks.find(row => row.id === 'swahili-a1-day-12');
+  for (const query of [{ track: track.id }, { key: track.objectKey }]) {
+    const { code, body } = await request(query);
+    assert.equal(code, 200);
+    assert.equal(body.objectKey, track.objectKey);
+    assert.match(body.lyrics, /Nina miadi Alhamisi/);
+    assert.equal(body.practiceQuestions.length, 7);
+    assert.match(body.practiceQuestions[5].answer, /Alhamisi, tarehe ishirini mwezi wa Agosti/);
+  }
+  const other = await request({ track: 'swahili-a1-day-11' });
+  assert.equal(other.body.practiceQuestions, undefined);
+  const horen = await request({ key: 'swahili/A1/day-12/day-12.mp3' });
+  assert.equal(horen.code, 404);
+});

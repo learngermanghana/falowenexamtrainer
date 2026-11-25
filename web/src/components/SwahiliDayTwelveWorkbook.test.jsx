@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import SwahiliA1PracticeWorkbook from "./SwahiliA1PracticeWorkbook";
 import { SWAHILI_A1_PRACTICE_UNITS } from "../data/swahili/a1PracticeUnits";
@@ -16,4 +16,32 @@ test.each([12,13])("Day %i has versioned calendar/routine exercises and recorded
  expect(screen.getByRole('button', {name:/Load audio/})).toBeTruthy();
  expect(screen.queryByText(/Teacher-led listening/)).toBeNull();
  expect(screen.getAllByRole('radio')).toHaveLength(15);
+});
+
+test("Day 12 exposes the song lyrics and all seven optional questions from the workbook", async () => {
+ const track = { id: "swahili-a1-day-12", title: "Angalia Kalenda", level: "A1", day: 12,
+  language: "Swahili", coursebook: true, objectKey: "swahili/music/A1/day-12/Angalia Kalenda.mp3.mpeg",
+  audioUrl: "https://www.falowen.app/api/music?track=swahili-a1-day-12" };
+ const practiceQuestions = require("../../../server/data/swahili-a1-day-12-music-practice.json");
+ const previousFetch = global.fetch;
+ global.fetch = jest.fn(async url => ({ok:true, json:async () => {
+  if (url.includes("swahili-catalog")) return { tracks: [track] };
+  if (url.includes("music-lyrics")) return {objectKey:track.objectKey, lyrics:"Jumamosi, Jumapili,", cues:[], practiceQuestions};
+  return {};
+ }}));
+ try {
+  render(<MemoryRouter initialEntries={["/campus/course/swahili/day-12"]}>
+   <SwahiliA1PracticeWorkbook lesson={SWAHILI_A1_PRACTICE_UNITS[12]} preview />
+  </MemoryRouter>);
+  fireEvent.click(screen.getByRole("button", {name:/Angalia Kalenda · Maneno ya wimbo na maswali/}));
+  const summary = await screen.findByText("Swahili lyrics · Soma pamoja");
+  expect(summary.closest("details").open).toBe(true);
+  expect(screen.getByText("Jumamosi, Jumapili,")).toBeTruthy();
+  const answers = screen.getAllByText("Onyesha jibu");
+  expect(answers).toHaveLength(7);
+  expect(answers.every(answer => !answer.closest("details").open)).toBe(true);
+  expect(screen.queryByRole("button", {name:/Load audio/})).toBeNull();
+ } finally {
+  global.fetch = previousFetch;
+ }
 });

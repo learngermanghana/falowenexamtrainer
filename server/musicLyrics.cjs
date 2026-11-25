@@ -15,6 +15,7 @@ const songStories = require('../web/public/music/song-stories.json');
 const englishRegistry = require('../web/public/music/english-translations.json');
 const englishTranslations = {...englishRegistry,transcripts:[...(englishRegistry.transcripts || []),
   day4NumberTiming.englishTranslation],drafts:[...(englishRegistry.drafts || []),b1InterviewTiming.englishTranslation,screenBreakTiming.englishTranslation,detourTiming.englishTranslation]};
+const day12MusicPractice = require('./data/swahili-a1-day-12-music-practice.json');
 const studioDrafts = require('../web/public/music/studio-drafts.json');
 function validateLyrics(data, objectKey) {
   if (!data || data.objectKey !== objectKey) return null;
@@ -133,10 +134,18 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
       && approved.recordingSha256 === estimate.recordingSha256 ? estimate : null;
     const fallback = checkedRecording?.cues.length ? checkedRecording
       : refinedEstimate || (ownerFallback?.cues.length ? ownerFallback : estimate || checkedRecording || ownerFallback);
-    const sendFallback = () => res.status(200).json(withEnglishTranslation({...fallback,
+    const sendLyrics = pack => {
+      const lyrics = withEnglishTranslation(pack);
+      if (objectKey === swahiliMusicKey('swahili-a1-day-12') &&
+          approved && sameSungLines(lyrics.lyrics, approved.lyrics)) {
+        return res.status(200).json({ ...lyrics, practiceQuestions: day12MusicPractice });
+      }
+      return res.status(200).json(lyrics);
+    };
+    const sendFallback = () => sendLyrics({...fallback,
       ...(fallback===ownerFallback && approved?.recordingSha256 ? {recordingSha256:approved.recordingSha256} : {}),
       source:fallback===estimate ? 'acoustic-estimate' : checkedRecording ? 'bundled' : 'owner-supplied',
-      timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? (recorded.timingStatus === 'estimated' ? 'estimated' : 'published') : approved?.timingStatus || 'missing'}));
+      timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? (recorded.timingStatus === 'estimated' ? 'estimated' : 'published') : approved?.timingStatus || 'missing'});
     try {
       const timingKey=objectKey.replace(/\.mp3(?:\.mpeg)?$/i,'.lyrics.json');
       const signed=signObject({key:timingKey},env);
@@ -154,7 +163,7 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
       // fallback cues for this fingerprinted recording. Reviewed R2 cues still win.
       if(fallback?.cues?.length && !checked.cues?.length && sameSungLines(checked.lyrics,fallback.lyrics))
         return sendFallback();
-      return res.status(200).json(withEnglishTranslation(checked));
+      return sendLyrics(checked);
     } catch { if(fallback) return sendFallback(); res.setHeader('Cache-Control','no-store'); return res.status(503).json({error:'Lyrics temporarily unavailable'}); }
   };
 }

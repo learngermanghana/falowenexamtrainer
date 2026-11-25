@@ -35,6 +35,10 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
         <p className="swahili-book__eyebrow">KISWAHILI · A1</p>
         <h1>{lesson.chapter} · {lesson.title}</h1>
         <p>{lesson.objective}</p>
+        {lesson.day === 12 && activeTab !== "references" && (
+          <button type="button" className="swahili-book__button swahili-book__button--soft"
+            onClick={() => selectTab("references")}>Angalia Kalenda · Maneno ya wimbo na maswali</button>
+        )}
       </header>
       {aiLecture && aiLecture.placement !== "grammar" && (
         <section className="swahili-book__tile" aria-labelledby={lectureHeadingId}>

@@ -15,6 +15,7 @@ const recordings=JSON.parse(read('web/public/music/timings.json')).recordings;
 async function room(track,pack,{studio=null,translations=null,classTimings=null,swahiliTracks=[]}={}){
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
  const w=dom.window;
+ w.HTMLElement.prototype.scrollIntoView = () => {};
  Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,coverForTrack,songStoryForTrack,approximateScrollTop,matchingEnglishTranslation,matchingDraftEnglishTranslation,matchingTranscriptEnglishTranslation,
   matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('song-stories')?JSON.parse(read('web/public/music/song-stories.json')):String(url).includes('class-timings')?{recordings:classTimings||[]}:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('swahili-catalog')?{tracks:swahiliTracks}:String(url).includes('catalog.json')?{tracks:classTimings?[track]:[]}:String(url).includes('studio-drafts')?{tracks:studio||[{...track,lyrics:'Draft lyrics are different'}]}:String(url).includes('english-translations')?(translations||{recordings:[],drafts:[]}):{lessons:{}}})});
  const a=w.document.getElementById('audio');
@@ -196,5 +197,26 @@ test('each Swahili song opens its own bilingual lyrics and story', async () => {
    d.querySelector('[data-music-language="german"]').click();
    assert.ok(!d.getElementById('tracks').textContent.includes(track.title));
   } finally { dom.window.close(); }
+ }
+});
+
+test('Swahili A1 Day 12 opens the published lyrics and offers seven self-check questions', async () => {
+ const track = JSON.parse(read('web/public/music/swahili-catalog.json')).tracks.find(row => row.id === 'swahili-a1-day-12');
+ const pack = JSON.parse(read('web/public/music/approved-recording-lyrics.json')).recordings.find(row => row.objectKey === track.objectKey);
+ pack.practiceQuestions = JSON.parse(read('server/data/swahili-a1-day-12-music-practice.json'));
+ const { w, dom, click } = await room(track, pack, {swahiliTracks:[track]});
+ try {
+  const d = w.document;
+  assert.equal(d.getElementById('detail-lyrics').hidden, false);
+  assert.match(d.getElementById('lyrics-text').textContent, /Wiki ina siku ngapi/);
+  assert.equal(d.getElementById('follow-lyrics').disabled, true);
+  click('lyrics-next');
+  assert.equal(d.getElementById('detail-practice').hidden, false);
+  const answers = [...d.querySelectorAll('#listening-questions details')];
+  assert.equal(answers.length, 7);
+  assert.ok(answers.every(answer => !answer.open));
+  assert.match(answers[5].textContent, /Alhamisi, tarehe ishirini mwezi wa Agosti/);
+ } finally {
+  dom.window.close();
  }
 });
