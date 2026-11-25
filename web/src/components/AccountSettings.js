@@ -10,7 +10,6 @@ import {getBackendUrl} from "../services/backendUrl";
 import { managedUpgradeState, verifiedLevelBalance } from "../utils/levelUpgradeBilling";
 import MyCoursesPanel from "./MyCoursesPanel";
 import StudentDocumentsPanel from "./StudentDocumentsPanel";
-import NotificationSettingsCard from "./NotificationSettingsCard";
 import AdditionalProgrammeRequest from "./AdditionalProgrammeRequest";
 import ClassParticipationCard from "./ClassParticipationCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
@@ -81,7 +80,7 @@ const AccountSettings = () => {
   const requestedTab = new URLSearchParams(location.search).get("tab") || "billing";
   // Keep the canonical Router tab expression stable for the Account sync
   // scripts, and handle the additional Documents tab as a separate fallback.
-  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab)
+  const activeTab = ["studentData", "participation", "billing", "upgrade", "deleteAccount"].includes(requestedTab)
     ? (isSwahili && ["participation", "upgrade"].includes(requestedTab)) || (isSecondaryCourse && requestedTab === "upgrade")
       ? "studentData" : requestedTab
     : requestedTab === "documents" ? "documents" : requestedTab === "courses" ? "courses" : "studentData";
@@ -690,7 +689,6 @@ const AccountSettings = () => {
           { key: "billing", label: "Billing / Pay tuition" },
           { key: "courses", label: "My courses" },
           { key: "studentData", label: t("accountSettings.tabs.studentData") },
-          { key: "notifications", label: t("accountOverview.notifications") },
           { key: "documents", label: "Documents" },
           { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
           { key: "deleteAccount", label: t("accountOverview.deleteAccount") },
@@ -752,7 +750,6 @@ const AccountSettings = () => {
         </section>
       ) : null}
 
-      {activeTab === "notifications" ? <NotificationSettingsCard /> : null}
 
       {activeTab === "billing" && !isUniversityRegistration && levelBillingUnverified ? (
         <section className="fw-account-billing"><h2>Payments &amp; billing</h2><p role="status">{studentProfile?.levelEnrollmentCheckError?"Unable to verify your level balance. Refresh this page or contact Falowen before paying.":"Checking your tuition balance…"}</p></section>

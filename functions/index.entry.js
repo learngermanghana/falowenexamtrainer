@@ -19,7 +19,7 @@ paymentAwareApp.get("/paystack/webhook", sendPaymentPolicyHealth);
 
 require.cache[require.resolve("./functionz/app")].exports = paymentAwareApp;
 
-const exportedFunctions = require("./index.notifications");
+const exportedFunctions = require("./index");
 const lessonProgressFunctions = require("./lessonProgress");
 const { submitAssignmentResubmission } = require("./resubmission");
 const { submitHistoricalAssignmentResubmission } = require("./historicalResubmission");
