@@ -10,6 +10,7 @@ import OnboardingChecklist from "./OnboardingChecklist";
 import OnboardingStudyBuddyStart from "./OnboardingStudyBuddyStart";
 import { buildFullClassScheduleUrl, getHomeClassIdentity } from "../utils/homeClassSchedule";
 import HomeMetrics from "./HomeMetrics";
+import SwahiliClassDashboard from "./SwahiliClassDashboard";
 import TrialCountdownBanner from "./TrialCountdownBanner";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PrimaryActionBar, SectionHeader } from "./ui";
@@ -320,6 +321,7 @@ const GeneralHome = ({
             </PrimaryActionBar>
           </section>
         ) : null}
+        {!browseOnly && !examOnly && <SwahiliClassDashboard studentProfile={studentProfile} level={levelKey?.toUpperCase()} />}
         <QuickMainAccess t={t} openCampus={openCampus} isSwahili swahiliLevel={levelKey?.toUpperCase()} />
         {(!levelKey || levelKey.toUpperCase() === "A1") && <section style={{ ...styles.card, display: "grid", gap: 10 }}>
           <SectionHeader
