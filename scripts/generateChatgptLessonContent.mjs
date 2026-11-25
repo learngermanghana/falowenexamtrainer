@@ -618,12 +618,34 @@ for (const [key, unit] of Object.entries(SWAHILI_A1_PRACTICE_UNITS)) {
     })),
   };
 }
+// Existing public Music assets, compiled with the course snapshot so the
+// API bundle does not depend on files outside its deployed functions root.
+// Keep exact recording identities internal; the MCP response projects only
+// a public track link and a bounded lyric passage.
+const musicJson=name=>JSON.parse(fs.readFileSync(path.join(root,"web/public/music",name),"utf8"));
+const publicTracks=(name,swahili=false)=>(musicJson(name).tracks||[])
+  .filter(t=>t.coursebook===true&&t.retired!==true&&(swahili||t.approved===true))
+  .map(t=>({id:t.id,title:t.title,level:t.level,day:t.day,topic:t.topic,
+    assignmentKey:t.assignmentKey,objectKey:t.objectKey,audioUrl:t.audioUrl,
+    approved:t.approved,coursebook:true}));
+const musicGerman=publicTracks("catalog.json");
+const musicSwahili=publicTracks("swahili-catalog.json",true);
+const musicKeys=new Set([...musicGerman,...musicSwahili].map(t=>t.objectKey));
+const musicRecords=name=>({recordings:(musicJson(name).recordings||[])
+  .filter(r=>musicKeys.has(r.objectKey)&&r.referenceOnly!==true&&r.transcriptionStatus!=="automatic")
+  .map(r=>({objectKey:r.objectKey,lyrics:r.lyrics}))});
+const musicTranslations={recordings:(musicJson("english-translations.json").recordings||[])
+  .filter(r=>musicKeys.has(r.objectKey))
+  .map(r=>({objectKey:r.objectKey,lines:(r.lines||[]).map(l=>({de:l.de,en:l.en}))}))};
+const musicStories={byObjectKey:Object.fromEntries(Object.entries(musicJson("song-stories.json").byObjectKey||{})
+  .filter(([key])=>musicKeys.has(key)).map(([key,v])=>[key,{storyDe:v.storyDe,storyEn:v.storyEn,focusDe:v.focusDe,focusEn:v.focusEn}]))};
 const artifact = {
   schemaVersion: 1,
   provenance: "Learner-facing Falowen Course Book content compiled from canonical workbook and lesson sources",
   levels: { A1, A2, B1, B2, C1, C2 },
   programs: { swahili: { A1: SWAHILI_A1 } },
   vocabularySourceUrl: VOCAB_SOURCE_URL,
+  musicTutor:{german:{tracks:musicGerman},swahili:{tracks:musicSwahili},approved:musicRecords("approved-recording-lyrics.json"),timings:musicRecords("timings.json"),translations:musicTranslations,stories:musicStories},
   officialWorkbookRules: { german: germanWorkbookRules, swahili: swahiliWorkbookRules },
 };
 const serialized = JSON.stringify(artifact, null, 2) + "\n";
