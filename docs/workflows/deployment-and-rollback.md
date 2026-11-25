@@ -26,3 +26,11 @@ Open German A1 Day 1 in Campus before publishing a preview update. With the lect
 - Never store deploy tokens, private R2 credentials, OAuth secrets or demo-user credentials in these documents.
 
 This guide is a **release checklist**, not a mechanism that automatically deploys or rolls back services.
+
+## Shared Firestore rules
+
+The learner rules release bundles the complete course rules with the marked
+Admin rules extension from `falowenadmin`. The release stops if the extension
+is missing, so Admin Leads keeps its existing page and language grants after
+learner deployments. The Admin release has a baseline comparison that prevents
+an older Admin snapshot from replacing current course rules.
