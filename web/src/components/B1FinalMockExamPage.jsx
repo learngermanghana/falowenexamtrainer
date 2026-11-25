@@ -429,12 +429,8 @@ function B1TimedMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
         });
       }
 
-      if (forceNew && typeof window !== "undefined") {
-        window.localStorage.removeItem(storageKey);
-      }
-
       const response = await startB1MockAttempt({ idToken, mockId });
-      if (response?.resumed && response?.state && !forceNew) {
+      if (response?.resumed && response?.state) {
         const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
         const localSavedAt = Number(exam.clientSavedAtMs || 0);
         const serverSavedAt = Number(response.state?.clientSavedAtMs || 0);
