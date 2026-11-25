@@ -248,7 +248,7 @@ export default function PlacementTestPage2026({ language = "german" }) {
 
   const languageName = isSwahili ? "Kiswahili" : "German";
   const resultUrl = isSwahili
-    ? (suggestedLevel === "B2" ? "/learn-swahili" : "/signup?program=swahili&level=" + encodeURIComponent(suggestedLevel) + "&source=placement-test")
+    ? (suggestedLevel === "B2" ? "https://wa.me/233205706589?text="+encodeURIComponent("Hello Falowen, my Kiswahili placement result is B2. Please help me confirm my level.") : "/signup?program=swahili&level=" + encodeURIComponent(suggestedLevel) + "&source=placement-test")
     : "/classes/?level=" + encodeURIComponent(suggestedLevel);
 
   return (
