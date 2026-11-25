@@ -8,6 +8,7 @@
  * This runs during Vercel's existing prebuild, and explicitly in the companion CI.
  */
 import fs from "node:fs";
+import { VOCAB_SOURCE_URL } from "../web/src/services/vocabService.js";
 import { register } from "node:module";
 import { SWAHILI_A1_PRACTICE_UNITS } from "../web/src/data/swahili/a1PracticeUnits.js";
 import path from "node:path";
@@ -554,6 +555,7 @@ for (const [key, unit] of Object.entries(SWAHILI_A1_PRACTICE_UNITS)) {
   const day = Number(key);
   if (!Number.isInteger(day) || day < 1 || day > 20 || Number(unit.day) !== day) continue;
   const examples = swExamples(unit.examples);
+  const terms = (Array.isArray(unit.vocabulary) ? unit.vocabulary : []).slice(0,40).map(v=>({term:text(v?.sw,180),meaning:text(v?.en,260)})).filter(v=>v.term&&v.meaning);
   const questions = items => (Array.isArray(items) ? items : []).slice(0, 12)
     .map(q => ({ question: text(q?.question, 600), options: strings(q?.choices || q?.options, 6, 450) }))
     .filter(q => q.question);
@@ -563,7 +565,7 @@ for (const [key, unit] of Object.entries(SWAHILI_A1_PRACTICE_UNITS)) {
     grammar: { rule: text(unit.rule, 2000), examples,
       sections: (Array.isArray(unit.grammarSections) ? unit.grammarSections : []).slice(0, 10)
         .map(s => ({ title: text(s.title, 250), rule: text(s.rule, 1800), examples: swExamples(s.examples) })) },
-    ...(examples.length ? { vocabulary: { phrases: examples, clarification: "Published lesson examples, not the complete vocabulary list." } } : {}),
+    ...((examples.length || terms.length) ? { vocabulary: { terms, phrases: examples, clarification: "Published lesson vocabulary and examples, not the complete dictionary." } } : {}),
     ...(unit.reading?.text ? { reading: { title: text(unit.reading.title, 260),
       passage: text(unit.reading.text, 12000), questions: questions(unit.reading.questions) } } : {}),
     ...(typeof unit.speaking === "string" && unit.speaking ? { speaking: { prompt: text(unit.speaking, 1800) } } : {}),
@@ -621,6 +623,7 @@ const artifact = {
   provenance: "Learner-facing Falowen Course Book content compiled from canonical workbook and lesson sources",
   levels: { A1, A2, B1, B2, C1, C2 },
   programs: { swahili: { A1: SWAHILI_A1 } },
+  vocabularySourceUrl: VOCAB_SOURCE_URL,
   officialWorkbookRules: { german: germanWorkbookRules, swahili: swahiliWorkbookRules },
 };
 const serialized = JSON.stringify(artifact, null, 2) + "\n";

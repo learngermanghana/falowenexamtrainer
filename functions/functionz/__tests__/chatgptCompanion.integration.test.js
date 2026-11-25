@@ -265,12 +265,13 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(26);
+      expect(list.data.result.tools).toHaveLength(30);
       expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["submit_my_falowen_workbook", "get_my_falowen_submission_status"]));
       expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["get_my_falowen_access", "get_my_falowen_swahili_lesson", "get_my_falowen_weaknesses"]));
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
       expect(list.data.result.tools[0].securitySchemes[0].type).toBe("oauth2");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_study_plan");
+      expect(list.data.result.tools.map(tool=>tool.name)).toEqual(expect.arrayContaining(["get_my_falowen_revision_levels","get_my_falowen_revision_lesson","get_my_falowen_personal_plan","get_my_falowen_revision_vocabulary"]));
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_vocabulary_practice");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_practice");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_mocks");
@@ -598,6 +599,25 @@ describe("Exam-only Companion connection",()=>{
       expect(forbidden.data.result.isError).toBe(true);
       const write=await call("save_my_falowen_practice_note",{});
       expect(write.data.result.isError).toBe(true);
+    });
+  });
+});
+
+describe("Personal revision tools OAuth integration",()=>{
+  test("paid A2 student may revise current content but cannot choose an unverified previous or higher level",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"student-1","personal-revision");
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      const access=await call("get_my_falowen_revision_levels");
+      expect(access.data.result.structuredContent.programs.german.full).toEqual(["A2"]);
+      const current=await call("get_my_falowen_revision_lesson",{program:"german",level:"A2",day:1,section:"reading"});
+      expect(current.data.result.structuredContent).toMatchObject({available:true,level:"A2",revisionOnly:true,officialSubmission:false});
+      for(const level of ["A1","B1"]){
+        const denied=await call("get_my_falowen_revision_lesson",{program:"german",level,day:1});
+        expect(denied.data.result.structuredContent.available).toBe(false);
+      }
+      const plan=await call("get_my_falowen_personal_plan",{program:"german",day:1,minutes:45});
+      expect(plan.data.result.structuredContent.activities.reduce((n,a)=>n+a.minutes,0)).toBe(45);
     });
   });
 });
