@@ -1,3 +1,4 @@
+import MockListeningReview, { listeningReviewRow } from "./MockListeningReview";
 import { runA2MockSubmissionStep } from "../services/a2MockSubmissionDiagnostics";
 import { resumeA2MockSections } from "../services/a2MockCloudResume";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -234,6 +235,7 @@ function A2Mock3ExamHubAttempt() {
           {ORDER.map(k=><p key={k}>{LABELS[ORDER.indexOf(k)]}: <strong>{flow.verifiedResult.sectionScores[k]}/25</strong></p>)}
           <p>Saved in Falowen Results and student score records.</p>
         </div>
+        <MockListeningReview rows={(flow.verifiedResult.listeningReview || []).map(row=>listeningReviewRow(row))}/>
         <button type="button" className="a2-mock2-primary" onClick={restart}>Start another Mock 3 attempt</button>
       </> : <>
         <p role="status">{finalBusy?"AI marking in progress · Schreiben and Sprechen":"Final /100 score is not verified yet. Submitted work remains saved."}</p>
