@@ -7,7 +7,7 @@ import { A2_GOETHE_SPEAKING_TEIL3 } from "./A2GoetheSpeakingMockTeil3Preview";
 import A2MockSpeakingExaminer from "./A2MockSpeakingExaminer";
 import LegacyA2FinalMockSpeaking from "./A2FinalMockSpeaking";
 
-const MOCK_ONE_TASKS = [
+export const MOCK_ONE_TASKS = [
   {
     teil:"1", title:"Fragen zur Person",
     english:"Ask and answer personal questions using the cards.",
