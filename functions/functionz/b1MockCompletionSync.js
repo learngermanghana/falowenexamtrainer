@@ -242,7 +242,10 @@ const syncB1MockCompletion = async ({
   return { ok: true, scoreDocId: artifacts.scoreDocId, notificationId: artifacts.notificationId, studentCode: artifacts.identity.studentCode };
 };
 
+const getPracticeObjectiveKeys = objectiveKeysForMock;
+
 module.exports = {
+  getPracticeObjectiveKeys,
   MOCK_TITLE, READING_ANSWER_KEY, LISTENING_ANSWER_KEY, scoreObjectiveAnswers,
   buildVerifiedB1MockScore, getB1ListeningReview, persistVerifiedB1MockSection, buildSectionBreakdown,
   deriveMockInsights, resolveStudentIdentity, assignmentIdForAttempt,
