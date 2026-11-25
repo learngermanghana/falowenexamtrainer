@@ -1,11 +1,11 @@
 import SwahiliObjectiveQuestions, { allObjectiveQuestionsAnswered } from "./SwahiliObjectiveQuestions";
 import { ReadingExamFrame, ReadingExamDocument } from "./ReadingExamLayout";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db, doc, getDoc } from "../firebase";
-import { saveSwahiliWorkbook } from "../services/swahiliWorkbookService";
-import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
+import { db } from "../firebase";
+import { useSwahiliB1Workbook } from "../hooks/useSwahiliB1Workbook";
+import { useSwahiliSignedAudio } from "../hooks/useSwahiliSignedAudio";
 import { WorkbookTabNav } from "./StandardWorkbookComponents";
 import { SWAHILI_B1_WORKBOOK_TABS, useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
 import { title, readingPassage, listeningDialogue, readingQuestions, listeningQuestions } from "../data/swahili/b1Day26";
@@ -15,60 +15,12 @@ import "./SwahiliCourseBook.css";
 
 const tabs = SWAHILI_B1_WORKBOOK_TABS;
 export default function SwahiliB1Day26Workbook({uid}) {
-  const {user,studentProfile} = useAuth();
-  const canSubmit = canSubmitSwahiliWorkbook({user,studentProfile}) && uid === user?.uid;
+  const {user} = useAuth();
   const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
-  const draftKey = uid && "swahili-b1-day-26:" + uid;
-  const [draft,setDraft] = useState(() => {
-    try { return (draftKey && JSON.parse(sessionStorage.getItem(draftKey))) || {writing:{essay:""},reading:{},listening:{}}; }
-    catch { return {writing:{essay:""},reading:{},listening:{}}; }
-  });
-  const [loading,setLoading] = useState(true);
-  const [saving,setSaving] = useState(false);
-  const [submitted,setSubmitted] = useState(false);
-  const [confirmationVersion,setConfirmationVersion] = useState(0);
-  const [notice,setNotice] = useState("");
-  const [audio,setAudio] = useState({url:"",loading:false,error:""});
-  async function loadAudio() {
-    if (audio.loading) return;
-    if (!user?.getIdToken) { setAudio({url:"",loading:false,error:"Ingia kwenye akaunti yako ili kusikiliza sauti."}); return; }
-    setAudio({url:"",loading:true,error:""});
-    try {
-      const token = await user.getIdToken();
-      const response = await fetch("/api/course-media/swahili/b1/day-26/audio-url",{headers:{Authorization:`Bearer ${token}`}});
-      const result = await response.json();
-      if (!response.ok || !result?.url) throw new Error(result?.error || "Sauti haikupatikana.");
-      setAudio({url:result.url,loading:false,error:""});
-    } catch (error) { setAudio({url:"",loading:false,error:error.message || "Sauti haikupatikana. Jaribu tena."}); }
-  }
-  const essay = draft.writing?.essay || "";
-  const complete = essay.trim().length > 0 && allObjectiveQuestionsAnswered(readingQuestions, draft.reading) && allObjectiveQuestionsAnswered(listeningQuestions, draft.listening);
-  useEffect(() => {
-    if (!canSubmit || !db) { setLoading(false); return; }
-    let active = true;
-    getDoc(doc(db,"users",uid,"swahiliLessons","b1-day-26")).then(snapshot => {
-      if (!active || !snapshot.exists()) return;
-      const prior = snapshot.data();
-      setDraft(current => ({writing:{essay:current.writing?.essay || prior.writing?.essay || ""},reading:{...prior.readingAnswers,...current.reading},listening:{...prior.listeningAnswers,...current.listening}}));
-      setSubmitted(true);
-    }).catch(() => { if(active) setNotice("Imeshindikana kupakia kazi ya awali."); })
-      .finally(() => { if(active) setLoading(false); });
-    return () => { active=false; };
-  },[uid,canSubmit]);
-  function update(section,id,value) {
-    const next = {...draft,[section]:{...draft[section],[id]:value}};
-    setDraft(next); setConfirmationVersion(version=>version+1); setNotice("");
-    try { if(draftKey) sessionStorage.setItem(draftKey,JSON.stringify(next)); } catch { /* keep in memory */ }
-  }
-  async function submit() {
-    if (!canSubmit || !db || loading || saving || !complete) return;
-    setSaving(true); setNotice("");
-    try {
-      await saveSwahiliWorkbook(user,{program:"swahili",level:"B1",day:26,lessonId:"swahili-b1-day-26",title,writing:{essay:essay.trim()},readingAnswers:draft.reading,listeningAnswers:draft.listening});
-      setSubmitted(true); setConfirmationVersion(version=>version+1); setNotice("Kazi yako imewasilishwa kwa mwalimu.");
-    } catch { setNotice("Imeshindikana kuwasilisha kazi. Jaribu tena."); }
-    finally { setSaving(false); }
-  }
+  const {draft,loading,saving,submitted,notice,feedback,confirmationVersion,storageNotice,canSubmit,update,submit} = useSwahiliB1Workbook({uid,day:26,title,complete: d => Boolean(d.writing.essay?.trim()) && allObjectiveQuestionsAnswered(readingQuestions,d.reading) && allObjectiveQuestionsAnswered(listeningQuestions,d.listening)});
+  const {audio,setAudio,loadAudio} = useSwahiliSignedAudio(user,"/api/course-media/swahili/b1/day-26/audio-url");
+  const essay = draft.writing.essay || "";
+  const complete = Boolean(essay.trim()) && allObjectiveQuestionsAnswered(readingQuestions,draft.reading) && allObjectiveQuestionsAnswered(listeningQuestions,draft.listening);
   return <main className="swahili-book swahili-book--workbook swahili-b1-study" lang="sw">
     <Link to="/campus/course">← Kitabu cha kozi</Link>
     <header className="swahili-book__hero"><p>Kiswahili B1 · Somo la 26 · 9.26</p><h1>{title}</h1><p>Jifunze kueleza changamoto za safari, kutoa suluhisho na ushauri kwa kutumia viunganishi vya B1.</p></header>
@@ -95,6 +47,8 @@ export default function SwahiliB1Day26Workbook({uid}) {
         <SwahiliFinalSubmit key={confirmationVersion} requireListening disabled={!canSubmit || !db || loading || saving || !complete} onSubmit={submit}>
           {saving ? "Inawasilishwa…" : submitted ? "Wasilisha marekebisho" : "Wasilisha kwa mwalimu"}
         </SwahiliFinalSubmit>
+        {feedback && <p><strong>Maoni ya mwalimu:</strong> {feedback}</p>}
+        {storageNotice && <p role="status">{storageNotice}</p>}
         {notice && <p role="status">{notice}</p>}
       </>}
     </section>

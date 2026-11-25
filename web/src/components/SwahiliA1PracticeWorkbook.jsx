@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useSwahiliSignedAudio } from "../hooks/useSwahiliSignedAudio";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { A2_B1_WORKBOOK_TABS_WITH_GRAMMAR, WorkbookTabNav } from "./StandardWorkbookComponents";
@@ -16,33 +17,13 @@ export default function SwahiliA1PracticeWorkbook({ lesson, preview = false }) {
   const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
   const assignment = useSwahiliAssignment(lesson, preview, activeTab, lesson.reading.questions, lesson.listening?.questions);
   const { writing, setWriting, reading, setReading, listeningAnswers, setListeningAnswers } = assignment;
-  const [audio, setAudio] = useState({ url: "", loading: false, error: "" });
   const { aiLecture, radio, listening } = lesson;
+  const {audio,setAudio,loadAudio:loadListeningAudio} = useSwahiliSignedAudio(user,listening?.audioUrlEndpoint,{signIn:"Sign in to play the recording.",failed:"Could not load the listening recording."});
   const lectureHeadingId = `swahili-ai-lecture-${lesson.day}`;
   const grammarSections = lesson.grammarSections || [{ rule: lesson.rule, examples: lesson.examples }];
   const hasLessonSong = [2, 10, 11, 12].includes(lesson.day);
   const vocabulary = lesson.vocabulary;
   const writingId = "swahili-writing-" + lesson.day;
-
-  async function loadListeningAudio() {
-    if (!listening || audio.loading) return;
-    if (!user?.getIdToken) {
-      setAudio({ url: "", loading: false, error: "Sign in to play the recording." });
-      return;
-    }
-    setAudio(current => ({ ...current, loading: true, error: "" }));
-    try {
-      const token = await user.getIdToken();
-      const response = await fetch(listening.audioUrlEndpoint, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const result = await response.json();
-      if (!response.ok || !result?.url) throw new Error(result?.error || "Could not load the listening recording.");
-      setAudio({ url: result.url, loading: false, error: "" });
-    } catch (error) {
-      setAudio(current => ({ ...current, loading: false, error: error.message || "Could not load the listening recording." }));
-    }
-  }
 
   return (
     <main className="swahili-book swahili-book--workbook">

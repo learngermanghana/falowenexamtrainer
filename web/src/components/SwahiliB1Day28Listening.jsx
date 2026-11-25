@@ -1,5 +1,6 @@
 import SwahiliObjectiveQuestions from "./SwahiliObjectiveQuestions";
-import React, { useState } from "react";
+import React from "react";
+import { useSwahiliSignedAudio } from "../hooks/useSwahiliSignedAudio";
 import { useAuth } from "../context/AuthContext";
 
 export const listeningQuestions = [
@@ -12,26 +13,7 @@ export const listeningQuestions = [
 
 export default function SwahiliB1Day28Listening({ answers, onAnswer }) {
   const { user } = useAuth();
-  const [listeningAudio, setListeningAudio] = useState({ url: "", loading: false, error: "" });
-  async function loadListeningAudio() {
-    if (listeningAudio.loading) return;
-    if (!user?.getIdToken) {
-      setListeningAudio({ url: "", loading: false, error: "Ingia kwenye akaunti yako ili kusikiliza sauti. Sign in to play the recording." });
-      return;
-    }
-    setListeningAudio(current => ({ ...current, loading: true, error: "" }));
-    try {
-      const token = await user.getIdToken();
-      const response = await fetch("/api/course-media/swahili/b1/day-28/audio-url", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const result = await response.json();
-      if (!response.ok || !result?.url) throw new Error(result?.error || "Could not load the listening recording.");
-      setListeningAudio({ url: result.url, loading: false, error: "" });
-    } catch (error) {
-      setListeningAudio({ url: "", loading: false, error: error.message || "Could not load the listening recording." });
-    }
-  }
+  const {audio:listeningAudio,setAudio:setListeningAudio,loadAudio:loadListeningAudio} = useSwahiliSignedAudio(user,"/api/course-media/swahili/b1/day-28/audio-url");
 
   return <>
     <h2>4 · Kusikiliza</h2>

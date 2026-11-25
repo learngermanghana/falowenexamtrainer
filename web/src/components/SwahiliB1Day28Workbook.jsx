@@ -1,11 +1,10 @@
 import { allObjectiveQuestionsAnswered } from "./SwahiliObjectiveQuestions";
 import WorkbookDayMusic from "./WorkbookDayMusic";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import SwahiliB1Day28Listening, { listeningQuestions } from "./SwahiliB1Day28Listening";
-import { useAuth } from "../context/AuthContext";
-import { db, doc, getDoc } from "../firebase";
-import { saveSwahiliWorkbook } from "../services/swahiliWorkbookService";
-import { canSubmitSwahiliWorkbook } from "../utils/campusProgram";
+import { db } from "../firebase";
+import { useSwahiliB1Workbook } from "../hooks/useSwahiliB1Workbook";
+
 import SwahiliB1Day28Reading, { readingQuestions } from "./SwahiliB1Day28Reading";
 import { Link } from "react-router-dom";
 import { SWAHILI_B1_WORKBOOK_TABS, useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
@@ -105,85 +104,13 @@ const radioIntro = (
 
 export default function SwahiliB1Day28Workbook({ uid }) {
   const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
-  const draftKey = uid && `swahili-b1-day-28:writing:${uid}`;
-  const [writing, setWriting] = useState(() => {
-    try { return (draftKey && sessionStorage.getItem(draftKey)) || ""; }
-    catch { return ""; }
-  });
-  const readingKey = uid && `swahili-b1-day-28:reading:${uid}`;
-  const [reading, setReading] = useState(() => {
-    try { return JSON.parse(sessionStorage.getItem(readingKey)) || {}; }
-    catch { return {}; }
-  });
-  const { user, studentProfile } = useAuth();
-  const canSubmit = canSubmitSwahiliWorkbook({ user, studentProfile }) && uid === user?.uid;
-  const listeningKey = uid && `swahili-b1-day-28:listening:${uid}`;
-  const [listening, setListening] = useState(() => {
-    try { return (listeningKey && JSON.parse(sessionStorage.getItem(listeningKey))) || {}; }
-    catch { return {}; }
-  });
-  const [saving, setSaving] = useState(false);
-  const [notice, setNotice] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [loadingWork, setLoadingWork] = useState(true);
-  const missing = [
-    !writing.trim() && "2 · Kuandika",
-    !allObjectiveQuestionsAnswered(readingQuestions, reading) && "3 · Kusoma",
-    !allObjectiveQuestionsAnswered(listeningQuestions, listening) && "4 · Kusikiliza",
-  ].filter(Boolean);
-
-  useEffect(() => {
-    if (!canSubmit || !db) { setLoadingWork(false); return; }
-    let active = true;
-    getDoc(doc(db, "users", uid, "swahiliLessons", "b1-day-28")).then(snapshot => {
-      if (!active || !snapshot.exists()) return;
-      const prior = snapshot.data();
-      setSubmitted(true);
-      setWriting(current => current || prior.writing?.email || "");
-      setReading(current => ({ ...prior.readingAnswers, ...current }));
-      setListening(current => ({ ...prior.listeningAnswers, ...current }));
-    }).catch(() => { if (active) setNotice("Imeshindikana kupakia kazi ya awali."); })
-      .finally(() => { if (active) setLoadingWork(false); });
-    return () => { active = false; };
-  }, [uid, canSubmit]);
-
-  async function submitWork() {
-    if (!canSubmit || !db || loadingWork || saving || missing.length) return;
-    setSaving(true);
-    setNotice("");
-    try {
-      await saveSwahiliWorkbook(user, {
-        studentId: uid, userId: uid, studentName: studentProfile?.name || user.displayName || "",
-        studentEmail: user.email || "", program: "swahili", level: "B1", day: 28,
-        lessonId: "swahili-b1-day-28", title: "Kutunza Mazingira katika Maisha ya Kila Siku",
-        status: "submitted",  writing: { email: writing.trim() },
-        readingAnswers: reading, listeningAnswers: listening,
-      });
-      setSubmitted(true);
-      setNotice("Kazi yako imewasilishwa kwa mwalimu.");
-    } catch { setNotice("Imeshindikana kuwasilisha kazi. Jaribu tena."); }
-    finally { setSaving(false); }
-  }
-  function updateListening(id, text) {
-    setNotice("");
-    const next = { ...listening, [id]: text };
-    setListening(next);
-    try { if (listeningKey) sessionStorage.setItem(listeningKey, JSON.stringify(next)); }
-    catch { /* Keep the draft in memory. */ }
-  }
-  function updateReading(id, text) {
-    setNotice("");
-    const next = { ...reading, [id]: text };
-    setReading(next);
-    try { if (readingKey) sessionStorage.setItem(readingKey, JSON.stringify(next)); }
-    catch { /* Keep answers editable when browser storage is unavailable. */ }
-  }
-  function updateWriting(text) {
-    setNotice("");
-    setWriting(text);
-    try { if (draftKey) sessionStorage.setItem(draftKey, text); }
-    catch { /* The exercise remains editable when browser storage is unavailable. */ }
-  }
+  const {draft,loading:loadingWork,saving,submitted,notice,feedback,confirmationVersion,storageNotice,canSubmit,update,submit:submitWork} = useSwahiliB1Workbook({uid,day:28,title:"Kutunza Mazingira katika Maisha ya Kila Siku",writingField:"email",complete: d => Boolean(d.writing.email?.trim()) && allObjectiveQuestionsAnswered(readingQuestions,d.reading) && allObjectiveQuestionsAnswered(listeningQuestions,d.listening)});
+  const writing = draft.writing.email || "";
+  const {reading,listening} = draft;
+  const missing = [!writing.trim() && "2 · Kuandika",!allObjectiveQuestionsAnswered(readingQuestions,reading) && "3 · Kusoma",!allObjectiveQuestionsAnswered(listeningQuestions,listening) && "4 · Kusikiliza"].filter(Boolean);
+  const updateWriting = value => update("writing","email",value);
+  const updateReading = (id,value) => update("reading",id,value);
+  const updateListening = (id,value) => update("listening",id,value);
   return (
     <RadioFirstWorkbookGate level="Kiswahili B1" day={28} transcriptIntro={radioIntro}
       introInstruction="Sikiliza kipindi cha Falowen Radio, kisha jibu maswali kabla ya kuendelea.">
@@ -359,10 +286,12 @@ export default function SwahiliB1Day28Workbook({ uid }) {
           {missing.length > 0 && <p>Kamilisha: {missing.join(", ")}</p>}
           <SwahiliReviewDraft writing={{ "Barua pepe": writing }} questions={readingQuestions} reading={reading}
             listeningQuestions={listeningQuestions} listening={listening} />
-          <SwahiliFinalSubmit requireListening disabled={!canSubmit || loadingWork || saving || missing.length > 0} onSubmit={submitWork}>
+          <SwahiliFinalSubmit key={confirmationVersion} requireListening disabled={!canSubmit || !db || loadingWork || saving || missing.length > 0} onSubmit={submitWork}>
             {saving ? "Inawasilishwa…" : submitted ? "Wasilisha marekebisho" : "Wasilisha kwa mwalimu"}
           </SwahiliFinalSubmit>
-          {notice && <p role="status">{notice}</p>}
+          {feedback && <p><strong>Maoni ya mwalimu:</strong> {feedback}</p>}
+        {storageNotice && <p role="status">{storageNotice}</p>}
+        {notice && <p role="status">{notice}</p>}
           <h3>Tathmini binafsi</h3>
           <ul><li>kutaja tabia zinazolinda mazingira.</li><li>kueleza namna kwa “kwa + kitenzi-jina”.</li><li>kutaja njia mbadala kwa “badala ya”.</li><li>kueleza lengo kwa “ili”.</li><li>kutoa maoni yenye faida, changamoto na pendekezo.</li><li>kuandika mwaliko mfupi wa shughuli ya mazingira.</li></ul>
           <h3>Kazi ya ziada · Tafakari</h3>
