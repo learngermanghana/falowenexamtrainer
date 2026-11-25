@@ -1,3 +1,8 @@
+import MockPracticeWorkspace, {MockModeGate,PracticeAudio,PracticeQuestions,PracticeWriting,PracticeSpeaking} from "./MockPracticeWorkspace";
+import { makeB1MockSpeakingTasks } from "./B1MockConversationalSpeaking";
+import { getB1Mock2HoerenQuestions } from "../services/b1Mock2HoerenService";
+import { getB1Mock3HoerenQuestions } from "../services/b1Mock3HoerenService";
+import { getB1Mock4HoerenQuestions } from "../services/b1Mock4HoerenService";
 import MockListeningReview, { listeningReviewRow, SavedMockListeningReview } from "./MockListeningReview";
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
@@ -229,7 +234,7 @@ const ReadingPart = ({ children, title, time }) => (
   </section>
 );
 
-export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
+function B1TimedMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
   const isSecond = mockId === "b1-mock-02";
   const isThird = mockId === "b1-mock-03";
   const isFourth = mockId === "b1-mock-04";
@@ -959,4 +964,144 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
       ) : null}
     </main>
   );
+}
+
+function B1PracticeListening({mockId,answers,onChange,idToken}) {
+  const [paper,setPaper]=useState(null),[error,setError]=useState(""),[retry,setRetry]=useState(0);
+  useEffect(()=>{if(mockId==="b1-mock-01"||!idToken)return;let active=true;setError("");const fetcher=mockId==="b1-mock-04"?getB1Mock4HoerenQuestions:mockId==="b1-mock-03"?getB1Mock3HoerenQuestions:getB1Mock2HoerenQuestions;fetcher(idToken).then(r=>{if(active)setPaper(r)}).catch(e=>{if(active)setError(e?.response?.data?.error||e.message)});return()=>{active=false}},[mockId,idToken,retry]);
+  const parts=mockId==="b1-mock-01"?B1_LISTENING:paper?.parts||[];
+  if(error)return <p role="alert">{error} <button type="button" onClick={()=>setRetry(n=>n+1)}>Retry loading questions</button></p>;
+  if(!parts.length)return <p role="status">Loading listening questions…</p>;
+  return <>{parts.map((part,i)=><section className="mock-practice-paper" key={i}><h2>Teil {i+1} · {part.title||part.label}</h2><p>{part.instruction}</p><PracticeAudio load={()=>fetchB1MockAudioPlaybackUrl({mockId:mockId.slice(3),part:part.id||`teil-${part.part||i+1}`,key:part.audioObjectKey||part.key,idToken})}/><PracticeQuestions questions={part.questions} answers={answers} onChange={onChange} keyFor={q=>`t${i+1}-${q.number}`}/></section>)}</>;
+}
+function B1PracticePaper({mockId}){
+  const isSecond=mockId==="b1-mock-02",isThird=mockId==="b1-mock-03",isFourth=mockId==="b1-mock-04",isVerified=isSecond||isThird||isFourth;
+  const reading=isFourth?B1_MOCK4_LESEN:isThird?B1_MOCK3_LESEN:isSecond?B1_MOCK2_READING:B1_READING;
+  const writingTasks=isFourth?B1_MOCK4_WRITING_TASKS:isThird?B1_MOCK3_WRITING_TASKS:isSecond?B1_MOCK2_WRITING_TASKS:B1_WRITING_TASKS;
+  return <MockPracticeWorkspace mockId={mockId} title={`B1 Mock ${Number(mockId.slice(-2))}`} reading={({answers,onChange:setLesen})=>{
+    const exam={lesenAnswers:answers};return <div className="b1-final-shell">          <ReadingPart title="Teil 1" time="10 Minuten">
+            <p>{reading.teil1.intro}</p>
+            {reading.teil1.accommodationNote ? <p className="b1-final-small-note">{reading.teil1.accommodationNote}</p> : null}
+            <div className="b1-final-reading-text">
+              <h3>{reading.teil1.heading}</h3>
+              {reading.teil1.subheading ? <em>{reading.teil1.subheading}</em> : null}
+              {reading.teil1.date ? <strong>{reading.teil1.date}</strong> : null}
+              {reading.teil1.paragraphs.map((p) => <p key={p}>{p}</p>)}
+              {!isVerified?<p>Bis bald,<br /><em>eure Susanne</em></p>:null}
+            </div>
+            {reading.teil1.questions.map((q) => (
+              <div className="b1-final-question" key={q.number}>
+                <strong>{q.number}. {q.question}</strong>
+                <ChoiceList
+                  name={`lesen-t1-${q.number}`}
+                  options={[["richtig","Richtig"],["falsch","Falsch"]]}
+                  value={exam.lesenAnswers[`t1-${q.number}`]}
+                  onChange={(value) => setLesen(`t1-${q.number}`, value)}
+                />
+              </div>
+            ))}
+          </ReadingPart>
+
+          <ReadingPart title="Teil 2 · Text 1" time="20 Minuten · gesamter Teil 2">
+            {reading.teil2.intro ? <p>{reading.teil2.intro}</p> : null}
+            <div className="b1-final-press-text">
+              <small>Text aus der Presse</small>
+              <h3>{reading.teil2.heading}</h3>
+              {reading.teil2.paragraphs.map((p) => <p key={p}>{p}</p>)}
+            </div>
+            {reading.teil2.questions.map((q) => (
+              <div className="b1-final-question" key={q.number}>
+                <strong>{q.number}. {q.question}</strong>
+                <ChoiceList name={`lesen-t2-${q.number}`} options={q.options}
+                  value={exam.lesenAnswers[`t2-${q.number}`]}
+                  onChange={(value) => setLesen(`t2-${q.number}`, value)} />
+              </div>
+            ))}
+
+            <div className="b1-final-text-divider">
+              <strong>{reading.teil2.text2.title}</strong>
+              <span>Aufgaben 10–12</span>
+            </div>
+            <p>{reading.teil2.text2.intro}</p>
+            <div className="b1-final-press-text">
+              <small>Text aus der Presse</small>
+              <h3>{reading.teil2.text2.heading}</h3>
+              {reading.teil2.text2.paragraphs.map((p) => <p key={p}>{p}</p>)}
+            </div>
+            {reading.teil2.text2.questions.map((q) => (
+              <div className="b1-final-question" key={q.number}>
+                <strong>{q.number}. {q.question}</strong>
+                <ChoiceList name={`lesen-t2-${q.number}`} options={q.options}
+                  value={exam.lesenAnswers[`t2-${q.number}`]}
+                  onChange={(value) => setLesen(`t2-${q.number}`, value)} />
+              </div>
+            ))}
+          </ReadingPart>
+
+          <ReadingPart title="Teil 3" time="10 Minuten">
+            <p>{reading.teil3.context}</p>
+            {reading.teil3.example ? <p>{reading.teil3.example}</p> : null}
+            <div className="b1-final-ads">
+              {reading.teil3.ads.map(([letter, title, copy]) => (
+                <article key={letter} className={!isVerified && letter === "C" ? "example" : ""}>
+                  <span>Anzeige {letter}{!isVerified && letter === "C" ? " · Beispiel" : ""}</span>
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                </article>
+              ))}
+            </div>
+            <div className="b1-final-situations">
+              {reading.teil3.situations.map((q) => (
+                <label key={q.number}>
+                  <span><strong>{q.number}.</strong> {q.text}</span>
+                  <select
+                    value={exam.lesenAnswers[`t3-${q.number}`] || ""}
+                    onChange={(event) => setLesen(`t3-${q.number}`, event.target.value)}
+                  >
+                    <option value="">Anzeige wählen</option>
+                    <option value={reading.teil3.noMatchValue || "0"}>{reading.teil3.noMatchValue || "0"} · keine passende Anzeige</option>
+                    {reading.teil3.ads.map(([letter]) => letter).filter((letter) => (isThird || isFourth) ? letter !== reading.teil3.exampleAd : isSecond || letter !== "C").map((letter) => (
+                      <option value={letter.toLowerCase()} key={letter}>{letter}</option>
+                    ))}
+                  </select>
+                </label>
+              ))}
+            </div>
+          </ReadingPart>
+
+          <ReadingPart title="Teil 4" time="15 Minuten">
+            <p>{reading.teil4.context}</p>
+            {reading.teil4.comments.map((q) => (
+              <div className="b1-final-comment" key={q.number}>
+                <p><strong>{q.number}. {q.person}:</strong> „{q.text}“</p>
+                <ChoiceList name={`lesen-t4-${q.number}`} options={[["ja","Ja"],["nein","Nein"]]}
+                  value={exam.lesenAnswers[`t4-${q.number}`]}
+                  onChange={(value) => setLesen(`t4-${q.number}`, value)} />
+              </div>
+            ))}
+          </ReadingPart>
+
+          <ReadingPart title="Teil 5" time="10 Minuten">
+            <p>{reading.teil5.context}</p>
+            <div className="b1-final-reading-text">
+              <h3>{reading.teil5.heading}</h3>
+              {reading.teil5.sections.map(([title, copy]) => (
+                <div key={title}><h4>{title}</h4><p>{copy}</p></div>
+              ))}
+            </div>
+            {reading.teil5.questions.map((q) => (
+              <div className="b1-final-question" key={q.number}>
+                <strong>{q.number}. {q.question}</strong>
+                <ChoiceList name={`lesen-t5-${q.number}`} options={q.options}
+                  value={exam.lesenAnswers[`t5-${q.number}`]}
+                  onChange={(value) => setLesen(`t5-${q.number}`, value)} />
+              </div>
+            ))}
+          </ReadingPart>
+
+</div>;
+  }} listening={props=><B1PracticeListening {...props} mockId={mockId}/>} writing={props=><PracticeWriting {...props} tasks={writingTasks}/>} speaking={props=><PracticeSpeaking {...props} tasks={makeB1MockSpeakingTasks(mockId)}/>}/>;
+}
+export default function B1FinalMockExamPage({mockId=B1_FINAL_MOCK_ID}){
+  const {user}=useAuth();return <MockModeGate key={`${user?.uid}:${mockId}`} mockId={mockId} title={`B1 Mock ${Number(mockId.slice(-2))}`} timed={<B1TimedMockExamPage mockId={mockId}/>} practice={<B1PracticePaper mockId={mockId}/>}/>;
 }
