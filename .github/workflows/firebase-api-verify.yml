@@ -40,3 +40,9 @@ jobs:
       - name: Test notification translations
         working-directory: functions
         run: node --test __tests__/classNotificationLanguage.test.cjs __tests__/studentNotificationLanguage.test.cjs
+
+      - name: Test independent exam entitlement and account retention
+        working-directory: functions
+        run: |
+          node --test __tests__/enrollmentCleanupProtection.test.cjs
+          npx --no-install jest --runInBand functionz/tests/mockCommerce.test.js functionz/tests/entitlementService.test.js
