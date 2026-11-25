@@ -1249,7 +1249,10 @@ function A1PracticePaper({mockId}) {
   const listening=isKombi?({4:A1_MOCK_4_LISTENING,5:A1_MOCK_5_LISTENING,6:A1_MOCK_6_LISTENING,7:A1_MOCK_7_LISTENING,8:A1_MOCK_8_LISTENING})[kombiNumber]:isMock3?A1_MOCK_3_LISTENING:isMock2?A1_MOCK_2_LISTENING:A1_GOETHE_LISTENING_MOCK;
   const writing=isKombi?A1_KOMBI_TASK_SETS[kombiNumber].writing:isMock3?A1_MOCK_3_WRITING:isMock2?A1_MOCK_2_WRITING:A1_GOETHE_WRITING_MOCK;
   const speaking=isKombi?A1_KOMBI_TASK_SETS[kombiNumber].speaking:isMock3?A1_MOCK_3_SPEAKING:isMock2?A1_MOCK_2_SPEAKING:A1_GOETHE_SPEAKING_MOCK;
-  return <MockPracticeWorkspace mockId={mockId} title={`A1 Mock ${kombiNumber}`} reading={({answers,onChange:setLesenAnswer})=>{
+  return <MockPracticeWorkspace mockId={mockId} title={`A1 Mock ${kombiNumber}`} displayAnswer={(section,row,value)=>{
+    if(section==="hoeren"&&isMock2){const part=[listening.teil1,listening.teil2,listening.teil3][row.part-1];const q=part?.questions.find(q=>q.number===row.number);if(q?.options?.some(o=>o.picture))return mockDisplayAnswer(q.options,value,`a1-picture-t${row.part}-${row.number}`)}
+    return String(value||"").toUpperCase();
+  }} reading={({answers,onChange:setLesenAnswer})=>{
     const exam={lesenAnswers:answers};return <article className="a1-goethe-mock-exam">        {isKombi ? <A1KombiReadingSection mockNumber={kombiNumber} answers={exam.lesenAnswers} onChange={setLesenAnswer} /> : isMock3 ? <A1Mock3ReadingSection answers={exam.lesenAnswers} onChange={setLesenAnswer} /> : isMock2 ? <A1Mock2Reading answers={exam.lesenAnswers} onChange={setLesenAnswer} /> : <>
         <section className="a1-final-mock-part">
           <h2>Teil 1</h2>
