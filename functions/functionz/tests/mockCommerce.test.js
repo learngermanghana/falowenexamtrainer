@@ -115,3 +115,18 @@ describe("signed mock webhook processing", () => {
     expect((await processMockWebhook({admin:another,data:{...signedPayload(),reference:"unknown"}})).body.reason).toBe("order_not_found");
   });
 });
+
+test("synthetic A2 exam payment records provider gross, fee and student contribution without touching course tuition",async()=>{
+ const admin=fakeAdmin({...mockOrder(),level:"A2",checkoutPesewas:9997,mockIds:["a2-final-01"]});
+ const payload={...signedPayload(),amount:9997,fees:194,paid_at:"2026-11-25T11:32:00Z",metadata:{...signedPayload().metadata,level:"A2"}};
+ expect((await processMockWebhook({admin,data:payload})).body.status).toBe("synced");
+ const purchase=admin.values.get("mockPurchases/ref-1");
+ expect(purchase).toMatchObject({priceGhs:99,grossAmountGhs:99.97,gatewayFeeGhs:1.94,studentFeeContributionGhs:0.97,paymentDate:"2026-11-25T11:32:00.000Z",program:"german",currency:"GHS"});
+ expect(admin.values.has("students/student-123")).toBe(false);
+ expect((await processMockWebhook({admin,data:payload})).body.status).toBe("duplicate");
+ expect(admin.values.get("mockPurchases/ref-1")).toEqual(purchase);
+});
+test("provider fee and gateway payment date remain unknown when omitted",async()=>{
+ const admin=fakeAdmin(mockOrder());await processMockWebhook({admin,data:signedPayload()});
+ expect(admin.values.get("mockPurchases/ref-1")).toMatchObject({gatewayFeeGhs:null,paymentDate:null});
+});
