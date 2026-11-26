@@ -195,10 +195,11 @@ import ExamWritingWorkspace from "./components/ExamWritingWorkspace";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
 import { routeEnrollmentLevel } from "./utils/levelEnrollmentAccess";
-import { activeOwnerTestingLevel, isCourseTestingOwner, isOwnerTestingCoursePath, ownerTestingLevels } from "./utils/ownerCourseTesting";
+import { activeOwnerTestingLevel, isCourseTestingOwner, isOwnerTestingCoursePath, ownerTestingLevels, testingClassOptions } from "./utils/ownerCourseTesting";
+import { OwnerCourseTestingContext } from "./context/OwnerCourseTestingContext";
 import { useToast } from "./context/ToastContext";
 import { announceExamSuccess } from "./services/interactionFeedback";
-import { isFirebaseConfigured } from "./firebase";
+import { isFirebaseConfigured, db, collection, getDocs } from "./firebase";
 import { styles } from "./styles";
 import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
@@ -772,9 +773,24 @@ const AppShell = ({
   const testingOwner = isCourseTestingOwner(user) && Boolean(studentProfile) && !browseOnly && studentProfile?.accountType !== "exam_only";
   const testingLevel = activeOwnerTestingLevel({user,program:testingProgram,selection:testingSelection,studentProfile,browseOnly});
   const testingCoursePath = isOwnerTestingCoursePath(location.pathname,testingLevel,testingProgram);
-  useEffect(()=>{setTestingSelection(null);},[user?.uid,testingProgram]);
+  const [testingClassId,setTestingClassId]=useState("");
+  const [testingClasses,setTestingClasses]=useState(null);
+  const [testingClassError,setTestingClassError]=useState("");
+  const testingActive=Boolean(testingLevel);
+  useEffect(()=>{
+    let live=true;
+    setTestingClasses(null);setTestingClassError("");setTestingClassId("");
+    if(!testingOwner||!testingActive||!db)return undefined;
+    getDocs(collection(db,"classes")).then(snapshot=>{if(live)setTestingClasses(snapshot.docs.map(row=>({...row.data(),id:row.id})));}).catch(()=>{if(live)setTestingClassError("Could not load classes. Exit testing and reopen to retry.");});
+    return()=>{live=false;};
+  },[testingOwner,testingActive,user?.uid]);
+  const classChoices=useMemo(()=>testingClassOptions(testingClasses,testingProgram,testingLevel),[testingClasses,testingProgram,testingLevel]);
+  const selectedTestingClass=classChoices.find(row=>row.id===testingClassId);
+  const discussionTesting=testingLevel?{uid:user.uid,program:testingProgram,level:testingLevel,className:selectedTestingClass?.name||"",classId:selectedTestingClass?.id||""}:null;
+  useEffect(()=>{setTestingSelection(null);setTestingClassId("");},[user?.uid,testingProgram]);
   const changeTestingLevel = level => {
     if(!testingOwner)return;
+    setTestingClassId("");
     setTestingSelection(ownerTestingLevels(testingProgram).includes(level)?{uid:user.uid,program:testingProgram,level}:null);
     navigate("/campus/course",{replace:true});
   };
@@ -876,6 +892,7 @@ const AppShell = ({
   }
 
   return (
+    <OwnerCourseTestingContext.Provider value={discussionTesting}>
     <div
       className={isOnboarding ? "onboarding-shell" : "app-shell"}
       style={isOnboarding ? undefined : styles.container}
@@ -929,6 +946,7 @@ const AppShell = ({
       {testingOwner && !isOnboarding && (testingLevel || location.pathname === "/campus/course" || location.pathname === "/campus/account") && <section aria-label="Developer testing access" style={{border:"1px solid #cbd5e1",borderRadius:12,padding:12,margin:"0 0 12px",display:"grid",gap:6}}>
         <strong>Developer testing access · {testingProgram==="swahili"?"Kiswahili":"German"}</strong>
         <label>Testing level <select aria-label="Developer testing level" value={testingLevel} onChange={event=>changeTestingLevel(event.target.value)}><option value="">Off · actual enrollment</option>{ownerTestingLevels(testingProgram).map(level=><option key={level} value={level}>{level}</option>)}</select></label>
+        {testingLevel&&<><label>Testing class <select aria-label="Developer testing class" value={selectedTestingClass?.id||""} onChange={event=>setTestingClassId(event.target.value)} disabled={!testingClasses}><option value="">No class selected</option>{classChoices.map(row=><option key={row.id} value={row.id}>{row.name}{row.status?" · "+row.status:""}</option>)}</select></label>{testingClassError?<small role="alert">{testingClassError}</small>:!testingClasses?<small>Loading classes…</small>:!classChoices.length?<small>No matching classes for this level.</small>:<small>German workbook discussions use this class for read-only review. Actual class membership is unchanged.</small>}</>}
         {testingLevel?<p role="status" style={{margin:0}}>Testing {testingLevel}. No enrollment or billing changes. This is live content, not a submission sandbox; avoid submitting test work. <button type="button" onClick={()=>changeTestingLevel("")}>Exit testing</button></p>:<small>Choose a level to inspect its Course Book. Switch language using the existing course menu. Resets when you reload or change language.</small>}
       </section>}
 
@@ -1481,6 +1499,7 @@ const AppShell = ({
       </main>
       {!isOnboarding ? <AssessmentStudySupport restricted={mockAssessment}><StudyBuddyBar studentProfile={studentProfile} /></AssessmentStudySupport> : null}
     </div>
+    </OwnerCourseTestingContext.Provider>
   );
 };
 
