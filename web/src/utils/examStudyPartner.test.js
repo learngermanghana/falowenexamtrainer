@@ -1,3 +1,4 @@
+import { buildExamPlanPriorities, buildExamPlanPrompt } from "./examStudyPartner";
 import { buildExamRevisionPrompt, safeExamPart, weakestScoredExamPart, getExamRevisionFocus } from "./examStudyPartner";
 import { buildExamStudyPrompt, canShowExamStudyPartner, EXAM_STUDY_SKILLS, EXAM_STUDY_MODES } from "./examStudyPartner";
 
@@ -43,4 +44,25 @@ test("revision focus requires scored evidence and selects the validated Teil", (
   expect(getExamRevisionFocus({ focus:{key:"lesen"}, latestBySection:{} })).toBeNull();
   expect(weakestScoredExamPart([{label:"Teil 1",score:3,total:4},{label:"Teil 2",score:4,total:10}])).toBe("Teil 2");
   expect(weakestScoredExamPart([{label:"Teil 1",score:5,total:5}])).toBe("");
+});
+
+test("revision plan uses broad priorities, days and chosen study time without raw results or dates", () => {
+  const priorities = buildExamPlanPriorities({latestBySection:{lesen:{percent:90},hoeren:{percent:45},schreiben:{percent:60}},weakParts:{hoeren:"Teil 2",schreiben:"private-id"}});
+  const prompt = buildExamPlanPrompt({level:"A2",daysRemaining:12,minutes:60,priorities,historyAvailable:true,date:"2026-12-08",uid:"private-id"});
+  expect(prompt).toContain("Listening · Hören: priority revision (Teil 2)");
+  expect(prompt).toContain("Reading · Lesen: maintenance");
+  expect(prompt).toContain("Speaking · Sprechen: not yet assessed");
+  expect(prompt).toContain("12 days");
+  expect(prompt).toContain("60 minutes");
+  expect(prompt).not.toContain("private-id");
+  expect(prompt).not.toContain("2026-12-08");
+  expect(prompt).not.toContain("45");
+});
+test("handles missing and past dates, exam day, and long horizons", () => {
+  expect(buildExamPlanPrompt({level:"A1",daysRemaining:-1})).toContain("7-day starter");
+  expect(buildExamPlanPrompt({level:"A1",daysRemaining:null})).toContain("7-day starter");
+  expect(buildExamPlanPrompt({level:"A1",daysRemaining:0})).toContain("exam is today");
+  expect(buildExamPlanPrompt({level:"C1",daysRemaining:90})).toContain("weekly roadmap");
+  expect(buildExamPlanPrompt({level:"B2",minutes:999})).toContain("30 minutes");
+  expect(buildExamPlanPrompt({level:"B2"})).toContain("No reliable practice history");
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // Date-only values use calendar days, avoiding fractional days across DST.
 export function examDaysRemaining(value, now = new Date()) {
@@ -10,13 +10,14 @@ export function examDaysRemaining(value, now = new Date()) {
 }
 const storageKey = (uid, level) => "falowen:exam-date:" + uid + ":" + level;
 
-export default function PersonalExamCountdown({uid, level, compact = false}) {
+export default function PersonalExamCountdown({uid, level, compact = false, onDateChange}) {
   const key = storageKey(uid, level);
   const [date, setDate] = useState(() => {
     try { return window.localStorage.getItem(key) || ""; } catch { return ""; }
   });
   const [storageIssue, setStorageIssue] = useState(false);
   const days = examDaysRemaining(date);
+  useEffect(() => { onDateChange?.({ key, date }); }, [key, date, onDateChange]);
   const update = value => {
     if (value && examDaysRemaining(value) === null) return;
     setDate(value);

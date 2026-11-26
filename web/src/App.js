@@ -1759,6 +1759,7 @@ const ExamArea = ({ onBack }) => {
   const assignedSwahiliLevel = normalizeCourseLevel(studentProfile?.level);
   const swahiliLevels = swahiliLevelOrder.filter((option,index) => index <= swahiliLevelOrder.indexOf(assignedSwahiliLevel) && !studentProfile?.blockedEnrollmentLevels?.includes(option));
   const [swahiliChoice, setSwahiliChoice] = useState(null);
+  const [examPlanDate, setExamPlanDate] = useState(null);
   const level = isSwahili
     ? (swahiliChoice?.uid === user?.uid && swahiliLevels.includes(swahiliChoice?.level) ? swahiliChoice.level : swahiliLevels.at(-1))
     : germanLevel;
@@ -1953,7 +1954,7 @@ const ExamArea = ({ onBack }) => {
               </button>
             ))}
           </div>
-            {!isSwahili && examSection === "overview" && user?.uid && <PersonalExamCountdown key={user.uid + ":" + level} uid={user.uid} level={level} compact />}
+            {!isSwahili && examSection === "overview" && user?.uid && <PersonalExamCountdown key={user.uid + ":" + level} uid={user.uid} level={level} compact onDateChange={setExamPlanDate} />}
           </div>
           <small style={{ ...styles.helperText, margin: 0 }}>
             Practise at your current level or any lower level.
@@ -1989,7 +1990,7 @@ const ExamArea = ({ onBack }) => {
       </div>
 
       {isSwahili ? <SwahiliExamSection level={level} section={examSection} /> : <>
-      {examSection === "overview" ? <ExamsOverviewPage dateInLevelPicker allowExamStudyPartner={allowExamStudyPartner} /> : null}
+      {examSection === "overview" ? <ExamsOverviewPage dateInLevelPicker allowExamStudyPartner={allowExamStudyPartner} examPlanDate={examPlanDate?.key === "falowen:exam-date:" + user?.uid + ":" + level ? examPlanDate.date : ""} /> : null}
       {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
       {examSection === "speaking" ? <SpeakingPage allowExamStudyPartner={allowExamStudyPartner} /> : null}
