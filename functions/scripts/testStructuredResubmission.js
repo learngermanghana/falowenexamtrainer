@@ -58,3 +58,12 @@ const legacy = _testing.validatePayload({
 assert.equal(legacy.structured, null);
 
 console.log("Structured resubmission server contract passed.");
+
+const {validateFamilyRetry}=require("../familyResubmission");
+const familyText="TEIL 1\n1. Es kostet zehn Euro.\n\nTEIL 2\nMeine Familie ist klein.\n\nTEIL 3\n1. gern";
+const familyRecording={audioUrl:"https://firebasestorage.googleapis.com/example",transcript:"Meine Familie ist klein."};
+assert.equal(validateFamilyRetry(familyText,familyRecording).sectionKey,"teil-2");
+assert.throws(()=>validateFamilyRetry(familyText,{...familyRecording,transcript:"Different"}),/matches Teil 2/);
+assert.throws(()=>validateFamilyRetry(familyText,null),/Save a family recording/);
+assert.throws(()=>validateFamilyRetry(familyText.replace("TEIL 3","TEIL 2"),familyRecording),/exactly one/);
+assert.equal(_testing.validatePayload({...basePayload,assignmentId:"A1-3",canonicalAssignmentKey:"A1-3",level:"A1",day:7,submissionText:familyText,familyRetryRecording:familyRecording}).familyRetry.transcript,familyRecording.transcript);
