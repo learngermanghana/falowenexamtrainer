@@ -16,6 +16,8 @@ import { fileURLToPath } from "node:url";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/b2LessonContentAlignment.js";
 import { getC1CanonicalTitle, getC1CanonicalGrammarTitle, getC1ContentProfile, alignC1LessonContent } from "../web/src/data/c1ContentRefresh.js";
 import { C1_READING_PRACTICE } from "../web/src/data/c1ReadingPractice.js";
+import { getC1AcademicDay } from "../web/src/data/c1AcademicCurriculum.js";
+import { getC1Phase2Lesson } from "../web/src/data/c1Phase2Lessons.js";
 import { C2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/c2LessonContentAlignment.js";
 import { C2_READING_PRACTICE } from "../web/src/data/c2ReadingPractice.js";
 import { C2_LISTENING_PRACTICE } from "../web/src/data/c2ListeningPractice.js";
@@ -414,18 +416,28 @@ for (let day = 1; day <= 28; day += 1) {
       !reading.questions?.length) {
     throw new Error("Missing authentic C1 learner practice for day " + day);
   }
+  const academic = getC1AcademicDay(day);
+  const practice = getC1Phase2Lesson(day);
+  if (!academic || !practice || practice.title !== academic.topic || practice.skill !== academic.skill || practice.part !== academic.part || practice.vocabulary.length !== 20) throw new Error("Missing upgraded C1 source for day " + day);
+  const skillFocus = {Lesen:"lesen",Hören:"hoeren",Sprechen:"speak",Schreiben:"write"}[practice.skill];
+  const practiceQuestions = (practice.questions || []).map(([question, options]) => ({question:text(question,900), options:strings(options,10,700)}));
+  const practiceMeta = { title:practice.title, part:practice.part, task:text(practice.instruction,1800), source:"Falowen-authored academic Course Book practice (not an official Goethe exam)" };
   C1[String(day)] = {
     level: "C1", day,
     chapter: text(entry.chapter || entry.displayChapter, 25),
-    title: text(title, 240),
-    topic: text(profile.question, 600),
-    goal: text(profile.aim, 700),
-    grammarFocus: text(grammarFocus, 300),
-    skillFocus: "self_study",
+    title: text(academic.topic, 240),
+    topic: text(academic.topic, 600),
+    foundationTitle: text(title,240),
+    goal: text(academic.task, 700),
+    grammarFocus: text(practice.grammar, 300),
+    skillFocus,
+    examPart: practice.part,
     campusTabs: ["Learn", "Lesen", "Speak", "Write", "Finish", "Ref"],
     grammar: {
-      focus: text(grammarFocus, 300),
-      explanation: strings(aligned.grammarLesson?.explanation, 6, 1100),
+      focus: text(practice.grammar, 300),
+      explanation: [text(practice.rule,1800), ...strings(aligned.grammarLesson?.explanation, 3, 1100)],
+      examples: [text(academic.example,700)],
+      exercises: practice.grammarChecks.map(([prompt])=>({question:text(prompt,900)})),
       rules: strings(aligned.grammarLesson?.rules, 8, 950),
       task: text(aligned.grammarLesson?.miniExercise, 1200),
       fullExplanationIncluded: false,
@@ -444,8 +456,9 @@ for (let day = 1; day <= 28; day += 1) {
       clarification: "Practise speaking in ChatGPT or Falowen Campus; no recorded speaking mark is created here.",
     },
     vocabulary: {
+      terms: practice.vocabulary.map(([term,meaning])=>({term:text(term,180),meaning:text(meaning,300)})),
       phrases: strings(aligned.phrases, 12, 180),
-      clarification: "Selected C1 course expressions, not a complete lesson vocabulary inventory.",
+      clarification: "All 20 German-English expressions from the upgraded C1 day.",
     },
     review: strings(profile.points, 6, 600),
     reading: {
@@ -459,6 +472,14 @@ for (let day = 1; day <= 28; day += 1) {
       questions: publicQuestions(reading.questions),
       clarification: "New Falowen C1 practice passage and open-response questions. ChatGPT may give feedback on attempted answers; official Campus marking is separate.",
     },
+    // Replace the featured skill with the actual upgraded exercise, retaining
+    // the previous supplemental open reading and productive tasks on other days.
+    ...(skillFocus === "lesen" ? {reading:{...practiceMeta, passageIncluded:true, questionsIncluded:true,
+      paragraphs: [text(practice.text,18000)], questions:practiceQuestions}} : {}),
+    ...(skillFocus === "hoeren" ? {listening:{...practiceMeta, audioAvailableInCampus:false, campusPlaybackAvailable:"device-dependent", audioMode:"Campus device-local German speech synthesis when supported; otherwise teacher read-aloud", questions:practiceQuestions,
+      clarification:"Open the corresponding Campus Learn tab for playback or teacher read-aloud. The hidden listening text is not exported; never pretend to play it in ChatGPT."}} : {}),
+    ...(skillFocus === "speak" ? {speaking:{...practiceMeta,prompt:text(practice.instruction,1800),guidingQuestions:strings(practice.prompts,8,900),followups:strings(practice.followups,5,800),rubric:strings(practice.rubric,8,800)}} : {}),
+    ...(skillFocus === "write" ? {writing:{...practiceMeta,type:practice.part===1?"Forumsbeitrag":"Formelle Nachricht",prompt:text(practice.instruction,1800),instructions:strings(practice.prompts,8,900),targetWords:practice.part===1?230:120,rubric:strings(practice.rubric,8,800)}} : {}),
   };
 }
 
