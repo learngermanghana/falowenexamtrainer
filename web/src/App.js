@@ -1880,7 +1880,7 @@ const ExamArea = ({ onBack }) => {
   return (
     <>
       {lockDialog}
-      <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+      <div className="exam-room-mobile-header" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
         <div className="nav-row exam-nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 0 }}>
           <button style={styles.secondaryButton} onClick={() => { announceExamSuccess("Home opened successfully."); onBack(); }}>
             {t("appNav.backHome")}
@@ -1963,7 +1963,7 @@ const ExamArea = ({ onBack }) => {
         {allowExamStudyPartner && ["lesen", "horen"].includes(examSection) && <ExamStudyPartner key={`${level}:${examSection}`} level={level} section={examSection} />}
 
         {!isSwahili && activeExamHero && examSection !== "speaking" ? (
-          <section
+          <section className="exam-room-hero"
             style={{
               ...styles.card,
               margin: 0,
