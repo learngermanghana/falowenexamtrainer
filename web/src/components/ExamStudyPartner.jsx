@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import { useAssessmentRestricted } from "../hooks/useAssessmentRestriction";
 import { buildA1ChatGPTUrl } from "../utils/a1StudyPartner";
-import { buildExamStudyPrompt, canShowExamStudyPartner, EXAM_STUDY_SKILLS, EXAM_STUDY_MODES } from "../utils/examStudyPartner";
+import { buildExamStudyPrompt, buildExamRevisionPrompt, canShowExamStudyPartner, EXAM_STUDY_SKILLS, EXAM_STUDY_MODES } from "../utils/examStudyPartner";
 
-export default function ExamStudyPartner({ level, section, restricted = false }) {
+export default function ExamStudyPartner({ level, section, restricted = false, revisionFocus = null, completedSkills = {} }) {
   const assessmentRestricted = useAssessmentRestricted(restricted);
-  const [selectedSkill, setSelectedSkill] = useState("overview");
-  const [mode, setMode] = useState("practice");
+  const [selectedSkill, setSelectedSkill] = useState(null);
+  const [mode, setMode] = useState(null);
   const [copyStatus, setCopyStatus] = useState("");
   if (!canShowExamStudyPartner({ level, section, restricted: assessmentRestricted })) return null;
-  const skill = section === "overview" ? selectedSkill : section;
-  const prompt = buildExamStudyPrompt({ level, section: skill, mode });
+  const skill = section === "overview" ? selectedSkill || revisionFocus?.section || "overview" : section;
+  const completed = Object.prototype.hasOwnProperty.call(completedSkills, skill);
+  const activity = mode === "mistakes" && !completed ? "practice" : mode || (revisionFocus?.section === skill && completed ? "mistakes" : "practice");
+  const prompt = activity === "mistakes" ? buildExamRevisionPrompt({ level, section: skill, part: completedSkills[skill], completed }) : buildExamStudyPrompt({ level, section: skill, mode: activity });
+  const recommended = EXAM_STUDY_SKILLS.find(item => item.key === revisionFocus?.section);
   const copyPrompt = async () => {
     try {
       await navigator.clipboard.writeText(prompt);
@@ -22,17 +25,19 @@ export default function ExamStudyPartner({ level, section, restricted = false })
     <details data-exam-study-partner={section} style={{ background: "#f0fdf4", color: "#14532d", border: "1px solid #bbdfc8", borderRadius: 10, padding: "10px 12px", minWidth: 0 }}>
       <summary style={{ cursor: "pointer", fontWeight: 700, lineHeight: 1.6 }}>
         Prepare with ChatGPT <span style={{ fontSize: 13, fontWeight: 400 }}>· {level}{section === "overview" ? " exam preparation" : " · " + label}</span>
+        {recommended && <span style={{display:"block",fontWeight:400,fontSize:13}}>Suggested revision: {recommended.label}{revisionFocus.part ? " · " + revisionFocus.part : ""}</span>}
       </summary>
       <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
-        <p style={{ margin: 0, fontSize: 13 }}>Practise with fresh questions before an exam. Your official results stay in Falowen.</p>
+        <p style={{ margin: 0, fontSize: 13 }}>Practise with fresh questions before an exam. Your official results stay in Falowen. Suggested revision uses your existing results locally; only level, skill and Teil are shared.</p>
         {section === "overview" && <label style={{ display: "grid", gap: 4 }}>Choose a skill
-          <select value={selectedSkill} onChange={e => { setSelectedSkill(e.target.value); setCopyStatus(""); }} style={{ padding: 8, maxWidth: "100%", color: "#14532d", background: "white", borderRadius: 6 }}>
+          <select value={skill} onChange={e => { setSelectedSkill(e.target.value); setMode(null); setCopyStatus(""); }} style={{ padding: 8, maxWidth: "100%", color: "#14532d", background: "white", borderRadius: 6 }}>
             {EXAM_STUDY_SKILLS.map(item => <option key={item.key} value={item.key}>{item.label}</option>)}
           </select>
         </label>}
         <label style={{ display: "grid", gap: 4 }}>Choose study activity
-          <select value={mode} onChange={e => { setMode(e.target.value); setCopyStatus(""); }} style={{ padding: 8, maxWidth: "100%", color: "#14532d", background: "white", borderRadius: 6 }}>
+          <select value={activity} onChange={e => { setMode(e.target.value); setCopyStatus(""); }} style={{ padding: 8, maxWidth: "100%", color: "#14532d", background: "white", borderRadius: 6 }}>
             {EXAM_STUDY_MODES.map(item => <option key={item.key} value={item.key}>{item.label}</option>)}
+            {completed && <option value="mistakes">Understand my mistakes</option>}
           </select>
         </label>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
