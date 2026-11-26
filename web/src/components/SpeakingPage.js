@@ -1,3 +1,4 @@
+import ExamMistakeReview from "./ExamMistakeReview";
 import ExamStudyPartner from "./ExamStudyPartner";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
@@ -1433,7 +1434,10 @@ const SpeakingPage = ({
             onStart={beginSpeakingPractice}/>
         ) : null}
         {isExamMode && practiceStage === "results" ? (
+          <>
           <SpeakingRunResults level={selectedLevel} results={runResults} onReturn={()=>setPracticeStage("home")} onRepeat={()=>beginSpeakingPractice(runResults.length>1)}/>
+          {allowExamStudyPartner && !liveExaminerActive && runResults.length > 0 && <div style={{padding:"10px 12px"}}><ExamMistakeReview key={selectedLevel+":"+runResults.length} level={selectedLevel} section="speaking" part={runResults.length===1?runResults[0].teil:""} completed /></div>}
+          </>
         ) : null}
         {isExamMode && practiceStage === "practice" ? <SpeakingExaminationScreen
           level={selectedLevel} teil={selectedTeil} parts={Object.keys(examSteps[selectedLevel] || {})}
