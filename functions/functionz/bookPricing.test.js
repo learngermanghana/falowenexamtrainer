@@ -19,3 +19,26 @@ test("digital guide scope pricing is independent of printing and preserves origi
   assert.equal(priceDigitalExamGuide({skills:4}),39);
   for(const skills of [0,5,1.2]) assert.throws(()=>priceDigitalExamGuide({skills}),RangeError);
 });
+
+test("German A1 exam preparation offers GH₵99 PDF and GH₵200 printed edition",()=>{
+  const {BOOKS,BOOK_CATALOG_TITLES,registerBookCommerceRoutes}=require("./bookCommerce");
+  const {DIGITAL_BOOK_OBJECTS}=require("./privateBookDelivery");
+  const title=BOOK_CATALOG_TITLES.find(item=>item.id==="german-a1-exam-preparation");
+  const digital=BOOKS["german-a1-exam-preparation-digital"];
+  const printed=BOOKS["german-a1-exam-preparation-printed"];
+  assert.deepEqual(title.formats,["digital","printed"]);
+  assert.equal(title.pages,50);
+  assert.deepEqual(title.bookIds,[digital.id,printed.id]);
+  assert.equal(digital.priceGhs,99);
+  assert.equal(printed.priceGhs,200);
+  assert.equal(printed.priceGhs,pricePrintedGuide(title.pages));
+  assert.equal(printed.format,"printed");
+  assert.equal(Object.hasOwn(DIGITAL_BOOK_OBJECTS,printed.id),false);
+  const routes={};
+  registerBookCommerceRoutes({get:(path,handler)=>{routes[path]=handler;},post:()=>{}},{admin:{}});
+  const catalog=routes["/books/catalog"]({}, {set:()=>{},json:data=>data});
+  const offer=catalog.books.find(book=>book.id===printed.id);
+  assert.equal(offer.deliveryMode,"print_on_demand");
+  assert.equal(offer.deliveryIncluded,false);
+  assert.equal(offer.checkoutTotalGhs,200);
+});
