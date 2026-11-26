@@ -258,6 +258,20 @@ const CLASSROOM_RECORDINGS = Object.freeze({
   'A2-25': Object.freeze({ id: 'a2-day25-tagesablauf-classroom', key: 'a2/day-25/tagesablauf.mp3' }),
   'B1-25': Object.freeze({ id: 'b1-day25-consumer-service', key: 'b1/day-25/online-shopping-verbraucherservice.mp3' }),
 });
+// Path-based lookup removes the fragile level/day/key query-string contract.
+function createClassroomRecordingPathHandler(options = {}) {
+  return createMusicHandler({ ...options, prepare: async (req, env) => {
+    const url = new URL(req.url, 'https://www.falowen.app');
+    const match = url.pathname.match(/^\/course-media\/classroom\/(a2|b1|swahili-b1)\/([1-9][0-9]?)\/audio-url$/);
+    const lookupKey = match ? match[1].toUpperCase() + '-' + Number(match[2]) : '';
+    const recording = Object.hasOwn(CLASSROOM_RECORDINGS, lookupKey) ? CLASSROOM_RECORDINGS[lookupKey] : null;
+    if (!recording) throw Object.assign(new Error('Classroom recording is not registered.'), {status:404});
+    if (url.searchParams.has('key') || url.searchParams.has('level') || url.searchParams.has('day')) {
+      throw Object.assign(new Error('Unexpected classroom recording parameters.'), {status:400});
+    }
+    return signObject(recording, env);
+  } });
+}
 function createClassroomAudioHandler(options = {}) {
   return createMusicHandler({ ...options, prepare: async (req, env) => {
     const params = new URL(req.url, 'https://www.falowen.app').searchParams;
@@ -288,4 +302,4 @@ function createClassroomBankAudioHandler(options = {}) {
     return signObject(recording, env);
   } });
 }
-module.exports = { createSwahiliB1Day27AudioHandler, createSwahiliB1Day26AudioHandler, createSwahiliDayThirteenAudioHandler, createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayThreeAudioHandler, createSwahiliDayFourAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayEightAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
+module.exports = { createSwahiliB1Day27AudioHandler, createSwahiliB1Day26AudioHandler, createSwahiliDayThirteenAudioHandler, createSwahiliB1Day28AudioHandler, createSwahiliDayOneAudioHandler, createSwahiliDayTwoAudioHandler, createSwahiliDayThreeAudioHandler, createSwahiliDayFourAudioHandler, createSwahiliDayFiveAudioHandler, createSwahiliDaySixAudioHandler, createSwahiliDaySevenAudioHandler, createSwahiliDayEightAudioHandler, createSwahiliDayTenAudioHandler, createSwahiliDayElevenAudioHandler, createSwahiliDayTwelveAudioHandler, createClassroomRecordingPathHandler, createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
