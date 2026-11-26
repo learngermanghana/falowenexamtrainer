@@ -10,31 +10,35 @@ export const A1_STUDY_MODES = Object.freeze([
 
 const clean = value => String(value ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
 
-export function isA1StudyPartnerLesson(lesson = {}) {
-  return Boolean(clean(lesson.title) && Number.isInteger(Number(lesson.day)) && Number(lesson.day) > 0
-    && clean(lesson.chapter) && !/final mock|abschlussprüfung/i.test(lesson.title)
+export function isStudyPartnerLesson(lesson = {}, level = "A1") {
+  return Boolean(["A1", "A2"].includes(level) && clean(lesson.title) && Number.isInteger(Number(lesson.day)) && Number(lesson.day) > 0
+    && clean(lesson.chapter) && !/final mock|speaking mock|abschlussprüfung/i.test(lesson.title)
     && !/final-mock-exam/i.test(lesson.destination || lesson.workbookRoute || ""));
 }
 
-export function buildA1StudyPrompt(lesson, mode = "explain", section = "") {
-  if (!isA1StudyPartnerLesson(lesson)) return "";
+export function buildStudyPrompt(lesson, mode = "explain", section = "", level = "A1") {
+  if (!isStudyPartnerLesson(lesson, level)) return "";
   const option = A1_STUDY_MODES.find(item => item.key === mode) || A1_STUDY_MODES[0];
-  const assignment = lesson.kind === "assignment" && /^A1-[0-9._]+$/.test(lesson.assignmentKey || "")
+  const assignment = lesson.kind === "assignment" && new RegExp("^" + level + "-[0-9._]+$").test(lesson.assignmentKey || "")
     ? " Official assignment reference: " + lesson.assignmentKey + "." : "";
   const source = lesson.kind === "assignment"
     ? "I am reviewing my teacher-led lesson and preparing for a tutor-marked assignment."
     : "I am studying this self-learning material independently.";
   return [
-    "Be my German A1 study partner at Falowen (Learn Language Education Academy).",
+    "Be my German " + level + " study partner at Falowen (Learn Language Education Academy).",
     "Current lesson: Day " + Number(lesson.day) + ", Kapitel " + clean(lesson.chapter) + " — " + clean(lesson.title) + "." + assignment,
     source,
     clean(section) ? "Current workbook section: " + clean(section) + "." : "",
     "If my Falowen Learning Companion is connected, retrieve this exact lesson by level, day and chapter" + (assignment ? " and assignment reference" : "") + ". Use learner-facing material only. If it is unavailable, tell me and use the topic above, without pretending you have read the lesson.",
-    option.instruction,
-    "Use simple German appropriate for A1, with short English explanations when helpful. Ask one question at a time, wait for my reply, correct my mistakes and explain why.",
+    option.instruction.replace(/\bA1\b/g, level),
+    "Use German appropriate for " + level + ", with short English explanations when helpful. Ask one question at a time, wait for my reply, correct my mistakes and explain why.",
     "Use fresh practice examples and hints. Do not provide official assignment answers, answer keys, complete my submission, save official marks, or start an exam. Ask for my own attempt first.",
   ].filter(Boolean).join("\n\n");
 }
+
+// Preserve the original A1 public API for existing callers and tests.
+export const isA1StudyPartnerLesson = (lesson) => isStudyPartnerLesson(lesson, "A1");
+export const buildA1StudyPrompt = (lesson, mode, section) => buildStudyPrompt(lesson, mode, section, "A1");
 
 export function buildA1ChatGPTUrl(prompt) {
   return prompt ? "https://chatgpt.com/?q=" + encodeURIComponent(prompt) : "https://chatgpt.com/";
