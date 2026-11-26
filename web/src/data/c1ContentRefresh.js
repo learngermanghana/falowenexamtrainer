@@ -1,3 +1,5 @@
+import { getC1AcademicDay } from "./c1AcademicCurriculum.js";
+
 export const C1_CANONICAL_TITLES = Object.freeze([
   "Ziele und Lernweg",
   "Kultur und Identität",
@@ -371,6 +373,7 @@ export const alignC1LessonContent = (lesson) => {
       writing: writing.topic,
     },
     c1ContentRefresh: {
+      academic: getC1AcademicDay(day),
       title: canonicalTitle,
       grammarTitle: canonicalGrammarTitle,
       aim: profile.aim,

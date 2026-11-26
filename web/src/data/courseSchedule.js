@@ -2,6 +2,7 @@ import { FRENCH_A1_SCHEDULE } from "./archive/french/courseSchedule";
 import { getAssignmentDictionaryEntry } from "./germanAssignmentCatalog";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import { getC1CanonicalGrammarTitle, getC1CanonicalTitle, getC1ContentProfile } from "./c1ContentRefresh";
+import { getC1AcademicDay } from "./c1AcademicCurriculum.js";
 import { A2_LISTENING_MODES, getA2ListeningTask } from "./a2ListeningTasks";
 import { getB1ListeningTask } from "./b1ListeningTasks";
 
@@ -727,6 +728,7 @@ const c1Schedule = [
   const profile = getC1ContentProfile(day);
   const canonicalTitle = getC1CanonicalTitle(day) || entry.topic;
   const grammarTitle = getC1CanonicalGrammarTitle(day);
+  const academic = getC1AcademicDay(day);
   return {
     ...entry,
     topic: canonicalTitle,
@@ -735,10 +737,10 @@ const c1Schedule = [
     grammar_topic: grammarTitle || entry.grammar_topic,
     goal: profile ? `Ziel: ${profile.aim}.` : entry.goal,
     instruction: profile
-      ? `Leitfrage: ${profile.question} Öffne die Lektion und arbeite die aktualisierten C1-Inhalte in Learn → Speak → Write → Finish → Ref durch.`
+      ? `Leitfrage: ${profile.question} Öffne die Lektion und arbeite die aktualisierten C1-Inhalte in Learn → Speak → Write → Finish → Ref durch.${academic ? ` Vertiefung: ${academic.topic} · ${academic.skill} Teil ${academic.part}.` : ""}`
       : entry.instruction,
     c1ContentRefresh: profile
-      ? { title: canonicalTitle, grammarTitle, aim: profile.aim, question: profile.question, writingPoints: profile.points }
+      ? { title: canonicalTitle, grammarTitle, aim: profile.aim, question: profile.question, writingPoints: profile.points, academic }
       : entry.c1ContentRefresh,
   };
 })
