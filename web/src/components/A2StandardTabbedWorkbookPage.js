@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import SharedTimedAssignment from "./SharedTimedAssignment";
+import StudyPartner from "./A1StudyPartner";
 import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import WorkbookDayMusic from "./WorkbookDayMusic";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -211,7 +212,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
       configOverride={lessonProfile?.timer || null}
       onTimeExpired={handleTimedExpiry}
     >
-      {({ isTabLocked }) => {
+      {({ isTabLocked, attemptState }) => {
         const displayedActiveTab = isTabLocked(visibleActiveTab) ? "grammar" : visibleActiveTab;
         return <div style={{ ...styles.container, display: "grid", gap: 16 }}>
           <div style={card}>
@@ -228,6 +229,9 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
                 ariaLabel={`A2 Day ${day} workbook sections`}
                 renderLegacyGrammarPanel={false}
               /></div>
+            {attemptState !== "active" && displayedActiveTab !== "submit" && (
+              <StudyPartner level="A2" key={assignmentKey} lesson={{ kind: "assignment", day, chapter: assignmentKey.startsWith("A2-") ? assignmentKey.slice(3) : chapter, title, assignmentKey }} section={({ references: "Lecture review and notes", grammar: "Grammar", sprechen: "Speaking practice", schreiben: "Writing preparation", lesen: "Reading preparation", hoeren: "Listening preparation", music: "Music" })[displayedActiveTab] || ""} />
+            )}
             {inlineTeacherLecture ? (
               <details
                 data-a2-day16-teacher-lecture={Number(day) === 16 ? "true" : undefined}
