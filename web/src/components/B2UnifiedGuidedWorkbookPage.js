@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import StudyPartner from "./A1StudyPartner";
-import { getB2ChapterOnePractice } from "../data/b2ChapterOnePractice";
+import { getB2ChapterOnePractice, getB2ChapterOneReadingEvidence } from "../data/b2ChapterOnePractice";
 import B2TopicIntroduction, { B2_TOPIC_FOUNDATIONS } from "./B2TopicIntroduction";
 import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
@@ -173,6 +173,7 @@ function ReadingPractice({ day, progress, setProgress }) {
         const selected = answers[index];
         const hasAnswer = Number.isInteger(selected);
         const correct = selected === item.answerIndex;
+        const evidence = getB2ChapterOneReadingEvidence(day, index);
         return <article key={item.question} style={sub}>
           <strong>{index + 1}. {item.question}</strong>
           <div style={{ display: "grid", gap: 8 }}>
@@ -196,7 +197,7 @@ function ReadingPractice({ day, progress, setProgress }) {
               </button>;
             })}
           </div>
-          {hasAnswer ? <div style={{ borderRadius: 12, padding: 10, background: correct ? "#f0fdf4" : "#fff7f7", lineHeight: 1.6 }}><strong>{correct ? "Richtig." : "Noch nicht richtig."}</strong> {!correct ? <>Richtige Antwort: <strong>{String.fromCharCode(65 + item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </> : null}{item.explanation}</div> : null}
+          {hasAnswer ? <div style={{ borderRadius: 12, padding: 10, background: correct ? "#f0fdf4" : "#fff7f7", lineHeight: 1.6 }}><strong>{correct ? "Richtig." : "Noch nicht richtig."}</strong> {!correct ? <>Richtige Antwort: <strong>{String.fromCharCode(65 + item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </> : null}{item.explanation}{evidence !== null && practice.paragraphs[evidence] ? <details style={{ marginTop: 8 }}><summary>Textbeleg · Absatz {evidence + 1}</summary><p>{practice.paragraphs[evidence]}</p></details> : null}</div> : null}
         </article>;
       })}
     </ReadingQuestionGrid>
