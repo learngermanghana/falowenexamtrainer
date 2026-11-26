@@ -9,7 +9,7 @@ import A1MockListeningPractice from "./A1MockListeningPractice";
 import A2Mock3Hoeren from "./A2Mock3Hoeren";
 import A2MockListeningPractice from "./A2MockListeningPractice";
 
-const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
+const HorenPage = ({ practiceLevel = "", sampleId = "", allowExamMistakeReview = false }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const openListeningSample = (route, message = "Hören practice opened successfully.") => {
@@ -42,7 +42,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
       if (normalizedLevel === "A1" && /^sample-[4-8]$/.test(sampleId)) return <A1MockListeningPractice key={sampleId} mockNumber={Number(sampleId.slice(-1))} />;
       if (normalizedLevel === "A2" && sampleId === "sample-3") return <A2Mock3Hoeren practiceReturnPath="/exams/horen" />;
       if (normalizedLevel === "A2" && /^sample-[4-8]$/.test(sampleId)) return <A2MockListeningPractice mockNumber={Number(sampleId.slice(-1))} />;
-      return <ListeningPracticeSamplePage level={normalizedLevel} sampleId={sampleId} />;
+      return <ListeningPracticeSamplePage level={normalizedLevel} sampleId={sampleId} allowExamMistakeReview={allowExamMistakeReview} />;
     }
 
     return (
