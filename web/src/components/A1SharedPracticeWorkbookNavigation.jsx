@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import A1StudyPartner from "./A1StudyPartner";
 import { useLocation, useNavigate } from "react-router-dom";
 import { A1_CANONICAL_LESSON_CATALOG } from "../data/a1CanonicalLessonCatalog";
 import { styles } from "../styles";
@@ -178,9 +179,10 @@ const navButtonStyle = (selected) => ({
 export default function A1SharedPracticeWorkbookNavigation() {
   const location = useLocation();
   const navigate = useNavigate();
+  const requestedLevel = String(new URLSearchParams(location.search).get("level") || location.state?.level || "").toUpperCase();
   const practice = useMemo(
-    () => resolveA1SharedPracticeLesson({ pathname: location.pathname }),
-    [location.pathname],
+    () => requestedLevel && requestedLevel !== "A1" ? null : resolveA1SharedPracticeLesson({ pathname: location.pathname }),
+    [location.pathname, requestedLevel],
   );
   const materialsDone = hasCompletedA1PracticeMaterials(location.search);
   const requestedView = requestedPracticeView(location.search);
@@ -294,6 +296,7 @@ export default function A1SharedPracticeWorkbookNavigation() {
   if (!practice || practice.singlePage || !materialsDone || !navMount || !sections.length) return null;
 
   return createPortal(
+    <>
     <section
       aria-label="A1 self-practice workbook navigation"
       style={{
@@ -333,7 +336,9 @@ export default function A1SharedPracticeWorkbookNavigation() {
         ))}
       </div>
       <div style={{ marginTop: 12 }}><A1CourseBookOffer /></div>
-    </section>,
+    </section>
+    <div style={{ marginBottom: 12 }}><A1StudyPartner key={practice.routeKey} lesson={practice} section={sections.find(section => section.key === activeView)?.title || ""} /></div>
+    </>,
     navMount,
   );
 }
