@@ -5,6 +5,7 @@ import StudyPartner from "./A1StudyPartner";
 import { getB2ChapterOnePractice, getB2ChapterOneReadingEvidence } from "../data/b2ChapterOnePractice";
 import { getB2ChapterTwoPractice, getB2ChapterTwoReadingEvidence } from "../data/b2ChapterTwoPractice";
 import { getB2ChapterThreePractice, getB2ChapterThreeReadingEvidence } from "../data/b2ChapterThreePractice";
+import { getB2ChapterFourPractice, getB2ChapterFourReadingEvidence } from "../data/b2ChapterFourPractice";
 import B2TopicIntroduction, { B2_TOPIC_FOUNDATIONS } from "./B2TopicIntroduction";
 import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
@@ -101,7 +102,7 @@ const GrammarLessonContent = ({ day }) => {
 
 
 function ChapterVocabulary({ day }) {
-  const practice = getB2ChapterOnePractice(day) || getB2ChapterTwoPractice(day) || getB2ChapterThreePractice(day);
+  const practice = getB2ChapterOnePractice(day) || getB2ChapterTwoPractice(day) || getB2ChapterThreePractice(day) || getB2ChapterFourPractice(day);
   if (!practice) return null;
   return <Section title="Wortschatz · Redemittel">
     <p style={{ margin: 0 }}>Lerne diese Ausdrücke als feste Wortverbindungen, nicht als einzelne Wörter.</p>
@@ -112,9 +113,9 @@ function ChapterVocabulary({ day }) {
 }
 
 function ChapterTransformations({ day }) {
-  const practice = getB2ChapterOnePractice(day) || getB2ChapterTwoPractice(day) || getB2ChapterThreePractice(day);
+  const practice = getB2ChapterOnePractice(day) || getB2ChapterTwoPractice(day) || getB2ChapterThreePractice(day) || getB2ChapterFourPractice(day);
   if (!practice) return null;
-  return <div data-b2-chapter-one-practice={day <= 5 ? day : undefined} data-b2-chapter-two-practice={day >= 6 && day <= 10 ? day : undefined} data-b2-chapter-three-practice={day >= 11 && day <= 15 ? day : undefined} style={sub}>
+  return <div data-b2-chapter-one-practice={day <= 5 ? day : undefined} data-b2-chapter-two-practice={day >= 6 && day <= 10 ? day : undefined} data-b2-chapter-three-practice={day >= 11 && day <= 15 ? day : undefined} data-b2-chapter-four-practice={day >= 16 && day <= 20 ? day : undefined} style={sub}>
     <strong>Satztraining · Vom B1- zum B2-Satz</strong>
     <p style={{ margin: 0 }}>Formuliere zuerst selbst einen Satz. Vergleiche danach deine Lösung mit dem Modell. Andere grammatisch korrekte Lösungen sind möglich.</p>
     {practice.transformations.map(([question, answer, explanation], index) => <article key={question} style={sub}>
@@ -175,7 +176,7 @@ function ReadingPractice({ day, progress, setProgress }) {
         const selected = answers[index];
         const hasAnswer = Number.isInteger(selected);
         const correct = selected === item.answerIndex;
-        const evidence = getB2ChapterOneReadingEvidence(day, index) ?? getB2ChapterTwoReadingEvidence(day, index) ?? getB2ChapterThreeReadingEvidence(day, index);
+        const evidence = getB2ChapterOneReadingEvidence(day, index) ?? getB2ChapterTwoReadingEvidence(day, index) ?? getB2ChapterThreeReadingEvidence(day, index) ?? getB2ChapterFourReadingEvidence(day, index);
         return <article key={item.question} style={sub}>
           <strong>{index + 1}. {item.question}</strong>
           <div style={{ display: "grid", gap: 8 }}>
