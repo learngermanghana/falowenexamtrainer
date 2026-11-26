@@ -61,6 +61,14 @@ const B2_GRAMMAR_FOCUS_LIBRARY = Object.freeze({
       "Neue Regeln wurden im letzten Jahr eingeführt.",
     ],
   ),
+  statePassive: focus(
+    "Zustandspassiv",
+    "resulting state",
+    "Das Zustandspassiv beschreibt das Ergebnis eines abgeschlossenen Vorgangs, nicht die Handlung selbst. Vergleiche: Das Glas wird sortiert (Vorgang) und das Glas ist sortiert (Zustand).",
+    "sein + Partizip II",
+    ["Vorgangspassiv: werden + Partizip II.", "Zustandspassiv: sein + Partizip II; die Handlung ist abgeschlossen."],
+    ["Die Wertstoffe werden getrennt. → Die Wertstoffe sind getrennt.", "Die Behälter werden gereinigt. → Die Behälter sind gereinigt."],
+  ),
   modalPassive: focus(
     "Modalpassiv",
     "modal verb + passive",
@@ -331,7 +339,7 @@ const B2_GRAMMAR_FOCUS_LIBRARY = Object.freeze({
 
 const DAY_FOCUS_KEYS = Object.freeze({
   1: ["method", "purpose", "consequence"],
-  2: ["passive", "modalPassive", "nominalization"],
+  2: ["passive", "statePassive", "modalPassive", "nominalization"],
   3: ["proportional", "concession", "withoutInstead"],
   4: ["withoutInstead", "pairedNotOnly", "method"],
   5: ["contrast", "proportional", "conditionalKonjunktiv"],
