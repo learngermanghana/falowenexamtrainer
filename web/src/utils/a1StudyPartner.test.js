@@ -20,7 +20,7 @@ test("self-learning uses independent context and no official assignment referenc
   expect(prompt).toContain("Day 6, Kapitel 2.3");
   expect(prompt).toContain("self-learning material independently");
   expect(prompt).not.toContain("Official assignment reference");
-  expect(prompt).toContain("Teach the grammar");
+  expect(prompt).toContain("Teach the retrieved grammar");
 });
 
 test("all five study modes build different prompts and URLs round trip", () => {
@@ -124,4 +124,17 @@ test("C1 voice uses canonical grammar and guiding question; orientation, mocks a
   expect(buildVoiceTeacherPrompt({...lesson,day:0},"voice-teacher","C1")).toBe("");
   expect(buildVoiceTeacherPrompt({...lesson,day:29,title:"C1 Final Mock Exam"},"voice-teacher","C1")).toBe("");
   expect(buildVoiceTeacherPrompt(lesson,"voice-teacher","C2")).toBe("");
+});
+
+test.each(VOICE_TEACHER_LEVELS)("all %s lesson study and voice modes require source retrieval before teaching", level => {
+  const lesson={kind:"practice",day:6,chapter:"2.3",title:"Public lesson"};
+  const prompts=[...A1_STUDY_MODES.map(m=>buildStudyPrompt(lesson,m.key,"",level)),...A1_VOICE_MODES.map(m=>buildVoiceTeacherPrompt(lesson,m.key,level))];
+  prompts.forEach(prompt=>{
+    expect(prompt.startsWith("IMPORTANT — CONNECTION FIRST")).toBe(true);
+    expect(prompt).toContain("select Connect");
+    expect(prompt).toContain("Do not generate random questions");
+    expect(prompt).toContain("before successful source retrieval");
+    expect(prompt).toContain("Respond in English");
+    expect(prompt).not.toContain("continue with original topic-based practice");
+  });
 });

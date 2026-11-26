@@ -44,3 +44,15 @@ test("revision focus requires scored evidence and selects the validated Teil", (
   expect(weakestScoredExamPart([{label:"Teil 1",score:3,total:4},{label:"Teil 2",score:4,total:10}])).toBe("Teil 2");
   expect(weakestScoredExamPart([{label:"Teil 1",score:5,total:5}])).toBe("");
 });
+
+test.each(["A1","A2","B1","B2","C1","C2"])("all %s exam study and review prompts require verified access", level=>{
+  const prompts=EXAM_STUDY_SKILLS.flatMap(skill=>EXAM_STUDY_MODES.map(mode=>buildExamStudyPrompt({level,section:skill.key,mode:mode.key})));
+  prompts.push(buildExamRevisionPrompt({level,section:"horen",completed:true}));
+  for(const prompt of prompts){
+    expect(prompt.startsWith("IMPORTANT — CONNECTION FIRST")).toBe(true);
+    expect(prompt).toContain("Respond in English");
+    expect(prompt).toContain("Do not generate random questions");
+    expect(prompt).toContain("before successful source retrieval");
+    expect(prompt).not.toContain("Otherwise say so and create original practice");
+  }
+});
