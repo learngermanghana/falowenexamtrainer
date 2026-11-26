@@ -1,3 +1,4 @@
+import { buildExamRevisionPrompt, safeExamPart, weakestScoredExamPart, getExamRevisionFocus } from "./examStudyPartner";
 import { buildExamStudyPrompt, canShowExamStudyPartner, EXAM_STUDY_SKILLS, EXAM_STUDY_MODES } from "./examStudyPartner";
 
 describe("Exam room ChatGPT preparation", () => {
@@ -26,4 +27,20 @@ describe("Exam room ChatGPT preparation", () => {
     expect(new Set(prompts).size).toBe(3);
     expect(prompts[2]).toContain("Do not assume you know my scores");
   });
+});
+
+test("completed skill revision contains only a safe level, skill and Teil", () => {
+  const prompt = buildExamRevisionPrompt({ level: "A2", section: "horen", part: "Teil 2", completed: true, uid: "private-id", score: 45, answer: "private-answer" });
+  expect(prompt).toContain("Prioritise Teil 2");
+  expect(prompt).not.toContain("private-");
+  expect(prompt).not.toContain("45");
+  expect(buildExamRevisionPrompt({ level: "A2", section: "horen", completed: false })).toBe("");
+  expect(safeExamPart("Teil 2 private-id")).toBe("");
+});
+
+test("revision focus requires scored evidence and selects the validated Teil", () => {
+  expect(getExamRevisionFocus({ focus: { key: "hoeren", weakPart: "Teil 2" }, latestBySection: { hoeren: {percent:45} } })).toEqual({ section:"horen", part:"Teil 2" });
+  expect(getExamRevisionFocus({ focus:{key:"lesen"}, latestBySection:{} })).toBeNull();
+  expect(weakestScoredExamPart([{label:"Teil 1",score:3,total:4},{label:"Teil 2",score:4,total:10}])).toBe("Teil 2");
+  expect(weakestScoredExamPart([{label:"Teil 1",score:5,total:5}])).toBe("");
 });
