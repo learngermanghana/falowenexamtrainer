@@ -1823,9 +1823,9 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     return Math.max(MIN_SUBMISSION_CHARACTERS + 200, bounded);
   }, [selectedAssignmentLevel, selectedPreview?.submissionText]);
 
+  const isFamilyResubmission = normalizeAssignmentIdentity(selectedCanonicalAssignmentKey || selectedAssignmentId) === "a1-3";
   const selectedDraft = useMemo(() => draftsByAssignment[form.assignmentTitle], [draftsByAssignment, form.assignmentTitle]);
   const hasDraftForSelection = Boolean(selectedDraft?.submissionText);
-  const isFamilyResubmission = normalizeAssignmentIdentity(selectedCanonicalAssignmentKey || selectedAssignmentId) === "a1-3";
   const familyPreviousAttempt = useMemo(() => isFamilyResubmission ? recentSubmissions.filter(entry=>isSameSelectedAssignment(entry)&&isSubmissionAttemptStatus(entry.status)).slice().sort((a,b)=>(Number(b.attemptNumber||b.attempt||0)-Number(a.attemptNumber||a.attempt||0))||((toDateValue(b.resubmittedAt||b.submittedAt||b.createdAt)?.getTime()||0)-(toDateValue(a.resubmittedAt||a.submittedAt||a.createdAt)?.getTime()||0)))[0] : null,[isFamilyResubmission,recentSubmissions,isSameSelectedAssignment]);
   const familyPriorRecording=getFamilyRecording(familyPreviousAttempt);
   const familyAttemptId=familyPreviousAttempt?.id||"";
