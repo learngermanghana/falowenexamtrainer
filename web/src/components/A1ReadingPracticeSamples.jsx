@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import { weakestScoredExamPart } from "../utils/examStudyPartner";
 import React, { useEffect, useMemo, useState } from "react";
 import additionalA1Samples from "../data/a1ReadingAdditionalSamples.json";
 import additionalA1SamplesPart2 from "../data/a1ReadingAdditionalSamplesPart2.json";
@@ -435,7 +437,7 @@ const LetterChoices = ({ name, value, onChange, disabled }) => (
   </div>
 );
 
-export default function A1ReadingPracticeSamples({ initialSampleId = "", standalone = false }) {
+export default function A1ReadingPracticeSamples({ initialSampleId = "", standalone = false, allowExamMistakeReview = false }) {
   const navigate = useNavigate();
   const { studentProfile, user, idToken } = useAuth();
   const studentKey = getReadingPracticeStudentKey({ studentProfile, user });
@@ -760,6 +762,7 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
               <div>
                 {sectionScores.map((section) => <span key={section.label}>{section.label}: {section.score}/5</span>)}
               </div>
+              {allowExamMistakeReview && <ExamMistakeReview level="A1" section="lesen" part={weakestScoredExamPart(sectionScores)} completed={submitted} />}
               <button type="button" onClick={resetSample}>Try this sample again</button>
             </div>
           )}
