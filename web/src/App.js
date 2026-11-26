@@ -1,3 +1,4 @@
+import { C1StudyMaterialLayout } from "./components/C1StudyPartner";
 import { normalizeCourseLevel } from "./utils/levelAccess";
 import SwahiliB1Day28Workbook from "./components/SwahiliB1Day28Workbook";
 import SwahiliB1Day26Workbook from "./components/SwahiliB1Day26Workbook";
@@ -1289,21 +1290,21 @@ const AppShell = ({
           <Route path="/campus/course/c1-day-1-willkommen-selbstlernstart-workbook" element={withRadioWorkbookGate("C1", 1, <C1Day1WillkommenSelbstlernstartWorkbookPage />)} />
           <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes" element={<B2Day1PersoenlicheIdentitaetGrammarNotesPage />} />
           <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook" element={withRadioWorkbookGate("B2", 1, <B2Day1PersoenlicheIdentitaetWorkbookPage />)} />
-                    <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes" element={<C1Day10IntegrationUndGesellschaftGrammarNotesPage />} />
-          <Route path="/campus/course/c1-day-10-migration-und-integration-grammar-notes" element={<C1Day10IntegrationUndGesellschaftGrammarNotesPage />} />
+                    <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes" element={<C1StudyMaterialLayout day={10}><C1Day10IntegrationUndGesellschaftGrammarNotesPage /></C1StudyMaterialLayout>} />
+          <Route path="/campus/course/c1-day-10-migration-und-integration-grammar-notes" element={<C1StudyMaterialLayout day={10}><C1Day10IntegrationUndGesellschaftGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-workbook" element={<C1Day10IntegrationUndGesellschaftWorkbookPage />} />
-          <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes" element={<C1Day11EngagementUndEhrenamtGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes" element={<C1StudyMaterialLayout day={11}><C1Day11EngagementUndEhrenamtGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-workbook" element={<C1Day11EngagementUndEhrenamtWorkbookPage />} />
-          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-erweiterte-vergleichsformen-grammar-notes" element={<C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage />} />
-          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes" element={<C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-erweiterte-vergleichsformen-grammar-notes" element={<C1StudyMaterialLayout day={12}><C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage /></C1StudyMaterialLayout>} />
+          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes" element={<C1StudyMaterialLayout day={12}><C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-12-freizeit-und-kultur-workbook" element={<C1Day12FreizeitUndKulturWorkbookPage />} />
-          <Route path="/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes" element={<C1Day13MehrsprachigkeitGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes" element={<C1StudyMaterialLayout day={13}><C1Day13MehrsprachigkeitGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-13-mehrsprachigkeit-workbook" element={<C1Day13MehrsprachigkeitWorkbookPage />} />
-          <Route path="/campus/course/c1-day-14-innovation-und-zukunft-grammar-notes" element={<C1Day14InnovationUndZukunftGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-14-innovation-und-zukunft-grammar-notes" element={<C1StudyMaterialLayout day={14}><C1Day14InnovationUndZukunftGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-14-innovation-und-zukunft-workbook" element={<C1Day14InnovationUndZukunftWorkbookPage />} />
-          <Route path="/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes" element={<C1Day15BildungUndLebenslangesLernenGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes" element={<C1StudyMaterialLayout day={15}><C1Day15BildungUndLebenslangesLernenGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook" element={<C1Day15BildungUndLebenslangesLernenWorkbookPage />} />
-          <Route path="/campus/course/c1-day-16-technologie-im-alltag-grammar-notes" element={<C1Day16TechnologieImAlltagGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-16-technologie-im-alltag-grammar-notes" element={<C1StudyMaterialLayout day={16}><C1Day16TechnologieImAlltagGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-16-technologie-im-alltag-workbook" element={<C1Day16TechnologieImAlltagWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-grammar-notes" element={<B1StudyMaterialLayout day={21}><B1Day21LebensformenHeuteGrammarNotesPage /></B1StudyMaterialLayout>} />
           <Route path="/campus/course/weather-perfekt-letter-13" element={<WeatherPerfektLetterPage />} />

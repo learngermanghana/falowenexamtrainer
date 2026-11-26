@@ -1,3 +1,4 @@
+import { buildVoiceTeacherPrompt, VOICE_TEACHER_LEVELS } from "./a1StudyPartner";
 import { A1_VOICE_MODES, buildA1VoiceTeacherPrompt } from "./a1StudyPartner";
 import { buildStudyPrompt, isStudyPartnerLesson, A1_STUDY_MODES, buildA1StudyPrompt, buildA1ChatGPTUrl, isA1StudyPartnerLesson } from "./a1StudyPartner";
 
@@ -54,7 +55,7 @@ test("A2 self-study and assessment exclusion remain distinct", () => {
   expect(prompt).toContain("self-learning material independently");
   expect(prompt).not.toContain("Official assignment reference");
   expect(isStudyPartnerLesson({ ...lesson, title: "Goethe A2 Speaking Mock" }, "A2")).toBe(false);
-  expect(buildStudyPrompt(lesson, "grammar", "", "C1")).toBe("");
+  expect(buildStudyPrompt(lesson, "grammar", "", "C2")).toBe("");
 });
 
 test("B1 prompt uses the actual chapter and encourages connected language", () => {
@@ -101,4 +102,26 @@ test("voice modes are distinct, practice-only and limited to A1 pilot", () => {
   expect(buildA1VoiceTeacherPrompt(independent,"voice-teacher","A2")).toBe("");
   expect(buildA1VoiceTeacherPrompt({...teacher,title:"A1 Final Mock Exam"})).toBe("");
   expect(buildA1VoiceTeacherPrompt(independent,"unknown")).toBe("");
+});
+
+test.each(VOICE_TEACHER_LEVELS)("voice teacher uses authorized %s lesson and both voice modes", level => {
+  const lesson = {kind:"practice",day:8,chapter:"2.3",title:"Lesson topic",grammarFocus:"Public grammar",guidingQuestion:"Public question",uid:"private-id"};
+  const teacher = buildVoiceTeacherPrompt(lesson,"voice-teacher",level);
+  const speaking = buildVoiceTeacherPrompt(lesson,"voice-speaking",level);
+  expect(teacher).toContain("original German " + level + " lesson for Day 8");
+  expect(teacher).toContain("level " + level + " and section overview");
+  expect(teacher).toContain("approximately 20-minute lesson");
+  expect(speaking).toContain("patient speaking partner");
+  expect(teacher).not.toContain("private-id");
+  expect(teacher).not.toBe(speaking);
+});
+test("C1 voice uses canonical grammar and guiding question; orientation, mocks and C2 excluded", () => {
+  const lesson={kind:"practice",day:8,chapter:"2.3",title:"Wohnen und Stadtentwicklung",grammarFocus:"Nominalisierung",guidingQuestion:"Wie wollen wir wohnen?"};
+  const prompt=buildVoiceTeacherPrompt(lesson,"voice-teacher","C1");
+  expect(prompt).toContain("Grammar focus: Nominalisierung");
+  expect(prompt).toContain("Guiding question: Wie wollen wir wohnen?");
+  expect(prompt).toContain("counterarguments");
+  expect(buildVoiceTeacherPrompt({...lesson,day:0},"voice-teacher","C1")).toBe("");
+  expect(buildVoiceTeacherPrompt({...lesson,day:29,title:"C1 Final Mock Exam"},"voice-teacher","C1")).toBe("");
+  expect(buildVoiceTeacherPrompt(lesson,"voice-teacher","C2")).toBe("");
 });

@@ -1,3 +1,4 @@
+import C1StudyPartner from "./C1StudyPartner";
 import React, { useEffect, useMemo, useState } from "react";
 import LiveSpeakInlinePractice from "./LiveSpeakInlinePractice";
 import AppBackButton from "./navigation/AppBackButton";
@@ -344,6 +345,7 @@ export default function C1SelfLearningCourse() {
               {dayState.completed ? <span style={styles.badge}>Self-marked complete</span> : null}
             </div>
 
+            {selectedDay === entry.day && <C1StudyPartner day={entry.day} section="Self-learning" />}
             <div role="tablist" aria-label={`C1 Tag ${entry.day}`} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {tabs.map((tab) => (
                 <button
