@@ -291,14 +291,17 @@ const B2_GRAMMAR_FOCUS_LIBRARY = Object.freeze({
     "indirekte Rede und Quellenangaben",
     "reported information and source attribution",
     "Bei wissenschaftlichen oder medialen Aussagen musst du klar zeigen, wer etwas behauptet und wie sicher die Information ist. Indirekte Rede und Quellenangaben schaffen Distanz zur Aussage.",
-    "Laut Quelle ... | Die Studie zeigt, dass ... | Die Autorin erklärt, ... | Konjunktiv I, wenn passend",
+    "Laut Quelle ... | Die Autorin erklärt, er sei / habe / werde ... | Konjunktiv I: Stamm + e (3. Person Singular; sein → sei)",
     [
       "Trenne fremde Aussagen klar von deiner eigenen Bewertung.",
       "Nutze Konjunktiv I vor allem dann, wenn du eine fremde Aussage ausdrücklich als Wiedergabe markieren willst.",
+      "Konjunktiv I: er ist → er sei; er hat → er habe; er wird → er werde; er sagt → er sage. Passe Personalpronomen an die neue Perspektive an.",
+      "Wenn Konjunktiv I mit dem Indikativ übereinstimmt, kann Konjunktiv II die indirekte Rede verdeutlichen (sie haben → sie hätten).",
     ],
     [
       "Laut der Studie ist der Effekt besonders bei jüngeren Teilnehmenden sichtbar.",
       "Die Forschenden erklären, die Ergebnisse seien noch nicht abschließend.",
+      "Der Experte sagt: Ich habe neue Daten. → Der Experte sagt, er habe neue Daten.",
     ],
   ),
   sourcePreps: focus(
