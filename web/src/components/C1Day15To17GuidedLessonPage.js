@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import C1TopicIntroduction from "./C1TopicIntroduction";
+import C1AcademicExamPractice, { C1AcademicGrammarPractice } from "./C1AcademicExamPractice";
 import C1Day15To17GrammarNotes from "./C1Day15To17GrammarNotes";
 import C1GrammarQuickCheck from "./C1GrammarQuickCheck";
 import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
@@ -54,13 +55,13 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
 
     {active === "learn" ? <>
       <Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 video"} src={videoEmbed} style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} allowFullScreen /> : <NoteBox>Continue with the Learn activity below.</NoteBox>}</Section>
-      <C1TopicIntroduction day={day} title={lesson.title} />
+      <C1TopicIntroduction day={day} title={lesson.title} /><C1AcademicGrammarPractice day={day} /><C1AcademicExamPractice day={day} tab="learn" />
       {day <= 16 ? <C1KnowledgeChoicePractice lesson={lesson} completed={progress.quizDone} onCompleteChange={(quizDone) => setProgress((old) => ({ ...old, quizDone, learnDone: quizDone || old.learnDone }))} /> : <><C1Day15To17GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /></>}
     </> : null}
 
-    {active === "speak" ? <Section title="Speaking builder"><C1SpeakGrammarGuide lesson={lesson} branchesOverride={branches.length ? branches : null} /><EmbeddedSpeechPracticePanel /><label><input type="checkbox" checked={progress.speakDone} onChange={(e) => setProgress((old) => ({ ...old, speakDone: e.target.checked }))} /> I completed a speaking practice.</label></Section> : null}
+    {active === "speak" ? <Section title="Speaking builder"><C1AcademicExamPractice day={day} tab="speak" /><C1SpeakGrammarGuide lesson={lesson} branchesOverride={branches.length ? branches : null} /><EmbeddedSpeechPracticePanel /><label><input type="checkbox" checked={progress.speakDone} onChange={(e) => setProgress((old) => ({ ...old, speakDone: e.target.checked }))} /> I completed a speaking practice.</label></Section> : null}
 
-    {active === "write" ? <Section title="Guided writing builder"><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={lesson} />{workbookUrl ? <a href={workbookUrl} style={styles.linkButton}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
+    {active === "write" ? <Section title="Guided writing builder"><C1AcademicExamPractice day={day} tab="write" /><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={lesson} />{workbookUrl ? <a href={workbookUrl} style={styles.linkButton}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={lesson} workbookId={`C1-day-${day}`} /> : null}
     {active === "finish" ? <Section title={`Summary C1 Day ${day}`}>{day === 15 && !progress.quizDone ? <NoteBox>Complete the new multiple-choice Learn questions. A legacy grammar checkbox is not counted as quiz completion.</NoteBox> : null}{quizCompleted ? <NoteBox><strong>Learn complete.</strong> The current Learn check is complete.</NoteBox> : null}<p>Practise the speaking task once more in Prüfungsmodus without the idea bank.</p>{progress.completed ? <NoteBox>Completed and saved on this device.</NoteBox> : null}<button style={styles.primaryButton} onClick={complete}>I have completed</button></Section> : null}
   </div>;
