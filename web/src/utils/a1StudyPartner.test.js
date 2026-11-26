@@ -53,5 +53,21 @@ test("A2 self-study and assessment exclusion remain distinct", () => {
   expect(prompt).toContain("self-learning material independently");
   expect(prompt).not.toContain("Official assignment reference");
   expect(isStudyPartnerLesson({ ...lesson, title: "Goethe A2 Speaking Mock" }, "A2")).toBe(false);
-  expect(buildStudyPrompt(lesson, "grammar", "", "B1")).toBe("");
+  expect(buildStudyPrompt(lesson, "grammar", "", "B2")).toBe("");
+});
+
+test("B1 prompt uses the actual chapter and encourages connected language", () => {
+  const prompt = buildStudyPrompt({ kind: "assignment", day: 27, chapter: "10.27", title: "Umweltfreundlich im Alltag", assignmentKey: "B1-10.27", uid: "private-record" }, "speaking", "Speaking practice", "B1");
+  expect(prompt).toContain("German B1 study partner");
+  expect(prompt).toContain("B1-10.27");
+  expect(prompt).toContain("realistic B1 conversation");
+  expect(prompt).toContain("connected sentences");
+  expect(prompt).not.toContain("A1");
+  expect(prompt).not.toContain("private-record");
+});
+
+test("B1 Day 23 grammar remains practice-only and speaking mock is excluded", () => {
+  const lesson = { kind: "practice", day: 23, chapter: "7.23", title: "Erstes Date", assignmentKey: "B1-7.23" };
+  expect(buildStudyPrompt(lesson, "grammar", "Self-learning grammar notes", "B1")).not.toContain("Official assignment reference");
+  expect(isStudyPartnerLesson({ ...lesson, title: "Goethe B1 Speaking Mock" }, "B1")).toBe(false);
 });
