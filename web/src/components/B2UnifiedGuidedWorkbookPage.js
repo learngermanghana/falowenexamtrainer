@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
+import StudyPartner from "./A1StudyPartner";
+import { getB2ChapterOnePractice } from "../data/b2ChapterOnePractice";
 import B2TopicIntroduction, { B2_TOPIC_FOUNDATIONS } from "./B2TopicIntroduction";
 import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
@@ -95,6 +97,30 @@ const GrammarLessonContent = ({ day }) => {
   </div>;
 };
 
+
+function ChapterOneVocabulary({ day }) {
+  const practice = getB2ChapterOnePractice(day);
+  if (!practice) return null;
+  return <Section title="Wortschatz · Redemittel">
+    <p style={{ margin: 0 }}>Lerne diese Ausdrücke als feste Wortverbindungen, nicht als einzelne Wörter.</p>
+    <dl style={{ ...sub, margin: 0 }}>
+      {practice.vocabulary.map(([de, en]) => <div key={de} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 6 }}><dt style={{ fontWeight: 700 }}>{de}</dt><dd style={{ margin: 0 }}>{en}</dd></div>)}
+    </dl>
+  </Section>;
+}
+
+function ChapterOneTransformations({ day }) {
+  const practice = getB2ChapterOnePractice(day);
+  if (!practice) return null;
+  return <div data-b2-chapter-one-practice={day} style={sub}>
+    <strong>Satztraining · Vom B1- zum B2-Satz</strong>
+    <p style={{ margin: 0 }}>Formuliere zuerst selbst einen Satz. Vergleiche danach deine Lösung mit dem Modell. Andere grammatisch korrekte Lösungen sind möglich.</p>
+    {practice.transformations.map(([question, answer, explanation], index) => <article key={question} style={sub}>
+      <strong>{index + 1}. {question}</strong>
+      <details><summary style={{ cursor: "pointer", fontWeight: 700 }}>Musterlösung anzeigen</summary><p>{answer}</p><p style={{ marginBottom: 0 }}>{explanation}</p></details>
+    </article>)}
+  </div>;
+}
 
 const normalizeVocab = (lesson = {}) => {
   const raw = Array.isArray(lesson.vocabulary) ? lesson.vocabulary : Array.isArray(lesson.keywords) ? lesson.keywords : [];
@@ -434,11 +460,14 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
     </header>
 
     <AdvancedSelfLearningTabNav level="B2" day={day} activeTab={active} onChange={changeView} />
+    <StudyPartner key={day} level="B2" section={active} lesson={{ kind: "practice", day, chapter: alignment.chapter, title: alignment.title, grammarFocus: alignment.grammar_topic, skillFocus: { lesen: "Lesen", hoeren: "Hören", speak: "Sprechen", write: "Schreiben" }[skillFocus] }} />
 
     {active === "learn" ? <>
       <B2TopicIntroduction day={day} />
+      <ChapterOneVocabulary day={day} />
       <Section title="Grammar / Learn">
         <GrammarLessonContent day={day} />
+        <ChapterOneTransformations day={day} />
         {grammarVideo?.url ? (
           <div data-b2-grammar-video-status="ready" style={{ ...sub, background: "#eff6ff", borderColor: "#bfdbfe" }}>
             <strong>{grammarVideo.title || "AI video"}</strong>
