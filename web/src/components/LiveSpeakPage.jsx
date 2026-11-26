@@ -286,6 +286,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       });
       if (!mounted.current) return;
       if (result.needsConfirmation) {
+        if (Number.isFinite(result.remainingAudioBytes)) {
+          setSession(old => old?.sessionId === currentSession.sessionId
+            ? {...old, remainingAudioBytes:result.remainingAudioBytes} : old);
+        }
         setAudioRetry(null);
         setPending({pendingId:result.pendingId,sessionId:currentSession.sessionId,transcript:result.transcript,uncertain:Boolean(result.uncertain),typed:Boolean(result.typed)});
         setRecognizedText(result.transcript);
@@ -1113,6 +1117,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 <strong>Your answer</strong>
                 <span role="timer" aria-label="Speaking time">{recording ? "● Recording " : ""}{recordingTimeLabel} / {speakingLimitLabel}</span>
               </div>
+              {Number.isFinite(session.remainingAudioBytes) ? <small role="status" style={{color:"#475569"}}>
+                {Math.max(0, Number(session.answerLimit || 0) - Number(session.answeredTurns || 0))} answers remaining · {session.remainingAudioBytes >= 1000000
+                  ? (session.remainingAudioBytes / 1000000).toFixed(1) + " MB"
+                  : Math.floor(session.remainingAudioBytes / 1000) + " KB"} recording allowance left for this task
+              </small> : null}
               {gradedCourseMock && notice ? <p role="status" aria-live="polite" className="speaking-mock-saved-notice">{notice}</p> : null}
               <div className="speaking-answer-mode" role="group" aria-label="Choose how to answer">
                 <button type="button" aria-pressed={answerMode==="record"} disabled={recording || busy || Boolean(pending)}

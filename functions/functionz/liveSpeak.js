@@ -511,7 +511,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         else if (!testing) tx.update(subRef, { remaining: admin.firestore.FieldValue.increment(-1), updatedAt: admin.firestore.FieldValue.serverTimestamp() });
         tx.set(sessionRef, { uid: student.auth.uid, sessionId, level, topic, source, examTask,
           examTryout:useExamTryout,
-          ...(preparedFlow ? {examFlow:preparedFlow,recognitionReviews:[]} : {}), expiresAt, turnsUsed: 0, answeredTurns:0, confirmedAnswers:[], messages:[], feedbackAttempts:0, inFlight: false, endedAt: null, startedAt: admin.firestore.FieldValue.serverTimestamp() });
+          ...(preparedFlow ? {examFlow:preparedFlow,recognitionReviews:[]} : {}), expiresAt, turnsUsed: 0, audioBytesUsed:0, answeredTurns:0, confirmedAnswers:[], messages:[], feedbackAttempts:0, inFlight: false, endedAt: null, startedAt: admin.firestore.FieldValue.serverTimestamp() });
         result = {...sessionView({sessionId, expiresAt, level, topic, source, examTask,examFlow:preparedFlow,examTryout:useExamTryout}),resumed:false};
       });
       return res.json({ ok: true, ...result, answerLimit: result.answerLimit, maxTurns: result.examFlow?.key === "A2-1" ? 14 : MAX_TURNS });
@@ -545,7 +545,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
   });
 
   app.post("/live-speak/session/turn", async (req, res) => {
-    let sessionRef, accepted = false, uid = "", sessionId = "";
+    let sessionRef, accepted = false, uid = "", sessionId = "", reservedAudioBytes = 0, reservationLease = 0, remainingAudioBytes = null;
     try {
       if (!requireEnabled(res)) return;
       const student = await requireStudent(req, res);
@@ -615,8 +615,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (!testingExamSession(session) && (Number(usageSnap.data()?.turns) || 0) + reservedCalls > quotaForSession(session)) {
           throw Object.assign(new Error("Pilot usage limit reached."), {status:429,code:"budget_reached"});
         }
+        reservedAudioBytes = audioBytes && examiner(session) ? audioBytes.length : 0;
+        reservationLease = Date.now();
+        remainingAudioBytes = Math.max(0, audioAllowance(session) - (Number(session.audioBytesUsed) || 0) - reservedAudioBytes);
         tx.update(sessionRef, {
-          inFlight: true, inFlightSince: Date.now(), turnsUsed: admin.firestore.FieldValue.increment(1),
+          inFlight: true, inFlightSince: reservationLease, turnsUsed: admin.firestore.FieldValue.increment(1),
           pendingId: null,
           ...(audioBytes && examiner(session) ? {audioBytesUsed:admin.firestore.FieldValue.increment(audioBytes.length)} : {}),
         });
@@ -635,7 +638,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           inFlight:false, pendingId, pendingTranscript:typedAnswer,
           pendingUncertain:false, pendingTyped:true, pendingAt:admin.firestore.FieldValue.serverTimestamp(),
         });
-        return res.json({ok:true,needsConfirmation:true,pendingId,transcript:typedAnswer,typed:true,uncertain:false});
+        return res.json({ok:true,needsConfirmation:true,pendingId,transcript:typedAnswer,typed:true,uncertain:false,remainingAudioBytes});
       }
       if (!process.env.OPENAI_API_KEY) throw new Error("Live Speak AI is not configured.");
       const client = getOpenAIClient();
@@ -667,7 +670,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // Do not let the tutor judge grammar based on unconfirmed speech recognition.
         return res.json({
           ok: true, needsConfirmation: true, pendingId, transcript,
-          uncertain: transcriptUncertain(recognition),
+          uncertain: transcriptUncertain(recognition), remainingAudioBytes,
         });
       }
       const reply = examFlow ? taskFlows.currentStep(examFlow,0).instruction : examTask ? examOpening(level, examTask) : topic
@@ -688,7 +691,15 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       // Provider calls may already have incurred costs. Keep the metered turn and
       // global spend counter, even on provider errors, to prevent unlimited retries.
       if (accepted && sessionRef) {
-        try { await updateSession(sessionRef, sessionId, { inFlight: false }); }
+        try { await db().runTransaction(async tx => {
+          const current = (await tx.get(sessionRef)).data();
+          if (current?.sessionId !== sessionId || !current.inFlight || current.inFlightSince !== reservationLease) return;
+          // Release only the failed recording's byte reservation. Provider
+          // spend and turn counts remain metered, including failed requests.
+          tx.update(sessionRef, {inFlight:false, ...(reservedAudioBytes ? {
+            audioBytesUsed: Math.max(0, (Number(current.audioBytesUsed) || 0) - reservedAudioBytes),
+          } : {})});
+        }); }
         catch (releaseError) { console.error("Live Speak lock release failed", releaseError?.message); }
       }
       if (err?.status) return error(res, err.status, err.code, err.message);
