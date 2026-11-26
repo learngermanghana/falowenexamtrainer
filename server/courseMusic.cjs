@@ -225,6 +225,7 @@ function createSwahiliDayElevenAudioHandler(options) {
 // Private course conversations, never exposed by the public music track map.
 // Fixed (level, day, objectKey) triples prevent arbitrary private R2 access.
 const CLASSROOM_RECORDINGS = Object.freeze({
+  'SWAHILI-B1-27': Object.freeze({ id: 'swahili-b1-day27-kutunza-classroom', key: 'swahili/B1/day-27/kuntunza.mp3' }),
   // Exact teacher-supplied B1 Day 28 MP3; private classroom playback only.
   'B1-28': Object.freeze({ id: 'b1-day28-klimafreundlich-leben', key: 'b1/day-28/klimafreundlich-leben.mp3' }),
   'B1-27': Object.freeze({ id: 'b1-day27-environment-everyday', key: 'b1/day-27/umweltfreundlich-im-alltag.mp3' }),
@@ -262,7 +263,7 @@ function createClassroomAudioHandler(options = {}) {
     const dayText = params.get('day') || '';
     const key = params.get('key') || '';
     const day = Number(dayText);
-    const lookupKey = /^(A2|B1)$/.test(level) && /^[1-9][0-9]?$/.test(dayText)
+    const lookupKey = /^(A2|B1|SWAHILI-B1)$/.test(level) && /^[1-9][0-9]?$/.test(dayText)
       ? `${level}-${day}` : '';
     const recording = Object.hasOwn(CLASSROOM_RECORDINGS, lookupKey) ? CLASSROOM_RECORDINGS[lookupKey] : null;
     if (!recording || key !== recording.key) {
