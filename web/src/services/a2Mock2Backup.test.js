@@ -62,3 +62,14 @@ test("reading backups is one on-demand authenticated request",async()=>{
   expect(fetch).toHaveBeenCalledTimes(1);
   expect(fetch.mock.calls[0][0]).toContain("mockId=b2-final-mock");
 });
+
+test("new B2 reading backs up all five parts only after final submission, and restores version", () => {
+  const state = {attemptStartedAtMs:start, readingFormatVersion:2, teil4Completed:true, teil5Answers:{28:"H",29:"A",30:"F"}};
+  expect(submittedB2Sections(state)).toEqual([]);
+  const parts = submittedB2Sections({...state, teil5Completed:true, lesenSubmittedAt:submitted});
+  expect(parts[0][1]).toMatchObject({readingFormatVersion:2, teil5Answers:state.teil5Answers});
+  const restore = restoreB2Backup({stage:"teil1",readingFormatVersion:2}, {backup:{attemptStartedAtMs:start,sections:{lesen:parts[0][1]}}});
+  expect(restore).toMatchObject({readingFormatVersion:2,teil5Completed:true,teil5Answers:state.teil5Answers,stage:"hoeren-teil1"});
+  const old = restoreB2Backup({stage:"teil1",readingFormatVersion:2}, {backup:{attemptStartedAtMs:start,sections:{lesen:{submittedAt:submitted}}}});
+  expect(old).toMatchObject({readingFormatVersion:1,teil5Completed:false,stage:"hoeren-teil1"});
+});
