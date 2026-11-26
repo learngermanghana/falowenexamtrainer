@@ -5,6 +5,10 @@
   z-index: auto !important;
   min-width: 0;
 }
+[data-advanced-self-learning-navigation] [data-workbook-tab-navigation] {
+  z-index: auto !important;
+  scroll-margin-top: 12px !important;
+}
 /* Tablets and touch laptops also need the standard workbook controls in flow.
    Keep the compact three-column button grid restricted to phones. */
 @media (max-width: 1024px), (pointer: coarse) {
