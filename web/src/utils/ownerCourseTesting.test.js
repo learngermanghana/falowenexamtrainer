@@ -1,4 +1,4 @@
-import {activeOwnerTestingLevel,isCourseTestingOwner,isOwnerTestingCoursePath,ownerTestingLevels} from "./ownerCourseTesting";
+import {activeOwnerTestingLevel,isCourseTestingOwner,isOwnerTestingCoursePath,ownerTestingLevels,testingClassOptions} from "./ownerCourseTesting";
 const owner={uid:"owner-uid",email:"moxflex@gmail.com",emailVerified:true};
 const selection={uid:owner.uid,program:"german",level:"C2"};
 const input={user:owner,program:"german",selection,studentProfile:{level:"A2",paid:2800}};
@@ -31,4 +31,12 @@ test("route exception is limited to chosen language and level of Course Book, no
   expect(isOwnerTestingCoursePath("/campus/course/swahili/b1/day-28","B1","german")).toBe(false);
   expect(isOwnerTestingCoursePath("/campus/course/swahili/day-5","A1","swahili")).toBe(true);
   expect(isOwnerTestingCoursePath("/campus/course/swahili/day-5","B1","swahili")).toBe(false);
+});
+
+test("class selector uses exact stored class names and excludes other languages and levels",()=>{
+  const rows=[{id:"a",name:"A1 Leipzig Klasse",language:"German",levelId:"A1"},{id:"b",name:"A2 Dortmund Klasse",language:"German",levelId:"A2"},{id:"c",name:"Kiswahili A1 – Arusha",language:"Swahili",levelId:"A1"},{id:"d",name:"A1 Previous Klasse",language:"German",levelId:"A1",status:"archived"},{id:"e",name:"bad/path",level:"A1"}];
+  expect(testingClassOptions(rows,"german","A1").map(row=>row.name)).toEqual(["A1 Leipzig Klasse","A1 Previous Klasse"]);
+  expect(testingClassOptions(rows,"swahili","A1").map(row=>row.id)).toEqual(["c"]);
+  expect(testingClassOptions(rows,"german","A2").map(row=>row.id)).toEqual(["b"]);
+  expect(testingClassOptions(rows,"german","C2")).toEqual([]);
 });
