@@ -1,3 +1,4 @@
+import "./WorkbookMobileLayout.css";
 import React, { useState } from "react";
 import { A1_STUDY_MODES, A1_VOICE_MODES, VOICE_TEACHER_LEVELS, buildVoiceTeacherPrompt, buildStudyPrompt, buildA1ChatGPTUrl, isStudyPartnerLesson } from "../utils/a1StudyPartner";
 
@@ -30,7 +31,7 @@ export default function StudyPartner({ lesson, section = "", level = "A1" }) {
       </summary>
       <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
         <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6 }}>Practise this lesson with ChatGPT. Choose what you need help with. Your official assignment and marks stay in Falowen.</p>
-        <fieldset style={{ margin: 0, padding: 0, border: 0, display: "grid", gap: 8 }}>
+        <fieldset className="study-partner-desktop-options" style={{ margin: 0, padding: 0, border: 0, display: "grid", gap: 8 }}>
           <legend style={{ fontWeight: 700, marginBottom: 8 }}>How would you like to study?</legend>
           {options.map(option => (
             <label key={option.key} style={{ display: "flex", gap: 8, alignItems: "center", minHeight: 32 }}>
@@ -39,7 +40,12 @@ export default function StudyPartner({ lesson, section = "", level = "A1" }) {
             </label>
           ))}
         </fieldset>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <label className="study-partner-mobile-options" style={{display:"none",gap:5,fontSize:13,fontWeight:700}}>How would you like to study?
+          <select value={mode} onChange={event=>{setMode(event.target.value);setCopyStatus("");}}>
+            {options.map(option=><option key={option.key} value={option.key}>{option.label}</option>)}
+          </select>
+        </label>
+        <div className="study-partner-actions" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <a href={buildA1ChatGPTUrl(prompt)} target="_blank" rel="noopener noreferrer" style={{ ...buttonStyle, color: "#fff", background: "#166534" }}>{voiceMode ? "Open voice lesson in ChatGPT ↗" : "Continue to ChatGPT ↗"}</a>
           <button type="button" onClick={copyPrompt} style={{ ...buttonStyle, background: "#fff", color: "#14532d", border: "1px solid #86b69a" }}>Copy prompt</button>
         </div>

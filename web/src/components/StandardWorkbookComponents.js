@@ -1,3 +1,4 @@
+import "./WorkbookMobileLayout.css";
 import C1StudyPartner from "./C1StudyPartner";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";

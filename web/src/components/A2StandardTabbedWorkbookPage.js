@@ -220,8 +220,8 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
             <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
             <p style={{ ...styles.subtitle, margin: 0 }}>{writingRequired
               ? (showHoeren ? "Select Grammar, Teil 1–4, Music or Submit below." : "Select Grammar, Teil 1–3, Music or Submit below.")
-              : (showHoeren ? "Today: Sprechen in class, then Lesen and Hören. Schreiben is not required." : "Today: Sprechen in class, then Lesen. Schreiben is not required.")} The tabs stay visible at the top of the workbook.</p>
-            <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav
+              : (showHoeren ? "Today: Sprechen in class, then Lesen and Hören. Schreiben is not required." : "Today: Sprechen in class, then Lesen. Schreiben is not required.")} Choose a tab to switch sections.</p>
+            <div data-workbook-sticky-wrapper style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav
                 activeTab={displayedActiveTab}
                 onChange={setActiveTab}
                 tabs={visibleTabs}

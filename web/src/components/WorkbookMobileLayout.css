@@ -1,0 +1,101 @@
+/* Keep workbook controls in normal flow on narrow displays. The A2 sticky
+   wrapper contains both navigation and the mapped answer-progress card. */
+@media (max-width: 768px) {
+  [data-workbook-sticky-wrapper],
+  [data-advanced-self-learning-navigation] {
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
+  }
+  [data-workbook-sticky-wrapper] {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  [data-workbook-tab-navigation] {
+    box-sizing: border-box;
+    min-width: 0;
+    z-index: auto !important;
+    padding: 8px !important;
+    gap: 7px !important;
+    scroll-margin-top: 12px !important;
+  }
+  [data-workbook-tab-navigation] > [role="tablist"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+  [data-workbook-tab-navigation] [role="tab"] {
+    box-sizing: border-box;
+    min-width: 0 !important;
+    min-height: 54px !important;
+    padding: 7px 4px !important;
+    border-radius: 10px !important;
+    overflow-wrap: anywhere;
+  }
+  [data-workbook-tab-navigation] [role="tab"] > span:first-child {
+    font-size: 13px !important;
+  }
+  [data-workbook-tab-navigation] [role="tab"] > span:nth-child(2) {
+    font-size: 9px !important;
+    letter-spacing: 0 !important;
+  }
+  [data-workbook-mapped-save-status] {
+    position: static !important;
+    z-index: auto !important;
+    box-sizing: border-box;
+    font-size: 13px;
+    line-height: 1.4;
+    gap: 6px !important;
+    margin-top: 8px !important;
+  }
+  [data-study-partner] {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+    padding: 9px 10px !important;
+    overflow-wrap: anywhere;
+  }
+  [data-study-partner] > summary {
+    min-height: 24px;
+    font-size: 14px;
+  }
+  [data-study-partner] .study-partner-desktop-options { display: none !important; }
+  [data-study-partner] .study-partner-mobile-options { display: grid !important; }
+  [data-study-partner] .study-partner-mobile-options select {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-size: 16px;
+    color: #14532d;
+    background: #fff;
+    border: 1px solid #86b69a;
+    border-radius: 8px;
+    padding: 8px;
+  }
+  [data-study-partner] .study-partner-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  [data-study-partner] .study-partner-actions > * {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    min-height: 44px !important;
+    text-align: center;
+    white-space: normal;
+  }
+  /* The existing floating launcher is redundant while the lesson study
+     partner is expanded. Restore it as soon as the student closes the panel. */
+  body:has(details[data-study-partner][open]) .study-buddy-reopen,
+  body:has(details[data-study-partner][open]) .study-buddy-bar.is-collapsed {
+    display: none !important;
+  }
+}
+@media (max-width: 340px) {
+  [data-workbook-tab-navigation] > [role="tablist"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
