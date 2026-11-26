@@ -1,3 +1,4 @@
+import C1StudyPartner from "./C1StudyPartner";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
@@ -357,6 +358,7 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
   const sticky = !["B2", "C2"].includes(normalizedLevel);
 
   return (
+    <>
     <div
       data-advanced-self-learning-navigation
       data-sticky-navigation={sticky ? "true" : "false"}
@@ -370,6 +372,8 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
         renderLegacyGrammarPanel={false}
       />
     </div>
+    {normalizedLevel === "C1" && <C1StudyPartner day={day} section={rotatingTabs.find(tab => tab.key === activeTab)?.label || "Learn"} />}
+    </>
   );
 };
 
