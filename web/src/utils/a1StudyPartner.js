@@ -3,10 +3,10 @@ import { FALOWEN_CONNECTION_REQUIRED } from "./falowenStudyConnection";
  // draft answers, grades, tokens, or the current URL/query string.
 export const A1_STUDY_MODES = Object.freeze([
   { key: "explain", label: "Explain this lesson", instruction: "Explain the topic with short A1 examples and check my understanding." },
-  { key: "grammar", label: "Practise grammar", instruction: "Teach the grammar for this lesson, then give me new short exercises." },
+  { key: "grammar", label: "Practise grammar", instruction: "Teach the retrieved grammar for this lesson, then give me short source-grounded exercises." },
   { key: "speaking", label: "Practise speaking", instruction: "Role-play a realistic A1 conversation on this topic, one question at a time." },
-  { key: "writing", label: "Practise writing", instruction: "Give me a new short A1 writing task on this topic and correct my own attempt." },
-  { key: "quiz", label: "Test my understanding", instruction: "Quiz me with new questions on this topic, one at a time." },
+  { key: "writing", label: "Practise writing", instruction: "Use a learner-facing A1 writing task from the retrieved lesson or a clearly labeled example based on it and correct my own attempt." },
+  { key: "quiz", label: "Test my understanding", instruction: "Quiz me from the retrieved lesson, one question at a time." },
 ]);
 
 const clean = value => String(value ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
@@ -36,8 +36,8 @@ export function buildStudyPrompt(lesson, mode = "explain", section = "", level =
     level === "B2" && clean(lesson.skillFocus) ? "Today's exam skill: " + clean(lesson.skillFocus) + "." : "",
     level === "C1" && clean(lesson.guidingQuestion) ? "Guiding question: " + clean(lesson.guidingQuestion) + "." : "",
     option.instruction.replace(/\bA1\b/g, level),
-    level === "B2" ? "Use B2-level vocabulary, collocations and complex but natural sentences. Train the current skill with fresh Goethe-style tasks: reading paraphrases and evidence, listening for detail using audio only when available, structured presentations and discussions, or forum posts and formal messages. Do not claim a text-only exercise is listening practice." : "",
-    level === "C1" ? "Use natural advanced German, precise vocabulary, nuanced argumentation, counterarguments, cohesive structure and register. Encourage independent reformulation." : "",
+    level === "B2" ? "Use B2-level vocabulary, collocations and complex but natural sentences. Train the current skill with authorized Falowen tasks or clearly labeled teaching examples based on them: reading paraphrases and evidence, listening for detail using audio only when available, structured presentations and discussions, or forum posts and formal messages. Do not claim a text-only exercise is listening practice." : "",
+    level === "C1" ? "Use natural advanced German for practice, precise vocabulary, nuanced argumentation, counterarguments, cohesive structure and register. Encourage independent reformulation." : "",
     level === "B1" ? "Encourage connected sentences, reasons, examples and appropriate register. For speaking, practise expressing opinions, planning together and responding to follow-up questions; for writing, practise coherent organisation and connectors." : "",
     "Use German appropriate for " + level + " in practice, with clear English explanations. Ask one question at a time, wait for my reply, correct my mistakes and explain why.",
     "Use source-grounded practice examples and hints. Do not provide official assignment answers, answer keys, complete my submission, save official marks, or start an exam. Ask for my own attempt first.",
