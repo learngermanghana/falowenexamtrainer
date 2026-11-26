@@ -239,6 +239,8 @@ export const WorkbookTabNav = ({
         data-workbook-tab-navigation
         style={{
           position: "relative",
+          boxSizing: "border-box",
+          minWidth: 0,
           scrollMarginTop: 96,
           zIndex: 30,
           display: "grid",
@@ -356,14 +358,13 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
     );
   };
 
-  const sticky = !["B2", "C2"].includes(normalizedLevel);
-
+  // Keep advanced workbook tabs in document flow on every screen size.
+  // A sticky control panel obscures the video and lesson text on tablets.
   return (
     <>
     <div
       data-advanced-self-learning-navigation
-      data-sticky-navigation={sticky ? "true" : "false"}
-      style={sticky ? { position: "sticky", top: 0, zIndex: 35 } : undefined}
+      data-sticky-navigation="false"
     >
       <WorkbookTabNav
         activeTab={activeTab}
