@@ -6,6 +6,7 @@ import { styles } from "../styles";
 import { TimedAssignmentPanel } from "./SharedTimedAssignment";
 import { normalizeA1SectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
 import A1CourseBookOffer from "./A1CourseBookOffer";
+import A1StudyPartner from "./A1StudyPartner";
 import A1Day1Dictionary from "./A1Day1Dictionary";
 import "./a1TutorMusicTabs.css";
 import { useA1TimedMockExam } from "./A1TimedMockExam";
@@ -359,7 +360,7 @@ export default function A1SharedAssignmentWorkbookLayout({
   const hasMusic = Boolean(music);
   const hasDictionary = isCombinedDay1;
   const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar, hasMusic, hasDictionary, groupAssignmentSections });
-  const { assignmentLocked, isTabLocked } = useA1TimedMockExam();
+  const { assignmentLocked, isTabLocked, attemptState } = useA1TimedMockExam();
   const overviewTab = availableSections.length ? "overview" : "assignment";
   const activeTabAllowedWhileLocked = ["overview", "grammar", "music", "dictionary"].includes(activeTab) || (!groupAssignmentSections && activeTab === "assignment");
   const visibleActiveTab = !activeTabAllowedWhileLocked && isTabLocked(activeTab)
@@ -399,6 +400,10 @@ export default function A1SharedAssignmentWorkbookLayout({
         assignmentLocked={assignmentLocked}
         isTabLocked={isTabLocked}
       />
+
+      {attemptState !== "active" && visibleActiveTab !== "submit" && (
+        <A1StudyPartner key={assignmentKey} lesson={{ ...assignment, kind: "assignment" }} section={availableSections.find(section => section.key === visibleActiveTab)?.label || ({ overview: "Overview", grammar: "Grammar", music: "Music", dictionary: "Vocabulary", assignment: "Assignment preparation" }[visibleActiveTab] || "")} />
+      )}
 
       <div data-workbook-content>
         <div data-workbook-panel={overviewTab} hidden={visibleActiveTab !== overviewTab}>{overview}</div>
