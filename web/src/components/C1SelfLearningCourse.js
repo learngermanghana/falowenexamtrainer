@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import ReadingExamFrame, { ReadingExamDocument } from "./ReadingExamLayout";
 import C1ReadingPracticePanel from "./C1ReadingPracticePanel";
+import { C1PreparationLink } from "./C1ExamPreparationPage";
 import { C1_READING_PRACTICE } from "../data/c1ReadingPractice.js";
 import { getC1CanonicalTitle, getC1CanonicalGrammarTitle, getC1ContentProfile } from "../data/c1ContentRefresh.js";
 
@@ -317,6 +318,7 @@ export default function C1SelfLearningCourse() {
 
       <div style={card}>
         <strong>C1 Tagesseiten</strong>
+        <C1PreparationLink />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course/c1-self-learning")}>Alle Tage</button>
           {C1_ALL_DAYS.map((entry) => (

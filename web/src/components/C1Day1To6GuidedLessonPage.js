@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import C1TopicIntroduction from "./C1TopicIntroduction";
+import C1AcademicExamPractice, { C1AcademicGrammarPractice } from "./C1AcademicExamPractice";
 import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
 import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
@@ -177,6 +178,8 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
           </div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the knowledge questions below.</NoteBox>}
         </Section>
         <C1TopicIntroduction day={Number(lesson.day)} title={lesson.title} />
+        <C1AcademicGrammarPractice day={lesson.day} />
+        <C1AcademicExamPractice day={lesson.day} tab="learn" />
         <C1KnowledgeChoicePractice
           lesson={lesson}
           completed={progress.learnDone}
@@ -185,12 +188,14 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
       </> : null}
 
       {active === "speak" ? <Section title="Speaking builder">
+        <C1AcademicExamPractice day={lesson.day} tab="speak" />
         <SpeakingBuilder lesson={lesson} />
         <EmbeddedSpeechPracticePanel />
         <label style={fieldLabel}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label>
       </Section> : null}
 
       {active === "write" ? <Section title="Guided writing builder">
+        <C1AcademicExamPractice day={lesson.day} tab="write" />
         <WritingCheatSheetTabs level="C1" day={lesson.day}>
           <WritingTaskPrompt lesson={lesson} />
           <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
