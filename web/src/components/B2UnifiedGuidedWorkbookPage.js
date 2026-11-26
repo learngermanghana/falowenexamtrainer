@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import StudyPartner from "./A1StudyPartner";
 import { getB2ChapterOnePractice, getB2ChapterOneReadingEvidence } from "../data/b2ChapterOnePractice";
+import { getB2ChapterTwoPractice, getB2ChapterTwoReadingEvidence } from "../data/b2ChapterTwoPractice";
 import B2TopicIntroduction, { B2_TOPIC_FOUNDATIONS } from "./B2TopicIntroduction";
 import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
@@ -98,8 +99,8 @@ const GrammarLessonContent = ({ day }) => {
 };
 
 
-function ChapterOneVocabulary({ day }) {
-  const practice = getB2ChapterOnePractice(day);
+function ChapterVocabulary({ day }) {
+  const practice = getB2ChapterOnePractice(day) || getB2ChapterTwoPractice(day);
   if (!practice) return null;
   return <Section title="Wortschatz · Redemittel">
     <p style={{ margin: 0 }}>Lerne diese Ausdrücke als feste Wortverbindungen, nicht als einzelne Wörter.</p>
@@ -109,10 +110,10 @@ function ChapterOneVocabulary({ day }) {
   </Section>;
 }
 
-function ChapterOneTransformations({ day }) {
-  const practice = getB2ChapterOnePractice(day);
+function ChapterTransformations({ day }) {
+  const practice = getB2ChapterOnePractice(day) || getB2ChapterTwoPractice(day);
   if (!practice) return null;
-  return <div data-b2-chapter-one-practice={day} style={sub}>
+  return <div data-b2-chapter-one-practice={day <= 5 ? day : undefined} data-b2-chapter-two-practice={day >= 6 ? day : undefined} style={sub}>
     <strong>Satztraining · Vom B1- zum B2-Satz</strong>
     <p style={{ margin: 0 }}>Formuliere zuerst selbst einen Satz. Vergleiche danach deine Lösung mit dem Modell. Andere grammatisch korrekte Lösungen sind möglich.</p>
     {practice.transformations.map(([question, answer, explanation], index) => <article key={question} style={sub}>
@@ -173,7 +174,7 @@ function ReadingPractice({ day, progress, setProgress }) {
         const selected = answers[index];
         const hasAnswer = Number.isInteger(selected);
         const correct = selected === item.answerIndex;
-        const evidence = getB2ChapterOneReadingEvidence(day, index);
+        const evidence = getB2ChapterOneReadingEvidence(day, index) ?? getB2ChapterTwoReadingEvidence(day, index);
         return <article key={item.question} style={sub}>
           <strong>{index + 1}. {item.question}</strong>
           <div style={{ display: "grid", gap: 8 }}>
@@ -465,10 +466,10 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
 
     {active === "learn" ? <>
       <B2TopicIntroduction day={day} />
-      <ChapterOneVocabulary day={day} />
+      <ChapterVocabulary day={day} />
       <Section title="Grammar / Learn">
         <GrammarLessonContent day={day} />
-        <ChapterOneTransformations day={day} />
+        <ChapterTransformations day={day} />
         {grammarVideo?.url ? (
           <div data-b2-grammar-video-status="ready" style={{ ...sub, background: "#eff6ff", borderColor: "#bfdbfe" }}>
             <strong>{grammarVideo.title || "AI video"}</strong>
