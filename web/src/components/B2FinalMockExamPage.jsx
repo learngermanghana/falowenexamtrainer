@@ -18,11 +18,17 @@ import { B2_FINAL_MOCK_STORAGE_KEY, B2_LISTENING, B2_READING, B2_WRITING_TASKS }
 import { getB2MockReviewPlans } from "../data/b2MockReviewPlans";
 import "./B2FinalMockExamPage.css";
 
+const READING_SECONDS = 65 * 60;
+const isReadingStage = stage => /^teil[1-5]$/.test(stage);
+const usesFullReading = state => state.readingFormatVersion === 2;
+const isReadingComplete = state => usesFullReading(state) ? state.teil5Completed : state.teil4Completed;
+
 const SECTION_DURATIONS = Object.freeze({
   teil1: 18 * 60,
   teil2: 12 * 60,
   teil3: 12 * 60,
   teil4: 12 * 60,
+  teil5: 6 * 60,
   schreiben: 75 * 60,
   sprechen: 30 * 60,
 });
@@ -36,6 +42,7 @@ const formatTime = (seconds) => {
 
 const initialState = () => ({
   stage: "teil1",
+  readingFormatVersion: 2,
   started: false,
   attemptStartedAtMs: null,
   deadlineMs: null,
@@ -45,6 +52,8 @@ const initialState = () => ({
   teil3Completed: false,
   teil4Answers: {},
   teil4Completed: false,
+  teil5Answers: {},
+  teil5Completed: false,
   hoeren1Answers: {},
   hoeren1AudioStatus: "not_started",
   hoeren1Completed: false,
@@ -174,6 +183,7 @@ const readState = (storageKey) => {
     return {
       ...initialState(),
       ...parsed,
+      readingFormatVersion: parsed.readingFormatVersion === 2 ? 2 : 1,
       stage,
       teil1Answers: parsed.teil1Answers || parsed.answers || {},
       teil2Answers: parsed.teil2Answers || {},
@@ -181,6 +191,8 @@ const readState = (storageKey) => {
       teil3Completed: Boolean(parsed.teil3Completed),
       teil4Answers: parsed.teil4Answers || {},
       teil4Completed: Boolean(parsed.teil4Completed),
+      teil5Answers: parsed.teil5Answers || {},
+      teil5Completed: Boolean(parsed.teil5Completed),
       hoeren1Answers: parsed.hoeren1Answers || {},
       hoeren1AudioStatus: restoreAudioStatus(parsed.hoeren1AudioStatus),
       hoeren1Completed: Boolean(parsed.hoeren1Completed),
@@ -230,6 +242,7 @@ const buildFinalScore = (state) => {
     ...Object.entries(B2_READING.teil2.answers).map(([number, answer]) => [state.teil2Answers?.[number], answer]),
     ...B2_READING.teil3.questions.map((question) => [state.teil3Answers?.[question.number], question.answer]),
     ...B2_READING.teil4.questions.map((question) => [state.teil4Answers?.[question.number], question.answer]),
+    ...(usesFullReading(state) ? B2_READING.teil5.questions.map(question => [state.teil5Answers?.[question.number], question.answer]) : []),
   ];
 
   const hoerenPairs = [
@@ -582,7 +595,7 @@ const Teil4Select = ({ number, value, answers, onChange, disabled }) => {
   );
 };
 
-const Teil4 = ({ answers, onChoose, secondsLeft, onFinish }) => {
+const Teil4 = ({ answers, onChoose, secondsLeft, onFinish, fullReading = false }) => {
   const answeredCount = B2_READING.teil4.questions.filter((question) => Boolean(answers[question.number])).length;
 
   return (
@@ -630,12 +643,28 @@ const Teil4 = ({ answers, onChoose, secondsLeft, onFinish }) => {
 
         <p className="b2-mock-autosave">Automatisch gespeichert</p>
         <button type="button" className="b2-mock-next" onClick={onFinish}>
-          Teil 4 abschließen · weiter zu Hören
+          {fullReading ? "Weiter zu Teil 5" : "Teil 4 abschließen · weiter zu Hören"}
         </button>
       </section>
     </>
   );
 };
+
+const Teil5 = ({ answers, onChoose, secondsLeft, onFinish }) => (
+  <section className="b2-mock-teil4-tasks">
+    <h2>{B2_READING.teil5.regulationTitle}</h2>
+    <ol type="A">{B2_READING.teil5.headings.map(heading => <li key={heading.id}>{heading.text}</li>)}</ol>
+    <p><strong>Beispiel:</strong> {B2_READING.teil5.example.text} · Lösung: C</p>
+    {B2_READING.teil5.questions.map(question => <article key={question.number} className="b2-mock-teil4-question">
+      <h3>§ {question.number}</h3><p>{question.text}</p>
+      <label>Überschrift <select aria-label={`Aufgabe ${question.number}`} value={answers[question.number] || ""} disabled={secondsLeft <= 0} onChange={event => onChoose(question.number, event.target.value)}>
+        <option value="">Bitte wählen</option>{B2_READING.teil5.headings.filter(heading => heading.id !== "C").map(heading => <option key={heading.id} value={heading.id}>{heading.id} · {heading.text}</option>)}
+      </select></label>
+    </article>)}
+    <p className="b2-mock-autosave">Automatisch gespeichert</p>
+    <button type="button" className="b2-mock-next" onClick={onFinish}>Lesen abschließen · weiter zu Hören</button>
+  </section>
+);
 
 const HorenChoiceList = ({ partId = "teil-1", question, value, onChoose, disabled = false, example = false }) => (
   <div className="b2-mock-hoeren-options" role="radiogroup" aria-label={`Aufgabe ${question.number}`}>
@@ -1122,7 +1151,7 @@ function B2FinalMockExamPageAttempt() {
     syncB2Backup(state, idToken, user.uid).catch(() => {
       // Keep local responses and retry when the student next visits.
     });
-  }, [idToken, user?.uid, state.teil4Completed, state.hoeren4Completed, state.schreibenCompleted,
+  }, [idToken, user?.uid, state.teil4Completed, state.teil5Completed, state.hoeren4Completed, state.schreibenCompleted,
       state.attemptStartedAtMs, state.lesenSubmittedAt, state.hoerenSubmittedAt, state.schreibenSubmittedAt,
       state.schreibenResult?.score]);
   useEffect(() => {
@@ -1130,19 +1159,21 @@ function B2FinalMockExamPageAttempt() {
     setState(current => current.attemptStartedAtMs ? current : {...current, attemptStartedAtMs:Date.now()});
   }, [state.attemptStartedAtMs, state.stage, state.started]);
   const secondsLeft = useMemo(() => {
-    const duration = SECTION_DURATIONS[state.stage];
+    const duration = usesFullReading(state) && isReadingStage(state.stage) ? READING_SECONDS : SECTION_DURATIONS[state.stage];
     if (!duration) return null;
     if (!state.started || !state.deadlineMs || state.completed) {
       return duration;
     }
     return Math.max(0, Math.ceil((state.deadlineMs - now) / 1000));
-  }, [now, state.completed, state.deadlineMs, state.stage, state.started]);
+  }, [now, state.completed, state.deadlineMs, state.stage, state.started, state.readingFormatVersion]);
 
+  const breakRemaining = usesFullReading(state) && state.stage === "schreiben" && !state.started && state.hoerenSubmittedAt ? Math.max(0, Math.ceil((Number(state.hoerenSubmittedAt) + 15 * 60 * 1000 - now) / 1000)) : 0;
   const start = () => {
+    if (breakRemaining > 0) return;
     announceExamSuccess(state.started ? "B2 mock resumed successfully." : "B2 mock started successfully.");
     setState((current) => {
       const stage = current.stage || "teil1";
-      const duration = SECTION_DURATIONS[stage];
+      const duration = usesFullReading(current) && isReadingStage(stage) ? READING_SECONDS : SECTION_DURATIONS[stage];
       return {
         ...current,
         started: true,
@@ -1263,7 +1294,7 @@ function B2FinalMockExamPageAttempt() {
       ...current,
       stage: "teil2",
       started: true,
-      deadlineMs: Date.now() + SECTION_DURATIONS.teil2 * 1000,
+      deadlineMs: usesFullReading(current) ? current.deadlineMs : Date.now() + SECTION_DURATIONS.teil2 * 1000,
     }));
     announceExamSuccess("Lesen Teil 1 completed. Continue to Teil 2.");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1274,7 +1305,7 @@ function B2FinalMockExamPageAttempt() {
       ...current,
       stage: "teil3",
       started: true,
-      deadlineMs: Date.now() + SECTION_DURATIONS.teil3 * 1000,
+      deadlineMs: usesFullReading(current) ? current.deadlineMs : Date.now() + SECTION_DURATIONS.teil3 * 1000,
     }));
     announceExamSuccess("Lesen Teil 2 completed. Continue to Teil 3.");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1286,16 +1317,27 @@ function B2FinalMockExamPageAttempt() {
       teil3Completed: true,
       stage: "teil4",
       started: true,
-      deadlineMs: Date.now() + SECTION_DURATIONS.teil4 * 1000,
+      deadlineMs: usesFullReading(current) ? current.deadlineMs : Date.now() + SECTION_DURATIONS.teil4 * 1000,
     }));
     announceExamSuccess("Lesen Teil 3 completed. Continue to Teil 4.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const chooseTeil5 = (number, answer) => {
+    if (!state.started || secondsLeft <= 0) return;
+    setState(current => ({...current, teil5Answers: {...current.teil5Answers, [number]: answer}}));
+  };
+  const goToReadingPart = stage => {
+    setState(current => usesFullReading(current) && current.started && isReadingStage(current.stage) && isReadingStage(stage) ? {...current, stage} : current);
+    window.scrollTo({top: 0, behavior: "smooth"});
+  };
+  const continueToTeil5 = () => goToReadingPart("teil5");
+
   const continueToHoerenTeil1 = () => {
     setState((current) => ({
       ...current,
       teil4Completed: true,
+      teil5Completed: usesFullReading(current),
       lesenSubmittedAt:Date.now(),
       stage: "hoeren-teil1",
       started: false,
@@ -1351,9 +1393,9 @@ function B2FinalMockExamPageAttempt() {
       hoeren4Completed: true,
       hoerenSubmittedAt:Date.now(),
       stage: "schreiben",
-      started: true,
+      started: !usesFullReading(current),
       completed: false,
-      deadlineMs: Date.now() + SECTION_DURATIONS.schreiben * 1000,
+      deadlineMs: usesFullReading(current) ? null : Date.now() + SECTION_DURATIONS.schreiben * 1000,
     }));
     announceExamSuccess("Hören completed. Continue to Schreiben.");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1430,7 +1472,7 @@ function B2FinalMockExamPageAttempt() {
   }, []);
 
   const completedSkills = [
-    state.teil4Completed ? "lesen" : null,
+    isReadingComplete(state) ? "lesen" : null,
     state.hoeren4Completed ? "hoeren" : null,
     state.schreibenCompleted ? "schreiben" : null,
     state.sprechenCompleted ? "sprechen" : null,
@@ -1520,13 +1562,15 @@ function B2FinalMockExamPageAttempt() {
           : "This is one full four-module exam, not a single reading or listening exercise. Start this section to continue; your previous work stays saved on this device."}
       />
 
+      {state.started && usesFullReading(state) && isReadingStage(state.stage) ? <nav aria-label="Lesen Teile 1–5"><p>Gemeinsame Arbeitszeit: 65 Minuten. Sie können zwischen den Teilen wechseln.</p>{[1,2,3,4,5].map(part => <button key={part} type="button" aria-current={state.stage === `teil${part}` ? "step" : undefined} onClick={() => goToReadingPart(`teil${part}`)}>Teil {part}</button>)}</nav> : null}
       {!state.started ? (
         <section className="b2-mock-start">
           <h2>B2 {getStageConfig(state.stage).module} · {getStageConfig(state.stage).title}</h2>
           <p>{getStageConfig(state.stage).intro}</p>
           <p><strong>Full mock: Lesen → Hören → Schreiben → Sprechen.</strong> Your final result appears only after all four modules.</p>
-          <details><summary>Official-format preparation and practice differences</summary><p>The course syllabus specifies Lesen (65 minutes, five parts), Hören (about 40 minutes), a 15–30 minute break before Schreiben (75 minutes), and Sprechen (about 15 minutes plus 15 minutes preparation). This online mock currently has four timed reading parts (54 minutes total), uses complete listening recordings, typed writing and recorded speaking with automated feedback. It is a diagnostic practice simulation, not an exact reproduction of the official examination. Take a 15–30 minute break before starting Schreiben and practise handwriting and live partner discussion separately.</p></details>
-          <button type="button" onClick={start}>Start or continue {getStageConfig(state.stage).module} · Module {FULL_MOCK_SKILLS.findIndex((step) => step.key === getFullMockSkillForStage(state.stage)) + 1}/4</button>
+          <details><summary>Official-format preparation and practice differences</summary><p>The course syllabus specifies Lesen (65 minutes, five parts), Hören (about 40 minutes), a 15–30 minute break before Schreiben (75 minutes), and Sprechen (about 15 minutes plus 15 minutes preparation). {usesFullReading(state) ? "This online mock has five reading parts (65 minutes shared across all parts)." : "This older saved attempt has four reading parts (54 minutes total). New attempts use five parts and a 65-minute shared timer."} It uses complete listening recordings, typed writing and recorded speaking with automated feedback. It is a diagnostic practice simulation, not an exact reproduction of the official examination. Take a 15–30 minute break before starting Schreiben and practise handwriting and live partner discussion separately.</p></details>
+          {breakRemaining > 0 ? <p role="status">Pause vor Schreiben: {formatTime(breakRemaining)}. Die Schreibzeit beginnt erst nach der Pause.</p> : null}
+          <button type="button" onClick={start} disabled={breakRemaining > 0}>Start or continue {getStageConfig(state.stage).module} · Module {FULL_MOCK_SKILLS.findIndex((step) => step.key === getFullMockSkillForStage(state.stage)) + 1}/4</button>
         </section>
       ) : state.stage === "sprechen" ? (
         <B2FinalMockSpeaking
@@ -1580,12 +1624,15 @@ function B2FinalMockExamPageAttempt() {
           onAudioStatusChange={setHoeren1AudioStatus}
           onFinish={continueToHoerenTeil2}
         />
+      ) : state.stage === "teil5" && usesFullReading(state) ? (
+        <Teil5 answers={state.teil5Answers} onChoose={chooseTeil5} secondsLeft={secondsLeft} onFinish={continueToHoerenTeil1} />
       ) : state.stage === "teil4" ? (
         <Teil4
           answers={state.teil4Answers}
           onChoose={chooseTeil4}
           secondsLeft={secondsLeft}
-          onFinish={continueToHoerenTeil1}
+          fullReading={usesFullReading(state)}
+          onFinish={usesFullReading(state) ? continueToTeil5 : continueToHoerenTeil1}
         />
       ) : state.stage === "teil3" ? (
         <Teil3
