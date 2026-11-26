@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import SharedTimedAssignment from "./SharedTimedAssignment";
+import StudyPartner from "./A1StudyPartner";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import WorkbookDayMusic from "./WorkbookDayMusic";
@@ -304,7 +305,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
       configOverride={lessonProfile?.timer || null}
       onTimeExpired={handleTimedExpiry}
     >
-      {({ isTabLocked }) => {
+      {({ isTabLocked, attemptState }) => {
         const resolvedActiveTab = isTabLocked(activeTab) ? "grammar" : activeTab;
         return (
               <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -323,6 +324,9 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                         ? `Today: Sprechen in class, then Teil 3 · Lesen and Teil 4 · ${part4Profile?.label || "Hören"}. Schreiben is not required for submission.`
                         : "Today: Sprechen in class, then Teil 3 · Lesen. Schreiben is not required for submission."))}
                   </p>
+                  {attemptState !== "active" && attemptState !== "loading" && resolvedActiveTab !== "submit" && (
+                    <StudyPartner level="B1" key={resolvedAssignmentKey} lesson={{ kind: "assignment", day: config.day, chapter: String(resolvedAssignmentKey || "").startsWith("B1-") ? resolvedAssignmentKey.slice(3) : config.chapter, title: config.title, assignmentKey: resolvedAssignmentKey }} section={({ references: "Lecture review and notes", grammar: "Grammar", sprechen: "Speaking practice", schreiben: "Writing preparation", lesen: "Reading preparation", hoeren: part4Profile?.label || "Listening preparation", music: "Music" })[resolvedActiveTab] || ""} />
+                  )}
                   <SectionImage image={config.heroImage} alt={config.heroAlt} />
                   <WorkbookTabNav
                     activeTab={resolvedActiveTab}

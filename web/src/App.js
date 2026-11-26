@@ -118,6 +118,7 @@ import A1Day5IntroducingYourselfArticlesWorkbookPage from "./components/A1Day5In
 import A1WorkbookRoutePage from "./components/A1WorkbookRoutePage";
 import A1PracticeBookLayout from "./components/A1PracticeBookLayout";
 import A2StudyMaterialLayout from "./components/A2StudyMaterialLayout";
+import B1StudyMaterialLayout from "./components/B1StudyMaterialLayout";
 import A1Day12TwentyFourHourClockAndDatesWorkbookPage from "./components/A1Day12TwentyFourHourClockAndDatesWorkbookPage";
 import A1Day13RevisionNumbersTimePricesWorkbookPage from "./components/A1Day13RevisionNumbersTimePricesWorkbookPage";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
@@ -1283,7 +1284,7 @@ const AppShell = ({
           <Route path="/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook" element={<C1Day15BildungUndLebenslangesLernenWorkbookPage />} />
           <Route path="/campus/course/c1-day-16-technologie-im-alltag-grammar-notes" element={<C1Day16TechnologieImAlltagGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-16-technologie-im-alltag-workbook" element={<C1Day16TechnologieImAlltagWorkbookPage />} />
-          <Route path="/campus/course/b1-day-21-lebensformen-heute-grammar-notes" element={<B1Day21LebensformenHeuteGrammarNotesPage />} />
+          <Route path="/campus/course/b1-day-21-lebensformen-heute-grammar-notes" element={<B1StudyMaterialLayout day={21}><B1Day21LebensformenHeuteGrammarNotesPage /></B1StudyMaterialLayout>} />
           <Route path="/campus/course/weather-perfekt-letter-13" element={<WeatherPerfektLetterPage />} />
           <Route path="/campus/course/health-and-body-parts-14-1" element={<HealthBodyPartsPage />} />
           <Route path="/campus/course/a1-day-7-asking-about-prices-and-preferences" element={<A1Day7PricesPreferencesGrammarPage />} />
