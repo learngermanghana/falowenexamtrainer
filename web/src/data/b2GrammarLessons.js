@@ -83,6 +83,14 @@ const B2_GRAMMAR_FOCUS_LIBRARY = Object.freeze({
       "Digitale Systeme können transparenter gestaltet werden.",
     ],
   ),
+  passiveAlternatives: focus(
+    "Passiv-Ersatzformen: sich lassen / sein + zu",
+    "passive alternatives: possibility and necessity",
+    "Mit sich lassen + Infinitiv kann man eine Möglichkeit ohne werden ausdrücken. Die Konstruktion sein + zu + Infinitiv drückt je nach Kontext eine Möglichkeit oder eine Pflicht aus.",
+    "Subjekt + lässt/lassen sich + Infinitiv | Subjekt + ist/sind + zu + Infinitiv",
+    ["Das lässt sich ändern = Das kann geändert werden.", "Die Anlage ist zu warten = Die Anlage muss gewartet werden; die genaue modale Bedeutung ergibt sich aus dem Kontext."],
+    ["Der Stromverbrauch lässt sich durch LED-Lampen senken.", "Die Solaranlage ist vor dem Winter zu überprüfen."],
+  ),
   nominalization: focus(
     "Nominalisierung",
     "turning actions/qualities into nouns",
@@ -343,7 +351,7 @@ const DAY_FOCUS_KEYS = Object.freeze({
   3: ["proportional", "concession", "withoutInstead"],
   4: ["withoutInstead", "pairedNotOnly", "method"],
   5: ["contrast", "proportional", "conditionalKonjunktiv"],
-  6: ["passive", "modalPassive", "conditional", "consequence"],
+  6: ["passive", "modalPassive", "passiveAlternatives", "conditional", "consequence"],
   7: ["relativePrep", "conditionalKonjunktiv", "consequence"],
   8: ["purpose", "passive", "modalPassive", "nominalization"],
   9: ["modalPassive", "conditional", "concession", "nevertheless"],
