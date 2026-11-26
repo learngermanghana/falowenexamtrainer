@@ -18,6 +18,9 @@ import {
 } from "../firebase";
 import { correctDiscussionText } from "../services/discussionService";
 import ClassMembersTab from "./ClassMembersTab";
+import {useOwnerCourseTesting} from "../context/OwnerCourseTestingContext";
+import {isCourseTestingOwner} from "../utils/ownerCourseTesting";
+import OwnerDiscussionPreview from "./OwnerDiscussionPreview";
 
 const postsCollectionRef = (level, className) =>
   collection(db, "class_board", level, "classes", className, "posts");
@@ -140,7 +143,7 @@ const getTimerMeta = (thread, now) => {
 
 const repliesCollectionRef = (threadId) => collection(db, "qa_posts", threadId, "responses");
 
-export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, title = "Class discussion", description, contributionOnly = false }) => {
+const LiveClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, title = "Class discussion", description, contributionOnly = false }) => {
   const { user, studentProfile, idToken } = useAuth();
   const [threads, setThreads] = useState([]);
   const [repliesByThread, setRepliesByThread] = useState({});
@@ -1407,4 +1410,12 @@ export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, 
   );
 };
 
+export function ClassDiscussionPanel(props){
+  const {user}=useAuth();
+  const selection=useOwnerCourseTesting();
+  if(isCourseTestingOwner(user)&&selection?.uid===user.uid){
+    return <OwnerDiscussionPreview key={JSON.stringify([selection.program,selection.level,selection.classId,props.lessonId,props.embedded])} selection={selection} {...props}/>;
+  }
+  return <LiveClassDiscussionPanel {...props}/>;
+}
 export default ClassDiscussionPanel;
