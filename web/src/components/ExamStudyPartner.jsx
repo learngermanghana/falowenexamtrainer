@@ -1,3 +1,4 @@
+import "./ExamStudyPartnerMobile.css";
 import React, { useState } from "react";
 import { useAssessmentRestricted } from "../hooks/useAssessmentRestriction";
 import { buildA1ChatGPTUrl } from "../utils/a1StudyPartner";
@@ -40,7 +41,7 @@ export default function ExamStudyPartner({ level, section, restricted = false, r
             {completed && <option value="mistakes">Understand my mistakes</option>}
           </select>
         </label>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <div className="exam-study-partner-actions" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <a href={buildA1ChatGPTUrl(prompt)} target="_blank" rel="noopener noreferrer" style={{ background: "#166534", color: "#fff", padding: "10px 14px", borderRadius: 8, textDecoration: "none", fontWeight: 700 }}>Continue to ChatGPT ↗</a>
           <button type="button" onClick={copyPrompt} style={{ border: "1px solid #86b69a", background: "#fff", color: "#14532d", borderRadius: 8, padding: "10px 14px" }}>Copy prompt</button>
         </div>

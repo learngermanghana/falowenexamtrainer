@@ -1,0 +1,101 @@
+/* Keep exam coaching compact and in normal flow on phones. */
+@media (max-width: 768px) {
+  [data-exam-study-partner], [data-exam-mistake-review] {
+    box-sizing: border-box;
+    position: static;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    padding: 9px 10px !important;
+    overflow-wrap: anywhere;
+  }
+  [data-exam-study-partner] > summary, [data-exam-mistake-review] > summary {
+    min-height: 24px;
+    font-size: 14px;
+  }
+  [data-exam-study-partner] label {
+    min-width: 0;
+    font-size: 13px;
+  }
+  [data-exam-study-partner] select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .exam-study-partner-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .exam-study-partner-actions > * {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 9px 12px;
+    text-align: center;
+    white-space: normal;
+  }
+  [data-exam-study-partner] textarea, [data-exam-mistake-review] textarea {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    font-size: 16px !important;
+  }
+  .exam-room-mobile-header {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .exam-room-mobile-header .mobile-exam-menu,
+  .exam-room-mobile-header .exam-room-level-picker {
+    position: static !important;
+    top: auto !important;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .exam-room-mobile-header .exam-room-hero {
+    min-height: 105px !important;
+    padding: 12px !important;
+    box-sizing: border-box;
+  }
+  .exam-room-mobile-header .exam-room-hero h2 {
+    font-size: 20px;
+    overflow-wrap: anywhere;
+  }
+  .exam-room-mobile-header .exam-room-date-picker-row,
+  .exam-room-mobile-header .exam-room-date-control,
+  .exam-room-mobile-header .exam-room-countdown {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .exam-room-mobile-header .exam-room-date-control input {
+    font-size: 16px;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+  }
+  .exam-room-mobile-header .exam-room-level-picker:not(.exam-room-level-picker--speaking) [aria-label="Choose exam practice level"] {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    gap: 6px !important;
+  }
+  .exam-room-mobile-header .exam-room-level-picker:not(.exam-room-level-picker--speaking) [aria-label="Choose exam practice level"] button {
+    min-width: 0 !important;
+    padding: 8px !important;
+    min-height: 44px;
+  }
+  body:has(details[data-exam-study-partner][open]) .study-buddy-reopen,
+  body:has(details[data-exam-study-partner][open]) .study-buddy-bar.is-collapsed,
+  body:has(details[data-exam-mistake-review][open]) .study-buddy-reopen,
+  body:has(details[data-exam-mistake-review][open]) .study-buddy-bar.is-collapsed {
+    display: none !important;
+  }
+}
