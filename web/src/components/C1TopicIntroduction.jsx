@@ -174,10 +174,11 @@ export default function C1TopicIntroduction({ day, title }) {
     >
       <div>
         <div style={{ fontWeight: 900, color: "#1d4ed8" }}>C1 · Thema verstehen</div>
-        <h2 style={{ margin: "4px 0 0", fontSize: "1.2rem" }}>{title || `C1 Day ${topic.day}`}</h2>
+        <h2 style={{ margin: "4px 0 0", fontSize: "1.2rem" }}>{academic?.topic || title || `C1 Day ${topic.day}`}</h2>
       </div>
 
-      <p style={{ margin: 0, lineHeight: 1.75 }}>{topic.intro}</p>
+      {academic && <p style={{ margin: 0 }}><strong>Prüfungstraining:</strong> {academic.skill} · Teil {academic.part} — {academic.task}</p>}
+      <p style={{ margin: 0, lineHeight: 1.75 }}><strong>Thematische Grundlage:</strong> {topic.intro}</p>
 
       <div style={infoBox}>
         <strong>Konkretes Beispiel</strong>
@@ -196,7 +197,7 @@ export default function C1TopicIntroduction({ day, title }) {
 
       {academic && (
         <div style={infoBox} data-c1-academic-day={academic.day}>
-          <strong>C1-Vertiefung · {academic.topic}</strong>
+          <strong>Sprachlicher Fokus · {academic.topic}</strong>
           <span><strong>Prüfungstraining:</strong> {academic.skill} · Teil {academic.part}</span>
           <span>{academic.task}</span>
           <span><strong>Sprachlicher Transfer:</strong> {academic.grammar} – {academic.structure}</span>
