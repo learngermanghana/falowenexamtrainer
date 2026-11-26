@@ -430,8 +430,9 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect(lesson.data.result.structuredContent.material.questions).toHaveLength(7);
       expect(lesson.data.result.structuredContent.material.questions[0]).not.toHaveProperty("answerIndex");
       const spoofed = await call({ day: 1, section: "reading", level: "B2" });
-      expect(spoofed.data.result.structuredContent.level).toBe("B1");
-      expect(spoofed.data.result.structuredContent.material.title).toBe("Traumdeutung und ihre Bedeutung");
+      expect(spoofed.data.result.structuredContent.currentLevel).toBe("B1");
+      expect(spoofed.data.result.structuredContent.available).toBe(false);
+      expect(spoofed.data.result.structuredContent).not.toHaveProperty("material");
     });
   });
 
@@ -552,7 +553,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const oldPluginLesson = await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 92, method: "tools/call",
         params: { name: "get_my_falowen_lesson",
-          arguments: { day: 1, level: "C2" } },
+          arguments: { day: 1 } },
       }, grant.tokens.access_token);
       const a1 = oldPluginLesson.data.result.structuredContent;
       expect(a1.level).toBe("A1");
@@ -569,7 +570,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const result = await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 91, method: "tools/call",
         params: { name: "get_my_falowen_lesson_content",
-          arguments: { day: 1, section: "reading", level: "B2" } },
+          arguments: { day: 1, section: "reading", level: "A2" } },
       }, grant.tokens.access_token);
       const reading = result.data.result.structuredContent;
       expect(reading.level).toBe("A2");
