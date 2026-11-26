@@ -225,6 +225,11 @@ function createSwahiliDayElevenAudioHandler(options) {
 // Private course conversations, never exposed by the public music track map.
 // Fixed (level, day, objectKey) triples prevent arbitrary private R2 access.
 const CLASSROOM_RECORDINGS = Object.freeze({
+  // Exact paths already authored in the existing classroom listening slides.
+  'A2-1': Object.freeze({ id: 'a2-1-classroom', key: 'a2/day-01/small-talk.mp3' }),
+  'A2-17': Object.freeze({ id: 'a2-17-classroom', key: 'a2/day-17/apotheken-detektiv.mp3' }),
+  'A2-26': Object.freeze({ id: 'a2-26-classroom', key: 'a2/day-26/gefuhle-beschreiben.mp3' }),
+  'A2-28': Object.freeze({ id: 'a2-28-classroom', key: 'a2/day-28/uber-die-zukunft-sprechen.mp3' }),
   'SWAHILI-B1-28': Object.freeze({ id: 'swahili-b1-day28-kutunza-classroom', key: 'swahili/B1/day-28/swahili-listening kuntasa.mp3' }),
   'SWAHILI-B1-27': Object.freeze({ id: 'swahili-b1-day27-kutunza-classroom', key: 'swahili/B1/day-27/kuntunza.mp3' }),
   'SWAHILI-B1-26': Object.freeze({ id: 'swahili-b1-day26-safari-classroom', key: 'swahili/B1/day-26/swahili-listening matitizo.mp3' }),
