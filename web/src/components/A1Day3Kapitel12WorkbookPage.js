@@ -1,6 +1,7 @@
 import React from "react";
 import InlineReadingTranslations from "./InlineReadingTranslations";
 import AppBackButton from "./navigation/AppBackButton";
+import A1StudyPartner from "./A1StudyPartner";
 
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
@@ -66,6 +67,7 @@ const A1Day3Kapitel12WorkbookPage = () => {
           A1 · Day 3 Workbook · Pronouns and Identity Expressions in German
         </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 1.2</p>
+        <A1StudyPartner lesson={{ kind: "practice", day: 3, chapter: "1.2", title: "Pronouns and Identity Expressions in German" }} />
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Complete all sections on this page, then submit your final answers in the submission area, not directly on this
           page.
