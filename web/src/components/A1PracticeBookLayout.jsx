@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import WorkbookDayMusic, { normalizeWorkbookSong } from "./WorkbookDayMusic";
 import { getYouTubeVideoId } from "./A1WorkbookMediaPanel";
 import { styles } from "../styles";
+import A1StudyPartner from "./A1StudyPartner";
 
 // This wrapper is for independent A1 practice books only. Do not mount it
 // around A1TutorMarkedWorkbookShell or any submission/assessment route.
@@ -103,6 +104,9 @@ export default function A1PracticeBookLayout({ day, chapter, title, overview = "
         </h1>
         {/* Canonical teacher and AI players already appear above this practice
             book. Do not repeat their links or players inside the workbook. */}
+        {(!new URLSearchParams(typeof window === "undefined" ? "" : window.location.search).get("level") || new URLSearchParams(typeof window === "undefined" ? "" : window.location.search).get("level").toUpperCase() === "A1") && (
+          <A1StudyPartner key={day + ":" + chapter} lesson={{ kind: "practice", day, chapter: Number(day) === 5 ? "1.3" : chapter, title }} section={{ overview: "Overview and lecture review", workbook: "Workbook practice", music: "Music" }[tab]} />
+        )}
       </header>
 
       <section style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
