@@ -15,6 +15,7 @@ import { saveExamRoomResult } from "../services/examRoomResultService";
 import { getMockAnswerBackup, restoreB2Backup, syncB2Backup } from "../services/a2Mock2Backup";
 import B2FinalMockSpeaking from "./B2FinalMockSpeaking";
 import { B2_FINAL_MOCK_STORAGE_KEY, B2_LISTENING, B2_READING, B2_WRITING_TASKS } from "../data/b2FinalMockData";
+import { getB2MockReviewPlans } from "../data/b2MockReviewPlans";
 import "./B2FinalMockExamPage.css";
 
 const SECTION_DURATIONS = Object.freeze({
@@ -1460,6 +1461,7 @@ function B2FinalMockExamPageAttempt() {
   }
   if (state.completed) {
     const finalScore = buildFinalScore(state);
+    const reviewPlans = getB2MockReviewPlans(finalScore.sectionScores);
     return (
       <main className="b2-mock-shell">
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
@@ -1488,7 +1490,8 @@ function B2FinalMockExamPageAttempt() {
           {state.sprechenResult?.overall_feedback_en ? (
             <p><strong>Sprechen:</strong> {state.sprechenResult.overall_feedback_en}</p>
           ) : null}
-          <p>Goethe-style module rule: each module needs at least 60% — 15/25 in this mock.</p>
+          <p>Goethe-style module rule: each module needs at least 60% — 15/25 in this mock. This is a Falowen practice result, not an official Goethe examination result.</p>
+          {reviewPlans.length > 0 ? <section aria-label="Three-day targeted review"><h2>3-day targeted review</h2><p>Review each module below 60% before another timed attempt or booking the official examination.</p>{reviewPlans.map(plan => <details key={plan.key}><summary>{plan.label} · {finalScore.sectionScores[plan.key]}/25</summary><ol>{plan.days.map(task => <li key={task}>{task}</li>)}</ol></details>)}</section> : <p>All four modules reached the practice threshold. Check the official exam format and discuss readiness with your tutor before booking.</p>}
           <FullMockRecovery
             level="B2"
             sectionScores={finalScore.sectionScores}
@@ -1522,6 +1525,7 @@ function B2FinalMockExamPageAttempt() {
           <h2>B2 {getStageConfig(state.stage).module} · {getStageConfig(state.stage).title}</h2>
           <p>{getStageConfig(state.stage).intro}</p>
           <p><strong>Full mock: Lesen → Hören → Schreiben → Sprechen.</strong> Your final result appears only after all four modules.</p>
+          <details><summary>Official-format preparation and practice differences</summary><p>The course syllabus specifies Lesen (65 minutes, five parts), Hören (about 40 minutes), a 15–30 minute break before Schreiben (75 minutes), and Sprechen (about 15 minutes plus 15 minutes preparation). This online mock currently has four timed reading parts (54 minutes total), uses complete listening recordings, typed writing and recorded speaking with automated feedback. It is a diagnostic practice simulation, not an exact reproduction of the official examination. Take a 15–30 minute break before starting Schreiben and practise handwriting and live partner discussion separately.</p></details>
           <button type="button" onClick={start}>Start or continue {getStageConfig(state.stage).module} · Module {FULL_MOCK_SKILLS.findIndex((step) => step.key === getFullMockSkillForStage(state.stage)) + 1}/4</button>
         </section>
       ) : state.stage === "sprechen" ? (
