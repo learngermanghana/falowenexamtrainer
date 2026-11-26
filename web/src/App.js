@@ -11,6 +11,8 @@ import { getSwahiliCampusRoute, matchSwahiliPreview } from "./utils/swahiliCours
 import { SWAHILI_RESOURCE_SECTIONS, getCampusProgram, getProgramCampusTabs, getProgramAllowedSections, getProgramCourseRedirect } from "./utils/campusProgram";
 import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
+import ExamStudyPartner from "./components/ExamStudyPartner";
+import { canShowExamStudyPartner } from "./utils/examStudyPartner";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
 import { MOCK_EXAM_CATALOG } from "./data/mockExamCatalog";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -1859,6 +1861,7 @@ const ExamArea = ({ onBack }) => {
     },
   };
   const activeExamHero = examHeroConfig[examSection];
+  const allowExamStudyPartner = canShowExamStudyPartner({ level, section: examSection, sampleId, trial: Boolean(trialExam), isSwahili, allowed: visibleLevels.includes(level) });
   const tabLocked = key => Boolean(!isSwahili && trialExam && !["overview", "mocks"].includes(key));
 
 
@@ -1952,6 +1955,8 @@ const ExamArea = ({ onBack }) => {
           </small>
         </div>
 
+        {allowExamStudyPartner && ["overview", "lesen", "horen"].includes(examSection) && <ExamStudyPartner key={`${level}:${examSection}`} level={level} section={examSection} />}
+
         {!isSwahili && activeExamHero && examSection !== "speaking" ? (
           <section
             style={{
@@ -1982,8 +1987,8 @@ const ExamArea = ({ onBack }) => {
       {examSection === "overview" ? <ExamsOverviewPage dateInLevelPicker /> : null}
       {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
-      {examSection === "speaking" ? <SpeakingPage /> : null}
-      {examSection === "writing" ? <ExamWritingWorkspace /> : null}
+      {examSection === "speaking" ? <SpeakingPage allowExamStudyPartner={allowExamStudyPartner} /> : null}
+      {examSection === "writing" ? <ExamWritingWorkspace allowExamStudyPartner={allowExamStudyPartner} /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
       {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
       {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
