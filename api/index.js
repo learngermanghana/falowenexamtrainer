@@ -2,6 +2,7 @@ const swahiliB1Day27AudioHandler = require('../server/courseMusic.cjs').createSw
 const swahiliB1Day26AudioHandler = require('../server/courseMusic.cjs').createSwahiliB1Day26AudioHandler();
 const swahiliB1Day28AudioHandler = require('../server/courseMusic.cjs').createSwahiliB1Day28AudioHandler();
 const classroomBankAudioHandler = require('../server/courseMusic.cjs').createClassroomBankAudioHandler();
+const classroomRecordingPathHandler = require('../server/courseMusic.cjs').createClassroomRecordingPathHandler();
 const classroomAudioHandler = require('../server/courseMusic.cjs').createClassroomAudioHandler();
 const swahiliDayOneAudioHandler = require('../server/courseMusic.cjs').createSwahiliDayOneAudioHandler();
 const swahiliDayThreeAudioHandler = require('../server/courseMusic.cjs').createSwahiliDayThreeAudioHandler();
@@ -197,6 +198,10 @@ module.exports = (req, res) => {
   }
   if (req.url === "/course-media/swahili/a1/day-6/audio-url" || req.url?.startsWith("/course-media/swahili/a1/day-6/audio-url?")) {
     return swahiliDaySixAudioHandler(req, res);
+  }
+
+  if (/^\/course-media\/classroom\/(?:a2|b1|swahili-b1)\/[1-9][0-9]?\/audio-url$/.test(req.url?.split("?")[0] || "")) {
+    return classroomRecordingPathHandler(req, res);
   }
 
   if (req.url === "/course-media/classroom/audio-url" || req.url?.startsWith("/course-media/classroom/audio-url?")) {
