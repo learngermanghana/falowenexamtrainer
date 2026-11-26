@@ -55,7 +55,7 @@ test("A2 self-study and assessment exclusion remain distinct", () => {
   expect(prompt).toContain("self-learning material independently");
   expect(prompt).not.toContain("Official assignment reference");
   expect(isStudyPartnerLesson({ ...lesson, title: "Goethe A2 Speaking Mock" }, "A2")).toBe(false);
-  expect(buildStudyPrompt(lesson, "grammar", "", "C2")).toBe("");
+  expect(buildStudyPrompt(lesson, "grammar", "", "C2")).toContain("German C2 study partner");
 });
 
 test("B1 prompt uses the actual chapter and encourages connected language", () => {
@@ -115,7 +115,7 @@ test.each(VOICE_TEACHER_LEVELS)("voice teacher uses authorized %s lesson and bot
   expect(teacher).not.toContain("private-id");
   expect(teacher).not.toBe(speaking);
 });
-test("C1 voice uses canonical grammar and guiding question; orientation, mocks and C2 excluded", () => {
+test("C1 voice uses canonical grammar and guiding question; orientation and mocks excluded; C2 supported", () => {
   const lesson={kind:"practice",day:8,chapter:"2.3",title:"Wohnen und Stadtentwicklung",grammarFocus:"Nominalisierung",guidingQuestion:"Wie wollen wir wohnen?"};
   const prompt=buildVoiceTeacherPrompt(lesson,"voice-teacher","C1");
   expect(prompt).toContain("Grammar focus: Nominalisierung");
@@ -123,7 +123,7 @@ test("C1 voice uses canonical grammar and guiding question; orientation, mocks a
   expect(prompt).toContain("counterarguments");
   expect(buildVoiceTeacherPrompt({...lesson,day:0},"voice-teacher","C1")).toBe("");
   expect(buildVoiceTeacherPrompt({...lesson,day:29,title:"C1 Final Mock Exam"},"voice-teacher","C1")).toBe("");
-  expect(buildVoiceTeacherPrompt(lesson,"voice-teacher","C2")).toBe("");
+  expect(buildVoiceTeacherPrompt(lesson,"voice-teacher","C2")).toContain("German C2 study partner");
 });
 
 test.each(VOICE_TEACHER_LEVELS)("all %s lesson study and voice modes require source retrieval before teaching", level => {
@@ -138,3 +138,5 @@ test.each(VOICE_TEACHER_LEVELS)("all %s lesson study and voice modes require sou
     expect(prompt).not.toContain("continue with original topic-based practice");
   });
 });
+
+ test.each(VOICE_TEACHER_LEVELS)("all %s modes allow switching sections and chapters in one conversation",level=>{const lesson={kind:"practice",day:9,chapter:"4.9",title:"Public lesson"};for(const prompt of [buildStudyPrompt(lesson,"grammar","Grammar",level),buildVoiceTeacherPrompt(lesson,"voice-teacher",level,"Grammar")]){expect(prompt).toContain("STARTING POINT only");expect(prompt).toContain("Current workbook section: Grammar");expect(prompt).toContain("Teil 1");expect(prompt).toContain("verify the new returned level, day and chapter");expect(prompt).toContain("switch to text in this same conversation");expect(prompt).toContain("No need to reopen Falowen");}});
