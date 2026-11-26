@@ -16,3 +16,13 @@ export function isOwnerTestingCoursePath(path,level,program){
   const explicit=value.match(/(?:^|[/-])([abc][12])(?=[/-]|$)/i)?.[1]?.toUpperCase();
   return (explicit || (swahili?"A1":level))===level;
 }
+
+ // Use exact stored class names because the discussion board is keyed by name, not class ID.
+export function testingClassOptions(rows,program,level){
+  if(!ownerTestingLevels(program).includes(level))return [];
+  return (Array.isArray(rows)?rows:[]).map(row=>{
+    const language=String(row.language||row.program||"german").trim().toLowerCase().replace(/^kiswahili$/,"swahili");
+    return {id:String(row.id||""),name:String(row.name||row.className||row.classId||"").trim(),program:language,level:String(row.levelId||row.level||row.courseLevel||row.languageLevel||"").trim().toUpperCase(),status:String(row.status||"")};
+  }).filter(row=>row.id&&row.name&&!row.name.includes("/")&&row.program===program&&row.level===level)
+    .sort((a,b)=>a.name.localeCompare(b.name)||a.id.localeCompare(b.id));
+}
