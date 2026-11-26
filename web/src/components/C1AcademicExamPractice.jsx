@@ -17,10 +17,11 @@ function ExamExercise({ lesson }) {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showModel, setShowModel] = useState(false);
-  const [played, setPlayed] = useState(false);
+  const [played, setPlayed] = useState(0);
   const [notice, setNotice] = useState("");
   const [speaking, setSpeaking] = useState(false);
   const audio = lesson.skill === "Hören";
+  const maxPlays = lesson.part === 2 || lesson.part === 4 ? 2 : 1;
   useEffect(() => () => { if (audio && typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel(); }, [audio]);
   const play = () => {
     const engine = typeof window !== "undefined" ? window.speechSynthesis : null;
@@ -30,18 +31,18 @@ function ExamExercise({ lesson }) {
     if (!voice) { setNotice("Keine lokale deutsche Stimme verfügbar. Bitte eine Lehrkraft vorlesen lassen oder das Transkript als Lesetraining nutzen."); return; }
     const speech = new Voice(lesson.text); speech.lang = "de-DE"; speech.voice = voice; speech.rate = 0.95;
     speech.onend = () => setSpeaking(false);
-    speech.onerror = () => { setSpeaking(false); setPlayed(false); setNotice("Wiedergabe fehlgeschlagen. Bitte erneut versuchen oder eine Lehrkraft vorlesen lassen."); };
-    setNotice(""); setPlayed(true); setSpeaking(true); engine.speak(speech);
+    speech.onerror = () => { setSpeaking(false); setPlayed(0); setNotice("Wiedergabe fehlgeschlagen. Bitte erneut versuchen oder eine Lehrkraft vorlesen lassen."); };
+    setNotice(""); setPlayed(n => n + 1); setSpeaking(true); engine.speak(speech);
   };
-  const reset = () => { if (audio && window.speechSynthesis) window.speechSynthesis.cancel(); setSpeaking(false); setPlayed(false); setChecked(false); setAnswers({}); setNotice(""); };
+  const reset = () => { if (audio && window.speechSynthesis) window.speechSynthesis.cancel(); setSpeaking(false); setPlayed(0); setChecked(false); setAnswers({}); setNotice(""); };
   const score = lesson.questions?.filter((q,i) => answers[i] === q[2]).length;
   return <section style={panel} data-c1-academic-practice={lesson.day}>
     <h2 style={{ margin: 0 }}>{lesson.skill} · Teil {lesson.part} · Prüfungstraining</h2>
     <strong>{lesson.title}</strong><p style={{ margin: 0 }}>{lesson.instruction}</p>
-    {audio ? <><p style={{ margin: 0 }}>Übung mit lokaler Browserstimme oder Lehrkraft, keine offizielle Prüfungsaufnahme. Lesen Sie zuerst die Aufgaben.</p><button type="button" onClick={play} disabled={played || checked} style={styles.primaryButton}>{speaking ? "Wiedergabe läuft" : played ? "Einmal abgespielt" : "Podcast hören"}</button>{notice && <p role="status">{notice}</p>}</> : lesson.text && <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{lesson.text}</p>}
+    {audio ? <><p style={{ margin: 0 }}>Übung mit lokaler Browserstimme oder Lehrkraft, keine offizielle Prüfungsaufnahme. Lesen Sie zuerst die Aufgaben.</p><button type="button" onClick={play} disabled={speaking || played >= maxPlays || checked} style={styles.primaryButton}>{speaking ? "Wiedergabe läuft" : played >= maxPlays ? "Wiedergabe abgeschlossen" : `Hören (${played + 1}/${maxPlays})`}</button>{notice && <p role="status">{notice}</p>}</> : lesson.text && <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{lesson.text}</p>}
     {lesson.questions ? <>
       {lesson.questions.map(([question, choices, correct, explanation], i) => <fieldset key={i} style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: 10 }} disabled={checked}>
-        <legend>{question}</legend>{choices.map((choice,j) => <label key={choice} style={{ display: "block", padding: "4px 0" }}><input type="radio" name={`c1-academic-${lesson.day}-${i}`} checked={answers[i] === j} onChange={() => setAnswers(old => ({ ...old, [i]: j }))} /> {choice}</label>)}
+        <legend>{question}</legend>{choices.map((choice,j) => <label key={choice} style={{ display: "block", padding: "4px 0" }}><input type="radio" name={`c1-academic-${lesson.day}-${i}`} checked={answers[i] === j} disabled={lesson.skill === "Lesen" && lesson.part === 3 && Object.entries(answers).some(([key,value]) => Number(key) !== i && value === j)} onChange={() => setAnswers(old => ({ ...old, [i]: j }))} /> {choice}</label>)}
         {checked && <p><strong>{answers[i] === correct ? "Richtig" : "Nicht richtig"} · Lösung: {choices[correct]}</strong> — {explanation}</p>}
       </fieldset>)}
       {checked ? <><p role="status"><strong>{score} / {lesson.questions.length} richtig</strong></p>{audio && <details><summary>Transkript und Belege</summary><p>{lesson.text}</p></details>}<button type="button" style={styles.linkButton} onClick={reset}>Erneut üben</button></> : <><button type="button" style={styles.primaryButton} disabled={speaking || Object.keys(answers).length !== lesson.questions.length} onClick={() => setChecked(true)}>Antworten überprüfen</button>{audio && <details><summary>Alternative: Transkript als Lesetraining</summary><p>{lesson.text}</p></details>}</>}

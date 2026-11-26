@@ -213,6 +213,7 @@ import LesenPage from "./components/LesenPage";
 import StudyCalendarPage from "./components/StudyCalendarPage";
 import QuestionOfDayPage from "./components/QuestionOfDayPage";
 import C1SelfLearningCourse from "./components/C1SelfLearningCourse";
+import C1ExamPreparationPage from "./components/C1ExamPreparationPage";
 import C1Day1WillkommenSelbstlernstartWorkbookPage from "./components/C1Day1WillkommenSelbstlernstartWorkbookPage";
 import C1Day10IntegrationUndGesellschaftGrammarNotesPage from "./components/C1Day10IntegrationUndGesellschaftGrammarNotesPage";
 import C1Day10IntegrationUndGesellschaftWorkbookPage from "./components/C1Day10IntegrationUndGesellschaftWorkbookPage";
@@ -1285,6 +1286,7 @@ const AppShell = ({
           <Route path="/campus/course/b2-final-mock-exam" element={<B2FinalMockExamPage />} />
           <Route path="/campus/course/b1-day-29-goethe-exam-orientation" element={<B1FinalMockExamPage />} />
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
+          <Route path="/campus/course/c1-self-learning/exam-preparation" element={<C1ExamPreparationPage />} />
           <Route path="/campus/course/c1-self-learning/day-:dayId" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-day-1-willkommen-selbstlernstart-workbook" element={withRadioWorkbookGate("C1", 1, <C1Day1WillkommenSelbstlernstartWorkbookPage />)} />
           <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes" element={<B2Day1PersoenlicheIdentitaetGrammarNotesPage />} />

@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { C1AcademicGrammarPractice } from "./C1AcademicExamPractice";
 
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
@@ -37,6 +38,7 @@ const lesson = {
 
 export default function C1Day11GrammarNotes({ checked = false, onCheckedChange }) {
   return <div style={{ display: "grid", gap: 16 }}>
+    <C1AcademicGrammarPractice day={11} />
     <section style={card}><span style={{ ...styles.badge, width: "fit-content" }}>C1 · Day 11 · Grammar Notes</span><h2 style={{ ...styles.title, margin: 0, fontSize: "clamp(1.7rem,4vw,2.5rem)" }}>{lesson.title}</h2><p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>{lesson.subtitle}</p></section>
     <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>Warum brauchst du diese Grammatik auf C1?</h2><p style={{ margin: 0, lineHeight: 1.75 }}>{lesson.why}</p><NoteBox><strong>Nach dieser Lektion kannst du:</strong><ul style={{ ...listStyle, marginTop: 8 }}>{lesson.goals.map((goal) => <li key={goal}>{goal}</li>)}</ul></NoteBox></section>
     <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>Kernstrukturen</h2><Table rows={lesson.rows} /></section>
