@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1AcademicExamPractice from "./C1AcademicExamPractice";
+import { C1PreparationLink } from "./C1ExamPreparationPage";
 import C1Day27To28GrammarNotes from "./C1Day27To28GrammarNotes";
 import C1TopicCollocationPractice from "./C1TopicCollocationPractice";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
@@ -56,6 +57,6 @@ export default function C1Day27To28GuidedLessonPage({ lesson, canonicalLesson = 
     {active === "speak" ? <Section title="Speaking builder"><C1AcademicExamPractice day={day} tab="speak" /><NoteBox tone="amber"><strong>Sprechfrage:</strong> {lesson.speakingBuilder?.question || lesson.speakingTopic || lesson.topic}</NoteBox><EmbeddedSpeechPracticePanel /><label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label></Section> : null}
     {active === "write" ? <Section title="Guided writing builder"><C1AcademicExamPractice day={day} tab="write" /><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={lesson} />{workbookUrl ? <a href={workbookUrl} style={{ ...styles.linkButton, width: "fit-content" }}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={lesson} workbookId={`C1-day-${day}`} /> : null}
-    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}><FinishSummary day={day} />{progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}<button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button></Section> : null}
+    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}><FinishSummary day={day} />{day === 28 && <C1PreparationLink />}{progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}<button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button></Section> : null}
   </div>;
 }
