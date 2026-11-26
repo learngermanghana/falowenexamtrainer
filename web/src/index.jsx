@@ -41,6 +41,7 @@ import A1SpeakingExamIntroEntryRoute, {
   A1_SPEAKING_EXAM_INTRO_ENTRY_PATH,
 } from './components/A1SpeakingExamIntroEntryRoute';
 import A2Day27DigitaleKommunikationGrammarPage from './components/A2Day27DigitaleKommunikationGrammarPage';
+import A2StudyMaterialLayout from './components/A2StudyMaterialLayout';
 import { A1_CANONICAL_LESSON_CATALOG } from './data/a1CanonicalLessonCatalog';
 import reportWebVitals from './reportWebVitals';
 import { getProgramCourseRedirect } from './utils/campusProgram';
@@ -147,7 +148,7 @@ const AuthenticatedAppRoutes = () => (
             />
             <Route
               path={A2_DAY27_GRAMMAR_ROUTE}
-              element={<A2Day27DigitaleKommunikationGrammarPage />}
+              element={<A2StudyMaterialLayout day={27}><A2Day27DigitaleKommunikationGrammarPage /></A2StudyMaterialLayout>}
             />
             <Route path="*" element={<App />} />
           </Routes>
