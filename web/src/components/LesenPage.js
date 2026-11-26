@@ -71,7 +71,7 @@ const SampleList = ({ level, samples, onOpen }) => (
   </section>
 );
 
-const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
+const LesenPage = ({ practiceLevel = "", sampleId = "", allowExamMistakeReview = false }) => {
   const navigate = useNavigate();
   const openReadingSample = (route, message = "Lesen practice opened successfully.") => {
     announceExamSuccess(message);
@@ -114,15 +114,15 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
     }
 
     return normalizedLevel === "C1" ? (
-      <C1ReadingPracticeSamples initialSampleId={selected.id} standalone />
+      <C1ReadingPracticeSamples initialSampleId={selected.id} standalone allowExamMistakeReview={allowExamMistakeReview} />
     ) : normalizedLevel === "B2" ? (
-      <B2ReadingPracticeSamples initialSampleId={selected.id} standalone />
+      <B2ReadingPracticeSamples initialSampleId={selected.id} standalone allowExamMistakeReview={allowExamMistakeReview} />
     ) : normalizedLevel === "B1" ? (
-      <B1ReadingPracticeSamples initialSampleId={selected.id} standalone />
+      <B1ReadingPracticeSamples initialSampleId={selected.id} standalone allowExamMistakeReview={allowExamMistakeReview} />
     ) : normalizedLevel === "A2" ? (
-      <A2ReadingPracticeSamples initialSampleId={selected.id} standalone />
+      <A2ReadingPracticeSamples initialSampleId={selected.id} standalone allowExamMistakeReview={allowExamMistakeReview} />
     ) : (
-      <A1ReadingPracticeSamples initialSampleId={selected.id} standalone />
+      <A1ReadingPracticeSamples initialSampleId={selected.id} standalone allowExamMistakeReview={allowExamMistakeReview} />
     );
   }
 

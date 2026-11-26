@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import { weakestScoredExamPart } from "../utils/examStudyPartner";
 import React, {useEffect,useMemo,useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../context/AuthContext";
@@ -41,7 +43,7 @@ const labelOf=value=>({a:"A",b:"B",c:"C",d:"D",e:"E",f:"F",g:"G",h:"H"})[value]|
 const optionsFor=n=>n<=9?["a","b","c","d"]:n<=15?["a","b","c","d","e","f","g","h"]:["a","b","c"];
 const format=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
 
-export default function B2ReadingPracticeSamples({initialSampleId="",standalone=false}){
+export default function B2ReadingPracticeSamples({initialSampleId="",standalone = false, allowExamMistakeReview = false}){
  const navigate=useNavigate();
  const {user,idToken,studentProfile}=useAuth();
  const [selected,setSelected]=useState(initialSampleId||tests[0].id);
@@ -116,7 +118,8 @@ export default function B2ReadingPracticeSamples({initialSampleId="",standalone=
   </section>
   <footer className="b1-final-paper">
    {!submitted?<><p>Complete all 30 questions before checking your answers.</p><button className="b1-final-primary" type="button" disabled={count!==30||remaining===0||sourceBlocked||!startedSample} onClick={submit}>Check answers ({count}/30)</button></>:
-   <div role="status"><h2>Result: {score}/30 · {pct}% · {getReadingReadinessLabel(pct)}</h2><p>{weakest?"Practise next: "+weakest.label:""}</p><p>{sectionScores.map(x=>x.label+": "+x.score+"/"+x.total).join(" · ")}</p><p>{sync[sample.id]==="saved"?"Your result is synced.":sync[sample.id]==="saving"?"Syncing result…":sync[sample.id]==="failed"?"Cloud sync not confirmed.":"Practice submitted."}</p><button type="button" onClick={reset}>Try again</button></div>}
+   <div role="status"><h2>Result: {score}/30 · {pct}% · {getReadingReadinessLabel(pct)}</h2><p>{weakest?"Practise next: "+weakest.label:""}</p><p>{sectionScores.map(x=>x.label+": "+x.score+"/"+x.total).join(" · ")}</p><p>{sync[sample.id]==="saved"?"Your result is synced.":sync[sample.id]==="saving"?"Syncing result…":sync[sample.id]==="failed"?"Cloud sync not confirmed.":"Practice submitted."}</p>{allowExamMistakeReview && <ExamMistakeReview level="B2" section="lesen" part={weakestScoredExamPart(sectionScores)} completed={submitted} />}
+              <button type="button" onClick={reset}>Try again</button></div>}
   </footer>
  </main>;
 }

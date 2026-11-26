@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import { weakestScoredExamPart } from "../utils/examStudyPartner";
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../context/AuthContext";
@@ -10,7 +12,7 @@ function readSaved(key){
   if(!key)return {};
   try{return JSON.parse(localStorage.getItem(key)||"{}")||{};}catch{return {};}
 }
-function PracticeAttempt({mockNumber,idToken,uid}){
+function PracticeAttempt({mockNumber,idToken,uid,allowExamMistakeReview}){
   const navigate=useNavigate();
   const mockId=`a2-mock-0${mockNumber}`;
   const storageKey=uid?`falowen:a2:hoeren-only:${mockId}:${uid}:v1`:null;
@@ -62,6 +64,7 @@ function PracticeAttempt({mockNumber,idToken,uid}){
     {result?<section style={{...styles.card,display:"grid",gap:8}} role="status" aria-live="polite">
       <h2 style={{margin:0}}>Hören result: {result.correct}/20 · {result.percent}%</h2>
       <p style={{margin:0}}>Teil 1: {result.partScores.teil1}/5 · Teil 2: {result.partScores.teil2}/5 · Teil 3: {result.partScores.teil3}/5 · Teil 4: {result.partScores.teil4}/5</p>
+      {allowExamMistakeReview && <ExamMistakeReview level="A2" section="horen" completed={Boolean(result)} part={weakestScoredExamPart(Object.entries(result.partScores || {}).map(([label,score])=>({label,score,total:5})))} />}
       {saveStatus==="saved"?<small>Practice result saved to your Exam File.</small>:null}
       {saveStatus==="saving"?<small>Saving result…</small>:null}
       {saveStatus==="failed"?<small>Your verified score is shown here, but the Exam File could not be updated.</small>:null}
@@ -72,9 +75,9 @@ function PracticeAttempt({mockNumber,idToken,uid}){
     </section>:null}
   </main>;
 }
-export default function A2MockListeningPractice({mockNumber}){
+export default function A2MockListeningPractice({mockNumber,allowExamMistakeReview=false}){
   const {user,idToken}=useAuth();
   if(![4,5,6,7,8].includes(mockNumber))return <p role="alert">This A2 Hören sample is not available.</p>;
   return <PracticeAttempt key={`${user?.uid||"guest"}-${mockNumber}`}
-    mockNumber={mockNumber} idToken={idToken} uid={user?.uid||null}/>;
+    mockNumber={mockNumber} idToken={idToken} uid={user?.uid||null} allowExamMistakeReview={allowExamMistakeReview}/>;
 }

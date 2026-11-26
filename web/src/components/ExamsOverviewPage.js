@@ -1,3 +1,5 @@
+import ExamStudyPartner from "./ExamStudyPartner";
+import { getExamRevisionFocus, safeExamPart } from "../utils/examStudyPartner";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExam } from "../context/ExamContext";
@@ -14,7 +16,7 @@ import { useAccessLock, examLockInfo } from "./AccessLockDialog";
 import { TrialExam } from "../context/TrialCatalogContext";
 
 const sectionIcons = { lesen: "📖", hoeren: "🎧", schreiben: "✍️", sprechen: "🎤" };
-export default function ExamsOverviewPage({ dateInLevelPicker = false }) {
+export default function ExamsOverviewPage({ dateInLevelPicker = false, allowExamStudyPartner = false }) {
   const trialExam = React.useContext(TrialExam);
   const isTrial = Boolean(trialExam);
   const { openLock, lockDialog } = useAccessLock();
@@ -39,6 +41,8 @@ export default function ExamsOverviewPage({ dateInLevelPicker = false }) {
     [currentLevel, cloudResults, localReading],
   );
   const nextActivity = examNextActivity(coach, trialExam);
+  const revisionFocus = !loading && !loadIssue ? getExamRevisionFocus(coach) : null;
+  const completedSkills = Object.fromEntries(Object.entries({lesen:"lesen",hoeren:"horen",schreiben:"writing",sprechen:"speaking"}).filter(([key])=>coach.latestBySection[key]).map(([key,section])=>[section,safeExamPart(coach.weakParts[key])]));
   const explainLock = (title, event) => openLock(examLockInfo({ title, trialExam, level: currentLevel, examOnly: studentProfile?.accountType === "exam_only" }), event);
   const hasFullMock = useMemo(
     () => getMockExamsForLevel(currentLevel, { includeCourse: true })
@@ -74,6 +78,7 @@ export default function ExamsOverviewPage({ dateInLevelPicker = false }) {
         <h2>Your {currentLevel} exam room</h2>
         {user?.uid && !dateInLevelPicker && <PersonalExamCountdown key={historyKey} uid={user.uid} level={currentLevel} compact />}
       </header>
+      {allowExamStudyPartner && !isTrial && <ExamStudyPartner key={historyKey} level={currentLevel} section="overview" revisionFocus={revisionFocus} completedSkills={completedSkills} />}
 
       <button
         type="button"

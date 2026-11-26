@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import { weakestScoredExamPart } from "../utils/examStudyPartner";
 import React, { useMemo, useState } from "react";
 import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresentation";
 import { useNavigate } from "react-router-dom";
@@ -415,7 +417,7 @@ const BinaryOptions = ({ name, value, onChange, disabled, labels }) => (
   </div>
 );
 
-export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "sample-1", mockId = "", freeTrial = false }) {
+export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "sample-1", mockId = "", freeTrial = false, allowExamMistakeReview = false }) {
   const navigate = useNavigate();
   const { idToken } = useAuth();
   const requestedLevel = String(level || "A1").toUpperCase();
@@ -800,6 +802,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
               <p style={{ margin: "5px 0 0" }}>
                 Result: <strong>{score}/{questions.length}</strong> · {percent}%
               </p>
+              {allowExamMistakeReview && !freeTrial && !mockId && <ExamMistakeReview level={normalizedLevel} section="horen" completed={submitted} part={weakestScoredExamPart(parts.map((part,index)=>{const qs=questions.filter(q=>q.key.startsWith(part.key+"-"));return {label:"Teil "+(index+1),total:qs.length,score:qs.filter(q=>String(answers[q.key]||"").toLowerCase()===String(q.answer).toLowerCase()).length};}))} />}
               {resultSyncStatus === "trial" ? <small>Your free sample result is displayed here; it is not saved to a Falowen account.</small> : null}
               {resultSyncStatus === "saving" ? <small>Saving result…</small> : null}
               {resultSyncStatus === "saved" ? <small>Result saved.</small> : null}

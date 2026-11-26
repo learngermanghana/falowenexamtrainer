@@ -1862,6 +1862,8 @@ const ExamArea = ({ onBack }) => {
   };
   const activeExamHero = examHeroConfig[examSection];
   const allowExamStudyPartner = canShowExamStudyPartner({ level, section: examSection, sampleId, trial: Boolean(trialExam), isSwahili, allowed: visibleLevels.includes(level) });
+  const sampleReviewLevel = String(practiceLevel || level || "").toUpperCase();
+  const allowExamMistakeReview = Boolean(sampleId && canShowExamStudyPartner({ level: sampleReviewLevel, section: examSection, trial: Boolean(trialExam), isSwahili, allowed: visibleLevels.includes(sampleReviewLevel) }));
   const tabLocked = key => Boolean(!isSwahili && trialExam && !["overview", "mocks"].includes(key));
 
 
@@ -1955,7 +1957,7 @@ const ExamArea = ({ onBack }) => {
           </small>
         </div>
 
-        {allowExamStudyPartner && ["overview", "lesen", "horen"].includes(examSection) && <ExamStudyPartner key={`${level}:${examSection}`} level={level} section={examSection} />}
+        {allowExamStudyPartner && ["lesen", "horen"].includes(examSection) && <ExamStudyPartner key={`${level}:${examSection}`} level={level} section={examSection} />}
 
         {!isSwahili && activeExamHero && examSection !== "speaking" ? (
           <section
@@ -1984,14 +1986,14 @@ const ExamArea = ({ onBack }) => {
       </div>
 
       {isSwahili ? <SwahiliExamSection level={level} section={examSection} /> : <>
-      {examSection === "overview" ? <ExamsOverviewPage dateInLevelPicker /> : null}
+      {examSection === "overview" ? <ExamsOverviewPage dateInLevelPicker allowExamStudyPartner={allowExamStudyPartner} /> : null}
       {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
       {examSection === "speaking" ? <SpeakingPage allowExamStudyPartner={allowExamStudyPartner} /> : null}
       {examSection === "writing" ? <ExamWritingWorkspace allowExamStudyPartner={allowExamStudyPartner} /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
-      {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
-      {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
+      {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} allowExamMistakeReview={allowExamMistakeReview} /> : null}
+      {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} allowExamMistakeReview={allowExamMistakeReview} /> : null}
       {examSection === "file" ? <MyExamFilePage /> : null}
       </>}
     </>
