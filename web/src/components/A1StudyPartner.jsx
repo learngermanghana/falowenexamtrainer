@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { A1_STUDY_MODES, A1_VOICE_MODES, buildA1VoiceTeacherPrompt, buildStudyPrompt, buildA1ChatGPTUrl, isStudyPartnerLesson } from "../utils/a1StudyPartner";
+import { A1_STUDY_MODES, A1_VOICE_MODES, VOICE_TEACHER_LEVELS, buildVoiceTeacherPrompt, buildStudyPrompt, buildA1ChatGPTUrl, isStudyPartnerLesson } from "../utils/a1StudyPartner";
 
 import { useAssessmentRestricted } from "../hooks/useAssessmentRestriction";
 
@@ -11,9 +11,9 @@ export default function StudyPartner({ lesson, section = "", level = "A1" }) {
   const assessmentRestricted = useAssessmentRestricted();
   if (assessmentRestricted || !isStudyPartnerLesson(lesson, level)) return null;
 
-  const voiceMode = level === "A1" && A1_VOICE_MODES.some(item => item.key === mode);
-  const prompt = voiceMode ? buildA1VoiceTeacherPrompt(lesson, mode, level) : buildStudyPrompt(lesson, mode, section, level);
-  const options = level === "A1" ? [...A1_VOICE_MODES, ...A1_STUDY_MODES] : A1_STUDY_MODES;
+  const voiceMode = VOICE_TEACHER_LEVELS.includes(level) && A1_VOICE_MODES.some(item => item.key === mode);
+  const prompt = voiceMode ? buildVoiceTeacherPrompt(lesson, mode, level) : buildStudyPrompt(lesson, mode, section, level);
+  const options = VOICE_TEACHER_LEVELS.includes(level) ? [...A1_VOICE_MODES, ...A1_STUDY_MODES] : A1_STUDY_MODES;
   const copyPrompt = async () => {
     try {
       await navigator.clipboard.writeText(prompt);
