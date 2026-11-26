@@ -268,3 +268,19 @@ describe("B2 Final Mock Lesen", () => {
     expect(app).toContain('path="/campus/course/b2-final-mock-exam" element={<B2FinalMockExamPage />}');
   });
 });
+
+
+test("new B2 reading has all 30 questions, regulation matching and a shared 65-minute deadline", () => {
+  const page = fs.readFileSync(path.resolve(__dirname, "./B2FinalMockExamPage.jsx"), "utf8");
+  expect(B2_READING.teil5.questions.map(q => q.number)).toEqual([28,29,30]);
+  expect(B2_READING.teil5.headings).toHaveLength(8);
+  expect(new Set(B2_READING.teil5.questions.map(q => q.answer)).size).toBe(3);
+  expect(B2_READING.teil5.questions.every(q => q.answer !== B2_READING.teil5.example.answer && B2_READING.teil5.headings.some(h => h.id === q.answer))).toBe(true);
+  expect(B2_READING.teil1.questions.length + Object.keys(B2_READING.teil2.answers).length + B2_READING.teil3.questions.length + B2_READING.teil4.questions.length + B2_READING.teil5.questions.length).toBe(30);
+  expect(page).toContain("READING_SECONDS = 65 * 60");
+  expect(page).toContain("LISTENING_SECONDS = 40 * 60");
+  expect(page).toContain("readingFormatVersion: parsed.readingFormatVersion === 2 ? 2 : 1");
+  expect(page).toContain("usesFullReading(state) ? B2_READING.teil5.questions.map");
+  expect(page).toContain("deadlineMs: usesFullReading(current) ? current.deadlineMs");
+  expect(page).toContain("disabled={breakRemaining > 0}");
+});

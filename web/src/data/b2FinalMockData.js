@@ -332,6 +332,28 @@ export const B2_READING = Object.freeze({
       },
     ],
   },
+  teil5: {
+    title: "Teil 5",
+    time: "Vorgeschlagene Arbeitszeit: 6 Minuten",
+    intro: "Lesen Sie die Benutzungsordnung eines kommunalen Lernzentrums. Ordnen Sie den Paragraphen 28 bis 30 die passenden Überschriften A–H zu. Vier Überschriften bleiben übrig; C ist das Beispiel.",
+    regulationTitle: "Benutzungsordnung des Lernzentrums (fiktiver Übungstext)",
+    headings: [
+      { id: "A", text: "Verlängerung der Ausleihfrist" },
+      { id: "B", text: "Zugang zu den Arbeitsplätzen" },
+      { id: "C", text: "Öffnungszeiten" },
+      { id: "D", text: "Umgang mit personenbezogenen Daten" },
+      { id: "E", text: "Teilnahme an Kursangeboten" },
+      { id: "F", text: "Ersatz bei Verlust oder Beschädigung" },
+      { id: "G", text: "Rückgabe außerhalb der Öffnungszeiten" },
+      { id: "H", text: "Anmeldung und Nutzerausweis" },
+    ],
+    example: { text: "Das Lernzentrum ist montags bis freitags von 9 bis 20 Uhr geöffnet. An gesetzlichen Feiertagen bleibt es geschlossen.", answer: "C" },
+    questions: [
+      { number: 28, text: "Wer zum ersten Mal Medien entleihen möchte, muss sich persönlich registrieren. Dazu sind ein gültiger Identitätsnachweis und eine aktuelle Anschrift vorzulegen. Nach erfolgreicher Registrierung wird eine Karte ausgestellt, die nicht auf andere Personen übertragen werden darf.", answer: "H" },
+      { number: 29, text: "Sofern kein anderer Nutzer ein entliehenes Medium vorgemerkt hat, kann die vereinbarte Leihdauer vor ihrem Ablauf einmal um weitere zwei Wochen erweitert werden. Der Antrag ist über das Nutzerkonto zu stellen. Bereits überfällige Medien sind zunächst zurückzugeben.", answer: "A" },
+      { number: 30, text: "Wer ausgeliehene Geräte oder Bücher nicht mehr zurückgeben kann oder diese durch unsachgemäße Behandlung unbrauchbar macht, hat die Kosten für eine gleichwertige Neuanschaffung zu tragen. Normale Gebrauchsspuren gelten nicht als Schaden.", answer: "F" },
+    ],
+  },
 });
 
 export const B2_LISTENING = Object.freeze({

@@ -52,3 +52,13 @@ test("a delayed B2 AI score updates the same document once and stores no media",
   assert.equal(record.sections.schreiben.score,18);
   assert.ok(!JSON.stringify(record).includes("audio"));
 });
+
+test("B2 version two retains reading Teil 5 without changing legacy backup shape", () => {
+  const input = {submittedAt:completed, readingFormatVersion:2, teil5Answers:{28:"H",29:"A",30:"F"}};
+  const result = validateBackup("b2-final-mock","lesen",input);
+  assert.equal(result.readingFormatVersion,2);
+  assert.deepEqual(result.teil5Answers,input.teil5Answers);
+  const old = validateBackup("b2-final-mock","lesen",{submittedAt:completed});
+  assert.equal(old.readingFormatVersion,undefined);
+  assert.equal(old.teil5Answers,undefined);
+});

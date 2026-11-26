@@ -77,10 +77,11 @@ export function submittedB2Sections(state = {}) {
   const started = state.attemptStartedAtMs;
   if (!started) return [];
   const data = [];
-  if (state.teil4Completed) data.push(["lesen", {
+  if (state.readingFormatVersion === 2 ? state.teil5Completed : state.teil4Completed) data.push(["lesen", {
     submittedAt: Number(state.lesenSubmittedAt) || started,
     teil1Answers: state.teil1Answers || {}, teil2Answers: state.teil2Answers || {},
     teil3Answers: state.teil3Answers || {}, teil4Answers: state.teil4Answers || {},
+    ...(state.readingFormatVersion === 2 ? {readingFormatVersion:2, teil5Answers:state.teil5Answers || {}} : {}),
   }]);
   if (state.hoeren4Completed) data.push(["hoeren", {
     submittedAt: Number(state.hoerenSubmittedAt) || started,
@@ -113,6 +114,9 @@ export function restoreB2Backup(local, response) {
     if (name === "lesen") {
       ["teil1Answers","teil2Answers","teil3Answers","teil4Answers"].forEach(key => {copy[key] = section[key] || {}});
       copy.teil4Completed = true;
+      copy.readingFormatVersion = section.readingFormatVersion === 2 ? 2 : 1;
+      copy.teil5Answers = section.teil5Answers || {};
+      copy.teil5Completed = copy.readingFormatVersion === 2;
       copy.lesenSubmittedAt = section.submittedAt;
       copy.stage = "hoeren-teil1";
     }
