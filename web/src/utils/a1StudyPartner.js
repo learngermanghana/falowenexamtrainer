@@ -11,7 +11,7 @@ export const A1_STUDY_MODES = Object.freeze([
 const clean = value => String(value ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
 
 export function isStudyPartnerLesson(lesson = {}, level = "A1") {
-  return Boolean(["A1", "A2", "B1"].includes(level) && clean(lesson.title) && Number.isInteger(Number(lesson.day)) && Number(lesson.day) > 0
+  return Boolean(["A1", "A2", "B1", "B2"].includes(level) && (level !== "B2" || Number(lesson.day) <= 28) && clean(lesson.title) && Number.isInteger(Number(lesson.day)) && Number(lesson.day) > 0
     && clean(lesson.chapter) && !/final mock|speaking mock|abschlussprüfung/i.test(lesson.title)
     && !/final-mock-exam/i.test(lesson.destination || lesson.workbookRoute || ""));
 }
@@ -30,7 +30,10 @@ export function buildStudyPrompt(lesson, mode = "explain", section = "", level =
     source,
     clean(section) ? "Current workbook section: " + clean(section) + "." : "",
     "If my Falowen Learning Companion is connected, retrieve this exact lesson by level, day and chapter" + (assignment ? " and assignment reference" : "") + ". Use learner-facing material only. If it is unavailable, tell me and use the topic above, without pretending you have read the lesson.",
+    level === "B2" && clean(lesson.grammarFocus) ? "Grammar focus: " + clean(lesson.grammarFocus) + "." : "",
+    level === "B2" && clean(lesson.skillFocus) ? "Today's exam skill: " + clean(lesson.skillFocus) + "." : "",
     option.instruction.replace(/\bA1\b/g, level),
+    level === "B2" ? "Use B2-level vocabulary, collocations and complex but natural sentences. Train the current skill with fresh Goethe-style tasks: reading paraphrases and evidence, listening for detail using audio only when available, structured presentations and discussions, or forum posts and formal messages. Do not claim a text-only exercise is listening practice." : "",
     level === "B1" ? "Encourage connected sentences, reasons, examples and appropriate register. For speaking, practise expressing opinions, planning together and responding to follow-up questions; for writing, practise coherent organisation and connectors." : "",
     "Use German appropriate for " + level + ", with short English explanations when helpful. Ask one question at a time, wait for my reply, correct my mistakes and explain why.",
     "Use fresh practice examples and hints. Do not provide official assignment answers, answer keys, complete my submission, save official marks, or start an exam. Ask for my own attempt first.",
