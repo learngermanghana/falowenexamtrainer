@@ -37,12 +37,15 @@ const savedMessages = session => (Array.isArray(session.messages) ? session.mess
 const answerLimit = session => session.examFlow ? taskFlows.maxAnswers(session) : EXAM_ANSWER_LIMIT;
 const turnLimit = session => session.examFlow?.key === "A2-1" ? 14 : MAX_TURNS;
 const audioAllowance = session => {
-  if (session.examFlow?.key === "B2-1") return 3 * MAX_AUDIO_BYTES;
-  if (/^C[12]-/.test(session.examFlow?.key || "")) {
-    const totalSeconds=(taskFlows.profileFor(session.examFlow)?.seconds || []).reduce((a,b)=>a+b,0);
-    return Math.min(3*MAX_LONG_AUDIO_BYTES,Math.max(EXAM_AUDIO_BYTE_ALLOWANCE,totalSeconds*3500));
-  }
-  return EXAM_AUDIO_BYTE_ALLOWANCE;
+  if (!session.examFlow) return EXAM_AUDIO_BYTE_ALLOWANCE;
+  // Budget one permitted upload for every server-owned answer step.
+  // The old two-upload cap could block A1/A2 dialogues halfway through.
+  // Keep existing turn, time, upload and provider accounting limits.
+  if (session.examFlow.key === "B1-2") return EXAM_AUDIO_BYTE_ALLOWANCE;
+  const plannedBytes = Array.from({length:answerLimit(session)}, (_, answeredTurns) =>
+    stepAudioBytes({...session, answeredTurns})
+  ).reduce((sum, bytes) => sum + bytes, 0);
+  return Math.max(EXAM_AUDIO_BYTE_ALLOWANCE, plannedBytes);
 };
 const transcriptLimit = session => session.examFlow
   ? (["B2-1","C1-1","C2-1"].includes(session.examFlow?.key) ? 6400 : recordingSeconds(session)>=120 ? MAX_FLOW_CHARS : recordingSeconds(session)>=60 ? 2400 : 800)
@@ -68,6 +71,7 @@ const sessionView = session => ({
   answerLimit: examiner(session) ? answerLimit(session) : null,
   examFlow: taskFlows.publicFlow(session), assessment: session.assessment || null,
   maxAudioBytes: recordingUploadLimit(session),
+  remainingAudioBytes: Math.max(0, audioAllowance(session) - (Number(session.audioBytesUsed) || 0)),
   maxRecordingSeconds: recordingSeconds(session),
   maxTranscriptChars: transcriptLimit(session),
   taskReady: examiner(session) && (Boolean(session.taskReady) || Number(session.answeredTurns) >= answerLimit(session)),
