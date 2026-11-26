@@ -42,7 +42,9 @@ function validateBackup(mockId, section, input) {
   if (mockId === "a2-mock-02") return {submittedAt: at, answers: answers(input.answers,20)};
   const names = section === "lesen" ? ["teil1Answers","teil2Answers","teil3Answers","teil4Answers"]
     : ["hoeren1Answers","hoeren2Answers","hoeren3Answers","hoeren4Answers"];
-  return { submittedAt: at, ...Object.fromEntries(names.map(name => [name, answers(input[name] || {}, 25)])) };
+  const newReading = section === "lesen" && input.readingFormatVersion === 2;
+  if (newReading) names.push("teil5Answers");
+  return { submittedAt: at, ...Object.fromEntries(names.map(name => [name, answers(input[name] || {}, name === "teil5Answers" ? 3 : 25)])), ...(newReading ? {readingFormatVersion:2} : {}) };
 }
 function publicBackup(data = {}) {
   return {
