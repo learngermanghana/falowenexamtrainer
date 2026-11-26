@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import A1StudyPartner from "./A1StudyPartner";
 import { styles } from "../styles";
 
 const pageStyle = {
@@ -379,6 +380,8 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
           Work straight down this page. There are no separate Teil tabs. Learn the language, practise it immediately,
           then finish with a short paragraph about yourself and your family.
         </p>
+
+        <A1StudyPartner lesson={{ kind: "practice", day: 6, chapter: "2.3", title: "Family, Languages, Questions and Hobbies" }} />
 
         <div style={infoBoxStyle}>
           <strong>By the end of this lesson you should be able to:</strong>
