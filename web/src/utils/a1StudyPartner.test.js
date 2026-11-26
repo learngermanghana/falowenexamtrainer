@@ -1,3 +1,4 @@
+import { A1_VOICE_MODES, buildA1VoiceTeacherPrompt } from "./a1StudyPartner";
 import { buildStudyPrompt, isStudyPartnerLesson, A1_STUDY_MODES, buildA1StudyPrompt, buildA1ChatGPTUrl, isA1StudyPartnerLesson } from "./a1StudyPartner";
 
 const teacher = { kind: "assignment", day: 17, chapter: "11", title: "Instructions", assignmentKey: "A1-11", uid: "private-user", answers: "private-answer", token: "private-token" };
@@ -80,4 +81,24 @@ test("B2 uses public grammar and skill metadata and excludes final mock", () => 
   expect(prompt).toContain("Today's exam skill: Lesen");
   expect(prompt).not.toContain("private-");
   expect(buildStudyPrompt({ ...lesson, day: 29, title: "B2 Final Mock Exam" }, "grammar", "", "B2")).toBe("");
+});
+
+test("A1 voice teacher retrieves authorised exact lesson and never transfers student fields", () => {
+  const prompt = buildA1VoiceTeacherPrompt(teacher);
+  expect(prompt).toContain("Day 17, Kapitel 11");
+  expect(prompt).toContain("A1-11");
+  expect(prompt).toContain("authorised revision levels");
+  expect(prompt).toContain("section overview");
+  expect(prompt).toContain("approximately 20-minute lesson");
+  expect(prompt).toContain("wait for my spoken answer");
+  expect(prompt).toContain("Never fetch protected exam material");
+  expect(prompt).not.toContain("private-");
+});
+test("voice modes are distinct, practice-only and limited to A1 pilot", () => {
+  const prompts = A1_VOICE_MODES.map(item => buildA1VoiceTeacherPrompt(independent,item.key));
+  expect(new Set(prompts).size).toBe(2);
+  expect(prompts[1]).toContain("patient speaking partner");
+  expect(buildA1VoiceTeacherPrompt(independent,"voice-teacher","A2")).toBe("");
+  expect(buildA1VoiceTeacherPrompt({...teacher,title:"A1 Final Mock Exam"})).toBe("");
+  expect(buildA1VoiceTeacherPrompt(independent,"unknown")).toBe("");
 });
