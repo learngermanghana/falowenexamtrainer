@@ -62,3 +62,13 @@ test("Kiswahili result email uses Kiswahili registration rather than German clas
   expect(result.html).not.toContain("Goethe");
   expect(result.html).not.toContain("Explore B1 classes");
 });
+
+test("B2 Kiswahili results include four section scores and admissions guidance",()=>{
+ const result=buildPlacementResultEmail({name:"Amina",language:"swahili",score:{a1:9,a2:9,b1:8,b2:7,total:33,level:"B2"}});
+ expect(result.subject).toContain("B2");
+ expect(result.text).toContain("33/40");
+ expect(result.text).toContain("B2 7/10");
+ expect(result.html).toContain("33/40");
+ expect(result.html).toContain("Contact Kiswahili admissions");
+ expect(result.html).not.toContain("signup?level=B2");
+});

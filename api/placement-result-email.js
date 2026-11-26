@@ -5,19 +5,21 @@ function buildPlacementResultEmail({name,score,language="german"}) {
   const isSwahili=language==="swahili";
   const languageLabel=isSwahili?"Kiswahili":"German";
   const disclaimer=isSwahili?"This is a preliminary placement recommendation, not an official CEFR certificate.":"This is a preliminary recommendation, not an official Goethe or CEFR certificate.";
-  const level=["A1","A2","B1"].includes(score?.level)?score.level:"A1";
+  const revised=isSwahili && Object.prototype.hasOwnProperty.call(score || {},"b2");
+  const level=(revised?["A1","A2","B1","B2"]:["A1","A2","B1"]).includes(score?.level)?score.level:"A1";
   const a1=safePoints(score?.a1),a2=safePoints(score?.a2),b1=safePoints(score?.b1);
-  const total=a1+a2+b1;
+  const b2=safePoints(score?.b2), max=revised?40:30;
+  const total=a1+a2+b1+(revised?b2:0);
   const who=String(name||"learner").trim().slice(0,120);
-  const signup="https://www.falowen.app/signup?level="+level+"&source=placement-test"+(isSwahili?"&program=swahili":"");
+  const signup=isSwahili&&level==="B2"?"https://wa.me/233205706589?text="+encodeURIComponent("Hello Falowen, my Kiswahili placement result is B2. Please help me confirm my level."):"https://www.falowen.app/signup?level="+level+"&source=placement-test"+(isSwahili?"&program=swahili":"");
   const subject="Your Falowen "+languageLabel+" placement result — "+level;
   const text=[
     "FALOWEN | "+languageLabel+" Language Hub","","Hello "+who+",",
     "Thank you for taking the Falowen "+languageLabel+" placement test.",
     "Recommended starting level: "+level,
-    "Score: "+total+"/30 (A1 "+a1+"/10, A2 "+a2+"/10, B1 "+b1+"/10).",
-    disclaimer,"",
-    (isSwahili?"Continue learning Kiswahili: ":"Choose your next class: ")+signup,
+    "Score: "+total+"/"+max+" (A1 "+a1+"/10, A2 "+a2+"/10, B1 "+b1+"/10"+(revised?", B2 "+b2+"/10":"")+").",
+    disclaimer+(revised?" Complete the writing or speaking follow-up with your teacher before final placement.":""),"",
+    (isSwahili?level==="B2"?"Contact Kiswahili admissions: ":"Continue learning Kiswahili: ":"Choose your next class: ")+signup,
     "Need help? Simply reply to this email.","Falowen Admissions — www.falowen.app"
   ].join("\n");
   const html=[
@@ -34,14 +36,15 @@ function buildPlacementResultEmail({name,score,language="german"}) {
     '<tr><td style="padding:0 32px 24px"><div style="background:#edf5ff;border:1px solid #d7e8ff;border-radius:12px;padding:24px">',
     '<div style="font-size:12px;font-weight:bold;color:#2f5d9f;letter-spacing:1px">RECOMMENDED LEVEL</div>',
     '<div style="font-size:54px;font-weight:800;color:#1553a8;margin:8px 0">'+level+'</div>',
-    '<div style="font-size:15px;color:#485a73">Your score: <strong>'+total+'/30 correct</strong></div></div></td></tr>',
+    '<div style="font-size:15px;color:#485a73">Your score: <strong>'+total+'/'+max+' correct</strong></div></div></td></tr>',
     '<tr><td style="padding:0 32px 25px"><div style="font-size:12px;font-weight:bold;color:#56647a;margin-bottom:12px">SCORE BREAKDOWN</div>',
     '<table role="presentation" width="100%" cellspacing="0"><tr>',
     '<td align="center" style="background:#f5f7fb;padding:15px"><b>A1</b><div>'+a1+'/10</div></td>',
     '<td align="center" style="background:#f5f7fb;padding:15px"><b>A2</b><div>'+a2+'/10</div></td>',
     '<td align="center" style="background:#f5f7fb;padding:15px"><b>B1</b><div>'+b1+'/10</div></td>',
-    '</tr></table><p style="font-size:12px;line-height:1.6;color:#64748b">'+escapeHtml(disclaimer)+'</p></td></tr>',
-    '<tr><td align="center" style="padding:0 32px 32px"><a href="'+signup+'" style="display:block;padding:16px;background:#1f5bbf;border-radius:10px;font-size:16px;font-weight:bold;color:#fff;text-decoration:none">'+(isSwahili?'Continue Kiswahili learning':'Explore '+level+' classes &amp; register')+' →</a>',
+    ...(revised?['<td align="center" style="background:#f5f7fb;padding:15px"><b>B2</b><div>'+b2+'/10</div></td>']:[]),
+    '</tr></table><p style="font-size:12px;line-height:1.6;color:#64748b">'+escapeHtml(disclaimer)+(revised?' Complete the writing or speaking follow-up with your teacher before final placement.':'')+'</p></td></tr>',
+    '<tr><td align="center" style="padding:0 32px 32px"><a href="'+signup+'" style="display:block;padding:16px;background:#1f5bbf;border-radius:10px;font-size:16px;font-weight:bold;color:#fff;text-decoration:none">'+(isSwahili?level==='B2'?'Contact Kiswahili admissions':'Continue Kiswahili learning':'Explore '+level+' classes &amp; register')+' →</a>',
     '<p style="font-size:13px;margin:20px 0 0">Have questions? Reply to this email for guidance.</p></td></tr>',
     '<tr><td style="padding:24px 32px;background:#f7f9fd;border-top:1px solid #e0e6ed;font-size:13px;line-height:1.7;color:#54657d"><b>Falowen Admissions</b><div><a href="https://www.falowen.app" style="color:#1f5bbf">www.falowen.app</a></div></td></tr>',
     '</table><p style="font-size:11px;color:#74839a;max-width:530px">You received this message after requesting to save your placement result and providing an email address.</p></td></tr></table></body></html>'

@@ -25,6 +25,7 @@ const button = (background, color = "#fff") => ({
 export default function PlacementFunnelNextStep({ result }) {
   const isSwahili = result.language === "swahili";
   const languageName = isSwahili ? "Kiswahili" : "German";
+  const needsTeacher = isSwahili && result.level === "B2";
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
@@ -142,9 +143,9 @@ export default function PlacementFunnelNextStep({ result }) {
       </div>
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <a href={classesUrl} onClick={() => trackPublicFunnelEvent("recommended_class_click", { level: result.level })} style={button("#2563eb")}>{isSwahili ? "Start Kiswahili learning" : `Choose a ${result.level} class`}</a>
-        <a href={signupUrl} onClick={() => trackPublicFunnelEvent("continue_application_click", { level: result.level })} style={{ ...button("#fff", "#1d4ed8"), borderColor: "#2563eb" }}>Continue application</a>
-        <a href={`https://wa.me/233205706589?text=${whatsappText}`} target="_blank" rel="noopener noreferrer" onClick={() => trackPublicFunnelEvent("placement_whatsapp_click", { level: result.level })} style={button("#16a34a")}>Ask on WhatsApp</a>
+        {!needsTeacher && <a href={classesUrl} onClick={() => trackPublicFunnelEvent("recommended_class_click", { level: result.level })} style={button("#2563eb")}>{isSwahili ? "Start Kiswahili learning" : `Choose a ${result.level} class`}</a>}
+        {!needsTeacher && <a href={signupUrl} onClick={() => trackPublicFunnelEvent("continue_application_click", { level: result.level })} style={{ ...button("#fff", "#1d4ed8"), borderColor: "#2563eb" }}>Continue application</a>}
+        <a href={`https://wa.me/233205706589?text=${whatsappText}`} target="_blank" rel="noopener noreferrer" onClick={() => trackPublicFunnelEvent("placement_whatsapp_click", { level: result.level })} style={button("#16a34a")}>{needsTeacher ? "Confirm B2 with admissions" : "Ask on WhatsApp"}</a>
       </div>
 
       {!result.registered && <form onSubmit={saveReminder} style={{ display: "grid", gap: 8, maxWidth: 560 }}>

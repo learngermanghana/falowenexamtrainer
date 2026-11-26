@@ -65,3 +65,19 @@ describe("Kiswahili placement uses its private answer key and level thresholds",
     expect(handler.placementLanguage(undefined)).toBe("german");
   });
 });
+
+test("v2 Kiswahili grades 40 items with its own private key and requires all foundations for B2",()=>{
+ const previous=process.env.SWAHILI_PLACEMENT_ANSWER_KEY_V2;
+ try {
+  process.env.SWAHILI_PLACEMENT_ANSWER_KEY_V2=Array(40).fill(0).join(",");
+  const perfect=Array(40).fill(0);
+  expect(handler.grade(perfect,"swahili","a1-b2-v2")).toEqual({a1:10,a2:10,b1:10,b2:10,total:40,answered:40,level:"B2"});
+  const lower=[...perfect];lower.fill(null,30,34);
+  expect(handler.grade(lower,"swahili","a1-b2-v2").level).toBe("B1");
+  lower.fill(null,20,24);
+  expect(handler.grade(lower,"swahili","a1-b2-v2").level).toBe("A2");
+  expect(()=>handler.grade(Array(30).fill(null),"swahili","a1-b2-v2")).toThrow();
+  delete process.env.SWAHILI_PLACEMENT_ANSWER_KEY_V2;
+  expect(()=>handler.grade(perfect,"swahili","a1-b2-v2")).toThrow(/configured/);
+ } finally {if(previous===undefined)delete process.env.SWAHILI_PLACEMENT_ANSWER_KEY_V2;else process.env.SWAHILI_PLACEMENT_ANSWER_KEY_V2=previous;}
+});

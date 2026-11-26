@@ -14,10 +14,12 @@ function placementLanguage(value) {
   if (!["german", "swahili"].includes(language)) throw Object.assign(new Error("Unsupported placement language"), {status:400});
   return language;
 }
-function answerKeyFor(language) {
+const SWAHILI_VERSION = "a1-b2-v2";
+function answerKeyFor(language, version) {
   if (language === "german") return GERMAN_ANSWERS;
-  const raw = String(process.env.SWAHILI_PLACEMENT_ANSWER_KEY || "").trim();
-  if (!/^[0-3](,[0-3]){29}$/.test(raw))
+  const revised = version === SWAHILI_VERSION;
+  const raw = String((revised ? process.env.SWAHILI_PLACEMENT_ANSWER_KEY_V2 : process.env.SWAHILI_PLACEMENT_ANSWER_KEY) || "").trim();
+  if (!(revised ? /^[0-3](,[0-3]){39}$/ : /^[0-3](,[0-3]){29}$/).test(raw))
     throw Object.assign(new Error("Kiswahili placement grading has not been configured"), {status:503});
   return raw.split(",").map(Number);
 }
@@ -86,17 +88,23 @@ function unseal(value) {
   dec.setAuthTag(Buffer.from(pieces[2],"base64url"));
   return JSON.parse(Buffer.concat([dec.update(Buffer.from(pieces[3],"base64url")),dec.final()]).toString("utf8"));
 }
-function grade(indices, requestedLanguage = "german") {
+function grade(indices, requestedLanguage = "german", version) {
   const language = placementLanguage(requestedLanguage);
-  if(!Array.isArray(indices)||indices.length!==30||indices.some(v=>v!==null&&(!Number.isInteger(v)||v<0||v>3))) {
-    throw Object.assign(new Error("Expected one choice or null for each of the 30 questions"),{status:400});
+  const revised = language === "swahili" && version === SWAHILI_VERSION;
+  const count = revised ? 40 : 30;
+  if(!Array.isArray(indices)||indices.length!==count||indices.some(v=>v!==null&&(!Number.isInteger(v)||v<0||v>3))) {
+    throw Object.assign(new Error("Expected one choice or null for each of the "+count+" questions"),{status:400});
   }
-  const answerKey = answerKeyFor(language);
+  const answerKey = answerKeyFor(language, version);
   const a1=answerKey.slice(0,10).filter((a,i)=>indices[i]===a).length;
   const a2=answerKey.slice(10,20).filter((a,i)=>indices[i+10]===a).length;
   const b1=answerKey.slice(20,30).filter((a,i)=>indices[i+20]===a).length;
   const level=language==="swahili" ? (a1<8?"A1":a2<8?"A2":b1>=7?"B1":"A2")
     : (a1<7||a2<7?"A1":b1>=7?"B1":"A2");
+  if (revised) {
+    const b2=answerKey.slice(30,40).filter((a,i)=>indices[i+30]===a).length;
+    return {a1,a2,b1,b2,total:a1+a2+b1+b2,answered:indices.filter(v=>v!==null).length,level:level==="B1"&&b2>=7?"B2":level};
+  }
   return {a1,a2,b1,total:a1+a2+b1,answered:indices.filter(v=>v!==null).length,level};
 }
 function validId(value){return /^pt_[a-zA-Z0-9-]{12,90}$/.test(String(value||""));}
@@ -141,6 +149,7 @@ async function readRecords() {
       const event=unseal(row[2]);if(!validId(event.id)||!["start","complete","contact","email_sent"].includes(event.type))continue;
       const previous=byId.get(event.id)||{id:event.id,language:"german",status:"started",startedAt:null,completedAt:null,contactedAt:null};
       if (event.language) previous.language=placementLanguage(event.language);
+      if (event.version === SWAHILI_VERSION && previous.language === "swahili") previous.version=event.version;
       if(event.type==="start"){previous.startedAt=event.at;previous.status=previous.completedAt?"completed":"in_progress";}
       if(event.type==="start" && event.contact) {
         previous.contactedAt=event.at;
@@ -201,7 +210,9 @@ async function handler(req,res){
     const language=placementLanguage(body.language);
     const event={id:body.id,type:body.action,language,at:new Date().toISOString()};
     if(body.action==="start"){
-      answerKeyFor(language); // Never start a test whose private scoring key is absent.
+      if (language === "swahili" && body.version === SWAHILI_VERSION) event.version = SWAHILI_VERSION;
+      if (body.version && event.version !== body.version) throw Object.assign(new Error("Unsupported placement version"),{status:400});
+      answerKeyFor(language,event.version); // Never start a test whose private scoring key is absent.
       const email=String(body.email||"").trim().toLowerCase();
       if(email.length>180 || !validEmail(email) || /[,;<>]/.test(email))
         throw Object.assign(new Error("Enter a valid email address for your result"),{status:400});
@@ -218,7 +229,8 @@ async function handler(req,res){
         if(start?.type!=="start" || start.id!==event.id || !start.contact ||
           placementLanguage(start.language)!==language)
           throw Object.assign(new Error("Invalid placement session or language"),{status:400});
-        event.score=grade(body.answers,language);
+        event.score=grade(body.answers,language,start.version);
+        if (start.version) event.version=start.version;
         await appendEvent(event);
         await queuePlacementResult({...event,contact:start.contact},sheetApi,googleToken);
         return res.status(200).json({ok:true,id:event.id,score:event.score,emailStatus:"queued"});
