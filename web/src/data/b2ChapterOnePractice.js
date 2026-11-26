@@ -46,3 +46,10 @@ export const B2_CHAPTER_ONE_PRACTICE = Object.freeze({
     ])
 });
 export const getB2ChapterOnePractice = day => B2_CHAPTER_ONE_PRACTICE[Number(day)] || null;
+
+// Paragraph references use the existing reading texts and do not alter answer indices.
+const READING_EVIDENCE = Object.freeze({
+  1: [0,1,3,3,4],
+  5: [0,1,2,3,4],
+});
+export const getB2ChapterOneReadingEvidence = (day, questionIndex) => READING_EVIDENCE[Number(day)]?.[questionIndex] ?? null;
