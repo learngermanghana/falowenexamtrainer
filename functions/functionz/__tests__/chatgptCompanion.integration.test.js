@@ -13,6 +13,7 @@ const challenge = crypto.createHash("sha256").update(verifier).digest("base64url
 function mockFirebase() {
   const collections = new Map();
   const studentData = new Map([
+    ["owner-preview", { uid:"owner-preview", role:"student", program:"german", level:"A2", paymentStatus:"paid" }],
     ["student-1", { uid: "student-1", role: "student", level: "A2", paymentStatus: "paid", name: "Student One", studentCode: "TEST001" }],
     ["student-2", { uid: "student-2", role: "student", level: "B1", paymentStatus: "paid", name: "Student Two", studentCode: "TEST002" }],
     ["exam-learner", { uid: "exam-learner", role: "student", level: "A2", program: "german", accountType: "exam_only", status: "registered" }],
@@ -112,9 +113,10 @@ function mockFirebase() {
     firestore: () => db,
     auth: () => ({
       async verifyIdToken(idToken) {
-        if (!["student-1", "student-2", "b2-learner", "c1-learner", "c2-learner", "student-class", "inactive", "exam-learner"].includes(idToken)) throw Error("invalid token");
-        return { uid: idToken, email: idToken + "@example.org", email_verified: true };
+        if (!["owner-preview", "student-1", "student-2", "b2-learner", "c1-learner", "c2-learner", "student-class", "inactive", "exam-learner"].includes(idToken)) throw Error("invalid token");
+        return { uid: idToken, email: idToken==="owner-preview"?"moxflex@gmail.com":idToken + "@example.org", email_verified: true };
       },
+      async getUser(uid){return {uid,email:uid==="owner-preview"?"moxflex@gmail.com":uid+"@example.org",emailVerified:true,disabled:false};},
     }),
   };
   return admin;
@@ -679,3 +681,5 @@ describe("Saved revision OAuth boundaries",()=>{
     });
   });
 });
+
+ test("verified owner can preview every German course without altering actual enrolment; ordinary students cannot",async()=>{await withServer(async origin=>{const owner=await connectStudent(origin,"owner-preview","owner-test");const ordinary=await connectStudent(origin,"student-1","ordinary-test");const call=async(token,name,args={})=>(await postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:201,method:"tools/call",params:{name,arguments:args}},token)).data.result.structuredContent;const token=owner.tokens.access_token;const levels=await call(token,"get_my_falowen_revision_levels");expect(levels.programs.german.current).toBe("A2");expect(levels.programs.german.full).toEqual(["A2"]);expect(levels.developerTesting.levels).toEqual(["A1","A2","B1","B2","C1","C2"]);for(const level of levels.developerTesting.levels){const lesson=await call(token,"get_my_falowen_revision_lesson",{program:"german",level,day:3,section:"overview"});expect(lesson.available).toBe(true);expect(lesson.level).toBe(level);expect(lesson.developerTesting).toBe(true);expect(lesson.officialSubmission).toBe(false);}const c1=await call(token,"get_my_falowen_lesson_content",{level:"C1",day:3,section:"grammar"});expect(c1.available).toBe(true);expect(c1.recordedLevel).toBe("A2");const denied=await call(ordinary.tokens.access_token,"get_my_falowen_revision_lesson",{program:"german",level:"C1",day:3,section:"overview"});expect(denied.available).toBe(false);expect(denied.developerTesting).toBeUndefined();expect((await call(token,"get_my_falowen_profile")).germanLevel).toBe("A2");});});
