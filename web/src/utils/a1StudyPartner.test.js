@@ -1,0 +1,38 @@
+import { A1_STUDY_MODES, buildA1StudyPrompt, buildA1ChatGPTUrl, isA1StudyPartnerLesson } from "./a1StudyPartner";
+
+const teacher = { kind: "assignment", day: 17, chapter: "11", title: "Instructions", assignmentKey: "A1-11", uid: "private-user", answers: "private-answer", token: "private-token" };
+const independent = { kind: "practice", day: 6, chapter: "2.3", title: "Family and Hobbies" };
+
+test("teacher prompt identifies exact assignment and active section without private data", () => {
+  const prompt = buildA1StudyPrompt(teacher, "speaking", "Teil 1 · Sprechen");
+  expect(prompt).toContain("Day 17, Kapitel 11");
+  expect(prompt).toContain("A1-11");
+  expect(prompt).toContain("Teil 1 · Sprechen");
+  expect(prompt).toContain("Role-play");
+  expect(prompt).toContain("Do not provide official assignment answers");
+  expect(prompt).not.toContain("private-");
+});
+
+test("self-learning uses independent context and no official assignment reference", () => {
+  const prompt = buildA1StudyPrompt(independent, "grammar");
+  expect(prompt).toContain("Day 6, Kapitel 2.3");
+  expect(prompt).toContain("self-learning material independently");
+  expect(prompt).not.toContain("Official assignment reference");
+  expect(prompt).toContain("Teach the grammar");
+});
+
+test("all five study modes build different prompts and URLs round trip", () => {
+  const prompts = A1_STUDY_MODES.map(({ key }) => buildA1StudyPrompt(independent, key));
+  expect(new Set(prompts).size).toBe(5);
+  for (const prompt of prompts) {
+    const url = new URL(buildA1ChatGPTUrl(prompt));
+    expect(url.origin).toBe("https://chatgpt.com");
+    expect(url.searchParams.get("q")).toBe(prompt);
+  }
+});
+
+test("final mock and invalid lesson metadata are excluded", () => {
+  expect(isA1StudyPartnerLesson({ ...teacher, title: "A1 Final Mock Exam" })).toBe(false);
+  expect(isA1StudyPartnerLesson({ ...teacher, destination: "/campus/course/a1-final-mock-exam" })).toBe(false);
+  expect(buildA1StudyPrompt({})).toBe("");
+});
