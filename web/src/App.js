@@ -117,6 +117,7 @@ import A1Day3PronounsIntroducingYourselfWorkbookPage from "./components/A1Day3Pr
 import A1Day5IntroducingYourselfArticlesWorkbookPage from "./components/A1Day5IntroducingYourselfArticlesWorkbookPage";
 import A1WorkbookRoutePage from "./components/A1WorkbookRoutePage";
 import A1PracticeBookLayout from "./components/A1PracticeBookLayout";
+import A2StudyMaterialLayout from "./components/A2StudyMaterialLayout";
 import A1Day12TwentyFourHourClockAndDatesWorkbookPage from "./components/A1Day12TwentyFourHourClockAndDatesWorkbookPage";
 import A1Day13RevisionNumbersTimePricesWorkbookPage from "./components/A1Day13RevisionNumbersTimePricesWorkbookPage";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
@@ -1129,7 +1130,7 @@ const AppShell = ({
             element={<LetterWritingIntroPage />}
           />
           <Route path="/campus/course/conjunctions-5-10" element={<A1FinalMockExamPage />} />
-          <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StarterConjunctionsPage />} />
+          <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StudyMaterialLayout day={1}><A2StarterConjunctionsPage /></A2StudyMaterialLayout>} />
           <Route path="/campus/course/a1-day-1-greetings-workbook" element={<A1Day1GreetingsWorkbookPage />} />
           <Route path="/campus/course/a1-day-2-foundations-workbook" element={<A1Day2UnifiedWorkbookPage />} />
           <Route path="/campus/course/a1-day-2-kapitel-1-1-workbook" element={<A1Day2Kapitel11WorkbookPage />} />
@@ -1351,95 +1352,95 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/personen-beschreiben-1-2-grammar-notes"
-            element={<A2Day2Kapitel12GrammarNotesPage />}
+            element={<A2StudyMaterialLayout day={2}><A2Day2Kapitel12GrammarNotesPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/dinge-und-personen-vergleichen-1-3-grammar-notes"
-            element={<ComparingThingsAndPeopleGrammarPage />}
+            element={<A2StudyMaterialLayout day={3}><ComparingThingsAndPeopleGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/wo-moechten-wir-uns-treffen-2-4-grammar-notes"
-            element={<WoTreffenUnsGrammarPage />}
+            element={<A2StudyMaterialLayout day={4}><WoTreffenUnsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/was-machst-du-in-deiner-freizeit-2-5-grammar-notes"
-            element={<A2Day5FreizeitSeparableVerbsGrammarPage />}
+            element={<A2StudyMaterialLayout day={5}><A2Day5FreizeitSeparableVerbsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/moebel-und-raeume-3-6-grammar-notes"
-            element={<A2Day6TwoCasePrepositionsGrammarPage />}
+            element={<A2StudyMaterialLayout day={6}><A2Day6TwoCasePrepositionsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/relativsaetze-die-der-das-wohnung-suchen-3-7-notes"
-            element={<A2Day7RelativeClausesWohnungGrammarPage />}
+            element={<A2StudyMaterialLayout day={7}><A2Day7RelativeClausesWohnungGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/imperativ-rezepte-und-essen-3-8-grammar-notes"
-            element={<A2Day8ImperativeGrammarPage />}
+            element={<A2StudyMaterialLayout day={8}><A2Day8ImperativeGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/perfekt-urlaub-4-9-grammar-notes"
-            element={<A2Day9PerfektGrammarPage />}
+            element={<A2StudyMaterialLayout day={9}><A2Day9PerfektGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes"
-            element={<A2Day10PraeteritumGrammarPage />}
+            element={<A2StudyMaterialLayout day={10}><A2Day10PraeteritumGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/unterwegs-verkehrsmittel-vergleichen-4-11-grammar-notes"
-            element={<A2Day11ComparativeFormsGrammarPage />}
+            element={<A2StudyMaterialLayout day={11}><A2Day11ComparativeFormsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/mein-traumberuf-5-12-grammar-notes"
-            element={<A2Day12MeinTraumberufGrammarPage />}
+            element={<A2StudyMaterialLayout day={12}><A2Day12MeinTraumberufGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/modalverben-im-praeteritum-vorstellungsgespraech-5-13-grammar-notes"
-            element={<A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage />}
+            element={<A2StudyMaterialLayout day={13}><A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/beruf-und-karriere-5-14-um-zu-grammar-notes"
-            element={<A2Day14BerufUndKarriereUmZuGrammarPage />}
+            element={<A2StudyMaterialLayout day={14}><A2Day14BerufUndKarriereUmZuGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes"
-            element={<A2Day15MeinLieblingssportSeitDativGrammarPage />}
+            element={<A2StudyMaterialLayout day={15}><A2Day15MeinLieblingssportSeitDativGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes"
-            element={<A2Day16WohlbefindenReflexiveVerbenGrammarPage />}
+            element={<A2StudyMaterialLayout day={16}><A2Day16WohlbefindenReflexiveVerbenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes"
-            element={<A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage />}
+            element={<A2StudyMaterialLayout day={18}><A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/einkaufen-wo-und-wie-7-19-oder-denn-grammar-notes"
-            element={<A2Day19EinkaufenOderDennGrammarPage />}
+            element={<A2StudyMaterialLayout day={19}><A2Day19EinkaufenOderDennGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/typische-reklamationssituationen-7-20-hoefliche-bitten-und-begruendungen-grammar-notes"
-            element={<A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage />}
+            element={<A2StudyMaterialLayout day={20}><A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/ein-wochenende-planen-8-21-wenn-ob-falls-grammar-notes"
-            element={<A2Day21EinWochenendePlanenWennObFallsGrammarPage />}
+            element={<A2StudyMaterialLayout day={21}><A2Day21EinWochenendePlanenWennObFallsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes"
-            element={<A2Day22DieWochePlanungGrammarPage />}
+            element={<A2StudyMaterialLayout day={22}><A2Day22DieWochePlanungGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes"
-            element={<A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage />}
+            element={<A2StudyMaterialLayout day={23}><A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/einen-urlaub-planen-9-24-final-a2-grammar-notes"
-            element={<A2Day24EinenUrlaubPlanenGrammarPage />}
+            element={<A2StudyMaterialLayout day={24}><A2Day24EinenUrlaubPlanenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/ueber-die-zukunft-sprechen-10-28-final-a2-grammar-notes"
-            element={<A2Day28UeberDieZukunftSprechenGrammarPage />}
+            element={<A2StudyMaterialLayout day={28}><A2Day28UeberDieZukunftSprechenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route path="/campus/course/a1-day-0-orientation-and-knowledge-test-workbook" element={<A1Day0OrientationKnowledgeTestWorkbookPage />} />
           <Route path="/campus/course/a2-day-0-orientation-and-knowledge-test-workbook" element={<A2Day0OrientationKnowledgeTestWorkbookPage />} />
