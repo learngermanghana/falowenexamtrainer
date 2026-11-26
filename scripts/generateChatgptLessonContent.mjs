@@ -38,6 +38,8 @@ import { A2_GRAMMAR_ROUTE_ENTRIES } from "../web/src/data/a2GrammarRoutes.js";
 import { A2_READING_TASKS } from "../web/src/data/a2ReadingTasks.js";
 import { A2_LISTENING_TASKS, A2_LISTENING_MODES } from "../web/src/data/a2ListeningTasks.js";
 import { A2_REQUIRED_WRITING_DAYS } from "../web/src/data/a2WritingSchedule.js";
+import { A2_PRESENTATION_CARDS } from "../web/src/data/a2PresentationCards.js";
+import { getA2GoetheWritingTask } from "../web/src/data/a2GoetheWritingTasks.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
 import { extractGrammarTeaching, grammarComponentPaths } from "./extractFalowenGrammar.mjs";
@@ -185,6 +187,16 @@ for (let day = 1; day <= 28; day += 1) {
   const listening = A2_LISTENING_TASKS[day];
   const grammarLink = A2_GRAMMAR_ROUTE_ENTRIES.find((entry) => Number(entry.day) === day);
   const writingRequired = A2_REQUIRED_WRITING_DAYS.includes(day);
+  // Day 22 is now a dedicated speaking mock, not an ordinary classroom card.
+  // Its protected mock is retrieved via Exams Room rather than the course exporter.
+  const presentation = day === 22 ? null : A2_PRESENTATION_CARDS[day];
+  const writingTask = writingRequired && day !== 22 ? getA2GoetheWritingTask(day) : null;
+  if (day !== 22 && (!presentation?.centralQuestion || presentation.branches?.length !== 5 || presentation.branches.some(b=>!b.question))) {
+    throw new Error("A2 original speaking card missing for day " + day);
+  }
+  if (writingRequired && day !== 22 && (!writingTask?.situation || writingTask.points?.length !== 3)) {
+    throw new Error("A2 original writing task missing for day " + day);
+  }
   const originalGrammar = extractGrammarTeaching(grammarSources.A2[day]);
   A2[String(day)] = {
     level: "A2", day, chapter: text(lesson.chapter || reading.chapter, 25),
@@ -213,10 +225,26 @@ for (let day = 1; day <= 28; day += 1) {
         ? text(listening.audioUrl, 500) : null,
       questions: publicQuestions(listening.questions),
     } } : {}),
-    ...(writingRequired ? { writing: {
+    ...(presentation ? { speaking: {
+      source: "Falowen A2 Course Book classroom presentation card",
+      format: "Goethe A2 Teil 2 inspired classroom practice",
+      prompt: text(presentation.centralQuestion,600),
+      instruction: text(presentation.instruction,1400),
+      instructionEn: text(presentation.instructionEn,1400),
+      guidingQuestions: presentation.branches.map(branch=>text(branch.question,450)),
+      keywords: strings(presentation.keywords,5,200),
+      languageSupport: presentation.branches.map(branch=>text(branch.starter,250)).filter(Boolean),
+      targetDurationSeconds: 60,
+      practiceOnly: true,
+      clarification: "Practise the original card as a short talk or interactive conversation. Ask the original guiding questions one at a time; wait for the learner's answer. Any newly worded follow-up must be identified as a teaching example. No model answers or official grades.",
+    } } : {}),
+    ...(writingTask ? { writing: {
+      source: "Falowen A2 Course Book writing task",
+      title: text(writingTask.title,400),
+      prompt: text(writingTask.situation,1800),
+      instructions: strings(writingTask.points,3,800),
       requiredInCampus: true,
-      instructions: [text(lesson.instruction, 800)].filter(Boolean),
-      clarification: "This is a Course Book submission requirement. The full writing prompt may be in the Campus workbook; no missing prompt is invented.",
+      clarification: "Original writing prompt and three required points. Coach the student's own answer; official marking and submission remain in Campus.",
     } } : {}),
   };
 }

@@ -104,7 +104,7 @@ function practiceGuideResponse(level, day, skill = "reading", mode = "exam", lan
   const steps = {
     reading: "First display the authentic passage. Ask only one original question at a time and wait for the student's answer. Give feedback with supporting paragraph evidence, then ask the next question. For open-response C1 questions, assess reasoning without inventing an official answer key.",
     listening: "Link the learner to the lesson audio in Falowen Campus where available. Never claim to play an audio file that was not supplied. Ask one original question at a time after listening; do not disclose hidden transcripts.",
-    speaking: "Present the original discussion prompt, let the learner answer in German, and coach coherence, grammar, vocabulary, pronunciation only when audio is actually available, and counterarguments.",
+    speaking: "Present the original speaking prompt. For an A2 classroom card, use its five original guiding questions one at a time; wait for the learner to answer in German before giving short feedback and continuing. Offer sentence starters only when needed. A newly worded conversational follow-up must be labelled as a teaching example, not a quoted Falowen question. Match the student level; assess pronunciation only when actual audio is available. Never claim an official grade.",
     writing: "Present the original writing task and expected length. Request the learner's own draft, then explain strengths and revisions using the provided rubric; do not claim to mark or submit in Campus.",
     grammar: "Teach the exact course grammar in the requested language, provide short level-appropriate examples, then ask a learner to create one sentence at a time and explain corrections.",
   };
