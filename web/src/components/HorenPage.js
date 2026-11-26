@@ -39,9 +39,9 @@ const HorenPage = ({ practiceLevel = "", sampleId = "", allowExamMistakeReview =
         );
       }
 
-      if (normalizedLevel === "A1" && /^sample-[4-8]$/.test(sampleId)) return <A1MockListeningPractice key={sampleId} mockNumber={Number(sampleId.slice(-1))} />;
-      if (normalizedLevel === "A2" && sampleId === "sample-3") return <A2Mock3Hoeren practiceReturnPath="/exams/horen" />;
-      if (normalizedLevel === "A2" && /^sample-[4-8]$/.test(sampleId)) return <A2MockListeningPractice mockNumber={Number(sampleId.slice(-1))} />;
+      if (normalizedLevel === "A1" && /^sample-[4-8]$/.test(sampleId)) return <A1MockListeningPractice key={sampleId} mockNumber={Number(sampleId.slice(-1))} allowExamMistakeReview={allowExamMistakeReview} />;
+      if (normalizedLevel === "A2" && sampleId === "sample-3") return <A2Mock3Hoeren practiceReturnPath="/exams/horen" allowExamMistakeReview={allowExamMistakeReview} />;
+      if (normalizedLevel === "A2" && /^sample-[4-8]$/.test(sampleId)) return <A2MockListeningPractice mockNumber={Number(sampleId.slice(-1))} allowExamMistakeReview={allowExamMistakeReview} />;
       return <ListeningPracticeSamplePage level={normalizedLevel} sampleId={sampleId} allowExamMistakeReview={allowExamMistakeReview} />;
     }
 
