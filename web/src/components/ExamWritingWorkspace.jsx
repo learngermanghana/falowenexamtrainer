@@ -1,3 +1,4 @@
+import ExamMistakeReview from "./ExamMistakeReview";
 import ExamStudyPartner from "./ExamStudyPartner";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useExam } from "../context/ExamContext";
@@ -384,6 +385,7 @@ export default function ExamWritingWorkspace({ allowExamStudyPartner = false } =
               draft={record.checkedText} rubric={feedback.data.rubric}
               corrections={feedback.data.corrections}
               structuredFeedback={feedback.data.structuredFeedback} />}
+          {allowExamStudyPartner && !timerRunning && !busy && !savingTutor && <ExamMistakeReview key={task.id} level={level} section="writing" part={part.label} completed={Boolean(feedback)} />}
           {part.format === "form" ? <details className="few-answer-key">
             <summary>Show correct answers</summary>
             <ol>{task.formFields.filter((field) => !field.fixed).map((field) =>
