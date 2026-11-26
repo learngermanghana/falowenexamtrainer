@@ -53,7 +53,7 @@ test("A2 self-study and assessment exclusion remain distinct", () => {
   expect(prompt).toContain("self-learning material independently");
   expect(prompt).not.toContain("Official assignment reference");
   expect(isStudyPartnerLesson({ ...lesson, title: "Goethe A2 Speaking Mock" }, "A2")).toBe(false);
-  expect(buildStudyPrompt(lesson, "grammar", "", "B2")).toBe("");
+  expect(buildStudyPrompt(lesson, "grammar", "", "C1")).toBe("");
 });
 
 test("B1 prompt uses the actual chapter and encourages connected language", () => {
@@ -70,4 +70,14 @@ test("B1 Day 23 grammar remains practice-only and speaking mock is excluded", ()
   const lesson = { kind: "practice", day: 23, chapter: "7.23", title: "Erstes Date", assignmentKey: "B1-7.23" };
   expect(buildStudyPrompt(lesson, "grammar", "Self-learning grammar notes", "B1")).not.toContain("Official assignment reference");
   expect(isStudyPartnerLesson({ ...lesson, title: "Goethe B1 Speaking Mock" }, "B1")).toBe(false);
+});
+
+test("B2 uses public grammar and skill metadata and excludes final mock", () => {
+  const lesson = { kind: "practice", day: 1, chapter: "1.1", title: "Müll vermeiden", grammarFocus: "indem / dadurch, dass", skillFocus: "Lesen", uid: "private-record", answers: "private-answer" };
+  const prompt = buildStudyPrompt(lesson, "grammar", "learn", "B2");
+  expect(prompt).toContain("German B2 study partner");
+  expect(prompt).toContain("Grammar focus: indem / dadurch, dass");
+  expect(prompt).toContain("Today's exam skill: Lesen");
+  expect(prompt).not.toContain("private-");
+  expect(buildStudyPrompt({ ...lesson, day: 29, title: "B2 Final Mock Exam" }, "grammar", "", "B2")).toBe("");
 });
