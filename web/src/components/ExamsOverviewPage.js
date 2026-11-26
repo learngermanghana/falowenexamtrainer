@@ -1,5 +1,5 @@
 import ExamStudyPartner from "./ExamStudyPartner";
-import { getExamRevisionFocus, safeExamPart } from "../utils/examStudyPartner";
+import { getExamRevisionFocus, safeExamPart, buildExamPlanPriorities } from "../utils/examStudyPartner";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExam } from "../context/ExamContext";
@@ -9,14 +9,14 @@ import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { announceExamSuccess } from "../services/interactionFeedback";
 import { getReadingPracticeHistory, getReadingPracticeStudentKey } from "../services/readingPracticeHistory";
 import { loadExamRoomResults } from "../services/examRoomDashboardService";
-import PersonalExamCountdown from "./PersonalExamCountdown";
+import PersonalExamCountdown, { examDaysRemaining } from "./PersonalExamCountdown";
 import "./ExamsOverviewPage.css";
 
 import { useAccessLock, examLockInfo } from "./AccessLockDialog";
 import { TrialExam } from "../context/TrialCatalogContext";
 
 const sectionIcons = { lesen: "📖", hoeren: "🎧", schreiben: "✍️", sprechen: "🎤" };
-export default function ExamsOverviewPage({ dateInLevelPicker = false, allowExamStudyPartner = false }) {
+export default function ExamsOverviewPage({ dateInLevelPicker = false, allowExamStudyPartner = false, examPlanDate = "" }) {
   const trialExam = React.useContext(TrialExam);
   const isTrial = Boolean(trialExam);
   const { openLock, lockDialog } = useAccessLock();
@@ -29,6 +29,9 @@ export default function ExamsOverviewPage({ dateInLevelPicker = false, allowExam
   const { user, idToken, studentProfile } = useAuth();
   const currentLevel = String(level || "A1").toUpperCase();
   const historyKey = (user?.uid || "") + ":" + currentLevel;
+  const [localPlanDate, setLocalPlanDate] = useState(null);
+  const planDate = dateInLevelPicker ? examPlanDate : localPlanDate?.key === "falowen:exam-date:" + historyKey ? localPlanDate.date : "";
+  const daysRemaining = examDaysRemaining(planDate);
   const [cloudHistory, setCloudHistory] = useState({ key: "", results: [] });
   const cloudResults = cloudHistory.key === historyKey ? cloudHistory.results : [];
   const [loading, setLoading] = useState(false);
@@ -41,6 +44,8 @@ export default function ExamsOverviewPage({ dateInLevelPicker = false, allowExam
     [currentLevel, cloudResults, localReading],
   );
   const nextActivity = examNextActivity(coach, trialExam);
+  const planHistoryAvailable = !loading && !loadIssue && Boolean(coach.coveredSkills) && cloudHistory.key === historyKey;
+  const planPriorities = planHistoryAvailable ? buildExamPlanPriorities(coach) : [];
   const revisionFocus = !loading && !loadIssue ? getExamRevisionFocus(coach) : null;
   const completedSkills = Object.fromEntries(Object.entries({lesen:"lesen",hoeren:"horen",schreiben:"writing",sprechen:"speaking"}).filter(([key])=>coach.latestBySection[key]).map(([key,section])=>[section,safeExamPart(coach.weakParts[key])]));
   const explainLock = (title, event) => openLock(examLockInfo({ title, trialExam, level: currentLevel, examOnly: studentProfile?.accountType === "exam_only" }), event);
@@ -76,9 +81,9 @@ export default function ExamsOverviewPage({ dateInLevelPicker = false, allowExam
       {lockDialog}
       <header className="exam-room-heading">
         <h2>Your {currentLevel} exam room</h2>
-        {user?.uid && !dateInLevelPicker && <PersonalExamCountdown key={historyKey} uid={user.uid} level={currentLevel} compact />}
+        {user?.uid && !dateInLevelPicker && <PersonalExamCountdown key={historyKey} uid={user.uid} level={currentLevel} compact onDateChange={setLocalPlanDate} />}
       </header>
-      {allowExamStudyPartner && !isTrial && <ExamStudyPartner key={historyKey} level={currentLevel} section="overview" revisionFocus={revisionFocus} completedSkills={completedSkills} />}
+      {allowExamStudyPartner && !isTrial && <ExamStudyPartner key={historyKey} level={currentLevel} section="overview" revisionFocus={revisionFocus} completedSkills={completedSkills} revisionPlan={{ daysRemaining, priorities: planPriorities, historyAvailable: planHistoryAvailable }} />}
 
       <button
         type="button"
