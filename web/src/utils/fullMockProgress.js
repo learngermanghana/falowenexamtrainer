@@ -8,7 +8,7 @@ export const FULL_MOCK_SKILLS = Object.freeze([
 export const getFullMockSkillForStage = (stage) => {
   if (FULL_MOCK_SKILLS.some((skill) => skill.key === stage)) return stage;
   if (/^hoeren-teil[1-4]$/.test(String(stage || ""))) return "hoeren";
-  if (/^teil[1-4]$/.test(String(stage || ""))) return "lesen";
+  if (/^teil[1-5]$/.test(String(stage || ""))) return "lesen";
   return "";
 };
 
