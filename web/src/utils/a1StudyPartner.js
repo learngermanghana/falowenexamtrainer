@@ -47,3 +47,22 @@ export const buildA1StudyPrompt = (lesson, mode, section) => buildStudyPrompt(le
 export function buildA1ChatGPTUrl(prompt) {
   return prompt ? "https://chatgpt.com/?q=" + encodeURIComponent(prompt) : "https://chatgpt.com/";
 }
+
+export const A1_VOICE_MODES = Object.freeze([
+  { key: "voice-teacher", label: "Learn with ChatGPT Live Voice · guided lesson" },
+  { key: "voice-speaking", label: "ChatGPT Live Voice · speaking partner" },
+]);
+export function buildA1VoiceTeacherPrompt(lesson, mode = "voice-teacher", level = "A1") {
+  if (level !== "A1" || !isA1StudyPartnerLesson(lesson) || !A1_VOICE_MODES.some(item => item.key === mode)) return "";
+  const source = buildA1StudyPrompt(lesson, mode === "voice-speaking" ? "speaking" : "explain", "");
+  return [
+    source,
+    "I want to learn aloud in ChatGPT Live Voice, using the Falowen Learning Companion. This is a lesson or independent practice, never an assessment or submission.",
+    "First check my authorised revision levels, then retrieve the original German A1 lesson for Day " + Number(lesson.day) + " from Falowen Learning Companion using its revision lesson tool with program german, level A1 and section overview. Verify that the returned day and topic match. Retrieve vocabulary, grammar and speaking only as needed, once per section during this session; reuse already retrieved content. Respect access restrictions. If content is unavailable, say so; ask whether I want to continue with original topic-based practice instead. Never invent a Falowen source.",
+    mode === "voice-teacher"
+      ? "Guide a flexible approximately 20-minute lesson: greet me and check readiness; introduce the lesson aim; teach a few core words from the actual lesson; explain one grammar rule in simple English with short German examples; ask me to make my own sentences; use a short role-play; recap my mistakes and finish with two comprehension checks. Adapt the pace and shorten or extend if I ask."
+      : "Act as a patient speaking partner. Introduce a few useful words from the lesson, demonstrate a short A1 exchange, then role-play using fresh prompts. Encourage me to answer in complete short sentences and practise again after feedback.",
+    "Speak slowly and naturally in short turns. Ask one question at a time and wait for my spoken answer; do not answer for me. Give me time to think. Correct one or two important errors at a time, say the corrected German phrase, and let me repeat it. If you cannot hear clearly, ask me to repeat rather than guess. Do not claim to have verified pronunciation or scored official work.",
+    "Do not read the entire lesson aloud as a lecture. Teach interactively. Never fetch protected exam material, reveal official assignment solutions, mark or submit my work, or write to Falowen. No private student records are needed. If this chat is currently in text, ask me to activate Live Voice before starting the spoken lesson."
+  ].join("\n\n");
+}
