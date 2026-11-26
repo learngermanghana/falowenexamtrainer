@@ -8,7 +8,6 @@ import {
 } from "../utils/a1CoursePracticeRoutes";
 import A1SimpleMarkMyLetterPanel from "./A1SimpleMarkMyLetterPanel";
 import A1WorkbookMediaPanel from "./A1WorkbookMediaPanel";
-import A1StudyPartner from "./A1StudyPartner";
 import SelfLearningJourneyGate from "./selfLearning/SelfLearningJourneyGate";
 import { isTeacherLectureResource } from "./selfLearning/TeacherLectureSupportingMaterials";
 import { getA1RadioResource } from "../data/a1RadioResources";
@@ -52,9 +51,6 @@ const getCanonicalLessonArticle = (day) => {
 
 export const getA1SelfLearningPracticeForLocation = (location = {}) => {
   const pathname = routePath(location.pathname);
-  const params = new URLSearchParams(location.search || "");
-  const level = String(params.get("level") || location.state?.level || "").toUpperCase();
-  if (level && level !== "A1") return null;
   const direct = A1_SELF_LEARNING_PRACTICES.find((lesson) =>
     [lesson.destination, lesson.lessonRoute, lesson.shortLessonRoute]
       .filter(Boolean)
@@ -321,16 +317,13 @@ const A1CoursePracticeAutoMount = () => {
 
       const mediaRoot = createRoot(mediaMount);
       mediaRoot.render(
-        <div style={{ display: "grid", gap: 12 }}>
-          <A1StudyPartner lesson={practice} />
-          <A1WorkbookMediaPanel
-            day={practice.day}
-            chapter={practice.chapter}
-            teacherVideo={journeyResources?.teacherVideo}
-            aiVideo={journeyResources?.aiVideo}
-            learningMode="self"
-          />
-        </div>,
+        <A1WorkbookMediaPanel
+          day={practice.day}
+          chapter={practice.chapter}
+          teacherVideo={journeyResources?.teacherVideo}
+          aiVideo={journeyResources?.aiVideo}
+          learningMode="self"
+        />,
       );
 
       return () => {
