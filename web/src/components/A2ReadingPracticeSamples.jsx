@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import { weakestScoredExamPart } from "../utils/examStudyPartner";
 import React, { useEffect, useMemo, useState } from "react";
 import newA2Samples4to7 from "../data/a2ReadingPdfSamples4to7.json";
 import newA2Sample8 from "../data/a2ReadingPdfSample8.json";
@@ -312,7 +314,7 @@ const allItems = (sample) => [
 const formatTime = (seconds) =>
   `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
-export default function A2ReadingPracticeSamples({ initialSampleId = "", standalone = false }) {
+export default function A2ReadingPracticeSamples({ initialSampleId = "", standalone = false, allowExamMistakeReview = false }) {
   const navigate = useNavigate();
   const { studentProfile, user, idToken } = useAuth();
   const studentKey = getReadingPracticeStudentKey({ studentProfile, user });
@@ -662,6 +664,7 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
               <strong>Result: {score}/20 · {percent}% · {getReadingReadinessLabel(percent)}</strong>
               <span>{weakestSection ? `Practise next: ${weakestSection.label}.` : ""} {savedAttemptBySample[sample.id] ? `Saved as attempt ${savedAttemptBySample[sample.id].attemptNumber}.` : ""}</span>
               <div>{sectionScores.map((section) => <span key={section.label}>{section.label}: {section.score}/5</span>)}</div>
+              {allowExamMistakeReview && <ExamMistakeReview level="A2" section="lesen" part={weakestScoredExamPart(sectionScores)} completed={submitted} />}
               <button type="button" onClick={resetSample}>Try this sample again</button>
             </div>
           )}
