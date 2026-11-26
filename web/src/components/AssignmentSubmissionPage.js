@@ -3133,7 +3133,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               <section key={familyAttemptId} aria-label="Teil 2 family speaking resubmission" style={{display:"grid",gap:8,border:"1px solid #bfdbfe",borderRadius:12,padding:12}}>
                 <strong>Teil 2 · Record your family answer again</strong>
                 <p style={{...styles.helperText,margin:0}}>Record, listen and save your improved answer. Your transcript replaces only Teil 2. Keep or correct the other answers below. Recording does not use a submission attempt.</p>
-                <A1FamilyRecording value={familyRecording} disabled={resubmissionStatus.loading||!canSubmitSelected()||!parseFamilyResubmission(resubmissionText||familyPreviousAttempt?.submissionText)} onMarked={saveFamilyRetryRecording} />
+                <A1FamilyRecording resubmission value={familyRecording} disabled={resubmissionStatus.loading||!canSubmitSelected()||!parseFamilyResubmission(resubmissionText||familyPreviousAttempt?.submissionText)} onMarked={saveFamilyRetryRecording} />
                 {!parseFamilyResubmission(resubmissionText||familyPreviousAttempt?.submissionText) && <p role="status">Restore the TEIL 1, TEIL 2 and TEIL 3 headings in Corrected work before recording.</p>}
               </section>
             ):null}
