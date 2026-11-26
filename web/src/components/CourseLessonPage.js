@@ -58,6 +58,7 @@ import B1Day28KlimafreundlichLebenGrammarNotesPage from "./B1Day28Klimafreundlic
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
+import B1StudyMaterialLayout from "./B1StudyMaterialLayout";
 import { applyA1GrammarRouteToLesson, getA1GrammarRoute } from "../data/a1GrammarRoutes";
 import { getA1RadioResource } from "../data/a1RadioResources";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
@@ -533,7 +534,7 @@ export default function CourseLessonPage() {
       const GrammarPage = B1_GRAMMAR_PAGES[dayNumber];
       return (
         <RadioFirstWorkbookGate level={level} day={dayNumber}>
-          <GrammarPage />
+          <B1StudyMaterialLayout day={dayNumber}><GrammarPage /></B1StudyMaterialLayout>
         </RadioFirstWorkbookGate>
       );
     }
