@@ -396,6 +396,8 @@ const httpsCallable = (functionsInstance, name, options) => {
     } catch (error) {
       const code = normalizeCallableText(error?.code).toLowerCase();
       if (code !== "internal" && code !== "functions/internal") throw error;
+      // Recorded Chapter 3 retries must use the server ownership and attempt checks.
+      if (normalizeCallableText(payload?.canonicalAssignmentKey || payload?.assignmentKey || payload?.assignmentId).toLowerCase().replace(/[^a-z0-9]/g,"")==="a13") throw error;
 
       console.warn(
         "Resubmission callable returned an internal error; using validated Firestore fallback.",

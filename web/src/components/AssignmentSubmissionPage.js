@@ -9,6 +9,8 @@ import { findOwnedSubmissionLock } from "../services/submissionLockService";
 import { getSubmissionSaveError } from "../utils/submissionSaveError";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import AutomaticMarkingStatus from "./AutomaticMarkingStatus";
+import A1FamilyRecording from "./A1FamilyRecording";
+import { getFamilyRecording, parseFamilyResubmission, replaceFamilyTranscript, validFamilyRecording } from "../utils/familyResubmission";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
 import { courseTrial } from "./TrialPractice";
@@ -915,6 +917,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const [autosaveStatus, setAutosaveStatus] = useState({ state: "idle", savedAt: null });
   const [resubmissionText, setResubmissionText] = useState("");
   const [resubmissionImprovement, setResubmissionImprovement] = useState("");
+  const [familyRetry, setFamilyRetry] = useState(null);
+  const familyRetrySeedRef = useRef("");
   const [resubmissionStatus, setResubmissionStatus] = useState({ loading: false, error: "", success: "" });
 
   useEffect(() => {
@@ -1819,8 +1823,31 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     return Math.max(MIN_SUBMISSION_CHARACTERS + 200, bounded);
   }, [selectedAssignmentLevel, selectedPreview?.submissionText]);
 
+  const isFamilyResubmission = normalizeAssignmentIdentity(selectedCanonicalAssignmentKey || selectedAssignmentId) === "a1-3";
   const selectedDraft = useMemo(() => draftsByAssignment[form.assignmentTitle], [draftsByAssignment, form.assignmentTitle]);
   const hasDraftForSelection = Boolean(selectedDraft?.submissionText);
+  const familyPreviousAttempt = useMemo(() => isFamilyResubmission ? recentSubmissions.filter(entry=>isSameSelectedAssignment(entry)&&isSubmissionAttemptStatus(entry.status)).slice().sort((a,b)=>(Number(b.attemptNumber||b.attempt||0)-Number(a.attemptNumber||a.attempt||0))||((toDateValue(b.resubmittedAt||b.submittedAt||b.createdAt)?.getTime()||0)-(toDateValue(a.resubmittedAt||a.submittedAt||a.createdAt)?.getTime()||0)))[0] : null,[isFamilyResubmission,recentSubmissions,isSameSelectedAssignment]);
+  const familyPriorRecording=getFamilyRecording(familyPreviousAttempt);
+  const familyAttemptId=familyPreviousAttempt?.id||"";
+  const familyRecording=familyRetry?.attemptId===familyAttemptId?familyRetry.recording:familyPriorRecording;
+  const familyFreshRecording=Boolean(familyRecording?.audioUrl&&familyRecording.audioUrl!==familyPriorRecording?.audioUrl);
+  useEffect(()=>{
+    if(!isFamilyResubmission||!canShowResubmissionForm||!familyAttemptId){familyRetrySeedRef.current="";return;}
+    const seedKey=[user?.uid,familyAttemptId].join(":");
+    if(familyRetrySeedRef.current===seedKey)return;
+    familyRetrySeedRef.current=seedKey;
+    const draft=selectedDraft?.status==="resubmission_draft"&&selectedDraft?.familyRetryAttemptId===familyAttemptId?selectedDraft:null;
+    const text=draft?.resubmissionText||familyPreviousAttempt?.submissionText||familyPreviousAttempt?.answer||"";
+    setResubmissionText(text);
+    setResubmissionImprovement(draft?.resubmissionImprovement||"");
+    setFamilyRetry({attemptId:familyAttemptId,recording:draft?.familyRetryRecording||getFamilyRecording(familyPreviousAttempt)});
+  },[isFamilyResubmission,canShowResubmissionForm,familyAttemptId,familyPreviousAttempt,selectedDraft,user?.uid]);
+  const saveFamilyRetryRecording=(recording)=>{
+    const next=replaceFamilyTranscript(resubmissionText||familyPreviousAttempt?.submissionText,recording.transcript);
+    if(!next){setResubmissionStatus({loading:false,error:"Keep the TEIL 1, TEIL 2 and TEIL 3 headings before saving your recording.",success:""});return;}
+    setFamilyRetry({attemptId:familyAttemptId,recording});
+    setResubmissionText(next);
+  };
 
   const latestSubmissionActionAt = useMemo(() => {
     const latest = recentSubmissions.reduce((acc, item) => {
@@ -2429,6 +2456,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         status: "resubmission_draft",
         resubmissionText: correctedText,
         resubmissionImprovement: trimmedImprovement,
+        ...(isFamilyResubmission?{familyRetryAttemptId:familyAttemptId,familyRetryRecording:familyRecording||null}:{}),
         createdAt: existingDraft?.createdAt || serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
@@ -2494,6 +2522,9 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
+    if(isFamilyResubmission&&!validFamilyRecording(correctedText,familyRecording)){
+      setResubmissionStatus({loading:false,error:"Keep all three Teile. Save a family recording for Teil 2; its transcript must match your corrected answer.",success:""});return;
+    }
     if (["A2", "B1"].includes(selectedAssignmentLevel)) {
       const sectionCheck = validateA2B1WorkbookSubmissionSections({
         level: selectedAssignmentLevel,
@@ -2561,7 +2592,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       resubmissionDiff.newWordsCount >= MIN_RESUBMISSION_NEW_WORDS;
 
     if (selectedPreview?.submissionText && resubmissionDiff.mode === "objective") {
-      if (resubmissionDiff.changedAnswers < MIN_OBJECTIVE_CHANGED_ANSWERS && !hasStrongTextEdits) {
+      if (!isFamilyResubmission && resubmissionDiff.changedAnswers < MIN_OBJECTIVE_CHANGED_ANSWERS && !hasStrongTextEdits) {
         setResubmissionStatus({
           loading: false,
           error: `For short answer lists (for example: 1.a 2.b 3.c), change at least ${MIN_OBJECTIVE_CHANGED_ANSWERS} answers from your previous attempt before resubmitting, or expand your corrections with fuller text.`,
@@ -2574,7 +2605,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     if (
       selectedPreview?.submissionText &&
       resubmissionDiff.mode === "text" &&
-      !hasStrongTextEdits
+      !hasStrongTextEdits && !isFamilyResubmission
     ) {
       setResubmissionStatus({
         loading: false,
@@ -2584,7 +2615,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (hasMatchingRecentSubmission(correctedText, { includeResubmitted: true })) {
+    if (!(isFamilyResubmission && familyFreshRecording) && hasMatchingRecentSubmission(correctedText, { includeResubmitted: true })) {
       setResubmissionStatus({
         loading: false,
         error: "This corrected text is the same as a recent submission. Please make it unique before resubmitting.",
@@ -2662,6 +2693,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         attempt: selectedResubmissionCount + 2,
         attemptNumber: selectedResubmissionCount + 2,
         previousScore: latestSelectedAssignmentScore,
+        ...(isFamilyResubmission?{familyRetryRecording:familyRecording,familyRetryAttemptId:familyAttemptId}:{}),
       };
 
       const submitAssignmentResubmission = httpsCallable(functions, "submitAssignmentResubmission");
@@ -2694,6 +2726,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       });
       setResubmissionText("");
       setResubmissionImprovement("");
+      setFamilyRetry(null);
 
       const submissionsRef = collection(db, SUBMISSION_COLLECTION);
       const snapshot = await getDocs(
@@ -3096,6 +3129,14 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
               Review your tutor feedback, correct the work, then submit the improved version below.
             </p>
+            {isFamilyResubmission && !resubmissionLimitReached && familyAttemptId ? (
+              <section key={familyAttemptId} aria-label="Teil 2 family speaking resubmission" style={{display:"grid",gap:8,border:"1px solid #bfdbfe",borderRadius:12,padding:12}}>
+                <strong>Teil 2 · Record your family answer again</strong>
+                <p style={{...styles.helperText,margin:0}}>Record, listen and save your improved answer. Your transcript replaces only Teil 2. Keep or correct the other answers below. Recording does not use a submission attempt.</p>
+                <A1FamilyRecording resubmission value={familyRecording} disabled={resubmissionStatus.loading||!canSubmitSelected()||!parseFamilyResubmission(resubmissionText||familyPreviousAttempt?.submissionText)} onMarked={saveFamilyRetryRecording} />
+                {!parseFamilyResubmission(resubmissionText||familyPreviousAttempt?.submissionText) && <p role="status">Restore the TEIL 1, TEIL 2 and TEIL 3 headings in Corrected work before recording.</p>}
+              </section>
+            ):null}
             {resubmissionLimitReached ? (
               <InfoBox tone="warning">
                 Submission is blocked because this work already has {MAX_TOTAL_SUBMISSION_ATTEMPTS} total submissions. Your teacher will mark and save the final submitted attempt.
@@ -3167,7 +3208,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 type="button"
                 style={styles.primaryButton}
                 onClick={handleResubmit}
-                disabled={resubmissionStatus.loading || resubmissionLimitReached || submissionCooldownRemainingMs > 0}
+                disabled={resubmissionStatus.loading || resubmissionLimitReached || submissionCooldownRemainingMs > 0 || (isFamilyResubmission&&!validFamilyRecording(resubmissionText,familyRecording))}
               >
                 {resubmissionStatus.loading ? "Saving ..." : "Submit resubmission"}
               </button>

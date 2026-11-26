@@ -1,6 +1,8 @@
 const { _protectedOnCall: onCall } = require("./accountDeletion");
 const { HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
+const { createHash } = require("node:crypto");
+const { validateFamilyRetry, verifyFamilyRecordingOwnership } = require("./familyResubmission");
 const { FieldValue, Timestamp } = require("firebase-admin/firestore");
 const {
   PASS_THRESHOLD_SCORE,
@@ -294,8 +296,10 @@ const validatePayload = (data = {}) => {
     );
   }
 
+  const isFamilyRetry = compact(canonicalAssignmentKey) === "a13";
+  const familyRetry = isFamilyRetry ? validateFamilyRetry(correctedText, data.familyRetryRecording) : null;
   let changedSubmissionParts = [];
-  if (hasStructuredPayload) {
+  if (hasStructuredPayload && !isFamilyRetry) {
     const requiredParts = requiredSubmissionParts.length ? requiredSubmissionParts : submissionSectionOrder;
     const missingParts = requiredParts.filter((partId) => !cleanText(structuredSections[partId], 12000));
     if (missingParts.length) {
@@ -328,7 +332,7 @@ const validatePayload = (data = {}) => {
         submissionSectionOrder.includes(partId)
       );
     }
-  } else if (correctedText.length < 80) {
+  } else if (!isFamilyRetry && correctedText.length < 80) {
     throw new HttpsError("invalid-argument", "Corrected text is too short.");
   }
 
@@ -354,7 +358,8 @@ const validatePayload = (data = {}) => {
     chapter: cleanText(data.chapter, 80),
     chapterKey: cleanText(data.chapterKey, 160),
     className: cleanText(data.className, 200),
-    structured: hasStructuredPayload
+    familyRetry,
+    structured: hasStructuredPayload && !isFamilyRetry
       ? {
           submissionStructureVersion: Math.max(1, Number(data.submissionStructureVersion || 1) || 1),
           structuredSections,
@@ -456,7 +461,22 @@ exports.submitAssignmentResubmission = onCall({ region: "europe-west1" }, async 
       .slice()
       .sort((left, right) => submissionMillis(right) - submissionMillis(left))[0];
 
-    const incomingFingerprint = cleanText(data.submissionFingerprint, 400);
+    let incomingFingerprint = cleanText(data.submissionFingerprint, 400);
+    let familyRetryAttachment = null;
+    if(validated.familyRetry){
+      if(latestAttempt?.id!==data.familyRetryAttemptId)throw new HttpsError("failed-precondition","Your last attempt changed. Refresh and save your recording again.");
+      const prior=latestAttempt.recordings?.find(r=>r.sectionKey==="teil-2")||latestAttempt.workbookSections?.["teil-2"]?.recording;
+      const recording=validated.familyRetry;
+      const reused=prior?.audioUrl===recording.audioUrl&&String(prior?.transcript||"").trim()===recording.transcript;
+      if(!reused){
+        if(attemptDocuments.some(row=>row.recordings?.some(r=>r.audioUrl===recording.audioUrl)||row.workbookSections?.["teil-2"]?.recording?.audioUrl===recording.audioUrl))throw new HttpsError("failed-precondition","Please save a new recording or keep the latest saved answer.");
+        await verifyFamilyRecordingOwnership(getAdmin(),authUid,recording.audioUrl);
+      } else if(getSubmissionText(latestAttempt)===validated.correctedText){
+        throw new HttpsError("failed-precondition","Correct an answer or record a new speaking response before resubmitting.");
+      }
+      familyRetryAttachment={recordings:[recording],workbookSections:{"teil-2":{text:recording.transcript,recording}},workbookRevision:"a1-3-recorded-family-grammar-v2"};
+      incomingFingerprint="a1-3:"+createHash("sha256").update(validated.correctedText+"\n"+recording.audioUrl).digest("hex");
+    }
     const duplicateInHistory = Boolean(
       incomingFingerprint &&
         matchingSubmissions.some(
@@ -483,6 +503,7 @@ exports.submitAssignmentResubmission = onCall({ region: "europe-west1" }, async 
       const counterSnap = await transaction.get(counterRef);
       const counter = counterSnap.data() || {};
       const attempts = Math.max(Number(counter.attempts || 0), historicalAttempts);
+      if(validated.familyRetry && attempts>historicalAttempts)throw new HttpsError("failed-precondition","Your latest attempt changed. Refresh before resubmitting.");
       const serverLatestSubmissionMillis = Math.max(
         latestSubmissionMillis,
         toMillis(counter.lastSubmittedAt),
@@ -545,6 +566,7 @@ exports.submitAssignmentResubmission = onCall({ region: "europe-west1" }, async 
         submissionText: validated.correctedText,
         answer: validated.correctedText,
         workContent: validated.correctedText,
+        ...(familyRetryAttachment||{}),
         improvementSummary: validated.improvementSummary,
         previousSubmissionText: cleanText(
           data.previousSubmissionText || getSubmissionText(latestAttempt),
