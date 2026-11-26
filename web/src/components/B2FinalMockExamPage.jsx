@@ -19,9 +19,12 @@ import { getB2MockReviewPlans } from "../data/b2MockReviewPlans";
 import "./B2FinalMockExamPage.css";
 
 const READING_SECONDS = 65 * 60;
+const LISTENING_SECONDS = 40 * 60;
+const isListeningStage = stage => /^hoeren-teil[1-4]$/.test(stage);
 const isReadingStage = stage => /^teil[1-5]$/.test(stage);
 const usesFullReading = state => state.readingFormatVersion === 2;
 const isReadingComplete = state => usesFullReading(state) ? state.teil5Completed : state.teil4Completed;
+const examDuration = (state, stage) => usesFullReading(state) && isReadingStage(stage) ? READING_SECONDS : usesFullReading(state) && isListeningStage(stage) ? LISTENING_SECONDS : SECTION_DURATIONS[stage];
 
 const SECTION_DURATIONS = Object.freeze({
   teil1: 18 * 60,
@@ -1159,7 +1162,7 @@ function B2FinalMockExamPageAttempt() {
     setState(current => current.attemptStartedAtMs ? current : {...current, attemptStartedAtMs:Date.now()});
   }, [state.attemptStartedAtMs, state.stage, state.started]);
   const secondsLeft = useMemo(() => {
-    const duration = usesFullReading(state) && isReadingStage(state.stage) ? READING_SECONDS : SECTION_DURATIONS[state.stage];
+    const duration = examDuration(state, state.stage);
     if (!duration) return null;
     if (!state.started || !state.deadlineMs || state.completed) {
       return duration;
@@ -1173,7 +1176,7 @@ function B2FinalMockExamPageAttempt() {
     announceExamSuccess(state.started ? "B2 mock resumed successfully." : "B2 mock started successfully.");
     setState((current) => {
       const stage = current.stage || "teil1";
-      const duration = usesFullReading(current) && isReadingStage(stage) ? READING_SECONDS : SECTION_DURATIONS[stage];
+      const duration = examDuration(current, stage);
       return {
         ...current,
         started: true,
@@ -1222,7 +1225,7 @@ function B2FinalMockExamPageAttempt() {
   };
 
   const chooseHoeren1 = (number, answer) => {
-    if (!state.started) return;
+    if (!state.started || (usesFullReading(state) && secondsLeft <= 0)) return;
     setState((current) => ({
       ...current,
       hoeren1Answers: { ...current.hoeren1Answers, [number]: answer },
@@ -1237,7 +1240,7 @@ function B2FinalMockExamPageAttempt() {
   };
 
   const chooseHoeren2 = (number, answer) => {
-    if (!state.started) return;
+    if (!state.started || (usesFullReading(state) && secondsLeft <= 0)) return;
     setState((current) => ({
       ...current,
       hoeren2Answers: { ...current.hoeren2Answers, [number]: answer },
@@ -1252,7 +1255,7 @@ function B2FinalMockExamPageAttempt() {
   };
 
   const chooseHoeren3 = (number, answer) => {
-    if (!state.started) return;
+    if (!state.started || (usesFullReading(state) && secondsLeft <= 0)) return;
     setState((current) => ({
       ...current,
       hoeren3Answers: { ...current.hoeren3Answers, [number]: answer },
@@ -1267,7 +1270,7 @@ function B2FinalMockExamPageAttempt() {
   };
 
   const chooseHoeren4 = (number, answer) => {
-    if (!state.started) return;
+    if (!state.started || (usesFullReading(state) && secondsLeft <= 0)) return;
     setState((current) => ({
       ...current,
       hoeren4Answers: { ...current.hoeren4Answers, [number]: answer },
@@ -1353,9 +1356,9 @@ function B2FinalMockExamPageAttempt() {
       ...current,
       hoeren1Completed: true,
       stage: "hoeren-teil2",
-      started: false,
+      started: usesFullReading(current),
       completed: false,
-      deadlineMs: null,
+      deadlineMs: usesFullReading(current) ? current.deadlineMs : null,
     }));
     announceExamSuccess("Hören Teil 1 completed. Continue to Teil 2.");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1366,9 +1369,9 @@ function B2FinalMockExamPageAttempt() {
       ...current,
       hoeren2Completed: true,
       stage: "hoeren-teil3",
-      started: false,
+      started: usesFullReading(current),
       completed: false,
-      deadlineMs: null,
+      deadlineMs: usesFullReading(current) ? current.deadlineMs : null,
     }));
     announceExamSuccess("Hören Teil 2 completed. Continue to Teil 3.");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1379,9 +1382,9 @@ function B2FinalMockExamPageAttempt() {
       ...current,
       hoeren3Completed: true,
       stage: "hoeren-teil4",
-      started: false,
+      started: usesFullReading(current),
       completed: false,
-      deadlineMs: null,
+      deadlineMs: usesFullReading(current) ? current.deadlineMs : null,
     }));
     announceExamSuccess("Hören Teil 3 completed. Continue to Teil 4.");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1562,6 +1565,7 @@ function B2FinalMockExamPageAttempt() {
           : "This is one full four-module exam, not a single reading or listening exercise. Start this section to continue; your previous work stays saved on this device."}
       />
 
+      {state.started && usesFullReading(state) && isListeningStage(state.stage) ? <p>Gemeinsame Arbeitszeit: circa 40 Minuten. Nach Ablauf können keine weiteren Antworten gespeichert werden. Die vollständigen Hördateien werden pro Teil einmal gestartet; im Goethe-Modellsatz werden die Texte in Teil 2 und 4 zweimal gehört.</p> : null}
       {state.started && usesFullReading(state) && isReadingStage(state.stage) ? <nav aria-label="Lesen Teile 1–5"><p>Gemeinsame Arbeitszeit: 65 Minuten. Sie können zwischen den Teilen wechseln.</p>{[1,2,3,4,5].map(part => <button key={part} type="button" aria-current={state.stage === `teil${part}` ? "step" : undefined} onClick={() => goToReadingPart(`teil${part}`)}>Teil {part}</button>)}</nav> : null}
       {!state.started ? (
         <section className="b2-mock-start">
