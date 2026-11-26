@@ -295,7 +295,7 @@ function DayOneContent({
   );
 }
 
-export default function SwahiliCourseBook({ day = null, basePath = "/swahili", preview = false }) {
+export default function SwahiliCourseBook({ day = null, basePath = "/swahili", preview = false, testingLevel = "" }) {
   const { user, studentProfile } = useAuth();
   const location = useLocation();
   const role = String(studentProfile?.role || "").toLowerCase();
@@ -382,7 +382,7 @@ export default function SwahiliCourseBook({ day = null, basePath = "/swahili", p
     const assignedLevel = studentProfile?.program === "swahili"
       ? normalizeCourseLevel(studentProfile.level) || normalizeCourseLevel(studentProfile.className)
       : "";
-    return <SwahiliCourseOverview basePath={basePath} preview={preview} uid={user?.uid} assignedLevel={assignedLevel} />;
+    return <SwahiliCourseOverview basePath={basePath} preview={preview} uid={user?.uid} assignedLevel={assignedLevel} testingLevel={testingLevel} />;
   }
 
   if (teacherView) {
