@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import A1StudyPartner from "./A1StudyPartner";
 import A1ExamObjectPicture from "./A1ExamObjectPicture";
 import { styles } from "../styles";
 
@@ -71,6 +72,7 @@ const SpeakingExamIntroPage = ({ initialTab = "overview" }) => {
       <p style={{ margin: 0, lineHeight: 1.7, color: "#334155", maxWidth: 850 }}>
         First understand the complete speaking exam. Then practise today’s main skill in detail: <strong>Teil 3</strong>, where you make a polite request and react to a request.
       </p>
+      <A1StudyPartner lesson={{ kind: "practice", day: 15, chapter: "4.7", title: "Introduction to the Goethe A1 Speaking Exam" }} section={tabs.find(tab => tab.id === activeTab)?.label || ""} />
     </header>
 
     <div role="tablist" aria-label="Speaking lesson sections" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 6, padding: 6, background: "#f1f5f9", borderRadius: 12 }}>
