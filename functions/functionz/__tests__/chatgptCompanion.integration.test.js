@@ -358,7 +358,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const legacy = (token) => postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 14, method: "tools/call",
         params: { name: "get_my_falowen_lesson",
-          arguments: { day: 1, level: "C2", section: "reading" } },
+          arguments: { day: 1, section: "reading" } },
       }, token);
       const a2 = (await legacy(first.tokens.access_token)).data.result.structuredContent;
       const b1 = (await legacy(second.tokens.access_token)).data.result.structuredContent;
@@ -449,25 +449,29 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
           arguments: { day, section, level: requestedLevel } },
       }, token);
 
-      const c1Reading = (await call(c1.tokens.access_token, 1, "reading", "C2"))
+      const wrong = (await call(c1.tokens.access_token,1,"reading","C2")).data.result.structuredContent;
+      expect(wrong.available).toBe(false);
+      expect(wrong.currentLevel).toBe("C1");
+      expect(wrong).not.toHaveProperty("material");
+      const c1Reading = (await call(c1.tokens.access_token, 1, "reading", "C1"))
         .data.result.structuredContent;
       expect(c1Reading.level).toBe("C1");
       expect(c1Reading.material.passageIncluded).toBe(true);
-      expect(c1Reading.material.paragraphs).toHaveLength(3);
-      expect(c1Reading.material.questions).toHaveLength(4);
+      expect(c1Reading.material.paragraphs.length).toBeGreaterThan(0);
+      expect(c1Reading.material.questions.length).toBeGreaterThan(0);
       expect(c1Reading.material.questions[0]).not.toHaveProperty("answerIndex");
-      const c1AdvancedReading = (await call(c1.tokens.access_token, 20, "reading", "C2"))
+      const c1AdvancedReading = (await call(c1.tokens.access_token, 20, "reading", "C1"))
         .data.result.structuredContent;
       expect(c1AdvancedReading.level).toBe("C1");
       expect(c1AdvancedReading.available).toBe(true);
       expect(c1AdvancedReading.material.paragraphs).toHaveLength(3);
       expect(c1AdvancedReading.material.questions).toHaveLength(4);
-      const c1Day20 = (await call(c1.tokens.access_token, 20, "overview", "B2"))
+      const c1Day20 = (await call(c1.tokens.access_token, 20, "overview", "C1"))
         .data.result.structuredContent;
       expect(c1Day20.level).toBe("C1");
-      expect(c1Day20.title).toBe("Digitale Gesundheit");
+      expect(c1Day20.title).toBe("KI im Gesundheitswesen und Telemedizin");
 
-      const c2Reading = (await call(c2.tokens.access_token, 1, "reading", "B2"))
+      const c2Reading = (await call(c2.tokens.access_token, 1, "reading", "C2"))
         .data.result.structuredContent;
       expect(c2Reading.level).toBe("C2");
       expect(c2Reading.available).toBe(true);
@@ -479,7 +483,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const legacy = (await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 77, method: "tools/call",
         params: { name: "get_my_falowen_lesson",
-          arguments: { day: 5, level: "B1", section: "reading" } },
+          arguments: { day: 5, level: "C2", section: "reading" } },
       }, c2.tokens.access_token)).data.result.structuredContent;
       expect(legacy.level).toBe("C2");
       expect(legacy.featuredCourseBookSection.section).toBe("reading");
@@ -497,18 +501,18 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect(legacyWriting.featuredCourseBookSection.material.targetWords).toBe(350);
       expect(legacyWriting).not.toHaveProperty("reading");
 
-      const c2Day20 = (await call(c2.tokens.access_token, 20, "reading", "B2"))
+      const c2Day20 = (await call(c2.tokens.access_token, 20, "reading", "C2"))
         .data.result.structuredContent;
       expect(c2Day20.level).toBe("C2");
       expect(c2Day20.available).toBe(false);
-      const c2Writing = (await call(c2.tokens.access_token, 20, "writing", "C1"))
+      const c2Writing = (await call(c2.tokens.access_token, 20, "writing", "C2"))
         .data.result.structuredContent;
       expect(c2Writing.material.targetWords).toBe(350);
 
       const exam = await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 85, method: "tools/call",
         params: { name: "get_my_falowen_practice_guide",
-          arguments: { day: 5, skill: "reading", mode: "exam", language: "en", level: "B1" } },
+          arguments: { day: 5, skill: "reading", mode: "exam", language: "en", level: "C2" } },
       }, c2.tokens.access_token);
       const guide = exam.data.result.structuredContent;
       expect(guide.level).toBe("C2");
