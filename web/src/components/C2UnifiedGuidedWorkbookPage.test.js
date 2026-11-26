@@ -241,9 +241,9 @@ describe("C2 unified topic-first workbook", () => {
   });
 
   test("keeps the B2 and C2 section navigation in normal document flow", () => {
-    expect(workbookComponents).toContain('const sticky = !["B2", "C2"].includes(normalizedLevel)');
-    expect(workbookComponents).toContain('data-sticky-navigation={sticky ? "true" : "false"}');
-    expect(workbookComponents).toContain('style={sticky ? { position: "sticky", top: 0, zIndex: 35 } : undefined}');
+    const advanced = workbookComponents.slice(workbookComponents.indexOf("export const AdvancedSelfLearningTabNav"), workbookComponents.indexOf("export const WorkbookTaskCard"));
+    expect(advanced).toContain('data-sticky-navigation="false"');
+    expect(advanced).not.toContain('position: "sticky"');
   });
 
 

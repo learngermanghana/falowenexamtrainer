@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import ExamStudyPartner from "./ExamStudyPartner";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import LiveSpeakPage from "./LiveSpeakPage";
@@ -109,6 +111,7 @@ const SpeakingPage = ({
   lockedTeil: lockedTeilProp = "",
   examOnly = false,
   contextLabel = "",
+  allowExamStudyPartner = false,
 }) => {
   const { level: examLevel } = useExam();
   const { idToken, user, studentProfile } = useAuth();
@@ -1112,6 +1115,10 @@ const SpeakingPage = ({
           </button> : null}
         </div>
 
+        {allowExamStudyPartner && isExamMode && practiceStage === "home" && !liveExaminerActive && !fullExam && !isRecording && (
+          <div style={{ padding: "10px 12px" }}><ExamStudyPartner key={selectedLevel} level={selectedLevel} section="speaking" /></div>
+        )}
+
         {!isExamMode ? (
         <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#F8FAFC", borderBottom: "1px solid #E5E7EB", flexWrap: "wrap", alignItems: "center" }}>
           {visibleSpeakingTabs.map((tab) => (
@@ -1427,7 +1434,10 @@ const SpeakingPage = ({
             onStart={beginSpeakingPractice}/>
         ) : null}
         {isExamMode && practiceStage === "results" ? (
+          <>
           <SpeakingRunResults level={selectedLevel} results={runResults} onReturn={()=>setPracticeStage("home")} onRepeat={()=>beginSpeakingPractice(runResults.length>1)}/>
+          {allowExamStudyPartner && !liveExaminerActive && runResults.length > 0 && <div style={{padding:"10px 12px"}}><ExamMistakeReview key={selectedLevel+":"+runResults.length} level={selectedLevel} section="speaking" part={runResults.length===1?runResults[0].teil:""} completed /></div>}
+          </>
         ) : null}
         {isExamMode && practiceStage === "practice" ? <SpeakingExaminationScreen
           level={selectedLevel} teil={selectedTeil} parts={Object.keys(examSteps[selectedLevel] || {})}

@@ -8,11 +8,16 @@
  * This runs during Vercel's existing prebuild, and explicitly in the companion CI.
  */
 import fs from "node:fs";
+import { VOCAB_SOURCE_URL } from "../web/src/services/vocabService.js";
+import { register } from "node:module";
+import { SWAHILI_A1_PRACTICE_UNITS } from "../web/src/data/swahili/a1PracticeUnits.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/b2LessonContentAlignment.js";
 import { getC1CanonicalTitle, getC1CanonicalGrammarTitle, getC1ContentProfile, alignC1LessonContent } from "../web/src/data/c1ContentRefresh.js";
 import { C1_READING_PRACTICE } from "../web/src/data/c1ReadingPractice.js";
+import { getC1AcademicDay } from "../web/src/data/c1AcademicCurriculum.js";
+import { getC1Phase2Lesson } from "../web/src/data/c1Phase2Lessons.js";
 import { C2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/c2LessonContentAlignment.js";
 import { C2_READING_PRACTICE } from "../web/src/data/c2ReadingPractice.js";
 import { C2_LISTENING_PRACTICE } from "../web/src/data/c2ListeningPractice.js";
@@ -33,6 +38,8 @@ import { A2_GRAMMAR_ROUTE_ENTRIES } from "../web/src/data/a2GrammarRoutes.js";
 import { A2_READING_TASKS } from "../web/src/data/a2ReadingTasks.js";
 import { A2_LISTENING_TASKS, A2_LISTENING_MODES } from "../web/src/data/a2ListeningTasks.js";
 import { A2_REQUIRED_WRITING_DAYS } from "../web/src/data/a2WritingSchedule.js";
+import { A2_PRESENTATION_CARDS } from "../web/src/data/a2PresentationCards.js";
+import { getA2GoetheWritingTask } from "../web/src/data/a2GoetheWritingTasks.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
 import { extractGrammarTeaching, grammarComponentPaths } from "./extractFalowenGrammar.mjs";
@@ -180,6 +187,16 @@ for (let day = 1; day <= 28; day += 1) {
   const listening = A2_LISTENING_TASKS[day];
   const grammarLink = A2_GRAMMAR_ROUTE_ENTRIES.find((entry) => Number(entry.day) === day);
   const writingRequired = A2_REQUIRED_WRITING_DAYS.includes(day);
+  // Day 22 is now a dedicated speaking mock, not an ordinary classroom card.
+  // Its protected mock is retrieved via Exams Room rather than the course exporter.
+  const presentation = day === 22 ? null : A2_PRESENTATION_CARDS[day];
+  const writingTask = writingRequired && day !== 22 ? getA2GoetheWritingTask(day) : null;
+  if (day !== 22 && (!presentation?.centralQuestion || presentation.branches?.length !== 5 || presentation.branches.some(b=>!b.question))) {
+    throw new Error("A2 original speaking card missing for day " + day);
+  }
+  if (writingRequired && day !== 22 && (!writingTask?.situation || writingTask.points?.length !== 3)) {
+    throw new Error("A2 original writing task missing for day " + day);
+  }
   const originalGrammar = extractGrammarTeaching(grammarSources.A2[day]);
   A2[String(day)] = {
     level: "A2", day, chapter: text(lesson.chapter || reading.chapter, 25),
@@ -208,10 +225,26 @@ for (let day = 1; day <= 28; day += 1) {
         ? text(listening.audioUrl, 500) : null,
       questions: publicQuestions(listening.questions),
     } } : {}),
-    ...(writingRequired ? { writing: {
+    ...(presentation ? { speaking: {
+      source: "Falowen A2 Course Book classroom presentation card",
+      format: "Goethe A2 Teil 2 inspired classroom practice",
+      prompt: text(presentation.centralQuestion,600),
+      instruction: text(presentation.instruction,1400),
+      instructionEn: text(presentation.instructionEn,1400),
+      guidingQuestions: presentation.branches.map(branch=>text(branch.question,450)),
+      keywords: strings(presentation.keywords,5,200),
+      languageSupport: presentation.branches.map(branch=>text(branch.starter,250)).filter(Boolean),
+      targetDurationSeconds: 60,
+      practiceOnly: true,
+      clarification: "Practise the original card as a short talk or interactive conversation. Ask the original guiding questions one at a time; wait for the learner's answer. Any newly worded follow-up must be identified as a teaching example. No model answers or official grades.",
+    } } : {}),
+    ...(writingTask ? { writing: {
+      source: "Falowen A2 Course Book writing task",
+      title: text(writingTask.title,400),
+      prompt: text(writingTask.situation,1800),
+      instructions: strings(writingTask.points,3,800),
       requiredInCampus: true,
-      instructions: [text(lesson.instruction, 800)].filter(Boolean),
-      clarification: "This is a Course Book submission requirement. The full writing prompt may be in the Campus workbook; no missing prompt is invented.",
+      clarification: "Original writing prompt and three required points. Coach the student's own answer; official marking and submission remain in Campus.",
     } } : {}),
   };
 }
@@ -411,18 +444,28 @@ for (let day = 1; day <= 28; day += 1) {
       !reading.questions?.length) {
     throw new Error("Missing authentic C1 learner practice for day " + day);
   }
+  const academic = getC1AcademicDay(day);
+  const practice = getC1Phase2Lesson(day);
+  if (!academic || !practice || practice.title !== academic.topic || practice.skill !== academic.skill || practice.part !== academic.part || practice.vocabulary.length !== 20) throw new Error("Missing upgraded C1 source for day " + day);
+  const skillFocus = {Lesen:"lesen",Hören:"hoeren",Sprechen:"speak",Schreiben:"write"}[practice.skill];
+  const practiceQuestions = (practice.questions || []).map(([question, options]) => ({question:text(question,900), options:strings(options,10,700)}));
+  const practiceMeta = { title:practice.title, part:practice.part, task:text(practice.instruction,1800), source:"Falowen-authored academic Course Book practice (not an official Goethe exam)" };
   C1[String(day)] = {
     level: "C1", day,
     chapter: text(entry.chapter || entry.displayChapter, 25),
-    title: text(title, 240),
-    topic: text(profile.question, 600),
-    goal: text(profile.aim, 700),
-    grammarFocus: text(grammarFocus, 300),
-    skillFocus: "self_study",
+    title: text(academic.topic, 240),
+    topic: text(academic.topic, 600),
+    foundationTitle: text(title,240),
+    goal: text(academic.task, 700),
+    grammarFocus: text(practice.grammar, 300),
+    skillFocus,
+    examPart: practice.part,
     campusTabs: ["Learn", "Lesen", "Speak", "Write", "Finish", "Ref"],
     grammar: {
-      focus: text(grammarFocus, 300),
-      explanation: strings(aligned.grammarLesson?.explanation, 6, 1100),
+      focus: text(practice.grammar, 300),
+      explanation: [text(practice.rule,1800), ...strings(aligned.grammarLesson?.explanation, 3, 1100)],
+      examples: [text(academic.example,700)],
+      exercises: practice.grammarChecks.map(([prompt])=>({question:text(prompt,900)})),
       rules: strings(aligned.grammarLesson?.rules, 8, 950),
       task: text(aligned.grammarLesson?.miniExercise, 1200),
       fullExplanationIncluded: false,
@@ -441,8 +484,9 @@ for (let day = 1; day <= 28; day += 1) {
       clarification: "Practise speaking in ChatGPT or Falowen Campus; no recorded speaking mark is created here.",
     },
     vocabulary: {
+      terms: practice.vocabulary.map(([term,meaning])=>({term:text(term,180),meaning:text(meaning,300)})),
       phrases: strings(aligned.phrases, 12, 180),
-      clarification: "Selected C1 course expressions, not a complete lesson vocabulary inventory.",
+      clarification: "All 20 German-English expressions from the upgraded C1 day.",
     },
     review: strings(profile.points, 6, 600),
     reading: {
@@ -456,6 +500,14 @@ for (let day = 1; day <= 28; day += 1) {
       questions: publicQuestions(reading.questions),
       clarification: "New Falowen C1 practice passage and open-response questions. ChatGPT may give feedback on attempted answers; official Campus marking is separate.",
     },
+    // Replace the featured skill with the actual upgraded exercise, retaining
+    // the previous supplemental open reading and productive tasks on other days.
+    ...(skillFocus === "lesen" ? {reading:{...practiceMeta, passageIncluded:true, questionsIncluded:true,
+      paragraphs: [text(practice.text,18000)], questions:practiceQuestions}} : {}),
+    ...(skillFocus === "hoeren" ? {listening:{...practiceMeta, audioAvailableInCampus:false, campusPlaybackAvailable:"device-dependent", audioMode:"Campus device-local German speech synthesis when supported; otherwise teacher read-aloud", questions:practiceQuestions,
+      clarification:"Open the corresponding Campus Learn tab for playback or teacher read-aloud. The hidden listening text is not exported; never pretend to play it in ChatGPT."}} : {}),
+    ...(skillFocus === "speak" ? {speaking:{...practiceMeta,prompt:text(practice.instruction,1800),guidingQuestions:strings(practice.prompts,8,900),followups:strings(practice.followups,5,800),rubric:strings(practice.rubric,8,800)}} : {}),
+    ...(skillFocus === "write" ? {writing:{...practiceMeta,type:practice.part===1?"Forumsbeitrag":"Formelle Nachricht",prompt:text(practice.instruction,1800),instructions:strings(practice.prompts,8,900),targetWords:practice.part===1?230:120,rubric:strings(practice.rubric,8,800)}} : {}),
   };
 }
 
@@ -543,10 +595,107 @@ const grammarCoverage = Object.fromEntries(["A2", "B1"].map((level) => [level,
 if (grammarCoverage.A2 < 20 || grammarCoverage.B1 < 20) {
   throw new Error("Insufficient actual grammar pages exported: " + JSON.stringify(grammarCoverage));
 }
+// Only explicit learner-facing fields; never copy an entire workbook object.
+const SWAHILI_A1 = {};
+const swExamples = items => (Array.isArray(items) ? items : []).slice(0, 12)
+  .map(item => ({ term: text(item?.swahili, 350), meaning: text(item?.english, 450) }))
+  .filter(item => item.term);
+for (const [key, unit] of Object.entries(SWAHILI_A1_PRACTICE_UNITS)) {
+  const day = Number(key);
+  if (!Number.isInteger(day) || day < 1 || day > 20 || Number(unit.day) !== day) continue;
+  const examples = swExamples(unit.examples);
+  const terms = (Array.isArray(unit.vocabulary) ? unit.vocabulary : []).slice(0,40).map(v=>({term:text(v?.sw,180),meaning:text(v?.en,260)})).filter(v=>v.term&&v.meaning);
+  const questions = items => (Array.isArray(items) ? items : []).slice(0, 12)
+    .map(q => ({ question: text(q?.question, 600), options: strings(q?.choices || q?.options, 6, 450) }))
+    .filter(q => q.question);
+  SWAHILI_A1[key] = {
+    day, title: text(unit.title, 240), chapter: text(unit.chapter, 80),
+    goal: text(unit.objective, 900), grammarFocus: text(unit.grammar, 450),
+    grammar: { rule: text(unit.rule, 2000), examples,
+      sections: (Array.isArray(unit.grammarSections) ? unit.grammarSections : []).slice(0, 10)
+        .map(s => ({ title: text(s.title, 250), rule: text(s.rule, 1800), examples: swExamples(s.examples) })) },
+    ...((examples.length || terms.length) ? { vocabulary: { terms, phrases: examples, clarification: "Published lesson vocabulary and examples, not the complete dictionary." } } : {}),
+    ...(unit.reading?.text ? { reading: { title: text(unit.reading.title, 260),
+      passage: text(unit.reading.text, 12000), questions: questions(unit.reading.questions) } } : {}),
+    ...(typeof unit.speaking === "string" && unit.speaking ? { speaking: { prompt: text(unit.speaking, 1800) } } : {}),
+    ...(unit.writing?.prompt ? { writing: { prompt: text(unit.writing.prompt, 1800) } } : {}),
+  };
+}
+// Campus data modules use extensionless relative imports. Resolve only local
+// JS modules during this build, without a runtime dependency or a second registry.
+register(new URL("./chatgptCourseSourceLoader.mjs", import.meta.url));
+const { getA2B1LessonProfile } = await import("../web/src/data/a2B1LessonProfile.js");
+const { getTimedAssignmentConfig, getTimedAssignmentPhase } = await import("../web/src/data/timedAssignmentConfig.js");
+const { getAssignmentSubmissionWordMinimum } = await import("../web/src/utils/assignmentSubmissionWordMinimum.js");
+const germanWorkbookRules = {};
+for (const level of ["A2", "B1"]) {
+  for (let day = 1; day <= 28; day++) {
+    const profile = getA2B1LessonProfile(level, day);
+    const id = profile?.assignmentKey;
+    if (!id || !profile.requiredSubmissionParts?.length || profile.timer ||
+        getTimedAssignmentConfig(id) || day >= getTimedAssignmentPhase(level).startDay) continue;
+    // The runtime also checks the assignment ID against the live curriculum manifest.
+    germanWorkbookRules[id] = { day, level,
+      requiredParts: profile.requiredSubmissionParts.map(p => p.number),
+      minimumWords: getAssignmentSubmissionWordMinimum({ level, chapter: id.slice(3) }) };
+  }
+}
+const swahiliWorkbookRules = {};
+for (const [key, unit] of Object.entries(SWAHILI_A1_PRACTICE_UNITS)) {
+  if (unit.practiceOnly || !unit.writing?.prompt || !unit.reading?.questions?.length) continue;
+  const questionRules = items => (items || []).map(q => ({
+    id: text(q.id, 80), choices: strings(q.choices || q.options, 8, 450),
+  }));
+  const reading = questionRules(unit.reading.questions);
+  const listening = questionRules(unit.listening?.questions);
+  if ([...reading,...listening].some(q => !q.id) ||
+      (unit.listening && !listening.length)) continue;
+  swahiliWorkbookRules[key] = { day: Number(key), title: text(unit.title, 240),
+    writingKey: Number(key) === 11 ? "dialogue" : "response",
+    reading, listening, ...(unit.contentVersion ? { contentVersion: unit.contentVersion } : {}),
+    ...(Number(key) === 4 ? { readingVersion: 2 } : {}) };
+  // Supply the exact question IDs for the student's reviewed answers, but never
+  // expose a recording URL, transcript or teacher key through the MCP export.
+  const exported = SWAHILI_A1[key];
+  if (exported?.reading) exported.reading.questions = unit.reading.questions.map(q => ({
+    id: text(q.id,80), question: text(q.question,600), options: strings(q.choices || q.options,8,450),
+  }));
+  if (exported && listening.length) exported.listening = {
+    audioAvailableInCampus: Boolean(unit.listening.audioUrlEndpoint),
+    questions: unit.listening.questions.map(q => ({
+      id: text(q.id,80), question: text(q.question,600), options: strings(q.choices || q.options,8,450),
+    })),
+  };
+}
+// Existing public Music assets, compiled with the course snapshot so the
+// API bundle does not depend on files outside its deployed functions root.
+// Keep exact recording identities internal; the MCP response projects only
+// a public track link and a bounded lyric passage.
+const musicJson=name=>JSON.parse(fs.readFileSync(path.join(root,"web/public/music",name),"utf8"));
+const publicTracks=(name,swahili=false)=>(musicJson(name).tracks||[])
+  .filter(t=>t.coursebook===true&&t.retired!==true&&(swahili||t.approved===true))
+  .map(t=>({id:t.id,title:t.title,level:t.level,day:t.day,topic:t.topic,
+    assignmentKey:t.assignmentKey,objectKey:t.objectKey,audioUrl:t.audioUrl,
+    approved:t.approved,coursebook:true}));
+const musicGerman=publicTracks("catalog.json");
+const musicSwahili=publicTracks("swahili-catalog.json",true);
+const musicKeys=new Set([...musicGerman,...musicSwahili].map(t=>t.objectKey));
+const musicRecords=name=>({recordings:(musicJson(name).recordings||[])
+  .filter(r=>musicKeys.has(r.objectKey)&&r.referenceOnly!==true&&r.transcriptionStatus!=="automatic")
+  .map(r=>({objectKey:r.objectKey,lyrics:r.lyrics}))});
+const musicTranslations={recordings:(musicJson("english-translations.json").recordings||[])
+  .filter(r=>musicKeys.has(r.objectKey))
+  .map(r=>({objectKey:r.objectKey,lines:(r.lines||[]).map(l=>({de:l.de,en:l.en}))}))};
+const musicStories={byObjectKey:Object.fromEntries(Object.entries(musicJson("song-stories.json").byObjectKey||{})
+  .filter(([key])=>musicKeys.has(key)).map(([key,v])=>[key,{storyDe:v.storyDe,storyEn:v.storyEn,focusDe:v.focusDe,focusEn:v.focusEn}]))};
 const artifact = {
   schemaVersion: 1,
   provenance: "Learner-facing Falowen Course Book content compiled from canonical workbook and lesson sources",
   levels: { A1, A2, B1, B2, C1, C2 },
+  programs: { swahili: { A1: SWAHILI_A1 } },
+  vocabularySourceUrl: VOCAB_SOURCE_URL,
+  musicTutor:{german:{tracks:musicGerman},swahili:{tracks:musicSwahili},approved:musicRecords("approved-recording-lyrics.json"),timings:musicRecords("timings.json"),translations:musicTranslations,stories:musicStories},
+  officialWorkbookRules: { german: germanWorkbookRules, swahili: swahiliWorkbookRules },
 };
 const serialized = JSON.stringify(artifact, null, 2) + "\n";
 if (serialized.includes('"answerIndex"') || serialized.includes('"sampleAnswer"') ||

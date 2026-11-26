@@ -4,7 +4,7 @@ import { analyzeAudio } from "../services/coachService";
 import { buildRecordedAudioBlob, createSpeakingMediaRecorder, userFacingAudioError } from "../lib/speakingAudio";
 import { styles } from "../styles";
 
-export default function A1FamilyRecording({ value, onMarked, task = null, disabled = false }) {
+export default function A1FamilyRecording({ value, onMarked, task = null, disabled = false, resubmission = false }) {
   const { user } = useAuth();
   const recorder = useRef(null);
   const stream = useRef(null);
@@ -90,7 +90,7 @@ export default function A1FamilyRecording({ value, onMarked, task = null, disabl
   return <div data-a1-family-recorder="true" style={{ display: "grid", gap: 12 }}>
     <button type="button" style={styles.secondaryButton} disabled={disabled || phase === "starting" || phase === "marking"}
       onClick={() => phase === "recording" ? recorder.current?.stop() : start()}>
-      {phase === "recording" ? "Stop recording" : phase === "starting" ? "Opening microphone…" : task ? "Record answer" : "Record family answer"}
+      {phase === "recording" ? "Stop recording" : phase === "starting" ? "Opening microphone…" : task ? "Record answer" : resubmission && value ? "Record again" : "Record family answer"}
     </button>
     {url ? <audio controls src={url} aria-label={task ? "Your recording" : "Your family recording"} /> : null}
     {blob ? <button type="button" style={styles.primaryButton} disabled={disabled || !user || phase !== "idle"} onClick={mark}>
@@ -101,7 +101,7 @@ export default function A1FamilyRecording({ value, onMarked, task = null, disabl
     {value ? <div style={{ whiteSpace: "pre-wrap" }}>
       {value.audioUrl ? <audio controls src={value.audioUrl} aria-label={task ? "Saved recording" : "Saved family recording"} /> : null}
       <h3>Your spoken answer</h3><p>{value.transcript}</p>
-      <p>{task ? "Your transcript is saved for tutor review. The audio is discarded after transcription." : "Your recording is saved. AI marks the complete assignment after final submission."}</p>
+      <p>{task ? "Your transcript is saved for tutor review. The audio is discarded after transcription." : resubmission ? "Your recording is saved. Submit the corrected assignment when you are ready." : "Your recording is saved. AI marks the complete assignment after final submission."}</p>
     </div> : null}
   </div>;
 }

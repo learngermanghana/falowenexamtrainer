@@ -218,7 +218,7 @@ describe("B2 unified C2-style course structure", () => {
     expect(nav).toContain('import { getB2DayTabs } from "../data/b2SkillCycle"');
     expect(nav).toContain('normalizedLevel === "B2"');
     expect(nav).toContain('getB2DayTabs(day)');
-    expect(nav).toContain('["B2", "C2"].includes(normalizedLevel)');
+    expect(nav).toContain('data-sticky-navigation="false"');
   });
 
   test("opens previous and next B2 lessons directly without repeating Radio", () => {

@@ -40,6 +40,13 @@ Run `node scripts/checkAiDocumentation.mjs`. It validates required sources, inte
 
 ## Kiswahili Course Book layout
 
+Published Kiswahili Radio episodes use the same Radio-first screen and Continue
+button as German A2 Day 1. A1 Days 5, 6, 10, 11 and 12 and B1 Day 28 open Radio
+before the workbook navigation. Continue preserves any requested workbook
+section. AI lessons retain their workbook placement. Lessons without a
+configured episode open directly to the workbook; Kiswahili A2 has no published
+workbooks yet.
+
 Kiswahili A1 Day 4 (**Nchi na Lugha**) replaces its old three-question short-answer Lesen with the instructor-supplied Amina–John countries/languages dialogue and five four-option multiple-choice questions. Hören now has five four-option questions based on the teacher-provided Kenya–Tanzania conversation and reads the private R2 key `swahili/A1/day-04/day-04.mp3` only through the existing Firebase-authenticated, fixed-key signed-audio endpoint `/api/course-media/swahili/a1/day-4/audio-url`. The learner workbook contains question prompts and options but no correct-answer key or public audio object URL. New Day 4 submissions use `readingVersion: 2`, so Admin applies the revised tutor key and includes listening; existing unversioned submissions retain the old three-question reading reference and no listening requirement. The learner review identifies older submissions rather than showing them under the new questions, and Day 4 revision drafts use a separate local key. The teacher-provided transcript is the basis for the five Hören questions; verify that the uploaded recording matches it before releasing to students. This does not change other lessons.
 
 
@@ -155,6 +162,10 @@ Review before public release: the supplied source contains potentially awkward p
 ### Kiswahili shared learner progress
 
 The Home dashboard, Course Book and Results consume `useSwahiliProgress` and the curriculum registry, which derives publication status from the existing A1 curriculum and A2/B1 title dictionary. Existing lesson document IDs, tutor review IDs and submission contracts are unchanged. On page mount the hook reads the learner's existing submissions once and fetches reviews only for submitted workbooks; no listener, polling or writes are added. Revisions take priority in Continue Learning. Progress measures submitted published required assignments, not completion of the full planned syllabus. Unknown data is not reported as zero. No new learner routes or permissions are introduced.
+
+## Owner Course Book testing access
+
+The verified owner can select Developer testing access in Campus → Course Book or Account, using the current enrolled language and a temporary testing level (German A1–C2; Kiswahili A1–B1, published lessons only). `web/src/utils/ownerCourseTesting.js` defines the identity, session and course-route checks; `web/src/App.js` holds the selection in memory, resetting on language change, logout or reload. The selector does not change `students`, `levelEnrollments`, payment grants, class assignment, or sheet synchronization. The Course Book suppresses its automatic completion snapshot while testing. The actual profile remains authoritative in Account, billing, and Exams Room. This is live course navigation, not an isolated data sandbox: explicitly submitting work or using ordinary progress controls may still save to the owner's real account. Server permissions, private audio access, assessment rules, and payment eligibility are not expanded. Use a dedicated test account for end-to-end submission and payment tests. No scheduled jobs or new data subscriptions are introduced.
 
 ### Kiswahili A1–B2 placement revision — 25 November 2026
 

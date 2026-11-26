@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { C1AcademicGrammarPractice } from "./C1AcademicExamPractice";
 
 const card = {
   ...styles.card,
@@ -78,6 +79,7 @@ const CheckAnswer = ({ question, children }) => (
 export default function C1Day7ReisenGrammarNotes({ checked = false, onCheckedChange }) {
   return (
     <div style={{ display: "grid", gap: 16 }}>
+      <C1AcademicGrammarPractice day={7} />
       <section style={card}>
         <span style={{ ...styles.badge, width: "fit-content" }}>C1 · Day 7 · Grammar Notes</span>
         <h2 style={{ ...styles.title, margin: 0, fontSize: "clamp(1.7rem, 4vw, 2.5rem)" }}>

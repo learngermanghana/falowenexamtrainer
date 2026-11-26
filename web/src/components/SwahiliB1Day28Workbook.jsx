@@ -8,8 +8,7 @@ import { useSwahiliB1Workbook } from "../hooks/useSwahiliB1Workbook";
 import SwahiliB1Day28Reading, { readingQuestions } from "./SwahiliB1Day28Reading";
 import { Link } from "react-router-dom";
 import { SWAHILI_B1_WORKBOOK_TABS, useSwahiliWorkbookTab, SwahiliWorkbookNavigation } from "./SwahiliWorkbookNavigation";
-import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
-import FalowenRadioTabContent from "./FalowenRadioTabContent";
+import SwahiliWorkbookRadio from "./SwahiliWorkbookRadio";
 import { WorkbookTabNav } from "./StandardWorkbookComponents";
 import SwahiliReviewDraft, { SwahiliFinalSubmit } from "./SwahiliReviewDraft";
 import TeacherLectureSupportingMaterials from "./selfLearning/TeacherLectureSupportingMaterials";
@@ -88,21 +87,30 @@ function MediaQuestions({ title, questions }) {
   );
 }
 
-const radioResource = {
-  title: "Kutunza Mazingira",
-  youtubeId: "aeXVw4Q4olE",
-  instruction: "Sikiliza kipindi, kisha jibu maswali.",
+const lesson = {
+  day: 28,
+  radio: {
+    resourceRole: "falowenRadio",
+    title: "Kutunza Mazingira",
+    youtubeId: "aeXVw4Q4olE",
+    instruction: "Sikiliza kipindi, kisha jibu maswali.",
+  },
 };
 
-const radioIntro = (
+const radioActivities = (
   <div className="swahili-b1-study" lang="sw">
-    <FalowenRadioTabContent level="Kiswahili B1" day={28} resource={radioResource} />
     <p><a href="https://youtu.be/aeXVw4Q4olE?si=mE7Lv8rc-LRliwsC" target="_blank" rel="noreferrer">Tazama kwenye YouTube</a></p>
     <MediaQuestions title="Maswali kuhusu podcast" questions={radioQuestions} />
   </div>
 );
 
 export default function SwahiliB1Day28Workbook({ uid }) {
+  return <SwahiliWorkbookRadio lesson={lesson} level="B1" radioActivities={radioActivities}>
+    <Workbook uid={uid} />
+  </SwahiliWorkbookRadio>;
+}
+
+function Workbook({ uid }) {
   const [activeTab, selectTab] = useSwahiliWorkbookTab(tabs);
   const {draft,loading:loadingWork,saving,submitted,notice,feedback,confirmationVersion,storageNotice,canSubmit,update,submit:submitWork} = useSwahiliB1Workbook({uid,day:28,title:"Kutunza Mazingira katika Maisha ya Kila Siku",writingField:"email",complete: d => Boolean(d.writing.email?.trim()) && allObjectiveQuestionsAnswered(readingQuestions,d.reading) && allObjectiveQuestionsAnswered(listeningQuestions,d.listening)});
   const writing = draft.writing.email || "";
@@ -112,8 +120,6 @@ export default function SwahiliB1Day28Workbook({ uid }) {
   const updateReading = (id,value) => update("reading",id,value);
   const updateListening = (id,value) => update("listening",id,value);
   return (
-    <RadioFirstWorkbookGate level="Kiswahili B1" day={28} transcriptIntro={radioIntro}
-      introInstruction="Sikiliza kipindi cha Falowen Radio, kisha jibu maswali kabla ya kuendelea.">
     <main className="swahili-book swahili-book--workbook swahili-b1-study" lang="sw">
       <Link to="/campus/course">← Kitabu cha kozi</Link>
       <header className="swahili-book__hero">
@@ -306,6 +312,5 @@ export default function SwahiliB1Day28Workbook({ uid }) {
       </section>
       <SwahiliWorkbookNavigation tabs={tabs} activeTab={activeTab} onChange={selectTab} />
     </main>
-    </RadioFirstWorkbookGate>
   );
 }

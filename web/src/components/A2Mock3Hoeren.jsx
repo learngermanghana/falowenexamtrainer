@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import { weakestScoredExamPart } from "../utils/examStudyPartner";
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import AppBackButton from "./navigation/AppBackButton";
@@ -32,7 +34,7 @@ const readFullHoerenCompletion = uid => {
   catch { return false; }
 };
 
-export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewReleased = false, practiceReturnPath = "/exams/mocks" }) {
+export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewReleased = false, practiceReturnPath = "/exams/mocks", allowExamMistakeReview = false }) {
   const { idToken, user } = useAuth();
   const [active, setActive] = useState(0);
   const [answers, setAnswers] = useState(() => restore(user?.uid));
@@ -183,6 +185,7 @@ export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewRele
             <h2>{embedded ? "Hören abgegeben" : `Hören-Übungsergebnis: ${score}/20`}</h2>
             <p>{embedded ? "Der Hören-Score wird mit den anderen drei Modulen durch den Server geprüft." : "Dies ist ausschließlich die lokale Hören-Übungsauswertung für vier Teile, keine verifizierte viermodulige Mock-Prüfungsnote."}</p>
             {!embedded ? <>
+              {allowExamMistakeReview && <ExamMistakeReview level="A2" section="horen" completed={submitted} part={weakestScoredExamPart(PARTS.map(item=>({label:"Teil "+item.number,total:item.data.questions.length,score:item.data.questions.filter(q=>String(answers[q.number]||"").toLowerCase()===String(q.answer).toLowerCase()).length})))} />}
               <div className="a2-mock3-hoeren-review" aria-label="Question by question review">
                 {PARTS.map(item => <section key={item.id}>
                   <h3>Teil {item.number} · {item.label}</h3>

@@ -143,8 +143,8 @@ test("unsubscribed exam-only students can browse all mock cards but cannot start
   locked.forEach(button => expect(button).toBeEnabled());
   fireEvent.click(locked[0]);
   expect(screen.getByRole("dialog")).toBeInTheDocument();
-  expect(screen.getByRole("link",{name:"View plans"})).toHaveAttribute("href","/mock/payment");
-  fireEvent.click(screen.getByRole("button",{name:"Keep browsing"}));
+  expect(screen.getByRole("link",{name:"Pay now"})).toHaveAttribute("href","/mock/payment");
+  fireEvent.keyDown(screen.getByRole("dialog"), {key:"Escape"});
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(screen.queryByRole("heading", { name: "Choose how to continue" })).toBeNull();
 });

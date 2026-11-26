@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { C1AcademicGrammarPractice } from "./C1AcademicExamPractice";
 
 const card = {
   ...styles.card,
@@ -306,6 +307,7 @@ export default function C1Day8To10GrammarNotes({ day, checked = false, onChecked
   if (!lesson) return null;
   const dayNumber = Number(day);
   return <div style={{ display: "grid", gap: 16 }}>
+      <C1AcademicGrammarPractice day={day} />
     <section style={card}>
       <span style={{ ...styles.badge, width: "fit-content" }}>C1 · Day {day} · Grammar Notes</span>
       <h2 style={{ ...styles.title, margin: 0, fontSize: "clamp(1.7rem,4vw,2.5rem)" }}>{lesson.title}</h2>

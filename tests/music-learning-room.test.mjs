@@ -23,6 +23,7 @@ function api() {
     } };
     if (id.includes('courseMusic.cjs')) return { signTrack: id => ({ url: 'https://signed.invalid/' + id }), signObject: ({key}) => {signedCalls.push({key});return {url:'https://signed.invalid/'+key};} };
     if (id.includes('musicDiscovery.cjs')) return { musicKeyFromAutoId };
+    if (id === '../server/swahiliMusic.cjs') return require(id);
     throw new Error('Unexpected import ' + id);
   };
   const module = { exports: {} };

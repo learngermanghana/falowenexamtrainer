@@ -1,3 +1,4 @@
+const {verifiedOwnerPreview,previewInfo} = require("./chatgptOwnerCourseTesting");
 "use strict";
 
 // Falowen ChatGPT learning companion: read-only MCP with OAuth 2.1 + PKCE.
@@ -11,7 +12,13 @@ const { getStudentTimetable } = require("./chatgptClassTimetable");
 const { prepareFromTimetable } = require("./chatgptClassPreparation");
 const { getExamPractice, listExamPractice } = require("./chatgptExamPractice");
 const { getMyExamDictionary } = require("./chatgptExamLibrary");
+const { TOOLS: EXAM_TOOLS, isExamOnlyProfile, validExamOnlyProfile, examTool } = require("./chatgptMockReview");
 const { germanEnrollment, submitA1Assignment } = require("./chatgptAssignmentSubmission");
+const { submitExpandedWorkbook, workbookStatus } = require("./chatgptWorkbookSubmission");
+const { TOOLS: REVISION_TOOLS, revisionTool, revisionAccess, permitted } = require("./chatgptPersonalRevision");
+const { enrollmentRows, enrollmentDecision } = require("./levelEnrollmentAccess");
+const { TOOLS: TUTOR_TOOLS, tutorTool } = require("./chatgptInteractiveTutor");
+const { TOOLS: COACH_TOOLS, coachTool } = require("./chatgptSavedRevision");
 
 let GENERATED_COURSE_CONTENT = null;
 try {
@@ -38,14 +45,14 @@ function lessonContentResponse(level, day, section = "overview") {
     source: "Falowen Course Book (learner-facing source data)",
     lessonUrl: lessonUrl(level, { dayNumber: day, displayChapter: content.chapter }),
     ...(level === "C1" ? { readingPracticeUrl: SITE + "/campus/course/c1-self-learning/day-" + day } : {}),
-    guidance: "Use only the supplied learner-facing text for claims about Falowen's exact exercises. Do not claim to know answers or completion state.",
+    guidance: "Use only the supplied learner-facing text for claims about Falowen's exact exercises. Do not claim to know answers or completion state. The selected lesson section is a starting point. Keep the last verified programme, level, day and chapter in this conversation. When the learner asks in German or English to switch section or chapter, retrieve the exact requested section of the same lesson or the requested new lesson before teaching. Verify level and day, and chapter if specified. Use the actual workbook part mapping when known; ask briefly if Teil numbering is ambiguous. Do not assume every level or exam has the same numbering. A2 Day 9 Teil 1 is speaking and Teil 2 writing. For previous levels use the authorised revision tools. Do not require a new conversation or a Campus tab change unless the requested source or playback is unavailable. If Voice cannot call tools, retrieve in text in the same chat and resume Voice. No invented exercises or automatic grade.",
+    availableSections: [...VALID_LESSON_SECTIONS].filter(key=>key==="overview"||Boolean(content[key])),
+    ...(level==="A2"&&day===9?{workbookPartSections:{"1":"speaking","2":"writing","3":"reading",...(content.listening?{"4":"listening"}:{})}}:{}),
   };
   if (section === "overview") return {
     ...base, available: true,
     topic: content.topic, goal: content.goal, grammarFocus: content.grammarFocus,
-    skillFocus: content.skillFocus, campusTabs: content.campusTabs,
-    availableSections: VALID_LESSON_SECTIONS.size && [...VALID_LESSON_SECTIONS].filter((key) =>
-      key === "overview" || Boolean(content[key])),
+    skillFocus: content.skillFocus, examPart: content.examPart, campusTabs: content.campusTabs,
     studySequence: [
       ...(level === "B1" && content.reading
         ? ["Read the original Falowen Lesen passage and answer its questions. Do not request a key before attempting them."]
@@ -98,7 +105,7 @@ function practiceGuideResponse(level, day, skill = "reading", mode = "exam", lan
   const steps = {
     reading: "First display the authentic passage. Ask only one original question at a time and wait for the student's answer. Give feedback with supporting paragraph evidence, then ask the next question. For open-response C1 questions, assess reasoning without inventing an official answer key.",
     listening: "Link the learner to the lesson audio in Falowen Campus where available. Never claim to play an audio file that was not supplied. Ask one original question at a time after listening; do not disclose hidden transcripts.",
-    speaking: "Present the original discussion prompt, let the learner answer in German, and coach coherence, grammar, vocabulary, pronunciation only when audio is actually available, and counterarguments.",
+    speaking: "Present the original speaking prompt. For an A2 classroom card, use its five original guiding questions one at a time; wait for the learner to answer in German before giving short feedback and continuing. Offer sentence starters only when needed. A newly worded conversational follow-up must be labelled as a teaching example, not a quoted Falowen question. Match the student level; assess pronunciation only when actual audio is available. Never claim an official grade.",
     writing: "Present the original writing task and expected length. Request the learner's own draft, then explain strengths and revisions using the provided rubric; do not claim to mark or submit in Campus.",
     grammar: "Teach the exact course grammar in the requested language, provide short level-appropriate examples, then ask a learner to create one sentence at a time and explain corrections.",
   };
@@ -214,7 +221,7 @@ async function studentForIdentity(admin, identity, boundId) {
     const linkedEmail = normalize(data.authEmail || data.loginEmail || data.email).toLowerCase();
     if (!identity.email_verified || !linkedEmail || linkedEmail !== normalize(identity.email).toLowerCase()) return null;
   }
-  if (!safeStudentAccess(data)) return null;
+  if (!safeStudentAccess(data) && !validExamOnlyProfile(data)) return null;
   return { id: snap.id, data };
 }
 
@@ -336,6 +343,62 @@ function summarizeStudentAssignments(student, rows) {
   };
 }
 
+// Enrolment metadata is not a payment grant. Never infer secondary enrolment
+// from a retained placement alone, or derive Kiswahili from German level.
+function companionPrograms(student) {
+  const data = student.data || {};
+  const german = germanEnrollment(student);
+  const programs = [];
+  if (german.enrolledInGerman && german.germanLevel) programs.push({ program: "german", level: german.germanLevel });
+  const secondary = normalize(data.secondaryProgram).toLowerCase();
+  const placement = data.coursePlacements?.swahili;
+  const swLevel = german.primaryProgram === "swahili"
+    ? normalizeLevel(data.level || data.course)
+    : german.primaryProgram === "german" && ["swahili", "kiswahili"].includes(secondary) && placement
+      ? normalizeLevel(placement.level || placement.levelId) : "";
+  if (swLevel) programs.push({ program: "swahili", level: swLevel });
+  return programs;
+}
+
+function swahiliLessonResponse(student, day, section = "overview") {
+  const enrolled = companionPrograms(student).find(p => p.program === "swahili");
+  const base = { program: "swahili", level: enrolled?.level || null, day, section,
+    campusUrl: SITE + "/campus/course" };
+  if (!enrolled || enrolled.level !== "A1") return { ...base, available: false,
+    clarification: "An active Kiswahili A1 enrolment is required. Other levels are not exported; use Campus." };
+  if (!Number.isInteger(day) || day < 1 || day > 20 ||
+      !["overview","grammar","vocabulary","reading","speaking","writing","listening"].includes(section)) {
+    return { ...base, available: false, clarification: "Unsupported Kiswahili day or section." };
+  }
+  const lesson = GENERATED_COURSE_CONTENT?.programs?.swahili?.A1?.[String(day)];
+  if (!lesson) return { ...base, available: false, clarification: "This lesson is not exported; do not invent course material." };
+  const details = { ...base, title: lesson.title, lessonUrl: SITE + "/campus/course/swahili/day-" + day,
+    guidance: "Use the published Kiswahili content. Ask one question at a time; provide unofficial feedback after the learner attempts it. Do not invent audio, grades, completion or answer keys." };
+  if (section === "overview") return { ...details, available: true, goal: lesson.goal,
+    grammarFocus: lesson.grammarFocus, availableSections: ["grammar","vocabulary","reading","speaking","writing","listening"].filter(k => Boolean(lesson[k])) };
+  return lesson[section] ? { ...details, available: true, material: lesson[section] }
+    : { ...details, available: false, clarification: "This section is not exported. Open the lesson in Campus." };
+}
+
+function revisionEvidence(student, rows) {
+  const level = studentView(student).level;
+  // Use only explicitly level-labelled records for new analytics, and never
+  // mix a dual-enrolled learner's potentially same-level programme scores.
+  if (!level || SELF_STUDY_LEVELS.has(level) || companionPrograms(student).length !== 1) {
+    return { available: false, level, clarification: "Programme-specific tutor evidence is unavailable for this account. No weaknesses or readiness score can be inferred." };
+  }
+  const scoped = (Array.isArray(rows) ? rows : []).filter(row =>
+    normalizeLevel(row.level) === level &&
+    !["swahili","kiswahili"].includes(normalize(row.program || row.languageProgram).toLowerCase()));
+  const summary = summarizeStudentAssignments(student, scoped);
+  const items = (summary.assignments || []).filter(a => a.status === "needs_review")
+    .sort((a,b) => a.bestRecordedScore - b.bestRecordedScore).slice(0, 5);
+  return { available: summary.passed + summary.needsReview > 0, level,
+    recordedPassed: summary.passed, recordedNeedsReview: summary.needsReview,
+    noGradeRecorded: summary.noGradeRecorded, revisionPriorities: items,
+    guidance: "Prioritise these real recorded assignments. Tutor scores alone are not skill scores or an exam readiness prediction; do not infer unsubmitted work or promise a pass. Use the actual lesson and ask the learner what they struggled with." };
+}
+
 const toolDefinitions = [
 
   {
@@ -355,6 +418,48 @@ const toolDefinitions = [
     _meta: { "openai/profile": true },
   },
   {
+    name: "get_my_falowen_access",
+    description: "List my recorded German and Kiswahili course enrolments and Campus link. This does not grant payment or previous-level access.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_my_falowen_swahili_lesson",
+    description: "Practise the published Kiswahili A1 workbook for my own enrolled programme. Choose a day and section; never substitute German, invent listening audio or expose official answers.",
+    inputSchema: { type: "object", properties: {
+      day: { type: "integer", minimum: 1, maximum: 20 },
+      section: { type: "string", enum: ["overview","grammar","vocabulary","reading","speaking","writing","listening"] },
+    }, required: ["day"], additionalProperties: false },
+  },
+  {
+    name: "get_my_falowen_weaknesses",
+    description: "Identify German revision priorities from my own explicitly level-labelled tutor assignment scores. Not a skill-level or exam readiness prediction; missing grades are not missing submissions.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name:"get_my_falowen_revision_levels",
+    description:"Check my verified current and previous course levels for read-only revision. A trial can only access Day 1. No new submission entitlement.",
+    inputSchema:{type:"object",properties:{},additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_revision_lesson",
+    description:"Retrieve authorised current or previous-level original German or Kiswahili A1 lesson content for revision only. First check revision levels; no official submission or grading.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},section:{type:"string",enum:["overview","vocabulary","grammar","reading","listening","speaking","writing","review"]}},required:["program","day"],additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_personal_plan",
+    description:"Build a personalised 15–120 minute plan from authorised lessons, explicitly scoped tutor assignment marks, or a selected verified mock result. Optional examDate is learner supplied, not an official scheduled date. For a mock-based plan first retrieve my verified attempt ID with mock history. No pass prediction or saved official grades.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},minutes:{type:"integer",minimum:15,maximum:120},mockId:{type:"string",maxLength:80},attemptId:{type:"string",maxLength:150},examDate:{type:"string",maxLength:10}},required:["program"],additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_revision_vocabulary",
+    description:"Retrieve bilingual vocabulary from an authorised published lesson (specify day) or the existing level-filtered German Campus dictionary (omit day for full course). Quiz one item at a time, repeat missed words within conversation; no saved spaced-repetition records.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},query:{type:"string",maxLength:100},limit:{type:"integer",minimum:1,maximum:20}},required:["program"],additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
+  },
+  {
     name: "get_my_falowen_study_plan",
     description: "Suggest a short daily study plan using my own recorded course assignments and learner-safe lesson content. Missing marks are not proof of non-submission; self-study completion cannot be verified.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
@@ -368,6 +473,18 @@ const toolDefinitions = [
     name: "get_my_falowen_grammar_writing_coach",
     description: "Coach grammar or writing from my real Falowen lesson with feedback on my own answers, without giving official grades or submitting work.",
     inputSchema: { type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50 }, skill: { type: "string", enum: ["grammar", "writing"] }, language: { type: "string", enum: ["de", "en"] } }, required: ["day", "skill"], additionalProperties: false },
+  },
+  {
+    name:"get_my_falowen_oral_examiner",
+    description:"Start interactive oral self-practice using an original authorised Exams Room speaking dictionary card, published mock task or course lesson. In exam mode ask one question at a time and give feedback at the end; coach mode corrects after each turn. No official grade, audio recording or timed exam. Exam-only students may use entitled exam sources, not Course Book.",
+    inputSchema:{type:"object",properties:{source:{type:"string",enum:["dictionary","mock","lesson"]},mode:{type:"string",enum:["exam","coach"]},program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},part:{type:"string",enum:["teil1","teil2","teil3","teil4","teil5"]},mockId:{type:"string",maxLength:80},taskId:{type:"string",maxLength:130},query:{type:"string",maxLength:100}},additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_music_tutor",
+    description:"List approved lesson-linked German or Kiswahili songs at an authorised course level, or study a chosen track using its exact bundled recording lyrics, matched English translation and editorial story when available. Returns up to eight lines per request. No R2 keys, drafts, guessed lyrics or timing, playback tracking or official score. Open the original Falowen Music song to listen.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},day:{type:"integer",minimum:1,maximum:50},trackId:{type:"string",maxLength:245},startLine:{type:"integer",minimum:1,maximum:500},lineCount:{type:"integer",minimum:1,maximum:8}},required:["program"],additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name: "get_my_falowen_speaking_partner",
@@ -397,13 +514,25 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_exam_practice",
-    description: "Retrieve one learner-visible original Schreiben/Sprechen task or A1 Mock 02/03 Lesen/Hören question from published Falowen mock exams. Hören supplies a protected Exams Room listening page link, NOT private audio or a transcript. No official timed attempt, answer key, or score.",
+    description: "Retrieve one learner-visible original task from a supported published A1–B1 mock, with Campus Practice Mode links for unexported sections. Hören supplies a protected Exams Room listening page link, NOT private audio or a transcript. No official timed attempt, answer key, or score.",
     inputSchema: { type: "object", properties: {
       mockId: { type: "string", pattern: "^[a-z][a-z0-9-]{2,79}$", maxLength: 80, description: "Published mock ID shown by get_my_falowen_exam_mocks; unsupported question sets return unavailable rather than invented tasks." },
       skill: { type: "string", enum: ["writing", "speaking", "reading", "listening"] },
       part: { type: "string", maxLength: 24 },
       questionNumber: { type: "integer", minimum: 1, maximum: 35 },
     }, required: ["mockId", "skill"], additionalProperties: false },
+  },
+  {
+    name:"get_my_falowen_mock_history",
+    description:"List my own official Falowen mock attempts for an accessible mock paper. Only verified completed attempts contain official scores. Use its attempt ID to retrieve corrections. No exam attempts are started or modified.",
+    inputSchema:{type:"object",properties:{mockId:{type:"string",maxLength:80},cursor:{type:"string",maxLength:150}},required:["mockId"],additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_mock_review",
+    description:"Retrieve my own verified mock attempt's numbered Lesen/Hören mistakes, saved Schreiben/Sprechen feedback, recorded section scores and targeted revision priorities. Never infer a pass prediction or use historical corrections to answer an active timed test.",
+    inputSchema:{type:"object",properties:{mockId:{type:"string",maxLength:80},attemptId:{type:"string",maxLength:150}},required:["mockId","attemptId"],additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
   },
   {
     name: "save_my_falowen_practice_note",
@@ -416,6 +545,32 @@ const toolDefinitions = [
     }, required: ["day", "skill", "note", "requestId"], additionalProperties: false },
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false, idempotentHint: true },
     securitySchemes: [{ type: "oauth2", scopes: [SCOPE, PRACTICE_WRITE_SCOPE] }],
+  },
+  {
+    name: "get_my_falowen_submission_status",
+    description: "Check my own official workbook submission record, required sections and review status. Use German assignment ID or Kiswahili A1 day. No record does not prove missing work; official grades are separate.",
+    inputSchema: { type:"object", properties:{
+      program:{type:"string",enum:["german","swahili"]},
+      assignmentId:{type:"string",maxLength:48},day:{type:"integer",minimum:1,maximum:20},
+    }, required:["program"],additionalProperties:false },
+  },
+  {
+    name: "submit_my_falowen_workbook",
+    description: "Submit eligible untimed German A2/B1 or published Kiswahili A1 work for tutor review. First retrieve exact requirements and prompts, show every learner answer and obtain separate explicit confirmation that the work is final. For Kiswahili listening require the student to confirm listening to the real recording or teacher. Never invent answers, submit timed work or overwrite an existing submission. Requires assignment-write OAuth permission.",
+    inputSchema:{type:"object",properties:{
+      program:{type:"string",enum:["german","swahili"]},
+      assignmentId:{type:"string",maxLength:48},
+      day:{type:"integer",minimum:1,maximum:20},
+      answerText:{type:"string",maxLength:4200},
+      writing:{type:"string",maxLength:12000},
+      readingAnswers:{type:"object",additionalProperties:{type:"string",maxLength:12000}},
+      listeningAnswers:{type:"object",additionalProperties:{type:"string",maxLength:12000}},
+      listeningConfirmed:{type:"boolean"},
+      requestId:{type:"string",minLength:8,maxLength:80,pattern:"^[A-Za-z0-9_-]+$"},
+      confirmed:{type:"boolean",description:"True only after explicit confirmation of the displayed exact final answers."},
+    },required:["program","requestId","confirmed"],additionalProperties:false},
+    annotations:{readOnlyHint:false,destructiveHint:true,openWorldHint:false,idempotentHint:true},
+    securitySchemes:[{type:"oauth2",scopes:[SCOPE,ASSIGNMENT_WRITE_SCOPE]}],
   },
   {
     name: "submit_my_falowen_assignment",
@@ -440,6 +595,31 @@ const toolDefinitions = [
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
+    name:"get_my_falowen_assignment_correction",
+    description:"Explain my recorded German A1–B1 tutor assignment feedback or my current reviewed Kiswahili A1 workbook. Ask for my own response before correcting it and create similar retry exercises. Never change marks or invent original answers.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1"]},assignmentId:{type:"string",maxLength:48},day:{type:"integer",minimum:1,maximum:20}},required:["program"],additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
+  },
+  {
+    name:"get_my_falowen_vocabulary_review",
+    description:"Get my own due vocabulary flashcards from previously confirmed practice sessions for an authorised course level. Repeat difficult words one at a time; never reveal the meaning before I answer. These are not grades.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},limit:{type:"integer",minimum:1,maximum:20}},required:["program"],additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
+  },
+  {
+    name:"save_my_falowen_vocabulary_review",
+    description:"Save up to ten vocabulary review outcomes matching the exact authorised Falowen vocabulary previously retrieved. Show the words and agreed self-reported outcomes, then request explicit confirmation before saving. Requires optional practice-write permission. Use a unique retry ID. Not an official score.",
+    inputSchema:{type:"object",properties:{program:{type:"string",enum:["german","swahili"]},level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"]},items:{type:"array",minItems:1,maxItems:10,items:{type:"object",properties:{term:{type:"string",maxLength:180},meaning:{type:"string",maxLength:300},day:{type:"integer",minimum:1,maximum:50},outcome:{type:"string",enum:["again","hard","remembered"]}},required:["term","meaning","outcome"],additionalProperties:false}},requestId:{type:"string",minLength:8,maxLength:80,pattern:"^[A-Za-z0-9_-]+$"},confirmed:{type:"boolean"}},required:["program","items","requestId","confirmed"],additionalProperties:false},
+    annotations:{readOnlyHint:false,destructiveHint:false,openWorldHint:false,idempotentHint:true},
+    securitySchemes:[{type:"oauth2",scopes:[SCOPE,PRACTICE_WRITE_SCOPE]}],
+  },
+  {
+    name:"get_my_falowen_exam_recommendations",
+    description:"Recommend targeted exam revision using my selected verified mock attempt and available authorised practice papers. First use mock history to select an attempt. If none is selected, establish a baseline rather than invent scores. No readiness percentage or pass prediction. Available to entitled exam-only accounts.",
+    inputSchema:{type:"object",properties:{mockId:{type:"string",maxLength:80},attemptId:{type:"string",maxLength:150},minutes:{type:"integer",minimum:15,maximum:120}},additionalProperties:false},
+    annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false},
+  },
+  {
     name: "get_my_falowen_feedback",
     description: "Retrieve my most recent tutor-marked assignment scores and feedback, not other students' data.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
@@ -458,7 +638,7 @@ const toolDefinitions = [
     name: "get_my_falowen_lesson",
     description: "Get my assigned course day and a learner-safe, source-grounded exercise for A1–C2 when exported. Supports older published ChatGPT connections without the practice guide. Ask one question at a time and never fabricate missing exercises or expose answer keys.",
     inputSchema: {
-      type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50, description: "Lesson day in the student's enrolled course." } },
+      type: "object", properties: { day: { type: "integer", minimum: 1, maximum: 50, description: "Lesson day in the student's enrolled course." }, level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"],description:"Requested German level; must match the linked current course."} },
       required: ["day"], additionalProperties: false,
     },
   },
@@ -469,6 +649,7 @@ const toolDefinitions = [
       type: "object",
       properties: {
         day: { type: "integer", minimum: 1, maximum: 50 },
+        level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"],description:"Requested German level; must match the linked current course."},
         skill: { type: "string", enum: ["reading", "listening", "speaking", "writing", "grammar"] },
         mode: { type: "string", enum: ["exam", "study"] },
         language: { type: "string", enum: ["de", "en"], description: "Language for explanations, not the original German source." },
@@ -479,11 +660,12 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_lesson_content",
-    description: "Read learner-facing Course Book content for my enrolled level. C1 now has Falowen-authored passages and questions on all 28 days (not Goethe originals). B2/C2 rotating skill days are preserved. Choose exact day and section; do not expose hidden solutions or invent audio.",
+    description: "Read actual learner-facing German Course Book material for the linked A1–C2 level, including the upgraded 28-day C1 curriculum. Verify the requested level explicitly; use revision tools for authorised previous levels. Never substitute another level or invent unavailable material.",
     inputSchema: {
       type: "object",
       properties: {
         day: { type: "integer", minimum: 1, maximum: 50, description: "Course Book day" },
+        level:{type:"string",enum:["A1","A2","B1","B2","C1","C2"],description:"Requested German level; must match the linked current course."},
         section: {
           type: "string", enum: ["overview", "vocabulary", "grammar", "reading", "listening", "speaking", "writing", "review"],
           description: "Choose one section per call to keep results fast. Default overview.",
@@ -493,7 +675,10 @@ const toolDefinitions = [
     },
   },
 ].map((tool) => ({
-  ...tool, annotations: tool.annotations || { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+  ...tool,
+  // Apply defaults per key, not per object: partial overrides must never
+  // remove mandatory explicit boolean hints from the published MCP schema.
+  annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, ...tool.annotations },
   securitySchemes: tool.securitySchemes || [{ type: "oauth2", scopes: [SCOPE] }],
   _meta: { ...(tool._meta || {}) },
 }));
@@ -530,8 +715,32 @@ function featuredLegacyCourseBookSection(level, day) {
 }
 
 async function callTool(name, args, student, admin) {
+  if (name === "get_my_falowen_access") return {
+    programs: companionPrograms(student), campusUrl: SITE + "/campus/account",
+    clarification: "Recorded programme enrolments only. Check Campus for billing, trial, exam and previous-level access."
+  };
+  if (name === "get_my_falowen_swahili_lesson") return swahiliLessonResponse(student, args?.day, args?.section ?? "overview");
+  if (name === "get_my_falowen_weaknesses") {
+    const level = studentView(student).level;
+    if (!level || SELF_STUDY_LEVELS.has(level) || companionPrograms(student).length !== 1) return revisionEvidence(student, []);
+    const code = normalize(student.data.studentCode || student.data.studentcode || student.id);
+    return revisionEvidence(student, await getScoresForStudent(code));
+  }
   const view = studentView(student);
   const enrollment = germanEnrollment(student);
+  const courseReadTools = new Set(["get_my_falowen_lesson","get_my_falowen_lesson_content","get_my_falowen_practice_guide","get_my_falowen_vocabulary_practice","get_my_falowen_grammar_writing_coach","get_my_falowen_speaking_partner","get_my_falowen_music_guide"]);
+  if (courseReadTools.has(name) && args?.level !== undefined && normalizeLevel(args.level) !== view.level) {
+    return {available:false,requestedLevel:normalizeLevel(args.level)||null,currentLevel:view.level,
+      clarification:"The requested level does not match the linked German course. Check get_my_falowen_revision_levels and retrieve an authorised previous level with get_my_falowen_revision_lesson. If the requested level is missing, verify the German enrolment in Falowen Campus or Admin; reconnect if using the wrong account. Do not teach a substituted level.",campusUrl:SITE+"/campus/account"};
+  }
+  if (courseReadTools.has(name) && view.level && admin?.firestore && Number.isInteger(args?.day)) {
+    const db=admin.firestore();
+    const [rows,policy]=await Promise.all([enrollmentRows(db.collection("students").doc(student.id)),db.collection("courseAccountAccess").doc(student.data.uid||student.id).get()]);
+    const decision=enrollmentDecision(rows,"german");
+    const access=revisionAccess(student.data,rows,policy.data()||{});
+    const restricted=decision.managed.includes(view.level)||decision.blocked.includes(view.level)||Boolean(student.data.trialStatus)||policy.data()?.examOnly===true;
+    if (restricted && !permitted(access,"german",view.level,args.day)) return {available:false,currentLevel:view.level,day:args.day,clarification:"This lesson is not authorised for the linked course. Check your course access in Falowen Campus. Do not substitute another lesson.",campusUrl:SITE+"/campus/account"};
+  }
   if (!enrollment.enrolledInGerman && name !== "get_my_falowen_profile") {
     return { available: false, program: enrollment.primaryProgram,
       campusUrl: SITE + "/campus/course",
@@ -676,9 +885,9 @@ async function callTool(name, args, student, admin) {
     const featured = featuredLegacyCourseBookSection(view.level, args.day);
     return {
       level: view.level, day: args.day,
-      title: normalize(entry?.topic || entry?.title || exported?.title).slice(0, 180),
-      goal: normalize(entry?.goal || exported?.goal).slice(0, 600),
-      grammarFocus: normalize(entry?.grammar_topic || entry?.grammarFocus || exported?.grammarFocus).slice(0, 200),
+      title: normalize(exported?.title || entry?.topic || entry?.title).slice(0, 180),
+      goal: normalize(exported?.goal || entry?.goal).slice(0, 600),
+      grammarFocus: normalize(exported?.grammarFocus || entry?.grammar_topic || entry?.grammarFocus).slice(0, 200),
       lessonUrl: lessonUrl(view.level, { dayNumber: args.day, displayChapter: entry?.displayChapter || entry?.chapter || exported?.chapter }),
       ...(view.level === "C1" ? { readingPracticeUrl: SITE + "/campus/course/c1-self-learning/day-" + args.day } : {}),
       guidance: "Explain concepts and offer short original practice questions. Do not complete graded coursework for the learner.",
@@ -867,8 +1076,8 @@ function makeRouter(admin) {
     if (message.method === "initialize") {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "Falowen Learning Companion", version: "1.2.0" },
-        instructions: "Tutoring protocol: prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For German Exams Room, start with get_my_falowen_exam_mocks, choose an explicitly supported mock skill for get_my_falowen_exam_practice, or get real Sprechen/Schreiben practice from get_my_falowen_exam_dictionary. For Hören, link the protected recording in Exams Room without copying private audio or transcripts. For Lesen, show the original source passage and one question at a time. Never invent a missing mock. Only help a learner practise their authorised German course and do not expose hidden solutions. For official A1 tutor submissions, show the exact full answer, request explicit separate confirmation, and use submit_my_falowen_assignment only if the student approved a permanent assignment lock and separately granted the assignment-write scope. A2/B1 and exam submissions remain in Campus. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
+        serverInfo: { name: "Falowen Learning Companion", version: "1.3.0" },
+        instructions: "Tutoring protocol: If revision_levels returns developerTesting.enabled, the verified owner may explicitly request any listed German test level for read-only Course Book preview. Do not confuse test levels with actual enrolled levels or grant exam, payment, progress or submission rights. Always use the explicit requested level and verify returned material.  The selected lesson section is a starting point. Keep the last verified programme, level, day and chapter in this conversation. When the learner asks in German or English to switch section or chapter, retrieve the exact requested section of the same lesson or the requested new lesson before teaching. Verify level and day, and chapter if specified. Use the actual workbook part mapping when known; ask briefly if Teil numbering is ambiguous. Do not assume every level or exam has the same numbering. A2 Day 9 Teil 1 is speaking and Teil 2 writing. For previous levels use the authorised revision tools. Do not require a new conversation or a Campus tab change unless the requested source or playback is unavailable. If Voice cannot call tools, retrieve in text in the same chat and resume Voice. No invented exercises or automatic grade. First verify the requested German level and actual authorised content. Pass level explicitly to lesson_content or practice_guide; if unavailable, stop and explain access, never substitute the linked level. Use revision_levels and revision_lesson for authorised earlier courses. For C1 use the upgraded academic topic and featured skill.  for assignment correction call get_my_falowen_assignment_correction and use recorded feedback only. For vocabulary revision call get_my_falowen_vocabulary_review, then retrieve new words from get_my_falowen_revision_vocabulary when needed. Save outcomes only after explicit confirmation using save_my_falowen_vocabulary_review and the optional practice-write permission. For targeted exam preparation call get_my_falowen_exam_recommendations with a verified attempt selected from mock history; missing skills are not zero, and never predict a pass. For interactive oral practice prefer get_my_falowen_oral_examiner, follow its exam or coach protocol, present one prompt at a time, allow fictional personal details, and never claim an official result or assess pronunciation from text alone. For song-based lessons prefer get_my_falowen_music_tutor, select an exact catalogue track first and use only matched recording lines; direct the learner to Falowen Music to hear the recording and never invent lyrics or timings. Otherwise prefer get_my_falowen_practice_guide for one-question-at-a-time reading, Hören, speaking, writing or bilingual grammar practice. If a student is connected to an older plugin that exposes only get_my_falowen_lesson, use its featuredCourseBookSection and follow practiceSuggestion. C1 reading passages are new Falowen-authored practice, not official Goethe texts. Do not persist conversation practice scores or report them as Campus grades.  For German Exams Room, start with get_my_falowen_exam_mocks, choose an explicitly supported mock skill for get_my_falowen_exam_practice, or get real Sprechen/Schreiben practice from get_my_falowen_exam_dictionary. For Hören, link the protected recording in Exams Room without copying private audio or transcripts. For Lesen, show the original source passage and one question at a time. Never invent a missing mock. Only help a learner practise their authorised German course and do not expose hidden solutions. For mock review, first call get_my_falowen_mock_history, then get_my_falowen_mock_review on a verified attempt. Practise repeatably using the returned practiceUrl and never create or change an official attempt. Exam-only accounts may use only the entitlement-checked Exams Room tools. For official A1 tutor submissions, show the exact full answer, request explicit separate confirmation, and use submit_my_falowen_assignment only if the student approved a permanent assignment lock and separately granted the assignment-write scope. A2/B1 and exam submissions remain in Campus. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, or only a reading task (not a passage) is supplied, say so rather than inventing a workbook passage. C2 uses a four-day skill rotation: Lesen is not available on every day. For personalised daily study, prefer get_my_falowen_personal_plan. For previous-level revision first call get_my_falowen_revision_levels, then get_my_falowen_revision_lesson or get_my_falowen_revision_vocabulary. Earlier-level material is read-only and does not grant assignment submission. Use the existing Campus dictionary for level-filtered flashcards, wait before revealing meanings, and repeat missed terms; do not claim persistent spaced-repetition history. Otherwise restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks to prepare for their next live class, call get_my_falowen_class_preparation; when asking just for timetable, time, topic or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
@@ -893,6 +1102,60 @@ function makeRouter(admin) {
       const name = normalize(message.params?.name);
       if (!toolDefinitions.some((tool) => tool.name === name)) {
         return res.json({ jsonrpc: "2.0", id, error: { code: -32602, message: "Unknown tool" } });
+      }
+      // Exam-only identities may use only the explicit, entitlement-checked exam tools.
+      if (EXAM_TOOLS.has(name)) {
+        const result = await examTool({name,args:message.params?.arguments||{},student,admin,uid:session.uid});
+        return res.json({jsonrpc:"2.0",id,result:{content:[{type:"text",text:JSON.stringify(result)}],structuredContent:result}});
+      }
+      if (TUTOR_TOOLS.has(name)) {
+        // Exam-only users can request oral practice only from authorised exam sources.
+        const args=message.params?.arguments||{};
+        if(isExamOnlyProfile(student.data)&&(name!=="get_my_falowen_oral_examiner"||args.source==="lesson")){
+          return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"This account has exam-only access. Choose an authorised exam speaking task."}]}});
+        }
+        const result=await tutorTool({name,args,student,admin,uid:session.uid,snapshot:GENERATED_COURSE_CONTENT,lessonContentResponse,swahiliLessonResponse});
+        return res.json({jsonrpc:"2.0",id,result:{content:[{type:"text",text:JSON.stringify(result)}],structuredContent:result}});
+      }
+      if (COACH_TOOLS.has(name)) {
+        if(isExamOnlyProfile(student.data)&&name!=="get_my_falowen_exam_recommendations"){
+          return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"This account has exam-only access. Course corrections and saved course vocabulary require full-course access."}]}});
+        }
+        const canWrite=session.scope.split(/\s+/).includes(PRACTICE_WRITE_SCOPE);
+        if(name==="save_my_falowen_vocabulary_review"&&!canWrite){
+          return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"Reconnect with optional practice-write permission. No vocabulary outcomes saved."}]}});
+        }
+        const result=await coachTool({name,args:message.params?.arguments||{},student,admin,uid:session.uid,
+          snapshot:GENERATED_COURSE_CONTENT,canWrite,dual:companionPrograms(student).length>1,
+          loadScores:()=>getScoresForStudent(normalize(student.data.studentCode||student.data.studentcode||student.id))});
+        return res.json({jsonrpc:"2.0",id,result:{content:[{type:"text",text:JSON.stringify(result)}],structuredContent:result}});
+      }
+      if (isExamOnlyProfile(student.data)) {
+        return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"This account has exam-only access. Use the Exams Room tools; Course Book and assignment tools require a Full Course account."}]}});
+      }
+      // Owner preview is deliberately separate from real enrollment permissions.
+      // Do not synthesize a student profile, unlock Exams Room or pass this flag to write tools.
+      const previewArgs=message.params?.arguments||{};
+      const ownerPreview=await verifiedOwnerPreview({session,student,admin,name,args:previewArgs});
+      if(ownerPreview && name!=="get_my_falowen_revision_levels"){
+        const result=name==="get_my_falowen_practice_guide"
+          ? practiceGuideResponse(previewArgs.level,previewArgs.day,previewArgs.skill,previewArgs.mode||"study",previewArgs.language||"en")
+          : lessonContentResponse(previewArgs.level,previewArgs.day,previewArgs.section||"overview");
+        const preview={...result,developerTesting:true,practiceOnly:true,officialSubmission:false,recordedLevel:studentView(student).level,
+          testingNotice:"Owner-only course preview; real enrollment and billing remain unchanged."};
+        return res.json({jsonrpc:"2.0",id,result:{content:[{type:"text",text:JSON.stringify(preview)}],structuredContent:preview}});
+      }
+      if (REVISION_TOOLS.has(name)) {
+        const result=await revisionTool({name,args:message.params?.arguments||{},student,admin,uid:session.uid,
+          snapshot:GENERATED_COURSE_CONTENT,lessonContentResponse,swahiliLessonResponse,
+          loadWeakness:async()=>{
+            const level=studentView(student).level;
+            if(!level||SELF_STUDY_LEVELS.has(level)||companionPrograms(student).length!==1)return revisionEvidence(student,[]);
+            const code=normalize(student.data.studentCode||student.data.studentcode||student.id);
+            return revisionEvidence(student,await getScoresForStudent(code));
+          }});
+        const response=ownerPreview&&name==="get_my_falowen_revision_levels"?{...result,available:true,developerTesting:previewInfo()}:result;
+        return res.json({jsonrpc:"2.0",id,result:{content:[{type:"text",text:JSON.stringify(response)}],structuredContent:response}});
       }
       if (name === "save_my_falowen_practice_note") {
         if (!session.scope.split(/\s+/).includes(PRACTICE_WRITE_SCOPE)) {
@@ -940,6 +1203,18 @@ function makeRouter(admin) {
           isError: !result.submitted, content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result,
         } });
       }
+      if (name === "submit_my_falowen_workbook" || name === "get_my_falowen_submission_status") {
+        if (name === "submit_my_falowen_workbook" && !session.scope.split(/\s+/).includes(ASSIGNMENT_WRITE_SCOPE)) {
+          return res.json({jsonrpc:"2.0",id,result:{isError:true,content:[{type:"text",text:"Reconnect with explicit assignment-write permission. Nothing was submitted."}]}});
+        }
+        const params = {admin,student,uid:session.uid,email:session.email,
+          args:message.params?.arguments || {},rules:GENERATED_COURSE_CONTENT?.officialWorkbookRules};
+        const result = name === "submit_my_falowen_workbook"
+          ? await submitExpandedWorkbook(params) : await workbookStatus(params);
+        return res.json({jsonrpc:"2.0",id,result:{
+          ...(name === "submit_my_falowen_workbook" ? {isError:!result.submitted} : {}),
+          content:[{type:"text",text:JSON.stringify(result)}],structuredContent:result}});
+      }
       const result = await callTool(name, message.params?.arguments || {}, student, admin);
       return res.json({ jsonrpc: "2.0", id, result: {
         content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result,
@@ -959,6 +1234,6 @@ function makeRouter(admin) {
 
 module.exports = {
   makeRouter, oauthParameters, safeStudentAccess, scoreRowsForStudent, summarizeStudentAssignments,
-  lessonContentResponse, practiceGuideResponse,
+  lessonContentResponse, practiceGuideResponse, companionPrograms, swahiliLessonResponse, revisionEvidence,
   constants: { ISSUER, RESOURCE, SCOPE, PRACTICE_WRITE_SCOPE, ASSIGNMENT_WRITE_SCOPE, CLIENT_ID, CALLBACK },
 };

@@ -25,7 +25,7 @@ updateFile("web/src/components/C1Day24To26GuidedLessonPage.js", (source) => {
     const pattern = /\{active === "speak" \? <Section title="Speaking builder">[\s\S]*?<EmbeddedSpeechPracticePanel \/>[\s\S]*?<\/Section> : null\}/;
     if (!pattern.test(updated)) throw new Error("C1 Day 24-26 speaking section not found.");
     const replacement = `{active === "speak" ? <Section title="Speaking builder">\n        <C1SpeakingGuidanceCards\n          question={speaking.question || effectiveLesson.speakingTopic || effectiveLesson.topic}\n          intro={speaking.intro}\n          branches={branches}\n        />\n        <EmbeddedSpeechPracticePanel />\n        <label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label>\n      </Section> : null}`;
-    updated = updated.replace(pattern, replacement);
+    updated = updated.replace(pattern, match => replacement.replace('<Section title="Speaking builder">', '<Section title="Speaking builder">' + (match.includes("C1AcademicExamPractice") ? '<C1AcademicExamPractice day={day} tab="speak" />' : "")));
   }
 
   return updated;
@@ -42,9 +42,12 @@ updateFile("web/src/components/C1Day27To28GuidedLessonPage.js", (source) => {
   const oldSpeak = '{active === "speak" ? <Section title="Speaking builder"><NoteBox tone="amber"><strong>Sprechfrage:</strong> {lesson.speakingBuilder?.question || lesson.speakingTopic || lesson.topic}</NoteBox><EmbeddedSpeechPracticePanel /><label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label></Section> : null}';
   const newSpeak = `{active === "speak" ? <Section title="Speaking builder">\n      <C1SpeakingGuidanceCards\n        question={lesson.speakingBuilder?.question || lesson.speakingTopic || lesson.topic}\n        intro={lesson.speakingBuilder?.intro}\n        branches={lesson.speakingBuilder?.branches || []}\n      />\n      <EmbeddedSpeechPracticePanel />\n      <label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label>\n    </Section> : null}`;
 
-  if (!updated.includes(newSpeak)) {
-    if (!updated.includes(oldSpeak)) throw new Error("C1 Day 27-28 speaking section not found.");
-    updated = updated.replace(oldSpeak, newSpeak);
+  const practice = '<C1AcademicExamPractice day={day} tab="speak" />';
+  const withPractice = text => text.replace('<Section title="Speaking builder">', '<Section title="Speaking builder">' + practice);
+  if (!updated.includes(newSpeak) && !updated.includes(withPractice(newSpeak))) {
+    if (updated.includes(withPractice(oldSpeak))) updated = updated.replace(withPractice(oldSpeak), withPractice(newSpeak));
+    else if (updated.includes(oldSpeak)) updated = updated.replace(oldSpeak, newSpeak);
+    else throw new Error("C1 Day 27-28 speaking section not found.");
   }
 
   return updated;

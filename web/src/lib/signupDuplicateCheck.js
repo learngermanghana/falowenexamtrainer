@@ -1,6 +1,6 @@
 import { getBackendUrl } from "../services/backendUrl";
 
-const REVIEW_MESSAGE = "Falowen needs to verify these details before creating another account. Please log in or reset your password if you already have an account. If you are a different student who shares a family phone number, contact info@falowen.app for help.";
+const REVIEW_MESSAGE = "Registration requires verification. It appears you may already have a Falowen account. Free trial access is limited to one trial per learner per language. Please sign in to your existing account or contact info@falowen.app for assistance.";
 const UNAVAILABLE_MESSAGE = "We could not verify your details right now. Your account has not been created. Please try again or contact info@falowen.app.";
 
 const registrationError = (code, message) => {
@@ -9,13 +9,18 @@ const registrationError = (code, message) => {
   return error;
 };
 
-export async function checkSignupDuplicate({ name, email, phone, emergencyContactPhone }) {
+export async function checkSignupDuplicate({ name, email, phone, emergencyContactPhone, program, browserId, studentCode }) {
   let response;
   try {
-    response = await fetch(`${getBackendUrl()}/auth/signup-duplicate-check`, {
+    // The signup endpoint is called directly in production so Cloud Run sees
+    // the request network rather than the Vercel server's shared egress IP.
+    const base = process.env.NODE_ENV === "production"
+      ? "https://europe-west1-falowen-examiner-trainer.cloudfunctions.net/api"
+      : getBackendUrl();
+    response = await fetch(`${base}/auth/signup-duplicate-check`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, emergencyContactPhone }),
+      body: JSON.stringify({ name, email, phone, emergencyContactPhone, program, browserId, studentCode }),
       cache: "no-store",
     });
   } catch {
@@ -34,6 +39,12 @@ export async function checkSignupDuplicate({ name, email, phone, emergencyContac
   const result = await response.json().catch(() => null);
   if (result?.code !== "CLEAR") {
     throw registrationError("auth/duplicate-check-unavailable", UNAVAILABLE_MESSAGE);
+  }
+  if (program) {
+    if (!/^[a-f0-9]{48}$/.test(result.permit || "")) {
+      throw registrationError("auth/duplicate-check-unavailable", UNAVAILABLE_MESSAGE);
+    }
+    return result.permit;
   }
   return true;
 }

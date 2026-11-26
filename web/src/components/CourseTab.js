@@ -557,12 +557,12 @@ const readPracticeProgress = (key) => {
   }
 };
 
-const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
+const CourseTab = ({ defaultLevel, defaultClassName, program, testingLevel = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { studentProfile, user } = useAuth();
   const resolvedStudentLevel = normalizeLevel(studentProfile?.level) || normalizeLevel(studentProfile?.className);
-  const resolvedDefaultLevel = resolvedStudentLevel || normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
+  const resolvedDefaultLevel = testingLevel || resolvedStudentLevel || normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "";
 
@@ -576,6 +576,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { openLock, lockDialog } = useAccessLock();
   const levels = useMemo(() => {
     if (trialLevel) return [trialLevel];
+    if (testingLevel && Object.hasOwn(schedules,testingLevel)) return [testingLevel];
     const baseLevels = Object.keys(schedules);
     const normalizedDefault = resolvedDefaultLevel;
     const merged = normalizedDefault && !baseLevels.includes(normalizedDefault) ? [...baseLevels, normalizedDefault] : baseLevels;
@@ -588,7 +589,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       if (bIndex !== -1) return 1;
       return a.localeCompare(b);
     });
-  }, [resolvedDefaultLevel, schedules, trialLevel, studentProfile?.blockedEnrollmentLevels,studentProfile?.grantedEnrollmentLevels]);
+  }, [resolvedDefaultLevel, schedules, trialLevel, testingLevel, studentProfile?.blockedEnrollmentLevels,studentProfile?.grantedEnrollmentLevels]);
 
   const [levelChoice, setLevelChoice] = useState(null);
   const assignedLevel = levels.includes(resolvedDefaultLevel) ? resolvedDefaultLevel : levels[0] || "";
@@ -763,7 +764,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   );
 
   useEffect(() => {
-    if (isC2CourseBook || loadingLessonProgress || !user?.uid || !courseCompletion?.total) return undefined;
+    if (testingLevel || isC2CourseBook || loadingLessonProgress || !user?.uid || !courseCompletion?.total) return undefined;
     const timer = setTimeout(() => {
       persistCourseCompletionSnapshot({
         progress: courseCompletion,
@@ -775,7 +776,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       });
     }, 500);
     return () => clearTimeout(timer);
-  }, [courseCompletion, isC2CourseBook, loadingLessonProgress, normalizedSelectedCourseLevel, studentProfile, user]);
+  }, [courseCompletion, isC2CourseBook, loadingLessonProgress, normalizedSelectedCourseLevel, studentProfile, user, testingLevel]);
 
   const practiceEntries = useMemo(() => decoratedSchedule.filter((entry) => !entry.isTutorMarked && !entry.isMilestone), [decoratedSchedule]);
   const practicalCompletedCount = practiceEntries.filter((entry) => effectivePracticeProgress[entry.assignmentKey]?.completed).length;

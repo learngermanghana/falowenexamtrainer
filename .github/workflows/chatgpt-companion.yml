@@ -5,6 +5,13 @@ on:
     paths:
       - "functions/functionz/chatgptCompanion.js"
       - "functions/functionz/chatgptAssignmentSubmission.js"
+      - "functions/functionz/chatgptWorkbookSubmission.js"
+      - "scripts/chatgptCourseSourceLoader.mjs"
+      - "web/src/data/swahili/**"
+      - "web/src/data/b1*.js"
+      - "web/src/data/b2*.js"
+      - "web/src/data/c1*.js"
+      - "web/src/data/c2*.js"
       - "functions/functionz/chatgptA1SubmissionSafety.js"
       - "functions/data/chatgptA1SubmissionRules.generated.json"
       - "scripts/generateChatgptA1SubmissionRules.mjs"
@@ -28,6 +35,29 @@ on:
       - "web/src/data/a1FinalMock2Data.js"
       - "web/src/data/a1FinalMock3Data.js"
       - "functions/functionz/chatgptExamLibrary.js"
+      - "functions/functionz/chatgptExamPractice.js"
+      - "functions/functionz/chatgptMockReview.js"
+      - "functions/functionz/chatgptPersonalRevision.js"
+      - "functions/functionz/chatgptInteractiveTutor.js"
+      - "functions/functionz/chatgptSavedRevision.js"
+      - "functions/functionz/scoresSheet.js"
+      - "functions/functionz/__tests__/chatgptSavedRevision.test.js"
+      - "firestore.rules"
+      - "functions/functionz/__tests__/chatgptInteractiveTutor.test.js"
+      - "web/public/music/catalog.json"
+      - "web/public/music/swahili-catalog.json"
+      - "web/public/music/approved-recording-lyrics.json"
+      - "web/public/music/timings.json"
+      - "web/public/music/english-translations.json"
+      - "web/public/music/song-stories.json"
+      - "functions/functionz/__tests__/chatgptPersonalRevision.test.js"
+      - "web/src/services/vocabService.js"
+      - "functions/functionz/mockAttemptHistory.js"
+      - "functions/functionz/mockListeningReview.js"
+      - "functions/functionz/entitlementService.js"
+      - "functions/functionz/levelEnrollmentAccess.js"
+      - "functions/functionz/mockCommerce.js"
+      - "scripts/chatgptExpandedMockContent.mjs"
       - "scripts/extractFalowenGrammar.mjs"
       - "scripts/extractFalowenWorkbook.mjs"
       - "web/src/components/A2B1WorkbookGrammarNotesContent.js"
@@ -66,7 +96,7 @@ jobs:
       - name: Generate student-facing curriculum from canonical A1–C2 sources
         run: node scripts/generateChatgptLessonContent.mjs && node scripts/generateChatgptExamContent.mjs
       - name: Verify OAuth constraints and student data scope
-        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js functions/functionz/__tests__/chatgptExamLibrary.test.js functions/functionz/__tests__/chatgptExamPractice.test.js functions/functionz/__tests__/chatgptAssignmentSubmission.test.js
+        run: npx jest --config jest.config.js --runInBand --runTestsByPath functions/functionz/__tests__/chatgptCompanion.test.js functions/functionz/__tests__/chatgptCompanion.integration.test.js functions/functionz/__tests__/chatgptClassTimetable.test.js functions/functionz/__tests__/chatgptClassPreparation.test.js functions/functionz/__tests__/chatgptExamLibrary.test.js functions/functionz/__tests__/chatgptExamPractice.test.js functions/functionz/__tests__/chatgptAssignmentSubmission.test.js functions/functionz/__tests__/chatgptPersonalRevision.test.js functions/functionz/__tests__/chatgptInteractiveTutor.test.js functions/functionz/__tests__/chatgptSavedRevision.test.js
       - name: Verify JavaScript syntax
         run: |
           node --check scripts/generateChatgptLessonContent.mjs
@@ -80,6 +110,13 @@ jobs:
           node --check functions/functionz/chatgptClassPreparation.js
           node --check functions/functionz/chatgptExamLibrary.js
           node --check functions/functionz/chatgptExamPractice.js
+          node --check functions/functionz/chatgptMockReview.js
+          node --check functions/functionz/chatgptPersonalRevision.js
+          node --check functions/functionz/chatgptInteractiveTutor.js
+          node --check functions/functionz/chatgptSavedRevision.js
+          node --check scripts/chatgptExpandedMockContent.mjs
           node --check functions/functionz/chatgptAssignmentSubmission.js
+          node --check functions/functionz/chatgptWorkbookSubmission.js
+          node --check scripts/chatgptCourseSourceLoader.mjs
           node --check functions/functionz/paymentAwareApp.js
           node -e "JSON.parse(require('fs').readFileSync('vercel.json', 'utf8'))"

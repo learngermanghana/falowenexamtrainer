@@ -4,6 +4,9 @@ export const COURSE_COMPLETION_SNAPSHOT_COLLECTION = "courseCompletionSnapshots"
 export const COURSE_COMPLETION_ENGINE_VERSION = 1;
 
 const lastPersistedFingerprintById = new Map();
+// Multiple mounted progress views may request the same snapshot concurrently.
+// Serialize per document and skip unchanged fingerprints after an earlier write.
+const pendingWriteById = new Map();
 
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeIdPart = (value = "") =>
@@ -93,23 +96,27 @@ export const persistCourseCompletionSnapshot = async ({
   if (!snapshot || !snapshotId || !dbInstance) return { ok: false, reason: "missing" };
 
   const fingerprint = getCourseCompletionSnapshotFingerprint(snapshot);
-  if (lastPersistedFingerprintById.get(snapshotId) === fingerprint) {
-    return { ok: true, skipped: true, snapshotId, snapshot };
-  }
-
-  await setDoc(
-    doc(dbInstance, COURSE_COMPLETION_SNAPSHOT_COLLECTION, snapshotId),
-    {
+  const previous = pendingWriteById.get(snapshotId);
+  const write = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+    if (lastPersistedFingerprintById.get(snapshotId) === fingerprint) {
+      return { ok: true, skipped: true, snapshotId, snapshot };
+    }
+    await setDoc(doc(dbInstance, COURSE_COMPLETION_SNAPSHOT_COLLECTION, snapshotId), {
       ...snapshot,
       updatedAt: serverTimestamp(),
-    },
-    { merge: true }
-  );
-
-  lastPersistedFingerprintById.set(snapshotId, fingerprint);
-  return { ok: true, skipped: false, snapshotId, snapshot };
+    }, { merge: true });
+    lastPersistedFingerprintById.set(snapshotId, fingerprint);
+    return { ok: true, skipped: false, snapshotId, snapshot };
+  });
+  pendingWriteById.set(snapshotId, write);
+  try {
+    return await write;
+  } finally {
+    if (pendingWriteById.get(snapshotId) === write) pendingWriteById.delete(snapshotId);
+  }
 };
 
 export const __resetCourseCompletionSnapshotCacheForTests = () => {
   lastPersistedFingerprintById.clear();
+  pendingWriteById.clear();
 };

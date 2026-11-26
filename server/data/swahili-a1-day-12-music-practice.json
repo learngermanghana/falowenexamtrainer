@@ -1,0 +1,44 @@
+[
+  {
+    "section": "Chagua jibu sahihi",
+    "prompt": "Wiki ina siku ngapi?",
+    "instructions": ["A. Siku tano", "B. Siku saba", "C. Siku kumi", "D. Siku kumi na mbili"],
+    "answer": "B — Siku saba."
+  },
+  {
+    "section": "Jaza nafasi",
+    "prompt": "Kamilisha siku za wiki kulingana na wimbo.",
+    "instructions": ["Jumamosi, Jumapili, ________, Jumanne, ________, Alhamisi, ________."],
+    "answer": "Jumatatu, Jumatano, Ijumaa."
+  },
+  {
+    "section": "Unganisha mwezi na nafasi yake",
+    "prompt": "Unganisha kila mwezi na nafasi yake katika mwaka.",
+    "instructions": ["1. Januari · 2. Mei · 3. Novemba · 4. Desemba", "A. Mwezi wa kumi na moja · B. Mwezi wa kumi na mbili", "C. Mwezi wa kwanza · D. Mwezi wa tano"],
+    "answer": "1–C, 2–D, 3–A, 4–B."
+  },
+  {
+    "section": "Kamilisha kalenda",
+    "prompt": "Kulingana na wimbo, leo ni Jumatano. Kamilisha sentensi.",
+    "instructions": ["Juzi ilikuwa ________.", "Jana ilikuwa ________.", "Leo ni ________.", "Kesho ni ________.", "Kesho kutwa ni ________."],
+    "answer": "Juzi ilikuwa Jumatatu.\nJana ilikuwa Jumanne.\nLeo ni Jumatano.\nKesho ni Alhamisi.\nKesho kutwa ni Ijumaa."
+  },
+  {
+    "section": "Soma hali hii na ujibu",
+    "prompt": "Leo ni Jumatatu, tarehe tano Mei.",
+    "instructions": ["a. Kesho ni siku gani?", "b. Kesho ni tarehe ngapi?", "c. Mwezi ni mwezi gani?"],
+    "answer": "a. Kesho ni Jumanne.\nb. Kesho ni tarehe sita.\nc. Mwezi ni Mei."
+  },
+  {
+    "section": "Sikiliza taarifa kuhusu miadi",
+    "prompt": "Kamilisha taarifa hii kulingana na wimbo.",
+    "instructions": ["Siku ya miadi: ________", "Tarehe ya miadi: ________", "Mwezi wa miadi: ________", "Kisha andika sentensi kamili: Nina miadi ________."],
+    "answer": "Siku: Alhamisi.\nTarehe: ishirini.\nMwezi: Agosti.\nNina miadi Alhamisi, tarehe ishirini mwezi wa Agosti."
+  },
+  {
+    "section": "Zungumza kuhusu kalenda yako",
+    "prompt": "Jibu kwa sentensi kamili.",
+    "instructions": ["a. Leo ni siku gani?", "b. Kesho ni siku gani?", "c. Siku yako ya kuzaliwa ni lini?", "d. Una miadi au shughuli muhimu lini?"],
+    "answer": "Majibu yatategemea kalenda na taarifa za mwanafunzi.\n\nMfano: Leo ni Jumatano. Kesho ni Alhamisi. Siku yangu ya kuzaliwa ni tarehe kumi mwezi wa Juni. Nina miadi Ijumaa, tarehe ishirini mwezi wa Agosti."
+  }
+]

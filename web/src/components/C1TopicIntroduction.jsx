@@ -1,6 +1,7 @@
 import React from "react";
 import { getC1ContentProfile } from "../data/c1ContentRefresh";
 import { styles } from "../styles";
+import { getC1AcademicDay } from "../data/c1AcademicCurriculum.js";
 
 const C1_TOPIC_FOUNDATIONS = Object.freeze({
   1: {
@@ -163,6 +164,7 @@ const infoBox = {
 
 export default function C1TopicIntroduction({ day, title }) {
   const topic = getC1TopicFoundation(day);
+  const academic = getC1AcademicDay(day);
   if (!topic) return null;
 
   return (
@@ -172,10 +174,11 @@ export default function C1TopicIntroduction({ day, title }) {
     >
       <div>
         <div style={{ fontWeight: 900, color: "#1d4ed8" }}>C1 · Thema verstehen</div>
-        <h2 style={{ margin: "4px 0 0", fontSize: "1.2rem" }}>{title || `C1 Day ${topic.day}`}</h2>
+        <h2 style={{ margin: "4px 0 0", fontSize: "1.2rem" }}>{academic?.topic || title || `C1 Day ${topic.day}`}</h2>
       </div>
 
-      <p style={{ margin: 0, lineHeight: 1.75 }}>{topic.intro}</p>
+      {academic && <p style={{ margin: 0 }}><strong>Prüfungstraining:</strong> {academic.skill} · Teil {academic.part} — {academic.task}</p>}
+      <p style={{ margin: 0, lineHeight: 1.75 }}><strong>Thematische Grundlage:</strong> {topic.intro}</p>
 
       <div style={infoBox}>
         <strong>Konkretes Beispiel</strong>
@@ -191,6 +194,17 @@ export default function C1TopicIntroduction({ day, title }) {
         <strong>Leitfrage</strong>
         <span>{topic.question}</span>
       </div>
+
+      {academic && (
+        <div style={infoBox} data-c1-academic-day={academic.day}>
+          <strong>Sprachlicher Fokus · {academic.topic}</strong>
+          <span><strong>Prüfungstraining:</strong> {academic.skill} · Teil {academic.part}</span>
+          <span>{academic.task}</span>
+          <span><strong>Sprachlicher Transfer:</strong> {academic.grammar} – {academic.structure}</span>
+          <span>{academic.example}</span>
+          <span><strong>Wortschatz:</strong> {academic.vocabulary.join(" · ")}</span>
+        </div>
+      )}
     </section>
   );
 }

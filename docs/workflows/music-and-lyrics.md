@@ -238,3 +238,14 @@ Firebase authorization route before rolling out staff timing saves.
 ### Kiswahili A1 Day 11 · Dukani
 
 The Music catalog and Day 11 workbook share `swahili-a1-day-11`. The teaching slide requests the same recording by its exact key. The 66 estimated line cues follow both passes of the final chorus in the supplied MP3. The recording pack also has matching English lines and a bilingual song story.
+
+## Swahili A1 Day 12 · Angalia Kalenda
+
+The Day 12 track opens its published lyric sheet in Falowen Music and the workbook's
+Music tab. The lyrics endpoint supplies seven optional calendar exercises and
+revealable answers when the public recording key and approved sung lines match.
+Admin uses the same response for its Music slide. The 30-second graded Day 12
+listening dialogue remains on the existing authenticated Teil 4 route. The song
+follows 63 estimated line intervals derived from word timestamps for the exact
+published recording. The workbook uses the same Falowen Radio embed pattern
+as Days 10 and 11. Podcast follow-up activities are available on the Admin slide.

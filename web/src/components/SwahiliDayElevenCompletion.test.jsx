@@ -8,7 +8,7 @@ jest.mock("../context/AuthContext", () => ({
   useAuth: () => ({ user: null, studentProfile: null }),
 }));
 
-const renderDay = (tab) => render(<MemoryRouter initialEntries={[`/campus/course/swahili/day-11?view=${tab}`]}>
+const renderDay = (tab) => render(<MemoryRouter initialEntries={[`/campus/course/swahili/day-11?view=${tab}&radio=done`]}>
   <SwahiliA1PracticeWorkbook lesson={SWAHILI_A1_PRACTICE_UNITS[11]} preview />
 </MemoryRouter>);
 
@@ -16,8 +16,7 @@ test("Day 11 grammar includes actionable rules, examples and a self check", () =
   renderDay("grammar");
   expect(screen.getByTitle("Video ya AI · Dukani").getAttribute("src"))
     .toBe("https://www.youtube-nocookie.com/embed/4DpZGme4Bu4");
-  expect(screen.getByTitle("Falowen Radio · Dukani").getAttribute("src"))
-    .toBe("https://www.youtube-nocookie.com/embed/_eSAXWecsgY");
+  expect(screen.queryByTitle(/Falowen Radio:.*Dukani/)).toBeNull();
   expect(screen.getByText(/Stock|Bidhaa zilizopo/)).toBeTruthy();
   expect(screen.getByText(/Ngeli ya Ki-\/Vi-/)).toBeTruthy();
   expect(screen.getByText(/Bei na kiasi/)).toBeTruthy();
@@ -27,7 +26,7 @@ test("Day 11 grammar includes actionable rules, examples and a self check", () =
 test("Day 11 references pairs music with the shopping warm-up", () => {
   renderDay("references");
   expect(screen.queryByTitle("Video ya AI · Dukani")).toBeNull();
-  expect(screen.getByTitle("Falowen Radio · Dukani")).toBeTruthy();
+  expect(screen.queryByTitle(/Falowen Radio:.*Dukani/)).toBeNull();
   expect(screen.getByRole("heading", { name: /Music · A1 Day 11/ })).toBeTruthy();
   expect(screen.getByText(/After listening to “Tunaenda Dukani!”/)).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Go to Group Practice" }));

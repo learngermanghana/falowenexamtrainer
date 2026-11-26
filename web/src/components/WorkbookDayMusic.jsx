@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import WorkbookMusicPlayer from "./WorkbookMusicPlayer";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { styles } from "../styles";
@@ -52,6 +52,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const [stories, setStories] = useState(null);
   const [translations, setTranslations] = useState({recordings:[]});
   const [activeLine, setActiveLine] = useState(-1);
+  const calendarLyricsRef = useRef(null);
   const [showEnglish, setShowEnglish] = useState(courseLevel === "A1");
   useEffect(() => { setShowEnglish(courseLevel === "A1"); }, [courseLevel]);
 
@@ -129,7 +130,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
             lyrics: data.lyrics.trim(), cues: data.cues,
             timingStatus: data.timingStatus, transcriptionStatus: data.transcriptionStatus,
             referenceOnly: data.referenceOnly, recordingSha256: data.recordingSha256,
-            englishTranslation: data.englishTranslation });
+            englishTranslation: data.englishTranslation, practiceQuestions: data.practiceQuestions });
           return;
         } catch (error) {
           if (controller.signal.aborted) return;
@@ -148,9 +149,22 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const approvedLyrics = recordingLyrics && chosen &&
     recordingLyrics.id === chosen.id && recordingLyrics.objectKey === chosen.objectKey
     ? recordingLyrics.lyrics : legacyLyrics;
+  const isCalendarSong = chosen?.id === "swahili-a1-day-12";
+  const practiceQuestions = isCalendarSong && recordingLyrics?.objectKey === chosen.objectKey
+    ? recordingLyrics.practiceQuestions : null;
   const englishPack = chosen && approvedLyrics ? matchingTranscriptEnglishTranslation(translations, chosen, recordingLyrics) || matchingEnglishTranslation(
     translations, chosen.objectKey, approvedLyrics) || matchingEnglishTranslation(
     {recordings:[{...recordingLyrics?.englishTranslation,objectKey:recordingLyrics?.objectKey}]},chosen.objectKey,approvedLyrics) : null;
+
+  useEffect(() => {
+    const box = calendarLyricsRef.current;
+    const line = box?.querySelector('[aria-current="true"]');
+    if (!line || !box.clientHeight) return;
+    const top = line.getBoundingClientRect().top - box.getBoundingClientRect().top;
+    if (top < 0 || top + line.offsetHeight > box.clientHeight) {
+      box.scrollTop += top - box.clientHeight / 3;
+    }
+  }, [activeLine]);
 
   if (!valid) return null;
 
@@ -215,7 +229,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
             Open this song on Falowen Music ↗
           </a>
           {approvedLyrics ? (
-            <details data-music-lyrics="true">
+            <details key={chosen.id} data-music-lyrics="true" open={isCalendarSong || undefined}>
               <summary style={{ cursor: "pointer", fontWeight: 800, color: "#164e36" }}>
                 {isSwahili ? "Swahili lyrics · Soma pamoja" : "German lyrics · Mitlesen"}
               </summary>
@@ -230,7 +244,9 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
                 {!englishPack ? <p data-english-unavailable="true" style={{ margin: 0, fontSize: 12, color: "#62766b" }}>
                   English translation is not available for this recording yet.
                 </p> : null}
-                <div style={{ display: "grid", gap: 5, padding: "4px 0" }}>
+                <div ref={isCalendarSong ? calendarLyricsRef : undefined}
+                  style={{ display: "grid", gap: 5, padding: "4px 0",
+                    ...(isCalendarSong ? { maxHeight: "50vh", overflowY: "auto" } : {}) }}>
                   {String(approvedLyrics).replace(/\\n/g, "\n").split(/\r?\n/).map((line, rawIndex) => {
                     const de = line.trim();
                     if (!de) return null;
@@ -274,6 +290,24 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
             <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
               Reviewed lyrics have not been published for this recording yet. You can still listen; line highlighting will be available after the matching lyrics and timings are added.
             </p>
+          )}
+          {practiceQuestions?.length > 0 && (
+            <section lang="sw" aria-label="Mazoezi ya wimbo">
+              <h3>Maswali ya wimbo</h3>
+              <ol>
+                {practiceQuestions.map(({section, prompt, instructions, answer}) => (
+                  <li key={section}>
+                    <h4>{section}</h4>
+                    <p>{prompt}</p>
+                    <ul>{instructions.map(step => <li key={step}>{step}</li>)}</ul>
+                    <details>
+                      <summary>Onyesha jibu</summary>
+                      <p style={{ whiteSpace: "pre-line" }}>{answer}</p>
+                    </details>
+                  </li>
+                ))}
+              </ol>
+            </section>
           )}
         </div>
       ) : null}

@@ -51,3 +51,23 @@ describe("workbook page chrome ownership", () => {
     ).toBe(true);
   });
 });
+
+
+describe("workbook navigation stays in page flow", () => {
+  test("advanced workbook tabs are not sticky on tablets or desktop", () => {
+    const source = read("StandardWorkbookComponents.js");
+    const advanced = source.slice(source.indexOf("export const AdvancedSelfLearningTabNav"), source.indexOf("export const WorkbookTaskCard"));
+    expect(advanced).toContain('data-sticky-navigation="false"');
+    expect(advanced).not.toContain('position: "sticky"');
+    expect(advanced).toContain("onChange={selectAdvancedTab}");
+    expect(advanced).toContain("C1StudyPartner");
+    const css = read("WorkbookMobileLayout.css");
+    expect(css).toMatch(/\[data-advanced-self-learning-navigation\]\s*\{\s*position: static !important/);
+  });
+  test("tablet and touch device rules neutralize legacy workbook sticky wrappers", () => {
+    const css = read("WorkbookMobileLayout.css");
+    expect(css).toMatch(/@media \(max-width: 1024px\), \(pointer: coarse\)\s*\{\s*\[data-workbook-sticky-wrapper\]/);
+    expect(css).toContain("@media (max-width: 768px)");
+    expect(css).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
+  });
+});

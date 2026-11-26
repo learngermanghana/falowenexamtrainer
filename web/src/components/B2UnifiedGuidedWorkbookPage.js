@@ -1,6 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
+import StudyPartner from "./A1StudyPartner";
+import { getB2ChapterOnePractice, getB2ChapterOneReadingEvidence } from "../data/b2ChapterOnePractice";
+import { getB2ChapterTwoPractice, getB2ChapterTwoReadingEvidence } from "../data/b2ChapterTwoPractice";
+import { getB2ChapterThreePractice, getB2ChapterThreeReadingEvidence } from "../data/b2ChapterThreePractice";
+import { getB2ChapterFourPractice, getB2ChapterFourReadingEvidence } from "../data/b2ChapterFourPractice";
+import { getB2ChapterFivePractice, getB2ChapterFiveReadingEvidence } from "../data/b2ChapterFivePractice";
 import B2TopicIntroduction, { B2_TOPIC_FOUNDATIONS } from "./B2TopicIntroduction";
 import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
@@ -96,6 +102,30 @@ const GrammarLessonContent = ({ day }) => {
 };
 
 
+function ChapterVocabulary({ day }) {
+  const practice = getB2ChapterOnePractice(day) || getB2ChapterTwoPractice(day) || getB2ChapterThreePractice(day) || getB2ChapterFourPractice(day) || getB2ChapterFivePractice(day);
+  if (!practice) return null;
+  return <Section title="Wortschatz · Redemittel">
+    <p style={{ margin: 0 }}>Lerne diese Ausdrücke als feste Wortverbindungen, nicht als einzelne Wörter.</p>
+    <dl style={{ ...sub, margin: 0 }}>
+      {practice.vocabulary.map(([de, en]) => <div key={de} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 6 }}><dt style={{ fontWeight: 700 }}>{de}</dt><dd style={{ margin: 0 }}>{en}</dd></div>)}
+    </dl>
+  </Section>;
+}
+
+function ChapterTransformations({ day }) {
+  const practice = getB2ChapterOnePractice(day) || getB2ChapterTwoPractice(day) || getB2ChapterThreePractice(day) || getB2ChapterFourPractice(day) || getB2ChapterFivePractice(day);
+  if (!practice) return null;
+  return <div data-b2-chapter-one-practice={day <= 5 ? day : undefined} data-b2-chapter-two-practice={day >= 6 && day <= 10 ? day : undefined} data-b2-chapter-three-practice={day >= 11 && day <= 15 ? day : undefined} data-b2-chapter-four-practice={day >= 16 && day <= 20 ? day : undefined} data-b2-chapter-five-practice={day >= 21 && day <= 25 ? day : undefined} style={sub}>
+    <strong>Satztraining · Vom B1- zum B2-Satz</strong>
+    <p style={{ margin: 0 }}>Formuliere zuerst selbst einen Satz. Vergleiche danach deine Lösung mit dem Modell. Andere grammatisch korrekte Lösungen sind möglich.</p>
+    {practice.transformations.map(([question, answer, explanation], index) => <article key={question} style={sub}>
+      <strong>{index + 1}. {question}</strong>
+      <details><summary style={{ cursor: "pointer", fontWeight: 700 }}>Musterlösung anzeigen</summary><p>{answer}</p><p style={{ marginBottom: 0 }}>{explanation}</p></details>
+    </article>)}
+  </div>;
+}
+
 const normalizeVocab = (lesson = {}) => {
   const raw = Array.isArray(lesson.vocabulary) ? lesson.vocabulary : Array.isArray(lesson.keywords) ? lesson.keywords : [];
   return raw
@@ -147,6 +177,7 @@ function ReadingPractice({ day, progress, setProgress }) {
         const selected = answers[index];
         const hasAnswer = Number.isInteger(selected);
         const correct = selected === item.answerIndex;
+        const evidence = getB2ChapterOneReadingEvidence(day, index) ?? getB2ChapterTwoReadingEvidence(day, index) ?? getB2ChapterThreeReadingEvidence(day, index) ?? getB2ChapterFourReadingEvidence(day, index) ?? getB2ChapterFiveReadingEvidence(day, index);
         return <article key={item.question} style={sub}>
           <strong>{index + 1}. {item.question}</strong>
           <div style={{ display: "grid", gap: 8 }}>
@@ -170,7 +201,7 @@ function ReadingPractice({ day, progress, setProgress }) {
               </button>;
             })}
           </div>
-          {hasAnswer ? <div style={{ borderRadius: 12, padding: 10, background: correct ? "#f0fdf4" : "#fff7f7", lineHeight: 1.6 }}><strong>{correct ? "Richtig." : "Noch nicht richtig."}</strong> {!correct ? <>Richtige Antwort: <strong>{String.fromCharCode(65 + item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </> : null}{item.explanation}</div> : null}
+          {hasAnswer ? <div style={{ borderRadius: 12, padding: 10, background: correct ? "#f0fdf4" : "#fff7f7", lineHeight: 1.6 }}><strong>{correct ? "Richtig." : "Noch nicht richtig."}</strong> {!correct ? <>Richtige Antwort: <strong>{String.fromCharCode(65 + item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </> : null}{item.explanation}{evidence !== null && practice.paragraphs[evidence] ? <details style={{ marginTop: 8 }}><summary>Textbeleg · Absatz {evidence + 1}</summary><p>{practice.paragraphs[evidence]}</p></details> : null}</div> : null}
         </article>;
       })}
     </ReadingQuestionGrid>
@@ -434,11 +465,14 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
     </header>
 
     <AdvancedSelfLearningTabNav level="B2" day={day} activeTab={active} onChange={changeView} />
+    <StudyPartner key={day} level="B2" section={active} lesson={{ kind: "practice", day, chapter: alignment.chapter, title: alignment.title, grammarFocus: alignment.grammar_topic, skillFocus: { lesen: "Lesen", hoeren: "Hören", speak: "Sprechen", write: "Schreiben" }[skillFocus] }} />
 
     {active === "learn" ? <>
       <B2TopicIntroduction day={day} />
+      <ChapterVocabulary day={day} />
       <Section title="Grammar / Learn">
         <GrammarLessonContent day={day} />
+        <ChapterTransformations day={day} />
         {grammarVideo?.url ? (
           <div data-b2-grammar-video-status="ready" style={{ ...sub, background: "#eff6ff", borderColor: "#bfdbfe" }}>
             <strong>{grammarVideo.title || "AI video"}</strong>

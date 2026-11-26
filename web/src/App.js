@@ -1,3 +1,4 @@
+import { C1StudyMaterialLayout } from "./components/C1StudyPartner";
 import { normalizeCourseLevel } from "./utils/levelAccess";
 import SwahiliB1Day28Workbook from "./components/SwahiliB1Day28Workbook";
 import SwahiliB1Day26Workbook from "./components/SwahiliB1Day26Workbook";
@@ -11,6 +12,8 @@ import { getSwahiliCampusRoute, matchSwahiliPreview } from "./utils/swahiliCours
 import { SWAHILI_RESOURCE_SECTIONS, getCampusProgram, getProgramCampusTabs, getProgramAllowedSections, getProgramCourseRedirect } from "./utils/campusProgram";
 import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
+import ExamStudyPartner from "./components/ExamStudyPartner";
+import { canShowExamStudyPartner } from "./utils/examStudyPartner";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
 import { MOCK_EXAM_CATALOG } from "./data/mockExamCatalog";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -117,6 +120,8 @@ import A1Day3PronounsIntroducingYourselfWorkbookPage from "./components/A1Day3Pr
 import A1Day5IntroducingYourselfArticlesWorkbookPage from "./components/A1Day5IntroducingYourselfArticlesWorkbookPage";
 import A1WorkbookRoutePage from "./components/A1WorkbookRoutePage";
 import A1PracticeBookLayout from "./components/A1PracticeBookLayout";
+import A2StudyMaterialLayout from "./components/A2StudyMaterialLayout";
+import B1StudyMaterialLayout from "./components/B1StudyMaterialLayout";
 import A1Day12TwentyFourHourClockAndDatesWorkbookPage from "./components/A1Day12TwentyFourHourClockAndDatesWorkbookPage";
 import A1Day13RevisionNumbersTimePricesWorkbookPage from "./components/A1Day13RevisionNumbersTimePricesWorkbookPage";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
@@ -193,9 +198,10 @@ import ExamWritingWorkspace from "./components/ExamWritingWorkspace";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
 import { routeEnrollmentLevel } from "./utils/levelEnrollmentAccess";
+import { activeOwnerTestingLevel, isCourseTestingOwner, isOwnerTestingCoursePath, ownerTestingLevels } from "./utils/ownerCourseTesting";
 import { useToast } from "./context/ToastContext";
 import { announceExamSuccess } from "./services/interactionFeedback";
-import { isFirebaseConfigured, listenForForegroundMessages } from "./firebase";
+import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
 import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
@@ -208,6 +214,7 @@ import LesenPage from "./components/LesenPage";
 import StudyCalendarPage from "./components/StudyCalendarPage";
 import QuestionOfDayPage from "./components/QuestionOfDayPage";
 import C1SelfLearningCourse from "./components/C1SelfLearningCourse";
+import C1ExamPreparationPage from "./components/C1ExamPreparationPage";
 import C1Day1WillkommenSelbstlernstartWorkbookPage from "./components/C1Day1WillkommenSelbstlernstartWorkbookPage";
 import C1Day10IntegrationUndGesellschaftGrammarNotesPage from "./components/C1Day10IntegrationUndGesellschaftGrammarNotesPage";
 import C1Day10IntegrationUndGesellschaftWorkbookPage from "./components/C1Day10IntegrationUndGesellschaftWorkbookPage";
@@ -225,7 +232,6 @@ import C1Day16TechnologieImAlltagGrammarNotesPage from "./components/C1Day16Tech
 import C1Day16TechnologieImAlltagWorkbookPage from "./components/C1Day16TechnologieImAlltagWorkbookPage";
 import B2Day1PersoenlicheIdentitaetGrammarNotesPage from "./components/B2Day1PersoenlicheIdentitaetGrammarNotesPage";
 import B2Day1PersoenlicheIdentitaetWorkbookPage from "./components/B2Day1PersoenlicheIdentitaetWorkbookPage";
-import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import LiveSpeakPage from "./components/LiveSpeakPage";
@@ -245,7 +251,6 @@ import PublicUpcomingClassesPage from "./components/PublicUpcomingClassesPage";
 import PublicExamPracticePage from "./components/PublicExamPracticePage";
 import PublicAdmissionsVisitorGuidePage from "./components/PublicAdmissionsVisitorGuidePage";
 import TutorMarkingPage from "./pages/TutorMarkingPage";
-import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { getTrialLifecycleState } from "./lib/trialAccess";
 import { isApprovedUniversityStudent, isPendingUniversityStudent } from "./lib/universityInvitations";
@@ -766,6 +771,17 @@ const AppShell = ({
   const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
   const { courseOptions, selectCourse } = useAuth();
   const isSwahiliCampus = getCampusProgram(studentProfile) === "swahili";
+  const testingProgram = getCampusProgram(studentProfile);
+  const [testingSelection,setTestingSelection] = useState(null);
+  const testingOwner = isCourseTestingOwner(user) && Boolean(studentProfile) && !browseOnly && studentProfile?.accountType !== "exam_only";
+  const testingLevel = activeOwnerTestingLevel({user,program:testingProgram,selection:testingSelection,studentProfile,browseOnly});
+  const testingCoursePath = isOwnerTestingCoursePath(location.pathname,testingLevel,testingProgram);
+  useEffect(()=>{setTestingSelection(null);},[user?.uid,testingProgram]);
+  const changeTestingLevel = level => {
+    if(!testingOwner)return;
+    setTestingSelection(ownerTestingLevels(testingProgram).includes(level)?{uid:user.uid,program:testingProgram,level}:null);
+    navigate("/campus/course",{replace:true});
+  };
   const isOnboarding = location.pathname === "/onboarding";
   const mockAssessment = isMockAssessmentRoute(location.pathname);
   const onboardingRole = String(studentProfile?.role || "student").toLowerCase();
@@ -851,48 +867,6 @@ const AppShell = ({
     }
   };
 
-  useEffect(() => {
-    if (!user || !studentProfile) return undefined;
-    let unsubscribe = () => {};
-    let isMounted = true;
-
-    listenForForegroundMessages(async (payload) => {
-      if (!isMounted || !payload) return;
-      const normalized = buildPushNotification(payload);
-      if (!normalized) return;
-      if (normalized.title || normalized.body) {
-        showToast(`${normalized.title}${normalized.body ? ` — ${normalized.body}` : ""}`, "info");
-      }
-
-      try {
-        await persistPushNotification({ studentId: studentProfile.id, payload, notification: normalized });
-      } catch (error) {
-        console.error("Failed to persist push notification", error);
-      }
-
-      try {
-        window.dispatchEvent(
-          new CustomEvent("falowen:push-notification", { detail: { notification: normalized } })
-        );
-      } catch (error) {
-        console.error("Failed to dispatch push notification event", error);
-      }
-    }).then((off) => {
-      if (typeof off === "function") {
-        unsubscribe = off;
-      }
-    }).catch((error) => {
-      console.error("Failed to listen for foreground messages", error);
-    });
-
-    return () => {
-      isMounted = false;
-      if (typeof unsubscribe === "function") {
-        unsubscribe();
-      }
-    };
-  }, [showToast, studentProfile, user]);
-
   if (directSwahiliTrial && (isOnboarding || /^\/signup(?:\/|$)/.test(location.pathname))) {
     return <Navigate to="/campus/course/swahili/day-1" replace />;
   }
@@ -932,10 +906,6 @@ const AppShell = ({
             {t("appNav.signedInAs", { email: user.email })}
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
-            <NotificationBell
-              notificationStatus={notificationStatus}
-              onEnablePush={enableNotifications}
-            />
             {courseSelector}
             <label style={{ display: "grid", gap: 4, fontSize: 12, color: "#374151" }}>
               {t("interfaceLanguage.shortLabel")}
@@ -960,6 +930,11 @@ const AppShell = ({
         </header>
       ) : null}
       {!isOnboarding ? <OfflineBanner /> : null}
+      {testingOwner && !isOnboarding && (testingLevel || location.pathname === "/campus/course" || location.pathname === "/campus/account") && <section aria-label="Developer testing access" style={{border:"1px solid #cbd5e1",borderRadius:12,padding:12,margin:"0 0 12px",display:"grid",gap:6}}>
+        <strong>Developer testing access · {testingProgram==="swahili"?"Kiswahili":"German"}</strong>
+        <label>Testing level <select aria-label="Developer testing level" value={testingLevel} onChange={event=>changeTestingLevel(event.target.value)}><option value="">Off · actual enrollment</option>{ownerTestingLevels(testingProgram).map(level=><option key={level} value={level}>{level}</option>)}</select></label>
+        {testingLevel?<p role="status" style={{margin:0}}>Testing {testingLevel}. No enrollment or billing changes. This is live content, not a submission sandbox; avoid submitting test work. <button type="button" onClick={()=>changeTestingLevel("")}>Exit testing</button></p>:<small>Choose a level to inspect its Course Book. Switch language using the existing course menu. Resets when you reload or change language.</small>}
+      </section>}
 
       {location.pathname.startsWith("/campus/course/") ? (
         <CampusQuickNavigation
@@ -974,7 +949,7 @@ const AppShell = ({
         {!isOnboarding ? <BookPdfDownloadInjector /> : null}
         <AssessmentRulesNotice restricted={mockAssessment} />
         {!isStaff && studentProfile?.blockedEnrollmentLevels?.length > 0 && <div role="status" style={{padding:12,marginBottom:12,border:"1px solid #f59e0b",borderRadius:8}}>Access paused for {studentProfile.blockedEnrollmentLevels.join(", ")}. Clear the outstanding balance or contact Falowen to confirm your contract. <Link to="/campus/account">View account</Link>.</div>}
-        {!isStaff && (studentProfile?.levelEnrollmentCheckPending||studentProfile?.levelEnrollmentCheckError) && /^\/(?:campus\/course|exams)(?:\/|$)/.test(location.pathname) ? <p>{studentProfile?.levelEnrollmentCheckError?"Unable to verify enrollment. Refresh or contact support.":"Checking your enrollment access…"}</p> : !isStaff && studentProfile?.blockedEnrollmentLevels?.includes(routeEnrollmentLevel(location.pathname,location.search,studentProfile)) ? <div role="alert"><h2>Course access paused</h2><p>This level has an overdue payment or ended contract. Your other levels and records are not deleted.</p><Link to="/campus/account">View account</Link> · <Link to="/campus/course">Back to courses</Link></div> : <Routes>
+        {!isStaff && (studentProfile?.levelEnrollmentCheckPending||studentProfile?.levelEnrollmentCheckError) && /^\/(?:campus\/course|exams)(?:\/|$)/.test(location.pathname) ? <p>{studentProfile?.levelEnrollmentCheckError?"Unable to verify enrollment. Refresh or contact support.":"Checking your enrollment access…"}</p> : !isStaff && !testingCoursePath && studentProfile?.blockedEnrollmentLevels?.includes(routeEnrollmentLevel(location.pathname,location.search,studentProfile)) ? <div role="alert"><h2>Course access paused</h2><p>This level has an overdue payment or ended contract. Your other levels and records are not deleted.</p><Link to="/campus/account">View account</Link> · <Link to="/campus/course">Back to courses</Link></div> : <Routes>
           <Route
             path="/onboarding"
             element={
@@ -1012,6 +987,7 @@ const AppShell = ({
                 studentProfile={studentProfile}
                 tabStructure={tabStructure}
                 tabStorageKey={tabStorageKey}
+                testingLevel={testingLevel}
               />
             }
           />
@@ -1028,20 +1004,21 @@ const AppShell = ({
                 studentProfile={studentProfile}
                 tabStructure={tabStructure}
                 tabStorageKey={tabStorageKey}
+                testingLevel={testingLevel}
               />
             }
           />
           <Route path="/campus/course/preview/:level" element={<NextLevelPreviewPage />} />
           <Route path="/campus/course/swahili/b1/day-26" element={
-            isStaff || ["B1", "B2", "C1", "C2"].includes(normalizeCourseLevel(studentProfile?.level) || normalizeCourseLevel(studentProfile?.className))
+            isStaff || (testingCoursePath && testingProgram==="swahili" && testingLevel==="B1") || ["B1", "B2", "C1", "C2"].includes(normalizeCourseLevel(studentProfile?.level) || normalizeCourseLevel(studentProfile?.className))
               ? <SwahiliB1Day26Workbook key={user?.uid} uid={user?.uid} /> : <Navigate to="/campus/course" replace />
           } />
           <Route path="/campus/course/swahili/b1/day-27" element={
-            isStaff || ["B1", "B2", "C1", "C2"].includes(normalizeCourseLevel(studentProfile?.level) || normalizeCourseLevel(studentProfile?.className))
+            isStaff || (testingCoursePath && testingProgram==="swahili" && testingLevel==="B1") || ["B1", "B2", "C1", "C2"].includes(normalizeCourseLevel(studentProfile?.level) || normalizeCourseLevel(studentProfile?.className))
               ? <SwahiliB1Day27Workbook key={user?.uid} uid={user?.uid} /> : <Navigate to="/campus/course" replace />
           } />
           <Route path="/campus/course/swahili/b1/day-28" element={
-            isStaff || ["B1", "B2", "C1", "C2"].includes(normalizeCourseLevel(studentProfile?.level) || normalizeCourseLevel(studentProfile?.className))
+            isStaff || (testingCoursePath && testingProgram==="swahili" && testingLevel==="B1") || ["B1", "B2", "C1", "C2"].includes(normalizeCourseLevel(studentProfile?.level) || normalizeCourseLevel(studentProfile?.className))
               ? <SwahiliB1Day28Workbook key={user?.uid} uid={user?.uid} /> : <Navigate to="/campus/course" replace />
           } />
           <Route path="/campus/course/swahili/day-1" element={<SwahiliCourseBook day={1} basePath="/campus/course/swahili" />} />
@@ -1177,7 +1154,7 @@ const AppShell = ({
             element={<LetterWritingIntroPage />}
           />
           <Route path="/campus/course/conjunctions-5-10" element={<A1FinalMockExamPage />} />
-          <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StarterConjunctionsPage />} />
+          <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StudyMaterialLayout day={1}><A2StarterConjunctionsPage /></A2StudyMaterialLayout>} />
           <Route path="/campus/course/a1-day-1-greetings-workbook" element={<A1Day1GreetingsWorkbookPage />} />
           <Route path="/campus/course/a1-day-2-foundations-workbook" element={<A1Day2UnifiedWorkbookPage />} />
           <Route path="/campus/course/a1-day-2-kapitel-1-1-workbook" element={<A1Day2Kapitel11WorkbookPage />} />
@@ -1310,27 +1287,28 @@ const AppShell = ({
           <Route path="/campus/course/b2-final-mock-exam" element={<B2FinalMockExamPage />} />
           <Route path="/campus/course/b1-day-29-goethe-exam-orientation" element={<B1FinalMockExamPage />} />
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
+          <Route path="/campus/course/c1-self-learning/exam-preparation" element={<C1ExamPreparationPage />} />
           <Route path="/campus/course/c1-self-learning/day-:dayId" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-day-1-willkommen-selbstlernstart-workbook" element={withRadioWorkbookGate("C1", 1, <C1Day1WillkommenSelbstlernstartWorkbookPage />)} />
           <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes" element={<B2Day1PersoenlicheIdentitaetGrammarNotesPage />} />
           <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook" element={withRadioWorkbookGate("B2", 1, <B2Day1PersoenlicheIdentitaetWorkbookPage />)} />
-                    <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes" element={<C1Day10IntegrationUndGesellschaftGrammarNotesPage />} />
-          <Route path="/campus/course/c1-day-10-migration-und-integration-grammar-notes" element={<C1Day10IntegrationUndGesellschaftGrammarNotesPage />} />
+                    <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes" element={<C1StudyMaterialLayout day={10}><C1Day10IntegrationUndGesellschaftGrammarNotesPage /></C1StudyMaterialLayout>} />
+          <Route path="/campus/course/c1-day-10-migration-und-integration-grammar-notes" element={<C1StudyMaterialLayout day={10}><C1Day10IntegrationUndGesellschaftGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-workbook" element={<C1Day10IntegrationUndGesellschaftWorkbookPage />} />
-          <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes" element={<C1Day11EngagementUndEhrenamtGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes" element={<C1StudyMaterialLayout day={11}><C1Day11EngagementUndEhrenamtGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-workbook" element={<C1Day11EngagementUndEhrenamtWorkbookPage />} />
-          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-erweiterte-vergleichsformen-grammar-notes" element={<C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage />} />
-          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes" element={<C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-erweiterte-vergleichsformen-grammar-notes" element={<C1StudyMaterialLayout day={12}><C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage /></C1StudyMaterialLayout>} />
+          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes" element={<C1StudyMaterialLayout day={12}><C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-12-freizeit-und-kultur-workbook" element={<C1Day12FreizeitUndKulturWorkbookPage />} />
-          <Route path="/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes" element={<C1Day13MehrsprachigkeitGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes" element={<C1StudyMaterialLayout day={13}><C1Day13MehrsprachigkeitGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-13-mehrsprachigkeit-workbook" element={<C1Day13MehrsprachigkeitWorkbookPage />} />
-          <Route path="/campus/course/c1-day-14-innovation-und-zukunft-grammar-notes" element={<C1Day14InnovationUndZukunftGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-14-innovation-und-zukunft-grammar-notes" element={<C1StudyMaterialLayout day={14}><C1Day14InnovationUndZukunftGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-14-innovation-und-zukunft-workbook" element={<C1Day14InnovationUndZukunftWorkbookPage />} />
-          <Route path="/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes" element={<C1Day15BildungUndLebenslangesLernenGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes" element={<C1StudyMaterialLayout day={15}><C1Day15BildungUndLebenslangesLernenGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook" element={<C1Day15BildungUndLebenslangesLernenWorkbookPage />} />
-          <Route path="/campus/course/c1-day-16-technologie-im-alltag-grammar-notes" element={<C1Day16TechnologieImAlltagGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-16-technologie-im-alltag-grammar-notes" element={<C1StudyMaterialLayout day={16}><C1Day16TechnologieImAlltagGrammarNotesPage /></C1StudyMaterialLayout>} />
           <Route path="/campus/course/c1-day-16-technologie-im-alltag-workbook" element={<C1Day16TechnologieImAlltagWorkbookPage />} />
-          <Route path="/campus/course/b1-day-21-lebensformen-heute-grammar-notes" element={<B1Day21LebensformenHeuteGrammarNotesPage />} />
+          <Route path="/campus/course/b1-day-21-lebensformen-heute-grammar-notes" element={<B1StudyMaterialLayout day={21}><B1Day21LebensformenHeuteGrammarNotesPage /></B1StudyMaterialLayout>} />
           <Route path="/campus/course/weather-perfekt-letter-13" element={<WeatherPerfektLetterPage />} />
           <Route path="/campus/course/health-and-body-parts-14-1" element={<HealthBodyPartsPage />} />
           <Route path="/campus/course/a1-day-7-asking-about-prices-and-preferences" element={<A1Day7PricesPreferencesGrammarPage />} />
@@ -1399,95 +1377,95 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/personen-beschreiben-1-2-grammar-notes"
-            element={<A2Day2Kapitel12GrammarNotesPage />}
+            element={<A2StudyMaterialLayout day={2}><A2Day2Kapitel12GrammarNotesPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/dinge-und-personen-vergleichen-1-3-grammar-notes"
-            element={<ComparingThingsAndPeopleGrammarPage />}
+            element={<A2StudyMaterialLayout day={3}><ComparingThingsAndPeopleGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/wo-moechten-wir-uns-treffen-2-4-grammar-notes"
-            element={<WoTreffenUnsGrammarPage />}
+            element={<A2StudyMaterialLayout day={4}><WoTreffenUnsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/was-machst-du-in-deiner-freizeit-2-5-grammar-notes"
-            element={<A2Day5FreizeitSeparableVerbsGrammarPage />}
+            element={<A2StudyMaterialLayout day={5}><A2Day5FreizeitSeparableVerbsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/moebel-und-raeume-3-6-grammar-notes"
-            element={<A2Day6TwoCasePrepositionsGrammarPage />}
+            element={<A2StudyMaterialLayout day={6}><A2Day6TwoCasePrepositionsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/relativsaetze-die-der-das-wohnung-suchen-3-7-notes"
-            element={<A2Day7RelativeClausesWohnungGrammarPage />}
+            element={<A2StudyMaterialLayout day={7}><A2Day7RelativeClausesWohnungGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/imperativ-rezepte-und-essen-3-8-grammar-notes"
-            element={<A2Day8ImperativeGrammarPage />}
+            element={<A2StudyMaterialLayout day={8}><A2Day8ImperativeGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/perfekt-urlaub-4-9-grammar-notes"
-            element={<A2Day9PerfektGrammarPage />}
+            element={<A2StudyMaterialLayout day={9}><A2Day9PerfektGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes"
-            element={<A2Day10PraeteritumGrammarPage />}
+            element={<A2StudyMaterialLayout day={10}><A2Day10PraeteritumGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/unterwegs-verkehrsmittel-vergleichen-4-11-grammar-notes"
-            element={<A2Day11ComparativeFormsGrammarPage />}
+            element={<A2StudyMaterialLayout day={11}><A2Day11ComparativeFormsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/mein-traumberuf-5-12-grammar-notes"
-            element={<A2Day12MeinTraumberufGrammarPage />}
+            element={<A2StudyMaterialLayout day={12}><A2Day12MeinTraumberufGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/modalverben-im-praeteritum-vorstellungsgespraech-5-13-grammar-notes"
-            element={<A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage />}
+            element={<A2StudyMaterialLayout day={13}><A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/beruf-und-karriere-5-14-um-zu-grammar-notes"
-            element={<A2Day14BerufUndKarriereUmZuGrammarPage />}
+            element={<A2StudyMaterialLayout day={14}><A2Day14BerufUndKarriereUmZuGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes"
-            element={<A2Day15MeinLieblingssportSeitDativGrammarPage />}
+            element={<A2StudyMaterialLayout day={15}><A2Day15MeinLieblingssportSeitDativGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes"
-            element={<A2Day16WohlbefindenReflexiveVerbenGrammarPage />}
+            element={<A2StudyMaterialLayout day={16}><A2Day16WohlbefindenReflexiveVerbenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes"
-            element={<A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage />}
+            element={<A2StudyMaterialLayout day={18}><A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/einkaufen-wo-und-wie-7-19-oder-denn-grammar-notes"
-            element={<A2Day19EinkaufenOderDennGrammarPage />}
+            element={<A2StudyMaterialLayout day={19}><A2Day19EinkaufenOderDennGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/typische-reklamationssituationen-7-20-hoefliche-bitten-und-begruendungen-grammar-notes"
-            element={<A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage />}
+            element={<A2StudyMaterialLayout day={20}><A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/ein-wochenende-planen-8-21-wenn-ob-falls-grammar-notes"
-            element={<A2Day21EinWochenendePlanenWennObFallsGrammarPage />}
+            element={<A2StudyMaterialLayout day={21}><A2Day21EinWochenendePlanenWennObFallsGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes"
-            element={<A2Day22DieWochePlanungGrammarPage />}
+            element={<A2StudyMaterialLayout day={22}><A2Day22DieWochePlanungGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes"
-            element={<A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage />}
+            element={<A2StudyMaterialLayout day={23}><A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/einen-urlaub-planen-9-24-final-a2-grammar-notes"
-            element={<A2Day24EinenUrlaubPlanenGrammarPage />}
+            element={<A2StudyMaterialLayout day={24}><A2Day24EinenUrlaubPlanenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route
             path="/campus/course/ueber-die-zukunft-sprechen-10-28-final-a2-grammar-notes"
-            element={<A2Day28UeberDieZukunftSprechenGrammarPage />}
+            element={<A2StudyMaterialLayout day={28}><A2Day28UeberDieZukunftSprechenGrammarPage /></A2StudyMaterialLayout>}
           />
           <Route path="/campus/course/a1-day-0-orientation-and-knowledge-test-workbook" element={<A1Day0OrientationKnowledgeTestWorkbookPage />} />
           <Route path="/campus/course/a2-day-0-orientation-and-knowledge-test-workbook" element={<A2Day0OrientationKnowledgeTestWorkbookPage />} />
@@ -1595,6 +1573,7 @@ const CampusArea = ({
   studentProfile,
   tabStructure,
   tabStorageKey,
+  testingLevel = "",
 }) => {
   const campusStudentProfile = studentProfile || {};
   const { t } = useTranslation();
@@ -1743,12 +1722,13 @@ const CampusArea = ({
       {resolvedSection === "books" && allowedSections.books ? <CampusBooksPage program={getCampusProgram(campusStudentProfile)} /> : null}
       {resolvedSection === "course" && allowedSections.course ? (
         String(campusStudentProfile?.program || "").toLowerCase() === "swahili" ? (
-          <SwahiliCourseBook basePath="/campus/course/swahili" />
+          <SwahiliCourseBook basePath="/campus/course/swahili" testingLevel={testingLevel} />
         ) : (
           <CourseTab
             defaultLevel={campusStudentProfile?.level}
             defaultClassName={campusStudentProfile?.className}
             program={campusStudentProfile?.program}
+            testingLevel={testingLevel}
           />
         )
       ) : null}
@@ -1884,6 +1864,9 @@ const ExamArea = ({ onBack }) => {
     },
   };
   const activeExamHero = examHeroConfig[examSection];
+  const allowExamStudyPartner = canShowExamStudyPartner({ level, section: examSection, sampleId, trial: Boolean(trialExam), isSwahili, allowed: visibleLevels.includes(level) });
+  const sampleReviewLevel = String(practiceLevel || level || "").toUpperCase();
+  const allowExamMistakeReview = Boolean(sampleId && canShowExamStudyPartner({ level: sampleReviewLevel, section: examSection, trial: Boolean(trialExam), isSwahili, allowed: visibleLevels.includes(sampleReviewLevel) }));
   const tabLocked = key => Boolean(!isSwahili && trialExam && !["overview", "mocks"].includes(key));
 
 
@@ -1977,6 +1960,8 @@ const ExamArea = ({ onBack }) => {
           </small>
         </div>
 
+        {allowExamStudyPartner && ["lesen", "horen"].includes(examSection) && <ExamStudyPartner key={`${level}:${examSection}`} level={level} section={examSection} />}
+
         {!isSwahili && activeExamHero && examSection !== "speaking" ? (
           <section
             style={{
@@ -2004,14 +1989,14 @@ const ExamArea = ({ onBack }) => {
       </div>
 
       {isSwahili ? <SwahiliExamSection level={level} section={examSection} /> : <>
-      {examSection === "overview" ? <ExamsOverviewPage dateInLevelPicker /> : null}
+      {examSection === "overview" ? <ExamsOverviewPage dateInLevelPicker allowExamStudyPartner={allowExamStudyPartner} /> : null}
       {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
-      {examSection === "speaking" ? <SpeakingPage /> : null}
-      {examSection === "writing" ? <ExamWritingWorkspace /> : null}
+      {examSection === "speaking" ? <SpeakingPage allowExamStudyPartner={allowExamStudyPartner} /> : null}
+      {examSection === "writing" ? <ExamWritingWorkspace allowExamStudyPartner={allowExamStudyPartner} /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
-      {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
-      {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
+      {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} allowExamMistakeReview={allowExamMistakeReview} /> : null}
+      {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} allowExamMistakeReview={allowExamMistakeReview} /> : null}
       {examSection === "file" ? <MyExamFilePage /> : null}
       </>}
     </>

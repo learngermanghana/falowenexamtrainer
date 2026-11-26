@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import { weakestScoredExamPart } from "../utils/examStudyPartner";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -15,7 +17,7 @@ const papers = { 4: A1_MOCK_4_LISTENING, 5: A1_MOCK_5_LISTENING, 6: A1_MOCK_6_LI
   7: A1_MOCK_7_LISTENING, 8: A1_MOCK_8_LISTENING };
 const binary = [{ id: "richtig", label: "Richtig" }, { id: "falsch", label: "Falsch" }];
 
-export default function A1MockListeningPractice({ mockNumber }) {
+export default function A1MockListeningPractice({ mockNumber, allowExamMistakeReview = false }) {
   const navigate = useNavigate();
   const { idToken } = useAuth();
   const [answers, setAnswers] = useState({});
@@ -80,6 +82,7 @@ export default function A1MockListeningPractice({ mockNumber }) {
     <section style={styles.card}>
       {result ? <>
         <h2>Hören result · {result.correct}/{result.total} · {result.percent}%</h2>
+        {allowExamMistakeReview && <ExamMistakeReview level="A1" section="horen" completed={Boolean(result)} part={weakestScoredExamPart(Object.entries(result.partScores || {}).map(([label,score])=>({label,score,total:5})))} />}
         <button disabled={busy} onClick={() => { setAnswers({}); setResult(null); setMessage(""); }}>Practise again</button>
       </> : <button disabled={busy || Object.keys(answers).length !== 15} onClick={submit}>
         {busy ? "Checking answers…" : `Check answers (${Object.keys(answers).length}/15)`}

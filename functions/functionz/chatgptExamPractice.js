@@ -3,7 +3,7 @@
 // The server registry includes private keys and rubrics. Export only the
 // student-facing writing/speaking fields below, never the source object.
 const registry = require("../data/assessmentTasks.json");
-const { listMyExamMocks, getMyMockObjectivePractice } = require("./chatgptExamLibrary");
+const { listMyExamMocks, getMyMockObjectivePractice, getExpandedMockTask } = require("./chatgptExamLibrary");
 const RELEASED = new Set(["a1-mock-02", "a1-mock-03", "a2-mock-02"]);
 const text = (x, max = 1200) => typeof x === "string" ? x.slice(0, max) : "";
 const list = (x, max = 10) => Array.isArray(x)
@@ -13,7 +13,7 @@ const safeTask = (task) => {
   if (!task || Array.isArray(task) || typeof task !== "object") return null;
   const out = {};
   for (const field of ["title", "topic", "situation", "instruction", "prompt", "keyword", "theme",
-                       "context", "recipient", "subject", "register", "followUp"]) {
+                       "context", "recipient", "subject", "register", "followUp", "pictureAlt"]) {
     if (typeof task[field] === "string") out[field] = text(task[field]);
   }
   for (const field of ["points", "card", "followups"]) {
@@ -28,6 +28,8 @@ function getExamPractice(level, mockId, skill, part, questionNumber) {
   if (skill === "reading" || skill === "listening") {
     return getMyMockObjectivePractice(level, mockId, skill, part, questionNumber);
   }
+  const expanded = getExpandedMockTask(level,mockId,skill,part);
+  if (expanded) return expanded;
   if (typeof mockId !== "string" || !RELEASED.has(mockId)) {
     return { available: false, message: "This mock is not in the approved ChatGPT practice export." };
   }
@@ -41,7 +43,9 @@ function getExamPractice(level, mockId, skill, part, questionNumber) {
   const section = source[skill];
   const key = part === undefined ? undefined : String(part);
   let task = null;
-  if (Array.isArray(section)) {
+  if (skill === "speaking" && key === "teil1" && Array.isArray(section?.cards)) {
+    task = { title: "Teil 1", instruction: "Stellen Sie Fragen zu den Themenkarten und beantworten Sie die Partnerfragen.", card: section.cards.map(c => [c.theme,c.keyword].filter(Boolean).join(" · ")) };
+  } else if (Array.isArray(section)) {
     task = section.find(entry => entry.id === key) || (!key ? section[0] : null);
   } else if (section && typeof section === "object") {
     if (skill === "writing") {
@@ -49,8 +53,7 @@ function getExamPractice(level, mockId, skill, part, questionNumber) {
         ? section[key] : section.teil1 || section;
       // A1 writing includes nested private form solutions: never return them.
     } else {
-      task = key && section[key] && typeof section[key] === "object"
-        ? section[key] : section.teil2 || section.teil3 || section;
+      task = key ? (section[key] && typeof section[key] === "object" ? section[key] : null) : section.teil2 || section.teil3 || section;
     }
   }
   const prompt = safeTask(task);

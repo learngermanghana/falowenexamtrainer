@@ -53,3 +53,46 @@ describe("German Exams Room source-authoritative practice export", () => {
     expect(data.writing.A1.length).toBeGreaterThan(0);
   });
 });
+
+
+describe("Expanded mock practice and entitlement boundaries",()=>{
+  const {getExpandedMockTask,campusMockLinks}=require("../chatgptExamLibrary");
+  const {examPolicy,allowedMock,revisionGuidance,validExamOnlyProfile}=require("../chatgptMockReview");
+  test("A2 published mocks use actual source passages and protected audio; Mock 8 has no Hören",()=>{
+    for(const id of ["a2-mock-02","a2-mock-04","a2-mock-05","a2-mock-06","a2-mock-07","a2-mock-08"]){
+      const reading=getMyMockObjectivePractice("A2",id,"reading","teil1",1);
+      expect(reading.available).toBe(true);
+      expect(reading.passage.length).toBeGreaterThan(0);
+      expect(reading.question.options.length).toBeGreaterThan(1);
+      expect(reading.examRoomUrl).toContain("mode=practice");
+      if(id!=="a2-mock-02")expect(getExpandedMockTask("A2",id,"writing","teil1").available).toBe(true);
+    }
+    expect(getMyMockObjectivePractice("A2","a2-mock-02","listening","teil2",6).choices.length).toBe(9);
+    expect(getMyMockObjectivePractice("A2","a2-mock-08","listening","teil1",1).available).toBe(false);
+    expect(getMyMockObjectivePractice("B1","b1-final-01","reading","teil1",1).available).toBe(true);
+    expect(getExpandedMockTask("B1","b1-mock-02","writing","teil1").available).toBe(true);
+    expect(campusMockLinks("A1").some(m=>m.id==="a1-final-04"&&m.status==="preview")).toBe(true);
+  });
+  test("course trial permits one designated paper; paid exam subscription is level-bound",()=>{
+    const now=Date.now();
+    const trial={program:"german",level:"A2",paymentStatus:"pending",trialStatus:"active",trialEndsAt:new Date(now+10000)};
+    const access=examPolicy({profile:trial,now});
+    expect(access.full).toBe(false);
+    expect(allowedMock(access,{level:"A2",id:"a2-final-01",mockId:"a2-final-01"})).toBe(true);
+    expect(allowedMock(access,{level:"A2",id:"a2-mock-04",mockId:"a2-mock-04"})).toBe(false);
+    expect(examPolicy({profile:{...trial,trialEndsAt:new Date(now-10000)},now})).toBeNull();
+    const profile={accountType:"exam_only",role:"student",program:"german",level:"A2",status:"registered"};
+    expect(validExamOnlyProfile(profile)).toBe(true);
+    expect(examPolicy({profile,now})).toBeNull();
+    expect(examPolicy({profile,now,grants:[{level:"B1",scope:"level",status:"active",expiresAtMs:now+10000}]})).toBeNull();
+    expect(examPolicy({profile,now,grants:[{level:"A2",scope:"level",status:"active",expiresAtMs:now+10000}]}).source).toBe("paid_exam_subscription");
+    expect(examPolicy({profile:{level:"A2",paymentStatus:"paid"},blocked:["A2"],now})).toBeNull();
+    expect(examPolicy({profile:{level:"A2"},now})).toBeNull();
+  });
+  test("revision priorities use only recorded module scores and do not predict passing",()=>{
+    const result=revisionGuidance({sectionScores:{lesen:20,hoeren:8,schreiben:15}});
+    expect(result.priorities).toEqual(["Hören","Schreiben"]);
+    expect(result.sections.length).toBe(3);
+    expect(result.guidance).toContain("not a prediction");
+  });
+});

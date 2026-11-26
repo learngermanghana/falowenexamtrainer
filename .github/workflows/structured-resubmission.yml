@@ -5,6 +5,11 @@ on:
     paths:
       - "web/src/utils/structuredSubmissionTemplate.js"
       - "web/src/utils/structuredSubmissionTemplate.test.js"
+      - "web/src/utils/familyResubmission.js"
+      - "web/src/utils/familyResubmission.test.js"
+      - "web/src/components/AssignmentSubmissionPage.js"
+      - "functions/familyResubmission.js"
+      - "web/src/firebase.js"
       - "web/src/components/StructuredResubmissionLifecycle.test.js"
       - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
       - "scripts/patchStructuredResubmission.mjs"
@@ -47,7 +52,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand src/utils/structuredSubmissionTemplate.test.js src/components/StructuredSubmissionLifecycle.test.js src/components/StructuredResubmissionLifecycle.test.js
+        run: npx jest --runInBand src/utils/structuredSubmissionTemplate.test.js src/components/StructuredSubmissionLifecycle.test.js src/components/StructuredResubmissionLifecycle.test.js src/utils/familyResubmission.test.js src/components/A1FamilyRecording.test.jsx
       - name: Check resubmission callable syntax
         run: node --check functions/resubmission.js
       - name: Test resubmission callable structured payload

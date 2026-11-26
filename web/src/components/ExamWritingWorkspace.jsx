@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import ExamStudyPartner from "./ExamStudyPartner";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
@@ -33,7 +35,7 @@ const writeRecords = (key, records) => {
 const answeredFormFields = (task, values) =>
   (task.formFields || []).filter((field) => !field.fixed && valueOf(values[field.key]).trim());
 
-export default function ExamWritingWorkspace() {
+export default function ExamWritingWorkspace({ allowExamStudyPartner = false } = {}) {
   const { level, setLevel, accessibleLevels } = useExam();
   const { user, idToken, studentProfile } = useAuth();
   const { showToast } = useToast();
@@ -255,6 +257,7 @@ export default function ExamWritingWorkspace() {
             <option key={choice} value={choice}>{choice}</option>)}</select>
         <span>{level} · {config.parts.length} parts · {config.minutes} minutes</span></div>
     </header>
+    {allowExamStudyPartner && !timerRunning && !busy && !savingTutor && <ExamStudyPartner key={level} level={level} section="writing" />}
     <nav className="few-parts" aria-label="Writing exam parts">
       {config.parts.map((section) => <button type="button" key={section.id}
         className={section.id === part.id ? "few-part active" : "few-part"}
@@ -382,6 +385,7 @@ export default function ExamWritingWorkspace() {
               draft={record.checkedText} rubric={feedback.data.rubric}
               corrections={feedback.data.corrections}
               structuredFeedback={feedback.data.structuredFeedback} />}
+          {allowExamStudyPartner && !timerRunning && !busy && !savingTutor && <ExamMistakeReview key={task.id} level={level} section="writing" part={part.label} completed={Boolean(feedback)} />}
           {part.format === "form" ? <details className="few-answer-key">
             <summary>Show correct answers</summary>
             <ol>{task.formFields.filter((field) => !field.fixed).map((field) =>

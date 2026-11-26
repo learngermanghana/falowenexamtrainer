@@ -18,8 +18,8 @@ const FILTERS = [
   { key: "needsRevision", label: "Needs revision" },
 ];
 
-export default function SwahiliCourseOverview({ basePath, preview, uid, assignedLevel }) {
-  const levels = getAccessibleLevels(preview ? "A1" : assignedLevel, SWAHILI_LEVELS);
+export default function SwahiliCourseOverview({ basePath, preview, uid, assignedLevel, testingLevel = "" }) {
+  const levels = !preview && SWAHILI_LEVELS.includes(testingLevel) ? [testingLevel] : getAccessibleLevels(preview ? "A1" : assignedLevel, SWAHILI_LEVELS);
   const enrollment = normalizeCourseLevel(assignedLevel) || "A1";
   const defaultLevel = levels.at(-1);
   const [levelChoice, setLevelChoice] = useState(null);

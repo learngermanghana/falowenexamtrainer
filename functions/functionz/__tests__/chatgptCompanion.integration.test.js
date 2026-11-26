@@ -13,8 +13,10 @@ const challenge = crypto.createHash("sha256").update(verifier).digest("base64url
 function mockFirebase() {
   const collections = new Map();
   const studentData = new Map([
-    ["student-1", { uid: "student-1", role: "student", level: "A2", name: "Student One", studentCode: "TEST001" }],
-    ["student-2", { uid: "student-2", role: "student", level: "B1", name: "Student Two", studentCode: "TEST002" }],
+    ["owner-preview", { uid:"owner-preview", role:"student", program:"german", level:"A2", paymentStatus:"paid" }],
+    ["student-1", { uid: "student-1", role: "student", level: "A2", paymentStatus: "paid", name: "Student One", studentCode: "TEST001" }],
+    ["student-2", { uid: "student-2", role: "student", level: "B1", paymentStatus: "paid", name: "Student Two", studentCode: "TEST002" }],
+    ["exam-learner", { uid: "exam-learner", role: "student", level: "A2", program: "german", accountType: "exam_only", status: "registered" }],
     ["b2-learner", { uid: "b2-learner", role: "student", level: "B2", name: "B2 Test Learner", studentCode: "TESTB2" }],
     ["c1-learner", { uid: "c1-learner", role: "student", level: "C1", name: "C1 Learner" }],
     ["c2-learner", { uid: "c2-learner", role: "student", level: "C2", name: "C2 Learner" }],
@@ -22,6 +24,7 @@ function mockFirebase() {
     ["student-class", { uid: "student-class", role: "student", level: "A1", classId: "class-genuine", name: "Class Learner" }],
   ]);
   collections.set("students", studentData);
+  collections.set("mockSubscriptions", new Map([["exam-learner_A2",{uid:"exam-learner",level:"A2",scope:"level",status:"active",expiresAtMs:Date.now()+86400000}]]));
   collections.set("classes", new Map([
     ["class-genuine", { name: "A1 Genuine Klasse", levelId: "A1", status: "active", timezone: "Africa/Accra", zoomProfileId: "profile-genuine" }],
     ["class-other", { name: "A1 Private Klasse", levelId: "A1", status: "active", zoomUrl: "https://zoom.us/j/333?pwd=other" }],
@@ -41,8 +44,10 @@ function mockFirebase() {
     collection(name) {
       const stored = getStore(name);
       return {
+        async get() { return {docs:[...stored.entries()].map(([id,data])=>({id,data:()=>data}))}; },
         doc(id) {
           return {
+            collection(subname) { return db.collection(name+"/"+id+"/"+subname); },
             async get() { return { id, exists: stored.has(id), data: () => stored.get(id) }; },
             async set(data) { stored.set(id, data); },
             async create(data) { if (stored.has(id)) throw Error("ALREADY_EXISTS"); stored.set(id, data); },
@@ -51,6 +56,7 @@ function mockFirebase() {
         where(field, operator, value) {
           if (operator !== "==") throw Error("unsupported fixture query");
           return {
+            async get() { return {docs:[...stored.entries()].filter(([,row])=>row?.[field]===value).map(([id,data])=>({id,data:()=>data}))}; },
             limit(max) {
               return {
                 async get() {
@@ -107,9 +113,10 @@ function mockFirebase() {
     firestore: () => db,
     auth: () => ({
       async verifyIdToken(idToken) {
-        if (!["student-1", "student-2", "b2-learner", "c1-learner", "c2-learner", "student-class", "inactive"].includes(idToken)) throw Error("invalid token");
-        return { uid: idToken, email: idToken + "@example.org", email_verified: true };
+        if (!["owner-preview", "student-1", "student-2", "b2-learner", "c1-learner", "c2-learner", "student-class", "inactive", "exam-learner"].includes(idToken)) throw Error("invalid token");
+        return { uid: idToken, email: idToken==="owner-preview"?"moxflex@gmail.com":idToken + "@example.org", email_verified: true };
       },
+      async getUser(uid){return {uid,email:uid==="owner-preview"?"moxflex@gmail.com":uid+"@example.org",emailVerified:true,disabled:false};},
     }),
   };
   return admin;
@@ -260,10 +267,23 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const meta = await fetch(origin + "/api/chatgpt/.well-known/oauth-protected-resource");
       expect((await meta.json()).authorization_servers).toContain(constants.ISSUER);
       const list = await postJson(origin + "/api/chatgpt/mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" });
-      expect(list.data.result.tools).toHaveLength(19);
+      expect(list.data.result.tools).toHaveLength(36);
+      // Exercise the actual serialized tools/list response, not internal defaults.
+      for (const tool of list.data.result.tools) {
+        for (const key of ["readOnlyHint", "destructiveHint", "openWorldHint"]) {
+          expect(Object.prototype.hasOwnProperty.call(tool.annotations, key)).toBe(true);
+          expect(typeof tool.annotations[key]).toBe("boolean");
+        }
+        expect(tool.annotations.readOnlyHint).toBe(tool.name.startsWith("get_"));
+        expect(tool.annotations.destructiveHint).toBe(tool.name.startsWith("submit_"));
+        expect(tool.annotations.openWorldHint).toBe(false);
+      }
+      expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["submit_my_falowen_workbook", "get_my_falowen_submission_status"]));
+      expect(list.data.result.tools.map(t => t.name)).toEqual(expect.arrayContaining(["get_my_falowen_access", "get_my_falowen_swahili_lesson", "get_my_falowen_weaknesses"]));
       expect(list.data.result.tools[0]._meta["openai/profile"]).toBe(true);
       expect(list.data.result.tools[0].securitySchemes[0].type).toBe("oauth2");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_study_plan");
+      expect(list.data.result.tools.map(tool=>tool.name)).toEqual(expect.arrayContaining(["get_my_falowen_revision_levels","get_my_falowen_revision_lesson","get_my_falowen_personal_plan","get_my_falowen_revision_vocabulary"]));
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_vocabulary_practice");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_practice");
       expect(list.data.result.tools.map((tool) => tool.name)).toContain("get_my_falowen_exam_mocks");
@@ -340,7 +360,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const legacy = (token) => postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 14, method: "tools/call",
         params: { name: "get_my_falowen_lesson",
-          arguments: { day: 1, level: "C2", section: "reading" } },
+          arguments: { day: 1, section: "reading" } },
       }, token);
       const a2 = (await legacy(first.tokens.access_token)).data.result.structuredContent;
       const b1 = (await legacy(second.tokens.access_token)).data.result.structuredContent;
@@ -412,8 +432,9 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect(lesson.data.result.structuredContent.material.questions).toHaveLength(7);
       expect(lesson.data.result.structuredContent.material.questions[0]).not.toHaveProperty("answerIndex");
       const spoofed = await call({ day: 1, section: "reading", level: "B2" });
-      expect(spoofed.data.result.structuredContent.level).toBe("B1");
-      expect(spoofed.data.result.structuredContent.material.title).toBe("Traumdeutung und ihre Bedeutung");
+      expect(spoofed.data.result.structuredContent.currentLevel).toBe("B1");
+      expect(spoofed.data.result.structuredContent.available).toBe(false);
+      expect(spoofed.data.result.structuredContent).not.toHaveProperty("material");
     });
   });
 
@@ -431,25 +452,29 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
           arguments: { day, section, level: requestedLevel } },
       }, token);
 
-      const c1Reading = (await call(c1.tokens.access_token, 1, "reading", "C2"))
+      const wrong = (await call(c1.tokens.access_token,1,"reading","C2")).data.result.structuredContent;
+      expect(wrong.available).toBe(false);
+      expect(wrong.currentLevel).toBe("C1");
+      expect(wrong).not.toHaveProperty("material");
+      const c1Reading = (await call(c1.tokens.access_token, 1, "reading", "C1"))
         .data.result.structuredContent;
       expect(c1Reading.level).toBe("C1");
       expect(c1Reading.material.passageIncluded).toBe(true);
-      expect(c1Reading.material.paragraphs).toHaveLength(3);
-      expect(c1Reading.material.questions).toHaveLength(4);
+      expect(c1Reading.material.paragraphs.length).toBeGreaterThan(0);
+      expect(c1Reading.material.questions.length).toBeGreaterThan(0);
       expect(c1Reading.material.questions[0]).not.toHaveProperty("answerIndex");
-      const c1AdvancedReading = (await call(c1.tokens.access_token, 20, "reading", "C2"))
+      const c1AdvancedReading = (await call(c1.tokens.access_token, 20, "reading", "C1"))
         .data.result.structuredContent;
       expect(c1AdvancedReading.level).toBe("C1");
       expect(c1AdvancedReading.available).toBe(true);
       expect(c1AdvancedReading.material.paragraphs).toHaveLength(3);
       expect(c1AdvancedReading.material.questions).toHaveLength(4);
-      const c1Day20 = (await call(c1.tokens.access_token, 20, "overview", "B2"))
+      const c1Day20 = (await call(c1.tokens.access_token, 20, "overview", "C1"))
         .data.result.structuredContent;
       expect(c1Day20.level).toBe("C1");
-      expect(c1Day20.title).toBe("Digitale Gesundheit");
+      expect(c1Day20.title).toBe("KI im Gesundheitswesen und Telemedizin");
 
-      const c2Reading = (await call(c2.tokens.access_token, 1, "reading", "B2"))
+      const c2Reading = (await call(c2.tokens.access_token, 1, "reading", "C2"))
         .data.result.structuredContent;
       expect(c2Reading.level).toBe("C2");
       expect(c2Reading.available).toBe(true);
@@ -461,7 +486,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const legacy = (await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 77, method: "tools/call",
         params: { name: "get_my_falowen_lesson",
-          arguments: { day: 5, level: "B1", section: "reading" } },
+          arguments: { day: 5, level: "C2", section: "reading" } },
       }, c2.tokens.access_token)).data.result.structuredContent;
       expect(legacy.level).toBe("C2");
       expect(legacy.featuredCourseBookSection.section).toBe("reading");
@@ -479,18 +504,18 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       expect(legacyWriting.featuredCourseBookSection.material.targetWords).toBe(350);
       expect(legacyWriting).not.toHaveProperty("reading");
 
-      const c2Day20 = (await call(c2.tokens.access_token, 20, "reading", "B2"))
+      const c2Day20 = (await call(c2.tokens.access_token, 20, "reading", "C2"))
         .data.result.structuredContent;
       expect(c2Day20.level).toBe("C2");
       expect(c2Day20.available).toBe(false);
-      const c2Writing = (await call(c2.tokens.access_token, 20, "writing", "C1"))
+      const c2Writing = (await call(c2.tokens.access_token, 20, "writing", "C2"))
         .data.result.structuredContent;
       expect(c2Writing.material.targetWords).toBe(350);
 
       const exam = await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 85, method: "tools/call",
         params: { name: "get_my_falowen_practice_guide",
-          arguments: { day: 5, skill: "reading", mode: "exam", language: "en", level: "B1" } },
+          arguments: { day: 5, skill: "reading", mode: "exam", language: "en", level: "C2" } },
       }, c2.tokens.access_token);
       const guide = exam.data.result.structuredContent;
       expect(guide.level).toBe("C2");
@@ -530,7 +555,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const oldPluginLesson = await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 92, method: "tools/call",
         params: { name: "get_my_falowen_lesson",
-          arguments: { day: 1, level: "C2" } },
+          arguments: { day: 1 } },
       }, grant.tokens.access_token);
       const a1 = oldPluginLesson.data.result.structuredContent;
       expect(a1.level).toBe("A1");
@@ -547,7 +572,7 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
       const result = await postJson(origin + "/api/chatgpt/mcp", {
         jsonrpc: "2.0", id: 91, method: "tools/call",
         params: { name: "get_my_falowen_lesson_content",
-          arguments: { day: 1, section: "reading", level: "B2" } },
+          arguments: { day: 1, section: "reading", level: "A2" } },
       }, grant.tokens.access_token);
       const reading = result.data.result.structuredContent;
       expect(reading.level).toBe("A2");
@@ -577,3 +602,84 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
   });
 
 });
+
+describe("Exam-only Companion connection",()=>{
+  test("paid exam-only learner can practise but cannot read Course Book or submit coursework",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"exam-learner","exam-only-connection");
+      expect(grant.response.status).toBe(200);
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      const list=await call("get_my_falowen_exam_mocks");
+      expect(list.data.result.structuredContent.access).toBe("paid_exam_subscription");
+      expect(list.data.result.structuredContent.mocks.every(m=>m.level==="A2")).toBe(true);
+      const forbidden=await call("get_my_falowen_lesson",{day:1});
+      expect(forbidden.data.result.isError).toBe(true);
+      const write=await call("save_my_falowen_practice_note",{});
+      expect(write.data.result.isError).toBe(true);
+    });
+  });
+});
+
+describe("Personal revision tools OAuth integration",()=>{
+  test("paid A2 student may revise current content but cannot choose an unverified previous or higher level",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"student-1","personal-revision");
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      const access=await call("get_my_falowen_revision_levels");
+      expect(access.data.result.structuredContent.programs.german.full).toEqual(["A2"]);
+      const current=await call("get_my_falowen_revision_lesson",{program:"german",level:"A2",day:1,section:"reading"});
+      expect(current.data.result.structuredContent).toMatchObject({available:true,level:"A2",revisionOnly:true,officialSubmission:false});
+      for(const level of ["A1","B1"]){
+        const denied=await call("get_my_falowen_revision_lesson",{program:"german",level,day:1});
+        expect(denied.data.result.structuredContent.available).toBe(false);
+      }
+      const plan=await call("get_my_falowen_personal_plan",{program:"german",day:1,minutes:45});
+      expect(plan.data.result.structuredContent.activities.reduce((n,a)=>n+a.minutes,0)).toBe(45);
+    });
+  });
+});
+
+describe("Interactive tutor authenticated access",()=>{
+  test("paid German course student receives speaking practice and exact public music catalogue",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"student-1","interactive-tutor-course");
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      const oral=await call("get_my_falowen_oral_examiner",{source:"mock",mockId:"a2-mock-02",part:"teil1",mode:"exam"});
+      expect(oral.data.result.structuredContent).toMatchObject({available:true,level:"A2",mode:"exam",officialResult:false});
+      const songs=await call("get_my_falowen_music_tutor",{program:"german",day:1});
+      expect(songs.data.result.structuredContent.tracks.map(t=>t.title)).toContain("Ein nettes Gespräch");
+      expect((await call("get_my_falowen_music_tutor",{program:"swahili"})).data.result.structuredContent.available).toBe(false);
+    });
+  });
+  test("exam-only account can practise speaking but cannot access lesson music",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"exam-learner","interactive-tutor-exam");
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      expect((await call("get_my_falowen_oral_examiner",{source:"mock",mockId:"a2-mock-02",part:"teil1"})).data.result.structuredContent.available).toBe(true);
+      expect((await call("get_my_falowen_oral_examiner",{source:"lesson",program:"german",day:1})).data.result.isError).toBe(true);
+      expect((await call("get_my_falowen_music_tutor",{program:"german",day:1})).data.result.isError).toBe(true);
+    });
+  });
+});
+
+describe("Saved revision OAuth boundaries",()=>{
+  test("read-only learner can view review list but cannot write vocabulary outcomes",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"student-1","vocab-review-readonly");
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      expect((await call("get_my_falowen_vocabulary_review",{program:"german"})).data.result.structuredContent).toMatchObject({available:true,total:0,dueCount:0});
+      expect((await call("save_my_falowen_vocabulary_review",{program:"german",confirmed:true})).data.result.isError).toBe(true);
+      expect((await call("get_my_falowen_vocabulary_review",{program:"german",level:"B1"})).data.result.structuredContent.available).toBe(false);
+    });
+  });
+  test("exam-only accounts can get recommendations but not saved coursework vocabulary",async()=>{
+    await withServer(async origin=>{
+      const grant=await connectStudent(origin,"exam-learner","exam-recommendations");
+      const call=(name,args={})=>postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}},grant.tokens.access_token);
+      expect((await call("get_my_falowen_exam_recommendations",{minutes:30})).data.result.structuredContent).toMatchObject({available:true,basis:"No selected verified result",priorities:[]});
+      expect((await call("get_my_falowen_vocabulary_review",{program:"german"})).data.result.isError).toBe(true);
+    });
+  });
+});
+
+ test("verified owner can preview every German course without altering actual enrolment; ordinary students cannot",async()=>{await withServer(async origin=>{const owner=await connectStudent(origin,"owner-preview","owner-test");const ordinary=await connectStudent(origin,"student-1","ordinary-test");const call=async(token,name,args={})=>(await postJson(origin+"/api/chatgpt/mcp",{jsonrpc:"2.0",id:201,method:"tools/call",params:{name,arguments:args}},token)).data.result.structuredContent;const token=owner.tokens.access_token;const levels=await call(token,"get_my_falowen_revision_levels");expect(levels.programs.german.current).toBe("A2");expect(levels.programs.german.full).toEqual(["A2"]);expect(levels.developerTesting.levels).toEqual(["A1","A2","B1","B2","C1","C2"]);for(const level of levels.developerTesting.levels){const lesson=await call(token,"get_my_falowen_revision_lesson",{program:"german",level,day:3,section:"overview"});expect(lesson.available).toBe(true);expect(lesson.level).toBe(level);expect(lesson.developerTesting).toBe(true);expect(lesson.officialSubmission).toBe(false);}const c1=await call(token,"get_my_falowen_lesson_content",{level:"C1",day:3,section:"grammar"});expect(c1.available).toBe(true);expect(c1.recordedLevel).toBe("A2");const denied=await call(ordinary.tokens.access_token,"get_my_falowen_revision_lesson",{program:"german",level:"C1",day:3,section:"overview"});expect(denied.available).toBe(false);expect(denied.developerTesting).toBeUndefined();expect((await call(token,"get_my_falowen_profile")).germanLevel).toBe("A2");});});

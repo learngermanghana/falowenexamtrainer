@@ -8,7 +8,11 @@ const {google}=createRequire(path.resolve(__dirname,"../functions/package.json")
 const project="falowen-examiner-trainer";
 (async()=>{
  if(process.env.FIREBASE_PROJECT_ID!==project) throw Error("Unexpected Firebase project");
- const content=fs.readFileSync(path.resolve(__dirname,"../firestore.rules"),"utf8");
+ const rulesPath=process.argv[2];
+ if(!rulesPath)throw Error("Expected a composed Firestore rules file");
+ const content=fs.readFileSync(rulesPath,"utf8");
+ if(!content.includes("/* BEGIN_ADMIN_RULES_EXTENSION */") ||
+    !content.includes("match /falowenManualLeads/{leadId}"))throw Error("Admin contacts grants are missing from the deployment bundle");
  const auth=await new google.auth.GoogleAuth({scopes:["https://www.googleapis.com/auth/cloud-platform"]}).getClient();
  const created=await auth.request({url:`https://firebaserules.googleapis.com/v1/projects/${project}/rulesets`,method:"POST",data:{source:{files:[{name:"firestore.rules",content}]}}});
  const name=created.data.name;

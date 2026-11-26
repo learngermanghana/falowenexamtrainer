@@ -2,6 +2,8 @@ import { FRENCH_A1_SCHEDULE } from "./archive/french/courseSchedule";
 import { getAssignmentDictionaryEntry } from "./germanAssignmentCatalog";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import { getC1CanonicalGrammarTitle, getC1CanonicalTitle, getC1ContentProfile } from "./c1ContentRefresh";
+import { getC1AcademicDay } from "./c1AcademicCurriculum.js";
+import { getC1Phase2Lesson } from "./c1Phase2Lessons.js";
 import { A2_LISTENING_MODES, getA2ListeningTask } from "./a2ListeningTasks";
 import { getB1ListeningTask } from "./b1ListeningTasks";
 
@@ -727,18 +729,23 @@ const c1Schedule = [
   const profile = getC1ContentProfile(day);
   const canonicalTitle = getC1CanonicalTitle(day) || entry.topic;
   const grammarTitle = getC1CanonicalGrammarTitle(day);
+  const academic = getC1AcademicDay(day);
+  const practice = getC1Phase2Lesson(day);
+  const displayTitle = academic?.topic || canonicalTitle;
   return {
     ...entry,
-    topic: canonicalTitle,
-    title: canonicalTitle,
-    lessonTitle: canonicalTitle,
-    grammar_topic: grammarTitle || entry.grammar_topic,
-    goal: profile ? `Ziel: ${profile.aim}.` : entry.goal,
-    instruction: profile
-      ? `Leitfrage: ${profile.question} Öffne die Lektion und arbeite die aktualisierten C1-Inhalte in Learn → Speak → Write → Finish → Ref durch.`
+    topic: displayTitle,
+    title: displayTitle,
+    lessonTitle: displayTitle,
+    foundationTitle: canonicalTitle,
+    grammar_topic: practice?.grammar || grammarTitle || entry.grammar_topic,
+    academic,
+    goal: academic ? `Ziel: ${academic.task}` : profile ? `Ziel: ${profile.aim}.` : entry.goal,
+    instruction: academic
+      ? `Prüfungstraining: ${academic.skill} · Teil ${academic.part}. ${practice?.instruction || academic.task} Öffne die Lektion und arbeite die C1-Inhalte in Learn → Speak → Write → Finish → Ref durch.`
       : entry.instruction,
     c1ContentRefresh: profile
-      ? { title: canonicalTitle, grammarTitle, aim: profile.aim, question: profile.question, writingPoints: profile.points }
+      ? { title: canonicalTitle, grammarTitle, aim: profile.aim, question: profile.question, writingPoints: profile.points, academic }
       : entry.c1ContentRefresh,
   };
 })
@@ -801,6 +808,10 @@ const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
     day: assignmentDay,
     chapter: entry.chapter,
     topic: entry.topic,
+    title: entry.title || entry.topic,
+    lessonTitle: entry.lessonTitle || entry.topic,
+    foundationTitle: entry.foundationTitle,
+    academic: entry.academic,
     goal: entry.goal,
     instruction: entry.instruction,
     grammar_topic: entry.grammar_topic || null,
@@ -829,6 +840,7 @@ const buildDictionaryBackedSchedule = (level) =>
     topic: resolvedTitle,
     title: resolvedTitle,
     lessonTitle: resolvedTitle,
+    ...(entry.academic ? { academic: entry.academic, foundationTitle: entry.foundationTitle } : {}),
     chapter: entry.chapter || null,
     goal: entry.goal || `Arbeite am ${level}-Thema ${entry.chapter}: ${resolvedTitle}.`,
     instruction: entry.instruction || "Schau das Video, wiederhole die Grammatik und bearbeite dein Arbeitsbuch.",
@@ -2552,7 +2564,7 @@ const normalizeCourseSchedules = (schedules) =>
             instruction:
               ((level === "A2" && Number(canonicalEntry.day) === 22) || (level === "B1" && Number(canonicalEntry.day) === 23))
                 ? "App Assessment · No live class. Open the speaking mock and complete all three parts with the Falowen AI examiner. Confirm your spoken answers; your result is saved after all three parts."
-                : needsSelfPracticeNote && levelSpecificInstruction && !hasNote
+                : level !== "C1" && needsSelfPracticeNote && levelSpecificInstruction && !hasNote
                 ? `${levelSpecificInstruction} ${SELF_PRACTICE_NOTE}`
                 : levelSpecificInstruction,
             lesen_hören: canonicalLesenHoeren,

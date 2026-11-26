@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
+import { C1AcademicGrammarPractice } from "./C1AcademicExamPractice";
 
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
@@ -85,6 +86,7 @@ export default function C1Day24To26GrammarNotes({ day, checked = false, onChecke
   const lesson = lessons[Number(day)];
   if (!lesson) return null;
   return <>
+    <C1AcademicGrammarPractice day={day} />
     <section style={card}><div><span style={{ ...styles.badge, width: "fit-content" }}>C1 Grammar Lab</span><h2 style={{ margin: "8px 0 4px" }}>{lesson.title}</h2><p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>{lesson.subtitle}</p></div><NoteBox tone="amber"><strong>Warum brauchst du das?</strong> {lesson.why}</NoteBox><div><h3>Lernziele</h3><ul style={listStyle}>{lesson.goals.map((goal) => <li key={goal}>{goal}</li>)}</ul></div></section>
     <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>Grammar notes</h2><div style={{ display: "grid", gap: 10 }}>{lesson.explanation.map(([title, text]) => <NoteBox key={title}><strong>{title}</strong><br />{text}</NoteBox>)}</div><Table rows={lesson.rows} /><div><h3>Modellabsatz</h3><p style={{ margin: 0, lineHeight: 1.8 }}>{lesson.model}</p></div></section>
     <KnowledgeTest questions={lesson.quiz} />

@@ -1,3 +1,5 @@
+import ExamMistakeReview from "./ExamMistakeReview";
+import { weakestScoredExamPart } from "../utils/examStudyPartner";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -58,7 +60,7 @@ const Question = ({ question, partKey, answer, onAnswer, submitted }) => {
   );
 };
 
-export default function B1ReadingPracticeSamples({ initialSampleId = "", standalone = false }) {
+export default function B1ReadingPracticeSamples({ initialSampleId = "", standalone = false, allowExamMistakeReview = false }) {
   const navigate = useNavigate();
   const { user, idToken, studentProfile } = useAuth();
   const [selectedId, setSelectedId] = useState(initialSampleId || B1_READING_PRACTICE_SAMPLES[0].id);
@@ -340,7 +342,8 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
             {syncBySample[sample.id] === "saving" ? <p>Syncing your result…</p> : null}
             {syncBySample[sample.id] === "saved" ? <p>Your result is synced.</p> : null}
             {syncBySample[sample.id] === "failed" ? <p>Cloud sync could not be confirmed. Your local result remains available.</p> : null}
-            <button type="button" onClick={reset}>Try this sample again</button>
+            {allowExamMistakeReview && <ExamMistakeReview level="B1" section="lesen" part={weakestScoredExamPart(sectionScores)} completed={submitted} />}
+              <button type="button" onClick={reset}>Try this sample again</button>
           </div>
         )}
       </footer>

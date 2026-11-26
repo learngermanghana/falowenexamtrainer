@@ -396,6 +396,8 @@ const httpsCallable = (functionsInstance, name, options) => {
     } catch (error) {
       const code = normalizeCallableText(error?.code).toLowerCase();
       if (code !== "internal" && code !== "functions/internal") throw error;
+      // Recorded Chapter 3 retries must use the server ownership and attempt checks.
+      if (normalizeCallableText(payload?.canonicalAssignmentKey || payload?.assignmentKey || payload?.assignmentId).toLowerCase().replace(/[^a-z0-9]/g,"")==="a13") throw error;
 
       console.warn(
         "Resubmission callable returned an internal error; using validated Firestore fallback.",
@@ -548,79 +550,9 @@ const getPushEnvironment = () => {
   };
 };
 
-const requestMessagingToken = async (shouldRetry = true) => {
-  assertFirebaseReady();
-
-  const environment = getPushEnvironment();
-  if (environment.ios && !environment.standalone) {
-    throw new Error(
-      "On iPhone (iOS 16.4 or newer), notifications only work from the Home Screen app, not a Safari tab. In Safari, tap Share → Add to Home Screen, open the new Falowen icon, then tap Enable notifications."
-    );
-  }
-
-  if (!environment.notificationApi) {
-    if (environment.ios && environment.standalone) {
-      throw new Error(
-        "This Falowen Home Screen install does not have access to iPhone Web Push. Delete the current Falowen Home Screen icon, open https://www.falowen.app in Safari, add it to the Home Screen again, then open that new icon and enable notifications."
-      );
-    }
-    throw new Error("This browser does not expose the Notifications API required for push notifications.");
-  }
-
-  // On iPhone/iPad the permission request must happen directly from the user's
-  // tap before Firebase Messaging initializes or checks the subscription.
-  const permission = await ensureNotificationPermission();
-  if (permission !== "granted") {
-    return null;
-  }
-
-  const supported = await isSupported().catch(() => false);
-  if (!supported) {
-    throw new Error(
-      environment.ios
-        ? "Falowen is installed, but iPhone Web Push is not available in this app session. Close Falowen, reopen it from the Home Screen icon, and try again."
-        : "This browser does not support Firebase Cloud Messaging. Please use Chrome or Edge on Android/desktop."
-    );
-  }
-
-  const messaging = getMessaging(app);
-  const vapidKey = process.env.REACT_APP_FIREBASE_VAPID_KEY;
-  if (!vapidKey) {
-    throw new Error("Missing REACT_APP_FIREBASE_VAPID_KEY for push notifications.");
-  }
-
-  const serviceWorkerRegistration = await registerMessagingServiceWorker();
-
-  if (!serviceWorkerRegistration) {
-    throw new Error(
-      "Push notifications require a registered service worker. Please use HTTPS or localhost."
-    );
-  }
-
-  try {
-    return await getToken(messaging, {
-      vapidKey,
-      serviceWorkerRegistration: serviceWorkerRegistration || undefined,
-    });
-  } catch (error) {
-    const isSubscribeFailed = error?.code === "messaging/token-subscribe-failed";
-
-    if (shouldRetry && isSubscribeFailed) {
-      await unregisterMessagingServiceWorker();
-      return requestMessagingToken(false);
-    }
-
-    throw error;
-  }
-};
-
-const listenForForegroundMessages = async (callback) => {
-  if (!isFirebaseConfigured || !app) return () => {};
-  const supported = await isSupported().catch(() => false);
-  if (!supported) return () => {};
-  const messaging = getMessaging(app);
-  return onMessage(messaging, callback);
-};
+// Device push is retired. Keep the existing public interface for older callers.
+const requestMessagingToken = async () => null;
+const listenForForegroundMessages = async () => () => {};
 
 export {
   app,

@@ -61,6 +61,14 @@ const B2_GRAMMAR_FOCUS_LIBRARY = Object.freeze({
       "Neue Regeln wurden im letzten Jahr eingeführt.",
     ],
   ),
+  statePassive: focus(
+    "Zustandspassiv",
+    "resulting state",
+    "Das Zustandspassiv beschreibt das Ergebnis eines abgeschlossenen Vorgangs, nicht die Handlung selbst. Vergleiche: Das Glas wird sortiert (Vorgang) und das Glas ist sortiert (Zustand).",
+    "sein + Partizip II",
+    ["Vorgangspassiv: werden + Partizip II.", "Zustandspassiv: sein + Partizip II; die Handlung ist abgeschlossen."],
+    ["Die Wertstoffe werden getrennt. → Die Wertstoffe sind getrennt.", "Die Behälter werden gereinigt. → Die Behälter sind gereinigt."],
+  ),
   modalPassive: focus(
     "Modalpassiv",
     "modal verb + passive",
@@ -74,6 +82,14 @@ const B2_GRAMMAR_FOCUS_LIBRARY = Object.freeze({
       "Recyclingmaterialien müssen besser gekennzeichnet werden.",
       "Digitale Systeme können transparenter gestaltet werden.",
     ],
+  ),
+  passiveAlternatives: focus(
+    "Passiv-Ersatzformen: sich lassen / sein + zu",
+    "passive alternatives: possibility and necessity",
+    "Mit sich lassen + Infinitiv kann man eine Möglichkeit ohne werden ausdrücken. Die Konstruktion sein + zu + Infinitiv drückt je nach Kontext eine Möglichkeit oder eine Pflicht aus.",
+    "Subjekt + lässt/lassen sich + Infinitiv | Subjekt + ist/sind + zu + Infinitiv",
+    ["Das lässt sich ändern = Das kann geändert werden.", "Die Anlage ist zu warten = Die Anlage muss gewartet werden; die genaue modale Bedeutung ergibt sich aus dem Kontext."],
+    ["Der Stromverbrauch lässt sich durch LED-Lampen senken.", "Die Solaranlage ist vor dem Winter zu überprüfen."],
   ),
   nominalization: focus(
     "Nominalisierung",
@@ -275,14 +291,17 @@ const B2_GRAMMAR_FOCUS_LIBRARY = Object.freeze({
     "indirekte Rede und Quellenangaben",
     "reported information and source attribution",
     "Bei wissenschaftlichen oder medialen Aussagen musst du klar zeigen, wer etwas behauptet und wie sicher die Information ist. Indirekte Rede und Quellenangaben schaffen Distanz zur Aussage.",
-    "Laut Quelle ... | Die Studie zeigt, dass ... | Die Autorin erklärt, ... | Konjunktiv I, wenn passend",
+    "Laut Quelle ... | Die Autorin erklärt, er sei / habe / werde ... | Konjunktiv I: Stamm + e (3. Person Singular; sein → sei)",
     [
       "Trenne fremde Aussagen klar von deiner eigenen Bewertung.",
       "Nutze Konjunktiv I vor allem dann, wenn du eine fremde Aussage ausdrücklich als Wiedergabe markieren willst.",
+      "Konjunktiv I: er ist → er sei; er hat → er habe; er wird → er werde; er sagt → er sage. Passe Personalpronomen an die neue Perspektive an.",
+      "Wenn Konjunktiv I mit dem Indikativ übereinstimmt, kann Konjunktiv II die indirekte Rede verdeutlichen (sie haben → sie hätten).",
     ],
     [
       "Laut der Studie ist der Effekt besonders bei jüngeren Teilnehmenden sichtbar.",
       "Die Forschenden erklären, die Ergebnisse seien noch nicht abschließend.",
+      "Der Experte sagt: Ich habe neue Daten. → Der Experte sagt, er habe neue Daten.",
     ],
   ),
   sourcePreps: focus(
@@ -331,11 +350,11 @@ const B2_GRAMMAR_FOCUS_LIBRARY = Object.freeze({
 
 const DAY_FOCUS_KEYS = Object.freeze({
   1: ["method", "purpose", "consequence"],
-  2: ["passive", "modalPassive", "nominalization"],
+  2: ["passive", "statePassive", "modalPassive", "nominalization"],
   3: ["proportional", "concession", "withoutInstead"],
   4: ["withoutInstead", "pairedNotOnly", "method"],
   5: ["contrast", "proportional", "conditionalKonjunktiv"],
-  6: ["passive", "modalPassive", "conditional", "consequence"],
+  6: ["passive", "modalPassive", "passiveAlternatives", "conditional", "consequence"],
   7: ["relativePrep", "conditionalKonjunktiv", "consequence"],
   8: ["purpose", "passive", "modalPassive", "nominalization"],
   9: ["modalPassive", "conditional", "concession", "nevertheless"],

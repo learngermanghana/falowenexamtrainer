@@ -1991,6 +1991,16 @@ export const SWAHILI_A1_PRACTICE_UNITS = Object.freeze({
     "title": "Siku, Miezi na Tarehe",
     "contentVersion": 3,
     "objective": "Name weekdays and months, ask and answer about dates, birthdays and appointments.",
+    "aiLecture": {
+      "title": "Video ya AI · Siku, Miezi na Tarehe",
+      "youtubeId": "xYwrJxRhVn8"
+    },
+    "radio": {
+      "resourceRole": "falowenRadio",
+      "youtubeId": "QdpRliUlbMA",
+      "title": "Falowen Radio · Siku, Miezi na Tarehe",
+      "instruction": "Sikiliza kipindi kuhusu siku, miezi na tarehe. This podcast is separate from the Teil 4 listening recording."
+    },
     "grammar": "Siku, miezi, tarehe na maneno ya wakati",
     "practiceOnly": false,
     "rule": "Say tarehe followed by the day number, then the month and year.",
