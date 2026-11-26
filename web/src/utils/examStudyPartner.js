@@ -1,3 +1,4 @@
+import { FALOWEN_CONNECTION_REQUIRED } from "./falowenStudyConnection";
 // Only fixed practice metadata and a derived skill/Teil are used. No scores, IDs, answers,
 // exam passages, current task text, tokens, or account information are sent.
 export const EXAM_STUDY_SKILLS = Object.freeze([
@@ -83,11 +84,12 @@ export function buildExamPlanPrompt({ level, daysRemaining, minutes = 30, priori
     return skill.label + ": " + entry.category + (part ? " (" + part + ")" : "");
   }) : [];
   return [
+    FALOWEN_CONNECTION_REQUIRED,
     "Be my German " + level + " exam revision planner at Falowen. This is preparation, not an active examination.",
     timeInstruction,
     "I can study about " + duration + " minutes per day. Keep each day's total within that time, including review and breaks.",
     safePriorities.length ? "My existing Falowen practice suggests these broad priorities: " + safePriorities.join("; ") + ". Give priority revision extra time, assess unpractised skills first, and maintain all four skills." : "No reliable practice history is available. Begin with a short diagnostic across all four skills and adapt the plan from my responses; do not invent my results.",
-    "For each day or week specify a realistic goal, task, time allocation and self-check. Use active recall, error review, original exam-style exercises and periodic progress checks. Suggest Falowen practice materials via the Learning Companion only if connected and available; otherwise use original examples.",
+    "For each day or week specify a realistic goal, task, time allocation and self-check. Use active recall, error review, authorized Falowen practice materials and periodic progress checks. Verify available exam resources for the requested level with the Learning Companion first; plan around those resources only. If unavailable, stop and explain the next access step in English.",
     "Ask one question at a time during practice and adjust the plan when I report progress. Do not claim official marks or exam bookings. Never solve a current exam, reproduce protected assessment content or submit anything on my behalf.",
     "Only the selected level, remaining days, chosen daily minutes and broad skill priorities are included; exact dates, scores, IDs and answers are not transferred."
   ].join("\n\n");
