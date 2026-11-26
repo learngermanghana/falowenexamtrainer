@@ -12,7 +12,11 @@ test.each([
  ['swahili-b1/28/audio-url','swahili/B1/day-28/swahili-listening%20kuntasa.mp3'],
  ['b1/26/audio-url','a2/day-26/reiseprobleme-und-losungen.mp3'],
  ['b1/27/audio-url','b1/day-27/umweltfreundlich-im-alltag.mp3'],
- ['a2/7/audio-url','a2/day-07/eine-wohnung-suchen.mp3']
+ ['a2/7/audio-url','a2/day-07/eine-wohnung-suchen.mp3'],
+ ['a2/1/audio-url','a2/day-01/small-talk.mp3'],
+ ['a2/17/audio-url','a2/day-17/apotheken-detektiv.mp3'],
+ ['a2/26/audio-url','a2/day-26/gefuhle-beschreiben.mp3'],
+ ['a2/28/audio-url','a2/day-28/uber-die-zukunft-sprechen.mp3']
 ])('signs exact registered path %s',async(path,key)=>{
  const r=await request(path); expect(r.code).toBe(200);expect(new URL(r.body.url).pathname).toBe('/'+key);expect(r.headers['Cache-Control']).toBe('private, no-store');
 });
