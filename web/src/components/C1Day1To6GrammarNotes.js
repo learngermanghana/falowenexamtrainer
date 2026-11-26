@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { C1AcademicGrammarPractice } from "./C1AcademicExamPractice";
 
 const card = {
   ...styles.card,
@@ -307,6 +308,7 @@ export default function C1Day1To6GrammarNotes({ day, checked = false, onCheckedC
         </NoteBox>
       </section>
 
+      <C1AcademicGrammarPractice day={day} />
       {lesson.sections.map((section) => (
         <section key={section.title} style={card}>
           <h2 style={{ margin: 0, fontSize: "1.2rem" }}>{section.title}</h2>
