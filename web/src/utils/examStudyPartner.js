@@ -1,15 +1,16 @@
+import { FALOWEN_CONNECTION_REQUIRED } from "./falowenStudyConnection";
 // Only fixed practice metadata and a derived skill/Teil are used. No scores, IDs, answers,
 // exam passages, current task text, tokens, or account information are sent.
 export const EXAM_STUDY_SKILLS = Object.freeze([
   { key: "overview", label: "All four skills", instruction: "Help me plan balanced exam preparation across Lesen, Hören, Schreiben and Sprechen." },
-  { key: "lesen", label: "Reading · Lesen", instruction: "Create a fresh level-appropriate reading passage and comprehension questions. Teach scanning, finding evidence and identifying paraphrases." },
-  { key: "horen", label: "Listening · Hören", instruction: "Practise listening with a new short script or spoken exercise if voice is available. Do not reveal the transcript before I attempt the questions. If audio is unavailable, explain the limitation and offer alternative practice." },
-  { key: "writing", label: "Writing · Schreiben", instruction: "Create a fresh level-appropriate writing prompt. Teach structure, register and task coverage, then correct my own attempt." },
-  { key: "speaking", label: "Speaking · Sprechen", instruction: "Use a fresh level-appropriate speaking task, role-play and ask follow-up questions. Practise turn-taking, fluency and appropriate register." },
+  { key: "lesen", label: "Reading · Lesen", instruction: "Use an authorized Falowen reading passage and its learner-visible comprehension questions. Teach scanning, finding evidence and identifying paraphrases." },
+  { key: "horen", label: "Listening · Hören", instruction: "Use authorized Falowen listening practice and its original audio or direct me to its protected listening page. Do not reveal the transcript before I attempt the questions. If audio is unavailable, explain the limitation and direct me to the Falowen listening page." },
+  { key: "writing", label: "Writing · Schreiben", instruction: "Use an authorized Falowen writing prompt. Teach structure, register and task coverage, then correct my own attempt." },
+  { key: "speaking", label: "Speaking · Sprechen", instruction: "Use an authorized Falowen speaking task, role-play and ask follow-up questions. Practise turn-taking, fluency and appropriate register." },
 ]);
 export const EXAM_STUDY_MODES = Object.freeze([
-  { key: "practice", label: "Practise with new questions", instruction: "Start an interactive practice session with one new question at a time." },
-  { key: "strategy", label: "Explain exam strategies", instruction: "Explain useful preparation strategies and demonstrate them with new examples." },
+  { key: "practice", label: "Practise with new questions", instruction: "After retrieval, start an interactive practice session with one source-grounded question at a time." },
+  { key: "strategy", label: "Explain exam strategies", instruction: "Explain useful preparation strategies and demonstrate them with examples based on retrieved material." },
   { key: "review", label: "Review my weak areas", instruction: "Ask which skill or type of mistake I struggle with, then give targeted revision. Do not assume you know my scores." },
 ]);
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -20,13 +21,14 @@ export function buildExamStudyPrompt({ level, section, mode = "practice" } = {})
   const skill = EXAM_STUDY_SKILLS.find(item => item.key === section);
   const option = EXAM_STUDY_MODES.find(item => item.key === mode) || EXAM_STUDY_MODES[0];
   return [
+    FALOWEN_CONNECTION_REQUIRED,
     "Be my German " + level + " examination preparation study partner at Falowen (Learn Language Education Academy).",
     "Selected exam skill: " + skill.label + ". This is independent preparation, not an active assessment.",
-    "If my Falowen Learning Companion is connected, use learner-facing practice resources appropriate to this level and skill, only if available. Otherwise say so and create original practice.",
+    "Use Falowen Learning Companion to retrieve authorized learner-facing practice for the selected level and skill. For speaking and writing, use the exam dictionary. For reading and listening, list published mocks first and retrieve supported practice; if only a protected Falowen page link is available, direct me there. For all four skills, verify available practice resources before planning. Verify the level and skill returned; if unavailable, stop and explain in English.",
     skill.instruction,
     option.instruction,
-    "Match the CEFR level " + level + ". Ask one question at a time, wait for my attempt, then explain mistakes and give actionable feedback. Use German appropriate to my level and brief English explanations if needed.",
-    "Do not solve current Falowen exam questions, disclose answer keys, reproduce protected assessment tasks, start or submit an exam, or save official marks. Use new examples instead."
+    "Match the CEFR level " + level + ". Ask one question at a time, wait for my attempt, then explain mistakes and give actionable feedback. Use German appropriate to my level and clear English explanations and feedback.",
+    "Do not solve current Falowen exam questions, disclose answer keys, reproduce protected assessment tasks, start or submit an exam, or save official marks. Use only source-grounded teaching examples instead."
   ].join("\n\n");
 }
 
@@ -51,7 +53,7 @@ export function buildExamRevisionPrompt({ level, section, part, completed = fals
   return [
     buildExamStudyPrompt({level, section, mode: "review"}),
     "I have already completed a Falowen practice assessment and want to review my mistakes.",
-    focus ? "Prioritise " + focus + " using original exercises at this level. Do not assume a specific task format unless verified." : "Help identify my mistake types through a short discussion.",
-    "No scores, answers or exam questions were transferred. Ask me to describe the mistake or feedback in my own words; do not ask for protected exam material. Explain the underlying rule or strategy, give a fresh example, then ask me to try another question. Do not claim to know why I got a particular question wrong without evidence."
+    focus ? "Prioritise " + focus + " using retrieved learner-facing exercises at this level. Do not assume a specific task format unless verified." : "Help identify my mistake types through a short discussion.",
+    "No scores, answers or exam questions were transferred. Ask me to describe the mistake or feedback in my own words; do not ask for protected exam material. Explain the underlying rule or strategy, give a clearly labeled source-grounded example, then ask me to try another authorized question. Do not claim to know why I got a particular question wrong without evidence."
   ].join("\n\n");
 }
