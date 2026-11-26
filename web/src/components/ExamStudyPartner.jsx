@@ -28,7 +28,7 @@ export default function ExamStudyPartner({ level, section, restricted = false, r
         {recommended && <span style={{display:"block",fontWeight:400,fontSize:13}}>Suggested revision: {recommended.label}{revisionFocus.part ? " · " + revisionFocus.part : ""}</span>}
       </summary>
       <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
-        <p style={{ margin: 0, fontSize: 13 }}>Practise with fresh questions before an exam. Your official results stay in Falowen. Suggested revision uses your existing results locally; only level, skill and Teil are shared.</p>
+        <p style={{ margin: 0, fontSize: 13 }}>Practise with authorised Falowen questions before an exam. Your official results stay in Falowen. Suggested revision uses your existing results locally; only level, skill and Teil are shared.</p>
         {section === "overview" && <label style={{ display: "grid", gap: 4 }}>Choose a skill
           <select value={skill} onChange={e => { setSelectedSkill(e.target.value); setMode(null); setCopyStatus(""); }} style={{ padding: 8, maxWidth: "100%", color: "#14532d", background: "white", borderRadius: 6 }}>
             {EXAM_STUDY_SKILLS.map(item => <option key={item.key} value={item.key}>{item.label}</option>)}
@@ -44,7 +44,7 @@ export default function ExamStudyPartner({ level, section, restricted = false, r
           <a href={buildA1ChatGPTUrl(prompt)} target="_blank" rel="noopener noreferrer" style={{ background: "#166534", color: "#fff", padding: "10px 14px", borderRadius: 8, textDecoration: "none", fontWeight: 700 }}>Continue to ChatGPT ↗</a>
           <button type="button" onClick={copyPrompt} style={{ border: "1px solid #86b69a", background: "#fff", color: "#14532d", borderRadius: 8, padding: "10px 14px" }}>Copy prompt</button>
         </div>
-        <p style={{ margin: 0, fontSize: 13 }}>Connect Falowen Learning Companion in ChatGPT for available Falowen practice resources. If the prompt does not open automatically, paste the copied prompt. ChatGPT usage limits may apply.</p>
+        <p style={{ margin: 0, fontSize: 13 }}>Connect Falowen Learning Companion in ChatGPT before practice. If it is disconnected, ChatGPT will be instructed to explain how to connect in English. If the prompt does not open automatically, paste the copied prompt. ChatGPT usage limits may apply.</p>
         <details>
           <summary style={{ cursor: "pointer", fontSize: 13 }}>Preview generated prompt</summary>
           <textarea aria-label="Generated exam preparation prompt" readOnly value={prompt} rows={6} style={{ boxSizing: "border-box", width: "100%", marginTop: 6, padding: 8, color: "#14532d", background: "#fff" }} />
