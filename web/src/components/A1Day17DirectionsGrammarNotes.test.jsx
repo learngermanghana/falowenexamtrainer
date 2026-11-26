@@ -4,37 +4,38 @@ import A1Day17DirectionsGrammarNotes from "./A1Day17DirectionsGrammarNotes";
 import { getA1GrammarNotesComponent } from "./A1WorkbookGrammarNotes";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 
-test("the real A1 Day 17 Kapitel 11 grammar route uses the updated Wegbeschreibung notes", () => {
+test("A1-11 grammar route uses the concise exam revision guide", () => {
   const chapter = getA1Assignment("A1-11");
   expect(chapter.day).toBe(17);
   expect(chapter.chapter).toBe("11");
   expect(getA1GrammarNotesComponent("A1-11")).toBe(A1Day17DirectionsGrammarNotes);
-  const { container } = render(<A1Day17DirectionsGrammarNotes />);
+  const {container} = render(<A1Day17DirectionsGrammarNotes />);
   expect(container.querySelector('[data-a1-day17-directions-grammar="chapter-11-v2"]')).toBeInTheDocument();
-  expect(screen.getByText(/Kapitel 11 · Wegbeschreibung und Imperativ/)).toBeInTheDocument();
-  expect(screen.getByText("4. Imperativ · du, ihr und Sie")).toBeInTheDocument();
-  expect(screen.getByText("6. Kurz prüfen · Self-check")).toBeInTheDocument();
-  expect(screen.queryByText(/Zusatzaufgabe/)).not.toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:/Kapitel 11 · Anweisungen/})).toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:"1. Imperativ mit Sie"})).toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:"3. Verboten, erlaubt und dürfen"})).toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:"4. Goethe A1 · Sprechen Teil 3"})).toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:"5. Kurz prüfen · Quick practice"})).toBeInTheDocument();
+  expect(screen.queryByText(/Imperativ · du, ihr/)).not.toBeInTheDocument();
+  expect(screen.queryByText("Bieg links ab.")).not.toBeInTheDocument();
+  expect(screen.queryByText("Biegt links ab.")).not.toBeInTheDocument();
   expect(container.querySelector("iframe")).not.toBeInTheDocument();
   expect(container.innerHTML).not.toContain("youtube.com");
-  expect(screen.getByText(/In this lesson you learn how to ask for directions/)).toBeInTheDocument();
-  expect(screen.getByText(/This grammar self-check is not graded/)).toBeInTheDocument();
 });
-
-test("teaches du, ihr and Sie including separable abbiegen and zum/zur", () => {
-  render(<A1Day17DirectionsGrammarNotes />);
-  expect(screen.getByText(/zu \+ dem =/)).toBeInTheDocument();
-  expect(screen.getByText(/zu \+ der =/)).toBeInTheDocument();
-  expect(screen.getByText("Bieg links ab.")).toBeInTheDocument();
-  expect(screen.getByText("Biegt links ab.")).toBeInTheDocument();
-  expect(screen.getByText("Biegen Sie links ab.")).toBeInTheDocument();
-  expect(screen.getByText(/Nimm die erste Straße rechts/)).toBeInTheDocument();
+test("formal commands, signs and permission are covered", () => {
+  const {container}=render(<A1Day17DirectionsGrammarNotes />);
+  for(const phrase of ["zum = zu dem", "zur = zu der", "Biegen Sie links ab!", "Man darf hier nicht rauchen.", "Man darf hier parken.", "Darf ich hier parken?", "Bitte rauchen Sie hier nicht!", "Können Sie mir bitte einen Stift geben?"]) {
+    expect(container.textContent).toContain(phrase);
+  }
 });
-
-test("grammar self-check gives feedback without changing assessed workbook sections", () => {
+test("five ungraded self-checks give feedback and can be reset", () => {
   render(<A1Day17DirectionsGrammarNotes />);
-  const answer = screen.getByLabelText("Gehen Sie geradeaus.");
-  fireEvent.click(answer);
-  expect(screen.getByText(/Correct! \/ Richtig! Für Sie: Infinitiv \+ Sie/)).toBeInTheDocument();
-  expect(screen.getByText(/Diese Grammatikübung ist nicht Teil der benoteten Hausaufgabe/)).toBeInTheDocument();
+  expect(screen.getAllByRole("group")).toHaveLength(5);
+  fireEvent.click(screen.getByLabelText("Gehen Sie geradeaus!"));
+  expect(screen.getByRole("status")).toHaveTextContent("Richtig! Verb + Sie + Rest.");
+  fireEvent.click(screen.getByLabelText("Man darf hier rauchen."));
+  expect(screen.getAllByRole("status")[1]).toHaveTextContent("Versuchen Sie es noch einmal.");
+  fireEvent.click(screen.getByRole("button",{name:"Neu starten"}));
+  expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  expect(screen.getByText(/This self-check is not graded/)).toBeInTheDocument();
 });

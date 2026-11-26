@@ -1,138 +1,116 @@
 import React, { useState } from "react";
 import { styles } from "../styles";
 
-// Kapitel 11 · A1 Day 17: simple, lesson-specific notes for Wegbeschreibung
-// und Imperativ. The tutor workbook assesses Sprechen/Hören/Lesen separately.
-const section = { ...styles.card, display: "grid", gap: 12, lineHeight: 1.7 };
-const rowCell = { padding: "10px 12px", borderBottom: "1px solid #e2e8f0", textAlign: "left", verticalAlign: "top" };
-const model = { background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 12, padding: 14, lineHeight: 1.8 };
-const exampleLines = [
-  ["Wo ist der Bahnhof?", "Where is the train station?"],
-  ["Wie komme ich zum Bahnhof?", "How do I get to the train station?"],
-  ["Wie komme ich zur Post?", "How do I get to the post office?"],
-  ["Entschuldigung, können Sie mir helfen?", "Excuse me, can you help me?"],
-];
-const imperativeForms = [
-  ["gehen", "Geh geradeaus.", "Geht geradeaus.", "Gehen Sie geradeaus."],
-  ["abbiegen", "Bieg links ab.", "Biegt links ab.", "Biegen Sie links ab."],
-  ["nehmen", "Nimm die erste Straße rechts.", "Nehmt die erste Straße rechts.", "Nehmen Sie die erste Straße rechts."],
-  ["warten", "Warte hier.", "Wartet hier.", "Warten Sie hier."],
-];
-const quickChecks = [
-  { prompt: "Sie sprechen mit einem Fremden. Was ist höflich?", choices: ["Geh geradeaus.", "Gehen Sie geradeaus.", "Geht geradeaus."], answer: 1, explanation: "Für Sie: Infinitiv + Sie. / Formal commands use infinitive + Sie." },
-  { prompt: "Du: Welche Form passt zu „abbiegen“?", choices: ["Bieg rechts ab.", "Biegen Sie rechts ab.", "Biegt rechts ab."], answer: 0, explanation: "Für du: Bieg … ab. / The prefix ab goes at the end." },
-  { prompt: "Ihr: Welche Form passt zu „nehmen“?", choices: ["Nimm die erste Straße.", "Nehmen Sie die erste Straße.", "Nehmt die erste Straße."], answer: 2, explanation: "Für ihr: nehmt. / Use nehmt when speaking to several friends." },
-  { prompt: "Welche Richtung ist richtig? „An der Ampel ...“", choices: ["biegen Sie links ab.", "links Sie biegen ab.", "Sie abbiegen links."], answer: 0, explanation: "An der Ampel biegen Sie links ab. / Turn left at the traffic light." },
+// A1-11: quick revision before the unchanged Sprechen, Hören and Lesen tasks.
+const section = { ...styles.card, display: "grid", gap: 9, lineHeight: 1.55 };
+const model = { background: "#eff6ff", color: "#173453", border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, display: "grid", gap: 5 };
+const cell = { padding: "8px 6px", borderBottom: "1px solid #e2e8f0", textAlign: "left", verticalAlign: "top" };
+const p = { margin: 0 };
+const checks = [
+  { prompt: "geradeaus gehen – Geben Sie eine Anweisung.", choices: ["Sie gehen geradeaus.", "Gehen Sie geradeaus!", "Gehen geradeaus Sie!"], answer: 1, explanation: "Verb + Sie + Rest." },
+  { prompt: "Wie komme ich ___ Apotheke?", choices: ["zum", "zur", "zu dem"], answer: 1, explanation: "die Apotheke → zur Apotheke." },
+  { prompt: "🚭 Rauchen verboten. Was bedeutet das?", choices: ["Man darf hier rauchen.", "Rauchen ist erlaubt.", "Man darf hier nicht rauchen."], answer: 2, explanation: "verboten = not allowed." },
+  { prompt: "🅿️ Fragen Sie nach Erlaubnis.", choices: ["Darf ich hier parken?", "Ich darf hier parken.", "Parken Sie hier nicht!"], answer: 0, explanation: "Darf + ich + Rest + Infinitiv?" },
+  { prompt: "📷 Fotografieren verboten. Welche höfliche Bitte passt?", choices: ["Bitte fotografieren Sie hier!", "Bitte fotografieren Sie hier nicht!", "Fotografieren ist erlaubt."], answer: 1, explanation: "A polite prohibition uses Sie + nicht. Reaktion: Entschuldigung." },
 ];
 
 export default function A1Day17DirectionsGrammarNotes() {
   const [selected, setSelected] = useState({});
   return (
-    <div data-a1-day17-directions-grammar="chapter-11-v2" style={{ display: "grid", gap: 16 }}>
+    <div data-a1-day17-directions-grammar="chapter-11-v2" style={{ display: "grid", gap: 12 }}>
       <section style={section}>
-        <h1 style={{ margin: 0 }}>Kapitel 11 · Wegbeschreibung und Imperativ</h1>
-        <p style={{ margin: 0 }}>In this lesson you learn how to ask for directions, describe a route and give polite instructions. German examples include English explanations.</p>
-        <p style={{ margin: 0, color: "#475569" }}>Lesson goal: ask for directions, explain a simple route and use <strong>du, ihr</strong> and <strong>Sie</strong> commands correctly.</p>
+        <h1 style={p}>Kapitel 11 · Anweisungen, Wegbeschreibung, verboten und erlaubt</h1>
+        <p style={p}>Quick revision: give polite instructions, ask for directions, understand signs and make requests in the A1 exam.</p>
+      </section>
+
+      <section style={section}>
+        <h2 style={p}>1. Imperativ mit Sie</h2>
+        <p style={p}>Use <strong>Verb + Sie + Rest</strong> to give a formal instruction. Add <strong>bitte</strong> to sound polite.</p>
         <div style={model}>
-          <strong>Remember / Merken Sie sich:</strong>
-          <span>Gehen Sie geradeaus. (Go straight ahead.) → Biegen Sie rechts ab. (Turn right.) → Das Haus ist auf der linken Seite. (The house is on the left.)</span>
+          <strong>Gehen + Sie + bitte geradeaus!</strong>
+          <span>Sie gehen geradeaus. → Gehen Sie bitte geradeaus!</span>
+          <span>Sie warten hier. → Warten Sie bitte hier!</span>
+          <span>Sie biegen links ab. → Biegen Sie links ab!</span>
+        </div>
+        <p style={p}><strong>abbiegen:</strong> ab goes at the end. Also: Nehmen Sie die zweite Straße rechts. (Take the second street on the right.)</p>
+      </section>
+
+      <section style={section}>
+        <h2 style={p}>2. Nach dem Weg fragen und den Weg beschreiben</h2>
+        <div style={model}>
+          <strong>Entschuldigung, wo ist der Bahnhof?</strong>
+          <span>Wie komme ich zum Bahnhof? / Wie komme ich zur Apotheke?</span>
+          <span>Ist das weit von hier? (Is it far from here?)</span>
+        </div>
+        <p style={p}><strong>zum</strong> = zu dem: zum Bahnhof, zum Hotel · <strong>zur</strong> = zu der: zur Post, zur Schule.</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {["⬆ geradeaus · straight ahead", "⬅ links · left", "➡ rechts · right", "🚦 die Ampel · traffic light", "die Kreuzung · intersection", "die Haltestelle · stop", "neben · next to", "gegenüber · opposite", "hinter · behind"].map(word => (
+            <span key={word} style={{ border: "1px solid #cbd5e1", borderRadius: 8, padding: "4px 8px" }}>{word}</span>
+          ))}
+        </div>
+        <div style={model}>
+          <strong>Ein kurzer Weg</strong>
+          <span>Gehen Sie geradeaus bis zur Ampel. Biegen Sie rechts ab. Der Bahnhof ist auf der linken Seite, neben der Post.</span>
+          <small>Go straight to the traffic light. Turn right. The station is on the left, next to the post office.</small>
         </div>
       </section>
 
       <section style={section}>
-        <h2 style={{ margin: 0 }}>1. Wichtige Wörter · Directions vocabulary</h2>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {[
-            "geradeaus · straight ahead", "links · left", "rechts · right",
-            "die Ampel · traffic light", "die Kreuzung · intersection",
-            "die Straße · street", "die Ecke · corner",
-            "der Bahnhof · train station", "die Post · post office",
-            "der Supermarkt · supermarket",
-          ].map(item => <span key={item} style={{ borderRadius: 10, padding: "9px 12px", border: "1px solid #cbd5e1", background: "#f8fafc" }}>{item}</span>)}
-        </div>
-        <p style={{ margin: 0 }}><strong>Useful expressions / Wichtige Ausdrücke:</strong> an der Ampel (at the traffic light) · bis zur Ampel (up to the traffic light) · an der Kreuzung (at the intersection) · die erste Straße links (first street on the left) · auf der rechten Seite (on the right) · auf der linken Seite (on the left) · gegenüber der Bäckerei (opposite the bakery) · neben der Post (next to the post office).</p>
-      </section>
-
-      <section style={section}>
-        <h2 style={{ margin: 0 }}>2. Nach dem Weg fragen · Asking for directions</h2>
+        <h2 style={p}>3. Verboten, erlaubt und dürfen</h2>
+        <p style={p}><strong>verboten</strong> = forbidden · <strong>erlaubt</strong> = allowed · <strong>dürfen</strong> = to be allowed to.</p>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead><tr><th style={rowCell}>Deutsch</th><th style={rowCell}>English</th></tr></thead>
-            <tbody>{exampleLines.map(([german, english]) => <tr key={german}><td style={rowCell}><strong>{german}</strong></td><td style={rowCell}>{english}</td></tr>)}</tbody>
+            <thead><tr><th style={cell}>Schild</th><th style={cell}>Bedeutung / Meaning</th></tr></thead>
+            <tbody>
+              <tr><td style={cell}><strong>🚭 Rauchen verboten</strong></td><td style={cell}>Man darf hier nicht rauchen.</td></tr>
+              <tr><td style={cell}><strong>🅿️ Parken erlaubt</strong></td><td style={cell}>Man darf hier parken.</td></tr>
+              <tr><td style={cell}><strong>🚫 Fotografieren verboten</strong></td><td style={cell}>Sie dürfen hier nicht fotografieren.</td></tr>
+              <tr><td style={cell}><strong>🚫 Handys verboten</strong></td><td style={cell}>Sie dürfen hier kein Handy benutzen.</td></tr>
+            </tbody>
           </table>
         </div>
         <div style={model}>
-          <strong>zum oder zur?</strong>
-          <span>zu + dem = <strong>zum</strong> (to the, masculine/neuter) → zum Bahnhof (to the station), zum Supermarkt (to the supermarket).</span>
-          <span>zu + der = <strong>zur</strong> (to the, feminine) → zur Post (to the post office), zur Schule (to the school).</span>
-          <span>Example / Beispiel: Wie komme ich <strong>zur</strong> Schule? (How do I get to the school?)</span>
+          <strong>Darf ich hier parken? (May I park here?)</strong>
+          <span>Ja, natürlich. / Nein, das ist verboten.</span>
+          <small>darf / dürfen + infinitive at the end: Man darf hier nicht rauchen.</small>
         </div>
+        <p style={p}><strong>Lesen:</strong> Rauchen verboten → „Sie dürfen hier rauchen.“ = Falsch.</p>
       </section>
 
       <section style={section}>
-        <h2 style={{ margin: 0 }}>3. Den Weg beschreiben · Giving directions</h2>
-        <div style={model}>
-          <strong>Ein einfacher Weg zum Bahnhof · A simple route to the station</strong>
-          <ol style={{ margin: 0, paddingLeft: 23 }}>
-            <li>Gehen Sie <strong>geradeaus</strong> bis zur Ampel. (Go straight ahead to the traffic light.)</li>
-            <li>An der Ampel biegen Sie <strong>rechts</strong> ab. (Turn right at the traffic light.)</li>
-            <li>Nehmen Sie die <strong>erste Straße links</strong>. (Take the first street on the left.)</li>
-            <li>Der Bahnhof ist <strong>auf der rechten Seite</strong>, <strong>gegenüber der Post</strong>. (The station is on the right, opposite the post office.)</li>
-          </ol>
+        <h2 style={p}>4. Goethe A1 · Sprechen Teil 3</h2>
+        <p style={p}>Look at the picture. Make a polite request and respond to your partner.</p>
+        <div style={{ display: "grid", gap: 6 }}>
+          <div style={model}><strong>🚭 Bitte rauchen Sie hier nicht!</strong><span>Entschuldigung. Natürlich.</span></div>
+          <div style={model}><strong>📷 Bitte fotografieren Sie hier nicht!</strong><span>Ja, natürlich.</span></div>
+          <div style={model}><strong>🪟 Öffnen Sie bitte das Fenster!</strong><span>Ja, gern.</span></div>
+          <div style={model}><strong>🖊️ Geben Sie mir bitte einen Stift!</strong><span>Or: Können Sie mir bitte einen Stift geben? – Ja, gern. Hier, bitte.</span></div>
         </div>
-        <p style={{ margin: 0 }}>The verb <strong>abbiegen</strong> (to turn) is separable: its prefix moves to the end. In German / Auf Deutsch: „Biegen Sie rechts <strong>ab</strong>.“ Also possible / Auch möglich: „An der Ampel <strong>biegen</strong> Sie rechts <strong>ab</strong>.“</p>
+        <p style={p}>A clear request and a short relevant reaction are enough. Use <strong>nicht</strong> for a prohibition: Rauchen Sie hier bitte nicht!</p>
       </section>
 
       <section style={section}>
-        <h2 style={{ margin: 0 }}>4. Imperativ · du, ihr und Sie</h2>
-        <p style={{ margin: 0 }}>Use the imperative for instructions. <strong>Sie</strong> is formal/polite for strangers, <strong>du</strong> addresses one friend, and <strong>ihr</strong> addresses several friends.</p>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 570 }}>
-            <thead><tr>{["Verb", "du", "ihr", "Sie"].map(h => <th key={h} style={rowCell}>{h}</th>)}</tr></thead>
-            <tbody>{imperativeForms.map(forms => <tr key={forms[0]}>{forms.map((cell, i) => <td key={i} style={rowCell}>{cell}</td>)}</tr>)}</tbody>
-          </table>
-        </div>
-        <div style={model}>
-          <strong>Rule / Regel:</strong>
-          <span><strong>du:</strong> Geh! / Bieg ab! / Nimm! — omit „du“ (for one friend).</span>
-          <span><strong>ihr:</strong> Geht! / Biegt ab! / Nehmt! — omit „ihr“ (for several friends).</span>
-          <span><strong>Sie:</strong> Gehen Sie! / Biegen Sie ab! / Nehmen Sie! (formal, infinitive + Sie)</span>
-        </div>
-      </section>
-
-      <section style={section}>
-        <h2 style={{ margin: 0 }}>5. Beispielgespräch · Mini-dialogue</h2>
-        <div style={model}>
-          <p style={{ margin: 0 }}><strong>A:</strong> Entschuldigung, wie komme ich zur Post? (Excuse me, how do I get to the post office?)</p>
-          <p style={{ margin: 0 }}><strong>B:</strong> Gehen Sie geradeaus bis zur Ampel. Biegen Sie links ab. Die Post ist neben dem Supermarkt. (Go straight to the light. Turn left. The post office is next to the supermarket.)</p>
-          <p style={{ margin: 0 }}><strong>A:</strong> Vielen Dank! (Thank you very much!)</p>
-          <p style={{ margin: 0 }}><strong>B:</strong> Bitte schön! (You are welcome!)</p>
-        </div>
-        <p style={{ margin: 0 }}>Practise the dialogue with a partner. Replace <em>Post</em> with <em>Bahnhof</em> (train station) or <em>Schule</em> (school), then change the directions.</p>
-
-      </section>
-
-      <section style={section}>
-        <h2 style={{ margin: 0 }}>6. Kurz prüfen · Self-check</h2>
-        <p style={{ margin: 0 }}>Choose the correct answer. This grammar self-check is not graded. / Diese Grammatikübung ist nicht Teil der benoteten Hausaufgabe.</p>
-        {quickChecks.map((item, index) => (
-          <div key={item.prompt} style={{ border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, display: "grid", gap: 7 }}>
-            <strong>{index + 1}. {item.prompt}</strong>
+        <h2 style={p}>5. Kurz prüfen · Quick practice</h2>
+        <p style={p}>Choose an answer. This self-check is not graded.</p>
+        {checks.map((item, index) => (
+          <fieldset key={item.prompt} style={{ border: "1px solid #cbd5e1", borderRadius: 10, padding: 10, minWidth: 0, display: "grid", gap: 6, margin: 0 }}>
+            <legend style={{ fontWeight: 700 }}>{index + 1}. {item.prompt}</legend>
             {item.choices.map((choice, optionIndex) => (
-              <label key={choice} style={{ display: "flex", alignItems: "center", gap: 9 }}>
+              <label key={choice} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <input type="radio" name={`a1-day17-grammar-${index}`} checked={selected[index] === optionIndex}
                   onChange={() => setSelected(previous => ({ ...previous, [index]: optionIndex }))} />
                 <span>{choice}</span>
               </label>
             ))}
-            {selected[index] !== undefined ? (
-              <p style={{ margin: 0, color: selected[index] === item.answer ? "#166534" : "#9f1239" }}>
-                {selected[index] === item.answer ? "Correct! / Richtig!" : "Try again. / Versuchen Sie es noch einmal."} {item.explanation}
+            {selected[index] !== undefined && (
+              <p role="status" style={{ ...p, color: selected[index] === item.answer ? "#166534" : "#9f1239" }}>
+                {selected[index] === item.answer ? "Richtig!" : "Versuchen Sie es noch einmal."} {item.explanation}
               </p>
-            ) : null}
-          </div>
+            )}
+          </fieldset>
         ))}
-        <p style={{ margin: 0, color: "#475569" }}>After studying, open Teil 1 (Speaking), Teil 2 (Listening) and Teil 3 (Reading) in the workbook.</p>
+        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => setSelected({})}>Neu starten</button>
+        <p style={p}>Now open the workbook tasks: Teil 1 Sprechen, Teil 2 Hören and Teil 3 Lesen.</p>
       </section>
     </div>
   );
