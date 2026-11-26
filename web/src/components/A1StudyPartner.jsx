@@ -52,12 +52,12 @@ export default function StudyPartner({ lesson, section = "", level = "A1" }) {
         {voiceMode && <div style={{display:"grid",gap:5,fontSize:13,lineHeight:1.6}}>
           <strong>Use ChatGPT Live Voice</strong>
           <p style={{margin:0}}>Connect Falowen Learning Companion, open ChatGPT, send the generated prompt (or paste it), then tap the Voice icon. In Settings → Voice choose Live if needed. Allow microphone access in ChatGPT. Your voice session happens in ChatGPT, not in Falowen; account limits apply.</p>
-          <p style={{margin:0}}>If the plugin is unavailable, retrieve the lesson in text first or ask for topic-based practice. The microphone does not start automatically.</p>
+          <p style={{margin:0}}>If Live Voice cannot access the plugin, retrieve the authorised lesson in text first and resume voice in the same conversation. If disconnected, ChatGPT should explain how to connect before teaching. The microphone does not start automatically.</p>
         </div>}
-        <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6 }}>Opens ChatGPT in a new tab. For exact Falowen lesson materials, connect the Falowen Learning Companion in ChatGPT. If the prompt does not appear automatically, copy and paste it there. ChatGPT usage limits may apply.</p>
+        <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6 }}>Opens ChatGPT in a new tab. A connected Falowen Learning Companion is required for this lesson. If the prompt does not appear automatically, copy and paste it there. ChatGPT usage limits may apply.</p>
         <details>
           <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 700 }}>First time? Connect your Falowen account</summary>
-          <p style={{ fontSize: 13, lineHeight: 1.6, margin: "8px 0 0" }}>Open ChatGPT, find Falowen Learning Companion in the plugin directory, select Connect, and sign in to your Falowen account. Then return to this lesson and continue to ChatGPT. You can also practise with the topic prompt without connecting.</p>
+          <p style={{ fontSize: 13, lineHeight: 1.6, margin: "8px 0 0" }}>Open ChatGPT, find Falowen Learning Companion in the plugin directory, select Connect, and sign in to your Falowen account. Then return to this lesson and continue to ChatGPT. If you are not connected, ChatGPT will be instructed to guide you through connecting before practice begins.</p>
         </details>
         {copyStatus && <p role="status" style={{ margin: 0, fontSize: 13 }}>{copyStatus}</p>}
         <details>
