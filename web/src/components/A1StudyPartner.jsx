@@ -13,7 +13,7 @@ export default function StudyPartner({ lesson, section = "", level = "A1" }) {
   if (assessmentRestricted || !isStudyPartnerLesson(lesson, level)) return null;
 
   const voiceMode = VOICE_TEACHER_LEVELS.includes(level) && A1_VOICE_MODES.some(item => item.key === mode);
-  const prompt = voiceMode ? buildVoiceTeacherPrompt(lesson, mode, level) : buildStudyPrompt(lesson, mode, section, level);
+  const prompt = voiceMode ? buildVoiceTeacherPrompt(lesson, mode, level, section) : buildStudyPrompt(lesson, mode, section, level);
   const options = VOICE_TEACHER_LEVELS.includes(level) ? [...A1_VOICE_MODES, ...A1_STUDY_MODES] : A1_STUDY_MODES;
   const copyPrompt = async () => {
     try {
@@ -30,9 +30,9 @@ export default function StudyPartner({ lesson, section = "", level = "A1" }) {
         Study with ChatGPT <span style={{ fontWeight: 400, color: "#466557", fontSize: 13 }}>· Your AI study partner</span>
       </summary>
       <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
-        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6 }}>Practise this lesson with ChatGPT. Choose what you need help with. Your official assignment and marks stay in Falowen.</p>
+        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6 }}>Practise this lesson with ChatGPT. Choose where to start. You can switch grammar, speaking, reading or other available sections in the same chat. Your official assignment and marks stay in Falowen.</p>
         <fieldset className="study-partner-desktop-options" style={{ margin: 0, padding: 0, border: 0, display: "grid", gap: 8 }}>
-          <legend style={{ fontWeight: 700, marginBottom: 8 }}>How would you like to study?</legend>
+          <legend style={{ fontWeight: 700, marginBottom: 8 }}>Where would you like to start?</legend>
           {options.map(option => (
             <label key={option.key} style={{ display: "flex", gap: 8, alignItems: "center", minHeight: 32 }}>
               <input type="radio" name={level.toLowerCase() + "-study-mode-" + lesson.day + "-" + lesson.chapter} checked={mode === option.key} onChange={() => { setMode(option.key); setCopyStatus(""); }} />
@@ -40,7 +40,7 @@ export default function StudyPartner({ lesson, section = "", level = "A1" }) {
             </label>
           ))}
         </fieldset>
-        <label className="study-partner-mobile-options" style={{display:"none",gap:5,fontSize:13,fontWeight:700}}>How would you like to study?
+        <label className="study-partner-mobile-options" style={{display:"none",gap:5,fontSize:13,fontWeight:700}}>Where would you like to start?
           <select value={mode} onChange={event=>{setMode(event.target.value);setCopyStatus("");}}>
             {options.map(option=><option key={option.key} value={option.key}>{option.label}</option>)}
           </select>

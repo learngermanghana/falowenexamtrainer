@@ -3,6 +3,7 @@ import C2GrammarTeaching from "./C2GrammarTeaching";
 import React,{useEffect,useMemo,useRef,useState}from"react";
 import{useLocation,useNavigate}from"react-router-dom";
 import AppBackButton from"./navigation/AppBackButton";
+import StudyPartner from "./A1StudyPartner";
 import LiveSpeakInlinePractice from "./LiveSpeakInlinePractice";
 import{EmbeddedSpeechPracticePanel}from"./selfLearning/EmbeddedPracticePanels";
 import{AdvancedSelfLearningTabNav}from"./StandardWorkbookComponents";
@@ -498,6 +499,7 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
   </header>
 
   <AdvancedSelfLearningTabNav level="C2" day={day} activeTab={active} onChange={changeView}/>
+  <StudyPartner key={day} level="C2" section={active} lesson={{kind:"practice",day,chapter:mastery.chapter,title:standard.title,grammarFocus:standard.grammarFocus,skillFocus:skillLabel?.label}}/>
 
   {active==="learn"?<Learn day={day} standard={standard} knowledge={knowledge} mastery={mastery} skillFocus={skillFocus} completed={progress.learnDone} onCompleteChange={learnDone=>setProgress(p=>({...p,learnDone}))}/>:null}
   {active==="lesen"?<ReadingPractice day={day} completed={progress.lesenDone} onCompleteChange={lesenDone=>setProgress(p=>({...p,lesenDone}))}/>:null}
