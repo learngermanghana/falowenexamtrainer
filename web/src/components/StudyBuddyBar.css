@@ -800,3 +800,9 @@
     width: 100%;
   }
 }
+
+/* Keep the floating assistant out of active speaking answer controls. */
+body:has(.speaking-exam-session__answer) .study-buddy-reopen,
+body:has(.speaking-exam-session__answer) .study-buddy-bar {
+  display: none;
+}
