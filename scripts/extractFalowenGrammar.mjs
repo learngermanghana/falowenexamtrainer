@@ -430,7 +430,7 @@ export function extractA1OriginalGrammar(root, day) {
   const names = { 1: "A1Day1GreetingsGrammarPage", 2: "A1Day2UnifiedGrammarPage",
     3: "A1Day3Kapitel12GrammarNotesPage", 4: "GermanNumbersGrammarPage" };
   const name = names[day];
-  if (!name) return null;
+  if (!name) return extractRemainingA1Grammar(root, day);
   const file = path.join(root, "web/src/components", name + ".js");
   const ast = parse(fs.readFileSync(file, "utf8"), { sourceType: "module", plugins: ["jsx"] });
   const top = ast.program.body.flatMap(n => n.type === "VariableDeclaration" ? n.declarations : [n]);
@@ -569,4 +569,177 @@ export function extractA1OriginalGrammar(root, day) {
     orderedNotes: out.map((block, index) => ({ number: index + 1, ...block })),
     clarification: "Read orderedNotes in workbook order. Original English and German teaching is preserved; interactive scores, navigation, images and hidden answers are not exported.",
   };
+}
+
+/** Read later A1 grammar pages without executing React. Only reviewed teaching
+ * literals and question/option pairs are exported; unsupported UI or dynamic
+ * content is explicitly reported rather than pretending the export is complete. */
+function extractRemainingA1Grammar(root, day) {
+  const routes = {
+    7:["A1Day7PricesPreferencesGrammarPage"],8:["FormingBasicStatementsPage"],
+    9:["A1Day9NominativeAccusativeGrammarPage"],10:["ObjectsAndColorsPage"],
+    11:["TwelveHourClockPage","WeekTimeSeparableGrammarBook"],
+    12:["A1Day12TwentyFourHourClockDatesPage"],16:["A1Day16FoodAndNegationGrammarPage"],
+    17:["DirectionsImperativePage"],18:["TwoCasePrepositionsPageLegacy"],
+    20:["LetterWritingIntroPage","LetterWritingGrammarNotesPage"],
+    21:["WeatherPerfektLetterPage"],22:["HealthBodyPartsPage"],
+  };
+  if(!routes[day])return null;
+  const [file,component=file]=routes[day];
+  const ast=parse(fs.readFileSync(path.join(root,"web/src/components",file+".js"),"utf8"),
+    {sourceType:"module",plugins:["jsx"]});
+  const top=ast.program.body.map(n=>["ExportNamedDeclaration","ExportDefaultDeclaration"].includes(n.type)?n.declaration:n)
+    .filter(Boolean).flatMap(n=>n.type==="VariableDeclaration"?n.declarations:[n]);
+  const def=name=>top.find(n=>n.id?.name===name);
+  const decl=name=>def(name)?.init;
+  const field=(n,k)=>n?.properties?.find(p=>p.type==="ObjectProperty"&&String(p.key?.name??p.key?.value)===k)?.value;
+  const attr=(n,k)=>n.openingElement?.attributes?.find(a=>a.type==="JSXAttribute"&&a.name?.name===k);
+  const prop=(n,k)=>{const v=attr(n,k)?.value;return v?.type==="JSXExpressionContainer"?v.expression:v;};
+  const unfreeze=n=>n?.type==="CallExpression"&&n.callee?.object?.name==="Object"&&n.callee?.property?.name==="freeze"?n.arguments[0]:n;
+  const fail=m=>{throw new Error(m);};
+  const blocks=[],missing=new Set();
+  const clean=v=>{const lines=v.split(/\r\n|\r|\n/);let last=0;lines.forEach((l,i)=>{if(/[^ \t]/.test(l))last=i;});
+    return lines.map((l,i)=>{let t=l.replace(/\t/g," ");if(i)t=t.replace(/^ +/,"");if(i!==lines.length-1)t=t.replace(/ +$/,"");return t&&i!==last?t+" ":t;}).join("");};
+  const teaching=new Set("verbForms examples possessiveColumns possessiveRows articleColumns nominativeRows accusativeRows quickGuideRows patternRows clockRows timeExpressionRows daypartRows separableRows keinRows foodWords mistakes speakingCards twoWayPrepositions definiteArticles indefiniteArticles prepositionTypes weatherWords bodyParts schmerzenExamples wehExamplesSingular wehExamplesPlural healthQuestions healthAnswers cancellationLines letterTopics shortSentencePatterns wQuestionPatterns modalVerbExamples weilExamples summaryPoints".split(" "));
+  const keys=new Set("title lines prompts description words wrong correct reason sentence english gender note".split(" "));
+  function val(n,env={}){
+    if(!n)fail("missing literal");
+    if(n.type==="StringLiteral"||n.type==="NumericLiteral")return n.value;
+    if(n.type==="ArrayExpression")return n.elements.map(x=>val(x,env));
+    if(n.type==="ObjectExpression")return Object.fromEntries(n.properties.filter(p=>p.type==="ObjectProperty"&&keys.has(p.key?.name??p.key?.value)).map(p=>[p.key.name??p.key.value,val(p.value,env)]));
+    if(n.type==="Identifier"){
+      if(Object.hasOwn(env,n.name))return env[n.name];
+      if(teaching.has(n.name)||day===12&&n.name==="KNOWLEDGE_TEST_PASS_MARK")return val(unfreeze(decl(n.name)),env);
+      if(day===7&&n.name==="practiceBlocks")return val(field(decl("lessonBlocks"),"practice"),env);
+    }
+    if(n.type==="MemberExpression"&&!n.computed){
+      const k=n.property?.name;
+      if(day===7&&n.object?.name==="lessonBlocks"&&["kostenCards","kostenConjugation","pronouns","gernLieber","gernVsMogen","mogenConjugation"].includes(k))return val(field(decl("lessonBlocks"),k),env);
+      if(keys.has(k)){const o=val(n.object,env);if(o&&Object.hasOwn(o,k))return o[k];}
+    }
+    if(n.type==="JSXElement")return inline(n,env);
+    fail("unsupported learner expression "+n.type);
+  }
+  const string=x=>typeof x==="string"||typeof x==="number"?String(x):fail("not text");
+  const inlineTags=new Set(["strong","em","b","i","span","u","s","Role","TopicLabel"]);
+  function inline(n,env){
+    if(n.type==="JSXText")return clean(n.value);
+    if(n.type==="JSXExpressionContainer")return n.expression.type==="JSXEmptyExpression"?"":string(val(n.expression,env));
+    if(n.type==="JSXElement"&&tag(n)==="br")return "\n";
+    if(n.type==="JSXElement"&&inlineTags.has(tag(n)))return n.children.map(x=>inline(x,env)).join("");
+    fail("unsupported inline "+(tag(n)||n.type));
+  }
+  const content=(n,env)=>n.children.map(x=>inline(x,env)).join("").trim();
+  const push=(type,text)=>{if(text)blocks.push({type,text});};
+  const heading=t=>push("heading",t);
+  const table=(headers,rows)=>{
+    if(!Array.isArray(rows)||!rows.length||rows.some(r=>!Array.isArray(r)||(headers.length&&r.length!==headers.length)))fail("invalid table");
+    blocks.push({type:"table",...(headers.length?{headers:headers.map(string)}:{}),rows:rows.map(r=>r.map(string))});
+  };
+  const quizzes=new Set("knowledgeQuestions questions timeKnowledgeChecks separableKnowledgeChecks lessonChecks KNOWLEDGE_TEST_QUESTIONS quiz quizQuestions mapSteps possessivePracticeQuestions bodyPartsQuiz doctorConsultationQuiz letterWritingQuiz".split(" "));
+  function questions(name){
+    if(!quizzes.has(name))fail("unapproved quiz");
+    const n=unfreeze(decl(name));if(n?.type!=="ArrayExpression")fail("quiz source changed");
+    for(const q of n.elements){
+      const prompt=field(q,"prompt")||field(q,"question")||field(q,"stem");
+      blocks.push({type:"multipleChoice",question:string(val(prompt)),options:val(field(q,"options")).map(string)});
+    }
+  }
+  const mapSource=e=>e?.type==="CallExpression"&&e.callee?.type==="MemberExpression"&&e.callee.property?.name==="map"?e.callee.object:null;
+  function mapItems(e,env){
+    const source=mapSource(e);
+    if(quizzes.has(source.name)){questions(source.name);return;}
+    const items=val(source,env),cb=e.arguments[0];
+    if(!Array.isArray(items)||cb?.type!=="ArrowFunctionExpression"||cb.body.type==="BlockStatement")fail("unsupported teaching map");
+    for(const [index,item] of items.entries()){
+      const next={...env},p=cb.params[0];
+      if(p?.type==="Identifier")next[p.name]=item;
+      else if(p?.type==="ArrayPattern"&&Array.isArray(item))p.elements.forEach((id,i)=>{if(id?.type==="Identifier")next[id.name]=item[i];else fail("map binding");});
+      else fail("map binding");
+      if(cb.params[1]?.type==="Identifier")next[cb.params[1].name]=index;
+      walk(cb.body,next);
+    }
+  }
+  function jsxOf(name){
+    const d=def(name),fn=d?.init||d;
+    if(["JSXElement","JSXFragment"].includes(fn?.body?.type))return fn.body;
+    const rs=fn?.body?.body?.filter(n=>n.type==="ReturnStatement"&&["JSXElement","JSXFragment"].includes(n.argument?.type))||[];
+    if(rs.length!==1)fail("grammar return changed: "+name);return rs[0].argument;
+  }
+  const omit=new Set(["AppBackButton","img","HeroImage","TopicImageBreak","FalowenLessonMusic","iframe","button","input","a"]);
+  const containers=new Set(["main","header","section","div","article","Note","Callout","InfoBox","Section","SubSection","pre"]);
+  const quizState=new Set(["showResults","showScore","checked","selected","selectedAnswer","mapFeedback"]);
+  function walk(n,env={}){
+    if(!n)return;
+    try{
+      if(n.type==="JSXText"){push("paragraph",clean(n.value).trim());return;}
+      if(n.type==="JSXFragment"){n.children.forEach(x=>walk(x,env));return;}
+      if(n.type==="JSXExpressionContainer"){
+        const e=n.expression;if(e.type==="JSXEmptyExpression")return;
+        if(mapSource(e)){mapItems(e,env);return;}
+        if(e.type==="ConditionalExpression"&&quizState.has(e.test?.name))return;
+        if(e.type==="LogicalExpression"&&e.left?.object?.name==="openAnswers")return;
+        push("paragraph",string(val(e,env)));return;
+      }
+      if(n.type!=="JSXElement")fail("unknown node "+n.type);
+      const t=tag(n),get=k=>val(prop(n,k),env),has=k=>Boolean(attr(n,k));
+      if(omit.has(t)||has("data-a1-pdf-hide-ui"))return;
+      if(t==="A1Day10GrammarFocus"){walk(jsxOf(t),env);return;}
+      if(t==="Day8QuickPractice"){heading("5. Quick practice");push("paragraph","Choose the correct verb form, question word or country preposition. You can try again.");questions("questions");return;}
+      if(t==="PracticeBlock"&&day===10){questions("possessivePracticeQuestions");return;}
+      if(t==="KnowledgeTest"&&day===11){heading(get("title"));questions(prop(n,"questions")?.name);return;}
+      if(t==="GermanExample"){push("example",get("german"));push("paragraph",get("english"));return;}
+      if(t==="WeilExplanation"&&day===20){walk(jsxOf(t),{pronoun:get("pronoun")});return;}
+      if(t==="Sentence"&&day===18){push("example",get("parts").map(r=>r[1]).join(" "));push("paragraph",get("english"));return;}
+      if(["Table","SimpleTable","ConjugationTable"].includes(t)){
+        if(has("caption"))push("paragraph",get("caption"));if(has("label"))push("paragraph",get("label"));
+        const h=t==="ConjugationTable"?["Pronoun",get("verb")+" in Präsens","English meaning"]:get(has("columns")?"columns":has("headings")?"headings":"headers");
+        table(h,get("rows"));return;
+      }
+      if(t==="ArticleTable"){table([get("title"),"Masculine","Feminine","Neuter","Plural"],[["Definite",...get("definite")],["Indefinite",...get("indefinite")]]);return;}
+      if(t==="ExampleList"){
+        const name=prop(n,"examples")?.name;if(!["nominativeMoreExamples","accusativeMoreExamples"].includes(name))fail("unapproved examples");
+        for(const item of decl(name).elements){push("example",val(field(item,"sentence")));for(const [k,label] of [["english","English:"],["gender","Gender / number:"],["note","Note:"]])push("paragraph",label+" "+val(field(item,k)));}return;
+      }
+      if(t==="BulletList"||t==="NumberedList"){blocks.push({type:t==="NumberedList"||has("ordered")?"orderedList":"list",items:get("items").map(string)});return;}
+      if(t==="table"){
+        const part=k=>n.children.find(x=>x.type==="JSXElement"&&tag(x)===k),head=part("thead"),body=part("tbody");
+        const hr=head?.children.find(x=>x.type==="JSXElement"&&tag(x)==="tr");if(!hr||!body)fail("table structure changed");
+        const hm=hr.children.find(x=>x.type==="JSXExpressionContainer"),bm=body.children.find(x=>x.type==="JSXExpressionContainer");
+        const headers=hm?val(mapSource(hm.expression),env):hr.children.filter(x=>x.type==="JSXElement"&&tag(x)==="th").map(x=>content(x,env));
+        const rows=bm?val(mapSource(bm.expression),env):body.children.filter(x=>x.type==="JSXElement"&&tag(x)==="tr").map(r=>r.children.filter(x=>x.type==="JSXElement"&&tag(x)==="td").map(x=>content(x,env)));
+        table(headers,rows);return;
+      }
+      if(/^h[1-6]$/.test(t)){heading(content(n,env));return;}
+      if(t==="ul"||t==="ol"){blocks.push({type:t==="ol"?"orderedList":"list",items:n.children.filter(x=>x.type==="JSXElement"&&tag(x)==="li").map(x=>content(x,env))});return;}
+      if(t==="br")return;
+      if(containers.has(t)){
+        if(t==="Section"&&has("title")){
+          if(has("eyebrow"))push("paragraph",get("eyebrow"));
+          heading((day===18&&has("number")?get("number")+". ":"")+get("title"));
+          if(has("subtitle"))push("paragraph",get("subtitle"));
+          if(day===17&&get("title")==="9) Interactive map scenario"){questions("mapSteps");missing.add("interactive map instructions");return;}
+          if(day===17&&get("title")==="8) Quick Check quiz (instant feedback)"){questions("quizQuestions");return;}
+          if(day===12&&get("title")==="Knowledge test: 24-hour clock and dates"){
+            push("paragraph","6 questions · Pass mark: "+val(decl("KNOWLEDGE_TEST_PASS_MARK"))+"/6");
+            push("paragraph","Answer all six multiple-choice questions before checking your score. Answers are not shown inside the question fields.");
+            push("paragraph","Choose one answer for every question.");questions("KNOWLEDGE_TEST_QUESTIONS");return;
+          }
+        }else if((t==="InfoBox"||t==="SubSection")&&has("title"))heading(get("title"));
+        const simple=n.children.every(x=>x.type==="JSXText"||(x.type==="JSXElement"&&(inlineTags.has(tag(x))||tag(x)==="br")));
+        if(simple)push("paragraph",content(n,env));else n.children.forEach(x=>walk(x,env));return;
+      }
+      if(t==="p"||inlineTags.has(t)){push("paragraph",content(n,env));return;}
+      fail("unsupported teaching component "+t);
+    }catch(error){missing.add(error.message);}
+  }
+  walk(jsxOf(component));
+  if(!blocks.some(b=>b.type==="heading")||blocks.length<5)throw new Error("No usable A1 grammar blocks: "+day);
+  // These mixed-layout pages are a conservative first export. Do not claim
+  // exact page completeness until each dynamic component has parity tests.
+  const omitted=[...missing];
+  if([7,9,10,17,18,20].includes(day))omitted.push("Full page parity not verified for this mixed layout");
+  return {source:"Falowen original A1 learner-facing grammar page",fullExplanationIncluded:omitted.length===0,
+    orderedNotes:blocks.map((b,i)=>({number:i+1,...b})),...(omitted.length?{omittedTeaching:omitted}:{}),
+    clarification:omitted.length?"Read only supplied original blocks in order; some interactive or dynamic teaching is not exported or verified. Open the Campus grammar page for those parts. Do not invent missing material.":"Read orderedNotes in workbook order. Original English and German teaching is preserved; interactive scores, navigation, images and hidden answers are not exported."};
 }
