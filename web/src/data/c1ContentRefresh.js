@@ -1,3 +1,4 @@
+import { C1_DAY1_WRITING_POINTS, C1_DAY1_WRITING_TOPIC } from "./c1Day1WritingTask.js";
 import { getC1AcademicDay } from "./c1AcademicCurriculum.js";
 import { getC1Phase2Lesson } from "./c1Phase2Lessons.js";
 
@@ -303,7 +304,10 @@ export const alignC1LessonContent = (lesson) => {
   const canonicalLesson = { ...lesson, title: canonicalTitle, lessonTitle: canonicalTitle, topic: profile.question };
 
   const originalGrammar = lesson.grammarLesson || {};
-  const writing = makeWritingContent(canonicalLesson, profile);
+  const writing = day === 1
+    ? { ...makeWritingContent(canonicalLesson, profile), topic: C1_DAY1_WRITING_TOPIC, structure: ["Einleitung: Führen Sie in das Thema ein.", ...C1_DAY1_WRITING_POINTS, "Schluss: Fassen Sie Ihre begründete Empfehlung zusammen."] }
+    : makeWritingContent(canonicalLesson, profile);
+  const writingPoints = day === 1 ? C1_DAY1_WRITING_POINTS : profile.points;
   const originalWritingBuilder = lesson.writingBuilder || {};
   const originalExamples = Array.isArray(originalGrammar.examples) ? originalGrammar.examples : [];
   const originalRules = Array.isArray(originalGrammar.rules) ? originalGrammar.rules : [];
@@ -355,7 +359,7 @@ export const alignC1LessonContent = (lesson) => {
     },
     writingTaskType: writing.taskType,
     writingTopic: writing.topic,
-    writingPromptBullets: profile.points,
+    writingPromptBullets: writingPoints,
     writingBuilder: {
       ...originalWritingBuilder,
       structure: writing.structure,
@@ -381,7 +385,7 @@ export const alignC1LessonContent = (lesson) => {
       aim: profile.aim,
       question: profile.question,
       speakingBranches: makeSpeakingBranches(canonicalLesson, profile),
-      writingPoints: profile.points,
+      writingPoints,
     },
   };
 };

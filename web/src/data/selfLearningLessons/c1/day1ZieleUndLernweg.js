@@ -1,3 +1,4 @@
+import { C1_DAY1_WRITING_POINTS, C1_DAY1_WRITING_TOPIC } from "../../c1Day1WritingTask.js";
 import { makeLesson } from "../buildSelfLearningLesson";
 import c1Day1LearningSpeakingGuide from "./day1LearningSpeakingGuide";
 
@@ -105,24 +106,11 @@ const c1Day1ZieleUndLernweg = makeLesson({
     ],
   },
   writingTaskType: "C1 opinion essay / Stellungnahme",
-  writingTopic: "Schreiben: Ziele und Lernweg. Verfassen Sie eine C1-Stellungnahme zu diesem Thema: Wie kann man einen realistischen Lernweg planen, um ein anspruchsvolles Sprachziel zu erreichen? Bearbeiten Sie alle Punkte: Erklären Sie, welche Kriterien bei der Planung eines Lernwegs wichtig sind. Argumentieren Sie anhand eines konkreten Beispiels für ein Lernziel. Nennen Sie mögliche Einwände gegen unrealistische Ziele oder zu starre Lernpläne. Erläutern Sie eine sinnvolle Alternative für Lernende mit wenig Zeit.",
+  writingTopic: C1_DAY1_WRITING_TOPIC,
+  writingPromptBullets: C1_DAY1_WRITING_POINTS,
   writingBuilder: {
-    structure: [
-      "Einleitung: Stellen Sie das Thema Ziele und Lernweg vor und zeigen Sie, warum eine klare Planung wichtig ist.",
-      "Erklären Sie: Welche Kriterien sollte man bei der Planung eines Lernwegs beachten?",
-      "Argumentieren Sie anhand eines Beispiels: Wählen Sie ein konkretes Lernziel und erklären Sie, wie man es sinnvoll erreichen kann.",
-      "Nennen Sie mögliche Einwände: Welche Probleme können durch unrealistische Ziele oder zu starre Lernpläne entstehen?",
-      "Erläutern Sie eine Alternative: Beschreiben Sie flexible Wochenziele, kurze tägliche Einheiten, Tutorfeedback oder einen hybriden Lernplan.",
-      "Schluss: Formulieren Sie ein differenziertes Fazit mit Ihrer eigenen Position.",
-    ],
-    usefulLines: [
-      "Die Planung eines Lernwegs gehört zu den wichtigsten Voraussetzungen für langfristigen Lernerfolg.",
-      "Dabei sollte man nicht nur das gewünschte Ziel, sondern auch Zeit, Alltag und persönliche Schwächen berücksichtigen.",
-      "Ein anschauliches Beispiel hierfür ist das Ziel, ... zu verbessern, weil ...",
-      "Kritisch zu betrachten ist jedoch, dass unrealistische Ziele schnell zu Frustration führen können.",
-      "Eine sinnvolle Alternative wäre ein flexibler Wochenplan, der ... verbindet.",
-      "Zusammenfassend lässt sich festhalten, dass ein guter Lernweg realistisch, messbar und anpassbar sein sollte.",
-    ],
+    structure: ["Einleitung: Führen Sie in das Thema ein.", ...C1_DAY1_WRITING_POINTS, "Schluss: Fassen Sie Ihre begründete Empfehlung zusammen."],
+    usefulLines: ["Von besonderer Bedeutung ist, dass ...", "Einerseits ... andererseits ...", "Digitale Hilfsmittel können ..., sofern ...", "Aus meiner Erfahrung ...", "Angehenden Studierenden empfehle ich ..., weil ..."],
   },
   phrases: [
     "einen realistischen Lernweg planen",
@@ -135,7 +123,7 @@ const c1Day1ZieleUndLernweg = makeLesson({
   ],
   tasks: {
     speaking: "Sprich 2 Minuten über deinen Lernweg. Nenne Kriterien, ein konkretes Lernziel, einen Einwand und eine Alternative.",
-    writing: "Schreibe 180–220 Wörter als C1-Stellungnahme über Ziele und Lernweg. Beantworte Erklärung, Beispiel, Einwand und Alternative.",
+    writing: C1_DAY1_WRITING_TOPIC,
     reading: "Wähle einen Artikel auf einer empfohlenen deutschen Plattform über Lernen, Motivation, Bildung oder Selbstorganisation. Notiere Hauptaussage, 5 Wörter und deine Meinung.",
     listening: "Wähle ein Audio oder Video auf einer empfohlenen deutschen Plattform über Lernen, Bildung oder Motivation. Fasse es in 4–5 Sätzen zusammen.",
   },
