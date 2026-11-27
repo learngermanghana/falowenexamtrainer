@@ -31,10 +31,10 @@ describe("B2 unified C2-style course structure", () => {
   });
 
   test("replaces Finish with Review and shows only today's main skill", () => {
-    expect(getB2DayTabs(1).map((tab) => tab.key)).toEqual(["learn", "lesen", "review", "references"]);
-    expect(getB2DayTabs(2).map((tab) => tab.key)).toEqual(["learn", "hoeren", "review", "references"]);
-    expect(getB2DayTabs(3).map((tab) => tab.key)).toEqual(["learn", "speak", "review", "references"]);
-    expect(getB2DayTabs(4).map((tab) => tab.key)).toEqual(["learn", "write", "review", "references"]);
+    expect(getB2DayTabs(1).map((tab) => tab.key)).toEqual(["music", "learn", "lesen", "review", "references"]);
+    expect(getB2DayTabs(2).map((tab) => tab.key)).toEqual(["music", "learn", "hoeren", "review", "references"]);
+    expect(getB2DayTabs(3).map((tab) => tab.key)).toEqual(["music", "learn", "speak", "review", "references"]);
+    expect(getB2DayTabs(4).map((tab) => tab.key)).toEqual(["music", "learn", "write", "review", "references"]);
     expect(getB2DayTabs(4).map((tab) => tab.key)).not.toContain("finish");
   });
 

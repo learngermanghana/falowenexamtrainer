@@ -249,3 +249,13 @@ listening dialogue remains on the existing authenticated Teil 4 route. The song
 follows 63 estimated line intervals derived from word timestamps for the exact
 published recording. The workbook uses the same Falowen Radio embed pattern
 as Days 10 and 11. Podcast follow-up activities are available on the Admin slide.
+
+## German B2–C2 course music
+
+B2, C1 and C2 lesson navigation includes an optional Music tab using the same
+public workbook player and exact level/day music discovery as A1–B1. Music does
+not affect lesson completion, marks or submissions; the existing Ref tab remains
+available. The supplied C1 Day 1 “Lernen mit Verstand” song is listed using its
+exact public music object key. Its supplied words are an untimed reference draft,
+not a recording-verified transcript; the player labels them accordingly and
+provides no line synchronization until recording-matched timing is available.

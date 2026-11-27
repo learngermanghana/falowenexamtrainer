@@ -33,6 +33,7 @@ const A2_B1_ALIASES = Object.freeze({
 
 const ADVANCED_ALIASES = Object.freeze({
   ...COMMON_ALIASES,
+  music: "music",
   learn: "learn",
   grammar: "learn",
   speak: "speak",

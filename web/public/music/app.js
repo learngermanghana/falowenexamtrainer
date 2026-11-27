@@ -1018,7 +1018,7 @@ Promise.all([
   }
   learning = lessons && typeof lessons.lessons === "object" && lessons.lessons ? lessons.lessons : {};
   studioDrafts = Array.isArray(drafts?.tracks) ? drafts.tracks.filter(item =>
-    ["A1","A2","B1"].includes(item.level) && Number.isInteger(item.day)
+    ["A1","A2","B1","B2","C1","C2"].includes(item.level) && Number.isInteger(item.day)
     && typeof item.lyrics === "string" && item.lyrics.length <= 6000
   ) : [];
   updateLanguageCatalog();

@@ -498,6 +498,25 @@
       "slides": true,
       "objectKey": "music/b1/day-20/Traumberuf.mp3",
       "approved": true
+    },
+    {
+      "id": "r2-c1-day-01-b64_TGVybmVuIG1pdCBWZXJzdGFuZC5tcDM",
+      "title": "Lernen mit Verstand",
+      "level": "C1",
+      "day": 1,
+      "assignmentKey": "C1-1.1",
+      "topic": "Wissenschaftliches Lernen und Lernstrategien",
+      "type": "Learning song",
+      "genre": "West African Palm Wine · Afro-Soul Pop",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-c1-day-01-b64_TGVybmVuIG1pdCBWZXJzdGFuZC5tcDM",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/c1/day-01/Lernen mit Verstand.mp3",
+      "approved": true,
+      "autoDiscovered": true
     }
   ]
 }

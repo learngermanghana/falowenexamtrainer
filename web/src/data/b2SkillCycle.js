@@ -23,6 +23,7 @@ export const getB2DayTabs = (day) => {
   const focus = getB2SkillFocus(day);
   const skill = focus ? B2_SKILL_LABELS[focus] : null;
   return [
+    { key: "music", label: "Music", description: "Optional" },
     { key: "learn", label: "Grammar", description: "Learn" },
     ...(focus && skill ? [{ key: focus, ...skill }] : []),
     { key: "review", label: "Review", description: "Wiederholen" },
