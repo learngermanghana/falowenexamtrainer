@@ -424,7 +424,7 @@ describe("C1 and C2 canonical student Course Book in ChatGPT", () => {
     expect(reading.material.questions.length).toBeGreaterThan(0);
     expect(lessonContentResponse("C1", 20, "reading").available).toBe(true);
     expect(lessonContentResponse("C1", 20, "writing").material.instructions.length).toBeGreaterThan(2);
-    expect(lessonContentResponse("C1", 20, "grammar").material.fullExplanationIncluded).toBe(true);
+    expect(lessonContentResponse("C1", 20, "grammar").material.fullExplanationIncluded).toBe(false);
   });
 
   test("C2 returns original Lesen only on actual reading days, with no answer keys", () => {
@@ -499,37 +499,41 @@ describe("A2 original classroom speaking and writing export",()=>{
 
  test("switching sections preserves verified course context and exposes actual A2 Day 9 part mapping",()=>{const grammar=lessonContentResponse("A2",9,"grammar");const speak=lessonContentResponse("A2",9,"speaking");const write=lessonContentResponse("A2",9,"writing");for(const result of [grammar,speak,write]){expect(result.available).toBe(true);expect(result.level).toBe("A2");expect(result.day).toBe(9);expect(result.workbookPartSections["1"]).toBe("speaking");expect(result.workbookPartSections["2"]).toBe("writing");expect(result.availableSections).toContain("speaking");expect(result.guidance).toContain("starting point");}expect(lessonContentResponse("C2",20,"reading").available).toBe(false);});
 
-describe("C1 original guided grammar notes", () => {
-  test("Day 1 exports real headings, exact text and structured tables in page order", () => {
-    const result = lessonContentResponse("C1", 1, "grammar");
-    const notes = result.material.orderedNotes;
+
+describe("C1 actual Learn workbook source", () => {
+  test("Day 1 matches the published Learn tab, not the unmounted grammar notes", () => {
+    const result=lessonContentResponse("C1",1,"grammar");
+    const notes=result.material.orderedNotes;
+    const index=text=>notes.findIndex(b=>b.text===text);
     expect(result.material.fullExplanationIncluded).toBe(true);
-    expect(notes[0]).toEqual({ number: 1, type: "heading", text: "Relativsätze mit Präpositionen" });
-    expect(notes[1].text).toBe("Lernwege, Personen, Methoden und Ziele präzise miteinander verbinden");
-    expect(notes.find(b => b.type === "heading" && b.text === "1. Die Präposition gehört zum Verb")).toBeDefined();
-    expect(notes.find(b => b.type === "table" && b.headers)).toMatchObject({
-      headers: ["Struktur / Bedeutung", "Form / Beispiel"],
-      rows: expect.arrayContaining([["arbeiten mit + Dativ", "der Tutor, mit dem ich arbeite"]]),
-    });
-    expect(notes.find(b => b.type === "heading" && b.text === "C1-Grammatik im Kontext").number)
-      .toBeLessThan(notes.find(b => b.type === "heading" && b.text === "1. Die Präposition gehört zum Verb").number);
+    expect(notes[0].text).toBe("C1 · Thema verstehen");
+    expect(notes[1].text).toBe("Wissenschaftliches Lernen und Lernstrategien");
+    expect(index("C1-Grammatik im Kontext")).toBeGreaterThan(0);
+    expect(index("Lesen · Teil 1 · Prüfungstraining")).toBeGreaterThan(index("C1-Grammatik im Kontext"));
+    expect(index("Grammar lesson")).toBeGreaterThan(index("Lesen · Teil 1 · Prüfungstraining"));
+    expect(notes[index("Grammar lesson")+1].text).toBe("Relativsätze mit Präpositionen");
+    expect(notes[index("Grammar lesson")+2].text).toBe("Fokus: Relativsätze mit Präpositionen");
+    expect(notes[index("Grammar lesson")+3].text).toBe("Relativsätze machen deinen C1-Text präziser, weil du zwei einfache Sätze verbinden kannst. Dadurch klingt dein Text weniger abgehackt und du kannst Kriterien, Ziele oder Probleme genauer erklären.");
+    expect(notes[index("Kernregeln")+1].items).toHaveLength(6);
+    expect(notes[index("Beispiele")+1].items).toHaveLength(5);
+    expect(index("C1 Kollokationen · Verben mit Präpositionen")).toBeGreaterThan(index("Beispiele"));
+    expect(index("Knowledge questions")).toBeGreaterThan(index("C1 Kollokationen · Verben mit Präpositionen"));
+    expect(notes.slice(index("Knowledge questions")+1).filter(b=>b.type==="multipleChoice")).toHaveLength(4);
+    expect(index("Warum brauchst du diese Grammatik auf C1?")).toBe(-1);
+    expect(index("Lernwege, Personen, Methoden und Ziele präzise miteinander verbinden")).toBe(-1);
     expect(result.guidance).toContain("material.orderedNotes");
   });
-  test("All 28 days expose numbered source blocks, not collapsed answers", () => {
-    for (let day = 1; day <= 28; day++) {
-      const grammar = lessonContentResponse("C1", day, "grammar").material;
-      expect(grammar.fullExplanationIncluded).toBe(true);
-      expect(grammar.orderedNotes.map(b => b.number)).toEqual(grammar.orderedNotes.map((_, i) => i + 1));
-      expect(grammar.orderedNotes.some(b => b.type === "questions")).toBe(true);
-      expect(grammar.orderedNotes.some(b => b.type === "table")).toBe(true);
-      for (const block of grammar.orderedNotes.filter(b => b.type === "questions")) expect(block.items.every(q => typeof q === "string")).toBe(true);
+  test("all 28 days return actual ordered content without hidden answers", () => {
+    for(let day=1;day<=28;day++){
+      const grammar=lessonContentResponse("C1",day,"grammar").material;
+      expect(grammar.fullExplanationIncluded).toBe(day<=16);
+      expect(grammar.orderedNotes[0].text).toBe("C1 · Thema verstehen");
+      expect(grammar.orderedNotes.map(b=>b.number)).toEqual(grammar.orderedNotes.map((_,i)=>i+1));
+      expect(grammar.orderedNotes.some(b=>b.type==="multipleChoice")).toBe(true);
       expect(JSON.stringify(grammar.orderedNotes)).not.toMatch(/"(answer|answerIndex|correctIndex|reason|checks|grammarChecks)"\s*:/);
+      if(day<=16)expect(grammar.orderedNotes.some(b=>b.text==="Grammar lesson")).toBe(true);
+      else expect(grammar.omittedTeaching.length).toBeGreaterThan(0);
     }
-    expect(lessonContentResponse("C1", 7, "grammar").material.orderedNotes.some(b => b.text === "1. Direkte Vergleiche")).toBe(true);
-    expect(lessonContentResponse("C1", 8, "grammar").material.orderedNotes.some(b => b.text === "1. Von verbal zu nominal")).toBe(true);
-    expect(lessonContentResponse("C1", 20, "grammar").material.orderedNotes.some(b => b.text === "So baust du die Grammatik auf")).toBe(true);
-    expect(lessonContentResponse("C1", 22, "grammar").material.orderedNotes.some(b => b.type === "multipleChoice" && b.options.length === 4)).toBe(true);
-    expect(lessonContentResponse("C1", 25, "grammar").material.orderedNotes.some(b => b.text === "Grammar notes")).toBe(true);
   });
 });
 
