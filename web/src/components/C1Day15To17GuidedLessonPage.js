@@ -1,3 +1,4 @@
+import C1FinishSummary from "./C1FinishSummary";
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import C1TopicIntroduction from "./C1TopicIntroduction";
@@ -63,6 +64,6 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
 
     {active === "write" ? <Section title="Guided writing builder"><C1AcademicExamPractice day={day} tab="write" /><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={lesson} />{workbookUrl ? <a href={workbookUrl} style={styles.linkButton}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={lesson} workbookId={`C1-day-${day}`} /> : null}
-    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}>{day === 15 && !progress.quizDone ? <NoteBox>Complete the new multiple-choice Learn questions. A legacy grammar checkbox is not counted as quiz completion.</NoteBox> : null}{quizCompleted ? <NoteBox><strong>Learn complete.</strong> The current Learn check is complete.</NoteBox> : null}<p>Practise the speaking task once more in Prüfungsmodus without the idea bank.</p>{progress.completed ? <NoteBox>Completed and saved on this device.</NoteBox> : null}<button style={styles.primaryButton} onClick={complete}>I have completed</button></Section> : null}
+    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}><C1FinishSummary day={day} />{day === 15 && !progress.quizDone ? <NoteBox>Complete the new multiple-choice Learn questions. A legacy grammar checkbox is not counted as quiz completion.</NoteBox> : null}{quizCompleted ? <NoteBox><strong>Learn complete.</strong> The current Learn check is complete.</NoteBox> : null}<p>Practise the speaking task once more in Prüfungsmodus without the idea bank.</p>{progress.completed ? <NoteBox>Completed and saved on this device.</NoteBox> : null}<button style={styles.primaryButton} onClick={complete}>I have completed</button></Section> : null}
   </div>;
 }

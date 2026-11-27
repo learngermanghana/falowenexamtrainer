@@ -1,3 +1,4 @@
+import C1FinishSummary from "./C1FinishSummary";
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import C1TopicIntroduction from "./C1TopicIntroduction";
@@ -71,6 +72,6 @@ export default function C1Day21To25SelfTutoringPage({ lesson, canonicalLesson = 
 
     {active === "write" ? <Section title="Guided writing builder"><C1AcademicExamPractice day={day} tab="write" /><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={effectiveLesson} />{workbookUrl ? <a href={workbookUrl} style={{ ...styles.linkButton, width: "fit-content" }}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(effectiveLesson)} storageKey={getStandardLessonStorageKey(effectiveLesson, "writing")} cloudField={getStandardWritingCloudField(effectiveLesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={effectiveLesson} workbookId={`C1-day-${day}`} /> : null}
-    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}>{progress.quizDone ? <NoteBox tone="green"><strong>Learn complete.</strong> The clickable grammar check was completed correctly.</NoteBox> : <NoteBox tone="amber">Complete the clickable grammar check before considering Learn finished.</NoteBox>}<p style={{ margin: 0, lineHeight: 1.7 }}>For exam readiness, repeat Speak once in Prüfungsmodus without the idea bank and complete the 220–280-word writing task independently.</p>{progress.completed ? <NoteBox tone="green">Completed and saved on this device.</NoteBox> : null}<button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button></Section> : null}
+    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}><C1FinishSummary day={day} />{progress.quizDone ? <NoteBox tone="green"><strong>Learn complete.</strong> The clickable grammar check was completed correctly.</NoteBox> : <NoteBox tone="amber">Complete the clickable grammar check before considering Learn finished.</NoteBox>}<p style={{ margin: 0, lineHeight: 1.7 }}>For exam readiness, repeat Speak once in Prüfungsmodus without the idea bank and complete the 220–280-word writing task independently.</p>{progress.completed ? <NoteBox tone="green">Completed and saved on this device.</NoteBox> : null}<button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button></Section> : null}
   </div>;
 }
