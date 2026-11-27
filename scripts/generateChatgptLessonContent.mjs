@@ -42,9 +42,16 @@ import { A2_PRESENTATION_CARDS } from "../web/src/data/a2PresentationCards.js";
 import { getA2GoetheWritingTask } from "../web/src/data/a2GoetheWritingTasks.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
-import { extractGrammarTeaching, grammarComponentPaths, extractC1GuidedGrammar, extractA1OriginalGrammar, extractA2OrderedGrammar, extractB1OrderedGrammar } from "./extractFalowenGrammar.mjs";
+import { extractGrammarTeaching, grammarComponentPaths, extractC1GuidedGrammar, extractA1OriginalGrammar, extractA2OrderedGrammar, extractB1OrderedGrammar, extractB2OrderedGrammar } from "./extractFalowenGrammar.mjs";
 import { loadWorkbookSource, extractLiteralQuestions, extractLiteralParagraphs, extractA1Day3Reading } from "./extractFalowenWorkbook.mjs";
 
+register(new URL("./chatgptCourseSourceLoader.mjs", import.meta.url));
+const { getB2GrammarLesson } = await import("../web/src/data/b2GrammarLessons.js");
+const { getB2ChapterOnePractice } = await import("../web/src/data/b2ChapterOnePractice.js");
+const { getB2ChapterTwoPractice } = await import("../web/src/data/b2ChapterTwoPractice.js");
+const { getB2ChapterThreePractice } = await import("../web/src/data/b2ChapterThreePractice.js");
+const { getB2ChapterFourPractice } = await import("../web/src/data/b2ChapterFourPractice.js");
+const { getB2ChapterFivePractice } = await import("../web/src/data/b2ChapterFivePractice.js");
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "functions/data/chatgptLessonContent.generated.json");
 const grammarSources = grammarComponentPaths(root);
@@ -384,6 +391,8 @@ for (let day = 1; day <= 28; day += 1) {
       })),
       task: text(grammar.task, 1100),
       checks: publicQuestions(grammar.checks),
+      ...extractB2OrderedGrammar(root, day, plan, getB2GrammarLesson(day),
+        getB2ChapterOnePractice(day) || getB2ChapterTwoPractice(day) || getB2ChapterThreePractice(day) || getB2ChapterFourPractice(day) || getB2ChapterFivePractice(day)),
     },
     ...(reading ? { reading: {
       title: text(reading.title, 250),
@@ -592,9 +601,9 @@ for (let day = 1; day <= 28; day += 1) {
   C2[String(day)] = item;
 }
 
-const grammarCoverage = Object.fromEntries(Object.entries({ A2, B1, C1 }).map(([level, lessons]) => [level,
+const grammarCoverage = Object.fromEntries(Object.entries({ A2, B1, B2, C1 }).map(([level, lessons]) => [level,
   Object.values(lessons).filter((entry) => entry.grammar?.fullExplanationIncluded).length]));
-if (Object.values(A2).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || Object.values(B1).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || grammarCoverage.C1 !== 28) {
+if (Object.values(A2).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || Object.values(B1).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || grammarCoverage.B2 !== 28 || Object.values(B2).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || grammarCoverage.C1 !== 28) {
   throw new Error("Insufficient actual grammar pages exported: " + JSON.stringify(grammarCoverage));
 }
 // Only explicit learner-facing fields; never copy an entire workbook object.
@@ -625,7 +634,7 @@ for (const [key, unit] of Object.entries(SWAHILI_A1_PRACTICE_UNITS)) {
 }
 // Campus data modules use extensionless relative imports. Resolve only local
 // JS modules during this build, without a runtime dependency or a second registry.
-register(new URL("./chatgptCourseSourceLoader.mjs", import.meta.url));
+
 const { getA2B1LessonProfile } = await import("../web/src/data/a2B1LessonProfile.js");
 const { getTimedAssignmentConfig, getTimedAssignmentPhase } = await import("../web/src/data/timedAssignmentConfig.js");
 const { getAssignmentSubmissionWordMinimum } = await import("../web/src/utils/assignmentSubmissionWordMinimum.js");
