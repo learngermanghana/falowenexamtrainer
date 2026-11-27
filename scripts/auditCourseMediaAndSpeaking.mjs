@@ -13,14 +13,6 @@ const requiredMarkers = {
   "web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js": [
     'url: "https://youtu.be/F67RRmGNK1c"',
   ],
-  "web/src/data/b2C1LessonMediaOverrides.js": [
-    'key: "c1-day16-technologie-alltag-ai-video"',
-    'url: "https://youtu.be/H4mPDTiMkwg"',
-    'key: "c1-day17-umwelt-verantwortung-ai-video"',
-    'url: "https://youtu.be/g-HaC_4ogaQ"',
-    'key: "c1-day18-gesellschaft-zusammenhalt-ai-video"',
-    'url: "https://youtu.be/ULtTH3LmWBo"',
-  ],
   "web/src/components/WritingCheatSheetTabs.js": [
     'writingVideo.badge || "Watch before writing · Essay Ideas"',
     'writingVideo.heading || "Get ideas for this exact essay"',
@@ -59,6 +51,13 @@ const forbiddenMarkers = {
     'youtube_link: "https://youtu.be/AWEHnJd1o3M"',
   ],
   "web/src/data/b2C1LessonMediaOverrides.js": [
+    // C1 media was retired with the academic curriculum refresh.
+    "c1-day16-technologie-alltag-ai-video",
+    "H4mPDTiMkwg",
+    "c1-day17-umwelt-verantwortung-ai-video",
+    "g-HaC_4ogaQ",
+    "c1-day18-gesellschaft-zusammenhalt-ai-video",
+    "ULtTH3LmWBo",
     "b2-day11-gesellschaft-integration-falowen-radio",
     "b2-day13-chapter-3-3-ai-video",
     "b2-day16-digitalisierung-alltag-ai-video",
