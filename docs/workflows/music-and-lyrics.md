@@ -279,3 +279,14 @@ object and recording metadata are not deleted. The supplied German lyrics and
 line-matched English are reference text until checked against that exact audio.
 No line timestamps are asserted; highlighting awaits audio alignment and review.
 Music remains optional and does not change the workbook assessment.
+
+## English audit — 27 November 2026
+
+The checked bundled German course catalog and the seven listed Kiswahili songs
+were compared with their exact-key lyric and English packs. The C1 Day 1
+“Lernen mit Verstand” reference text now has matching English for all 56 lines;
+it remains untimed and unverified against the recording. B1 Day 4's existing
+English reference and 17 estimated cues are now available through the same lyrics
+API used by the workbook; both remain labelled as drafts. The A1 Day 21 “Bina,
+tut mir leid” recording had no matching bundled lyric pack during this check.
+Live R2-only additions and sidecars could not be audited from the offline build.

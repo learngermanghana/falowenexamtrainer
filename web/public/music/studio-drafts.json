@@ -1217,7 +1217,8 @@
       "recordingSha256": "ccff1e634e8f1d202dea1c5a3b1b77a6a8572102d6b20d6004e65d6e1e5d9883",
       "recordingObjectKey": "music/b1/day-04/Ort zum Leben.mp3",
       "timingStatus": "estimated",
-      "timingMethod": "Whisper small alignment to unverified studio draft; 87.5% recognized-word coverage. NOT an approved recording transcript."
+      "timingMethod": "Whisper small alignment to unverified studio draft; 87.5% recognized-word coverage. NOT an approved recording transcript.",
+      "publishEstimatedReference": true
     },
     {
       "level": "B1",
