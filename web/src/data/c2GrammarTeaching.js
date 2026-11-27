@@ -479,3 +479,12 @@ export const C2_GRAMMAR_TEACHING = {
   }
 };
 export const getC2GrammarTeaching = day => C2_GRAMMAR_TEACHING[Number(day)] || null;
+
+// Learner-facing transformation examples shared by the Learn tab and companion.
+export const C2_TRANSFORMATION_FAMILIES=[
+ ["obwohl → trotz","Obwohl die Umsetzung teuer ist, ... → Trotz der hohen Umsetzungskosten ..."],
+ ["um ... zu → zur + Nominalisierung","..., um den Zugang zu verbessern. → ... zur Verbesserung des Zugangs."],
+ ["erkennen/merken → jemandem wird klar","Die Beteiligten erkannten, dass ... → Den Beteiligten wurde klar, dass ..."],
+ ["wenn + Mittel/Ursache → durch + Nominalisierung","Wenn Institutionen investieren, ... → Durch gezielte Investitionen ..."],
+ ["skeptisch sein → Zweifel haben","Viele waren skeptisch, ob ... → Viele hatten Zweifel daran, ob ..."],
+];
