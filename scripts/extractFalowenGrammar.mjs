@@ -743,3 +743,228 @@ function extractRemainingA1Grammar(root, day) {
     orderedNotes:blocks.map((b,i)=>({number:i+1,...b})),...(omitted.length?{omittedTeaching:omitted}:{}),
     clarification:omitted.length?"Read only supplied original blocks in order; some interactive or dynamic teaching is not exported or verified. Open the Campus grammar page for those parts. Do not invent missing material.":"Read orderedNotes in workbook order. Original English and German teaching is preserved; interactive scores, navigation, images and hidden answers are not exported."};
 }
+
+/** A2 grammar follows the canonical embedded workbook component, not the
+ * bounded legacy summaries. Interpret only reviewed literal teaching JSX;
+ * never run React, callbacks, state or quiz answer code. */
+export function extractA2OrderedGrammar(filePath, day) {
+  const ast=parse(fs.readFileSync(filePath,"utf8"),{sourceType:"module",plugins:["jsx"]});
+  const program=ast.program;
+  const exported=program.body.find(n=>n.type==="ExportDefaultDeclaration")?.declaration;
+  const definitions=new Map();
+  for(const n of program.body){
+    const d=n.type==="ExportDefaultDeclaration"||n.type==="ExportNamedDeclaration"?n.declaration:n;
+    if(d?.type==="VariableDeclaration")for(const v of d.declarations)if(v.id.type==="Identifier")definitions.set(v.id.name,v.init);
+    if(d?.type==="FunctionDeclaration"&&d.id)definitions.set(d.id.name,d);
+  }
+  const name=exported?.type==="Identifier"?exported.name:exported?.type==="CallExpression"&&exported.callee?.name==="memo"?exported.arguments[0]?.name:exported?.id?.name;
+  const fn=definitions.get(name)||exported;
+  const locals=new Map(definitions);
+  for(const n of fn?.body?.body||[])if(n.type==="VariableDeclaration")for(const d of n.declarations)if(d.id.type==="Identifier")locals.set(d.id.name,d.init);
+  const field=(n,k)=>n?.properties?.find(p=>p.type==="ObjectProperty"&&String(p.key?.name??p.key?.value)===k)?.value;
+  const attr=(n,k)=>n.openingElement?.attributes?.find(a=>a.type==="JSXAttribute"&&a.name?.name===k);
+  const prop=(n,k)=>{const v=attr(n,k)?.value;return v?.type==="JSXExpressionContainer"?v.expression:v;};
+  const fail=m=>{throw new Error(m);};
+  const blocks=[],missing=new Set();
+  const hidden=/^(?:correct answer|sample answers?|model answers?|answer key|solution key|musterlösung|lösungsschlüssel|lösungen|lösung\s*:)/i;
+  const clean=v=>{const lines=v.split(/\r\n|\r|\n/);let last=0;lines.forEach((l,i)=>{if(/[^ \t]/.test(l))last=i;});
+    return lines.map((l,i)=>{let t=l.replace(/\t/g," ");if(i)t=t.replace(/^ +/,"");if(i!==lines.length-1)t=t.replace(/ +$/,"");return t&&i!==last?t+" ":t;}).join("");};
+  // Only observed grammar reference collections, never generic object evaluation.
+  const teachingNames=new Set("nominativeRows accusativeRows articleRows shortcutRows prepositions examples verbs importantPrefixes pronouns reflexiveVerbs".split(" "));
+  const teachingKeys=new Set("noun woFull woShort wohinFull wohinShort change infinitive stem prefix meaning german english de en title form pronoun verb example".split(" "));
+  function value(n,env={}){
+    if(!n)fail("missing teaching value");
+    if(n.type==="StringLiteral"||n.type==="NumericLiteral"||n.type==="BooleanLiteral")return n.value;
+    if(n.type==="ArrayExpression")return n.elements.map(x=>value(x,env));
+    if(n.type==="ObjectExpression")return Object.fromEntries(n.properties.filter(p=>p.type==="ObjectProperty"&&teachingKeys.has(p.key?.name??p.key?.value)).map(p=>[p.key.name??p.key.value,value(p.value,env)]));
+    if(n.type==="Identifier"){
+      if(Object.hasOwn(env,n.name))return env[n.name];
+      if(teachingNames.has(n.name))return value(locals.get(n.name),env);
+    }
+    if(n.type==="MemberExpression"&&!n.computed&&teachingKeys.has(n.property?.name)){
+      const obj=value(n.object,env);if(obj&&Object.hasOwn(obj,n.property.name))return obj[n.property.name];
+    }
+    if(n.type==="BinaryExpression"&&["===","!=="].includes(n.operator)){
+      const a=value(n.left,env),b=value(n.right,env);return n.operator==="==="?a===b:a!==b;
+    }
+    fail("unsupported A2 literal "+n.type);
+  }
+  const str=x=>typeof x==="string"||typeof x==="number"?String(x):fail("non-text value");
+  const inlineTags=new Set(["strong","em","b","i","span","s","u","code","InlineCode","small","mark"]);
+  function inline(n,env){
+    if(n.type==="JSXText")return clean(n.value);
+    if(n.type==="JSXExpressionContainer")return n.expression.type==="JSXEmptyExpression"?"":str(value(n.expression,env));
+    if(n.type==="JSXElement"&&tag(n)==="br")return "\n";
+    if(n.type==="JSXElement"&&inlineTags.has(tag(n)))return n.children.map(x=>inline(x,env)).join("");
+    fail("unsupported inline "+(tag(n)||n.type));
+  }
+  const content=(n,env)=>n.children.map(x=>inline(x,env)).join("").trim();
+  const push=(type,text)=>{if(text&&!hidden.test(text))blocks.push({type,text});};
+  const heading=t=>push("heading",t);
+  const table=(headers,rows)=>{
+    if(!rows.length||rows.some(r=>!Array.isArray(r)||(headers.length&&r.length!==headers.length)))fail("table shape changed");
+    blocks.push({type:"table",...(headers.length?{headers:headers.map(str)}:{}),rows:rows.map(r=>r.map(str))});
+  };
+  function questions(n){
+    if(n?.type!=="ArrayExpression")fail("nonliteral grammar quiz");
+    for(const q of n.elements){
+      const prompt=field(q,"stem")||field(q,"prompt")||field(q,"question");
+      const options=field(q,"options");
+      const english=field(q,"english");
+      const item={type:"multipleChoice",question:str(value(prompt)),options:value(options).map(str)};
+      if(english)item.translation=str(value(english));
+      blocks.push(item);
+    }
+  }
+  const mapSource=e=>e?.type==="CallExpression"&&e.callee?.type==="MemberExpression"&&e.callee.property?.name==="map"?e.callee.object:null;
+  const quizNames=new Set(["questions","practiceQuestions"]);
+  function bindings(pattern,item,env){
+    if(pattern?.type==="Identifier"){env[pattern.name]=item;return;}
+    if(pattern?.type==="ArrayPattern"&&Array.isArray(item)){pattern.elements.forEach((p,i)=>bindings(p,item[i],env));return;}
+    if(pattern?.type==="ObjectPattern"&&item&&typeof item==="object"){
+      for(const p of pattern.properties){if(p.type!=="ObjectProperty"||!teachingKeys.has(p.key?.name))fail("unsupported teaching binding");bindings(p.value,item[p.key.name],env);}return;
+    }
+    fail("unsupported map binding");
+  }
+  function mapped(e,env,consume){
+    const source=mapSource(e),cb=e.arguments[0],items=value(source,env);
+    if(!Array.isArray(items)||cb?.type!=="ArrowFunctionExpression"||cb.body.type==="BlockStatement")fail("unsupported teaching map");
+    for(const [i,item] of items.entries()){
+      const next={...env};bindings(cb.params[0],item,next);if(cb.params[1]?.type==="Identifier")next[cb.params[1].name]=i;
+      consume(cb.body,next);
+    }
+  }
+  function jsxOf(d,embedded=false){
+    if(["JSXElement","JSXFragment"].includes(d?.body?.type))return d.body;
+    const statements=d?.body?.body||[];
+    if(embedded){
+      const branch=statements.find(n=>n.type==="IfStatement"&&n.test?.name==="embedded");
+      if(branch?.consequent?.type==="ReturnStatement")return branch.consequent.argument;
+    }
+    const rs=statements.filter(n=>n.type==="ReturnStatement"&&["JSXElement","JSXFragment"].includes(n.argument?.type));
+    if(rs.length!==1)fail("grammar return changed");return rs[0].argument;
+  }
+  function mini(n){
+    // A2MiniLearningBlock renders null unless essential is set. Honor this
+    // explicitly rather than exposing retired question banks.
+    const essential=attr(n,"essential");
+    if(!essential||essential.value&&prop(n,"essential")?.value!==true)return;
+    const spread=n.openingElement.attributes.find(a=>a.type==="JSXSpreadAttribute");
+    if(spread&&spread.argument?.name!=="lesson")fail("unreviewed mini lesson spread");
+    const record=spread?locals.get("lesson"):null;
+    const read=k=>prop(n,k)||field(record,k);
+    const text=k=>read(k)?str(value(read(k))):"";
+    heading(text("title"));
+    if(text("english"))push("paragraph","English support: "+text("english"));
+    if(text("rule"))push("paragraph","Regel: "+text("rule"));
+    if(read("examples"))for(const e of value(read("examples")))push("example",str(e));
+    if(text("commonMistake"))push("paragraph","Häufiger Fehler: "+text("commonMistake"));
+    if(read("questions")?.elements?.length){heading("Kurz prüfen.");questions(read("questions"));}
+    if(text("outputPrompt")){
+      heading("Jetzt selbst anwenden");push("paragraph",text("outputPrompt"));
+      if(read("starters"))blocks.push({type:"list",items:value(read("starters")).map(str)});
+    }
+  }
+  const wrappers=new Set(["GrammarContent","FocusedGrammarContent","FocusedContent"]);
+  const omit=new Set(["AppBackButton","img","button","input","iframe","video","audio","a"]);
+  const stateNames=new Set(["showAnswers","showAnswer","showResults","showScore","checked","selected","answered","allAnswered","showFeedback","isCorrect","selectedAnswers"]);
+  const isState=e=>e?.type==="Identifier"&&stateNames.has(e.name);
+  const containers=new Set(["main","header","section","div","article","Container","figure","figcaption","aside","pre","blockquote","label","fieldset"]);
+  function walk(n,env={}){
+    if(!n)return;
+    try{
+      if(n.type==="JSXText"){push("paragraph",clean(n.value).trim());return;}
+      if(n.type==="JSXFragment"){n.children.forEach(x=>walk(x,env));return;}
+      if(n.type==="JSXExpressionContainer"){
+        const e=n.expression;if(e.type==="JSXEmptyExpression")return;
+        const source=mapSource(e);
+        if(source){
+          if(quizNames.has(source.name)){questions(locals.get(source.name));return;}
+          mapped(e,env,walk);return;
+        }
+        if(e.type==="ConditionalExpression"){
+          if(isState(e.test))return;
+          if(e.test.type==="BinaryExpression"){walk(value(e.test,env)?e.consequent:e.alternate,env);return;}
+          missing.add("dynamic conditional content");return;
+        }
+        if(e.type==="LogicalExpression"&&e.operator==="&&"){
+          if(isState(e.left)||e.left.type==="UnaryExpression"&&e.left.argument?.name==="embedded")return;
+          missing.add("dynamic conditional content");return;
+        }
+        push("paragraph",str(value(e,env)));return;
+      }
+      if(n.type==="NullLiteral")return;
+      if(n.type!=="JSXElement")fail("unknown node "+n.type);
+      const t=tag(n),get=k=>value(prop(n,k),env);
+      if(omit.has(t))return;
+      if(wrappers.has(t)){walk(jsxOf(definitions.get(t)),env);return;}
+      if(t==="A2MiniLearningBlock"){mini(n);return;}
+      if(t==="MiniPractice"&&day===14){questions(locals.get("practiceQuestions"));return;}
+      if(t==="Example"){
+        const de=prop(n,"german")||prop(n,"de"),en=prop(n,"english")||prop(n,"en");
+        if(de)push("example",str(value(de,env)));if(en)push("paragraph",str(value(en,env)));
+        if(!de&&!en)n.children.forEach(x=>walk(x,env));return;
+      }
+      if(t==="Section"||t==="SectionCard"){
+        heading(str(get("title")));if(prop(n,"en"))push("paragraph",str(get("en")));
+        n.children.forEach(x=>walk(x,env));return;
+      }
+      if(t==="details"){
+        // The summary is visible before opening; never export its answer body.
+        const summary=n.children.find(x=>x.type==="JSXElement"&&tag(x)==="summary");
+        if(summary)push("paragraph",content(summary,env));
+        missing.add("collapsed content");return;
+      }
+      if(t==="table"){
+        const part=k=>n.children.find(x=>x.type==="JSXElement"&&tag(x)===k);
+        const rows=(parent,cell)=>{
+          const result=[];if(!parent)return result;
+          const add=(r,e)=>{if(tag(r)!=="tr")fail("table row changed");
+            const cells=r.children.filter(x=>x.type==="JSXElement"&&tag(x)===cell).map(x=>content(x,e));
+            if(cells.length)result.push(cells);else fail("dynamic table cells");};
+          for(const x of parent.children){
+            if(x.type==="JSXElement"&&tag(x)==="tr"){
+              const dyn=x.children.find(y=>y.type==="JSXExpressionContainer"&&mapSource(y.expression));
+              if(dyn){
+                const list=[];mapped(dyn.expression,env,(c,e)=>list.push(content(c,e)));result.push(list);
+              }else add(x,env);
+            }else if(x.type==="JSXExpressionContainer"&&mapSource(x.expression)){
+              const source=mapSource(x.expression);
+              const data=value(source,env);
+              // Direct array-of-array tables preserve original rows; object
+              // maps are evaluated only against the visible cell templates.
+              if(Array.isArray(data)&&data.every(r=>Array.isArray(r)&&r.every(v=>typeof v==="string")))result.push(...data);
+              else mapped(x.expression,env,add);
+            }
+          }return result;
+        };
+        const headers=rows(part("thead"),"th").flat(),body=rows(part("tbody"),"td");
+        table(headers,body);return;
+      }
+      if(/^h[1-6]$/.test(t)){heading(content(n,env));return;}
+      if(t==="ul"||t==="ol"){
+        const items=[];
+        for(const x of n.children){
+          if(x.type==="JSXElement"&&tag(x)==="li"){const item=content(x,env);if(!hidden.test(item))items.push(item);}
+          else if(x.type==="JSXExpressionContainer"&&mapSource(x.expression))mapped(x.expression,env,(li,e)=>{const item=content(li,e);if(!hidden.test(item))items.push(item);});
+        }
+        if(items.length)blocks.push({type:t==="ol"?"orderedList":"list",items});return;
+      }
+      if(t==="br")return;
+      if(containers.has(t)){
+        const simple=n.children.every(x=>x.type==="JSXText"||x.type==="JSXExpressionContainer"&&!mapSource(x.expression)||(x.type==="JSXElement"&&(inlineTags.has(tag(x))||tag(x)==="br")));
+        if(simple){push("paragraph",content(n,env));return;}
+        n.children.forEach(x=>walk(x,env));return;
+      }
+      if(t==="p"||inlineTags.has(t)){push("paragraph",content(n,env));return;}
+      fail("unsupported component "+t);
+    }catch(error){missing.add(error.message);}
+  }
+  walk(jsxOf(fn,true));
+  if(!blocks.length)throw new Error("No ordered A2 grammar source for day "+day);
+  const omittedTeaching=[...missing];
+  return {orderedNotes:blocks.map((b,i)=>({number:i+1,...b})),
+    fullExplanationIncluded:omittedTeaching.length===0,
+    ...(omittedTeaching.length?{omittedTeaching}:{}),
+    clarification:omittedTeaching.length?"Read orderedNotes in sequence, not the legacy summaries. Some original dynamic teaching or collapsed content was not exported; open the Campus grammar page for omitted material. Do not invent it.":"Read orderedNotes in sequence, preserving the original text, tables and questions. Hidden answers and interactive UI remain in Campus."};
+}

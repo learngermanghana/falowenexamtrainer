@@ -293,7 +293,7 @@ describe("A1 and A2 canonical Course Book exports for ChatGPT", () => {
       expect(reading.material.text.length).toBeGreaterThan(45);
       expect(reading.material.questions.length).toBeGreaterThan(0);
       expect(reading.material.questions[0]).not.toHaveProperty("answerIndex");
-      expect(lessonContentResponse("A2", day, "grammar").material.fullExplanationIncluded).toBe(true);
+      expect(lessonContentResponse("A2", day, "grammar").material.orderedNotes.length).toBeGreaterThan(0);
     }
     const first = lessonContentResponse("A2", 1, "reading");
     expect(first.material.title).toBe("Neu im Büro");
@@ -312,7 +312,7 @@ describe("Original Falowen grammar teaching and remaining workbook gaps", () => 
     for (let day = 1; day <= 28; day += 1) {
       const grammar = lessonContentResponse("A2", day, "grammar");
       expect(grammar.available).toBe(true);
-      expect(grammar.material.fullExplanationIncluded).toBe(true);
+      expect(grammar.material.orderedNotes.length).toBeGreaterThan(0);
       expect(grammar.material.sections.length).toBeGreaterThan(0);
       expect(grammar.material.sections[0]).toHaveProperty("explanation");
       expect(grammar.material.sections[0].explanation.length).toBeGreaterThan(25);
@@ -533,5 +533,27 @@ describe("Remaining original A1 grammar routes", () => {
     expect(notes(16).filter(b=>b.type==="multipleChoice")).toHaveLength(6);
     expect(notes(17).some(b=>b.type==="multipleChoice"&&b.question.includes("Bahnhof"))).toBe(true);
     expect(notes(22).some(b=>b.type==="list"&&b.items.some(x=>x.includes("der Kopf")))).toBe(true);
+  });
+});
+
+describe("A2 original ordered grammar pages", () => {
+  const notes = day => lessonContentResponse("A2",day,"grammar").material.orderedNotes;
+  test("all 28 canonical A2 days have ordered teaching and honest completeness metadata", () => {
+    for (let day=1;day<=28;day++) {
+      const g=lessonContentResponse("A2",day,"grammar").material;
+      expect(g.orderedNotes.length).toBeGreaterThan(0);
+      expect(g.orderedNotes.map(b=>b.number)).toEqual(g.orderedNotes.map((_,i)=>i+1));
+      expect(JSON.stringify(g.orderedNotes)).not.toMatch(/"(answer|answerIndex|correctIndex|explanation|sampleAnswer)"\s*:/);
+      if(!g.fullExplanationIncluded)expect(g.omittedTeaching.length).toBeGreaterThan(0);
+      for(const q of g.orderedNotes.filter(b=>b.type==="multipleChoice"))expect(q.options.length).toBeGreaterThan(1);
+    }
+  });
+  test("original Day 1 wording, Day 2 declension table and Day 28 visible mini lesson", () => {
+    expect(notes(1).some(b=>b.text==="1. First understand the meaning: reason or result?")).toBe(true);
+    expect(notes(2).some(b=>b.type==="table"&&b.rows.some(r=>r.includes("ein großer Hund")))).toBe(true);
+    expect(notes(2).some(b=>b.text?.startsWith("Correct answer:"))).toBe(false);
+    expect(notes(28).some(b=>b.text==="Über Zukunftspläne sprechen")).toBe(true);
+    expect(notes(28).filter(b=>b.type==="multipleChoice")).toHaveLength(4);
+    expect(notes(7).some(b=>b.text==="Knowledge Test · Relativsätze")).toBe(false);
   });
 });

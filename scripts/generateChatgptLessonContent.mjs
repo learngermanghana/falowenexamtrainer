@@ -42,7 +42,7 @@ import { A2_PRESENTATION_CARDS } from "../web/src/data/a2PresentationCards.js";
 import { getA2GoetheWritingTask } from "../web/src/data/a2GoetheWritingTasks.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
-import { extractGrammarTeaching, grammarComponentPaths, extractC1GuidedGrammar, extractA1OriginalGrammar } from "./extractFalowenGrammar.mjs";
+import { extractGrammarTeaching, grammarComponentPaths, extractC1GuidedGrammar, extractA1OriginalGrammar, extractA2OrderedGrammar } from "./extractFalowenGrammar.mjs";
 import { loadWorkbookSource, extractLiteralQuestions, extractLiteralParagraphs, extractA1Day3Reading } from "./extractFalowenWorkbook.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -198,7 +198,7 @@ for (let day = 1; day <= 28; day += 1) {
   if (writingRequired && day !== 22 && (!writingTask?.situation || writingTask.points?.length !== 3)) {
     throw new Error("A2 original writing task missing for day " + day);
   }
-  const originalGrammar = extractGrammarTeaching(grammarSources.A2[day]);
+  const originalGrammar = { ...extractGrammarTeaching(grammarSources.A2[day]), ...extractA2OrderedGrammar(grammarSources.A2[day], day) };
   A2[String(day)] = {
     level: "A2", day, chapter: text(lesson.chapter || reading.chapter, 25),
     title: text(lesson.title || lesson.topic, 240),
@@ -594,7 +594,7 @@ for (let day = 1; day <= 28; day += 1) {
 
 const grammarCoverage = Object.fromEntries(Object.entries({ A2, B1, C1 }).map(([level, lessons]) => [level,
   Object.values(lessons).filter((entry) => entry.grammar?.fullExplanationIncluded).length]));
-if (grammarCoverage.A2 < 20 || grammarCoverage.B1 < 20 || grammarCoverage.C1 !== 28) {
+if (Object.values(A2).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || grammarCoverage.B1 < 20 || grammarCoverage.C1 !== 28) {
   throw new Error("Insufficient actual grammar pages exported: " + JSON.stringify(grammarCoverage));
 }
 // Only explicit learner-facing fields; never copy an entire workbook object.
