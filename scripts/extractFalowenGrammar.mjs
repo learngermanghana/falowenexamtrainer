@@ -161,3 +161,79 @@ export function grammarComponentPaths(root) {
   }
   return result;
 }
+
+/**
+ * C1 Days 1–6 use a single literal lesson registry in the actual React page.
+ * Read its AST without evaluating JSX, and project only fields the page teaches.
+ * Preserve text and table cells verbatim; self-check answers never leave Campus.
+ */
+export function extractC1GuidedGrammar(root, day, practice) {
+  if (!Number.isInteger(day) || day < 1 || day > 6) return null;
+  const file = path.join(root, "web/src/components/C1Day1To6GrammarNotes.js");
+  const ast = parse(fs.readFileSync(file, "utf8"), { sourceType: "module", plugins: ["jsx"] });
+  const registry = findNodes(ast.program, n => n.type === "VariableDeclarator" &&
+    n.id?.name === "lessons" && n.init?.type === "ObjectExpression");
+  if (registry.length !== 1) throw new Error("C1 guided grammar registry changed");
+  const field = (node, key) => node?.properties?.find(p => p.type === "ObjectProperty" &&
+    String(p.key?.name ?? p.key?.value) === String(key))?.value;
+  const lesson = field(registry[0].init, day);
+  const str = node => {
+    if (node?.type !== "StringLiteral" || !node.value.trim())
+      throw new Error("Unexpected C1 grammar text on day " + day);
+    return node.value;
+  };
+  const list = (node, map) => {
+    if (node?.type !== "ArrayExpression") throw new Error("Unexpected C1 grammar list on day " + day);
+    return node.elements.map(map);
+  };
+  const val = (node, key) => str(field(node, key));
+  const texts = node => list(node, str);
+  const pairs = node => list(node, row => {
+    const values = texts(row);
+    if (values.length !== 2) throw new Error("Unexpected C1 grammar pair on day " + day);
+    return values;
+  });
+  const blocks = [
+    { type: "heading", text: val(lesson, "title") },
+    { type: "paragraph", text: val(lesson, "subtitle") },
+    { type: "heading", text: "Warum brauchst du diese Grammatik auf C1?" },
+    { type: "paragraph", text: val(lesson, "why") },
+    { type: "heading", text: "Nach dieser Lektion kannst du:" },
+    { type: "list", items: texts(field(lesson, "goals")) },
+    { type: "heading", text: "C1-Grammatik im Kontext" },
+    { type: "paragraph", text: practice.grammar },
+    { type: "paragraph", text: practice.rule },
+    { type: "questions", items: practice.grammarChecks.map(([prompt]) => prompt) },
+    { type: "heading", text: "Wortschatz · " + practice.vocabulary.length + " Ausdrücke" },
+    { type: "table", rows: practice.vocabulary.map(([term, meaning]) => [term, meaning]) },
+  ];
+  for (const section of list(field(lesson, "sections"), n => n)) {
+    blocks.push({ type: "heading", text: val(section, "title") },
+      { type: "paragraph", text: val(section, "text") });
+    if (field(section, "rows")) blocks.push({ type: "table",
+      headers: ["Struktur / Bedeutung", "Form / Beispiel"], rows: pairs(field(section, "rows")) });
+    if (field(section, "examples")) blocks.push({ type: "examples", items: texts(field(section, "examples")) });
+    if (field(section, "note")) blocks.push({ type: "note", label: "Merke:", text: val(section, "note") });
+    if (field(section, "mistakes")) for (const [wrong, correct] of pairs(field(section, "mistakes")))
+      blocks.push({ type: "teachingCorrection", wrong, correct });
+  }
+  blocks.push({ type: "heading", text: "C1-Modellabsatz" },
+    { type: "paragraph", text: val(lesson, "model") },
+    { type: "heading", text: "Typische Fehler" },
+    { type: "list", items: texts(field(lesson, "common")) },
+    { type: "heading", text: "Schrittweise Mini-Übung" },
+    { type: "orderedList", items: texts(field(lesson, "practice")) },
+    { type: "heading", text: "Selbstkontrolle" },
+    { type: "paragraph", text: "Löse die Aufgabe zuerst selbst und öffne danach die Antwort." },
+    { type: "questions", items: list(field(lesson, "checks"), (row, index) => {
+      if (row?.type !== "ArrayExpression" || row.elements.length !== 2)
+        throw new Error("Unexpected C1 self-check on day " + day);
+      return (index + 1) + ". " + str(row.elements[0]);
+    }) });
+  return {
+    source: "Falowen original C1 guided grammar notes and academic grammar practice",
+    fullExplanationIncluded: true,
+    orderedNotes: blocks.map((block, index) => ({ number: index + 1, ...block })),
+    clarification: "Read orderedNotes in sequence without paraphrasing when the learner requests the original. Teaching examples and corrections are included; collapsed exercise solutions and completion controls remain in Campus.",
+  };
+}

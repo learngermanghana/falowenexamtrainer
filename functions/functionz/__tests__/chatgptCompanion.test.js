@@ -455,3 +455,32 @@ describe("A2 original classroom speaking and writing export",()=>{
 });
 
  test("switching sections preserves verified course context and exposes actual A2 Day 9 part mapping",()=>{const grammar=lessonContentResponse("A2",9,"grammar");const speak=lessonContentResponse("A2",9,"speaking");const write=lessonContentResponse("A2",9,"writing");for(const result of [grammar,speak,write]){expect(result.available).toBe(true);expect(result.level).toBe("A2");expect(result.day).toBe(9);expect(result.workbookPartSections["1"]).toBe("speaking");expect(result.workbookPartSections["2"]).toBe("writing");expect(result.availableSections).toContain("speaking");expect(result.guidance).toContain("starting point");}expect(lessonContentResponse("C2",20,"reading").available).toBe(false);});
+
+describe("C1 original guided grammar notes", () => {
+  test("Day 1 exports real headings, exact text and structured tables in page order", () => {
+    const result = lessonContentResponse("C1", 1, "grammar");
+    const notes = result.material.orderedNotes;
+    expect(result.material.fullExplanationIncluded).toBe(true);
+    expect(notes[0]).toEqual({ number: 1, type: "heading", text: "Relativsätze mit Präpositionen" });
+    expect(notes[1].text).toBe("Lernwege, Personen, Methoden und Ziele präzise miteinander verbinden");
+    expect(notes.find(b => b.type === "heading" && b.text === "1. Die Präposition gehört zum Verb")).toBeDefined();
+    expect(notes.find(b => b.type === "table" && b.headers)).toMatchObject({
+      headers: ["Struktur / Bedeutung", "Form / Beispiel"],
+      rows: expect.arrayContaining([["arbeiten mit + Dativ", "der Tutor, mit dem ich arbeite"]]),
+    });
+    expect(notes.find(b => b.type === "heading" && b.text === "C1-Grammatik im Kontext").number)
+      .toBeLessThan(notes.find(b => b.type === "heading" && b.text === "1. Die Präposition gehört zum Verb").number);
+    expect(result.guidance).toContain("material.orderedNotes");
+  });
+  test("Days 1–6 expose numbered source blocks, not collapsed answers; later days remain honest", () => {
+    for (let day = 1; day <= 6; day++) {
+      const grammar = lessonContentResponse("C1", day, "grammar").material;
+      expect(grammar.fullExplanationIncluded).toBe(true);
+      expect(grammar.orderedNotes.map(b => b.number)).toEqual(grammar.orderedNotes.map((_, i) => i + 1));
+      expect(grammar.orderedNotes.at(-1).type).toBe("questions");
+      expect(grammar.orderedNotes.at(-1).items.every(q => typeof q === "string")).toBe(true);
+      expect(JSON.stringify(grammar.orderedNotes)).not.toMatch(/"(answer|answerIndex|correctIndex|reason|checks|grammarChecks)"\s*:/);
+    }
+    expect(lessonContentResponse("C1", 7, "grammar").material.fullExplanationIncluded).toBe(false);
+  });
+});
