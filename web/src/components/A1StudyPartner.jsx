@@ -30,7 +30,7 @@ export default function StudyPartner({ lesson, section = "", level = "A1" }) {
         Study with ChatGPT <span style={{ fontWeight: 400, color: "#466557", fontSize: 13 }}>· Your AI study partner</span>
       </summary>
       <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
-        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6 }}>Practise this lesson with ChatGPT. Choose where to start. You can switch grammar, speaking, reading or other available sections in the same chat. Your official assignment and marks stay in Falowen.</p>
+        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6 }}>Learn from the original Falowen workbook. Guided lessons start with the available Learn material; choose grammar, speaking, writing or a knowledge check to start there. Switch sections in the same chat. Your official assignment and marks stay in Falowen.</p>
         <fieldset className="study-partner-desktop-options" style={{ margin: 0, padding: 0, border: 0, display: "grid", gap: 8 }}>
           <legend style={{ fontWeight: 700, marginBottom: 8 }}>Where would you like to start?</legend>
           {options.map(option => (
@@ -51,7 +51,7 @@ export default function StudyPartner({ lesson, section = "", level = "A1" }) {
         </div>
         {voiceMode && <div style={{display:"grid",gap:5,fontSize:13,lineHeight:1.6}}>
           <strong>Use ChatGPT Live Voice</strong>
-          <p style={{margin:0}}>Connect Falowen Learning Companion, open ChatGPT, send the generated prompt (or paste it), then tap the Voice icon. In Settings → Voice choose Live if needed. Allow microphone access in ChatGPT. Your voice session happens in ChatGPT, not in Falowen; account limits apply.</p>
+          <p style={{margin:0}}>Connect Falowen Learning Companion, open ChatGPT, send the generated prompt (or paste it) in text, confirm the original lesson has been retrieved, then tap the Voice icon. In Settings → Voice choose Live if needed. Allow microphone access in ChatGPT. Your voice session happens in ChatGPT, not in Falowen; account limits apply.</p>
           <p style={{margin:0}}>If Live Voice cannot access the plugin, retrieve the authorised lesson in text first and resume voice in the same conversation. If disconnected, ChatGPT should explain how to connect before teaching. The microphone does not start automatically.</p>
         </div>}
         <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6 }}>Opens ChatGPT in a new tab. A connected Falowen Learning Companion is required for this lesson. If the prompt does not appear automatically, copy and paste it there. ChatGPT usage limits may apply.</p>

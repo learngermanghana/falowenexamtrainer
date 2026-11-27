@@ -1,4 +1,4 @@
-import { buildVoiceTeacherPrompt, VOICE_TEACHER_LEVELS } from "./a1StudyPartner";
+import { buildVoiceTeacherPrompt, VOICE_TEACHER_LEVELS, STUDY_START_SECTIONS } from "./a1StudyPartner";
 import { A1_VOICE_MODES, buildA1VoiceTeacherPrompt } from "./a1StudyPartner";
 import { buildStudyPrompt, isStudyPartnerLesson, A1_STUDY_MODES, buildA1StudyPrompt, buildA1ChatGPTUrl, isA1StudyPartnerLesson } from "./a1StudyPartner";
 
@@ -90,7 +90,7 @@ test("A1 voice teacher retrieves authorised exact lesson and never transfers stu
   expect(prompt).toContain("A1-11");
   expect(prompt).toContain("authorised revision levels");
   expect(prompt).toContain("section overview");
-  expect(prompt).toContain("approximately 20-minute lesson");
+  expect(prompt).toContain("one original block or small related group at a time");
   expect(prompt).toContain("wait for my spoken answer");
   expect(prompt).toContain("Never fetch protected exam material");
   expect(prompt).not.toContain("private-");
@@ -109,8 +109,8 @@ test.each(VOICE_TEACHER_LEVELS)("voice teacher uses authorized %s lesson and bot
   const teacher = buildVoiceTeacherPrompt(lesson,"voice-teacher",level);
   const speaking = buildVoiceTeacherPrompt(lesson,"voice-speaking",level);
   expect(teacher).toContain("original German " + level + " lesson for Day 8");
-  expect(teacher).toContain("level " + level + " and section overview");
-  expect(teacher).toContain("approximately 20-minute lesson");
+  expect(teacher).toContain("level " + level + " and section grammar");
+  expect(teacher).toContain("one original block or small related group at a time");
   expect(speaking).toContain("patient speaking partner");
   expect(teacher).not.toContain("private-id");
   expect(teacher).not.toBe(speaking);
@@ -140,3 +140,31 @@ test.each(VOICE_TEACHER_LEVELS)("all %s lesson study and voice modes require sou
 });
 
  test.each(VOICE_TEACHER_LEVELS)("all %s modes allow switching sections and chapters in one conversation",level=>{const lesson={kind:"practice",day:9,chapter:"4.9",title:"Public lesson"};for(const prompt of [buildStudyPrompt(lesson,"grammar","Grammar",level),buildVoiceTeacherPrompt(lesson,"voice-teacher",level,"Grammar")]){expect(prompt).toContain("STARTING POINT only");expect(prompt).toContain("Current workbook section: Grammar");expect(prompt).toContain("Teil 1");expect(prompt).toContain("verify the new returned level, day and chapter");expect(prompt).toContain("switch to text in this same conversation");expect(prompt).toContain("No need to reopen Falowen");}});
+
+test.each(VOICE_TEACHER_LEVELS)("all %s modes retrieve their actual starting section and preserve source", level => {
+  const lesson={kind:"practice",day:1,chapter:"1.1",title:"Public lesson",uid:"private-id"};
+  for(const mode of [...A1_STUDY_MODES,...A1_VOICE_MODES]){
+    const prompt=mode.key.startsWith("voice-")?buildVoiceTeacherPrompt(lesson,mode.key,level,"Learn"):buildStudyPrompt(lesson,mode.key,"Learn",level);
+    expect(prompt).toContain("START HERE: retrieve section "+STUDY_START_SECTIONS[mode.key]+".");
+    expect(prompt).toContain("Make a fresh tool call");
+    expect(prompt).toContain("material.orderedNotes");
+    expect(prompt).toContain("fullExplanationIncluded is false");
+    expect(prompt).toContain("do not paraphrase, skip, silently correct or translate");
+    expect(prompt).toContain("verify the new returned level, day and chapter");
+    expect(prompt).not.toContain("private-id");
+    expect(prompt).not.toContain("71 blocks");
+    expect(prompt).not.toContain("approximately 20-minute lesson");
+    expect(prompt).not.toMatch(/START HERE: retrieve section (learn|quiz|overview)/);
+  }
+});
+test("guided C1 Voice starts from the first source block; grammar and quizzes target the original headings",()=>{
+  const lesson={kind:"practice",day:1,chapter:"1.1",title:"Wissenschaftliches Lernen und Lernstrategien"};
+  const voice=buildVoiceTeacherPrompt(lesson,"voice-teacher","C1","Learn");
+  expect(voice).toContain("Start from the first available ordered Learn block");
+  expect(voice).toContain("Track the current heading and block number");
+  expect(voice).toContain("retrieve the starting material here before asking me to activate Voice");
+  expect(buildStudyPrompt(lesson,"grammar","Learn","C1")).toContain("Grammar lesson heading if present");
+  expect(buildStudyPrompt(lesson,"quiz","Learn","C1")).toContain("Prefer the final knowledge questions");
+  expect(buildStudyPrompt(lesson,"speaking","Learn","C1")).toContain("START HERE: retrieve section speaking");
+  expect(buildStudyPrompt(lesson,"writing","Learn","C1")).toContain("START HERE: retrieve section writing");
+});
