@@ -39,9 +39,11 @@ const normalizedTitle = value => String(value || "").toLocaleLowerCase("de-DE")
 function referenceLyricsFor(track) {
   if (!track || !track.autoDiscovered) return null;
   const candidates = studioDrafts.filter(item => item.level === track.level && item.day === track.day);
-  const exact = candidates.find(item => normalizedTitle(item.title) === normalizedTitle(track.title));
-  const byKey = track.assignmentKey && candidates.find(item => item.assignmentKey === track.assignmentKey);
-  const draft = exact || byKey || (candidates.length === 1 ? candidates[0] : null);
+  const exactKey = candidates.find(item => item.recordingObjectKey && item.recordingObjectKey === track.objectKey);
+  const eligible = candidates.filter(item => !item.recordingObjectKey || item.recordingObjectKey === track.objectKey);
+  const exact = eligible.find(item => normalizedTitle(item.title) === normalizedTitle(track.title));
+  const byKey = track.assignmentKey && eligible.find(item => item.assignmentKey === track.assignmentKey);
+  const draft = exactKey || exact || byKey || (eligible.length === 1 ? eligible[0] : null);
   return draft && typeof draft.lyrics === "string" && draft.lyrics.trim()
     ? {lyrics:draft.lyrics,
        cues:track.objectKey && draft.recordingObjectKey === track.objectKey &&

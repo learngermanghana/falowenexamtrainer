@@ -137,13 +137,6 @@
     },
     {
       "level": "A1",
-      "day": 17,
-      "assignmentKey": "A1-11",
-      "title": "Wie komme ich zum Bahnhof?",
-      "lyrics": "[Verse 1]\nIch stehe vor dem Rathaus.\nIch suche den Bahnhof.\nIch frage eine nette Frau:\nWie komme ich dorthin?\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Verse 2]\nDie Frau sagt: Gehen Sie weiter.\nAn der Ampel nach rechts.\nIch sage: Vielen Dank!\nSie lächelt: Gern geschehen.\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Outro]\nJetzt sehe ich den Bahnhof.\nMein Zug kommt gerade an.\nMit Falowen finde ich den Weg."
-    },
-    {
-      "level": "A1",
       "day": 18,
       "assignmentKey": "A1-12.1",
       "title": "Wo ist mein Schlüssel?",
@@ -1401,6 +1394,23 @@
       "recordingObjectKey": "music/c1/day-01/Lernen mit Verstand.mp3",
       "lyrics": "[Intro]\nHmm, oh yeah …\nWissen wächst mit der Zeit,\nNeugier macht den Geist bereit.\n\n[Strophe 1]\nWissen lässt sich nicht erzwingen,\nLernen muss an Tiefe gewinnen.\nStatt nur Fakten zu speichern,\nWill ich mein Verständnis erweitern.\n\nGezielt das Wissen aktivieren,\nKomplexe Inhalte strukturieren.\nZusammenhänge klar erkennen,\nUnd sie mit eigenen Worten benennen.\n\n[Refrain]\nLernen mit Verstand,\nMit Methode und System.\nWas ich heute noch nicht weiß,\nKann ich morgen schon verstehen.\n\nLernen mit Verstand,\nNeue Wege ausprobieren.\nAus den Fehlern Konsequenzen ziehen,\nDas Gelernte reflektieren.\n\n[Strophe 2]\nDie Wahl der richtigen Strategie\nHängt vom jeweiligen Lernziel ab.\nRegelmäßiges Wiederholen\nRuft gespeichertes Wissen ab.\n\nVon besonderer Bedeutung\nIst die aktive Anwendung.\nDurch bewusste Selbstreflexion\nEntsteht nachhaltige Veränderung.\n\n[Refrain]\nLernen mit Verstand,\nMit Methode und System.\nWas ich heute noch nicht weiß,\nKann ich morgen schon verstehen.\n\nLernen mit Verstand,\nNeue Wege ausprobieren.\nAus den Fehlern Konsequenzen ziehen,\nDas Gelernte reflektieren.\n\n[Bridge]\nJe gezielter wir reflektieren,\nDesto besser können wir reagieren.\nWer seine Schwächen analysiert,\nErkennt, was zum Fortschritt führt.\n\nNicht die Menge ist entscheidend,\nSondern wie man Wissen vernetzt.\nEin Konzept wird erst verständlich,\nWenn man es in die Praxis umsetzt.\n\n[Finaler Refrain]\nLernen mit Verstand,\nMit Ausdauer und Motivation.\nJeder Rückschlag birgt die Chance\nAuf persönliche Transformation.\n\nLernen mit Verstand,\nHmm, die Neugier bleibt bestehen.\nDenn es geht nicht nur ums Wissen,\nSondern darum, zu verstehen.\n\n[Outro]\nWissen vernetzen,\nZiele bewusst setzen.\nErkenntnisse gewinnen,\nImmer wieder neu beginnen.\n\nOh, Lernen mit Verstand …",
       "publishUntimedReference": true
+    },
+    {
+      "level": "A1",
+      "day": 17,
+      "assignmentKey": "A1-11",
+      "title": "Ich bin nach Berlin gefahren",
+      "recordingObjectKey": "music/a1/day-17/Auf Wiedersehen, Berlin.mp3",
+      "publishUntimedReference": true,
+      "lyrics": "[Verse 1]\nIch bin nach Berlin gefahren,\nIch habe eine Fahrkarte gekauft.\nIch bin durch die Stadt gegangen,\nIch habe viele Fotos gemacht.\n\n[Chorus]\nGehen Sie geradeaus,\nBiegen Sie links ab.\nGehen Sie bis zur Ampel,\nDann biegen Sie rechts ab.\n\n[Verse 2]\nIch bin in den Park gegangen,\nIch habe viele Schilder gesehen.\nRauchen ist hier verboten,\nRadfahren ist hier erlaubt.\nParken ist hier verboten,\nFotografieren ist erlaubt.\nBei Rot bleiben Sie stehen,\nBei Grün dürfen Sie gehen.\n\n[Chorus]\nGehen Sie geradeaus,\nBiegen Sie links ab.\nGehen Sie bis zur Ampel,\nDann biegen Sie rechts ab.\n\n[Verse 3]\nIch bin ins Museum gegangen,\nIch habe schöne Bilder gesehen.\nIch habe im Hotel geschlafen,\nBerlin war wunderschön.\n\n[Outro]\nHmm, Berlin, Berlin,\nIch möchte dich wiedersehen.\nIch bin nach Hause gefahren,\nAuf Wiedersehen, Berlin."
+    },
+    {
+      "level": "A1",
+      "day": 17,
+      "assignmentKey": "A1-11",
+      "title": "Wie komme ich zum Bahnhof?",
+      "lyrics": "[Verse 1]\nIch stehe vor dem Rathaus.\nIch suche den Bahnhof.\nIch frage eine nette Frau:\nWie komme ich dorthin?\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Verse 2]\nDie Frau sagt: Gehen Sie weiter.\nAn der Ampel nach rechts.\nIch sage: Vielen Dank!\nSie lächelt: Gern geschehen.\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Outro]\nJetzt sehe ich den Bahnhof.\nMein Zug kommt gerade an.\nMit Falowen finde ich den Weg.",
+      "recordingObjectKey": "music/a1/day-17/Wo ist der Bahnhof_.mp3"
     }
   ]
 }
