@@ -168,7 +168,8 @@ export function grammarComponentPaths(root) {
  * Preserve text and table cells verbatim; self-check answers never leave Campus.
  */
 export function extractC1GuidedGrammar(root, day, practice) {
-  if (!Number.isInteger(day) || day < 1 || day > 6) return null;
+  if (!Number.isInteger(day) || day < 1 || day > 28) return null;
+  if (day >= 7) return c1LaterGrammar(root, day, practice);
   const file = path.join(root, "web/src/components/C1Day1To6GrammarNotes.js");
   const ast = parse(fs.readFileSync(file, "utf8"), { sourceType: "module", plugins: ["jsx"] });
   const registry = findNodes(ast.program, n => n.type === "VariableDeclarator" &&
@@ -230,6 +231,191 @@ export function extractC1GuidedGrammar(root, day, practice) {
         throw new Error("Unexpected C1 self-check on day " + day);
       return (index + 1) + ". " + str(row.elements[0]);
     }) });
+  return {
+    source: "Falowen original C1 guided grammar notes and academic grammar practice",
+    fullExplanationIncluded: true,
+    orderedNotes: blocks.map((block, index) => ({ number: index + 1, ...block })),
+    clarification: "Read orderedNotes in sequence without paraphrasing when the learner requests the original. Teaching examples and corrections are included; collapsed exercise solutions and completion controls remain in Campus.",
+  };
+}
+
+/** Exact static JSX teaching for Day 7 and the explicitly selected deep dives.
+ * No JSX is executed. Unknown content nodes fail the build instead of silently
+ * losing prose. CheckAnswer children and completion labels are never traversed.
+ */
+function c1StaticBlocks(node, academic) {
+  const out = [];
+  const attr = (n, key) => n.openingElement.attributes.find(a =>
+    a.type === "JSXAttribute" && a.name?.name === key)?.value;
+  const literal = n => {
+    if (n?.type === "StringLiteral") return n.value;
+    if (n?.type === "ArrayExpression") return n.elements.map(literal);
+    throw new Error("Unexpected static C1 JSX literal");
+  };
+  const prop = (n, key) => {
+    const value = attr(n, key);
+    return literal(value?.type === "JSXExpressionContainer" ? value.expression : value);
+  };
+  // React's multiline JSX whitespace rules; retain original inline spacing.
+  const jsxText = value => {
+    const lines = value.split(/\r\n|\n|\r/);
+    let lastNonempty = 0;
+    lines.forEach((line, i) => { if (/[^ \t]/.test(line)) lastNonempty = i; });
+    return lines.map((line, i) => {
+      let t = line.replace(/\t/g, " ");
+      if (i !== 0) t = t.replace(/^ +/, "");
+      if (i !== lines.length - 1) t = t.replace(/ +$/, "");
+      return t && i !== lastNonempty ? t + " " : t;
+    }).join("");
+  };
+  const inline = n => {
+    if (n.type === "JSXText") return jsxText(n.value);
+    if (n.type === "JSXElement" && tag(n) === "br") return "\n";
+    if (n.type === "JSXElement" && ["strong", "em", "span", "b", "i"].includes(tag(n)))
+      return n.children.map(inline).join("");
+    if (n.type === "JSXExpressionContainer" && n.expression.type === "StringLiteral")
+      return n.expression.value;
+    throw new Error("Unsupported inline C1 grammar node: " + (tag(n) || n.type));
+  };
+  const content = n => n.children.map(inline).join("").trim();
+  const push = (type, text) => { if (text) out.push({ type, text }); };
+  const walk = n => {
+    if (n.type === "JSXText") { push("paragraph", jsxText(n.value).trim()); return; }
+    if (n.type === "JSXFragment") { n.children.forEach(walk); return; }
+    if (n.type !== "JSXElement") throw new Error("Unsupported C1 teaching node " + n.type);
+    const t = tag(n);
+    if (t === "C1AcademicGrammarPractice") { out.push(...academic); return; }
+    if (["label", "input"].includes(t)) return;
+    if (t === "CheckAnswer") { out.push({ type: "questions", items: [prop(n, "question")] }); return; }
+    if (t === "Mistake") { out.push({ type: "teachingCorrection", wrong: prop(n, "wrong"), correct: prop(n, "correct") }); return; }
+    if (t === "Table") {
+      if (attr(n, "rows")) {
+        out.push({ type: "table", headers: prop(n, "headers"), rows: prop(n, "rows") }); return;
+      }
+      const rows = findNodes(n, x => x.type === "JSXElement" && tag(x) === "tr");
+      const cells = (row, type) => row.children.filter(x => x.type === "JSXElement" && tag(x) === type).map(content);
+      const headers = rows.flatMap(row => cells(row, "th"));
+      const body = rows.map(row => cells(row, "td")).filter(row => row.length);
+      if (!headers.length || !body.length || body.some(row => row.length !== headers.length))
+        throw new Error("Unexpected C1 JSX table");
+      out.push({ type: "table", headers, rows: body }); return;
+    }
+    if (/^h[1-6]$/.test(t)) { push("heading", content(n)); return; }
+    if (["ul", "ol"].includes(t)) {
+      const items = n.children.filter(x => x.type === "JSXElement" && tag(x) === "li").map(content);
+      out.push({ type: t === "ol" ? "orderedList" : "list", items }); return;
+    }
+    if (["p", "span", "strong", "ExampleBox", "NoteBox"].includes(t)) {
+      if (n.children.some(x => x.type === "JSXElement" && ["ul", "ol", "div", "p"].includes(tag(x)))) {
+        n.children.forEach(walk); return;
+      }
+      push(t === "ExampleBox" ? "example" : t === "NoteBox" ? "note" : "paragraph", content(n)); return;
+    }
+    if (["div", "section"].includes(t)) { n.children.forEach(walk); return; }
+    throw new Error("Unknown C1 static teaching tag " + t);
+  };
+  walk(node);
+  return out;
+}
+
+function c1LaterGrammar(root, day, practice) {
+  const group = day === 7 ? "7Reisen" : day <= 10 ? "8To10" : day === 11 ? "11" :
+    day <= 14 ? "12To14" : day <= 17 ? "15To17" : day <= 20 ? "18To20" :
+    day <= 23 ? "21To23" : day <= 26 ? "24To26" : "27To28";
+  const file = path.join(root, "web/src/components/C1Day" + group + "GrammarNotes.js");
+  const ast = parse(fs.readFileSync(file, "utf8"), { sourceType: "module", plugins: ["jsx"] });
+  const academic = [
+    { type: "heading", text: "C1-Grammatik im Kontext" },
+    { type: "paragraph", text: practice.grammar },
+    { type: "paragraph", text: practice.rule },
+    { type: "questions", items: practice.grammarChecks.map(([prompt]) => prompt) },
+    { type: "heading", text: "Wortschatz · " + practice.vocabulary.length + " Ausdrücke" },
+    { type: "table", rows: practice.vocabulary.map(([term, meaning]) => [term, meaning]) },
+  ];
+  const jsxReturn = fn => {
+    const returns = fn.body?.body?.filter(n => n.type === "ReturnStatement" &&
+      ["JSXElement", "JSXFragment"].includes(n.argument?.type)) || [];
+    if (returns.length !== 1) throw new Error("C1 grammar return changed for day " + day);
+    return returns[0].argument;
+  };
+  const namedJSX = name => {
+    const nodes = findNodes(ast.program, n => n.type === "VariableDeclarator" &&
+      n.id?.name === name && n.init?.type === "ArrowFunctionExpression");
+    if (nodes.length !== 1) throw new Error("Missing C1 grammar section " + name);
+    return c1StaticBlocks(jsxReturn(nodes[0].init), academic);
+  };
+  let blocks;
+  if (day === 7) {
+    const fn = ast.program.body.find(n => n.type === "ExportDefaultDeclaration")?.declaration;
+    blocks = c1StaticBlocks(jsxReturn(fn), academic);
+  } else {
+    const single = day === 11;
+    const declarations = findNodes(ast.program, n => n.type === "VariableDeclarator" &&
+      n.id?.name === (single ? "lesson" : "lessons") && n.init?.type === "ObjectExpression");
+    if (declarations.length !== 1) throw new Error("C1 grammar registry changed for day " + day);
+    const field = (node, key) => node?.properties?.find(p => p.type === "ObjectProperty" &&
+      String(p.key?.name ?? p.key?.value) === String(key))?.value;
+    const lesson = single ? declarations[0].init : field(declarations[0].init, day);
+    const str = n => {
+      if (n?.type !== "StringLiteral" || !n.value.trim()) throw new Error("Invalid C1 grammar string on day " + day);
+      return n.value;
+    };
+    const list = (n, map) => {
+      if (n?.type !== "ArrayExpression") throw new Error("Invalid C1 grammar list on day " + day);
+      return n.elements.map(map);
+    };
+    const val = (node, key) => str(field(node, key));
+    const strings = n => list(n, str);
+    const pairs = n => list(n, row => {
+      const pair = strings(row);
+      if (pair.length !== 2) throw new Error("Invalid C1 grammar pair on day " + day);
+      return pair;
+    });
+    const heading = text => ({ type: "heading", text });
+    const paragraph = text => ({ type: "paragraph", text });
+    blocks = [...academic, heading(val(lesson, "title")), paragraph(val(lesson, "subtitle"))];
+    if (day >= 24 && day <= 26) {
+      blocks.push({ type: "note", label: "Warum brauchst du das?", text: val(lesson, "why") }, heading("Lernziele"));
+    } else {
+      blocks.push(heading(day >= 21 && day <= 23 ? "Was lernst du hier?" : "Warum brauchst du diese Grammatik auf C1?"),
+        paragraph(val(lesson, "why")), heading("Nach dieser Lektion kannst du:"));
+    }
+    blocks.push({ type: "list", items: strings(field(lesson, "goals")) });
+    if (day >= 21 && day <= 26) {
+      blocks.push(heading(day <= 23 ? "Grammatik Schritt für Schritt" : "Grammar notes"));
+      for (const [title, text] of pairs(field(lesson, "explanation"))) blocks.push(heading(title), paragraph(text));
+    }
+    if (day === 20) blocks.push(...namedJSX("MiniLesson"));
+    if (!(day >= 24 && day <= 26)) blocks.push(heading(day >= 21 && day <= 23 ? "Kernstrukturen auf einen Blick" :
+      day >= 18 && day <= 20 ? "Kernstrukturen mit Beispielen" : "Kernstrukturen"));
+    blocks.push({ type: "table", headers: ["Struktur", "C1-Beispiel"], rows: pairs(field(lesson, "rows")) });
+    if (day >= 8 && day <= 10) blocks.push(...namedJSX("Day" + day + "DeepDive"));
+    const model = () => blocks.push(heading(day >= 24 && day <= 26 ? "Modellabsatz" :
+      day >= 18 && day <= 20 ? "C1-Modellabsatz: So klingt es im Zusammenhang" : "C1-Modellabsatz"),
+      paragraph(val(lesson, "model")));
+    const quiz = () => {
+      blocks.push(heading("Knowledge Test"));
+      if (day <= 20) blocks.push(heading("Teste die Grammatik direkt"));
+      blocks.push(paragraph(day <= 20 ? "Klicke auf eine Antwort. Du siehst sofort, ob sie richtig ist und warum." :
+        day <= 23 ? "Klicke auf eine Antwort. Du siehst sofort, ob sie richtig ist." :
+        "Wähle eine Antwort. Du bekommst sofort Feedback und kannst deine Antwort ändern."));
+      // Explicit projection: do not even read the answer or feedback fields.
+      for (const item of list(field(lesson, "quiz"), n => n)) {
+        blocks.push({ type: "multipleChoice", question: val(item, day <= 20 ? "question" : "q"),
+          options: strings(field(item, "options")) });
+      }
+    };
+    if (day >= 18 && day <= 23) { quiz(); model(); }
+    else if (day >= 24 && day <= 26) { model(); quiz(); }
+    else {
+      model();
+      blocks.push(heading("Selbstkontrolle"), paragraph("Löse die Aufgabe zuerst selbst und öffne danach die Antwort."),
+        { type: "questions", items: list(field(lesson, "checks"), (row, index) => {
+          if (row?.type !== "ArrayExpression" || row.elements.length !== 2) throw new Error("Invalid C1 self-check");
+          return (index + 1) + ". " + str(row.elements[0]);
+        }) });
+    }
+  }
   return {
     source: "Falowen original C1 guided grammar notes and academic grammar practice",
     fullExplanationIncluded: true,
