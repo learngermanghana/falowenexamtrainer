@@ -269,3 +269,13 @@ The supplied German lyrics and exact-line English are labelled as a reference
 draft until checked against the R2 recording. There are no invented line cues;
 line highlighting awaits an audio alignment and review. The workbook remains
 optional and ungraded. Retiring the old public track does not delete its R2 object.
+
+## A2 Day 11 · Mein Zug kommt zu spät
+
+The A2 Day 11 workbook and Falowen Music use the public object
+`music/a2/day-11/Wieder zu spät.mp3`. The previous “Mit dem Rad, mit dem Zug”
+recording is retired from discovery and public playback; its historical R2
+object and recording metadata are not deleted. The supplied German lyrics and
+line-matched English are reference text until checked against that exact audio.
+No line timestamps are asserted; highlighting awaits audio alignment and review.
+Music remains optional and does not change the workbook assessment.

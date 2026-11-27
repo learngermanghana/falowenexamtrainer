@@ -8907,6 +8907,120 @@
           "en": "Goodbye, Berlin."
         }
       ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a2/day-11/Wieder zu spät.mp3",
+      "level": "A2",
+      "day": 11,
+      "assignmentKey": "A2-4.11",
+      "draftTitle": "Mein Zug kommt zu spät",
+      "lines": [
+        {
+          "de": "Sieben Uhr, ich muss los,",
+          "en": "Seven o’clock, I have to go,"
+        },
+        {
+          "de": "Am Bahnhof ist viel los.",
+          "en": "The station is busy."
+        },
+        {
+          "de": "Mein Zug kommt heute nicht,",
+          "en": "My train isn’t coming today,"
+        },
+        {
+          "de": "Ich schaue auf die Uhr.",
+          "en": "I look at the clock."
+        },
+        {
+          "de": "Wieder zu spät,",
+          "en": "Late again,"
+        },
+        {
+          "de": "Mein Zug hat Verspätung.",
+          "en": "My train is delayed."
+        },
+        {
+          "de": "Wieder zu spät,",
+          "en": "Late again,"
+        },
+        {
+          "de": "Ich brauche eine Verbindung.",
+          "en": "I need a connection."
+        },
+        {
+          "de": "Der Zug fällt aus,",
+          "en": "The train is cancelled,"
+        },
+        {
+          "de": "Ich muss umsteigen.",
+          "en": "I have to change trains."
+        },
+        {
+          "de": "Der Bahnsteig ist voll,",
+          "en": "The platform is crowded,"
+        },
+        {
+          "de": "Ich muss hier bleiben.",
+          "en": "I have to stay here."
+        },
+        {
+          "de": "Ich rufe meinen Chef an,",
+          "en": "I call my boss,"
+        },
+        {
+          "de": "Ich komme später an.",
+          "en": "I will arrive later."
+        },
+        {
+          "de": "Kein guter Start,",
+          "en": "Not a good start,"
+        },
+        {
+          "de": "Ein langer Tag.",
+          "en": "A long day."
+        },
+        {
+          "de": "Wieder zu spät,",
+          "en": "Late again,"
+        },
+        {
+          "de": "Mein Zug hat Verspätung.",
+          "en": "My train is delayed."
+        },
+        {
+          "de": "Wieder zu spät,",
+          "en": "Late again,"
+        },
+        {
+          "de": "Ich brauche eine Verbindung.",
+          "en": "I need a connection."
+        },
+        {
+          "de": "Endlich bin ich da,",
+          "en": "At last I am there,"
+        },
+        {
+          "de": "Alles wieder gut.",
+          "en": "Everything is fine again."
+        },
+        {
+          "de": "Morgen fahre ich früher,",
+          "en": "Tomorrow I will leave earlier,"
+        },
+        {
+          "de": "Wenn der Zug auch fährt.",
+          "en": "If the train runs."
+        },
+        {
+          "de": "Feierabend, ab nach Haus,",
+          "en": "Work is over, time to go home,"
+        },
+        {
+          "de": "Hoffentlich fällt kein Zug aus.",
+          "en": "Hopefully no train is cancelled."
+        }
+      ]
     }
   ],
   "transcripts": [

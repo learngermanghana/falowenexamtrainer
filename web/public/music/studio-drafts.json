@@ -407,7 +407,8 @@
       "day": 11,
       "assignmentKey": "A2-4.11",
       "title": "Mit dem Rad, mit dem Zug",
-      "lyrics": "[Intro]\nMit dem Rad, mit dem Zug.\n\n[Verse 1]\nAm Morgen fahre ich mit dem Rad,\ndie Sonne scheint auf meine Stadt.\nDer Wind ist frisch, die Luft ist klar,\nich fahre los, wie wunderbar.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an.\n\n[Verse 2]\nAm Nachmittag nehme ich den Zug,\nich habe heute noch nicht genug.\nIch kaufe mir eine Fahrkarte\nund steige ein, bevor ich starte.\nDie Häuser ziehen schnell vorbei,\nich schaue raus und fühle mich frei.\nAm Bahnhof wartest du auf mich,\nich steige aus und freue mich.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an,\nweil ich mit dir die Welt entdecken kann.\n\n[Outro]\nMal fahre ich Rad, mal nehme ich den Zug,\nich bin unterwegs, das gefällt mir gut.\nOb nah, ob fern, ich komme an,\nweil jeder Weg uns verbinden kann."
+      "lyrics": "[Intro]\nMit dem Rad, mit dem Zug.\n\n[Verse 1]\nAm Morgen fahre ich mit dem Rad,\ndie Sonne scheint auf meine Stadt.\nDer Wind ist frisch, die Luft ist klar,\nich fahre los, wie wunderbar.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an.\n\n[Verse 2]\nAm Nachmittag nehme ich den Zug,\nich habe heute noch nicht genug.\nIch kaufe mir eine Fahrkarte\nund steige ein, bevor ich starte.\nDie Häuser ziehen schnell vorbei,\nich schaue raus und fühle mich frei.\nAm Bahnhof wartest du auf mich,\nich steige aus und freue mich.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an,\nweil ich mit dir die Welt entdecken kann.\n\n[Outro]\nMal fahre ich Rad, mal nehme ich den Zug,\nich bin unterwegs, das gefällt mir gut.\nOb nah, ob fern, ich komme an,\nweil jeder Weg uns verbinden kann.",
+      "recordingObjectKey": "music/a2/day-11/Mit dem Rad, mit dem Zug.mp3"
     },
     {
       "level": "A2",
@@ -1411,6 +1412,15 @@
       "title": "Wie komme ich zum Bahnhof?",
       "lyrics": "[Verse 1]\nIch stehe vor dem Rathaus.\nIch suche den Bahnhof.\nIch frage eine nette Frau:\nWie komme ich dorthin?\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Verse 2]\nDie Frau sagt: Gehen Sie weiter.\nAn der Ampel nach rechts.\nIch sage: Vielen Dank!\nSie lächelt: Gern geschehen.\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Outro]\nJetzt sehe ich den Bahnhof.\nMein Zug kommt gerade an.\nMit Falowen finde ich den Weg.",
       "recordingObjectKey": "music/a1/day-17/Wo ist der Bahnhof_.mp3"
+    },
+    {
+      "level": "A2",
+      "day": 11,
+      "assignmentKey": "A2-4.11",
+      "title": "Mein Zug kommt zu spät",
+      "recordingObjectKey": "music/a2/day-11/Wieder zu spät.mp3",
+      "publishUntimedReference": true,
+      "lyrics": "[Verse 1]\nSieben Uhr, ich muss los,\nAm Bahnhof ist viel los.\nMein Zug kommt heute nicht,\nIch schaue auf die Uhr.\n\n[Chorus]\nWieder zu spät,\nMein Zug hat Verspätung.\nWieder zu spät,\nIch brauche eine Verbindung.\n\n[Verse 2]\nDer Zug fällt aus,\nIch muss umsteigen.\nDer Bahnsteig ist voll,\nIch muss hier bleiben.\nIch rufe meinen Chef an,\nIch komme später an.\nKein guter Start,\nEin langer Tag.\n\n[Chorus]\nWieder zu spät,\nMein Zug hat Verspätung.\nWieder zu spät,\nIch brauche eine Verbindung.\n\n[Verse 3]\nEndlich bin ich da,\nAlles wieder gut.\nMorgen fahre ich früher,\nWenn der Zug auch fährt.\n\n[Outro]\nFeierabend, ab nach Haus,\nHoffentlich fällt kein Zug aus."
     }
   ]
 }

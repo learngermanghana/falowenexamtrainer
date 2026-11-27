@@ -9,6 +9,7 @@ const catalog = require('../web/public/music/catalog.json');
 const LEVELS = new Set(['A1','A2','B1','B2','C1','C2']);
 // Keep superseded MP3s out of discovery so the lesson uses the current recording.
 const RETIRED_MUSIC_KEYS = new Set([
+  'music/a2/day-11/Mit dem Rad, mit dem Zug.mp3',
   'music/a1/day-17/Wo ist der Bahnhof_.mp3',
   'music/a1/day-16/So bestelle ich mein Essen.mp3',
   'music/a2/day-14/Pläne für mein Leben.mp3',
