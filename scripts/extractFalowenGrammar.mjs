@@ -423,3 +423,150 @@ function c1LaterGrammar(root, day, practice) {
     clarification: "Read orderedNotes in sequence without paraphrasing when the learner requests the original. Teaching examples and corrections are included; collapsed exercise solutions and completion controls remain in Campus.",
   };
 }
+
+/** Original A1 grammar pages, first four days. Parse only the explicitly
+ * selected page return; never run React, quiz callbacks or answer state. */
+export function extractA1OriginalGrammar(root, day) {
+  const names = { 1: "A1Day1GreetingsGrammarPage", 2: "A1Day2UnifiedGrammarPage",
+    3: "A1Day3Kapitel12GrammarNotesPage", 4: "GermanNumbersGrammarPage" };
+  const name = names[day];
+  if (!name) return null;
+  const file = path.join(root, "web/src/components", name + ".js");
+  const ast = parse(fs.readFileSync(file, "utf8"), { sourceType: "module", plugins: ["jsx"] });
+  const top = ast.program.body.flatMap(n => n.type === "VariableDeclaration" ? n.declarations : [n]);
+  const declaration = key => top.find(n => n.type === "VariableDeclarator" && n.id?.name === key)?.init;
+  const field = (n, key) => n?.properties?.find(p => p.type === "ObjectProperty" &&
+    String(p.key?.name ?? p.key?.value) === key)?.value;
+  const literal = n => {
+    if (n?.type === "StringLiteral") return n.value;
+    if (n?.type === "ArrayExpression") return n.elements.map(literal);
+    throw new Error("Unexpected A1 teaching literal, day " + day);
+  };
+  const fn = declaration(name) || top.find(n => n.type === "ExportDefaultDeclaration" &&
+    n.declaration?.id?.name === name)?.declaration;
+  const returns = fn?.body?.body?.filter(n => n.type === "ReturnStatement" && n.argument?.type === "JSXElement") || [];
+  if (returns.length !== 1) throw new Error("Original A1 grammar page changed: " + name);
+  const out = [];
+  const attr = (n, key) => n.openingElement.attributes.find(a =>
+    a.type === "JSXAttribute" && a.name?.name === key);
+  const rawProp = (n, key) => {
+    const v = attr(n, key)?.value;
+    return v?.type === "JSXExpressionContainer" ? v.expression : v;
+  };
+  const clean = value => {
+    const lines = value.split(/\r\n|\r|\n/);
+    let last = 0;
+    lines.forEach((line, i) => { if (/[^ \t]/.test(line)) last = i; });
+    return lines.map((line, i) => {
+      let t = line.replace(/\t/g, " ");
+      if (i) t = t.replace(/^ +/, "");
+      if (i !== lines.length - 1) t = t.replace(/ +$/, "");
+      return t && i !== last ? t + " " : t;
+    }).join("");
+  };
+  const inlineTags = ["strong", "em", "b", "i", "span"];
+  const inline = n => {
+    if (n.type === "JSXText") return clean(n.value);
+    if (n.type === "JSXElement" && tag(n) === "br") return "\n";
+    if (n.type === "JSXElement" && inlineTags.includes(tag(n))) return n.children.map(inline).join("");
+    if (n.type === "JSXExpressionContainer" && n.expression.type === "StringLiteral") return n.expression.value;
+    throw new Error("Unexpected inline A1 grammar node, day " + day + ": " + (tag(n) || n.type));
+  };
+  const content = n => n.children.map(inline).join("").trim();
+  const push = (type, text) => { if (text) out.push({ type, text }); };
+  const mappedArray = n => {
+    if (n?.type !== "CallExpression" || n.callee?.type !== "MemberExpression" ||
+        n.callee.property?.name !== "map") throw new Error("Unexpected A1 teaching map");
+    return n.callee.object;
+  };
+  const rowsFrom = n => {
+    if (n?.type === "Identifier") {
+      if (!["alphabet", "pronouns", "pronounRows", "conjugationRows",
+        "numbersZeroToTwenty", "tens", "hundreds", "thousands"].includes(n.name))
+        throw new Error("Unapproved A1 teaching array " + n.name);
+      n = declaration(n.name);
+    }
+    const rows = literal(n);
+    if (!Array.isArray(rows) || !rows.every(row => Array.isArray(row) && row.every(x => typeof x === "string")))
+      throw new Error("Invalid A1 teaching table");
+    return rows;
+  };
+  const table = (headers, rows) => {
+    if (!rows.length || (headers.length && rows.some(r => r.length !== headers.length)))
+      throw new Error("Invalid A1 teaching table width");
+    out.push({ type: "table", ...(headers.length ? { headers } : {}), rows });
+  };
+  const questions = ids => {
+    const n = declaration("knowledgeQuestions");
+    if (n?.type !== "ArrayExpression") throw new Error("Missing A1 knowledge questions");
+    const items = n.elements.filter(q => !ids || ids.includes(literal(field(q, "id"))));
+    for (const q of items) out.push({ type: "multipleChoice",
+      question: literal(field(q, day === 1 ? "prompt" : "question")),
+      options: literal(field(q, "options")) });
+    if (ids && items.length !== ids.length) throw new Error("A1 knowledge question mapping changed");
+  };
+  const walk = n => {
+    if (n.type === "JSXText") { push("paragraph", clean(n.value).trim()); return; }
+    if (n.type === "JSXExpressionContainer") {
+      const e = n.expression;
+      if (e.type === "JSXEmptyExpression") return;
+      if (day === 3 && e.type === "ConditionalExpression" && e.test?.name === "checked") return;
+      if (day === 3 && e.type === "CallExpression" && mappedArray(e)?.name === "knowledgeQuestions") {
+        questions(); return;
+      }
+      if (day === 2 && e.type === "CallExpression" && mappedArray(e)?.name === "alphabet") {
+        table([], rowsFrom(mappedArray(e))); return;
+      }
+      throw new Error("Unexpected A1 dynamic grammar node, day " + day);
+    }
+    if (n.type !== "JSXElement") throw new Error("Unexpected A1 grammar node");
+    const t = tag(n);
+    if (["AppBackButton", "img", "button"].includes(t) || attr(n, "data-a1-pdf-hide-ui")) return;
+    if (t === "KnowledgeCheck" && day === 1) {
+      const key = literal(rawProp(n, "sectionKey"));
+      const map = declaration("knowledgeQuestionIdsBySection")?.arguments?.[0];
+      questions(literal(field(map, key))); return;
+    }
+    if (t === "NumberTable" && day === 4) {
+      table(attr(n, "showPronunciation") ? ["Number", "German", "Pronunciation"] : ["Number", "German"],
+        rowsFrom(rawProp(n, "rows"))); return;
+    }
+    if (t === "table") {
+      const part = key => n.children.find(x => x.type === "JSXElement" && tag(x) === key);
+      const head = part("thead"), body = part("tbody");
+      if (!head || !body) throw new Error("A1 table structure changed");
+      const hr = head.children.find(x => x.type === "JSXElement" && tag(x) === "tr");
+      const headerMap = hr.children.find(x => x.type === "JSXExpressionContainer");
+      const headers = headerMap ? literal(mappedArray(headerMap.expression)) :
+        hr.children.filter(x => x.type === "JSXElement" && tag(x) === "th").map(content);
+      const dynamic = body.children.find(x => x.type === "JSXExpressionContainer");
+      const rows = dynamic ? rowsFrom(mappedArray(dynamic.expression)) :
+        body.children.filter(x => x.type === "JSXElement" && tag(x) === "tr").map(row =>
+          row.children.filter(x => x.type === "JSXElement" && tag(x) === "td").map(content));
+      table(headers, rows); return;
+    }
+    if (/^h[1-6]$/.test(t)) { push("heading", content(n)); return; }
+    if (["ul", "ol"].includes(t)) {
+      out.push({ type: t === "ol" ? "orderedList" : "list",
+        items: n.children.filter(x => x.type === "JSXElement" && tag(x) === "li").map(content) }); return;
+    }
+    if (["main", "header", "section", "div"].includes(t)) {
+      const isInline = n.children.every(x => x.type === "JSXText" ||
+        (x.type === "JSXElement" && ["strong", "em", "b", "i", "br"].includes(tag(x))));
+      if (isInline) push("paragraph", content(n));
+      else n.children.forEach(walk);
+      return;
+    }
+    if (["p", "span", "strong", "em", "BuilderPiece"].includes(t)) { push("paragraph", content(n)); return; }
+    if (t === "br") return;
+    throw new Error("Unapproved A1 grammar tag: " + t);
+  };
+  walk(returns[0].argument);
+  if (!out.some(b => b.type === "heading") || out.length < 10) throw new Error("Incomplete A1 original notes");
+  return {
+    source: "Falowen original A1 learner-facing grammar page",
+    fullExplanationIncluded: true,
+    orderedNotes: out.map((block, index) => ({ number: index + 1, ...block })),
+    clarification: "Read orderedNotes in workbook order. Original English and German teaching is preserved; interactive scores, navigation, images and hidden answers are not exported.",
+  };
+}
