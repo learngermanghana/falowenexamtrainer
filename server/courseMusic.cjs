@@ -52,6 +52,24 @@ function isMusicStaff(account, env = process.env) {
   return claims.admin === true || ['admin','teacher','tutor','staff','instructor'].includes(String(claims.role || '').toLowerCase())
     || emails.includes(String(account.email || '').toLowerCase());
 }
+// Scoped Admin staff are provisioned with staff, staffPages and staffLanguages
+// custom claims, not necessarily a legacy role. Use the fresh account lookup
+// and the requested classroom language; never let a scoped role bypass its pages.
+function isClassroomStaff(account, env, language) {
+  let claims;
+  try { claims = JSON.parse(account.customAttributes || '{}') || {}; }
+  catch { return false; }
+  const role = String(claims.role || '').toLowerCase();
+  if (claims.admin === true || role === 'admin') return true;
+  if (claims.staff === false) return false;
+  if (claims.staff === true || Array.isArray(claims.staffPages) || Array.isArray(claims.staffLanguages)) {
+    return (claims.staff === true || ['staff','teacher','tutor','instructor'].includes(role))
+      && Array.isArray(claims.staffPages) && claims.staffPages.includes('teaching-slides')
+      && Array.isArray(claims.staffLanguages) && claims.staffLanguages.includes(language);
+  }
+  // Preserve existing legacy teacher/administrator accounts.
+  return isMusicStaff(account, env);
+}
 function prepareMusic(req, env) {
   const id = new URL(req.url, 'https://www.falowen.app').searchParams.get('track') || '';
   return signTrack(id, env);
@@ -83,7 +101,7 @@ function createMusicHandler({
       const data = await response.json();
       const account = data.users?.[0];
       if (!response.ok || !account?.localId || account.disabled) return res.status(401).json({error:'Your Falowen session has expired. Please sign in again.'});
-      if (!await isAuthorized(account,env)) return res.status(403).json({error:authorizationError});
+      if (!await isAuthorized(account,env,req)) return res.status(403).json({error:authorizationError});
       const signed = await prepare(req, env, account);
       return res.status(200).json({url:signed.url, expiresAt:signed.expiresAt, track:signed.id});
     } catch (error) {
@@ -265,7 +283,12 @@ const CLASSROOM_RECORDINGS = Object.freeze({
 });
 // Path-based lookup removes the fragile level/day/key query-string contract.
 function createClassroomRecordingPathHandler(options = {}) {
-  return createMusicHandler({ ...options, prepare: async (req, env) => {
+  return createMusicHandler({ ...options,
+    isAuthorized: options.isAuthorized || ((account, env, req) => {
+      const path = new URL(req.url, 'https://www.falowen.app').pathname;
+      return isClassroomStaff(account, env, path.startsWith('/course-media/classroom/swahili-b1/') ? 'swahili' : 'german');
+    }),
+    prepare: async (req, env) => {
     const url = new URL(req.url, 'https://www.falowen.app');
     const match = url.pathname.match(/^\/course-media\/classroom\/(a2|b1|swahili-b1)\/([1-9][0-9]?)\/audio-url$/);
     const lookupKey = match ? match[1].toUpperCase() + '-' + Number(match[2]) : '';
@@ -278,7 +301,12 @@ function createClassroomRecordingPathHandler(options = {}) {
   } });
 }
 function createClassroomAudioHandler(options = {}) {
-  return createMusicHandler({ ...options, prepare: async (req, env) => {
+  return createMusicHandler({ ...options,
+    isAuthorized: options.isAuthorized || ((account, env, req) => {
+      const level = new URL(req.url, 'https://www.falowen.app').searchParams.get('level');
+      return isClassroomStaff(account, env, level === 'SWAHILI-B1' ? 'swahili' : 'german');
+    }),
+    prepare: async (req, env) => {
     const params = new URL(req.url, 'https://www.falowen.app').searchParams;
     const level = params.get('level') || '';
     const dayText = params.get('day') || '';
@@ -295,7 +323,9 @@ function createClassroomAudioHandler(options = {}) {
 }
 // Legacy A2 classroom URLs remain unchanged and securely limited to A2.
 function createClassroomBankAudioHandler(options = {}) {
-  return createMusicHandler({ ...options, prepare: async (req, env) => {
+  return createMusicHandler({ ...options,
+    isAuthorized: options.isAuthorized || ((account, env) => isClassroomStaff(account, env, 'german')),
+    prepare: async (req, env) => {
     const params = new URL(req.url, 'https://www.falowen.app').searchParams;
     const dayText = params.get('day') || '';
     const key = params.get('key') || '';
