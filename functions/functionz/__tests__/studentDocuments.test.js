@@ -112,6 +112,7 @@ describe("student-only document download API", () => {
     await handler({ params: { kind: "certificate" }, body: { level: "A1" } }, res);
     expect(res.code).toBe(409);
     expect(res.payload.error).toMatch(/not available yet/);
+    expect(res.payload.error).toContain("18 of 19 required tasks");
   });
 
   test("requires server configuration and enforces request quotas", async () => {
@@ -127,4 +128,13 @@ describe("student-only document download API", () => {
     expect(limited.code).toBe(429);
     expect(global.fetch).not.toHaveBeenCalled();
   });
+
+ test.each(["certificate","transcript","enrollment","agreement","receipt","residence"])("trial users cannot download %s", async kind => {
+  const res = makeResponse();
+  await makeHandler({student:{studentCode:"STU123",email:"student@example.com",trialStatus:"active",paid:0}})({params:{kind},body:{level:"A1"}},res);
+  expect(res.code).toBe(403);
+  expect(res.payload.code).toBe("trial_document_restricted");
+  expect(global.fetch).not.toHaveBeenCalled();
+ });
+
 });
