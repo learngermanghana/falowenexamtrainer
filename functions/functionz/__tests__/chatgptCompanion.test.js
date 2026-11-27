@@ -326,7 +326,7 @@ describe("Original Falowen grammar teaching and remaining workbook gaps", () => 
     for (let day = 1; day <= 28; day += 1) {
       const grammar = lessonContentResponse("B1", day, "grammar");
       expect(grammar.available).toBe(true);
-      expect(grammar.material.fullExplanationIncluded).toBe(true);
+      expect(grammar.material.orderedNotes.length).toBeGreaterThan(20);
       expect(grammar.material.sections.length).toBeGreaterThan(0);
     }
     const day1 = lessonContentResponse("B1", 1, "grammar");
@@ -555,5 +555,37 @@ describe("A2 original ordered grammar pages", () => {
     expect(notes(28).some(b=>b.text==="Über Zukunftspläne sprechen")).toBe(true);
     expect(notes(28).filter(b=>b.type==="multipleChoice")).toHaveLength(4);
     expect(notes(7).some(b=>b.text==="Knowledge Test · Relativsätze")).toBe(false);
+  });
+});
+
+describe("B1 original ordered grammar pages", () => {
+  const grammar=day=>lessonContentResponse("B1",day,"grammar").material;
+  const notes=day=>grammar(day).orderedNotes;
+  test("all 28 days have original introductions, English support and numbered teaching",()=>{
+    for(let day=1;day<=28;day++){
+      const g=grammar(day),b=g.orderedNotes;
+      expect(b.length).toBeGreaterThan(20);
+      expect(b.map(x=>x.number)).toEqual(b.map((_,i)=>i+1));
+      expect(b[0].text).toBe("B1 · Thema kurz verstehen");
+      expect(b.some(x=>x.text==="English support · Read this before the German grammar notes")).toBe(true);
+      expect(b.some(x=>x.text==="Sentence structure")).toBe(true);
+      expect(JSON.stringify(b)).not.toMatch(/"(answer|answerIndex|correctIndex|sampleAnswer)"\s*:/);
+      if(!g.fullExplanationIncluded)expect(g.omittedTeaching.length).toBeGreaterThan(0);
+    }
+  });
+  test("Day 1 keeps original tables and exercises; Day 28 keeps the climate lesson",()=>{
+    expect(notes(1).some(b=>b.text==="Warum lernen wir Präsens und Perfekt?")).toBe(true);
+    expect(notes(1).some(b=>b.type==="table"&&b.headers?.includes("Präsens")&&b.headers?.includes("Perfekt"))).toBe(true);
+    expect(notes(1).some(b=>b.type==="orderedList"&&b.items.some(x=>x.includes("Konjugiere das Verb träumen")))).toBe(true);
+    expect(notes(28).some(b=>b.text==="1. Zwei Entwicklungen verbinden – je … desto")).toBe(true);
+  });
+  test("solution boxes and collapsed exercise answers are excluded even from compatibility sections",()=>{
+    for(const day of [2,3,4,5,6,15,18]){
+      const b=JSON.stringify(grammar(day));
+      expect(b).not.toMatch(/Lösungen anzeigen|Mögliche Lösungen:|"text":"Lösungen"/);
+    }
+    expect(JSON.stringify(grammar(15))).not.toContain("1. Viele E-Mails werden verschickt.");
+    expect(notes(18).some(b=>b.text==="Think first · Erst verstehen, dann anwenden")).toBe(true);
+    expect(notes(18).some(b=>b.text==="Wege zum Wunschberuf: Ziele mit um ... zu")).toBe(false);
   });
 });
