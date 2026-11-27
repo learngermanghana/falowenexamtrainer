@@ -1,5 +1,6 @@
 import InlineReadingTranslations from "./InlineReadingTranslations";
 import C2GrammarTeaching from "./C2GrammarTeaching";
+import { C2_TRANSFORMATION_FAMILIES } from "../data/c2GrammarTeaching.js";
 import React,{useEffect,useMemo,useRef,useState}from"react";
 import{useLocation,useNavigate}from"react-router-dom";
 import AppBackButton from"./navigation/AppBackButton";
@@ -29,13 +30,7 @@ const sub={border:"1px solid #dbeafe",borderRadius:14,padding:13,background:"#f8
 const Section=({title,children})=><section style={card}><h2 style={{margin:0,fontSize:"1.18rem"}}>{title}</h2>{children}</section>;
 const Opinion=({children,index})=><blockquote style={{margin:0,border:"1px solid #cbd5e1",borderRadius:14,padding:16,background:"#fff",fontStyle:"italic",lineHeight:1.7}}>{index?index+". ":""}„{children}“</blockquote>;
 
-const TRANSFORMATION_FAMILIES=[
- ["obwohl → trotz","Obwohl die Umsetzung teuer ist, ... → Trotz der hohen Umsetzungskosten ..."],
- ["um ... zu → zur + Nominalisierung","..., um den Zugang zu verbessern. → ... zur Verbesserung des Zugangs."],
- ["erkennen/merken → jemandem wird klar","Die Beteiligten erkannten, dass ... → Den Beteiligten wurde klar, dass ..."],
- ["wenn + Mittel/Ursache → durch + Nominalisierung","Wenn Institutionen investieren, ... → Durch gezielte Investitionen ..."],
- ["skeptisch sein → Zweifel haben","Viele waren skeptisch, ob ... → Viele hatten Zweifel daran, ob ..."],
-];
+
 
 const speakingBranches=(standard,knowledge)=>[
  {title:"1. Erste Kursaussage",ideas:[knowledge.vocab?.[0]?.[0],knowledge.actors?.[0]?.[0],knowledge.tensions?.[0]?.[0]].filter(Boolean),prompt:`Was spricht für diese Aussage, und wo liegt ihre Grenze? „${standard.perspectives?.[0]}“`,starter:"Dieser Position lässt sich insofern zustimmen, als ..."},
@@ -81,7 +76,7 @@ function Learn({day,standard,knowledge,mastery,skillFocus,completed,onCompleteCh
    <p style={{margin:0,lineHeight:1.75}}>Plane zuerst Position → Begründung → Beispiel → Gegenargument → Reaktion → Synthese. Die heutige Grammatik soll die Argumentation präziser machen, nicht unnötig kompliziert.</p>
   </Section>:standard.writeType==="reformulation"?<Section title="Umformung · kurzes Grammatiktraining">
    <p style={{margin:0,lineHeight:1.75}}>Nutze die Transformationsfamilien heute als Grammatiktraining. Sie sind nicht die Hauptaufgabe des Tages.</p>
-   <div style={{display:"grid",gap:9}}>{TRANSFORMATION_FAMILIES.map(([name,example])=><div key={name} style={sub}><strong>{name}</strong><span>{example}</span></div>)}</div>
+   <div style={{display:"grid",gap:9}}>{C2_TRANSFORMATION_FAMILIES.map(([name,example])=><div key={name} style={sub}><strong>{name}</strong><span>{example}</span></div>)}</div>
   </Section>:<Section title="Argumentation · Inhalt vor Form">
    <p style={{margin:0,lineHeight:1.75}}>Plane zuerst Position → Begründung → Beispiel → Gegenargument → Reaktion → Synthese. Nutze die heutige Grammatik nur dort, wo sie die logische Beziehung oder das Register präziser macht.</p>
   </Section>}
