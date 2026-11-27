@@ -358,6 +358,49 @@ describe("Original Falowen grammar teaching and remaining workbook gaps", () => 
 });
 
 
+describe("C2 original unified workbook grammar", () => {
+  const grammar=day=>lessonContentResponse("C2",day,"grammar").material;
+  const notes=day=>grammar(day).orderedNotes;
+  test("all 28 days preserve the original four-stage lesson and topic checks",()=>{
+    for(let day=1;day<=28;day++){
+      const g=grammar(day),b=g.orderedNotes;
+      expect(g.fullExplanationIncluded).toBe(true);
+      expect(b.length).toBeGreaterThan(30);
+      expect(b.map(x=>x.number)).toEqual(b.map((_,i)=>i+1));
+      const labels=["1. Verstehen · Was bedeutet das?","2. Satz bauen · Schritt für Schritt","3. Gemeinsam prüfen","4. Jetzt selbst anwenden · nach dem gemeinsamen Check"];
+      const indices=labels.map(title=>b.findIndex(x=>x.type==="heading"&&x.text===title));
+      expect(indices.every((x,i)=>x>=0&&(i===0||x>indices[i-1]))).toBe(true);
+      const checks=b.filter(x=>x.type==="multipleChoice");
+      expect(checks).toHaveLength(4);
+      for(const q of checks){
+        expect(Object.keys(q).sort()).toEqual(["number","options","question","type"]);
+        expect(q.options.length).toBeGreaterThan(1);
+      }
+      expect(g.task).toBe(b[indices[3]+1].text);
+      expect(b.some(x=>x.text==="Umformung · kurzes Grammatiktraining")).toBe(day%4===2);
+      expect(b.some(x=>x.text==="Argumentation · Schreiben vorbereiten")).toBe(day%4===0);
+    }
+  });
+  test("Day 1 uses exact grammar wording and original learner-facing check",()=>{
+    const b=notes(1);
+    expect(b.some(x=>x.text==="Eine nuancierte Bewertung nennt Bedingungen statt alles gut oder schlecht zu nennen.")).toBe(true);
+    expect(b.some(x=>x.text==="Recycling ist sinnvoll, sofern Produkte nicht repariert werden können.")).toBe(true);
+    expect(b.find(x=>x.type==="multipleChoice")).toEqual(expect.objectContaining({
+      question:"Welche Aussage nennt eine Bedingung?",
+      options:["Recycling ist immer die beste Lösung.","Recycling ist sinnvoll, sofern Reparatur nicht möglich ist."]
+    }));
+    expect(b.some(x=>x.text==="Bewerte Reparatur und Recycling. Nenne mit sofern eine Bedingung, unter der deine Bewertung gilt.")).toBe(true);
+    expect(JSON.stringify(b)).not.toContain('"answerIndex"');
+    expect(JSON.stringify(b)).not.toContain('"explanation"');
+  });
+  test("transformation teaching examples are included but exam model answers are not exported",()=>{
+    expect(notes(2).some(x=>x.text==="obwohl → trotz")).toBe(true);
+    expect(notes(2).some(x=>x.text==="Obwohl die Umsetzung teuer ist, ... → Trotz der hohen Umsetzungskosten ...")).toBe(true);
+    expect(JSON.stringify(grammar(2))).not.toMatch(/"(modelAnswer|sampleAnswer|answerIndex|reformulations)"\s*:/);
+    expect(notes(28).some(x=>x.text==="Formuliere eine vorsichtige Aussage um. Vergleiche danach Bedeutung, Evidenzgrad und Register beider Versionen.")).toBe(true);
+  });
+});
+
 describe("C1 and C2 canonical student Course Book in ChatGPT", () => {
   test("shows 28 real C1/C2 day overviews with their own levels", () => {
     for (const level of ["C1", "C2"]) {
