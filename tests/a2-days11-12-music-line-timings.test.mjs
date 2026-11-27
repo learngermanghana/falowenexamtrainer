@@ -9,13 +9,12 @@ const catalog = JSON.parse(readFileSync('web/public/music/catalog.json', 'utf8')
 const drafts = JSON.parse(readFileSync('web/public/music/studio-drafts.json', 'utf8'));
 const { validateLyrics, createLyricsHandler } = require('../server/musicLyrics.cjs');
 const published = [
-  {key:'music/a2/day-11/Mit dem Rad, mit dem Zug.mp3',count:24,sha:'208e3be5013d24a27c17d51b5d5f574fffd9e0df28af6a118a87ec1baef59d1d',duration:141.6},
   {key:'music/a2/day-12/Träume ändern sich.mp3',count:28,sha:'3a0fa44ba3a83261bda42fa23e0759bcda6ba7c518e6af9e35960e80563de281',duration:113.232},
 ];
 const env = {R2_ACCOUNT_ID:'a'.repeat(32),R2_ACCESS_KEY_ID:'test',R2_SECRET_ACCESS_KEY:'test',R2_AUDIO_BUCKET:'test-audio'};
 const mkRes=()=>({statusCode:200,setHeader(){return this},status(n){this.statusCode=n;return this},json(body){this.body=body;return this}});
 
-test('Day 11 and Day 12 fingerprint-bound packs cover every sung line in order',()=>{
+test('Day 12 fingerprint-bound pack covers every sung line in order',()=>{
   for(const {key,count,sha,duration} of published){
     const pack = approved.recordings.find(x=>x.objectKey===key);
     assert.ok(pack, 'missing approved recording '+key);

@@ -374,24 +374,6 @@
       "approved": true
     },
     {
-      "id": "r2-a2-day-11-b64_TWl0IGRlbSBSYWQsIG1pdCBkZW0gWnVnLm1wMw",
-      "title": "Mit dem Rad, mit dem Zug",
-      "level": "A2",
-      "day": 11,
-      "assignmentKey": "A2-4.11",
-      "topic": "Unterwegs · Rad und Zug",
-      "type": "Learning story",
-      "genre": "Acoustic Afro-Soul",
-      "language": "German",
-      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-11-b64_TWl0IGRlbSBSYWQsIG1pdCBkZW0gWnVnLm1wMw",
-      "featured": false,
-      "attendance": true,
-      "coursebook": true,
-      "slides": true,
-      "objectKey": "music/a2/day-11/Mit dem Rad, mit dem Zug.mp3",
-      "approved": true
-    },
-    {
       "id": "r2-a2-day-12-b64_VHLDpHVtZSDDpG5kZXJuIHNpY2gubXAz",
       "title": "Träume ändern sich",
       "level": "A2",
@@ -534,6 +516,25 @@
       "coursebook": true,
       "slides": true,
       "objectKey": "music/a1/day-17/Auf Wiedersehen, Berlin.mp3",
+      "approved": true,
+      "autoDiscovered": true
+    },
+    {
+      "id": "r2-a2-day-11-b64_V2llZGVyIHp1IHNww6R0Lm1wMw",
+      "title": "Mein Zug kommt zu spät",
+      "level": "A2",
+      "day": 11,
+      "assignmentKey": "A2-4.11",
+      "topic": "Verkehr und Arbeitsweg",
+      "type": "Learning song",
+      "genre": "Melodic trap",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-11-b64_V2llZGVyIHp1IHNww6R0Lm1wMw",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/day-11/Wieder zu spät.mp3",
       "approved": true,
       "autoDiscovered": true
     }
