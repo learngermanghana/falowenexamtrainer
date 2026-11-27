@@ -79,6 +79,9 @@ function lessonContentResponse(level, day, section = "overview") {
     ...base, available: false,
     clarification: "This section is not included in the exported lesson material; open the relevant Falowen Campus tab. Do not invent missing exercises.",
   };
+  if (section === "grammar" && content.grammar?.orderedNotes?.length) {
+    base.guidance += " For exact line-by-line reading, use material.orderedNotes in numeric order, preserving original German wording and table rows. Read one block at a time if requested; distinguish teaching examples from exercises. Do not read hidden solutions or claim that the learner has completed the notes.";
+  }
   return { ...base, available: true, material: content[section] };
 }
 
