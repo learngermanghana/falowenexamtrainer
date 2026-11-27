@@ -511,3 +511,27 @@ describe("Original A1 grammar page retrieval", () => {
     expect(four.find(b => b.type === "table" && b.headers?.includes("Pronunciation")).rows).toHaveLength(21);
   });
 });
+
+describe("Remaining original A1 grammar routes", () => {
+  test("published grammar routes expose ordered teaching and no hidden quiz answers", () => {
+    for (const day of [7,8,9,10,11,12,16,17,18,20,21,22]) {
+      const g = lessonContentResponse("A1", day, "grammar").material;
+      expect(g.orderedNotes.length).toBeGreaterThan(5);
+      expect(g.orderedNotes.map(b => b.number)).toEqual(g.orderedNotes.map((_,i)=>i+1));
+      for (const q of g.orderedNotes.filter(b=>b.type==="multipleChoice")) {
+        expect(Object.keys(q).sort()).toEqual(["number","options","question","type"]);
+        expect(q.options.length).toBeGreaterThan(1);
+      }
+      if (!g.fullExplanationIncluded) expect(g.omittedTeaching.length).toBeGreaterThan(0);
+    }
+  });
+  test("time, negation, directions and health return real teaching", () => {
+    const notes = day => lessonContentResponse("A1",day,"grammar").material.orderedNotes;
+    expect(notes(11).find(b=>b.type==="table"&&b.headers.includes("Time")).rows)
+      .toEqual(expect.arrayContaining([["06:30","Es ist halb sieben."]]));
+    expect(notes(12).filter(b=>b.type==="multipleChoice")).toHaveLength(6);
+    expect(notes(16).filter(b=>b.type==="multipleChoice")).toHaveLength(6);
+    expect(notes(17).some(b=>b.type==="multipleChoice"&&b.question.includes("Bahnhof"))).toBe(true);
+    expect(notes(22).some(b=>b.type==="list"&&b.items.some(x=>x.includes("der Kopf")))).toBe(true);
+  });
+});
