@@ -280,72 +280,7 @@ export const LESSON_RADIO_DICTIONARY = {
         "Höre den Podcast über Müllvermeidung aufmerksam an. Achte auf konkrete Maßnahmen, ihre Begründungen und ihre Folgen. Danach gehst du weiter zum Lernteil.",
     },
   },
-  C1: {
-    1: {
-      key: "c1-day1-ziele-lernweg-falowen-radio",
-      title: "Ziele und Lernweg",
-      youtubeId: "McNk1VTFvMk",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf realistische Lernziele und einen flexiblen Lernweg ein. Danach gehst du weiter zum Lernteil.",
-    },
-    2: {
-      key: "c1-day2-kultur-identitaet-falowen-radio",
-      title: "Kultur und Identität",
-      youtubeId: "rmaxh302FEY",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf das Thema Kultur und Identität ein. Danach gehst du weiter zum Lernteil.",
-    },
-    3: {
-      key: "c1-day3-medien-informationskompetenz-falowen-radio",
-      title: "Medien und Informationskompetenz",
-      youtubeId: "6IvVh9RPJ5s",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf Nachrichten, Quellenkritik und digitale Verantwortung ein. Danach gehst du weiter zum Lernteil.",
-    },
-    4: {
-      key: "c1-day4-beziehungen-teamarbeit-falowen-radio",
-      title: "Beziehungen und Teamarbeit",
-      youtubeId: "Vl3mmytfrRk",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf Beziehungen und Teamarbeit ein. Danach gehst du weiter zum Lernteil.",
-    },
-    5: {
-      key: "c1-day5-berufliche-entwicklung-falowen-radio",
-      title: "Berufliche Entwicklung",
-      youtubeId: "69FO0zn9ZvA",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf berufliche Entwicklung ein. Danach gehst du weiter zum Lernteil.",
-    },
-    6: {
-      key: "c1-day6-gesundheit-lebensstil-falowen-radio",
-      title: "Gesundheit und Lebensstil",
-      youtubeId: "Yp1usG7StS8",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf Gesundheit, Prävention, psychisches Wohlbefinden und einen ausgewogenen Lebensstil ein. Danach gehst du weiter zum Lernteil.",
-    },
-    7: {
-      key: "c1-day7-reisen-nachhaltigkeit-falowen-radio",
-      title: "Reisen und Nachhaltigkeit",
-      youtubeId: "9OrT0EeIrvU",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf nachhaltiges Reisen, Mobilität, Tourismus und Verantwortung ein. Danach gehst du weiter zum Lernteil.",
-    },
-    8: {
-      key: "c1-day8-wohnen-stadtentwicklung-falowen-radio",
-      title: "Wohnen und Stadtentwicklung",
-      youtubeId: "z61nrz6yFgs",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf Wohnen, Stadtentwicklung und Lebensqualität ein. Danach gehst du weiter zum Lernteil.",
-    },
-  },
+  C1: {},
 };
 
 export const getLessonRadioResource = (level = "", day = "") => {

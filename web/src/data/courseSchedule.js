@@ -816,8 +816,8 @@ const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
     instruction: entry.instruction,
     grammar_topic: entry.grammar_topic || null,
     assignment: entry.assignment === true,
-    video: assignmentDay === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
-    youtube_link: assignmentDay === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
+    video: "",
+    youtube_link: "",
     ...resolveC1LessonLinks(assignmentDay),
   };
 });

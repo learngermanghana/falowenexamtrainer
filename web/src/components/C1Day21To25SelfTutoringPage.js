@@ -7,7 +7,6 @@ import C1Day21To23GrammarNotes from "./C1Day21To23GrammarNotes";
 import C1Day24To26GrammarNotes from "./C1Day24To26GrammarNotes";
 import C1GrammarQuickCheck from "./C1GrammarQuickCheck";
 import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
-import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
@@ -22,7 +21,6 @@ import { styles } from "../styles";
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const Section = ({ title, children }) => <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>{title}</h2>{children}</section>;
 const NoteBox = ({ children, tone = "blue" }) => { const tones = { blue: ["#bfdbfe", "#eff6ff", "#1e3a8a"], green: ["#86efac", "#f0fdf4", "#14532d"], amber: ["#fde68a", "#fffbeb", "#92400e"] }; const [border, background, color] = tones[tone] || tones.blue; return <div style={{ border: `1px solid ${border}`, borderRadius: 14, padding: 12, background, color, lineHeight: 1.65 }}>{children}</div>; };
-const embedUrl = (url = "") => { try { const parsed = new URL(url); const host = parsed.hostname.replace(/^www\./, ""); const id = host === "youtu.be" ? parsed.pathname.replace(/^\//, "") : parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop(); return id ? `https://www.youtube.com/embed/${id}` : ""; } catch { return ""; } };
 
 const day25Overrides = {
   speakingTopic: "Darf die Wissenschaft alles erforschen, was technisch möglich ist?",
@@ -45,17 +43,11 @@ export default function C1Day21To25SelfTutoringPage({ lesson, canonicalLesson = 
   const day = Number(lesson?.day || 0);
   const effectiveLesson = day === 25 ? { ...lesson, ...day25Overrides } : lesson;
   const { showToast } = useToast();
-  const radio = canonicalLesson?.resources?.falowenRadio || null;
-  const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
   const storageKey = getStandardLessonStorageKey(effectiveLesson, "progress");
   const [progress, setProgress] = useState(() => { try { return { learnDone: false, quizDone: false, speakDone: false, completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") }; } catch { return { learnDone: false, quizDone: false, speakDone: false, completed: false }; } });
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
 
-  if (!entered && radio) return <div style={{ ...styles.container, display: "grid", gap: 18 }}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><FalowenRadioTabContent level="C1" day={day} resource={radio} onContinue={() => setEntered(true)} /></div>;
-
-  const video = effectiveLesson.videoResource || canonicalLesson?.resources?.aiVideo || canonicalLesson?.resources?.teacherVideo || null;
-  const videoEmbed = embedUrl(video?.url);
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || effectiveLesson.resources?.workbook?.url || "";
   const branches = getC1Day21To25SpeakingScaffold(day);
   const GrammarNotes = day <= 23 ? C1Day21To23GrammarNotes : C1Day24To26GrammarNotes;
@@ -66,7 +58,7 @@ export default function C1Day21To25SelfTutoringPage({ lesson, canonicalLesson = 
     <header style={{ ...card, background: "linear-gradient(135deg,#0f172a,#1e3a8a)", color: "#fff" }}><span style={{ ...styles.badge, width: "fit-content" }}>C1 · Day {day}</span><h1 style={{ margin: 0 }}>{effectiveLesson.title}</h1><p style={{ margin: 0, color: "#e2e8f0" }}>{effectiveLesson.topic}</p></header>
     <AdvancedSelfLearningTabNav level="C1" day={day} activeTab={active} onChange={setActive} />
 
-    {active === "learn" ? <><Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 lesson video"} src={videoEmbed} allowFullScreen style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} /> : <NoteBox tone="amber">Continue with the grammar lesson below.</NoteBox>}</Section><C1TopicIntroduction day={day} title={effectiveLesson.title} /><C1AcademicExamPractice day={day} tab="learn" /><GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.quizDone} onCompleteChange={(quizDone) => setProgress((old) => ({ ...old, quizDone }))} /></> : null}
+    {active === "learn" ? <><C1TopicIntroduction day={day} title={effectiveLesson.title} /><C1AcademicExamPractice day={day} tab="learn" /><GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.quizDone} onCompleteChange={(quizDone) => setProgress((old) => ({ ...old, quizDone }))} /></> : null}
 
     {active === "speak" ? <Section title="Speaking builder"><C1AcademicExamPractice day={day} tab="speak" /><C1SpeakGrammarGuide lesson={effectiveLesson} branchesOverride={branches} /><EmbeddedSpeechPracticePanel /><label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label></Section> : null}
 

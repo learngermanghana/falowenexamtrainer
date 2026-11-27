@@ -464,8 +464,8 @@ const buildDictionaryBackedSchedule = (level) =>
     lesen_hören: {
       chapter: entry.chapter || null,
       assignment: entry.assignment === true,
-      video: level === "C1" && Number(entry.assignmentDay) === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
-      youtube_link: level === "C1" && Number(entry.assignmentDay) === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
+      video: "",
+      youtube_link: "",
       grammarbook_link: entry.schreiben_sprechen?.grammar_link || "",
       workbook_link: entry.schreiben_sprechen?.workbook_link || "",
     },

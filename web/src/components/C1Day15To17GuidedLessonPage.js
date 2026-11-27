@@ -7,7 +7,6 @@ import C1Day15To17GrammarNotes from "./C1Day15To17GrammarNotes";
 import C1GrammarQuickCheck from "./C1GrammarQuickCheck";
 import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
 import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
-import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
@@ -22,13 +21,10 @@ import { styles } from "../styles";
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18 };
 const NoteBox = ({ children }) => <div style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 12, background: "#eff6ff", lineHeight: 1.65 }}>{children}</div>;
 const Section = ({ title, children }) => <section style={card}><h2 style={{ margin: 0 }}>{title}</h2>{children}</section>;
-const embedUrl = (url = "") => { try { const p = new URL(url); const id = p.hostname.includes("youtu.be") ? p.pathname.slice(1) : p.searchParams.get("v") || p.pathname.split("/").filter(Boolean).pop(); return id ? `https://www.youtube.com/embed/${id}` : ""; } catch { return ""; } };
 
 export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = null }) {
   const { showToast } = useToast();
   const day = Number(lesson.day);
-  const radio = canonicalLesson?.resources?.falowenRadio || null;
-  const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
   const [progress, setProgress] = useState(() => {
@@ -40,10 +36,6 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
     }
   });
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
-  if (!entered && radio) return <div style={{ ...styles.container, display: "grid", gap: 18 }}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><FalowenRadioTabContent level="C1" day={day} resource={radio} onContinue={() => setEntered(true)} /></div>;
-
-  const video = lesson.videoResource || canonicalLesson?.resources?.aiVideo || canonicalLesson?.resources?.teacherVideo || null;
-  const videoEmbed = embedUrl(video?.url);
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || lesson.resources?.workbook?.url || "";
   const branches = getC1Day16To20SpeakingScaffold(day);
   const complete = () => { setProgress((old) => ({ ...old, completed: true, completedAt: new Date().toISOString() })); showToast(`C1 Day ${day} completed.`, "success"); };
@@ -55,7 +47,7 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
     <AdvancedSelfLearningTabNav level="C1" day={day} activeTab={active} onChange={setActive} />
 
     {active === "learn" ? <>
-      <Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 video"} src={videoEmbed} style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} allowFullScreen /> : <NoteBox>Continue with the Learn activity below.</NoteBox>}</Section>
+      
       <C1TopicIntroduction day={day} title={lesson.title} /><C1AcademicExamPractice day={day} tab="learn" />
       {day <= 16 ? <C1KnowledgeChoicePractice lesson={lesson} completed={progress.quizDone} onCompleteChange={(quizDone) => setProgress((old) => ({ ...old, quizDone, learnDone: quizDone || old.learnDone }))} /> : <><C1Day15To17GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /></>}
     </> : null}

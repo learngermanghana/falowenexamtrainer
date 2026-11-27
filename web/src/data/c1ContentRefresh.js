@@ -315,6 +315,7 @@ export const alignC1LessonContent = (lesson) => {
 
   return {
     ...canonicalLesson,
+    videoResource: null,
     grammar_topic: canonicalGrammarTitle,
     grammarFocus: canonicalGrammarTitle,
     explanation: [

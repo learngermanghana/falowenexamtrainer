@@ -5,7 +5,6 @@ import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1AcademicExamPractice, { C1AcademicGrammarPractice } from "./C1AcademicExamPractice";
 import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
 import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
-import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
@@ -19,19 +18,8 @@ import { styles } from "../styles";
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
-export const C1_DAY9_FALOWEN_RADIO = {
-  key: "c1-day9-konsum-werbung-falowen-radio",
-  title: "Konsum und Werbung 2.4",
-  youtubeId: "VpL14EhvvEM",
-  duration: "",
-  instruction:
-    "Höre aufmerksam zu und stimme dich auf Konsum, Werbung, digitale Beeinflussung und Verantwortung ein. Danach gehst du weiter zum Lernteil.",
-};
-
-export const resolveC1Day8To10Radio = (day, canonicalLesson = null) =>
-  canonicalLesson?.skipFalowenRadio
-    ? null
-    : canonicalLesson?.resources?.falowenRadio || (Number(day) === 9 ? C1_DAY9_FALOWEN_RADIO : null);
+export const C1_DAY9_FALOWEN_RADIO = null;
+export const resolveC1Day8To10Radio = () => null;
 
 const NoteBox = ({ children, tone = "blue" }) => {
   const tones = { blue: ["#bfdbfe", "#eff6ff", "#1e3a8a"], green: ["#bbf7d0", "#f0fdf4", "#14532d"], amber: ["#fde68a", "#fffbeb", "#92400e"] };
@@ -54,7 +42,6 @@ const summaries = {
   11: { title: "Engagement und Ehrenamt: Verantwortung in der Gesellschaft", intro: "C1 Day 11 behandelt freiwilliges Engagement als wichtigen Teil gesellschaftlicher Teilhabe. Es geht darum, warum Menschen sich engagieren, wie Vereine und Initiativen funktionieren und wo die Grenzen freiwilliger Hilfe liegen.", points: ["Erkläre Motivation, Zweck und gesellschaftlichen Nutzen von Ehrenamt.", "Nutze passende Konnektoren, um Ergänzung, Gegensatz, Grund, Folge, Bedingung und Ziel klar zu verknüpfen.", "Eine starke C1-Antwort zeigt, dass Ehrenamt professionelle Strukturen ergänzen, aber nicht ersetzen sollte."], vocabulary: ["das Ehrenamt", "sich engagieren", "der Zusammenhalt", "niedrigschwellige Angebote", "Verantwortung übernehmen"] },
 };
 
-const embedUrl = (url = "") => { try { const parsed = new URL(url); const host = parsed.hostname.replace(/^www\./, ""); const id = host === "youtu.be" ? parsed.pathname.replace(/^\//, "") : parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop(); return id ? `https://www.youtube.com/embed/${id}` : ""; } catch { return ""; } };
 const FinishSummary = ({ day, lesson }) => { const item = summaries[day]; if (!item) return null; return <div style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 14, background: "#eff6ff", display: "grid", gap: 10 }}><h3 style={{ margin: 0 }}>{item.title}</h3><p style={{ margin: 0, lineHeight: 1.7 }}>{item.intro}</p><ul style={listStyle}>{item.points.map((point) => <li key={point}>{point}</li>)}</ul>{lesson?.grammarFocus ? <div><strong>Grammar focus:</strong> {lesson.grammarFocus}</div> : null}<div><strong>Wortschatz:</strong> {item.vocabulary.join(" · ")}</div></div>; };
 
 const SpeakingBuilder = ({ lesson }) => <C1SpeakGrammarGuide lesson={lesson} />;
@@ -62,19 +49,11 @@ const SpeakingBuilder = ({ lesson }) => <C1SpeakGrammarGuide lesson={lesson} />;
 export default function C1Day8To10GuidedLessonPage({ lesson, canonicalLesson = null }) {
   const { showToast } = useToast();
   const day = Number(lesson.day);
-  const radio = resolveC1Day8To10Radio(day, canonicalLesson);
-  const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
   const [progress, setProgress] = useState(() => { try { return { learnDone: false, speakDone: false, completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") }; } catch { return { learnDone: false, speakDone: false, completed: false }; } });
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
 
-  if (!entered && radio) {
-    return <div style={{ ...styles.container, display: "grid", gap: 18 }}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><header style={{ ...card, borderColor: "#bfdbfe", background: "linear-gradient(135deg,#eff6ff,#f8fafc)" }}><span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>Start here</span><h1 style={{ margin: 0 }}>C1 · Day {day} · {lesson.title}</h1><p style={{ margin: 0, color: "#475569" }}>Listen to Falowen Radio first. Continue opens Learn, Speak, Write and Finish.</p></header><FalowenRadioTabContent level="C1" day={day} resource={radio} onContinue={() => { setEntered(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>;
-  }
-
-  const video = lesson.videoResource || canonicalLesson?.resources?.aiVideo || canonicalLesson?.resources?.teacherVideo || null;
-  const videoEmbed = embedUrl(video?.url);
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || lesson.resources?.workbook?.url || "";
   const finish = () => { const completedAt = new Date().toISOString(); setProgress((old) => ({ ...old, completed: true, completedAt })); showToast(`C1 Day ${day} completed. Your progress was saved.`, "success"); };
 
@@ -82,7 +61,7 @@ export default function C1Day8To10GuidedLessonPage({ lesson, canonicalLesson = n
     <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
     <header style={{ borderRadius: 22, overflow: "hidden", color: "#fff", backgroundImage: `linear-gradient(135deg,rgba(2,6,23,.94),rgba(30,64,175,.72)),url(${lesson.heroImage || ""})`, backgroundSize: "cover", backgroundPosition: "center", padding: "clamp(22px,4vw,42px)", display: "grid", gap: 16, minHeight: 240, alignContent: "space-between" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><span style={{ ...styles.badge, background: "rgba(255,255,255,.16)", color: "#fff" }}>C1</span><span style={{ ...styles.badge, background: "rgba(255,255,255,.16)", color: "#fff" }}>Day {day}</span><span style={{ ...styles.badge, background: "rgba(37,99,235,.9)", color: "#fff" }}>Chapter {lesson.chapter}</span></div><div><h1 style={{ margin: 0, fontSize: "clamp(2rem,5vw,3.4rem)" }}>{lesson.title}</h1><p style={{ margin: "10px 0 0", color: "#e2e8f0" }}>{lesson.topic}</p></div></header>
     <AdvancedSelfLearningTabNav level="C1" day={day} activeTab={active} onChange={setActive} />
-    {active === "learn" ? <><Section title="AI video">{video?.url ? <div style={{ display: "grid", gap: 10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "C1 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}</div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the knowledge questions below.</NoteBox>}</Section><C1TopicIntroduction day={day} title={lesson.title} /><C1AcademicGrammarPractice day={day} /><C1AcademicExamPractice day={day} tab="learn" /><C1KnowledgeChoicePractice lesson={lesson} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /></> : null}
+    {active === "learn" ? <><C1TopicIntroduction day={day} title={lesson.title} /><C1AcademicGrammarPractice day={day} /><C1AcademicExamPractice day={day} tab="learn" /><C1KnowledgeChoicePractice lesson={lesson} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /></> : null}
     {active === "speak" ? <Section title="Speaking builder"><C1AcademicExamPractice day={day} tab="speak" /><SpeakingBuilder lesson={lesson} /><EmbeddedSpeechPracticePanel /><label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label></Section> : null}
     {active === "write" ? <Section title="Guided writing builder"><C1AcademicExamPractice day={day} tab="write" /><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={lesson} />{workbookUrl ? <a href={workbookUrl} style={{ ...styles.linkButton, width: "fit-content" }}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={lesson} workbookId={`C1-day-${day}`} /> : null}

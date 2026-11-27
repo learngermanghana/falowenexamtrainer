@@ -6,7 +6,6 @@ import {
   applyB2C1LessonVideoOverrides,
 } from "./b2C1LessonMediaOverrides";
 import { normalizeB2C1Lesson } from "./lessonModel";
-import c1Day10IntegrationUndGesellschaft from "./selfLearningLessons/c1/day10IntegrationUndGesellschaft";
 import { getWritingVideoResource } from "./writingVideoResources";
 
 describe("requested lesson media mappings", () => {
@@ -91,17 +90,6 @@ describe("requested lesson media mappings", () => {
     expect(getWritingVideoResource("B2", 5)).toBeNull();
   });
 
-  test("uses the approved C1 Day 10 Chapter 2.5 AI video in both lesson sources", () => {
-    expect(c1Day10IntegrationUndGesellschaft.videoResource).toEqual(
-      expect.objectContaining({ url: "https://youtu.be/S_c9eIH-rzY" }),
-    );
-    expect(B2_C1_LESSON_VIDEO_OVERRIDES.C1[10].videoResources[0]).toEqual(
-      expect.objectContaining({
-        chapter: "2.5",
-        url: "https://youtu.be/S_c9eIH-rzY",
-      }),
-    );
-  });
 
   test("keeps B2 Radio empty without inventing a YouTube source", () => {
     expect(Object.keys(B2_C1_LESSON_RADIO_OVERRIDES.B2)).toHaveLength(0);
@@ -133,21 +121,15 @@ describe("requested lesson media mappings", () => {
     expect(b2Day10.resources.aiVideo).toBeNull();
   });
 
-  test("does not change the approved C1 Day 14 AI video", () => {
-    expect(B2_C1_LESSON_VIDEO_OVERRIDES.C1[14].videoResources[0]).toEqual(
-      expect.objectContaining({
-        key: "c1-day14-innovation-zukunft-ai-video",
-        chapter: "3.4",
-        url: "https://youtu.be/GEQNr4JedlM",
-      }),
-    );
-
-    const c1Day14 = normalizeB2C1Lesson(
-      { level: "C1", day: 14, chapter: "3.4", title: "Innovation und Zukunft" },
-      "C1",
-    );
-    expect(c1Day14.resources.aiVideo).toEqual(
-      expect.objectContaining({ url: "https://youtu.be/GEQNr4JedlM" }),
-    );
+  test("retires C1 Radio and AI videos for all 28 days, even with stale raw URLs", () => {
+    expect(B2_C1_LESSON_VIDEO_OVERRIDES.C1).toEqual({});
+    expect(B2_C1_LESSON_RADIO_OVERRIDES.C1).toEqual({});
+    for (let day = 1; day <= 28; day++) {
+      const lesson = normalizeB2C1Lesson({ level: "C1", day, video: "https://youtu.be/old", ai_video: "https://youtu.be/old" }, "C1");
+      expect(lesson.capabilities.radio).toBe(false);
+      expect(lesson.resources.falowenRadio).toBeNull();
+      expect(lesson.resources.aiVideo).toBeNull();
+      expect(lesson.resources.videos).toEqual([]);
+    }
   });
 });

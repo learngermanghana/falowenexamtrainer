@@ -33,6 +33,7 @@ export const isFalowenRadioResource = (resource) => {
 };
 
 export const resolveRadioFirstWorkbookResource = (level, day) => {
+  if (String(level || "").trim().toUpperCase() === "C1" && Number(day) >= 1 && Number(day) <= 28) return null;
   const resource =
     getB2C1RadioResource(level, day) ||
     getLessonRadioResource(level, day) ||
@@ -121,7 +122,8 @@ export const shouldShowRadioFirst = (level, day) =>
   Boolean(resolveRadioFirstWorkbookResource(level, day));
 
 const RadioFirstWorkbookGate = ({ level, day, children, resource = null, courseBookPath = "/campus/course", transcriptIntro = null, introInstruction, radioActivities }) => {
-  const explicitRadio = isFalowenRadioResource(resource) ? resource : null;
+  const retiredC1Radio = String(level || "").trim().toUpperCase() === "C1" && Number(day) >= 1 && Number(day) <= 28;
+  const explicitRadio = !retiredC1Radio && isFalowenRadioResource(resource) ? resource : null;
   const radio = explicitRadio || (transcriptIntro ? null : resolveRadioFirstWorkbookResource(level, day));
   const hasIntro = Boolean(radio || transcriptIntro);
   const location = useLocation();

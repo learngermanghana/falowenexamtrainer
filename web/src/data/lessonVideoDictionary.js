@@ -285,20 +285,7 @@ export const LESSON_VIDEO_DICTIONARY = {
     },
   },
   B2: {},
-  C1: {
-    4: {
-      videoResources: [
-        {
-          key: "c1-day4-beziehungen-teamarbeit-ai-video",
-          chapter: "1.4",
-          title: "C1 Day 4 · Beziehungen und Teamarbeit · AI video",
-          description:
-            "AI video lesson for discussing relationships, teamwork and participial attributes.",
-          url: "https://youtu.be/-1GtaOiI8mc",
-        },
-      ],
-    },
-  },
+  C1: {},
 };
 
 const pickFirst = (...values) =>

@@ -32,7 +32,7 @@ export const LEVEL_CAPABILITIES = Object.freeze({
   A2: { radio: true, fourPartWorkbook: true, tutorSubmission: true, selfAssessment: false },
   B1: { radio: true, fourPartWorkbook: true, tutorSubmission: true, selfAssessment: false },
   B2: { radio: true, fourPartWorkbook: false, tutorSubmission: false, selfAssessment: true },
-  C1: { radio: true, fourPartWorkbook: false, tutorSubmission: false, selfAssessment: true },
+  C1: { radio: false, fourPartWorkbook: false, tutorSubmission: false, selfAssessment: true },
 });
 
 const levelKey = (value = "") => String(value).trim().toUpperCase();
@@ -325,6 +325,7 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
   const capabilities = LEVEL_CAPABILITIES[level] || LEVEL_CAPABILITIES.A1;
   const rawGroups = resourceGroups(rawLesson, level, day);
   const strictB2 = isRedesignedB2Day(level, day);
+  const retiredC1Media = level === "C1" && day >= 1 && day <= 28;
   const groups = strictB2
     ? rawGroups.map((group) => ({ ...group, grammarBook: null }))
     : rawGroups;
@@ -360,7 +361,7 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
     removeHiddenTeacherVideos(level, day, authoritativeVideos),
     groups,
   );
-  const videos = applyLessonHubVideoPolicy({ level, rawLesson, videos: chapterScopedVideos });
+  const videos = retiredC1Media ? [] : applyLessonHubVideoPolicy({ level, rawLesson, videos: chapterScopedVideos });
   const assignmentId = rawLesson.assignmentId || rawLesson.assignment_id || null;
   return {
     level,

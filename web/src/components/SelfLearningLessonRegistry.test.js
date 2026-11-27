@@ -57,24 +57,11 @@ describe("self-learning lesson Falowen Radio integration", () => {
     expect(screen.getByRole("button", { name: /continue to workbook/i })).toBeInTheDocument();
   });
 
-  test("C1 lesson with a Radio entry keeps the listening-only entrance", () => {
-    renderRegisteredLesson("C1", 1, radio);
-
-    expect(screen.getByRole("heading", { name: "🎙️ Falowen Radio" })).toBeInTheDocument();
-    expect(screen.getByText("Test Radio Episode")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /continue to teil/i })).toBeInTheDocument();
-  });
-
-  test("C1 opens its lesson-owned AI video after Falowen Radio", () => {
-    renderRegisteredLesson("C1", 1, radio);
-
-    fireEvent.click(screen.getByRole("button", { name: /continue to teil/i }));
-
-    expect(screen.getByRole("heading", { name: "AI video" })).toBeInTheDocument();
-    expect(screen.getByTitle("Video explanation: Relativsätze mit Präpositionen")).toHaveAttribute(
-      "src",
-      "https://www.youtube.com/embed/u41XmMwb5PU",
-    );
+  test.each(Array.from({ length: 28 }, (_, index) => index + 1))("C1 Day %s opens Learn directly without old Radio or AI video", (day) => {
+    renderRegisteredLesson("C1", day, radio);
+    expect(screen.queryByRole("heading", { name: /Falowen Radio/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "AI video" })).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Learn · Input" })).toBeInTheDocument();
   });
 
   test("B2 lesson without Radio opens the new rotating lesson UI directly", () => {
@@ -93,24 +80,6 @@ describe("self-learning lesson Falowen Radio integration", () => {
     expect(screen.getByRole("tab", { name: "Learn · Input" })).toBeInTheDocument();
   });
 
-  test("C1 Engagement und Ehrenamt uses the Day 1 standout Radio-to-tabs workbook", () => {
-    renderRegisteredLesson("C1", 11, radio);
-
-    expect(screen.getByRole("heading", { name: "🎙️ Falowen Radio" })).toBeInTheDocument();
-    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "1. Learn" })).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: /continue to teil/i }));
-
-    expect(screen.getByRole("heading", { name: "Engagement und Ehrenamt", level: 1 })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Learn · Input" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Speak · Practice" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Write · Practice" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Finish · Complete" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Ref · Notes" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Teil 1 · Sprechen/i })).not.toBeInTheDocument();
-    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
-  });
 
   test("C1 Day 8 keeps the saved Schreiben video on the Write page", () => {
     renderRegisteredLesson("C1", 8);

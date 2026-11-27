@@ -11,7 +11,6 @@ import C1Day21To25SelfTutoringPage from "./C1Day21To25SelfTutoringPage";
 import C1ExtraGuidedLessonPage from "./C1Day24To26GuidedLessonPage";
 import C1LastGuidedLessonPage from "./C1Day27To28GuidedLessonPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
-import { C1_DAY3_RADIO_OVERRIDE } from "../data/c1Day3RadioOverride";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 
 export const shouldMountMarkMyLetter = () => false;
@@ -27,9 +26,6 @@ export const resolveCanonicalLessonForPage = (lesson, canonicalLesson) => {
         falowenRadio: null,
       },
     };
-  }
-  if (level === "C1" && day === 3) {
-    return { ...(canonicalLesson || {}), resources: { ...(canonicalLesson?.resources || {}), falowenRadio: C1_DAY3_RADIO_OVERRIDE } };
   }
   if (level === "B2" && day >= 1 && day <= 28) {
     const resources = canonicalLesson?.resources || {};
