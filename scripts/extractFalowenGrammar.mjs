@@ -1057,3 +1057,90 @@ export function extractB1OrderedGrammar(root,filePath,day){
   return {source:"Falowen original B1 learner-facing workbook grammar page",...result,
     sections:sections.filter(x=>x.explanation)};
 }
+
+
+/** B2 Learn uses a shared data-driven workbook, not the legacy standalone
+ * Day 1 grammar route. Project its actual visible teaching in render order.
+ * Transformations expose only the question; model solutions stay in Campus. */
+export function extractB2OrderedGrammar(root, day, alignment, grammar, practice) {
+  const file = path.join(root, "web/src/components/B2TopicIntroduction.jsx");
+  const ast = parse(fs.readFileSync(file, "utf8"), {sourceType:"module",plugins:["jsx"]});
+  const field = (n,key) => n?.properties?.find(p=>p.type==="ObjectProperty" &&
+    String(p.key?.name??p.key?.value)===String(key))?.value;
+  const registry = name => {
+    const nodes = findNodes(ast.program,n=>n.type==="VariableDeclarator"&&n.id?.name===name);
+    if(nodes.length!==1) throw new Error("B2 topic registry changed: "+name);
+    const init=nodes[0].init;
+    if(init?.type!=="CallExpression"||init.callee?.object?.name!=="Object"||init.callee?.property?.name!=="freeze")
+      throw new Error("Unexpected B2 topic registry: "+name);
+    return field(init.arguments[0],day);
+  };
+  const literal = n => {
+    if(n?.type!=="StringLiteral"||!n.value.trim()) throw new Error("Missing B2 topic text for day "+day);
+    return n.value;
+  };
+  const topic=registry("B2_TOPIC_FOUNDATIONS");
+  const english=literal(registry("B2_TOPIC_ENGLISH_FOUNDATIONS"));
+  const required = (v,label) => {
+    if(typeof v!=="string"||!v.trim())throw new Error("Missing B2 "+label+" on day "+day);
+    return v;
+  };
+  const list=(items,label)=>{
+    if(!Array.isArray(items)||!items.length)throw new Error("Missing B2 "+label+" on day "+day);
+    return items.map(v=>required(v,label));
+  };
+  if(grammar?.day!==day||Number(alignment?.day)!==day||!grammar.focuses?.length)
+    throw new Error("Missing canonical B2 grammar lesson on day "+day);
+  const heading=text=>({type:"heading",text});
+  const paragraph=text=>({type:"paragraph",text});
+  const example=text=>({type:"example",text});
+  const blocks=[
+    paragraph("B2 · Thema zuerst verstehen"),
+    heading(required(alignment.title,"topic title")),
+    paragraph("First understand what the topic means and what the main issue is. Then use the B2 grammar to express those ideas clearly."),
+    heading("In simple English"),paragraph(english),
+    heading("Auf Deutsch"),paragraph(literal(field(topic,"intro"))),
+    heading("Konkretes Beispiel"),example(literal(field(topic,"example"))),
+    heading("Abwägung"),paragraph(literal(field(topic,"tension"))),
+    heading("Leitfrage"),{type:"questions",items:[literal(field(topic,"question"))]},
+  ];
+  if(day<=25&&!practice)throw new Error("Missing B2 chapter practice on day "+day);
+  if(practice){
+    if(!practice.vocabulary?.length||!practice.transformations?.length)
+      throw new Error("Incomplete B2 chapter practice on day "+day);
+    blocks.push(heading("Wortschatz · Redemittel"),
+      paragraph("Lerne diese Ausdrücke als feste Wortverbindungen, nicht als einzelne Wörter."),
+      {type:"table",rows:practice.vocabulary.map(row=>{
+        if(!Array.isArray(row)||row.length!==2)throw new Error("Invalid B2 vocabulary row");
+        return list(row,"vocabulary");
+      })});
+  }
+  blocks.push(heading("Grammar / Learn"),heading(required(grammar.title,"grammar title")),
+    paragraph("Heute im Kontext: "+required(grammar.context,"context")),
+    paragraph("Lernziel: "+required(grammar.goal,"goal")),
+    paragraph("Warum diese Grammatik? "+required(grammar.whyThisGrammar,"relevance")));
+  for(const item of grammar.focuses){
+    blocks.push(heading(required(item.title,"focus title")),
+      paragraph(required(item.english,"English gloss")),
+      paragraph(required(item.explanation,"explanation")),
+      paragraph(required(item.pattern,"pattern")),
+      heading("Regeln"),{type:"list",items:list(item.rules,"rules")},
+      heading("Beispiele"),{type:"examples",items:list(item.examples,"examples")});
+  }
+  blocks.push(heading("Modellsatz für heute"),example(required(grammar.modelSentence,"teaching model sentence")),
+    heading("Mini-Übung"),paragraph(required(grammar.miniExercise,"mini exercise")));
+  if(practice){
+    blocks.push(heading("Satztraining · Vom B1- zum B2-Satz"),
+      paragraph("Formuliere zuerst selbst einen Satz. Vergleiche danach deine Lösung mit dem Modell. Andere grammatisch korrekte Lösungen sind möglich."),
+      {type:"questions",items:practice.transformations.map((row,index)=>{
+        if(!Array.isArray(row)||row.length!==3)throw new Error("Invalid B2 transformation");
+        return (index+1)+". "+required(row[0],"transformation prompt");
+      })});
+  }
+  return {
+    source:"Falowen original B2 unified workbook Grammar / Learn teaching",
+    fullExplanationIncluded:true,
+    orderedNotes:blocks.map((block,index)=>({number:index+1,...block})),
+    clarification:"Read orderedNotes in workbook order, not the legacy supplementary grammar fields. Teaching models are included; transformation solutions, exercise feedback, videos and completion controls stay in Campus. Days 26–28 have no ChapterTransformations component in the current workbook.",
+  };
+}
