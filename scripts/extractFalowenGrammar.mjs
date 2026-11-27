@@ -747,7 +747,7 @@ function extractRemainingA1Grammar(root, day) {
 /** A2 grammar follows the canonical embedded workbook component, not the
  * bounded legacy summaries. Interpret only reviewed literal teaching JSX;
  * never run React, callbacks, state or quiz answer code. */
-export function extractA2OrderedGrammar(filePath, day) {
+export function extractA2OrderedGrammar(filePath, day, b1 = null) {
   const ast=parse(fs.readFileSync(filePath,"utf8"),{sourceType:"module",plugins:["jsx"]});
   const program=ast.program;
   const exported=program.body.find(n=>n.type==="ExportDefaultDeclaration")?.declaration;
@@ -765,7 +765,7 @@ export function extractA2OrderedGrammar(filePath, day) {
   const attr=(n,k)=>n.openingElement?.attributes?.find(a=>a.type==="JSXAttribute"&&a.name?.name===k);
   const prop=(n,k)=>{const v=attr(n,k)?.value;return v?.type==="JSXExpressionContainer"?v.expression:v;};
   const fail=m=>{throw new Error(m);};
-  const blocks=[],missing=new Set();
+  const blocks=b1 ? [...b1.introduction] : [],missing=new Set();
   const hidden=/^(?:correct answer|sample answers?|model answers?|answer key|solution key|musterlösung|lösungsschlüssel|lösungen|lösung\s*:)/i;
   const clean=v=>{const lines=v.split(/\r\n|\r|\n/);let last=0;lines.forEach((l,i)=>{if(/[^ \t]/.test(l))last=i;});
     return lines.map((l,i)=>{let t=l.replace(/\t/g," ");if(i)t=t.replace(/^ +/,"");if(i!==lines.length-1)t=t.replace(/ +$/,"");return t&&i!==last?t+" ":t;}).join("");};
@@ -896,6 +896,35 @@ export function extractA2OrderedGrammar(filePath, day) {
       if(n.type==="NullLiteral")return;
       if(n.type!=="JSXElement")fail("unknown node "+n.type);
       const t=tag(n),get=k=>value(prop(n,k),env);
+      if(b1){
+        // Omit the entire exercise solution box, not only its heading.
+        const first=n.children.find(x=>x.type!=="JSXText"||x.value.trim());
+        if(first?.type==="JSXElement"&&["strong","h2","h3","h4","span"].includes(tag(first))){
+          const label=visibleText(first).trim();
+          if(/^(?:Mögliche Lösungen|Lösungen|Musterlösungen?|Beispiellösungen?|Correct answers?|Sample answers?)(?:\s*:|\s*$)/i.test(label))return;
+        }
+        if(t==="B1GrammarEnglishSupport"){
+          if(get("day")!==day)fail("B1 English support day mismatch");
+          blocks.push(...b1.englishSupport);return;
+        }
+        if(t==="RuleCard"){
+          heading(str(get("title")));
+          push("paragraph",str(get("meaning")));
+          push("example","Beispiel: "+str(get("example")));
+          if(prop(n,"note"))push("paragraph",str(get("note")));return;
+        }
+        if(["NoteBox","ExampleBox","Note","Formula"].includes(t)){
+          const simple=n.children.every(x=>x.type==="JSXText"||
+            (x.type==="JSXElement"&&(inlineTags.has(tag(x))||tag(x)==="br"))||
+            (x.type==="JSXExpressionContainer"&&x.expression.type==="StringLiteral"));
+          if(simple)push(t==="ExampleBox"?"example":t==="Formula"?"paragraph":"note",content(n,env));
+          else n.children.forEach(x=>walk(x,env));return;
+        }
+        if(t==="details"){
+          const summary=n.children.find(x=>x.type==="JSXElement"&&tag(x)==="summary");
+          if(summary&&/lösungen anzeigen/i.test(visibleText(summary)))return;
+        }
+      }
       if(omit.has(t))return;
       if(wrappers.has(t)){walk(jsxOf(definitions.get(t)),env);return;}
       if(t==="A2MiniLearningBlock"){mini(n);return;}
@@ -961,10 +990,70 @@ export function extractA2OrderedGrammar(filePath, day) {
     }catch(error){missing.add(error.message);}
   }
   walk(jsxOf(fn,true));
-  if(!blocks.length)throw new Error("No ordered A2 grammar source for day "+day);
+  if(!blocks.length)throw new Error("No ordered grammar source for day "+day);
   const omittedTeaching=[...missing];
   return {orderedNotes:blocks.map((b,i)=>({number:i+1,...b})),
     fullExplanationIncluded:omittedTeaching.length===0,
     ...(omittedTeaching.length?{omittedTeaching}:{}),
     clarification:omittedTeaching.length?"Read orderedNotes in sequence, not the legacy summaries. Some original dynamic teaching or collapsed content was not exported; open the Campus grammar page for omitted material. Do not invent it.":"Read orderedNotes in sequence, preserving the original text, tables and questions. Hidden answers and interactive UI remain in Campus."};
+}
+
+
+/** The B1 workbook places a topic introduction, optional Days 18–23
+ * think-first card, then the canonical grammar page with English support.
+ * Read shared literal registries directly; never evaluate React. */
+export function extractB1OrderedGrammar(root,filePath,day){
+  const componentDir=path.join(root,"web/src/components");
+  const field=(n,key)=>n?.properties?.find(p=>p.type==="ObjectProperty"&&String(p.key?.name??p.key?.value)===String(key))?.value;
+  function record(file,registry){
+    const ast=parse(fs.readFileSync(path.join(componentDir,file),"utf8"),{sourceType:"module",plugins:["jsx"]});
+    const declaration=findNodes(ast.program,n=>n.type==="VariableDeclarator"&&n.id?.name===registry);
+    if(declaration.length!==1)throw new Error("B1 registry changed: "+registry);
+    const init=declaration[0].init;
+    const obj=init?.type==="CallExpression"&&init.callee?.object?.name==="Object"&&init.callee?.property?.name==="freeze"?init.arguments[0]:init;
+    const item=field(obj,day);
+    return key=>{
+      const value=field(item,key);
+      if(value?.type!=="StringLiteral"||!value.value.trim())throw new Error("B1 source field missing "+registry+" "+day+" "+key);
+      return value.value;
+    };
+  }
+  const topic=record("B1TopicIntroduction.js","B1_TOPIC_INTROS");
+  const support=record("B1GrammarEnglishSupport.js","SUPPORT_BY_DAY");
+  const heading=text=>({type:"heading",text});
+  const paragraph=text=>({type:"paragraph",text});
+  const introduction=[paragraph("B1 · Thema kurz verstehen"),heading(topic("title")),
+    paragraph(topic("intro")),heading("Beispiel"),{type:"example",text:topic("example")},
+    heading("Denkfrage"),{type:"questions",items:[topic("question")]}];
+  // The think-first introduction is visible, but its mini block lacks
+  // essential and renders null. Do not export the dormant question bank.
+  if(day>=18&&day<=23){
+    const source=fs.readFileSync(path.join(componentDir,"B1Days18To23LearningUpgrade.jsx"),"utf8");
+    const ast=parse(source,{sourceType:"module",plugins:["jsx"]});
+    const cards=jsxElements(ast.program,"section");
+    const mini=jsxElements(ast.program,"A2MiniLearningBlock");
+    if(cards.length!==1||mini.length!==1||mini[0].openingElement.attributes.some(a=>a.name?.name==="essential"))
+      throw new Error("B1 think-first component changed; review visible layout");
+    const div=cards[0].children.find(n=>n.type==="JSXElement"&&tag(n)==="div");
+    const p=cards[0].children.find(n=>n.type==="JSXElement"&&tag(n)==="p");
+    const flatten=n=>n.type==="JSXText"?n.value:(n.children||[]).map(flatten).join("");
+    introduction.push(heading(flatten(div).trim()),paragraph(flatten(p).trim()));
+  }
+  const englishSupport=[heading("English support · Read this before the German grammar notes"),
+    paragraph("The lesson stays mainly in German, but these explanations make the grammar rule and word order clear in English.")];
+  for(const [label,key] of [["Key terms","terms"],["What the rule means","rule"],["Sentence structure","structure"],
+    ["When to use it","use"],["Common mistake to avoid","watchOut"],["German example","example"]]){
+    englishSupport.push(heading(label),{type:key==="example"?"example":"paragraph",text:support(key)});
+  }
+  const result=extractA2OrderedGrammar(filePath,day,{introduction,englishSupport});
+  // Compatibility sections derive from the same answer-safe ordered export.
+  const sections=[];
+  for(const block of result.orderedNotes){
+    if(block.type==="heading"){sections.push({title:block.text,explanation:""});continue;}
+    if(!sections.length)sections.push({title:"Grammar teaching",explanation:""});
+    const content=block.text||(block.type==="table"?[...(block.headers?[block.headers]:[]),...block.rows].map(r=>r.join(" | ")).join("\n"):block.items?.join("\n"));
+    if(content)sections.at(-1).explanation += (sections.at(-1).explanation?"\n":"")+content;
+  }
+  return {source:"Falowen original B1 learner-facing workbook grammar page",...result,
+    sections:sections.filter(x=>x.explanation)};
 }
