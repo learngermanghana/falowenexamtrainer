@@ -1,3 +1,4 @@
+import C1FinishSummary from "./C1FinishSummary";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
@@ -129,7 +130,6 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
     { key: "learn", label: "answer all Learn knowledge questions correctly", complete: progress.learnDone },
     { key: "speak", label: "complete a speaking practice", complete: progress.speakDone },
     { key: "write", label: fullEssay ? "use AI Analyse / Mark My Letter and review the corrections" : "complete the guided writing questions", complete: effectiveWritingComplete },
-    { key: "confidence", label: "choose your confidence level", complete: Boolean(progress.confidence) },
   ];
   const missingRequirements = finishRequirements.filter((item) => !item.complete);
   const finishReady = missingRequirements.length === 0;
@@ -208,14 +208,12 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
 
       {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={lesson} workbookId={`C1-day-${lesson.day}`} /> : null}
 
-      {active === "finish" ? <Section title={`Finish C1 Day ${lesson.day}`}>
+      {active === "finish" ? <Section title={`Summary C1 Day ${lesson.day}`}><C1FinishSummary day={lesson.day} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
           <ProgressCard label="Learn" complete={progress.learnDone} detail="All multiple-choice knowledge questions answered correctly" />
           <ProgressCard label="Speak" complete={progress.speakDone} detail="Speaking practice completed" />
           <ProgressCard label="Write" complete={effectiveWritingComplete} detail={fullEssay ? "AI analysis reviewed and errors improved" : `${writing.completedQuestions}/${writing.totalQuestions} questions · ${writing.wordCount} final words`} />
         </div>
-        <label style={{ display: "grid", gap: 7 }}><strong>Confidence level</strong><span style={{ color: "#64748b", fontSize: 13 }}>Choose how confident you feel after this lesson.</span><select value={progress.confidence || ""} onChange={(event) => setProgress((old) => ({ ...old, confidence: event.target.value }))} style={styles.select}><option value="">Select confidence</option><option value="low">Low confidence</option><option value="medium">Medium confidence</option><option value="high">High confidence</option></select></label>
-        <label style={{ display: "grid", gap: 7 }}><strong>Short reflection</strong><textarea value={progress.reflection} onChange={(event) => setProgress((old) => ({ ...old, reflection: event.target.value }))} placeholder="What did you learn, and what should you improve next?" style={{ minHeight: 120, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", resize: "vertical" }} /></label>
         {!finishReady ? <NoteBox tone="amber"><strong>Mark complete is blocked because:</strong><ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>{missingRequirements.map((item) => <li key={item.key}>{item.label}</li>)}</ul></NoteBox> : null}
         {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>

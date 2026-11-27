@@ -1,3 +1,4 @@
+import C1FinishSummary from "./C1FinishSummary";
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import C1TopicIntroduction from "./C1TopicIntroduction";
@@ -53,6 +54,6 @@ export default function C1Day12To14GuidedLessonPage({ lesson, canonicalLesson = 
     {active === "speak" ? <Section title="Speaking builder"><C1AcademicExamPractice day={day} tab="speak" /><C1SpeakGrammarGuide lesson={lesson} /><EmbeddedSpeechPracticePanel /><label><input type="checkbox" checked={progress.speakDone} onChange={(e) => setProgress((old) => ({ ...old, speakDone: e.target.checked }))} /> I completed a speaking practice.</label></Section> : null}
     {active === "write" ? <Section title="Guided writing builder"><C1AcademicExamPractice day={day} tab="write" /><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={lesson} />{workbookUrl ? <a href={workbookUrl} style={styles.linkButton}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={lesson} workbookId={`C1-day-${day}`} /> : null}
-    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}>{progress.quizDone ? <NoteBox><strong>Learn complete.</strong> All multiple-choice knowledge questions were answered correctly.</NoteBox> : <NoteBox>Complete the new knowledge questions in Learn. An older grammar-note checkbox does not count as quiz completion.</NoteBox>}{progress.completed ? <NoteBox>Completed and saved on this device.</NoteBox> : null}<button style={styles.primaryButton} onClick={finish}>I have completed</button></Section> : null}
+    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}><C1FinishSummary day={day} />{progress.quizDone ? <NoteBox><strong>Learn complete.</strong> All multiple-choice knowledge questions were answered correctly.</NoteBox> : <NoteBox>Complete the new knowledge questions in Learn. An older grammar-note checkbox does not count as quiz completion.</NoteBox>}{progress.completed ? <NoteBox>Completed and saved on this device.</NoteBox> : null}<button style={styles.primaryButton} onClick={finish}>I have completed</button></Section> : null}
   </div>;
 }

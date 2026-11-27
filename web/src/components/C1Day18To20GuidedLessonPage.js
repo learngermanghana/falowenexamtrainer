@@ -1,3 +1,4 @@
+import C1FinishSummary from "./C1FinishSummary";
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import C1TopicIntroduction from "./C1TopicIntroduction";
@@ -56,6 +57,6 @@ export default function C1Day18To20GuidedLessonPage({ lesson, canonicalLesson = 
     {active === "write" ? <Section title="Guided writing builder"><C1AcademicExamPractice day={day} tab="write" /><WritingCheatSheetTabs level="C1" day={day}>{day === 18 ? <><NoteBox><strong>Schreibaufgabe:</strong> {day18Writing.question}</NoteBox><ul>{day18Writing.points.map((point) => <li key={point}>{point}</li>)}</ul></> : <WritingTaskPrompt lesson={lesson} />}{workbookUrl ? <a href={workbookUrl} style={styles.linkButton}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
 
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={lesson} workbookId={`C1-day-${day}`} /> : null}
-    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}><p>Complete the clickable Learn check, then practise Speak once in Prüfungsmodus without prompts.</p>{progress.learnDone ? <NoteBox><strong>Learn complete.</strong> Grammar practice completed.</NoteBox> : null}{progress.completed ? <NoteBox>Completed and saved on this device.</NoteBox> : null}<button style={styles.primaryButton} onClick={finish}>I have completed</button></Section> : null}
+    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}><C1FinishSummary day={day} /><p>Complete the clickable Learn check, then practise Speak once in Prüfungsmodus without prompts.</p>{progress.learnDone ? <NoteBox><strong>Learn complete.</strong> Grammar practice completed.</NoteBox> : null}{progress.completed ? <NoteBox>Completed and saved on this device.</NoteBox> : null}<button style={styles.primaryButton} onClick={finish}>I have completed</button></Section> : null}
   </div>;
 }
