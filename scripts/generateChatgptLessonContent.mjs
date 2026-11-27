@@ -42,7 +42,7 @@ import { A2_PRESENTATION_CARDS } from "../web/src/data/a2PresentationCards.js";
 import { getA2GoetheWritingTask } from "../web/src/data/a2GoetheWritingTasks.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
-import { extractGrammarTeaching, grammarComponentPaths, extractC1GuidedGrammar } from "./extractFalowenGrammar.mjs";
+import { extractGrammarTeaching, grammarComponentPaths, extractC1GuidedGrammar, extractA1OriginalGrammar } from "./extractFalowenGrammar.mjs";
 import { loadWorkbookSource, extractLiteralQuestions, extractLiteralParagraphs, extractA1Day3Reading } from "./extractFalowenWorkbook.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -103,6 +103,7 @@ for (const day of [...new Set(a1Entries.map((entry) =>
         chapter: text(entry.chapter, 25), url: text(entry.route, 400),
       })),
       fullExplanationIncluded: false,
+      ...(extractA1OriginalGrammar(root, day) || {}),
     },
   };
 }
