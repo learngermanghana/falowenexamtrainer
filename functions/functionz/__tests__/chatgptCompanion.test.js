@@ -589,3 +589,37 @@ describe("B1 original ordered grammar pages", () => {
     expect(notes(18).some(b=>b.text==="Wege zum Wunschberuf: Ziele mit um ... zu")).toBe(false);
   });
 });
+
+describe("B2 original unified workbook grammar",()=>{
+  const grammar=day=>lessonContentResponse("B2",day,"grammar").material;
+  const notes=day=>grammar(day).orderedNotes;
+  test("all 28 days have original topic context and complete ordered grammar teaching",()=>{
+    for(let day=1;day<=28;day++){
+      const g=grammar(day),b=g.orderedNotes;
+      expect(g.fullExplanationIncluded).toBe(true);
+      expect(b.length).toBeGreaterThan(20);
+      expect(b.map(x=>x.number)).toEqual(b.map((_,i)=>i+1));
+      for(const title of ["In simple English","Auf Deutsch","Grammar / Learn","Regeln","Beispiele","Modellsatz für heute","Mini-Übung"])
+        expect(b.some(x=>x.type==="heading"&&x.text===title)).toBe(true);
+      expect(b.some(x=>x.text?.startsWith("Warum diese Grammatik?"))).toBe(true);
+      expect(b.some(x=>x.text==="Satztraining · Vom B1- zum B2-Satz")).toBe(day<=25);
+      expect(JSON.stringify(b)).not.toMatch(/"(answer|answerIndex|correctIndex|sampleAnswer|explanation)"\s*:/);
+    }
+  });
+  test("Day 1 matches the current unified grammar source rather than the old identity notes",()=>{
+    const b=notes(1);
+    expect(b.some(x=>x.text==="indem / dadurch, dass")).toBe(true);
+    expect(b.some(x=>x.text==="Mit indem und dadurch, dass erklärst du die Methode, durch die ein Ergebnis erreicht wird. Beide Strukturen beantworten sinngemäß die Frage: Wie wird das erreicht?")).toBe(true);
+    expect(b.find(x=>x.type==="table").rows).toContainEqual(["Abfall vermeiden","avoid waste"]);
+    expect(b.at(-1).items[0]).toBe("1. Wir verwenden Mehrwegflaschen. So reduzieren wir Abfall. (indem)");
+    expect(JSON.stringify(b)).not.toContain("Wir reduzieren Abfall, indem wir Mehrwegflaschen verwenden.");
+    expect(JSON.stringify(b)).not.toContain("Methode: Das konjugierte Verb steht am Ende.");
+    expect(b.some(x=>x.text==="Adjektivdeklination")).toBe(false);
+  });
+  test("Days 26–28 retain real grammar tasks without invented chapter transformations",()=>{
+    for(const day of [26,27,28]){
+      expect(notes(day).some(x=>x.text==="Mini-Übung")).toBe(true);
+      expect(notes(day).some(x=>x.text==="Satztraining · Vom B1- zum B2-Satz")).toBe(false);
+    }
+  });
+});
