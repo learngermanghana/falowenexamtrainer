@@ -259,3 +259,13 @@ available. The supplied C1 Day 1 “Lernen mit Verstand” song is listed using 
 exact public music object key. Its supplied words are an untimed reference draft,
 not a recording-verified transcript; the player labels them accordingly and
 provides no line synchronization until recording-matched timing is available.
+
+## A1 Day 17 · Berlin song
+
+The A1 Day 17 workbook and shared music catalog use “Ich bin nach Berlin
+gefahren”, at `music/a1/day-17/Auf Wiedersehen, Berlin.mp3`. The earlier
+`Wo ist der Bahnhof_.mp3` is retired from public discovery and playback.
+The supplied German lyrics and exact-line English are labelled as a reference
+draft until checked against the R2 recording. There are no invented line cues;
+line highlighting awaits an audio alignment and review. The workbook remains
+optional and ungraded. Retiring the old public track does not delete its R2 object.

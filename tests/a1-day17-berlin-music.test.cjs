@@ -1,0 +1,28 @@
+const {test} = require('node:test');
+const assert = require('node:assert/strict');
+const catalog = require('../web/public/music/catalog.json');
+const {musicTrackFromKey,musicKeyFromAutoId} = require('../server/musicDiscovery.cjs');
+const {createLyricsHandler} = require('../server/musicLyrics.cjs');
+const key = 'music/a1/day-17/Auf Wiedersehen, Berlin.mp3';
+const oldKey = 'music/a1/day-17/Wo ist der Bahnhof_.mp3';
+test('Day 17 plays the new recording, retires the old track, and serves matching reference lyrics with English', async () => {
+ const song = catalog.tracks.find(row => row.objectKey === key);
+ assert.equal(song.assignmentKey,'A1-11');
+ assert.equal(song.coursebook,true);
+ assert.equal(musicTrackFromKey(key).id,song.id);
+ assert.equal(musicKeyFromAutoId(song.id),key);
+ assert.equal(musicTrackFromKey(oldKey),null);
+ const oldId='r2-a1-day-17-b64_'+Buffer.from('Wo ist der Bahnhof_.mp3').toString('base64url');
+ assert.equal(musicKeyFromAutoId(oldId),'');
+ assert.equal(catalog.tracks.some(row=>row.objectKey===oldKey && !row.retired),false);
+ let body, status;
+ const res={setHeader(){},status(code){status=code;return this},json(data){body=data;return this}};
+ await createLyricsHandler({env:{},fetchImpl:async()=>{throw Error('offline')}})({method:'GET',query:{track:song.id}},res);
+ assert.equal(status,200);
+ assert.equal(body.referenceOnly,true);
+ assert.equal(body.objectKey,key);
+ assert.deepEqual(body.cues,[]);
+ assert.match(body.lyrics,/Bei Rot bleiben Sie stehen/);
+ assert.equal(body.englishTranslation.source,'course-draft');
+ assert.equal(body.englishTranslation.lines.length,28);
+});

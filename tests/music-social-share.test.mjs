@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const handler=require('../api/music-share.js');
+const {musicTrackFromKey} = require('../server/musicDiscovery.cjs');
 const {JSDOM}=createRequire(new URL('../web/package.json',import.meta.url))('jsdom');
 import {coverForTrack} from '../web/public/music/cover-art.js';
 import {resolveRecordingLesson} from '../web/public/music/lesson-content.js';
@@ -21,7 +22,7 @@ function request(track,method='GET'){
  return {headers,body,status};
 }
 test('every audited song has crawler-readable title, cover, canonical URL and the shared player',()=>{
- for(const id of [...coverage.courseRecordings.map(row=>row.trackId),...catalog.tracks.filter(row=>row.retired !== true).map(row=>row.id)]){
+ for(const id of [...coverage.courseRecordings.filter(row=>musicTrackFromKey(row.objectKey)).map(row=>row.trackId),...catalog.tracks.filter(row=>row.retired !== true).map(row=>row.id)]){
   const result=request(id);assert.equal(result.status,200,id);
   const dom=new JSDOM(result.body);const doc=dom.window.document;
   assert.equal(doc.body.dataset.track,id);
@@ -87,7 +88,7 @@ test('legacy .html links reach song metadata before filesystem or the learner SP
  assert.ok(routeIndex>=0);assert.ok(routeIndex<config.routes.findIndex(row=>row.handle==='filesystem'));
  const route=config.routes[routeIndex];
  assert.equal(route.dest,'/api/music-share.js?track=$1');
- const ids=[...coverage.courseRecordings.map(row=>row.trackId),...catalog.tracks.filter(row=>!row.retired).map(row=>row.id)];
+ const ids=[...coverage.courseRecordings.filter(row=>musicTrackFromKey(row.objectKey)).map(row=>row.trackId),...catalog.tracks.filter(row=>!row.retired).map(row=>row.id)];
  for(const id of ids){
   const match=('/music/songs/'+id+'.html').match(new RegExp('^'+route.src+'$'));
   assert.equal(match?.[1],id);const response=request(match[1]);assert.equal(response.status,200);

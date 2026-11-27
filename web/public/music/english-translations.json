@@ -8785,6 +8785,128 @@
           "en": "At Falowen, I learn to think about our future."
         }
       ]
+    },
+    {
+      "source": "course-draft",
+      "objectKey": "music/a1/day-17/Auf Wiedersehen, Berlin.mp3",
+      "level": "A1",
+      "day": 17,
+      "assignmentKey": "A1-11",
+      "draftTitle": "Ich bin nach Berlin gefahren",
+      "lines": [
+        {
+          "de": "Ich bin nach Berlin gefahren,",
+          "en": "I travelled to Berlin,"
+        },
+        {
+          "de": "Ich habe eine Fahrkarte gekauft.",
+          "en": "I bought a ticket."
+        },
+        {
+          "de": "Ich bin durch die Stadt gegangen,",
+          "en": "I walked through the city,"
+        },
+        {
+          "de": "Ich habe viele Fotos gemacht.",
+          "en": "I took lots of photos."
+        },
+        {
+          "de": "Gehen Sie geradeaus,",
+          "en": "Go straight ahead,"
+        },
+        {
+          "de": "Biegen Sie links ab.",
+          "en": "Turn left."
+        },
+        {
+          "de": "Gehen Sie bis zur Ampel,",
+          "en": "Go as far as the traffic lights,"
+        },
+        {
+          "de": "Dann biegen Sie rechts ab.",
+          "en": "Then turn right."
+        },
+        {
+          "de": "Ich bin in den Park gegangen,",
+          "en": "I went into the park,"
+        },
+        {
+          "de": "Ich habe viele Schilder gesehen.",
+          "en": "I saw many signs."
+        },
+        {
+          "de": "Rauchen ist hier verboten,",
+          "en": "Smoking is forbidden here,"
+        },
+        {
+          "de": "Radfahren ist hier erlaubt.",
+          "en": "Cycling is allowed here."
+        },
+        {
+          "de": "Parken ist hier verboten,",
+          "en": "Parking is forbidden here,"
+        },
+        {
+          "de": "Fotografieren ist erlaubt.",
+          "en": "Taking photographs is allowed."
+        },
+        {
+          "de": "Bei Rot bleiben Sie stehen,",
+          "en": "Stop at the red light,"
+        },
+        {
+          "de": "Bei Grün dürfen Sie gehen.",
+          "en": "At the green light, you may go."
+        },
+        {
+          "de": "Gehen Sie geradeaus,",
+          "en": "Go straight ahead,"
+        },
+        {
+          "de": "Biegen Sie links ab.",
+          "en": "Turn left."
+        },
+        {
+          "de": "Gehen Sie bis zur Ampel,",
+          "en": "Go as far as the traffic lights,"
+        },
+        {
+          "de": "Dann biegen Sie rechts ab.",
+          "en": "Then turn right."
+        },
+        {
+          "de": "Ich bin ins Museum gegangen,",
+          "en": "I went into the museum,"
+        },
+        {
+          "de": "Ich habe schöne Bilder gesehen.",
+          "en": "I saw beautiful pictures."
+        },
+        {
+          "de": "Ich habe im Hotel geschlafen,",
+          "en": "I slept at the hotel,"
+        },
+        {
+          "de": "Berlin war wunderschön.",
+          "en": "Berlin was beautiful."
+        },
+        {
+          "de": "Hmm, Berlin, Berlin,",
+          "en": "Hmm, Berlin, Berlin,"
+        },
+        {
+          "de": "Ich möchte dich wiedersehen.",
+          "en": "I would like to see you again."
+        },
+        {
+          "de": "Ich bin nach Hause gefahren,",
+          "en": "I travelled home,"
+        },
+        {
+          "de": "Auf Wiedersehen, Berlin.",
+          "en": "Goodbye, Berlin."
+        }
+      ]
     }
   ],
   "transcripts": [
