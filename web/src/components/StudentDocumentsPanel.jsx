@@ -11,9 +11,28 @@ const REGISTRATION_DOCUMENTS = {
   residence: "Issued residence-permit support letter",
 };
 
+function documentTrialRestriction(profile = {}) {
+  const status = String(profile.trialStatus || "").trim().toLowerCase();
+  const accountStatus = String(profile.status || "").trim().toLowerCase();
+  const trial = ["active", "expired", "used", "ended"].includes(status)
+    || ["trial", "trial_active", "trial_expired"].includes(accountStatus)
+    || Boolean(profile.trialStartedAt || profile.trialUsedAt || profile.trialEndsAt);
+  const paid = Number(profile.paid ?? profile.paidAmount ?? 0) > 0
+    || ["paid", "partial", "partially paid", "partially_paid", "part paid", "part-paid"].includes(String(profile.paymentStatus || "").trim().toLowerCase());
+  if (!trial || paid) return "";
+  const rawEnd = profile.trialEndsAt;
+  const end = rawEnd?.toMillis?.() ?? new Date(rawEnd || "").getTime();
+  const expired = ["expired", "used", "ended"].includes(status) || accountStatus === "trial_expired"
+    || (Number.isFinite(end) && end <= Date.now());
+  return expired
+    ? "Your free trial has ended. Official school documents are unavailable until you enroll and your tuition payment is confirmed."
+    : "You are on a free trial. Official school documents cannot be downloaded until you enroll and your tuition payment is confirmed.";
+}
+
 export default function StudentDocumentsPanel({ user, studentProfile }) {
   const initialLevel = LEVELS.includes(String(studentProfile?.level || "").toUpperCase())
     ? String(studentProfile.level).toUpperCase() : "A1";
+  const trialReason = documentTrialRestriction(studentProfile || {});
   const [level, setLevel] = useState(initialLevel);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -68,6 +87,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
 
   async function download(kind) {
     if (busy || !user || verificationBusy) return;
+    if (trialReason) { setError(trialReason); return; }
     if (!verifiedEmail) {
       setError("Verify your account email first using the controls above.");
       return;
@@ -111,7 +131,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
         window.setTimeout(() => URL.revokeObjectURL(url), 2000);
       }
     } catch (err) {
-      setError(err.message || "Document download failed. Please try again.");
+      setError(err instanceof TypeError ? "Could not connect to the document service. Check your internet connection and try again." : (err.message || "Document download failed. Please try again."));
     } finally {
       setBusy("");
     }
@@ -130,7 +150,8 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
         </p>
       </div>
 
-      {!verifiedEmail && user ? (
+      {trialReason && <div role="alert" style={{ border: "1px solid #fbd38d", background: "#fffbeb", padding: 14, borderRadius: 10 }}><strong>Document downloads locked</strong><p>{trialReason}</p><a href="/campus/account?tab=billing">Open Billing / Pay tuition</a></div>}
+      {!trialReason && !verifiedEmail && user ? (
         <div style={{ border: "1px solid #fbd38d", background: "#fffbeb", borderRadius: 12, padding: 16, display: "grid", gap: 10 }}>
           <strong>Verify your account email</strong>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
@@ -147,9 +168,10 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
           </div>
         </div>
       ) : null}
-      {verifiedEmail ? <p style={{ margin: 0, color: "#166534", fontSize: 13 }}>Email verified — school documents are available subject to eligibility.</p> : null}
+      {verifiedEmail && !trialReason ? <p style={{ margin: 0, color: "#166534", fontSize: 13 }}>Email verified — school documents are available subject to eligibility.</p> : null}
       {verificationNotice ? <p role="status" style={{ margin: 0, color: "#334155", fontSize: 13 }}>{verificationNotice}</p> : null}
 
+      {error && <p role="alert" style={{ color: "#991b1b", margin: 0 }}>{error}</p>}
       <label style={{ display: "grid", gap: 6, maxWidth: 280, fontSize: 14, fontWeight: 650 }}>
         German course level
         <select aria-label="German course level" value={level} disabled={Boolean(busy)}
@@ -166,7 +188,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
             A PDF of your verified scores for the selected course. Available as soon as results are recorded.
             Unfinished work appears as incomplete.
           </p>
-          <button type="button" disabled={Boolean(busy) || Boolean(verificationBusy) || !user || !verifiedEmail} onClick={() => download("transcript")}
+          <button type="button" disabled={Boolean(busy) || Boolean(verificationBusy) || !user || !verifiedEmail || Boolean(trialReason)} onClick={() => download("transcript")}
             style={{ border: "1px solid #3158e7", borderRadius: 9, background: "#eef2ff", color: "#244cda", padding: 11, cursor: "pointer", fontWeight: 700 }}>
             {busy === "transcript" ? "Preparing transcript…" : "Download transcript PDF"}
           </button>
@@ -178,7 +200,7 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
             The signed course certificate is available only after every required marked task
             and the official final assessment have passed verification.
           </p>
-          <button type="button" disabled={Boolean(busy) || Boolean(verificationBusy) || !user || !verifiedEmail} onClick={() => download("certificate")}
+          <button type="button" disabled={Boolean(busy) || Boolean(verificationBusy) || !user || !verifiedEmail || Boolean(trialReason)} onClick={() => download("certificate")}
             style={{ border: "1px solid #3158e7", borderRadius: 9, background: "#3158e7", color: "#fff", padding: 11, cursor: "pointer", fontWeight: 700 }}>
             {busy === "certificate" ? "Checking eligibility…" : "Check & download certificate"}
           </button>
@@ -193,13 +215,12 @@ export default function StudentDocumentsPanel({ user, studentProfile }) {
         <h3 style={{ margin: 0 }}>Enrollment and payment documents</h3>
         <p style={{ margin: 0 }}>These documents use your registered student record. Receipts and residence letters are available once issued to your registered email by Student Docs. For online payment receipts, open <a href="/campus/account?tab=billing">Billing history</a>.</p>
         {Object.entries(REGISTRATION_DOCUMENTS).map(([kind, label]) => (
-          <button type="button" key={kind} disabled={Boolean(busy) || Boolean(verificationBusy) || !user || !verifiedEmail}
+          <button type="button" key={kind} disabled={Boolean(busy) || Boolean(verificationBusy) || !user || !verifiedEmail || Boolean(trialReason)}
             onClick={() => download(kind)}>
             {busy === kind ? "Preparing PDF…" : `Download ${label.toLowerCase()} PDF`}
           </button>
         ))}
       </section>
-      {error ? <p role="alert" style={{ color: "#991b1b", margin: 0 }}>{error}</p> : null}
       {notice ? <p role="status" style={{ color: "#166534", margin: 0 }}>{notice}</p> : null}
     </section>
   );
