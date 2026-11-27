@@ -5,7 +5,6 @@ import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1AcademicExamPractice, { C1AcademicGrammarPractice } from "./C1AcademicExamPractice";
 import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
 import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
-import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
@@ -63,7 +62,6 @@ const ProgressCard = ({ label, complete, detail }) => (
   </div>
 );
 
-const embedUrl = (url = "") => {
   try {
     const parsed = new URL(url);
     const host = parsed.hostname.replace(/^www\./, "");
@@ -89,8 +87,6 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
   const location = useLocation();
   const { showToast } = useToast();
   const { studentProfile, user } = useAuth();
-  const radio = canonicalLesson?.resources?.falowenRadio || null;
-  const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
   const [writing, setWriting] = useState({ complete: false, completedQuestions: 0, totalQuestions: 5, wordCount: 0 });
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
@@ -104,22 +100,6 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
 
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
 
-  if (!entered && radio) {
-    return (
-      <div style={{ ...styles.container, display: "grid", gap: 18 }}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <header style={{ ...card, borderColor: "#bfdbfe", background: "linear-gradient(135deg,#eff6ff,#f8fafc)" }}>
-          <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>Start here</span>
-          <h1 style={{ margin: 0 }}>C1 · Day {lesson.day} · {lesson.title}</h1>
-          <p style={{ margin: 0, color: "#475569" }}>Listen to Falowen Radio first. Continue opens Learn, Speak, Write and Finish.</p>
-        </header>
-        <FalowenRadioTabContent level="C1" day={lesson.day} resource={radio} onContinue={() => { setEntered(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
-      </div>
-    );
-  }
-
-  const video = lesson.videoResource || canonicalLesson?.resources?.aiVideo || canonicalLesson?.resources?.teacherVideo || null;
-  const videoEmbed = embedUrl(video?.url);
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || lesson.resources?.workbook?.url || "";
   const assignmentId = canonicalLesson?.submission?.assignmentId;
   const canSubmit = Boolean(canonicalLesson?.submission?.enabled && assignmentId);
@@ -170,13 +150,7 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
       <AdvancedSelfLearningTabNav level="C1" day={lesson.day} activeTab={active} onChange={setActive} />
 
       {active === "learn" ? <>
-        <Section title="AI video">
-          {video?.url ? <div style={{ display: "grid", gap: 10 }}>
-            <strong>{video.title || "Lesson video"}</strong>
-            {video.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{video.description}</p> : null}
-            {videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "C1 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}
-          </div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the knowledge questions below.</NoteBox>}
-        </Section>
+        
         <C1TopicIntroduction day={Number(lesson.day)} title={lesson.title} />
         <C1AcademicGrammarPractice day={lesson.day} />
         <C1AcademicExamPractice day={lesson.day} tab="learn" />
