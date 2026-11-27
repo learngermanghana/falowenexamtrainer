@@ -4,7 +4,6 @@ import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1AcademicExamPractice from "./C1AcademicExamPractice";
 import C1Day24To26GrammarNotes from "./C1Day24To26GrammarNotes";
 import C1TopicCollocationPractice from "./C1TopicCollocationPractice";
-import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
@@ -68,24 +67,17 @@ const day25Writing = {
   },
 };
 
-const embedUrl = (url = "") => { try { const parsed = new URL(url); const host = parsed.hostname.replace(/^www\./, ""); const id = host === "youtu.be" ? parsed.pathname.replace(/^\//, "") : parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop(); return id ? `https://www.youtube.com/embed/${id}` : ""; } catch { return ""; } };
 const FinishSummary = ({ day }) => { const item = summaries[day]; if (!item) return null; return <div style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 14, background: "#eff6ff", display: "grid", gap: 10 }}><h3 style={{ margin: 0 }}>{item.title}</h3><p style={{ margin: 0, lineHeight: 1.7 }}>{item.intro}</p><ul style={listStyle}>{item.points.map((point) => <li key={point}>{point}</li>)}</ul><div><strong>Wortschatz:</strong> {item.vocabulary.join(" · ")}</div></div>; };
 
 export default function C1Day24To26GuidedLessonPage({ lesson, canonicalLesson = null }) {
   const { showToast } = useToast();
   const day = Number(lesson.day);
   const effectiveLesson = day === 25 ? { ...lesson, ...day25Writing, speakingTopic: day25Speaking.question, speakingBuilder: day25Speaking } : lesson;
-  const radio = canonicalLesson?.resources?.falowenRadio || null;
-  const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
   const storageKey = getStandardLessonStorageKey(effectiveLesson, "progress");
   const [progress, setProgress] = useState(() => { try { return { learnDone: false, speakDone: false, completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") }; } catch { return { learnDone: false, speakDone: false, completed: false }; } });
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
 
-  if (!entered && radio) return <div style={{ ...styles.container, display: "grid", gap: 18 }}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><header style={{ ...card, borderColor: "#bfdbfe", background: "linear-gradient(135deg,#eff6ff,#f8fafc)" }}><span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>Start here</span><h1 style={{ margin: 0 }}>C1 · Day {day} · {effectiveLesson.title}</h1><p style={{ margin: 0, color: "#475569" }}>Listen to Falowen Radio first. Continue opens Learn, Speak, Write and Finish.</p></header><FalowenRadioTabContent level="C1" day={day} resource={radio} onContinue={() => { setEntered(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>;
-
-  const video = effectiveLesson.videoResource || canonicalLesson?.resources?.aiVideo || canonicalLesson?.resources?.teacherVideo || null;
-  const videoEmbed = embedUrl(video?.url);
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || effectiveLesson.resources?.workbook?.url || "";
   const speaking = effectiveLesson.speakingBuilder || {};
   const branches = Array.isArray(speaking.branches) ? speaking.branches : [];
@@ -95,7 +87,7 @@ export default function C1Day24To26GuidedLessonPage({ lesson, canonicalLesson = 
     <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
     <header style={{ borderRadius: 22, overflow: "hidden", color: "#fff", backgroundImage: `linear-gradient(135deg,rgba(2,6,23,.94),rgba(30,64,175,.72)),url(${effectiveLesson.heroImage || ""})`, backgroundSize: "cover", backgroundPosition: "center", padding: "clamp(22px,4vw,42px)", display: "grid", gap: 16, minHeight: 240, alignContent: "space-between" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><span style={{ ...styles.badge, background: "rgba(255,255,255,.16)", color: "#fff" }}>C1</span><span style={{ ...styles.badge, background: "rgba(255,255,255,.16)", color: "#fff" }}>Day {day}</span><span style={{ ...styles.badge, background: "rgba(37,99,235,.9)", color: "#fff" }}>Chapter {effectiveLesson.chapter}</span></div><div><h1 style={{ margin: 0, fontSize: "clamp(2rem,5vw,3.4rem)" }}>{effectiveLesson.title}</h1><p style={{ margin: "10px 0 0", color: "#e2e8f0" }}>{effectiveLesson.topic}</p></div></header>
     <AdvancedSelfLearningTabNav level="C1" day={day} activeTab={active} onChange={setActive} />
-    {active === "learn" ? <><Section title="AI video">{video?.url ? <div style={{ display: "grid", gap: 10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "C1 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}</div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes below.</NoteBox>}</Section><C1TopicIntroduction day={day} title={effectiveLesson.title} /><C1AcademicExamPractice day={day} tab="learn" /><C1TopicCollocationPractice day={day} /><C1Day24To26GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} /></> : null}
+    {active === "learn" ? <><C1TopicIntroduction day={day} title={effectiveLesson.title} /><C1AcademicExamPractice day={day} tab="learn" /><C1TopicCollocationPractice day={day} /><C1Day24To26GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} /></> : null}
     {active === "speak" ? <Section title="Speaking builder"><C1AcademicExamPractice day={day} tab="speak" /><NoteBox tone="amber"><strong>Sprechfrage:</strong> {speaking.question || effectiveLesson.speakingTopic || effectiveLesson.topic}</NoteBox>{speaking.intro ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>{speaking.intro}</p> : null}{branches.length ? <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 12 }}>{branches.map((branch) => <div key={branch.title} style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff", display: "grid", gap: 8 }}><strong>{branch.title}</strong>{branch.prompt ? <span style={{ lineHeight: 1.55 }}>{branch.prompt}</span> : null}<ul style={listStyle}>{(branch.points || branch.keywords || []).map((point) => <li key={point}>{point}</li>)}</ul></div>)}</div> : null}<EmbeddedSpeechPracticePanel /><label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label></Section> : null}
     {active === "write" ? <Section title="Guided writing builder"><C1AcademicExamPractice day={day} tab="write" /><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={effectiveLesson} />{workbookUrl ? <a href={workbookUrl} style={{ ...styles.linkButton, width: "fit-content" }}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(effectiveLesson)} storageKey={getStandardLessonStorageKey(effectiveLesson, "writing")} cloudField={getStandardWritingCloudField(effectiveLesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={effectiveLesson} workbookId={`C1-day-${day}`} /> : null}
