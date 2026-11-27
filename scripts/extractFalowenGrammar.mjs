@@ -1144,3 +1144,96 @@ export function extractB2OrderedGrammar(root, day, alignment, grammar, practice)
     clarification:"Read orderedNotes in workbook order, not the legacy supplementary grammar fields. Teaching models are included; transformation solutions, exercise feedback, videos and completion controls stay in Campus. Days 26–28 have no ChapterTransformations component in the current workbook.",
   };
 }
+
+
+/** C1 Days 1–16 render C1KnowledgeChoicePractice, NOT the standalone
+ * C1Day*GrammarNotes pages. Match the actual Learn component hierarchy.
+ * Topic and collocation registries are read from their original JSX.
+ */
+export function extractC1LiveWorkbookGrammar(root,day,lesson,academic,practice,profile){
+  const field=(n,key)=>n?.properties?.find(p=>p.type==="ObjectProperty"&&String(p.key?.name??p.key?.value)===String(key))?.value;
+  const literal=n=>{
+    if(n?.type==="StringLiteral")return n.value;
+    if(n?.type==="ArrayExpression")return n.elements.map(literal);
+    throw new Error("Unexpected C1 workbook literal on day "+day);
+  };
+  function record(file,name){
+    const ast=parse(fs.readFileSync(path.join(root,"web/src/components",file),"utf8"),{sourceType:"module",plugins:["jsx"]});
+    const nodes=findNodes(ast.program,n=>n.type==="VariableDeclarator"&&n.id?.name===name);
+    if(nodes.length!==1)throw new Error("C1 source registry changed: "+name);
+    const init=nodes[0].init;
+    const obj=init?.type==="CallExpression"&&init.callee?.object?.name==="Object"&&init.callee?.property?.name==="freeze"?init.arguments[0]:init;
+    const item=field(obj,day);
+    if(!item)throw new Error("C1 source day missing: "+day);
+    return key=>literal(field(item,key));
+  }
+  const topic=record("C1TopicIntroduction.jsx","C1_TOPIC_FOUNDATIONS");
+  const coll=record("C1TopicCollocationPractice.jsx","C1_TOPIC_COLLOCATIONS");
+  const h=text=>({type:"heading",text}),p=text=>({type:"paragraph",text}),e=text=>({type:"example",text});
+  const q=(question,options)=>({type:"multipleChoice",question,options:[...options]});
+  const blocks=[h("C1 · Thema verstehen"),h(academic.topic),
+    p("Prüfungstraining: "+academic.skill+" · Teil "+academic.part+" — "+academic.task),
+    p("Thematische Grundlage: "+topic("intro")),h("Konkretes Beispiel"),e(topic("example")),
+    h("Zielkonflikt / Perspektiven"),p(topic("tension")),h("Leitfrage"),p(profile.question),
+    h("Sprachlicher Fokus · "+academic.topic),p("Prüfungstraining: "+academic.skill+" · Teil "+academic.part),
+    p(academic.task),p("Sprachlicher Transfer: "+academic.grammar+" – "+academic.structure),e(academic.example),
+    p("Wortschatz: "+academic.vocabulary.join(" · "))];
+  const academicGrammar=()=>blocks.push(h("C1-Grammatik im Kontext"),p(practice.grammar),p(practice.rule),
+    {type:"questions",items:practice.grammarChecks.map(([prompt])=>prompt)},
+    h("Wortschatz · "+practice.vocabulary.length+" Ausdrücke"),
+    {type:"table",rows:practice.vocabulary.map(([term,meaning])=>[term,meaning])});
+  const featured=()=>{
+    if(!["Lesen","Hören"].includes(practice.skill))return;
+    blocks.push(h(practice.skill+" · Teil "+practice.part+" · Prüfungstraining"),h(practice.title),p(practice.instruction));
+    if(practice.skill==="Lesen"&&practice.text)blocks.push(p(practice.text));
+    if(practice.skill==="Hören")blocks.push(p("Übung mit lokaler Browserstimme oder Lehrkraft, keine offizielle Prüfungsaufnahme. Lesen Sie zuerst die Aufgaben."));
+    for(const [question,options] of practice.questions||[])blocks.push(q(question,options));
+  };
+  const collocations=()=>{
+    const items=coll("items");
+    blocks.push(h("C1 Kollokationen · Verben mit Präpositionen"),h("Passende Verbindungen für: "+coll("topic")),
+      p("Lerne nicht nur das Verb. Lerne die ganze Verbindung mit Präposition und Kasus, damit du sie beim Sprechen und Schreiben automatisch richtig bildest."));
+    for(const [pattern,meaning,example] of items)blocks.push(h(pattern),p(meaning),e("Beispiel: "+example));
+    blocks.push(h("Kurz prüfen"),p("Wähle die Verbindung, die zur englischen Bedeutung passt."));
+    const patterns=items.map(row=>row[0]);
+    items.slice(0,3).forEach(([pattern,meaning],i)=>blocks.push(q((i+1)+". "+meaning,[pattern,...patterns.filter(v=>v!==pattern)].slice(0,4))));
+    blocks.push(p("Jetzt produzieren: Formuliere zwei eigene C1-Sätze zum heutigen Thema und benutze dabei mindestens zwei der Verbindungen oben."));
+  };
+  const grammar=lesson?.grammarLesson;
+  if(day<=16){
+    if(!grammar?.title||!grammar.explanation?.length||!grammar.rules?.length||!grammar.examples?.length)
+      throw new Error("Missing actual C1 Learn grammar source on day "+day);
+    if(day<=14)academicGrammar();
+    featured();
+    blocks.push(h("Grammar lesson"),h(grammar.title),p("Fokus: "+lesson.grammarFocus),
+      ...grammar.explanation.map(p),h("Kernregeln"),{type:"list",items:grammar.rules},
+      h("Beispiele"),{type:"examples",items:grammar.examples},p("Kurz üben: "+grammar.miniExercise));
+    collocations();
+    const items=(grammar.knowledgeTest||[]).filter(item=>item.question&&Array.isArray(item.options)&&item.options.length>=2&&item.answer);
+    if(items.length){
+      blocks.push(h("Learn by choosing"),h("Knowledge questions"));
+      for(const item of items)blocks.push(q(item.question,item.options));
+    }else blocks.push(h("Knowledge practice"),p("Multiple-choice knowledge questions are not available for this lesson yet."));
+  }else{
+    featured();
+    if(day>=26)collocations();
+    const notes=extractC1GuidedGrammar(root,day,practice);
+    blocks.push(...notes.orderedNotes.map(({number,...block})=>block));
+    if(day<=25){
+      collocations();
+      const ast=parse(fs.readFileSync(path.join(root,"web/src/components/C1GrammarQuickCheck.js"),"utf8"),{sourceType:"module",plugins:["jsx"]});
+      const registry=findNodes(ast.program,n=>n.type==="VariableDeclarator"&&n.id?.name==="itemsByDay");
+      if(registry.length!==1)throw new Error("C1 quick checks changed");
+      const rows=field(registry[0].init,day);
+      if(rows){
+        blocks.push(h("Learn by choosing"),h("Grammar knowledge check"),p("Answer the real multiple-choice questions after reading the grammar notes."));
+        for(const [i,row] of rows.elements.entries())blocks.push(q((i+1)+". "+literal(row.elements[0]),literal(row.elements[1])));
+      }
+    }
+  }
+  return {source:"Falowen current C1 workbook Learn tab",
+    fullExplanationIncluded:day<=16,
+    ...(day>16?{omittedTeaching:["Later guided page layout still requires full visual parity verification"]}:{}),
+    orderedNotes:blocks.map((b,i)=>({number:i+1,...b})),
+    clarification:"Read orderedNotes in the actual Learn tab order, without paraphrasing, adding an alternate introduction or substituting standalone notes. For grammar only, begin at the requested grammar heading; for the whole Learn tab start at C1 · Thema verstehen. Read one block at a time if requested. Hidden answers, feedback, audio transcripts and completion controls remain in Campus."};
+}
