@@ -591,9 +591,9 @@ for (let day = 1; day <= 28; day += 1) {
   C2[String(day)] = item;
 }
 
-const grammarCoverage = Object.fromEntries(["A2", "B1"].map((level) => [level,
-  Object.values(level === "A2" ? A2 : B1).filter((entry) => entry.grammar?.fullExplanationIncluded).length]));
-if (grammarCoverage.A2 < 20 || grammarCoverage.B1 < 20) {
+const grammarCoverage = Object.fromEntries(Object.entries({ A2, B1, C1 }).map(([level, lessons]) => [level,
+  Object.values(lessons).filter((entry) => entry.grammar?.fullExplanationIncluded).length]));
+if (grammarCoverage.A2 < 20 || grammarCoverage.B1 < 20 || grammarCoverage.C1 !== 28) {
   throw new Error("Insufficient actual grammar pages exported: " + JSON.stringify(grammarCoverage));
 }
 // Only explicit learner-facing fields; never copy an entire workbook object.
