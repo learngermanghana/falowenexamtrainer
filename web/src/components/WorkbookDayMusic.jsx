@@ -8,7 +8,7 @@ import { matchingEnglishTranslation, matchingTranscriptEnglishTranslation } from
 // Uploads to music/<level>/day-XX/ are discovered through the existing
 // bounded server-side R2 music-list endpoint, not direct browser R2 access.
 const SONG_ID = /^[a-zA-Z0-9_-]{1,245}$/;
-const LEVELS = new Set(["A1", "A2", "B1"]);
+const LEVELS = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
 
 export const normalizeWorkbookSong = (track, level, day, program = "german") => {
   if (!track || !SONG_ID.test(String(track.id || ""))) return null;
@@ -189,7 +189,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
             ? (learningMode === "self"
               ? " Self-learning exercises and Radio are separate from Music."
               : " Tutor-marked assignments and their submission remain separate from Music.")
-            : " Assessed Teil 4 · Hören remains separate."}
+            : ["A2", "B1"].includes(courseLevel) ? " Assessed Teil 4 · Hören remains separate." : " Lesson practice remains separate."}
         </p>
       </div>
 
@@ -230,6 +230,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
           </a>
           {approvedLyrics ? (
             <details key={chosen.id} data-music-lyrics="true" open={isCalendarSong || undefined}>
+              {recordingLyrics?.referenceOnly ? <p>Lyric draft supplied for this song; the words have not yet been checked against the recording.</p> : null}
               <summary style={{ cursor: "pointer", fontWeight: 800, color: "#164e36" }}>
                 {isSwahili ? "Swahili lyrics · Soma pamoja" : "German lyrics · Mitlesen"}
               </summary>

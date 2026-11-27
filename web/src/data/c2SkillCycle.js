@@ -23,6 +23,7 @@ export const getC2DayTabs = (day) => {
   const focus = getC2SkillFocus(day);
   const skill = focus ? C2_SKILL_LABELS[focus] : null;
   return [
+    { key: "music", label: "Music", description: "Optional" },
     { key: "learn", label: "Grammar", description: "Learn" },
     ...(focus && skill ? [{ key: focus, ...skill }] : []),
     { key: "review", label: "Review", description: "Wiederholen" },

@@ -1,5 +1,6 @@
 import "./WorkbookMobileLayout.css";
 import C1StudyPartner from "./C1StudyPartner";
+import WorkbookDayMusic from "./WorkbookDayMusic";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
@@ -31,6 +32,7 @@ export const A2_B1_WORKBOOK_TABS_WITH_GRAMMAR = [
 ];
 
 export const B2_C1_WORKBOOK_TABS = [
+  { key: "music", label: "Music", description: "Optional" },
   { key: "learn", label: "Learn", description: "Input" },
   { key: "speak", label: "Speak", description: "Practice" },
   { key: "write", label: "Write", description: "Practice" },
@@ -374,6 +376,7 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
         renderLegacyGrammarPanel={false}
       />
     </div>
+    {activeTab === "music" && <WorkbookDayMusic level={normalizedLevel} day={day} hideLegacyNotes />}
     {normalizedLevel === "C1" && <C1StudyPartner day={day} section={rotatingTabs.find(tab => tab.key === activeTab)?.label || "Learn"} />}
     </>
   );
