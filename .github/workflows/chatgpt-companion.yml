@@ -68,6 +68,8 @@ on:
       - "web/src/data/c1*.js"
       - "web/src/data/c2*.js"
       - "web/src/components/C1SelfLearningCourse.js"
+      - "web/src/components/C1Day1To6GrammarNotes.js"
+      - "web/src/components/C1AcademicExamPractice.jsx"
       - "web/package.json"
       - "functions/functionz/__tests__/chatgptCompanion.test.js"
       - "functions/functionz/__tests__/chatgptCompanion.integration.test.js"
