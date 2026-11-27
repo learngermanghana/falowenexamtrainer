@@ -42,7 +42,7 @@ import { A2_PRESENTATION_CARDS } from "../web/src/data/a2PresentationCards.js";
 import { getA2GoetheWritingTask } from "../web/src/data/a2GoetheWritingTasks.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
-import { extractGrammarTeaching, grammarComponentPaths } from "./extractFalowenGrammar.mjs";
+import { extractGrammarTeaching, grammarComponentPaths, extractC1GuidedGrammar } from "./extractFalowenGrammar.mjs";
 import { loadWorkbookSource, extractLiteralQuestions, extractLiteralParagraphs, extractA1Day3Reading } from "./extractFalowenWorkbook.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -470,6 +470,7 @@ for (let day = 1; day <= 28; day += 1) {
       task: text(aligned.grammarLesson?.miniExercise, 1200),
       fullExplanationIncluded: false,
       clarification: "Canonical C1 teaching focus and exercise; consult Campus for full original grammar notes.",
+      ...(extractC1GuidedGrammar(root, day, practice) || {}),
     },
     writing: {
       type: text(aligned.writingTaskType, 180),
