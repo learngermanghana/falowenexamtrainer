@@ -51,3 +51,10 @@ test("unverified learners cannot download documents without completing verificat
   expect(await screen.findByText(/not verified yet/)).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Download transcript PDF" })).toBeDisabled();
 });
+
+ test("trial learners see the reason and all six download actions are disabled", () => {
+  render(<StudentDocumentsPanel user={{uid:"trial",emailVerified:true}} studentProfile={{level:"A1",trialStatus:"active",paid:0}} />);
+  expect(screen.getByRole("alert")).toHaveTextContent(/free trial/i);
+  expect(screen.getAllByRole("button", {name:/download/i})).toHaveLength(6);
+  screen.getAllByRole("button", {name:/download/i}).forEach(button => expect(button).toBeDisabled());
+ });
