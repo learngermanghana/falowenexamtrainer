@@ -267,7 +267,7 @@ describe("A1 and A2 canonical Course Book exports for ChatGPT", () => {
     expect(reading.material.questions[0].options).toHaveLength(4);
     expect(reading.material.questions[0]).not.toHaveProperty("answer");
     const grammar = lessonContentResponse("A1", 1, "grammar");
-    expect(grammar.material.fullExplanationIncluded).toBe(false);
+    expect(grammar.material.fullExplanationIncluded).toBe(true);
     expect(grammar.material.noteLinks[0].url).toContain("/campus/course/");
   });
 
@@ -487,5 +487,27 @@ describe("C1 original guided grammar notes", () => {
     expect(lessonContentResponse("C1", 20, "grammar").material.orderedNotes.some(b => b.text === "So baust du die Grammatik auf")).toBe(true);
     expect(lessonContentResponse("C1", 22, "grammar").material.orderedNotes.some(b => b.type === "multipleChoice" && b.options.length === 4)).toBe(true);
     expect(lessonContentResponse("C1", 25, "grammar").material.orderedNotes.some(b => b.text === "Grammar notes")).toBe(true);
+  });
+});
+
+describe("Original A1 grammar page retrieval", () => {
+  test("Days 1–4 contain numbered original teaching, tables and safe knowledge checks", () => {
+    for (let day = 1; day <= 4; day++) {
+      const g = lessonContentResponse("A1", day, "grammar").material;
+      expect(g.fullExplanationIncluded).toBe(true);
+      expect(g.orderedNotes.map(b => b.number)).toEqual(g.orderedNotes.map((_, i) => i + 1));
+      expect(JSON.stringify(g.orderedNotes)).not.toMatch(/"(answer|answerIndex|correctIndex|explanation)"\s*:/);
+    }
+    const one = lessonContentResponse("A1", 1, "grammar").material.orderedNotes;
+    expect(one.some(b => b.text === "1. Formal and Informal Greetings")).toBe(true);
+    expect(one.filter(b => b.type === "multipleChoice")).toHaveLength(10);
+    const two = lessonContentResponse("A1", 2, "grammar").material.orderedNotes;
+    expect(two.find(b => b.type === "table" && b.headers?.includes("Pronoun")).rows[0])
+      .toEqual(["ich", "I", "lerne", "heiße", "bin"]);
+    const three = lessonContentResponse("A1", 3, "grammar").material.orderedNotes;
+    expect(three.filter(b => b.type === "multipleChoice")).toHaveLength(8);
+    expect(three.some(b => b.text === "3) Three W-words for simple questions")).toBe(true);
+    const four = lessonContentResponse("A1", 4, "grammar").material.orderedNotes;
+    expect(four.find(b => b.type === "table" && b.headers?.includes("Pronunciation")).rows).toHaveLength(21);
   });
 });
