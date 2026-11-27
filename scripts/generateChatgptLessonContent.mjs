@@ -46,7 +46,7 @@ import { A2_PRESENTATION_CARDS } from "../web/src/data/a2PresentationCards.js";
 import { getA2GoetheWritingTask } from "../web/src/data/a2GoetheWritingTasks.js";
 import { B1_WRITING_TASKS } from "../web/src/data/b1WritingTasks.js";
 import curriculumManifest from "../functions/data/curriculumManifest.js";
-import { extractGrammarTeaching, grammarComponentPaths, extractC1GuidedGrammar, extractA1OriginalGrammar, extractA2OrderedGrammar, extractB1OrderedGrammar, extractB2OrderedGrammar } from "./extractFalowenGrammar.mjs";
+import { extractGrammarTeaching, grammarComponentPaths, extractC1GuidedGrammar, extractA1OriginalGrammar, extractA2OrderedGrammar, extractB1OrderedGrammar, extractB2OrderedGrammar, extractC1LiveWorkbookGrammar } from "./extractFalowenGrammar.mjs";
 import { loadWorkbookSource, extractLiteralQuestions, extractLiteralParagraphs, extractA1Day3Reading } from "./extractFalowenWorkbook.mjs";
 
 register(new URL("./chatgptCourseSourceLoader.mjs", import.meta.url));
@@ -428,6 +428,17 @@ for (let day = 1; day <= 28; day += 1) {
 // instructions come from the same content-refresh alignment used by Campus.
 // The legacy reading plan supplies genuine tasks for Days 1–16, but does not
 // contain reading passages or question banks; do not fabricate either.
+// Resolve the same data modules selected by the current self-learning registry.
+const c1RegistrySource=fs.readFileSync(path.join(root,"web/src/components/SelfLearningLessonRegistry.js"),"utf8");
+const c1WorkbookSources=new Map([...c1RegistrySource.matchAll(/import c1Day(\d+)\w+ from "\.\.\/data\/selfLearningLessons\/c1\/([^"]+)";/g)].map(m=>[Number(m[1]),m[2]]));
+const c1LiveLessons=new Map();
+for(let day=1;day<=16;day++){
+  const moduleName=c1WorkbookSources.get(day);
+  if(!moduleName)throw new Error("Missing C1 live workbook registry day "+day);
+  const source=await import("../web/src/data/selfLearningLessons/c1/"+moduleName+".js");
+  if(Number(source.default?.day)!==day||source.default?.level!=="C1")throw new Error("Wrong C1 live workbook source day "+day);
+  c1LiveLessons.set(day,alignC1LessonContent(source.default));
+}
 const C1 = {};
 const c1Entries = curriculumManifest.getCurriculumEntriesForLevel("C1");
 const c1ReadingSource = fs.readFileSync(
@@ -448,7 +459,7 @@ for (let day = 1; day <= 28; day += 1) {
   if (!entry || !profile) throw new Error("Missing canonical C1 content for day " + day);
   const title = getC1CanonicalTitle(day);
   const grammarFocus = getC1CanonicalGrammarTitle(day);
-  const aligned = alignC1LessonContent({
+  const aligned = c1LiveLessons.get(day) || alignC1LessonContent({
     level: "C1", day, title, grammarFocus,
     grammarLesson: { explanation: [], rules: [], examples: [] },
   });
@@ -477,14 +488,14 @@ for (let day = 1; day <= 28; day += 1) {
     campusTabs: ["Learn", "Lesen", "Speak", "Write", "Finish", "Ref"],
     grammar: {
       focus: text(practice.grammar, 300),
-      explanation: [text(practice.rule,1800), ...strings(aligned.grammarLesson?.explanation, 3, 1100)],
-      examples: [text(academic.example,700)],
+      explanation: [text(practice.rule,1800), ...strings(aligned.grammarLesson?.explanation, 8, 1800)],
+      examples: [text(academic.example,700), ...strings(aligned.grammarLesson?.examples, 8, 1400)],
       exercises: practice.grammarChecks.map(([prompt])=>({question:text(prompt,900)})),
       rules: strings(aligned.grammarLesson?.rules, 8, 950),
       task: text(aligned.grammarLesson?.miniExercise, 1200),
       fullExplanationIncluded: false,
       clarification: "Canonical C1 teaching focus and exercise; consult Campus for full original grammar notes.",
-      ...(extractC1GuidedGrammar(root, day, practice) || {}),
+      ...extractC1LiveWorkbookGrammar(root, day, aligned, academic, practice, profile),
     },
     writing: {
       type: text(aligned.writingTaskType, 180),
@@ -613,7 +624,7 @@ if (Object.values(C2).filter(entry => entry.grammar?.fullExplanationIncluded && 
 
 const grammarCoverage = Object.fromEntries(Object.entries({ A2, B1, B2, C1 }).map(([level, lessons]) => [level,
   Object.values(lessons).filter((entry) => entry.grammar?.fullExplanationIncluded).length]));
-if (Object.values(A2).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || Object.values(B1).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || grammarCoverage.B2 !== 28 || Object.values(B2).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || grammarCoverage.C1 !== 28) {
+if (Object.values(A2).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || Object.values(B1).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || grammarCoverage.B2 !== 28 || Object.values(B2).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28 || Object.values(C1).filter(entry => entry.grammar?.orderedNotes?.length).length !== 28) {
   throw new Error("Insufficient actual grammar pages exported: " + JSON.stringify(grammarCoverage));
 }
 // Only explicit learner-facing fields; never copy an entire workbook object.
