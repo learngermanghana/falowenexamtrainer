@@ -617,11 +617,20 @@ describe("B1 original ordered grammar pages", () => {
       expect(b.some(x=>x.text==="English support · Read this before the German grammar notes")).toBe(true);
       expect(b.some(x=>x.text==="Sentence structure")).toBe(true);
       expect(JSON.stringify(b)).not.toMatch(/"(answer|answerIndex|correctIndex|sampleAnswer)"\s*:/);
-      if(!g.fullExplanationIncluded)expect(g.omittedTeaching.length).toBeGreaterThan(0);
+      expect(g.fullExplanationIncluded).toBe(true);
+      expect(g.omittedTeaching).toBeUndefined();
     }
   });
   test("Day 1 keeps original tables and exercises; Day 28 keeps the climate lesson",()=>{
     expect(notes(1).some(b=>b.text==="Warum lernen wir Präsens und Perfekt?")).toBe(true);
+    const table=notes(1).find(b=>b.type==="table"&&b.headers?.join("|")==="Person|Form");
+    expect(table).toMatchObject({headers:["Person","Form"],rows:[
+      ["ich","ich träume"],["du","du träumst"],["er/sie/es","er/sie/es träumt"],
+      ["wir","wir träumen"],["ihr","ihr träumt"],["sie/Sie","sie/Sie träumen"]
+    ]});
+    const heading=notes(1).findIndex(b=>b.text==="Beispiel mit dem Thema Traumwelt: träumen");
+    expect(notes(1)[heading+1]).toEqual(table);
+    expect(notes(1)[heading+2].text).toBe("Unregelmäßige Verben im Präsens");
     expect(notes(1).some(b=>b.type==="table"&&b.headers?.includes("Präsens")&&b.headers?.includes("Perfekt"))).toBe(true);
     expect(notes(1).some(b=>b.type==="orderedList"&&b.items.some(x=>x.includes("Konjugiere das Verb träumen")))).toBe(true);
     expect(notes(28).some(b=>b.text==="1. Zwei Entwicklungen verbinden – je … desto")).toBe(true);
