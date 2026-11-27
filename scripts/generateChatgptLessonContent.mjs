@@ -19,6 +19,10 @@ import { C1_READING_PRACTICE } from "../web/src/data/c1ReadingPractice.js";
 import { getC1AcademicDay } from "../web/src/data/c1AcademicCurriculum.js";
 import { getC1Phase2Lesson } from "../web/src/data/c1Phase2Lessons.js";
 import { C2_LESSON_CONTENT_ALIGNMENT } from "../web/src/data/c2LessonContentAlignment.js";
+import { getC2GrammarTeaching, C2_TRANSFORMATION_FAMILIES } from "../web/src/data/c2GrammarTeaching.js";
+import { getC2ExamStandard } from "../web/src/data/c2ExamStandardContent.js";
+import { getC2TopicKnowledge, getC2TopicChecks } from "../web/src/data/c2TopicKnowledge.js";
+import { extractC2OrderedGrammar } from "./extractC2OrderedGrammar.mjs";
 import { C2_READING_PRACTICE } from "../web/src/data/c2ReadingPractice.js";
 import { C2_LISTENING_PRACTICE } from "../web/src/data/c2ListeningPractice.js";
 import { getC2SkillFocus, getC2DayTabs } from "../web/src/data/c2SkillCycle.js";
@@ -562,6 +566,9 @@ for (let day = 1; day <= 28; day += 1) {
       structure: text(plan.grammarNotes?.wordOrder, 1300),
       examples: strings(plan.grammarNotes?.examples, 6, 700),
       commonMistakes: strings(plan.grammarNotes?.commonMistakes, 6, 850),
+      task: getC2GrammarTeaching(day)?.independentTask,
+      ...extractC2OrderedGrammar(day, plan, getC2ExamStandard(day), getC2TopicKnowledge(day),
+        getC2GrammarTeaching(day), getC2TopicChecks(day), focus, C2_TRANSFORMATION_FAMILIES),
     },
     review: strings(getC2ReviewKeyPoints(day), 8, 900),
     ...(focus === "lesen" && reading ? { reading: {
@@ -590,6 +597,9 @@ for (let day = 1; day <= 28; day += 1) {
     })() } : {}),
   };
   C2[String(day)] = item;
+}
+if (Object.values(C2).filter(entry => entry.grammar?.fullExplanationIncluded && entry.grammar?.orderedNotes?.length).length !== 28) {
+  throw new Error("Insufficient original C2 grammar pages exported");
 }
 
 const grammarCoverage = Object.fromEntries(Object.entries({ A2, B1, C1 }).map(([level, lessons]) => [level,
