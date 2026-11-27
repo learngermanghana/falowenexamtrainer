@@ -128,9 +128,10 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
     const approved = approvedLyrics.recordings?.find(pack => pack.objectKey === objectKey);
     const ownerFallback = approved ? validateLyrics(approved, objectKey) : null;
     // Owner-supplied song text is a reference until checked against its MP3.
-    const draft = studioDrafts.tracks?.find(row => row.publishUntimedReference === true && row.recordingObjectKey === objectKey);
-    const checkedDraft = draft && validateLyrics({objectKey, lyrics:draft.lyrics}, objectKey);
-    const draftFallback = checkedDraft ? {...checkedDraft, referenceOnly:true, draftTitle:draft.title, assignmentKey:draft.assignmentKey} : null;
+    const draft = studioDrafts.tracks?.find(row => (row.publishUntimedReference === true || row.publishEstimatedReference === true) && row.recordingObjectKey === objectKey);
+    const timedDraft = draft?.publishEstimatedReference === true && draft.timingStatus === 'estimated' && /^[a-f0-9]{64}$/.test(draft.recordingSha256 || '');
+    const checkedDraft = draft && validateLyrics({objectKey, lyrics:draft.lyrics, ...(timedDraft ? {cues:draft.cues} : {})}, objectKey);
+    const draftFallback = checkedDraft ? {...checkedDraft, referenceOnly:true, draftTitle:draft.title, assignmentKey:draft.assignmentKey, ...(timedDraft ? {timingStatus:'estimated',recordingSha256:draft.recordingSha256} : {})} : null;
     const estimate=validateEstimate(estimates.recordings?.find(pack=>pack.objectKey===objectKey),objectKey,approved);
     // A fresh word-aligned estimate can replace a coarse estimate for the same
     // fingerprint. Reviewed bundled timing and owner R2 sidecars still win.
@@ -149,7 +150,7 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
     const sendFallback = () => sendLyrics({...fallback,
       ...(fallback===ownerFallback && approved?.recordingSha256 ? {recordingSha256:approved.recordingSha256} : {}),
       source:fallback===estimate ? 'acoustic-estimate' : fallback===draftFallback ? 'course-draft' : checkedRecording ? 'bundled' : 'owner-supplied',
-      timingStatus:fallback===estimate ? 'estimated' : checkedRecording ? (recorded.timingStatus === 'estimated' ? 'estimated' : 'published') : approved?.timingStatus || 'missing'});
+      timingStatus:fallback===estimate || (fallback===draftFallback && draftFallback?.timingStatus==='estimated') ? 'estimated' : checkedRecording ? (recorded.timingStatus === 'estimated' ? 'estimated' : 'published') : approved?.timingStatus || 'missing'});
     try {
       const timingKey=objectKey.replace(/\.mp3(?:\.mpeg)?$/i,'.lyrics.json');
       const signed=signObject({key:timingKey},env);
