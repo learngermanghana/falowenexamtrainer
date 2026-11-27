@@ -80,7 +80,7 @@ function lessonContentResponse(level, day, section = "overview") {
     clarification: "This section is not included in the exported lesson material; open the relevant Falowen Campus tab. Do not invent missing exercises.",
   };
   if (section === "grammar" && content.grammar?.orderedNotes?.length) {
-    base.guidance += " For exact line-by-line reading, prioritize material.orderedNotes over the older summary sections; use it in numeric order, preserving original German wording and table rows. Read one block at a time if requested; distinguish teaching examples from exercises. If fullExplanationIncluded is false, explain that the original export is partial and use the Campus grammar link for omitted material. Do not read hidden solutions or claim that the learner has completed the notes.";
+    base.guidance += " For exact line-by-line reading, prioritize material.orderedNotes over the older summary sections; use it in numeric order, preserving original German wording and table rows. Read one block at a time if requested; distinguish teaching examples from exercises. For C1, the actual Learn workbook starts at C1 · Thema verstehen; if the learner specifically asks for the Grammar lesson, begin at that heading and use its following exact blocks. Never substitute a different grammar introduction or rephrase the original. If fullExplanationIncluded is false, explain that the original export is partial and use the Campus grammar link for omitted material. Do not read hidden solutions or claim that the learner has completed the notes.";
   }
   return { ...base, available: true, material: content[section] };
 }
