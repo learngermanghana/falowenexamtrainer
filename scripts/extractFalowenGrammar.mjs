@@ -967,7 +967,16 @@ export function extractA2OrderedGrammar(filePath, day, b1 = null) {
             }
           }return result;
         };
-        const headers=rows(part("thead"),"th").flat(),body=rows(part("tbody"),"td");
+        // A leading header row may be authored directly inside tbody
+        // (B1 Day 1: Person / Form). Preserve it as column headers and
+        // continue exporting every data row, rather than dropping the table.
+        const thead=part("thead"),tbody=part("tbody");
+        const firstRow=tbody?.children.find(x=>x.type==="JSXElement"&&tag(x)==="tr");
+        const firstCells=firstRow?.children.filter(x=>x.type==="JSXElement")||[];
+        const inlineHeader=!thead&&firstCells.length>0&&firstCells.every(x=>tag(x)==="th");
+        const headers=inlineHeader?firstCells.map(x=>content(x,env)):rows(thead,"th").flat();
+        const dataBody=inlineHeader?{...tbody,children:tbody.children.filter(x=>x!==firstRow)}:tbody;
+        const body=rows(dataBody,"td");
         table(headers,body);return;
       }
       if(/^h[1-6]$/.test(t)){heading(content(n,env));return;}
