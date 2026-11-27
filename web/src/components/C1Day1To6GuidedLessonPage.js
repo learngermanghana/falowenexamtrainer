@@ -63,17 +63,6 @@ const ProgressCard = ({ label, complete, detail }) => (
   </div>
 );
 
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.replace(/^www\./, "");
-    const id = host === "youtu.be"
-      ? parsed.pathname.replace(/^\//, "")
-      : parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
-    return id ? `https://www.youtube.com/embed/${id}` : "";
-  } catch {
-    return "";
-  }
-};
 
 const SpeakingBuilder = ({ lesson }) => {
   const day = Number(lesson.day);
