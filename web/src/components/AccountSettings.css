@@ -71,3 +71,10 @@
 .fw-billing-transactions div {padding:8px 0;border-bottom:1px solid var(--line);display:grid;gap:3px;}
 .fw-account[data-billing-active="true"] .fw-account-billing {gap:14px;}
 @container (max-width: 710px) { .fw-account[data-billing-active="true"] .fw-account-content {order:-1;} }
+
+.fw-account-pay-shortcut { margin-top: 12px; }
+.fw-account[data-billing-active="true"] .fw-account-header { margin-bottom: 14px; }
+@container (max-width: 710px) {
+  .fw-account[data-billing-active="true"] .fw-account-header h1 { margin-top: 6px; font-size: 24px; }
+  .fw-account[data-billing-active="true"] .fw-account-billing { gap: 10px; }
+}

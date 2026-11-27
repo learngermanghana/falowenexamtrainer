@@ -59,15 +59,15 @@ function LevelCard({row,user,paymentsEnabled,blocked,granted,studentProfile}){
   }catch(e){setHistoryError(e.message);}finally{setHistoryBusy(false);}
  };
  return <article className="fw-billing-level" data-level-billing={row.id}>
-  <header><h3>{title(row)}</h3><span className="fw-account-pill" style={{background:due===0?"#e7f6ed":"#fff4df",color:due===0?"#166534":"#92400e"}}>{due===null?"Fee to confirm":due===0?"Paid":overdue?"Payment overdue":"Payment due"}</span></header>
+  <header><h3>{title(row)}</h3><span className="fw-account-pill" style={{background:due===0?"#e7f6ed":"#fff4df",color:due===0?"#166534":"#92400e"}}>{due===null?"Fee to confirm":due===0?"Fully paid":overdue?"Payment overdue":"Payment due"}</span></header>
   <div className="fw-billing-due"><small>Outstanding balance</small><strong>{due===null?"Not confirmed":money(due)}</strong></div>
   {payable&&<div className="fw-billing-action">
-   {paymentsEnabled?<><button className="fw-billing-pay" type="button" disabled={!valid||busy} onClick={pay}>{busy?"Opening Paystack…":valid?"Pay now · "+money(selected):"Pay now"}</button>
+   {paymentsEnabled?<><button className="fw-billing-pay" type="button" disabled={!valid||busy} onClick={pay}>{busy?"Opening Paystack…":valid?"Pay Now · "+money(selected):"Pay Now"}</button>
    {fee&&<small>Secure Paystack checkout · Total charged {money(fee.checkoutAmount)} including your {money(fee.studentFeeContribution)} fee share.</small>}
    {due>2000&&<details onToggle={e=>{setCustom(e.currentTarget.open);setAmount("");}}><summary>Pay part of the balance instead</summary><label>Tuition amount (GHS)<input type="number" min="2000" max={due} step=".01" value={amount} onChange={e=>setAmount(e.target.value)}/></label><small>Minimum GH₵2,000, or pay the remaining balance.</small></details>}
    {error&&<p role="alert">{error}</p>}</>:<p>Online payment is temporarily unavailable. Contact Falowen for assistance.</p>}
   </div>}
-  {overlap?<p role="alert">An earlier upgrade exists for this level. Contact Falowen to verify the balance before paying again.</p>:due>0&&!payable&&<p>Contact Falowen about this {row.status} enrollment before paying.</p>}
+  {overlap&&due>0?<p role="alert">Payment needs verification: an earlier upgrade is still open. Contact Falowen to reconcile your payment record before checkout. <a href="mailto:info@falowen.app">Contact billing support</a></p>:due>0&&!payable&&<p>Contact Falowen about this {row.status} enrollment before paying.</p>}
   <div className="fw-billing-breakdown"><div><small>Tuition</small><strong>{row.tuitionFee==null?"Not set":money(row.tuitionFee)}</strong></div><div><small>Already paid</small><strong>{row.paid==null?"Not set":money(row.paid)}</strong></div></div>
   {percent!==null&&<><progress aria-label={title(row)+" tuition paid"} value={percent} max={100}/><small>{percent}% paid</small></>}
   <div className="fw-billing-dates"><span>Payment deadline: <strong>{date(row.paymentDeadline)}</strong></span><span>Contract: {date(row.contractStart)} to {date(row.contractEnd)} · {row.status}</span>{blocked?<small>Course access paused. {managed?"Full payment restores upgrade access and extends the contract; additional installments do not restart temporary access.":"Payment does not extend an expired contract automatically."}</small>:granted?<small>{row.contractEnd&&row.contractEnd<new Date().toISOString().slice(0,10)?"Previous course · revision access retained":"Course access available"}</small>:null}</div>

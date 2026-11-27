@@ -661,6 +661,8 @@ const AccountSettings = () => {
     studentProfile?.contractEnd ||
     (Number.isFinite(trialLifecycle.endsAtMs) ? trialLifecycle.endsAtMs : null);
 
+  const hasVerifiedLevelDebt = !levelBillingUnverified && levelBillingRows.some(row => verifiedLevelBalance(row) > 0 && ["active", "expired", "completed", "planned"].includes(row.status));
+  const showTuitionShortcut = !isUniversityRegistration && (hasVerifiedLevelDebt || (!levelBillingRows.length && !levelBillingUnverified && !isSecondaryCourse && hasOutstandingTuition));
   const displayName = studentProfile?.name || user?.displayName || t("accountOverview.student");
   const initials = displayName.trim().split(/\s+/).slice(0, 2).map(word => word.charAt(0)).join("").toUpperCase();
 
@@ -678,6 +680,7 @@ const AccountSettings = () => {
           <p>{[studentProfile?.level, studentProfile?.className].filter(Boolean).join(" · ") || t("accountOverview.courseAccount")}</p>
           <span className="fw-account-pill" style={{color: accountAccess.tone, background: accountAccess.background}}>{accountAccess.label}</span>
         </div>
+        {showTuitionShortcut && activeTab !== "billing" && <button type="button" className="fw-billing-pay fw-account-pay-shortcut" onClick={() => selectAccountTab("billing")}>Pay tuition</button>}
         <dl className="fw-account-meta">
           <dt>{t("accountOverview.studentCode")}</dt>
           <dd>{studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "–"}</dd>

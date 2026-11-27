@@ -102,3 +102,14 @@ describe("payment recovery billing flow", () => {
     expect(source).not.toContain("Payment received");
   });
 });
+
+ test("account exposes a prominent tuition shortcut for verified debt", () => {
+  const source = read("AccountSettings.js");
+  expect(source).toContain("hasVerifiedLevelDebt");
+  expect(source).toContain('className="fw-billing-pay fw-account-pay-shortcut"');
+  expect(source).toContain('selectAccountTab("billing")');
+  const panel = read("LevelBillingPanel.js");
+  expect(panel.indexOf("fw-billing-due")).toBeLessThan(panel.indexOf("fw-billing-action"));
+  expect(panel).toContain("Pay Now");
+  expect(panel).toContain("Fully paid");
+ });
