@@ -10,6 +10,24 @@ const MAX_PDF_BYTES = 2_750_000;
 
 const lower = (value) => String(value || "").trim().toLowerCase();
 
+function documentTrialRestriction(profile = {}) {
+  const status = String(profile.trialStatus || "").trim().toLowerCase();
+  const accountStatus = String(profile.status || "").trim().toLowerCase();
+  const trial = ["active", "expired", "used", "ended"].includes(status)
+    || ["trial", "trial_active", "trial_expired"].includes(accountStatus)
+    || Boolean(profile.trialStartedAt || profile.trialUsedAt || profile.trialEndsAt);
+  const paid = Number(profile.paid ?? profile.paidAmount ?? 0) > 0
+    || ["paid", "partial", "partially paid", "partially_paid", "part paid", "part-paid"].includes(String(profile.paymentStatus || "").trim().toLowerCase());
+  if (!trial || paid) return "";
+  const rawEnd = profile.trialEndsAt;
+  const end = rawEnd?.toMillis?.() ?? new Date(rawEnd || "").getTime();
+  const expired = ["expired", "used", "ended"].includes(status) || accountStatus === "trial_expired"
+    || (Number.isFinite(end) && end <= Date.now());
+  return expired
+    ? "Your free trial has ended. Official school documents are unavailable until you enroll and your tuition payment is confirmed."
+    : "You are on a free trial. Official school documents cannot be downloaded until you enroll and your tuition payment is confirmed.";
+}
+
 function isTrustedAppsScriptUrl(raw) {
   try {
     const url = new URL(raw);
@@ -53,6 +71,9 @@ function registerStudentDocumentRoutes(app, {
         return res.status(403).json({ error: "Your student account details need verification. Contact Falowen support." });
       }
 
+      const trialReason = documentTrialRestriction(profile);
+      if (trialReason) return res.status(403).json({ code: "trial_document_restricted", error: trialReason });
+
       const webhookUrl = String((academic ? process.env.ANNOUNCEMENT_WEBHOOK_URL : process.env.STUDENT_DOCS_WEBHOOK_URL) || "").trim();
       const webhookToken = String((academic ? process.env.ANNOUNCEMENT_WEBHOOK_TOKEN : process.env.STUDENT_DOCS_WEBHOOK_TOKEN) || "").trim();
       if (!webhookToken || !isTrustedAppsScriptUrl(webhookUrl)) {
@@ -86,13 +107,20 @@ function registerStudentDocumentRoutes(app, {
       const result = await upstreamResponse.json();
       if (!result?.ok) {
         if (!academic && result?.code === "document_unavailable") {
-          return res.status(404).json({ error: "This document is not available for your student record. Contact Falowen if you expected a copy." });
+          return res.status(404).json({ error: ({ enrollment: "No enrollment letter is available for your student record. Contact Falowen to verify your enrollment.", agreement: "No payment agreement is available for your student record. Contact Falowen to verify your agreement.", receipt: "No issued payment receipt is available for your student record yet. Check Billing history or contact Falowen.", residence: "No residence-permit support letter has been issued for your student record yet. Contact Falowen." })[kind] });
         }
-        const isNotEligible = /not yet eligible|not qualified|required tasks|final course assessment/i.test(result?.error || "");
+        const reason = typeof result?.error === "string" ? result.error : "";
+        const isNotEligible = kind === "certificate" && /not yet eligible|not qualified|required tasks|final course assessment|final mock|incomplete|failed assignments|missing assignments|not passed/i.test(reason);
+        // Only expose bounded academic facts, not raw upstream exceptions or private data.
+        const progress = reason.match(/\b(\d{1,3})\s*\/\s*(\d{1,3})\s+(?:required\s+)?(?:tasks|assignments|workbooks|items)(?:\s+(?:passed|completed|verified))?/i);
+        const verifiedProgress = progress && Number(progress[2]) > 0 && Number(progress[1]) <= Number(progress[2]) ? progress : null;
+        const finalMissing = /(?:final (?:course assessment|mock|assessment|exam)).{0,60}(?:missing|not passed|not completed|not verified|required|failed|pending)|(?:missing|failed|pending).{0,40}final (?:mock|assessment|exam)/i.test(reason);
+        const failed = reason.match(/\b(\d{1,3})\s+failed\s+(?:tasks|assignments|workbooks|items)\b/i);
+        const details = [verifiedProgress ? verifiedProgress[1] + " of " + verifiedProgress[2] + " required tasks recorded as " + (/passed/i.test(verifiedProgress[0]) ? "passed" : /completed/i.test(verifiedProgress[0]) ? "completed" : "verified by the document service") + "." : "", failed ? failed[1] + " required tasks have failed." : "", finalMissing ? "Your official final assessment is missing, has not passed, or has not been verified." : ""].filter(Boolean).join(" ");
         const hasNoScores = /no verified .*scores|no score rows/i.test(result?.error || "");
         return res.status(isNotEligible ? 409 : hasNoScores ? 404 : 503).json({
           error: isNotEligible
-            ? "Your certificate is not available yet. Complete the required marked work and official final assessment."
+            ? `Your ${level} certificate is not available yet. ${details || "The document service has not confirmed that all required marked tasks and the official final assessment have passed."} Check Results or contact your tutor to resolve outstanding work.`
             : hasNoScores
               ? "No verified scores are available for this level yet."
               : "Falowen could not generate this document. Contact support if the problem continues.",
@@ -117,7 +145,7 @@ function registerStudentDocumentRoutes(app, {
       console.error("Self-service academic document request failed", {
         kind, level, reason: error?.name === "TimeoutError" ? "timeout" : "upstream_error",
       });
-      return res.status(503).json({ error: "The document service is temporarily unavailable. Please try again." });
+      return res.status(503).json({ error: ["TimeoutError", "AbortError"].includes(error?.name) ? "The document generator timed out. Please try again." : "The document service is temporarily unavailable. Please try again." });
     }
   });
 }
