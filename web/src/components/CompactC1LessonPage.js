@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
+import C1FinishSummary from "./C1FinishSummary";
+import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1Day7ReisenGrammarNotes from "./C1Day7ReisenGrammarNotes";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
@@ -26,8 +28,6 @@ const card = {
   boxShadow: "0 10px 26px rgba(15,23,42,.06)",
 };
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
-const tabs = ["learn", "speak", "write", "finish", "references"];
-const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Ref" };
 
 
 const Section = ({ title, children }) => (
@@ -64,17 +64,6 @@ const ResourceButton = ({ href, children }) => {
   return <a href={href} {...(external ? { target: "_blank", rel: "noreferrer" } : {})} style={{ ...styles.linkButton, width: "fit-content" }}>{children}</a>;
 };
 
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.replace(/^www\./, "");
-    const id = host === "youtu.be"
-      ? parsed.pathname.replace(/^\//, "")
-      : parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
-    return id ? `https://www.youtube.com/embed/${id}` : "";
-  } catch {
-    return "";
-  }
-};
 
 export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) {
   const navigate = useNavigate();
@@ -108,7 +97,6 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
     { key: "learn", label: "tick the grammar review checkbox on Learn", complete: progress.learnDone },
     { key: "speak", label: "tick the speaking practice checkbox on Speak", complete: progress.speakDone },
     { key: "write", label: fullEssay ? "tick that you used AI Analyse / Mark My Letter on Write" : "complete the guided writing questions on Write", complete: effectiveWritingComplete },
-    { key: "confidence", label: "choose your confidence level on this Finish page", complete: Boolean(progress.confidence) },
   ];
   const missingRequirements = finishRequirements.filter((item) => !item.complete);
   const finishReady = missingRequirements.length === 0;
@@ -145,9 +133,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
         <div><h1 style={{ margin: 0, fontSize: "clamp(2rem,5vw,3.6rem)" }}>{lesson.title}</h1><p style={{ margin: "10px 0 0", color: "#e2e8f0" }}>{lesson.topic}</p></div>
       </header>
 
-      <div style={{ position: "sticky", top: 0, zIndex: 5, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8, padding: 10, border: "1px solid #e2e8f0", borderRadius: 18, background: "rgba(248,250,252,.94)" }}>
-        {tabs.map((tab) => <button key={tab} type="button" onClick={() => setActive(tab)} style={{ ...(active === tab ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44 }}>{labels[tab]}</button>)}
-      </div>
+      <AdvancedSelfLearningTabNav level="C1" day={lesson.day} activeTab={active} onChange={setActive} />
 
       {active === "learn" ? <>
         
@@ -195,12 +181,11 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
 
       {active === "references" ? <WorkbookReferenceAnswers level={lesson.level} lesson={lesson} workbookId={`${lesson.level}-day-${lesson.day}`} /> : null}
 
-      {active === "finish" ? <Section title={`Finish ${lesson.level} Day ${lesson.day}`}>
+      {active === "finish" ? <Section title={`Summary C1 Day ${lesson.day}`}>
+        <C1FinishSummary day={lesson.day} />
         <p><strong>Learn:</strong> {progress.learnDone ? "Complete" : "Not complete"}</p>
         <p><strong>Speak:</strong> {progress.speakDone ? "Complete" : "Not complete"}</p>
         <p><strong>Write:</strong> {effectiveWritingComplete ? "Complete" : "Not complete"} · {fullEssay ? "AI analysis reviewed" : `${writing.wordCount} words`}</p>
-        <label style={{ display: "grid", gap: 7 }}><strong>Confidence level</strong><span style={{ color: "#64748b", fontSize: 13 }}>Choose this here so you do not have to mark confidence again in the Course Book.</span><select value={progress.confidence || ""} onChange={(event) => setProgress((old) => ({ ...old, confidence: event.target.value }))} style={styles.select}><option value="">Select confidence</option><option value="low">Low confidence</option><option value="medium">Medium confidence</option><option value="high">High confidence</option></select></label>
-        <textarea value={progress.reflection} onChange={(event) => setProgress((old) => ({ ...old, reflection: event.target.value }))} placeholder="Short reflection" style={{ minHeight: 110, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit" }} />
         {!finishReady ? <NoteBox tone="amber"><strong>Mark complete is blocked because:</strong><ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>{missingRequirements.map((item) => <li key={item.key}>{item.label}</li>)}</ul></NoteBox> : null}
         {progress.completed ? <NoteBox tone="green">Lesson completed and saved.</NoteBox> : null}
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
