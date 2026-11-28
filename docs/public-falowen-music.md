@@ -2,6 +2,8 @@
 
 The public site **https://music.falowen.app/** is served by the existing Falowen learner Vercel project, via the host-specific root route in the root `vercel.json`. This is **not** a Cloudflare R2 bucket endpoint or a new Vercel project. The public site is static and needs no login, Firestore rules, Firebase function, new background scan or paid music generation.
 
+The short public alias `https://falowen.app/music` (also `https://www.falowen.app/music`, with or without a trailing slash) redirects permanently (HTTP 308 on the learner host) to `https://music.falowen.app/`. Keep the Music subdomain as the canonical destination so player navigation, song share links and SEO metadata stay consistent. The alias matches only the library landing path; `/music/` asset files, embeds, song-share routes and APIs retain their existing behavior. The apex host already redirects to `www.falowen.app`.
+
 ## Where songs come from
 
 - `web/public/music/catalog.json` is the approved public song list. Every song needs a real, publicly accessible HTTPS MP3 in `audioUrl`.
