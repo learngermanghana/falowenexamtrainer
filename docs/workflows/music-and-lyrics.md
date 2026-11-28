@@ -290,3 +290,11 @@ English reference and 17 estimated cues are now available through the same lyric
 API used by the workbook; both remain labelled as drafts. The A1 Day 21 “Bina,
 tut mir leid” recording had no matching bundled lyric pack during this check.
 Live R2-only additions and sidecars could not be audited from the offline build.
+
+## C1 Day 2 · Zwischen allen Ufern
+
+The shared catalogue identifies the C1 Day 2 recording at
+`music/c1/day-02/Zwischen allen Ufern.mp3` for the Music player, workbook and
+slides. The supplied object key has not been checked against live R2 here.
+No recording-matched lyrics or timings were located, so this entry does not
+assert lyric approval or line synchronization.
