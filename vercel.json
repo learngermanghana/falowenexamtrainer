@@ -330,6 +330,26 @@
   ],
   "routes": [
     {
+      "src": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "books.falowen.app"
+        }
+      ],
+      "status": 308,
+      "headers": {
+        "Location": "https://www.falowen.app/books"
+      }
+    },
+    {
+      "src": "/music/?",
+      "status": 308,
+      "headers": {
+        "Location": "https://music.falowen.app/"
+      }
+    },
+    {
       "src": "/books/deutsch-a1-course-workbook/?",
       "dest": "/__books/a1-course-workbook.html",
       "headers": {
