@@ -298,3 +298,7 @@ The shared catalogue identifies the C1 Day 2 recording at
 slides. The supplied object key has not been checked against live R2 here.
 No recording-matched lyrics or timings were located, so this entry does not
 assert lyric approval or line synchronization.
+
+The teacher-supplied Day 2 German text and matching English are now available
+as an untimed reference draft for that exact key. No cue timing or acoustic
+verification is asserted; the recording must be checked before timing publication.
