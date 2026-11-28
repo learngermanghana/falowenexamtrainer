@@ -25,6 +25,13 @@
   ],
   "navigation": [
     {
+      "id": "teach",
+      "label": "Teach with Falowen",
+      "route": "/teach",
+      "purpose": "Apply for teaching collaboration using text details and an external reference video link; no employment guarantee",
+      "requiresLogin": false
+    },
+    {
       "id": "about-us",
       "label": "About us",
       "route": "/about-us",

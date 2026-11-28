@@ -41,6 +41,7 @@ const LegalFooter = ({ compact = false }) => (
         aria-label="Falowen legal links"
         style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}
       >
+        {!compact && <a href="/teach" style={{ color: "#475569", textDecoration: "none", fontWeight: 700 }}>Teach with Falowen</a>}
         {links.map((link) => (
           <a
             key={link.href}

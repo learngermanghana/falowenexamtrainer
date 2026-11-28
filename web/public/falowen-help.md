@@ -16,6 +16,7 @@ Generated A1–C2 lesson/course map: https://www.falowen.app/falowen-course-map.
 | Learner need | Destination | Official route |
 | --- | --- | --- |
 | About the academy and its teachers | About us | https://www.falowen.app/about-us |
+| Apply to collaborate as a language teacher | Teach with Falowen | https://www.falowen.app/teach |
 | Not sure of German level | Placement Test | https://www.falowen.app/placement-test |
 | New German registration | Sign up | https://www.falowen.app/signup?program=german |
 | Existing account | Log in | https://www.falowen.app/login/ |
@@ -499,3 +500,7 @@ Open Exams Room (login required): https://www.falowen.app/exams/overview
 ## Partnerships
 
 Visit [Partnerships](https://www.falowen.app/partnerships) to apply as a referral partner. Schools and sponsors can use [Organisation enrolment](https://www.falowen.app/organisation-enrolment) to submit a student group for review. Both forms are public.
+
+## Teaching opportunities
+
+Use https://www.falowen.app/teach to apply to join the teaching network. No learner account or document upload is required. Complete the text form, provide a reference or demonstration video link, and consent to review. A successful submission displays an acknowledgement. The academy contacts suitable applicants when opportunities arise; submitting does not guarantee employment.

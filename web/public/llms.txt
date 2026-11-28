@@ -8,6 +8,8 @@ Last reviewed: 15 November 2026. Read the linked official sources for current in
 
 ## Primary documentation
 
+- [Teach with Falowen](https://www.falowen.app/teach): Public teacher application form with a reference video link, no account or uploads required; opportunities are subject to review.
+
 - [About Us — Learn Language Education Academy](https://www.falowen.app/about-us): Public school background, teachers, classroom location and how Falowen supports learners. Formerly /visitor-guide; the old link redirects here.
 - [Falowen Books](https://www.falowen.app/books): Public storefront; `https://books.falowen.app/` is a redirect alias after DNS and deployment verification.
 - [Falowen Music](https://music.falowen.app/): `https://www.falowen.app/music` is a redirect alias to this canonical public site. Public German learning songs and optional English translations. A lyric may be a verified recording pack, an estimated line alignment or a clearly labeled course draft; do not describe all as verified or timed.
