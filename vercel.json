@@ -386,6 +386,13 @@
       }
     },
     {
+      "src": "/teach/?",
+      "dest": "/teach/index.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/book-appointment/?",
       "dest": "/book-appointment/index.html",
       "headers": {
@@ -651,6 +658,16 @@
     {
       "src": "/classes/([^/]+)/?",
       "dest": "/classes/index.html"
+    },
+    {
+      "src": "/api/public/teacher-applications",
+      "methods": [
+        "POST"
+      ],
+      "dest": "https://admin.falowen.app/api/teacher-applications",
+      "headers": {
+        "Cache-Control": "no-store"
+      }
     },
     {
       "src": "/api/public/appointments",
