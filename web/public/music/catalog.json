@@ -501,6 +501,25 @@
       "autoDiscovered": true
     },
     {
+      "id": "r2-c1-day-02-b64_Wndpc2NoZW4gYWxsZW4gVWZlcm4ubXAz",
+      "title": "Zwischen allen Ufern",
+      "level": "C1",
+      "day": 2,
+      "assignmentKey": "C1-1.2",
+      "topic": "Kulturelle Identität und Globalisierung",
+      "type": "Learning song",
+      "genre": "",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-c1-day-02-b64_Wndpc2NoZW4gYWxsZW4gVWZlcm4ubXAz",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/c1/day-02/Zwischen allen Ufern.mp3",
+      "approved": true,
+      "autoDiscovered": true
+    },
+    {
       "id": "r2-a1-day-17-b64_QXVmIFdpZWRlcnNlaGVuLCBCZXJsaW4ubXAz",
       "title": "Ich bin nach Berlin gefahren",
       "level": "A1",
