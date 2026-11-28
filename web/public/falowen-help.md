@@ -503,4 +503,4 @@ Visit [Partnerships](https://www.falowen.app/partnerships) to apply as a referra
 
 ## Teaching opportunities
 
-Use https://www.falowen.app/teach to apply to join the teaching network. No learner account or document upload is required. Complete the text form, provide a reference or demonstration video link, and consent to review. A successful submission displays an acknowledgement. The academy contacts suitable applicants when opportunities arise; submitting does not guarantee employment.
+Use https://www.falowen.app/teach to apply to join the teaching network. On the public homepage, find Teach with Falowen below the team profiles or in the footer. No learner account or document upload is required. Complete the text form, provide a reference or demonstration video link, and consent to review. A successful submission displays an acknowledgement. The academy contacts suitable applicants when opportunities arise; submitting does not guarantee employment.
