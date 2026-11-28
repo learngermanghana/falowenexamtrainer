@@ -8,6 +8,7 @@
 | --- | --- |
 | Learner campus `www.falowen.app` | This repo: React in `web/src/`, Vercel routing in `vercel.json` and `api/`, Express/Firebase integrations in `functions/functionz/` |
 | Public Music `music.falowen.app` | The learner repo's `web/public/music/` static player and existing music library / signed R2 audio APIs; **not** a standalone public R2 bucket |
+| Public Books `www.falowen.app/books` | Existing learner React storefront and generated book social-preview pages; the `books.falowen.app` root is a redirect alias, not another storefront |
 | AI-facing public help | `web/public/llms.txt`, `falowen-help.md`, `falowen-navigation.json` and the generated course map |
 | Learning Companion MCP | Student-scoped read-only endpoint; [plugin reference](mcp-plugin-reference.md) |
 | Tutor/Admin `admin.falowen.app` | Separate **falowenadmin** React/Vite + Firebase Functions repo; do not edit it by changing learner docs alone |
@@ -35,6 +36,12 @@ page's canonical URL, structured-data URL, public sitemap and navigation point t
 `/about-us`. The existing `visitor_guide_open` admissions event/source identifier
 is intentionally retained for historical analytics continuity. The separate
 `/help` support guide is unchanged.
+
+### Public Music and Books aliases
+
+The root `vercel.json` keeps the existing canonical destinations and adds two permanent (308) landing-page redirects: `https://www.falowen.app/music` (also reachable through the apex host `falowen.app/music`) to `https://music.falowen.app/`, and `https://books.falowen.app/` to `https://www.falowen.app/books`. Existing `/books` product pages, `/campus/books`, checkout, Music assets and individual song share URLs remain unchanged. Both aliases reuse the `falowenexamtrainer` Vercel project; no new project, backend, authentication origin or recurring job is needed.
+
+For the Books hostname, attach `books.falowen.app` as a production domain to the existing learner Vercel project (without a separate Vercel domain-level redirect, since `vercel.json` owns the root redirect). In the external Cloudflare `falowen.app` DNS zone, add a DNS-only CNAME named `books` pointing to the exact project-specific CNAME target shown by Vercel. Verify DNS configuration and HTTPS certificate readiness in Vercel. After the route commit is deployed, confirm that the apex and www Music aliases reach the canonical player, the Books subdomain root reaches the canonical storefront, and existing canonical/deep links still work. A verified Vercel domain alone does not prove that external DNS, HTTPS or production routing is ready.
 
 ## Public landing-page questions
 
