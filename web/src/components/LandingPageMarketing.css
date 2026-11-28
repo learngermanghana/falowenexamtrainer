@@ -314,3 +314,14 @@
 
 .falowen-team-credentials { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 5px; margin-top: 10px; }
 .falowen-team-credentials span { border-radius: 7px; padding: 5px 7px; background: #edf4ff; color: #244d89; font-size: 10px; font-weight: 750; line-height: 1.4; }
+
+/* A lightweight invitation after the educator profiles, not a competing hero. */
+.falowen-teach-invitation { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 28px; background: #eef6f2; border: 1px solid #d5e6dc; border-radius: 18px; }
+.falowen-teach-invitation-copy { min-width: 0; }
+.falowen-teach-kicker { color: #0d503f; font-size: 11px; font-weight: 800; letter-spacing: .12em; }
+.falowen-teach-invitation h2 { margin: 5px 0 6px; color: #0d503f; font-size: clamp(20px, 2.2vw, 26px); font-weight: 800; line-height: 1.25; }
+.falowen-teach-invitation p { margin: 0; color: #36564a; font-size: 14px; line-height: 1.55; max-width: 650px; }
+.falowen-teach-action { display: inline-flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0; min-height: 44px; max-width: 100%; padding: 11px 17px; border-radius: 10px; background: #0d503f; color: #fff; font-size: 14px; font-weight: 750; text-decoration: none; text-align: center; }
+.falowen-teach-action:hover { background: #073b2d; color: #fff; }
+.falowen-teach-action:focus-visible { outline: 3px solid #0d503f; outline-offset: 3px; }
+@media (max-width: 600px) { .falowen-teach-invitation { flex-direction: column; align-items: flex-start; padding: 19px 16px; gap: 14px; } .falowen-teach-action { width: 100%; } }
