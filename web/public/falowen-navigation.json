@@ -481,6 +481,7 @@
     "music": {
       "campus": "/campus/music",
       "publicSite": "https://music.falowen.app/",
+      "publicAlias": "https://www.falowen.app/music",
       "behavior": "The campus embeds the same-origin existing music app, so enrolled users retain the Falowen navigation; there is no separate login or duplicate audio copy.",
       "englishLyrics": "For matching reviewed German lyric packs, Show English is optional; A1 defaults on and A2/B1 defaults off when a translation is available.",
       "lyricStatus": "Verified recording, estimated alignment and unverified course draft are separate states. Follow lyrics may be approximate or estimated.",
@@ -488,7 +489,8 @@
     },
     "books": {
       "catalog": "/books",
-      "behavior": "Books opens the existing public bookstore and keeps its payment/digital delivery flow."
+      "publicAlias": "https://books.falowen.app/",
+      "behavior": "Books opens the existing public bookstore and keeps its payment/digital delivery flow. The public alias redirects to the canonical storefront once DNS and deployment are active."
     },
     "chatgptLearningCompanion": {
       "oauthScope": "falowen:read",
