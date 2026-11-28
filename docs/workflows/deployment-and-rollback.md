@@ -34,3 +34,10 @@ Admin rules extension from `falowenadmin`. The release stops if the extension
 is missing, so Admin Leads keeps its existing page and language grants after
 learner deployments. The Admin release has a baseline comparison that prevents
 an older Admin snapshot from replacing current course rules.
+
+## Teacher application release
+
+1. Deploy the matching `falowenadmin` Vercel revision first (API `/api/teacher-applications` and owner-only UI `/teacher-applications`). Confirm existing server Firebase identity and service-account configuration is available. No rules migration or scheduled job is required for this server-only collection.
+2. Run the Admin scoped `node --test tests/teacher-applications.test.js` and both repositories' `node scripts/checkAiDocumentation.mjs`; check latest PR CI. Deploy the learner Vercel revision only after the Admin API is ready.
+3. Verify `https://www.falowen.app/teach` and its footer link, rejection of invalid/empty input and unsupported video links, a consented synthetic POST through `/api/public/teacher-applications`, and the on-screen receipt. Verify the owner can find, review and delete that test record, that a duplicate email does not create a second record, stale review saves fail with 409, and unauthenticated GET/PATCH/DELETE cannot read or modify applications. Remove the synthetic record. Do not log real applicant data. Confirm both deployed commit IDs before sharing the link.
+4. If rolling back, remove the learner link/route first; the existing private records remain for the owner. No automatic deletion or new staff accounts are created.
