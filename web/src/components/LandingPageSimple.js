@@ -203,6 +203,13 @@ COPY.sw = { ...COPY.en, ...{
   "metaDescription": "Jifunze Kijerumani A1–C2 katika madarasa ya moja kwa moja au anza Kiswahili kwa kitabu cha A1 mtandaoni."
 } };
 
+const TEACH_COPY = {
+  en: { kicker: "GROW WITH FALOWEN", title: "Are you a language teacher?", description: "Join our growing network of educators and explore opportunities to teach, collaborate and inspire learners worldwide.", action: "Teach with Falowen" },
+  de: { kicker: "MIT FALOWEN WACHSEN", title: "Unterrichtest du Sprachen?", description: "Werde Teil unseres wachsenden Netzwerks von Lehrkräften und entdecke Möglichkeiten, zu unterrichten, zusammenzuarbeiten und Lernende weltweit zu inspirieren.", action: "Mit Falowen unterrichten" },
+  fr: { kicker: "GRANDIR AVEC FALOWEN", title: "Vous enseignez les langues ?", description: "Rejoignez notre réseau d'enseignants et découvrez des possibilités d'enseigner, de collaborer et d'inspirer des apprenants du monde entier.", action: "Enseigner avec Falowen" },
+  sw: { kicker: "KUA PAMOJA NA FALOWEN", title: "Je, wewe ni mwalimu wa lugha?", description: "Jiunge na mtandao wetu wa walimu na ugundue fursa za kufundisha, kushirikiana na kuhamasisha wanafunzi duniani kote.", action: "Fundisha na Falowen" },
+};
+
 const FOOTER_LINKS = [
   { href: "/courses/", labelKey: "footerCourses" },
   { href: "/learn-german-ghana", labelKey: "footerGhana" },
@@ -212,6 +219,7 @@ const FOOTER_LINKS = [
   { href: "/reviews/", labelKey: "footerReviews" },
   { href: "/learn-german-with-chatgpt", labelKey: "footerChatgpt" },
   { href: "/partnerships", labelKey: "navPartnerships" },
+  { href: "/teach", labelKey: "teach" },
   { href: "/about-us", labelKey: "footerHelp" },
 ];
 
@@ -316,6 +324,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
   const detected = String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2);
   const [language, setLanguage] = useState(COPY[detected] ? detected : "en");
   const copy = COPY[language] || COPY.en;
+  const teach = TEACH_COPY[language] || TEACH_COPY.en;
 
   useEffect(() => {
     const next = String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2);
@@ -382,12 +391,21 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
 
         <MeetOurTeam team={academyProfile.team} language={language} />
 
+        <section className="falowen-teach-invitation" aria-labelledby="falowen-teach-title">
+          <div className="falowen-teach-invitation-copy">
+            <span className="falowen-teach-kicker">{teach.kicker}</span>
+            <h2 id="falowen-teach-title">{teach.title}</h2>
+            <p>{teach.description}</p>
+          </div>
+          <a className="falowen-teach-action" href="/teach">{teach.action} <span aria-hidden="true">→</span></a>
+        </section>
+
         <div className="falowen-home-reviews-intro"><p>{copy.reviewsIntro}</p></div>
         {/* /homepage-reviews.js injects genuine Google reviews before the final CTA. */}
 
         <footer className="falowen-home-footer">
           <div className="falowen-home-footer-links">
-            {FOOTER_LINKS.map((item) => <a href={item.href} key={item.href}>{copy[item.labelKey]}</a>)}
+            {FOOTER_LINKS.map((item) => <a href={item.href} key={item.href}>{item.labelKey === "teach" ? teach.action : copy[item.labelKey]}</a>)}
           </div>
           <div className="falowen-home-level-directory">
             <nav className="falowen-home-level-group" aria-label={copy.footerCourseLevels}>
